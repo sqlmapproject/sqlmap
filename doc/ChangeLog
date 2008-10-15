@@ -1,0 +1,229 @@
+sqlmap (0.6.1-1) stable; urgency=low
+
+  * Major bug fix to blind SQL injection bisection algorithm to handle an
+    exception;
+  * Written a Metasploit 3 auxiliary module to run sqlmap;
+  * Implemented possibility to test for and inject also on LIKE
+    statements;
+  * Implemented --start and --stop options to set the first and the last
+    table entry to dump;
+  * Added non-interactive/batch-mode (--batch) option to make it easy to
+    wrap sqlmap in Metasploit and any other tool;
+  * Minor enhancement to save also the length of query output in the
+    session file when retrieving the query output length for ETA or for
+    resume purposes. TODO: fix for ETA
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri,  10 Oct 2008 10:00:00 +0100
+
+
+sqlmap (0.6-1) stable; urgency=low
+
+  * Complete code refactor and many bugs fixed;
+  * Added multithreading support to set the maximum number of concurrent
+    HTTP requests;
+  * Implemented SQL shell (--sql-shell) functionality and fixed SQL query
+    (--sql-query, before called -e) to be able to run whatever SELECT
+    statement and get its output in both inband and blind SQL injection
+    attack;
+  * Added an option (--privileges) to retrieve DBMS users privileges, it
+    also notifies if the user is a DBMS administrator;
+  * Added support (-c) to read options from configuration file, an example
+    of valid INI file is sqlmap.conf and support (--save) to save command
+    line options on a configuration file;
+  * Created a function that updates the whole sqlmap to the latest stable
+    version available by running sqlmap with --update option;
+  * Created sqlmap .deb (Debian, Ubuntu, etc.) and .rpm (Fedora, etc.)
+    installation binary packages;
+  * Created sqlmap .exe (Windows) portable executable;
+  * Save a lot of more information to the session file, useful when
+    resuming injection on the same target to not loose time on identifying
+    injection, UNION fields and back-end DBMS twice or more times;
+  * Improved automatic check for parenthesis when testing and forging SQL
+    query vector;
+  * Now it checks for SQL injection on all GET/POST/Cookie parameters then
+    it lets the user select which parameter to perform the injection on in
+    case that more than one is injectable;
+  * Implemented support for HTTPS requests over HTTP(S) proxy;
+  * Added a check to handle NULL or not available queries output;
+  * More entropy (randomStr() and randomInt() functions in
+    lib/core/common.py) in inband SQL injection concatenated query and in
+    AND condition checks;
+  * Improved XML files structure;
+  * Implemented the possibility to change the HTTP Referer header;
+  * Added support to resume from session file also when running with
+    inband SQL injection attack;
+  * Added an option (--os-shell) to execute operating system commands if
+    the back-end DBMS is MySQL, the web server has the PHP engine active
+    and permits write access on a directory within the document root;
+  * Added a check to assure that the provided string to match (--string)
+    is within the page content;
+  * Fixed various queries in XML file;
+  * Added LIMIT, ORDER BY and COUNT queries to the XML file and adapted
+    the library to parse it;
+  * Fixed password fetching function, mainly for Microsoft SQL Server and
+    reviewed the password hashes parsing function;
+  * Major bug fixed to avoid tracebacks when the testable parameter(s) is
+    dynamic, but not injectable;
+  * Enhanced logging system: added three more levels of verbosity to show
+    also HTTP sent and received traffic;
+  * Enhancement to handle Set-Cookie from target url and automatically
+    re-establish the Session when it expires;
+  * Added support to inject also on Set-Cookie parameters;
+  * Implemented TAB completion and command history on both --sql-shell and
+    --os-shell;
+  * Renamed some command line options;
+  * Added a conversion library;
+  * Added code schema and reminders for future developments;
+  * Added Copyright comment and $Id$ svn property to all Python files;
+  * Updated the command line layout and help messages;
+  * Updated some docstrings;
+  * Updated documentation files.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon,  1 Sep 2008 10:00:00 +0100
+
+
+sqlmap (0.5-1) stable; urgency=low
+
+  * Added support for Oracle database management system
+  * Extended inband SQL injection functionality (--union-use) to all
+    other possible queries since it only worked with -e and --file on
+    all DMBS plugins;
+  * Added support to extract database users password hash on Microsoft
+    SQL Server;
+  * Added a fuzzer function with the aim to parse HTML page looking
+    for standard database error messages consequently improving
+    database fingerprinting;
+  * Added support for SQL injection on HTTP Cookie and User-Agent headers;
+  * Reviewed HTTP request library (lib/request.py) to support the
+    extended inband SQL injection functionality. Splitted getValue()
+    into getInband() and getBlind();
+  * Major enhancements in common library and added checkForBrackets()
+    method to check if the bracket(s) are needed to perform a UNION query
+    SQL injection attack;
+  * Implemented --dump-all functionality to dump entire DBMS data from
+    all databases tables;
+  * Added support to exclude DBMS system databases' when enumeration
+    tables and dumping their entries (--exclude-sysdbs);
+  * Implemented in Dump.dbTableValues() method the CSV file dumped data
+    automatic saving in csv/ folder by default;
+  * Added DB2, Informix and Sybase DBMS error messages and minor
+    improvements in xml/errors.xml;
+  * Major improvement in all three DBMS plugins so now sqlmap does not
+    get entire databases' tables structure when all of database/table/
+    column are specified to be dumped;
+  * Important fixes in lib/option.py to make sqlmap properly work also
+    with python 2.5 and handle the CSV dump files creation work also
+    under Windows operating system, function __setCSVDir() and fixed
+    also in lib/dump.py;
+  * Minor enhancement in lib/injection.py to randomize the number
+    requested to test the presence of a SQL injection affected parameter
+    and implemented the possibilities to break (q) the for cycle when
+    using the google dork option (-g);
+  * Minor fix in lib/request.py to properly encode the url to request
+    in case the "fixed" part of the url has blank spaces;
+  * More minor layout enhancements in some libraries;
+  * Renamed DMBS plugins;
+  * Complete code refactoring, a lot of minor and some major fixes in
+    libraries, many minor improvements;
+  * Updated all documentation files.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun,  4 Nov 2007 20:00:00 +0100
+
+
+sqlmap (0.4-1) stable; urgency=low
+
+  * Added DBMS fingerprint based also upon HTML error messages parsing
+    defined in lib/parser.py which reads an XML file defining default
+    error messages for each supported DBMS;
+  * Added Microsoft SQL Server extensive DBMS fingerprint checks based
+    upon accurate '@@version' parsing matching on an XML file to get also
+    the exact patching level of the DBMS;
+  * Added support for query ETA (Estimated Time of Arrival) real time
+    calculation (--eta);
+  * Added support to extract database management system users password
+    hash on MySQL and PostgreSQL (--passwords);
+  * Added docstrings to all functions, classes and methods, consequently
+    released the sqlmap development documentation
+    <http://sqlmap.sourceforge.net/dev/>;
+  * Implemented Google dorking feature (-g) to take advantage of Google
+    results affected by SQL injection to perform other command line
+    argument on their DBMS;
+  * Improved logging functionality: passed from banal 'print' to Python
+    native logging library;
+  * Added support for more than one parameter in '-p' command line
+    option;
+  * Added support for HTTP Basic and Digest authentication methods
+    (--basic-auth and --digest-auth);
+  * Added the command line option '--remote-dbms' to manually specify
+    the remote DBMS;
+  * Major improvements in union.UnionCheck() and union.UnionUse()
+    functions to make it possible to exploit inband SQL injection also
+    with database comment characters ('--' and '#') in UNION SELECT
+    statements;
+  * Added the possibility to save the output into a file while performing
+    the queries (-o OUTPUTFILE) so it is possible to stop and resume the
+    same query output retrieving in a second time (--resume);
+  * Added support to specify the database table column to enumerate
+    (-C COL);
+  * Added inband SQL injection (UNION SELECT) support (--union-use);
+  * Complete code refactoring, a lot of minor and some major fixes in
+    libraries, many minor improvements;
+  * Reviewed the directory tree structure;
+  * Splitted lib/common.py: inband injection functionalities now are
+    moved to lib/union.py;
+  * Updated documentation files.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri, 15 Jun 2007 20:00:00 +0100
+
+
+sqlmap (0.3-1) stable; urgency=low
+
+  * Added module for MS SQL Server;
+  * Strongly improved MySQL dbms active fingerprint and added MySQL
+    comment injection check;
+  * Added PostgreSQL dbms active fingerprint;
+  * Added support for string match (--string);
+  * Added support for UNION check (--union-check);
+  * Removed duplicated code, delegated most of features to the engine
+    in common.py and option.py;
+  * Added support for --data command line argument to pass the string
+    for POST requests;
+  * Added encodeParams() method to encode url parameters before making
+    http request;
+  * Many bug fixes;
+  * Rewritten documentation files;
+  * Complete code restyling.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat, 20 Jan 2007 20:00:00 +0100
+
+
+sqlmap (0.2-1) stable; urgency=low
+
+  * complete refactor of entire program;
+  * added TODO and THANKS files;
+  * added some papers references in README file;
+  * moved headers to user-agents.txt, now -f parameter specifies a file
+    (user-agents.txt) and randomize the selection of User-Agent header;
+  * strongly improved program plugins (mysqlmap.py and postgres.py),
+    major enhancements:
+    * improved active mysql fingerprint check_dbms();
+    * improved enumeration functions for both databases;
+    * minor changes in the unescape() functions;
+  * replaced old inference algorithm with a new bisection algorithm.
+  * reviewed command line parameters, now with -p it's possible to
+    specify the parameter you know it's vulnerable to sql injection,
+    this way the script won't perform the sql injection checks itself;
+    removed the TOKEN parameter;
+  * improved Common class, adding support for http proxy and http post
+    method in hash_page;
+  * added OptionCheck class in option.py which performs all needed checks
+    on command line parameters and values;
+  * added InjectionCheck class in injection.py which performs check on
+    url stability, dynamics of parameters and injection on dynamic url
+    parameters;
+  * improved output methods in dump.py;
+  * layout enhancement on main program file (sqlmap.py), adapted to call
+    new option/injection classes and improvements on catching of
+    exceptions.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Wed,  13 Dec 2006 20:00:00 +0100

@@ -1,0 +1,117 @@
+== Individuals ==
+
+Chip Andrews <chip@sqlsecurity.com>
+    for his excellent work maintaining the SQL Server versions database
+    at SQLSecurity.com and permission to implement the update feature
+    taking data from his site
+
+Karl Chen <quarl@cs.berkeley.edu>
+    for providing with the multithreading patch for the inference
+    algorithm
+
+Stefano Di Paola <stefano.dipaola@wisec.it>
+    for suggesting good features
+
+Adam Faheem <faheem.adam@is.co.za>
+    for reporting a few bugs
+
+Rong-En Fan <rafan@freebsd.org>
+    for commiting the sqlmap 0.5 port to the official FreeBSD project
+    repository
+
+Giorgio Fedon <giorgio.fedon@gmail.com>
+    for suggesting a speed improvement for bisection algorithm
+    for reporting a bug when running against Microsoft SQL Server 2005
+
+Ivan Giacomelli <truemilk@insiberia.net>
+    for reporting a bug
+    for suggesting a minor enhancement
+
+Davide Guerri <d.guerri@caspur.it>
+    for suggesting an enhancement
+
+Kristian Erik Hermansen <kristian.hermansen@gmail.com>
+    for reporting a bug
+    for donating to sqlmap development
+
+Jorge Hoya <aquinadie@gmail.com>
+    for suggesting a minor enhancement
+
+Will Holcomb <wholcomb@gmail.com>
+    for his MultipartPostHandler class to handle multipart POST forms and
+    permission to include it within sqlmap source code
+
+Michael Majchrowicz <mmajchrowicz@gmail.com>
+    for extensively beta-testing sqlmap on various MySQL DBMS
+    for providing really appreciated feedback
+    for suggesting a lot of ideas and features
+
+Enrico Milanese <enricomilanese@gmail.com>
+    for reporting a bugs when using (-a) a single line User-Agent file
+    for providing me with some ideas for the PHP backdoor
+
+Roberto Nemirovsky <roberto.paes@gmail.com>
+    for pointing me out some enhancements
+
+Antonio Parata <s4tan@ictsc.it>
+    for providing me with some ideas for the PHP backdoor
+
+Chris Patten <cpatten@sunera.com>
+    for reporting a bug in the blind SQL injection bisection algorithm
+
+Adam Pridgen <adam.pridgen@gmail.com>
+    for suggesting some features
+
+Alberto Revelli <r00t@northernfortress.net>
+    for inspiring me to write sqlmap user's manual in SGML
+    for his great Microsoft SQL Server take over tool, sqlninja,
+    http://sqlninja.sourceforge.net
+
+Andres Riancho <andres.riancho@gmail.com>
+    for beta-testing sqlmap
+    for reporting a bug and suggesting some features
+    for including sqlmap in his great web application audit and attack
+    framework, w3af, http://w3af.sourceforge.net
+
+Antonio Riva <antonio.riva@gmail.com>
+    for reporting a bug when running with python 2.5
+
+Richard Safran <allapplyhere@yahoo.com>
+    for donating the sqlmap.org domain control
+
+Tomoyuki Sakurai <cherry@trombik.org>
+    for submitting to the FreeBSD project the sqlmap 0.5 port
+
+M Simkin <mlsimkin@cox.net>
+    for suggesting a feature
+
+Alessandro Tanasi <alessandro@tanasi.it>
+    for extensively beta-testing sqlmap
+    for suggesting many features and reporting some minor bugs
+
+Efrain Torres <et@metasploit.com>
+    for helping me out to improve the Metasploit Framework 3 sqlmap
+    auxiliary module and the integration with Metasploit WMAP framework
+    for his great Metasploit WMAP framework
+
+Sandro Tosi <matrixhasu@gmail.com>
+    for helping to create sqlmap Debian package correctly
+
+Bedirhan Urgun <bedirhanurgun@gmail.com>
+    for extensively beta-testing sqlmap
+    for suggesting some features and improvements
+    for benchmarking sqlmap in the context of his SQL injection
+    benchmark project, OWASP SQLiBench, http://code.google.com/p/sqlibench
+
+fufuh <fufuh@users.sourceforge.net>
+    for reporting a bug when running on Windows
+
+Sylphid <sylphid.su@sti.com.tw>
+    for suggesting some features
+
+
+== Organizations ==
+
+OWASP Board <http://www.owasp.org>
+    for sponsoring part of the sqlmap development in the context of OWASP
+    Spring of Code 2007

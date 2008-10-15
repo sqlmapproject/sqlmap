@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <!-- MySQL -->
+    <dbms value="MySQL">
+        <error regexp="SQL syntax.*MySQL"/>
+        <error regexp="Warning.*mysql_.*"/>
+        <error regexp="valid MySQL result"/>
+    </dbms>
+
+    <!-- PostgreSQL -->
+    <dbms value="PostgreSQL">
+        <error regexp="PostgreSQL.*ERROR"/>
+        <error regexp="Warning.*pg_.*"/>
+        <error regexp="valid PostgreSQL result"/>
+    </dbms>
+
+    <!-- Microsoft SQL Server -->
+    <dbms value="Microsoft SQL Server">
+        <error regexp="Driver.*SQL[\-\_\ ]*Server"/>
+        <error regexp="OLE DB.*SQL Server"/>
+        <error regexp="SQL Server.*Driver"/>
+        <error regexp="Warning.*mssql_.*"/>
+    </dbms>
+
+    <!-- Microsoft Access -->
+    <dbms value="Microsoft Access">
+        <error regexp="Access.*Driver"/>
+        <error regexp="Driver.*Access"/>
+    </dbms>
+
+    <!-- Oracle -->
+    <dbms value="Oracle">
+        <error regexp="ORA-[0-9][0-9][0-9][0-9]"/>
+        <error regexp="Oracle error"/>
+        <error regexp="Oracle.*Driver"/>
+        <error regexp="Warning.*oci_.*"/>
+        <error regexp="Warning.*ora_.*"/>
+    </dbms>
+
+    <!-- DB2 -->
+    <dbms value="DB2">
+        <error regexp="CLI Driver.*DB2"/>
+        <error regexp="DB2 SQL error"/>
+    </dbms>
+
+    <!-- Informix -->
+    <dbms value="Informix">
+        <error regexp="Exception.*Informix"/>
+    </dbms>
+
+    <!-- Sybase -->
+    <dbms value="Sybase">
+        <error regexp="Sybase message"/>
+    </dbms>
+
+    <!-- Interbase -->
+    <dbms value="Interbase">
+        <error regexp="Dynamic SQL Error"/>
+    </dbms>
+
+</root>
