@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: resume.py 294M 2008-10-14 23:49:41Z (local) $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: google.py 330 2008-08-28 21:25:48Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

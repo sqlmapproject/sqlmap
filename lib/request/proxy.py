@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: proxy.py 322 2008-08-27 00:21:22Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

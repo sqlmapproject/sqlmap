@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: target.py 294 2008-07-28 23:30:15Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

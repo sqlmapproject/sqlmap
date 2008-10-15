@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: multipartpost.py 316 2008-08-03 22:56:20Z inquisb $
+$Id$
 
 02/2006 Will Holcomb <wholcomb@gmail.com>
 

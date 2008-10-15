@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: dump.py 360M 2008-10-15 00:04:47Z (local) $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

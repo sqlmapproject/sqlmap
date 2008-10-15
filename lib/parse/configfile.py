@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: configfile.py 261 2008-07-21 11:33:49Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

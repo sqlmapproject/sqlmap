@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: connect.py 280 2008-07-25 13:33:06Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

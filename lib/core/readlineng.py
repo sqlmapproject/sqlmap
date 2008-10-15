@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: readlineng.py 326 2008-08-27 12:20:15Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

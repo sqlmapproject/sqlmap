@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: blind.py 355M 2008-10-15 00:00:47Z (local) $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

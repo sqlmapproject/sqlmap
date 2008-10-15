@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: datatype.py 316 2008-08-03 22:56:20Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

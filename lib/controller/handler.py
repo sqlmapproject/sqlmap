@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: handler.py 283 2008-07-25 15:16:11Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

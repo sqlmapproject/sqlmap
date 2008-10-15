@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: inject.py 368M 2008-10-14 23:52:59Z (local) $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

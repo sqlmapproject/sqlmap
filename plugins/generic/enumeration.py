@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: enumeration.py 363 2008-09-21 23:56:32Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

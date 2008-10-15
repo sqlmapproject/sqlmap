@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: cmdline.py 368 2008-09-30 00:09:59Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

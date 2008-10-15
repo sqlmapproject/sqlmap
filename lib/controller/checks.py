@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: checks.py 357 2008-09-21 18:52:16Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

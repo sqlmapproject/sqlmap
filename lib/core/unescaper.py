@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: unescaper.py 214 2008-07-14 14:17:06Z inquisb $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 

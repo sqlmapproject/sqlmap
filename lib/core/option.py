@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: option.py 321M 2008-10-13 22:58:44Z (local) $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
