@@ -24,6 +24,9 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import sys
+
+from lib.core.settings import VERSION
 from lib.core.settings import VERSION_STRING
 
 
@@ -85,9 +88,11 @@ class sqlmapValueException(Exception):
 
 def unhandledException():
     errMsg  = "unhandled exception in %s, please copy " % VERSION_STRING
-    errMsg += "this and the following traceback and send us by email. "
-    errMsg += "We will fix it as soon as possible:"
-
+    errMsg += "the command line and the following text and send us "
+    errMsg += "by email. We will fix it as soon as possible:\n"
+    errMsg += "sqlmap version: %s\n" % VERSION
+    errMsg += "Python version: %s\n" % sys.version.split()[0]
+    errMsg += "Operating system: %s" % sys.platform
     return errMsg
 
 
