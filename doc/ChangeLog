@@ -11,7 +11,8 @@ sqlmap (0.6.1-1) stable; urgency=low
     wrap sqlmap in Metasploit and any other tool;
   * Minor enhancement to save also the length of query output in the
     session file when retrieving the query output length for ETA or for
-    resume purposes.
+    resume purposes;
+  * Minor bug fix to correctly handle parameters' value with % character.
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri,  10 Oct 2008 10:00:00 +0100
 

@@ -98,7 +98,7 @@ Sandro Tosi <matrixhasu@gmail.com>
     for helping to create sqlmap Debian package correctly
 
 Bedirhan Urgun <bedirhanurgun@gmail.com>
-    for extensively beta-testing sqlmap
+    for reporting a few bugs
     for suggesting some features and improvements
     for benchmarking sqlmap in the context of his SQL injection
     benchmark project, OWASP SQLiBench, http://code.google.com/p/sqlibench
