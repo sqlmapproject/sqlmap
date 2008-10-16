@@ -25,7 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 from ConfigParser import NoSectionError
-from ConfigParser import SafeConfigParser
+from ConfigParser import ConfigParser
 
 from lib.core.common import checkFile
 from lib.core.data import conf
@@ -76,7 +76,7 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(configFile)
 
     if not config.has_section("Request"):

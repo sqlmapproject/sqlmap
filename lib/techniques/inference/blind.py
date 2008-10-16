@@ -92,7 +92,10 @@ def bisection(payload, expression, length=None):
             queriesCount[0] += 1
             limit = ((maxValue + minValue) / 2)
 
-            forgedPayload = payload % (expressionUnescaped, idx, limit)
+            # TODO: find a cleaner way to do this
+            forgedPayload = payload.replace("%", "%%", 1) % (expressionUnescaped, idx, limit)
+            forgedPayload = forgedPayload.replace("%%", "%")
+
             result = Request.queryPage(forgedPayload)
 
             if result == kb.defaultResult:
