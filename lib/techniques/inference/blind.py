@@ -92,9 +92,7 @@ def bisection(payload, expression, length=None):
             queriesCount[0] += 1
             limit = ((maxValue + minValue) / 2)
 
-            # TODO: find a cleaner way to do this
-            forgedPayload = payload.replace("%", "%%", 1) % (expressionUnescaped, idx, limit)
-            forgedPayload = forgedPayload.replace("%%", "%")
+            forgedPayload = payload % (expressionUnescaped, idx, limit)
 
             result = Request.queryPage(forgedPayload)
 
@@ -175,8 +173,7 @@ def bisection(payload, expression, length=None):
 
         assert index[0] == length
 
-        if conf.sessionFile:
-            dataToSessionFile(replaceNewlineTabs(value))
+        dataToSessionFile(replaceNewlineTabs(value))
 
         if conf.verbose in ( 1, 2 ) and not showEta:
             dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), value))
@@ -195,8 +192,7 @@ def bisection(payload, expression, length=None):
 
             value += val
 
-            if conf.sessionFile:
-                dataToSessionFile(replaceNewlineTabs(val))
+            dataToSessionFile(replaceNewlineTabs(val))
 
             if showEta:
                 etaProgressUpdate(time.time() - charStart, index)
@@ -210,7 +206,6 @@ def bisection(payload, expression, length=None):
         infoMsg = "retrieved: %s" % value
         logger.info(infoMsg)
 
-    if conf.sessionFile:
-        dataToSessionFile("]\n")
+    dataToSessionFile("]\n")
 
     return queriesCount[0], value

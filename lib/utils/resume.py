@@ -146,8 +146,7 @@ def resume(expression, payload):
         infoMsg += "%s" % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        if conf.sessionFile:
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
 
         return resumedValue
     elif len(resumedValue) < int(length):
@@ -155,8 +154,7 @@ def resume(expression, payload):
         infoMsg += "%s..." % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        if conf.sessionFile:
-            dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+        dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
 
         if select:
             newExpr = expressionUnescaped.replace(regExpr, substringQuery % (regExpr, len(resumedValue) + 1, int(length)), 1)

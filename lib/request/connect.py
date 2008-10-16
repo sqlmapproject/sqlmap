@@ -87,14 +87,14 @@ class Connect:
                 get = conf.parameters["GET"]
 
             if get:
-                get = urlencode(get)
+                get = urlencode(get).replace("%%", "%")
                 url = "%s?%s" % (url, get)
                 requestMsg += "?%s" % get
         elif conf.method == "POST":
             if conf.parameters.has_key("POST") and not post:
                 post = conf.parameters["POST"]
 
-            post = urlencode(post)
+            post = urlencode(post).replace("%%", "%")
 
         requestMsg += " HTTP/1.1"
 
@@ -113,7 +113,7 @@ class Connect:
                 if not cookieStr:
                     cookieStr = "Cookie: "
 
-                cookie = str(cookie)
+                cookie = str(cookie).replace("%%", "%")
                 index  = cookie.index(" for ")
 
                 cookieStr += "%s; " % cookie[8:index]

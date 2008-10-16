@@ -40,9 +40,8 @@ def setString():
     """
 
     condition = (
-                  conf.sessionFile and ( not kb.resumedQueries
-                  or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("String") ) )
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("String") )
                 )
 
     if condition:
@@ -59,8 +58,7 @@ def setInjection():
         kb.injParameter = conf.agent
 
     condition = (
-                  kb.injPlace and kb.injParameter and
-                  conf.sessionFile and ( not kb.resumedQueries
+                  kb.injPlace and kb.injParameter and ( not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
                   ( not kb.resumedQueries[conf.url].has_key("Injection point") 
                   or not kb.resumedQueries[conf.url].has_key("Injection parameter")
@@ -82,9 +80,8 @@ def setParenthesis(parenthesisCount):
     """
 
     condition = (
-                  conf.sessionFile and ( not kb.resumedQueries
-                  or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Parenthesis") ) )
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Parenthesis") )
                 )
 
     if condition:
@@ -101,9 +98,9 @@ def setDbms(dbms):
     """
 
     condition = (
-                  conf.sessionFile and ( not kb.resumedQueries
+                  not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("DBMS") ) )
+                  not kb.resumedQueries[conf.url].has_key("DBMS") )
                 )
 
     if condition:
@@ -133,11 +130,10 @@ def setUnion(comment=None, count=None, position=None):
 
     if comment and count:
         condition = (
-                      conf.sessionFile and ( not kb.resumedQueries
-                      or ( kb.resumedQueries.has_key(conf.url) and
+                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
                       ( not kb.resumedQueries[conf.url].has_key("Union comment") 
                       or not kb.resumedQueries[conf.url].has_key("Union count")
-                      ) ) )
+                      ) )
                     )
 
         if condition:
@@ -149,10 +145,9 @@ def setUnion(comment=None, count=None, position=None):
 
     elif position:
         condition = (
-                      conf.sessionFile and ( not kb.resumedQueries
-                      or ( kb.resumedQueries.has_key(conf.url) and
+                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
                       ( not kb.resumedQueries[conf.url].has_key("Union position")
-                      ) ) )
+                      ) )
                     )
 
         if condition:

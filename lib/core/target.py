@@ -66,7 +66,7 @@ def __setRequestParams():
         raise sqlmapSyntaxException, errMsg
 
     if conf.data:
-        conf.parameters["POST"] = conf.data
+        conf.parameters["POST"] = conf.data.replace("%", "%%")
         __paramDict = paramToDict("POST", conf.data)
 
         if __paramDict:
@@ -75,7 +75,7 @@ def __setRequestParams():
 
     # Perform checks on Cookie parameters
     if conf.cookie:
-        conf.parameters["Cookie"] = conf.cookie
+        conf.parameters["Cookie"] = conf.cookie.replace("%", "%%")
         __paramDict = paramToDict("Cookie", conf.cookie)
 
         if __paramDict:
@@ -86,7 +86,7 @@ def __setRequestParams():
     if conf.httpHeaders:
         for httpHeader, headerValue in conf.httpHeaders:
             if httpHeader == "User-Agent":
-                conf.parameters["User-Agent"] = headerValue
+                conf.parameters["User-Agent"] = headerValue.replace("%", "%%")
 
                 condition  = not conf.testParameter
                 condition |= "User-Agent" in conf.testParameter

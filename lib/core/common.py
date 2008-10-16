@@ -229,6 +229,9 @@ def dataToStdout(data):
 
 
 def dataToSessionFile(data):
+    if not conf.sessionFile:
+        return
+
     conf.sessionFP.write(data)
     conf.sessionFP.flush()
 
@@ -494,7 +497,7 @@ def parseTargetUrl():
         conf.port = 80
 
     if __urlSplit[3]:
-        conf.parameters["GET"] = __urlSplit[3]
+        conf.parameters["GET"] = __urlSplit[3].replace("%", "%%")
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
 

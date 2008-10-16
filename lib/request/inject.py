@@ -55,8 +55,7 @@ def __getFieldsProxy(expression):
 def __goInference(payload, expression):
     start   = time.time()
 
-    if conf.sessionFile:
-        dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression))
+    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression))
 
     if ( conf.eta or conf.threads > 1 ) and kb.dbms:
         _, length, _ = queryOutputLength(expression, payload)
@@ -326,7 +325,7 @@ def __goInband(expression):
 
             output = re.findall(regExpr, output, re.S)
 
-            if conf.sessionFile and ( partial or not condition ):
+            if partial or not condition:
                 logOutput = "".join(["__START__%s__STOP__" % replaceNewlineTabs(value) for value in output])
                 dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, logOutput))
 

@@ -149,7 +149,7 @@ def start():
 
             if setCookieAsInjectable:
                 conf.httpHeaders.append(("Cookie", cookieStr))
-                conf.parameters["Cookie"] = cookieStr
+                conf.parameters["Cookie"] = cookieStr.replace("%", "%%")
                 __paramDict = paramToDict("Cookie", cookieStr)
 
                 if __paramDict:
