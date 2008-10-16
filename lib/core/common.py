@@ -33,6 +33,7 @@ import time
 import urlparse
 
 
+from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -497,7 +498,7 @@ def parseTargetUrl():
         conf.port = 80
 
     if __urlSplit[3]:
-        conf.parameters["GET"] = __urlSplit[3].replace("%", "%%")
+        conf.parameters["GET"] = urldecode(__urlSplit[3]).replace("%", "%%")
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
 

@@ -72,7 +72,11 @@ def urldecode(string):
     if not string:
         return
 
-    return urllib.unquote_plus(string)
+    doublePercFreeString = string.replace("%%", "__DPERC__")
+    unquotedString = urllib.unquote_plus(doublePercFreeString)
+    unquotedString = unquotedString.replace("__DPERC__", "%%")
+
+    return unquotedString
 
 
 def urlencode(string, safe=":/?%&="):

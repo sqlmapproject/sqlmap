@@ -32,6 +32,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
+from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -66,8 +67,9 @@ def __setRequestParams():
         raise sqlmapSyntaxException, errMsg
 
     if conf.data:
-        conf.parameters["POST"] = conf.data.replace("%", "%%")
-        __paramDict = paramToDict("POST", conf.data)
+        urlDecodedData = urldecode(conf.data).replace("%", "%%")
+        conf.parameters["POST"] = urlDecodedData
+        __paramDict = paramToDict("POST", urlDecodedData)
 
         if __paramDict:
             conf.paramDict["POST"] = __paramDict
@@ -75,8 +77,9 @@ def __setRequestParams():
 
     # Perform checks on Cookie parameters
     if conf.cookie:
-        conf.parameters["Cookie"] = conf.cookie.replace("%", "%%")
-        __paramDict = paramToDict("Cookie", conf.cookie)
+        urlDecodedCookie = urldecode(conf.cookie).replace("%", "%%")
+        conf.parameters["Cookie"] = urlDecodedCookie
+        __paramDict = paramToDict("Cookie", urlDecodedCookie)
 
         if __paramDict:
             conf.paramDict["Cookie"] = __paramDict
@@ -86,7 +89,7 @@ def __setRequestParams():
     if conf.httpHeaders:
         for httpHeader, headerValue in conf.httpHeaders:
             if httpHeader == "User-Agent":
-                conf.parameters["User-Agent"] = headerValue.replace("%", "%%")
+                conf.parameters["User-Agent"] = urldecode(headerValue).replace("%", "%%")
 
                 condition  = not conf.testParameter
                 condition |= "User-Agent" in conf.testParameter
