@@ -55,12 +55,12 @@ def __getFieldsProxy(expression):
 def __goInference(payload, expression):
     start   = time.time()
 
-    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression))
-
     if ( conf.eta or conf.threads > 1 ) and kb.dbms:
         _, length, _ = queryOutputLength(expression, payload)
     else:
         length = None
+
+    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression))
 
     count, value = bisection(payload, expression, length=length)
     duration = int(time.time() - start)
