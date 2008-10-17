@@ -141,8 +141,8 @@ class Connect:
 
         except urllib2.HTTPError, e:
             if e.code == 401:
-                exceptionMsg  =  "not authorized, try to provide right HTTP "
-                exceptionMsg +=  "authentication type and valid credentials"
+                exceptionMsg  = "not authorized, try to provide right HTTP "
+                exceptionMsg += "authentication type and valid credentials"
                 raise sqlmapConnectionException, exceptionMsg
             else:
                 page = e.read()
