@@ -33,7 +33,7 @@ read specific files on the file system and much more.
 sqlmap is developed in <htmlurl url="http://www.python.org" name="Python">,
 a dynamic object-oriented interpreted programming language.
 This makes the tool independent from the operating system since it only
-requires the Python interpreter.
+requires the Python interpreter version equal or above to 2.4.
 The interpreter is freely downloadable from its
 <htmlurl url="http://python.org/download/" name="official site">.
 To make it even easier, many GNU/Linux distributions come out of the box

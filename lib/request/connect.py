@@ -74,7 +74,7 @@ class Connect:
         if direct:
             if "?" in url:
                 url, params = url.split("?")
-                params = urlencode(params)
+                params = urlencode(params).replace("%%", "%")
                 url = "%s?%s" % (url, params)
                 requestMsg += "?%s" % params
         elif multipart:
@@ -100,7 +100,7 @@ class Connect:
 
         try:
             # Perform HTTP request
-            headers        = forgeHeaders(cookie, ua)
+            headers        = forgeHeaders(urlencode(cookie).replace("%%", "%"), ua)
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 
@@ -113,7 +113,7 @@ class Connect:
                 if not cookieStr:
                     cookieStr = "Cookie: "
 
-                cookie = str(cookie).replace("%%", "%")
+                cookie = str(cookie)
                 index  = cookie.index(" for ")
 
                 cookieStr += "%s; " % cookie[8:index]
