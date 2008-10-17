@@ -98,9 +98,12 @@ class Connect:
 
         requestMsg += " HTTP/1.1"
 
+        if cookie:
+            cookie = urlencode(cookie).replace("%%", "%")
+
         try:
             # Perform HTTP request
-            headers        = forgeHeaders(urlencode(cookie).replace("%%", "%"), ua)
+            headers        = forgeHeaders(cookie, ua)
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 

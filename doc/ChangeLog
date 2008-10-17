@@ -2,7 +2,7 @@ sqlmap (0.6.1-1) stable; urgency=low
 
   * Major bug fix to blind SQL injection bisection algorithm to handle an
     exception;
-  * Written a Metasploit 3 auxiliary module to run sqlmap;
+  * Added a Metasploit 3 auxiliary module to run sqlmap;
   * Implemented possibility to test for and inject also on LIKE
     statements;
   * Implemented --start and --stop options to set the first and the last
