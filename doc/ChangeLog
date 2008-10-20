@@ -2,7 +2,7 @@ sqlmap (0.6.1-1) stable; urgency=low
 
   * Major bug fix to blind SQL injection bisection algorithm to handle an
     exception;
-  * Added a Metasploit 3 auxiliary module to run sqlmap;
+  * Added a Metasploit Framework 3 auxiliary module to run sqlmap;
   * Implemented possibility to test for and inject also on LIKE
     statements;
   * Implemented --start and --stop options to set the first and the last
@@ -12,6 +12,9 @@ sqlmap (0.6.1-1) stable; urgency=low
   * Minor enhancement to save also the length of query output in the
     session file when retrieving the query output length for ETA or for
     resume purposes;
+  * Changed the order sqlmap dump table entries from column by column to
+    row by row. Now it also dumps entries as they are stored in the tables,
+    not forcing the entries' order alphabetically anymore;
   * Minor bug fix to correctly handle parameters' value with % character.
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri,  10 Oct 2008 10:00:00 +0100

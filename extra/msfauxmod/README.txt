@@ -1,5 +1,11 @@
 To use Metasploit's sqlmap auxiliary module launch msfconsole and follow
-the example below:
+the example below.
+
+Note that if you are willing to run Metasploit's sqlmap auxiliary module on
+Metasploit Framework 3.0 or 3.1 you first need to copy wmap_sqlmap.rb to
+your <msf3 root path>/modules/auxiliary/scanner/http/ folder then launch
+msfconsole because this module has been officially integrated in Metasploit
+from the release 3.2.
 
 $ ./msfconsole
 

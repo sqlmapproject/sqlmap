@@ -87,12 +87,12 @@ M Simkin <mlsimkin@cox.net>
 
 Alessandro Tanasi <alessandro@tanasi.it>
     for extensively beta-testing sqlmap
-    for suggesting many features and reporting some minor bugs
+    for suggesting many features and reporting some bugs
 
 Efrain Torres <et@metasploit.com>
     for helping me out to improve the Metasploit Framework 3 sqlmap
-    auxiliary module and the integration with Metasploit WMAP framework
-    for his great Metasploit WMAP framework
+    auxiliary module and the integration with Metasploit WMAP Framework
+    for his great Metasploit WMAP Framework
 
 Sandro Tosi <matrixhasu@gmail.com>
     for helping to create sqlmap Debian package correctly
