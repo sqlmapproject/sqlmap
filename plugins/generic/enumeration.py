@@ -944,18 +944,16 @@ class Enumeration:
 
                     if kb.dbms in ( "MySQL", "PostgreSQL" ):
                         query = rootQuery["blind"]["query"] % (column, conf.db,
-                                                               conf.tbl, colList[0],
-                                                               index)
+                                                               conf.tbl, index)
                     elif kb.dbms == "Oracle":
                         query = rootQuery["blind"]["query"] % (column, column,
                                                                conf.tbl.upper(),
-                                                               colList[0], index)
+                                                               index)
                     elif kb.dbms == "Microsoft SQL Server":
                         query = rootQuery["blind"]["query"] % (column, conf.db,
                                                                conf.tbl, column,
                                                                index, column,
-                                                               conf.db, conf.tbl,
-                                                               colList[0], colList[0])
+                                                               conf.db, conf.tbl)
 
                     value = inject.getValue(query, inband=False)
 

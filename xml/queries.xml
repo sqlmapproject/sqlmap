@@ -46,7 +46,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d, 1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s LIMIT %d, 1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
     </dbms>
 
@@ -93,7 +93,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS limit FROM %s ORDER BY %s) WHERE limit=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS limit FROM %s) WHERE limit=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
     </dbms>
 
@@ -141,7 +141,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
     </dbms>
 
@@ -165,29 +165,29 @@
         <current_db query="DB_NAME()"/>
         <users>
             <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
-            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins ORDER BY name) ORDER BY name" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
+            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
         </users>
         <passwords>
             <inband query="SELECT name, master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins" query2="SELECT name, master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins" condition="name"/>
-            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..sysxlogins WHERE name='%s' ORDER BY name) ORDER BY name"  query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM sys.sql_logins WHERE name='%s' ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
+            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..sysxlogins WHERE name='%s')"  query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
         </passwords>
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
         <privileges/>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases"/>
-            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
+            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
             <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
-            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u', 'v') ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
+            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u', 'v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'"/>
-            <blind query="SELECT TOP 1 name FROM (SELECT TOP %s name FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s') ORDER BY name ASC) CTABLE ORDER BY name DESC" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')"/>
+            <blind query="SELECT TOP 1 name FROM (SELECT TOP %s name FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')) CTABLE" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s..%s"/>
-            <blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s ORDER BY %s) ORDER BY %s" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
+            <blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s)" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
         </dump_table>
     </dbms>
 
