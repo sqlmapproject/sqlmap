@@ -147,7 +147,7 @@ def cmdLineParser():
 
         enumeration.add_option("--dump", dest="dumpTable", action="store_true",
                                help="Dump DBMS database table entries "
-                                    "(req: -T, -D opt: -C)")
+                                    "(req: -T, -D opt: -C, --start, --stop)")
 
         enumeration.add_option("--dump-all", dest="dumpAll", action="store_true",
                                help="Dump all DBMS databases tables entries")
