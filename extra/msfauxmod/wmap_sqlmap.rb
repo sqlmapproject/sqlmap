@@ -42,8 +42,13 @@ class Metasploit3 < Msf::Auxiliary
 				OptString.new('BODY', [ false, "The data string to be sent through POST", '' ]),
 				OptString.new('OPTS', [ false,  "The sqlmap options to use", ' ' ]),
 				OptPath.new('SQLMAP_PATH', [ true,  "The sqlmap >= 0.6.1 full path ", '/sqlmap/sqlmap.py' ]), 
-				OptBool.new('BATCH', [ true,  "Never ask for user input, use the default behaviour", 'true' ])
+				OptBool.new('BATCH', [ true,  "Never ask for user input, use the default behaviour", true ])
 			], self.class)
+	end
+	
+	# Modify to true if you have sqlmap installed.
+	def wmap_enabled
+		false
 	end
 
 	# Test a single host
