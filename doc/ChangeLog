@@ -1,3 +1,19 @@
+sqlmap (0.6.2-1) stable; urgency=low
+
+  * Major bug fix to correctly dump tables entries when --stop is not
+    specified;
+  * Major bug fix so that the users' privileges enumeration now works
+    properly also on MySQL < 5.0;
+  * Major improvement to correctly enumerate tables, columns and dump
+    tables entries on Oracle and on PostgreSQL when the database name is
+    not 'public' schema or a system database;
+  * Minor enhancement to be able to dump entries also on MySQL < 5.0 when
+    database name, table name and column(s) are provided;
+  * Various minor fixes and code restyling.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat,  1 Nov 2008 10:00:00 +0100
+
+
 sqlmap (0.6.1-1) stable; urgency=low
 
   * Major bug fix to blind SQL injection bisection algorithm to handle an
@@ -17,7 +33,7 @@ sqlmap (0.6.1-1) stable; urgency=low
     not forcing the entries' order alphabetically anymore;
   * Minor bug fix to correctly handle parameters' value with % character.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri,  10 Oct 2008 10:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri, 20 Oct 2008 10:00:00 +0100
 
 
 sqlmap (0.6-1) stable; urgency=low
@@ -78,7 +94,7 @@ sqlmap (0.6-1) stable; urgency=low
   * Renamed some command line options;
   * Added a conversion library;
   * Added code schema and reminders for future developments;
-  * Added Copyright comment and $Id$ svn property to all Python files;
+  * Added Copyright comment and $Id$;
   * Updated the command line layout and help messages;
   * Updated some docstrings;
   * Updated documentation files.

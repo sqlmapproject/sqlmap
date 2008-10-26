@@ -41,6 +41,9 @@ Will Holcomb <wholcomb@gmail.com>
     for his MultipartPostHandler class to handle multipart POST forms and
     permission to include it within sqlmap source code
 
+Luke Jahnke <luke.jahnke@gmail.com>
+    for reporting a bug when running against MySQL < 5.0
+
 Michael Majchrowicz <mmajchrowicz@gmail.com>
     for extensively beta-testing sqlmap on various MySQL DBMS
     for providing really appreciated feedback
@@ -91,7 +94,8 @@ Alessandro Tanasi <alessandro@tanasi.it>
 
 Efrain Torres <et@metasploit.com>
     for helping me out to improve the Metasploit Framework 3 sqlmap
-    auxiliary module and the integration with Metasploit WMAP Framework
+    auxiliary module and for commiting it on the Metasploit official
+    Subversion repository
     for his great Metasploit WMAP Framework
 
 Sandro Tosi <matrixhasu@gmail.com>
