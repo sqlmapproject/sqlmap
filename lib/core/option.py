@@ -489,7 +489,10 @@ def __saveCmdline():
                 if datatype == "boolean":
                     value = "False"
                 elif datatype == "integer":
-                    value = "1"
+                    if option == "threads":
+                        value = "1"
+                    else:
+                        value = "0"
                 elif datatype == "string":
                     value = ""
 
