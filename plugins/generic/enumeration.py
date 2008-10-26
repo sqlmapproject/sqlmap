@@ -57,18 +57,18 @@ class Enumeration:
     def __init__(self, dbms):
         self.has_information_schema = None
 
-        self.banner                = ""
-        self.currentUser           = ""
-        self.currentDb             = ""
-        self.cachedUsers           = []
-        self.cachedUsersPassword   = {}
-        self.cachedUsersPrivileges = {}
-        self.cachedDbs             = []
-        self.cachedTables          = {}
-        self.cachedColumns         = {}
-        self.dumpedTable           = {}
+        self.banner                 = ""
+        self.currentUser            = ""
+        self.currentDb              = ""
+        self.cachedUsers            = []
+        self.cachedUsersPassword    = {}
+        self.cachedUsersPrivileges  = {}
+        self.cachedDbs              = []
+        self.cachedTables           = {}
+        self.cachedColumns          = {}
+        self.dumpedTable            = {}
 
-        temp.inference             = queries[dbms].inference
+        temp.inference              = queries[dbms].inference
 
         if dbms == "MySQL":
             self.excludeDbsList = MYSQL_SYSTEM_DBS
@@ -78,6 +78,10 @@ class Enumeration:
             self.excludeDbsList = ORACLE_SYSTEM_DBS
         elif dbms == "Microsoft SQL Server":
             self.excludeDbsList = MSSQL_SYSTEM_DBS
+
+
+    def forceDbmsEnum(self):
+        pass
 
 
     def getBanner(self):
@@ -588,18 +592,7 @@ class Enumeration:
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-        if kb.dbms == "Oracle":
-            if conf.db:
-                conf.db = conf.db.upper()
-            else:
-                conf.db = "USERS"
-
-                warnMsg  = "on Oracle it is only possible to enumerate "
-                warnMsg += "tables if you provide a TABLESPACE_NAME as "
-                warnMsg += "database name. sqlmap is going to use "
-                warnMsg += "'USERS' to retrieve all tables owned by an "
-                warnMsg += "Oracle database management system user"
-                logger.warn(warnMsg)
+        self.forceDbmsEnum()
 
         logMsg = "fetching tables"
         if conf.db:
@@ -701,16 +694,11 @@ class Enumeration:
         if "." in conf.tbl:
             conf.db, conf.tbl = conf.tbl.split(".")
 
+        self.forceDbmsEnum()
+
         if not conf.db:
             errMsg = "missing database parameter"
-
-            if kb.dbms == "PostgreSQL":
-                conf.db = "public"
-
-                errMsg += ", sqlmap is going to use 'public' schema"
-                logger.warn(errMsg)
-            else:
-                raise sqlmapMissingMandatoryOptionException, errMsg
+            raise sqlmapMissingMandatoryOptionException, errMsg
 
         logMsg  = "fetching columns "
         logMsg += "for table '%s' " % conf.tbl
@@ -821,20 +809,11 @@ class Enumeration:
         if "." in conf.tbl:
             conf.db, conf.tbl = conf.tbl.split(".")
 
+        self.forceDbmsEnum()
+
         if not conf.db:
             errMsg = "missing database parameter"
-
-            if kb.dbms == "PostgreSQL":
-                conf.db = "public"
-
-                errMsg += ", sqlmap is going to use 'public' schema"
-                logger.warn(errMsg)
-            else:
-                raise sqlmapMissingMandatoryOptionException, errMsg
-
-        if kb.dbms == "Oracle":
-            conf.db = conf.db.upper()
-            conf.tbl = conf.tbl.upper()
+            raise sqlmapMissingMandatoryOptionException, errMsg
 
         rootQuery = queries[kb.dbms].dumpTable
 

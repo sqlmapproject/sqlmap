@@ -189,6 +189,22 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
             return False
 
 
+    def forceDbmsEnum(self):
+        if conf.db:
+            conf.db = conf.db.upper()
+        else:
+            conf.db = "USERS"
+
+            warnMsg  = "on Oracle it is only possible to enumerate "
+            warnMsg += "if you provide a TABLESPACE_NAME as database "
+            warnMsg += "name. sqlmap is going to use 'USERS' as database "
+            warnMsg += "name"
+            logger.warn(warnMsg)
+
+        if conf.tbl:
+            conf.tbl = conf.tbl.upper()
+
+
     def getDbs(self):
         warnMsg = "this plugin can not enumerate databases"
         logger.warn(warnMsg)

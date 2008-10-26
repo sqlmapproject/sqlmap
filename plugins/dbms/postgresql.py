@@ -35,6 +35,7 @@ from lib.core.data import logger
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.session import setDbms
 from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 from lib.request import inject
 #from lib.utils.fuzzer import passiveFuzzing
@@ -200,3 +201,14 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             logger.warn(warnMsg)
 
             return False
+
+
+    def forceDbmsEnum(self):
+        if kb.dbms == "PostgreSQL" and conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
+            conf.db = "public"
+
+            warnMsg  = "on PostgreSQL it is only possible to enumerate "
+            warnMsg += "on the current schema and on system databases, "
+            warnMsg += "sqlmap is going to use 'public' schema as "
+            warnMsg += "database name"
+            logger.warn(warnMsg)
