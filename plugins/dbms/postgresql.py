@@ -204,7 +204,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def forceDbmsEnum(self):
-        if kb.dbms == "PostgreSQL" and conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
+        if conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
             conf.db = "public"
 
             warnMsg  = "on PostgreSQL it is only possible to enumerate "
