@@ -784,11 +784,6 @@ class Enumeration:
 
 
     def dumpTable(self):
-        if kb.dbms == "MySQL" and not self.has_information_schema:
-            errMsg  = "information_schema not available, "
-            errMsg += "back-end DBMS is MySQL < 5.0"
-            raise sqlmapUnsupportedFeatureException, errMsg
-
         if not conf.tbl:
             errMsg = "missing table parameter"
             raise sqlmapMissingMandatoryOptionException, errMsg
@@ -804,6 +799,23 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].dumpTable
 
+        if conf.col:
+            self.cachedColumns[conf.db] = {}
+            self.cachedColumns[conf.db][conf.tbl] = {}
+            for column in colList:
+                self.cachedColumns[conf.db][conf.tbl][column] = None
+        elif not self.cachedColumns:
+            if kb.dbms == "MySQL" and not self.has_information_schema:
+                errMsg  = "information_schema not available, "
+                errMsg += "back-end DBMS is MySQL < 5.0"
+                raise sqlmapUnsupportedFeatureException, errMsg
+
+            self.cachedColumns = self.getColumns(onlyColNames=True)
+
+        colList = self.cachedColumns[conf.db][conf.tbl].keys()
+        colList.sort(key=lambda x: x.lower())
+        colString = ", ".join(column for column in colList)
+
         logMsg = "fetching"
         if conf.col:
             colList = conf.col.split(",")
@@ -812,18 +824,6 @@ class Enumeration:
         logMsg += " entries for table '%s'" % conf.tbl
         logMsg += " on database '%s'" % conf.db
         logger.info(logMsg)
-
-        if conf.col:
-            self.cachedColumns[conf.db] = {}
-            self.cachedColumns[conf.db][conf.tbl] = {}
-            for column in colList:
-                self.cachedColumns[conf.db][conf.tbl][column] = None
-        elif not self.cachedColumns:
-            self.cachedColumns = self.getColumns(onlyColNames=True)
-
-        colList = self.cachedColumns[conf.db][conf.tbl].keys()
-        colList.sort(key=lambda x: x.lower())
-        colString = ", ".join(column for column in colList)
 
         if conf.unionUse:
             if kb.dbms == "Oracle":
