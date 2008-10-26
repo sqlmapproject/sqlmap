@@ -54,7 +54,7 @@ SQLMAP_SOURCE_URL  = "http://downloads.sourceforge.net/sqlmap/sqlmap-%s.zip"
 
 # Database managemen system specific variables
 MSSQL_SYSTEM_DBS  = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
-MYSQL_SYSTEM_DBS  = ( "information_schema", "mysql" )
+MYSQL_SYSTEM_DBS  = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
 PGSQL_SYSTEM_DBS  = ( "information_schema", "pg_catalog" )
 ORACLE_SYSTEM_DBS = ( "SYSTEM", "SYSAUX" )
 
