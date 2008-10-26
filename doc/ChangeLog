@@ -9,7 +9,7 @@ sqlmap (0.6.2-1) stable; urgency=low
     not 'public' schema or a system database;
   * Minor enhancement to be able to dump entries also on MySQL < 5.0 when
     database name, table name and column(s) are provided;
-  * Various minor fixes and code restyling.
+  * Minor code restyling.
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat,  1 Nov 2008 10:00:00 +0100
 
@@ -246,4 +246,4 @@ sqlmap (0.2-1) stable; urgency=low
     new option/injection classes and improvements on catching of
     exceptions.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Wed,  13 Dec 2006 20:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Wed, 13 Dec 2006 20:00:00 +0100
