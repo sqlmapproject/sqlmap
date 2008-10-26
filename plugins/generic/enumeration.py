@@ -55,7 +55,7 @@ class Enumeration:
     """
 
     def __init__(self, dbms):
-        self.has_information_schema = None
+        self.has_information_schema = False
 
         self.banner                 = ""
         self.currentUser            = ""
