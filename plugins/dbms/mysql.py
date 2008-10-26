@@ -58,7 +58,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
     """
 
     def __init__(self):
-        self.has_information_schema = False
         Enumeration.__init__(self, "MySQL")
 
         unescaper.setUnescape(MySQLMap.unescape)
