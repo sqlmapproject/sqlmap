@@ -52,6 +52,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
     """
 
     def __init__(self):
+        self.excludeDbsList = PGSQL_SYSTEM_DBS
         Enumeration.__init__(self, "PostgreSQL")
 
         unescaper.setUnescape(PostgreSQLMap.unescape)

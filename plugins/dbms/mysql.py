@@ -40,6 +40,7 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import MYSQL_SYSTEM_DBS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.request import inject
@@ -58,6 +59,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
     """
 
     def __init__(self):
+        self.excludeDbsList = MYSQL_SYSTEM_DBS
         Enumeration.__init__(self, "MySQL")
 
         unescaper.setUnescape(MySQLMap.unescape)

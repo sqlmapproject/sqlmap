@@ -41,6 +41,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.session import setDbms
 from lib.core.settings import MSSQL_ALIASES
+from lib.core.settings import MSSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
@@ -59,6 +60,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
     """
 
     def __init__(self):
+        self.excludeDbsList = MSSQL_SYSTEM_DBS
         Enumeration.__init__(self, "Microsoft SQL Server")
 
         unescaper.setUnescape(MSSQLServerMap.unescape)

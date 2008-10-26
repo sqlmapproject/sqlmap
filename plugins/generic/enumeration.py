@@ -39,10 +39,6 @@ from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.settings import MYSQL_SYSTEM_DBS
-from lib.core.settings import PGSQL_SYSTEM_DBS
-from lib.core.settings import ORACLE_SYSTEM_DBS
-from lib.core.settings import MSSQL_SYSTEM_DBS
 from lib.core.shell import autoCompletion
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -69,15 +65,6 @@ class Enumeration:
         self.dumpedTable            = {}
 
         temp.inference              = queries[dbms].inference
-
-        if dbms == "MySQL":
-            self.excludeDbsList = MYSQL_SYSTEM_DBS
-        elif dbms == "PostgreSQL":
-            self.excludeDbsList = PGSQL_SYSTEM_DBS
-        elif dbms == "Oracle":
-            self.excludeDbsList = ORACLE_SYSTEM_DBS
-        elif dbms == "Microsoft SQL Server":
-            self.excludeDbsList = MSSQL_SYSTEM_DBS
 
 
     def forceDbmsEnum(self):
@@ -535,7 +522,7 @@ class Enumeration:
         if kb.dbms == "MySQL" and not self.has_information_schema:
             warnMsg  = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
-            warnMsg += "names will be fetched from 'mysql' table"
+            warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
         logMsg = "fetching database names"

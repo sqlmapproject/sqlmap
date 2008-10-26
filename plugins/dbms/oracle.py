@@ -52,6 +52,7 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def __init__(self):
+        self.excludeDbsList = ORACLE_SYSTEM_DBS
         Enumeration.__init__(self, "Oracle")
 
         unescaper.setUnescape(OracleMap.unescape)
