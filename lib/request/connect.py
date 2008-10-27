@@ -82,7 +82,7 @@ class Connect:
                 conn = multipartOpener.open(url, multipart)
                 page = conn.read()
                 return page
-        elif conf.method == "GET":
+        elif conf.method in ( "GET", "POST" ):
             if conf.parameters.has_key("GET") and not get:
                 get = conf.parameters["GET"]
 
