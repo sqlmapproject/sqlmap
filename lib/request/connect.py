@@ -77,12 +77,14 @@ class Connect:
                 params = urlencode(params).replace("%%", "%")
                 url = "%s?%s" % (url, params)
                 requestMsg += "?%s" % params
+
         elif multipart:
                 multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(url, multipart)
                 page = conn.read()
                 return page
-        elif conf.method in ( "GET", "POST" ):
+
+        else:
             if conf.parameters.has_key("GET") and not get:
                 get = conf.parameters["GET"]
 
@@ -90,11 +92,12 @@ class Connect:
                 get = urlencode(get).replace("%%", "%")
                 url = "%s?%s" % (url, get)
                 requestMsg += "?%s" % get
-        elif conf.method == "POST":
-            if conf.parameters.has_key("POST") and not post:
-                post = conf.parameters["POST"]
 
-            post = urlencode(post).replace("%%", "%")
+            if conf.method == "POST":
+                if conf.parameters.has_key("POST") and not post:
+                    post = conf.parameters["POST"]
+
+                post = urlencode(post).replace("%%", "%")
 
         requestMsg += " HTTP/1.1"
 
@@ -107,7 +110,7 @@ class Connect:
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 
-            if "Accept-Encoding" not in req.headers:
+            if not req.has_header("Accept-Encoding"):
                 requestHeaders += "\nAccept-Encoding: identity"
 
             requestHeaders = "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
@@ -121,10 +124,10 @@ class Connect:
 
                 cookieStr += "%s; " % cookie[8:index]
 
-            if "Cookie" not in req.headers and cookieStr:
+            if not req.has_header("Cookie") and cookieStr:
                 requestHeaders += "\n%s" % cookieStr[:-2]
      
-            if "Connection" not in req.headers:
+            if not req.has_header("Connection"):
                 requestHeaders += "\nConnection: close"
 
             requestMsg += "\n%s" % requestHeaders
