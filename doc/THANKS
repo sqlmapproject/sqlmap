@@ -44,6 +44,9 @@ Will Holcomb <wholcomb@gmail.com>
 Luke Jahnke <luke.jahnke@gmail.com>
     for reporting a bug when running against MySQL < 5.0
 
+Pavol Luptak <pavol.luptak@nethemba.com>
+    for reporting a bug when injecting on a POST data parameter
+
 Michael Majchrowicz <mmajchrowicz@gmail.com>
     for extensively beta-testing sqlmap on various MySQL DBMS
     for providing really appreciated feedback

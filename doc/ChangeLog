@@ -4,6 +4,8 @@ sqlmap (0.6.2-1) stable; urgency=low
     specified;
   * Major bug fix so that the users' privileges enumeration now works
     properly also on MySQL < 5.0;
+  * Major bug fix when the request is POST to also send the provided url
+    parameters if any have been provided;
   * Major improvement to correctly enumerate tables, columns and dump
     tables entries on Oracle and on PostgreSQL when the database name is
     not 'public' schema or a system database;
