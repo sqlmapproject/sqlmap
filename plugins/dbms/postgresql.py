@@ -137,6 +137,10 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def checkDbms(self):
+        """
+        Reference for fingerprint: http://www.postgresql.org/docs/8.3/interactive/release-8-3.html
+        """
+
         if conf.dbms in PGSQL_ALIASES:
             setDbms("PostgreSQL")
 
@@ -166,8 +170,13 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             if not conf.extensiveFp:
                 return True
 
-            if inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)") == "2":
-                kb.dbmsVersion = [">= 8.2.0"]
+            transTimeCasted = inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)") in ( "1", "2" )
+            transTime       = inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)") in ( "1", "2" )
+
+            if transTimeCasted and not transTime:
+                kb.dbmsVersion = [">= 8.3.0"]
+            elif transTime:
+                kb.dbmsVersion = [">= 8.2.0", "< 8.3.0"]
             elif inject.getValue("GREATEST(5, 9, 1)") == "9":
                 kb.dbmsVersion = [">= 8.1.0", "< 8.2.0"]
             elif inject.getValue("WIDTH_BUCKET(5.35, 0.024, 10.06, 5)") == "3":

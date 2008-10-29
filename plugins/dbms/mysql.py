@@ -132,15 +132,15 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             return None
 
-        # MySQL valid versions updated at 07/2008
+        # MySQL valid versions updated at 10/2008
         versions = (
                      (32200, 32233),    # MySQL 3.22
                      (32300, 32354),    # MySQL 3.23
                      (40000, 40024),    # MySQL 4.0
                      (40100, 40122),    # MySQL 4.1
-                     (50000, 50067),    # MySQL 5.0
-                     (50100, 50126),    # MySQL 5.1
-                     (60000, 60006),    # MySQL 6.0
+                     (50000, 50072),    # MySQL 5.0
+                     (50100, 50129),    # MySQL 5.1
+                     (60000, 60008),    # MySQL 6.0
                    )
 
         for element in versions:
@@ -202,6 +202,14 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def checkDbms(self):
+        """
+        References for fingerprint:
+
+        * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-x.html
+        * http://dev.mysql.com/doc/refman/5.1/en/news-5-1-x.html
+        * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html
+        """
+
         if conf.dbms in MYSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
             setDbms("MySQL %s" % kb.dbmsVersion[0])
 
@@ -229,11 +237,8 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
                 return False
 
-            query  = "SELECT %s " % randInt
-            query += "FROM information_schema.TABLES "
-            query += "LIMIT 0, 1"
-
-            if inject.getValue(query) == randInt:
+            # Determine if it is MySQL >= 5.0.0
+            if inject.getValue("SELECT %s FROM information_schema.TABLES LIMIT 0, 1" % randInt) == randInt:
                 setDbms("MySQL 5")
                 self.has_information_schema = True
 
@@ -241,18 +246,47 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                     kb.dbmsVersion = [">= 5.0.0"]
                     return True
 
-                self.currentDb = inject.getValue("DATABASE()")
-                if self.currentDb == inject.getValue("SCHEMA()"):
-                    kb.dbmsVersion = [">= 5.0.2", "< 5.1"]
+                # Check if it is MySQL >= 6.0.3
+                if inject.getValue("SELECT %s FROM information_schema.PARAMETERS LIMIT 0, 1" % randInt) == randInt:
+                    if inject.getValue("SELECT %s FROM information_schema.PROFILING LIMIT 0, 1" % randInt) == randInt:
+                        kb.dbmsVersion = [">= 6.0.5"]
+                    else:
+                        kb.dbmsVersion = [">= 6.0.3", "< 6.0.5"]
 
-                    query  = "SELECT %s " % randInt
-                    query += "FROM information_schema.PARTITIONS "
-                    query += "LIMIT 0, 1"
+                # Or if it MySQL >= 5.1.2 and < 6.0.3
+                elif inject.getValue("MID(@@plugin_dir, 1, 1)"):
+                    if inject.getValue("SELECT %s FROM information_schema.PROFILING LIMIT 0, 1" % randInt) == randInt:
+                        kb.dbmsVersion = [">= 5.1.28", "< 6.0.3"]
+                    elif inject.getValue("MID(@@innodb_stats_on_metadata, 1, 1)"):
+                        kb.dbmsVersion = [">= 5.1.17", "< 5.1.28"]
+                    elif inject.getValue("SELECT %s FROM information_schema.REFERENTIAL_CONSTRAINTS LIMIT 0, 1" % randInt) == randInt:
+                        kb.dbmsVersion = [">= 5.1.10", "< 5.1.17"]
+                    elif inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt) == randInt:
+                        kb.dbmsVersion = [">= 5.1.7", "< 5.1.10"]
+                    elif inject.getValue("SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1" % randInt) == randInt:
+                        kb.dbmsVersion = ["= 5.1.6"]
+                    elif inject.getValue("SELECT %s FROM information_schema.PLUGINS LIMIT 0, 1" % randInt) == randInt:
+                        kb.dbmsVersion = [">= 5.1.5", "< 5.1.6"]
+                    elif inject.getValue("MID(@@table_open_cache, 1, 1)"):
+                        kb.dbmsVersion = [">= 5.1.3", "< 5.1.5"]
+                    else:
+                        kb.dbmsVersion = ["= 5.1.2"]
 
-                    if inject.getValue(query) == randInt:
-                        kb.dbmsVersion = [">= 5.1"]
+                # Or if it is MySQL >= 5.0.0 and < 5.1.2
+                elif inject.getValue("MID(@@hostname, 1, 1)"):
+                    kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
+                # NOTE: MySQL 5.0.12 introduced SLEEP() function
+                # References:
+                # * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-12.html
+                # * http://dev.mysql.com/doc/refman/5.0/en/miscellaneous-functions.html#function_sleep
+                elif inject.getValue("SELECT 1 FROM DUAL") == "1":
+                    kb.dbmsVersion = [">= 5.0.11", "< 5.0.38"]
+                elif inject.getValue("DATABASE() LIKE SCHEMA()"):
+                    kb.dbmsVersion = [">= 5.0.2", "< 5.0.11"]
                 else:
-                    kb.dbmsVersion = ["= 5.0.0 or 5.0.1"]
+                    kb.dbmsVersion = [">= 5.0.0", "<= 5.0.1"]
+
+            # Otherwise assume it is MySQL < 5.0.0
             else:
                 setDbms("MySQL 4")
                 kb.dbmsVersion = ["< 5.0.0"]
@@ -260,7 +294,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 if not conf.extensiveFp:
                     return True
 
+                # Check which version of MySQL , 5.0.0 it is
                 coercibility = inject.getValue("COERCIBILITY(USER())")
+
                 if coercibility == "3":
                     kb.dbmsVersion = [">= 4.1.11", "< 5.0.0"]
                 elif coercibility == "2":

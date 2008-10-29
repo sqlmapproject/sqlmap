@@ -11,6 +11,8 @@ sqlmap (0.6.2-1) stable; urgency=low
     not 'public' schema or a system database;
   * Minor improvement to be able to dump entries on MySQL < 5.0 when
     database name, table name and column(s) are provided;
+  * Updated the database management system fingerprint checks to correctly
+    identify MySQL 5.1.x, MySQL 6.0.x and PostgreSQL 8.3;
   * Minor code restyling.
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat,  1 Nov 2008 10:00:00 +0100

@@ -110,8 +110,8 @@
         <limitstring query=" OFFSET "/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
-        <substring query="SUBSTR((%s), %d, %d)"/>
-        <inference query="AND ASCII(SUBSTR((%s), %d, 1)) > %d"/>
+        <substring query="SUBSTR((%s)::text, %d, %d)"/>
+        <inference query="AND ASCII(SUBSTR((%s)::text, %d, 1)) > %d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_DATABASE()"/>
