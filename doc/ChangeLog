@@ -9,7 +9,7 @@ sqlmap (0.6.2-1) stable; urgency=low
   * Major improvement to correctly enumerate tables, columns and dump
     tables entries on Oracle and on PostgreSQL when the database name is
     not 'public' schema or a system database;
-  * Minor enhancement to be able to dump entries also on MySQL < 5.0 when
+  * Minor improvement to be able to dump entries on MySQL < 5.0 when
     database name, table name and column(s) are provided;
   * Minor code restyling.
 
