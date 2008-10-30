@@ -314,7 +314,7 @@ def __setHTTPUserAgent():
     logger.debug(debugMsg)
 
     try:
-        fd = open(conf.userAgentsFile)
+        fd = open(conf.userAgentsFile, "r")
     except IOError:
         warnMsg  = "unable to read HTTP User-Agent header "
         warnMsg += "file '%s'" % conf.userAgentsFile

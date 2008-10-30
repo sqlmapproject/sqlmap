@@ -294,7 +294,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 if not conf.extensiveFp:
                     return True
 
-                # Check which version of MySQL , 5.0.0 it is
+                # Check which version of MySQL < 5.0.0 it is
                 coercibility = inject.getValue("COERCIBILITY(USER())")
 
                 if coercibility == "3":
