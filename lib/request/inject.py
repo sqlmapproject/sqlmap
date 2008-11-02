@@ -71,7 +71,7 @@ def __goInference(payload, expression):
     return value
 
 
-def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload):
+def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None):
     outputs = []
 
     for field in expressionFieldsList:
@@ -80,7 +80,12 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         expressionReplaced = expression.replace(expressionFields, field, 1)
         output = resume(expressionReplaced, payload)
 
-        if not output:
+        if not output or ( expected == "int" and not output.isdigit() ):
+            if output:
+                warnMsg  = "expected value type %s, resumed '%s', " % (expected, output)
+                warnMsg += "sqlmap is going to retrieve the value again"
+                logger.warn(warnMsg)
+
             output = __goInference(payload, expressionReplaced)
 
         outputs.append(output)
@@ -88,7 +93,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
     return outputs
 
 
-def __goInferenceProxy(expression, fromUser=False):
+def __goInferenceProxy(expression, fromUser=False, expected=None):
     """
     Retrieve the output of a SQL query characted by character taking
     advantage of an blind SQL injection vulnerability on the affected
@@ -108,7 +113,7 @@ def __goInferenceProxy(expression, fromUser=False):
 
     output = resume(expression, payload)
 
-    if output:
+    if output and ( expected == None or ( expected == "int" and output.isdigit() ) ):
         return output
 
     if kb.dbmsDetected:
@@ -179,7 +184,7 @@ def __goInferenceProxy(expression, fromUser=False):
                     count = resume(countedExpression, payload)
 
                     if not stopLimit:
-                        if not count:
+                        if not count or not count.isdigit():
                             count = __goInference(payload, countedExpression)
 
                         if count.isdigit() and int(count) > 0:
@@ -268,7 +273,7 @@ def __goInferenceProxy(expression, fromUser=False):
                             limitedExpr += "NOT IN (%s" % (limitStr % num)
                             limitedExpr += "%s %s)" % (expressionFieldsList[0], fromFrom)
 
-                        output = __goInferenceFields(limitedExpr, expressionFields, expressionFieldsList, payload)
+                        output = __goInferenceFields(limitedExpr, expressionFields, expressionFieldsList, payload, expected)
                         outputs.append(output)
 
                     return outputs
@@ -276,7 +281,7 @@ def __goInferenceProxy(expression, fromUser=False):
         elif kb.dbms == "Oracle" and expression.startswith("SELECT ") and " FROM " not in expression:
             expression = "%s FROM DUAL" % expression
 
-        outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload)
+        outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected)
 
         returnValue = ", ".join([output for output in outputs])
     else:
@@ -285,7 +290,7 @@ def __goInferenceProxy(expression, fromUser=False):
     return returnValue
 
 
-def __goInband(expression):
+def __goInband(expression, expected=None):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
     injection vulnerability on the affected parameter.
@@ -304,7 +309,7 @@ def __goInband(expression):
     if condition:
         output = resume(expression, None)
 
-        if not output:
+        if not output or ( expected == "int" and not output.isdigit() ):
             partial = True
 
     if not output:
@@ -355,7 +360,7 @@ def __goInband(expression):
     return data
 
 
-def getValue(expression, blind=True, inband=True, fromUser=False):
+def getValue(expression, blind=True, inband=True, fromUser=False, expected=None):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -368,9 +373,9 @@ def getValue(expression, blind=True, inband=True, fromUser=False):
     value = None
 
     if inband and conf.unionUse and kb.dbms:
-        value = __goInband(expression)
+        value = __goInband(expression, expected)
 
     if blind and not value:
-        value = __goInferenceProxy(expression, fromUser)
+        value = __goInferenceProxy(expression, fromUser, expected)
 
     return value

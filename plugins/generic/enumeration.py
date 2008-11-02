@@ -135,9 +135,9 @@ class Enumeration:
                 query = rootQuery["blind"]["count2"]
             else:
                 query = rootQuery["blind"]["count"]
-            count = inject.getValue(query, inband=False)
+            count = inject.getValue(query, inband=False, expected="int")
 
-            if not len(count) or count == "0":
+            if not count.isdigit() or not len(count) or count == "0":
                 errMsg = "unable to retrieve the number of database users"
                 raise sqlmapNoneDataException, errMsg
 
@@ -228,9 +228,9 @@ class Enumeration:
                     query = rootQuery["blind"]["count2"] % user
                 else:
                     query = rootQuery["blind"]["count"] % user
-                count = inject.getValue(query, inband=False)
+                count = inject.getValue(query, inband=False, expected="int")
 
-                if not len(count) or count == "0":
+                if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of password "
                     warnMsg += "hashes for user '%s'" % user
                     logger.warn(warnMsg)
@@ -458,9 +458,9 @@ class Enumeration:
                     query = rootQuery["blind"]["count"] % (conditionChar, queryUser)
                 else:
                     query = rootQuery["blind"]["count"] % queryUser
-                count = inject.getValue(query, inband=False)
+                count = inject.getValue(query, inband=False, expected="int")
 
-                if not len(count) or count == "0":
+                if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of "
                     warnMsg += "privileges for user '%s'" % user
                     logger.warn(warnMsg)
@@ -572,9 +572,9 @@ class Enumeration:
                 query = rootQuery["blind"]["count2"]
             else:
                 query = rootQuery["blind"]["count"]
-            count = inject.getValue(query, inband=False)
+            count = inject.getValue(query, inband=False, expected="int")
 
-            if not len(count) or count == "0":
+            if not count.isdigit() or not len(count) or count == "0":
                 errMsg = "unable to retrieve the number of databases"
                 raise sqlmapNoneDataException, errMsg
 
@@ -662,9 +662,9 @@ class Enumeration:
                 logger.info(logMsg)
 
                 query = rootQuery["blind"]["count"] % db
-                count = inject.getValue(query, inband=False)
+                count = inject.getValue(query, inband=False, expected="int")
 
-                if not len(count) or count == "0":
+                if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of "
                     warnMsg += "tables for database '%s'" % db
                     logger.warn(warnMsg)
@@ -756,9 +756,9 @@ class Enumeration:
             elif kb.dbms == "Microsoft SQL Server":
                 query = rootQuery["blind"]["count"] % (conf.db, conf.db, conf.tbl)
 
-            count = inject.getValue(query, inband=False)
+            count = inject.getValue(query, inband=False, expected="int")
 
-            if not len(count) or count == "0":
+            if not count.isdigit() or not len(count) or count == "0":
                 errMsg  = "unable to retrieve the number of columns "
                 errMsg += "for table '%s' " % conf.tbl
                 errMsg += "on database '%s'" % conf.db
@@ -905,9 +905,9 @@ class Enumeration:
                 query = rootQuery["blind"]["count"] % conf.tbl.upper()
             else:
                 query = rootQuery["blind"]["count"] % (conf.db, conf.tbl)
-            count = inject.getValue(query, inband=False)
+            count = inject.getValue(query, inband=False, expected="int")
 
-            if not len(count) or count == "0":
+            if not count.isdigit() or not len(count) or count == "0":
                 errMsg = "unable to retrieve the number of "
                 if conf.col:
                     errMsg += "columns '%s' " % colString
