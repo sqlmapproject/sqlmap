@@ -30,7 +30,7 @@ import sys
 
 
 # sqlmap version and site
-VERSION            = "0.6.1"
+VERSION            = "0.6.2"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 SITE               = "http://sqlmap.sourceforge.net"
 
