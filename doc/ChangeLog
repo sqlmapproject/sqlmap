@@ -6,10 +6,12 @@ sqlmap (0.6.2-1) stable; urgency=low
     properly also on both MySQL < 5.0 and MySQL >= 5.0;
   * Major bug fix when the request is POST to also send the GET parameters
     if any have been provided;
+  * Major bug fix to correctly update sqlmap to the latest stable release
+    with command line --update;
   * Major bug fix so that when the expected value of a query (count
-    variable) is an integer and for some reason the resumed value from
-    session file is a string or a binary file, the query is executed again
-    and and its new output saved to the session file;
+    variable) is an integer and, for some reasons, its resumed value from
+    the session file is a string or a binary file, the query is executed
+    again and its new output saved to the session file;
   * Minor improvement to correctly enumerate tables, columns and dump
     tables entries on Oracle and on PostgreSQL when the database name is
     not 'public' schema or a system database;
