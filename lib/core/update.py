@@ -203,28 +203,24 @@ def __updateMSSQLXML():
 
 def __createFile(pathname, data):
     mkpath(os.path.dirname(pathname))
+
     fileFP = open(pathname, "wb")
     fileFP.write(data)
     fileFP.close()
 
 
-def __extractZipFile(zipFile):
+def __extractZipFile(tempDir, zipFile, sqlmapNewestVersion):
     # Check if the saved binary file is really a ZIP file
     if zipfile.is_zipfile(zipFile):
         sqlmapZipFile = zipfile.ZipFile(zipFile)
     else:
-        raise sqlmapFilePathException, "the downloaded file does not seem to be a zipfile"
-
-    # Create a temporary directory
-    tempDir = tempfile.mkdtemp("", "sqlmap_latest-")
+        raise sqlmapFilePathException, "the downloaded file does not seem to be a ZIP file"
 
     # Extract each file within the ZIP file in the temporary directory
     for info in sqlmapZipFile.infolist():
         if info.filename[-1] != '/':
             data = sqlmapZipFile.read(info.filename)
             __createFile(os.path.join(tempDir, info.filename), data)
-
-    return tempDir
 
 
 def __updateSqlmap():
@@ -247,6 +243,7 @@ def __updateSqlmap():
         return
 
     sqlmapNewestVersion = str(sqlmapNewestVersion).replace("\n", "")
+    sqlmapNewestVersion = "0.6.1"
 
     if not re.search("^([\w\.\-]+)$", sqlmapNewestVersion):
         errMsg = "sqlmap version is in a wrong syntax"
@@ -259,10 +256,18 @@ def __updateSqlmap():
         logger.info(infoMsg)
 
         return
-    else:
+
+    elif sqlmapNewestVersion > VERSION:
         infoMsg  = "sqlmap latest stable version is %s. " % sqlmapNewestVersion
         infoMsg += "Going to download it from the SourceForge File List page"
         logger.info(infoMsg)
+
+    elif sqlmapNewestVersion < VERSION:
+        infoMsg  = "if you are running a version of sqlmap more updated than "
+        infoMsg += "the latest stable version (%s)" % sqlmapNewestVersion
+        logger.info(infoMsg)
+
+        return
 
     sqlmapBinaryStringUrl = SQLMAP_SOURCE_URL % sqlmapNewestVersion
 
@@ -278,25 +283,28 @@ def __updateSqlmap():
 
         return
 
-    # Save the sqlmap compressed source to a ZIP file in a temporary
-    # directory and extract it
-    zipFile = os.path.join(tempfile.gettempdir(), "sqlmap-%s.zip" % sqlmapNewestVersion)
+    debugMsg  = 'saving the sqlmap compressed source to a ZIP file into '
+    debugMsg += 'the temporary directory and extract it'
+    logger.debug(debugMsg)
+
+    tempDir = tempfile.gettempdir()
+    zipFile = os.path.join(tempDir, "sqlmap-%s.zip" % sqlmapNewestVersion)
     __createFile(zipFile, sqlmapBinaryString)
-    tempDir = __extractZipFile(zipFile)
+    __extractZipFile(tempDir, zipFile, sqlmapNewestVersion)
 
     # For each file and directory in the temporary directory copy it
     # to the sqlmap root path and set right permission
     # TODO: remove files not needed anymore and all pyc within the
     # sqlmap root path in the end
-    for root, dirs, files in os.walk(os.path.join(tempDir, "sqlmap")):
+    for root, dirs, files in os.walk(os.path.join(tempDir, "sqlmap-%s" % sqlmapNewestVersion)):
         # Just for development release
-        if '.svn' in dirs:
-            dirs.remove('.svn')
+        if '.svn' in root:
+            continue
 
         cleanRoot = root.replace(tempDir, "")
-        cleanRoot = cleanRoot.replace("%ssqlmap" % os.sep, "")
+        cleanRoot = cleanRoot.replace("%ssqlmap-%s" % (os.sep, sqlmapNewestVersion), "")
 
-        if cleanRoot.startswith("/"):
+        if cleanRoot.startswith(os.sep):
             cleanRoot = cleanRoot[1:]
 
         for f in files:
@@ -307,17 +315,17 @@ def __updateSqlmap():
             srcFile = os.path.join(root, f)
             dstFile = os.path.join(paths.SQLMAP_ROOT_PATH, os.path.join(cleanRoot, f))
 
+            if f == "sqlmap.conf" and os.path.exists(dstFile):
+                infoMsg = "backupping configuration file to '%s.bak'" % dstFile
+                logger.info(infoMsg)
+                shutil.move(dstFile, "%s.bak" % dstFile)
+
             if os.path.exists(dstFile):
                 debugMsg = "replacing file '%s'" % dstFile
             else:
                 debugMsg = "creating new file '%s'" % dstFile
 
             logger.debug(debugMsg)
-
-            if f == "sqlmap.conf" and os.path.exists(dstFile):
-                infoMsg = "backupping configuration file to '%s.bak'" % dstFile
-                logger.info(infoMsg)
-                shutil.move(dstFile, "%s.bak" % dstFile)
 
             mkpath(os.path.dirname(dstFile))
             shutil.copy(srcFile, dstFile)
