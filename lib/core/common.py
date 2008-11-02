@@ -105,7 +105,7 @@ def paramToDict(place, parameters=None):
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
             if not testableParameters.has_key(parameter):
-                warnMsg =  "the testable parameter '%s' " % parameter
+                warnMsg  =  "the testable parameter '%s' " % parameter
                 warnMsg += "you provided is not into the %s" % place
                 logger.warn(warnMsg)
 
@@ -538,10 +538,10 @@ def getRange(count, dump=False):
     limitStop  = count
 
     if dump:
-        if isinstance(conf.limitStop, int) and conf.limitStop < count:
+        if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
             limitStop = conf.limitStop
 
-        if isinstance(conf.limitStart, int) and conf.limitStart <= limitStop:
+        if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
             limitStart = conf.limitStart
 
     # TODO: also for Microsoft SQL Server in getColumns method?
