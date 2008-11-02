@@ -6,7 +6,7 @@
                 10.00.1750
             </version>
             <servicepack>
-                +Q956718
+                0+Q956718
             </servicepack>
         </signature>
         <signature>
@@ -45,10 +45,26 @@
     <signatures release="2005">
         <signature>
             <version>
+                9.00.3294
+            </version>
+            <servicepack>
+                2+Q956854
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
                 9.00.3282
             </version>
             <servicepack>
                 2+Q953752
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3282
+            </version>
+            <servicepack>
+                2+Q954607
             </servicepack>
         </signature>
         <signature>
@@ -89,6 +105,14 @@
             </version>
             <servicepack>
                 2+Q952330
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3242
+            </version>
+            <servicepack>
+                2+Q951190
             </servicepack>
         </signature>
         <signature>
@@ -385,6 +409,14 @@
             </version>
             <servicepack>
                 2+Q933097
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3073
+            </version>
+            <servicepack>
+                2+Q954606
             </servicepack>
         </signature>
         <signature>
