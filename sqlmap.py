@@ -72,16 +72,20 @@ def main():
 
         if conf.start:
             start()
+
     except exceptionsTuple, e:
         logger.error(e)
+
     except KeyboardInterrupt:
         print
         errMsg = "user aborted"
         logger.error(errMsg)
+
     except EOFError:
         print
         errMsg = "exit"
         logger.error(errMsg)
+
     except:
         errMsg = unhandledException()
         logger.error(errMsg)

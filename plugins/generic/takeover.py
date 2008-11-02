@@ -33,5 +33,5 @@ class Takeover:
     """
 
     def osShell(self):
-        errMsg = "this plugin does not support OS shell functionality yet"
+        errMsg = "OS shell functionality not yet implemented for this DBMS"
         raise sqlmapUnsupportedFeatureException, errMsg

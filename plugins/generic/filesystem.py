@@ -33,10 +33,10 @@ class Filesystem:
     """
 
     def readFile(self, rFile):
-        errMsg = "this plugin does not support OS file reading yet"
+        errMsg = "OS file reading not yet implemented for this DBMS"
         raise sqlmapUnsupportedFeatureException, errMsg
 
 
     def writeFile(self, wFile):
-        errMsg = "this plugin does not support OS file writing yet"
+        errMsg = "OS file writing not yet implemented for this DBMS"
         raise sqlmapUnsupportedFeatureException, errMsg

@@ -210,7 +210,7 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getDbs(self):
-        warnMsg = "this plugin can not enumerate databases"
+        warnMsg = "on Oracle it is not possible to enumerate databases"
         logger.warn(warnMsg)
 
         return []

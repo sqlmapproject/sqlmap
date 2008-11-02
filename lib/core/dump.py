@@ -91,7 +91,8 @@ class Dump:
 
 
     def lister(self, header, elements):
-        self.__write("%s [%d]:" % (header, len(elements)))
+        if elements:
+            self.__write("%s [%d]:" % (header, len(elements)))
 
         try:
             elements = set(elements)
@@ -106,13 +107,15 @@ class Dump:
             elif isinstance(element, (list, tuple, set)):
                 self.__write("[*] " + ", ".join(e for e in element))
 
-        self.__write("")
+        if elements:
+            self.__write("")
 
 
     def userSettings(self, header, userSettings, subHeader):
         self.__areAdmins = set()
 
-        self.__write("%s:" % header)
+        if userSettings:
+            self.__write("%s:" % header)
 
         if isinstance(userSettings, (tuple, list, set)):
             self.__areAdmins = userSettings[1]

@@ -195,7 +195,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getPrivileges(self):
-        warnMsg = "this plugin can not fetch database users privileges"
+        warnMsg = "on MySQL is it not possible to fetch database users privileges"
         logger.warn(warnMsg)
 
         return {}
