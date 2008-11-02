@@ -40,6 +40,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
+from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -346,19 +347,19 @@ class Enumeration:
                 if "," in conf.user:
                     users = conf.user.split(",")
                     query += " WHERE "
-                    # NOTE: we need this here only for MySQL 5.0 because
-                    # of a known issue explained in queries.xml
+                    # NOTE: I assume that the user provided is not in
+                    # MySQL >= 5.0 syntax 'user'@'host'
                     if kb.dbms == "MySQL" and self.has_information_schema:
-                        likeUser = "%" + conf.user + "%"
+                        queryUser = "%" + conf.user + "%"
                         query += " OR ".join("%s LIKE '%s'" % (condition, "%" + user + "%") for user in users)
                     else:
                         query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
                 else:
-                    # NOTE: we need this here only for MySQL 5.0 because
-                    # of a known issue explained in queries.xml
+                    # NOTE: I assume that the user provided is not in
+                    # MySQL >= 5.0 syntax 'user'@'host'
                     if kb.dbms == "MySQL" and self.has_information_schema:
-                        likeUser = "%" + conf.user + "%"
-                        query += " WHERE %s LIKE '%s'" % (condition, likeUser)
+                        queryUser = "%" + conf.user + "%"
+                        query += " WHERE %s LIKE '%s'" % (condition, queryUser)
                     else:
                         query += " WHERE %s = '%s'" % (condition, conf.user)
 
@@ -406,11 +407,25 @@ class Enumeration:
                         self.cachedUsersPrivileges[user] = list(privileges)
 
         if not self.cachedUsersPrivileges:
+            conditionChar = "="
+
             if conf.user:
-                if "," in conf.user:
+                if kb.dbms == "MySQL" and self.has_information_schema:
+                    conditionChar = " LIKE "
+
+                    if "," in conf.user:
+                        users = set()
+                        for user in conf.user.split(","):
+                            users.add("%" + user + "%")
+                    else:
+                        users = [ "%" + conf.user + "%" ]
+
+                elif "," in conf.user:
                     users = conf.user.split(",")
+
                 else:
-                    users = [conf.user]
+                    users = [ conf.user ]
+
             else:
                 if not len(self.cachedUsers):
                     users = self.getUsers()
@@ -420,11 +435,10 @@ class Enumeration:
             retrievedUsers = set()
 
             for user in users:
-                if kb.dbms == "MySQL":
-                    parsedUser = re.search("\047(.*?)\047@'", user)
+                unescapedUser = None
 
-                    if parsedUser:
-                        user = parsedUser.groups()[0].replace("'", "")
+                if kb.dbms == "MySQL" and self.has_information_schema:
+                    unescapedUser = unescaper.unescape(user, quote=False)
 
                 if user in retrievedUsers:
                     continue
@@ -433,24 +447,26 @@ class Enumeration:
                 logMsg += "for user '%s'" % user
                 logger.info(logMsg)
 
-                if kb.dbms == "MySQL" and self.has_information_schema:
-                    likeUser = "%" + user + "%"
+                if unescapedUser:
+                    queryUser = unescapedUser
                 else:
-                    likeUser = user
+                    queryUser = user
 
                 if kb.dbms == "MySQL" and not self.has_information_schema:
-                    query = rootQuery["blind"]["count2"] % likeUser
+                    query = rootQuery["blind"]["count2"] % queryUser
+                elif kb.dbms == "MySQL" and self.has_information_schema:
+                    query = rootQuery["blind"]["count"] % (conditionChar, queryUser)
                 else:
-                    query = rootQuery["blind"]["count"] % likeUser
+                    query = rootQuery["blind"]["count"] % queryUser
                 count = inject.getValue(query, inband=False)
 
                 if not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of "
-                    warnMsg += "privileges for user '%s'" % likeUser
+                    warnMsg += "privileges for user '%s'" % user
                     logger.warn(warnMsg)
                     continue
 
-                logMsg = "fetching privileges for user '%s'" % likeUser
+                logMsg = "fetching privileges for user '%s'" % user
                 logger.info(logMsg)
 
                 privileges = set()
@@ -458,13 +474,15 @@ class Enumeration:
 
                 for index in indexRange:
                     if kb.dbms == "MySQL" and not self.has_information_schema:
-                        query = rootQuery["blind"]["query2"] % (likeUser, index)
+                        query = rootQuery["blind"]["query2"] % (queryUser, index)
+                    elif kb.dbms == "MySQL" and self.has_information_schema:
+                        query = rootQuery["blind"]["query"] % (conditionChar, queryUser, index)
                     else:
-                        query = rootQuery["blind"]["query"] % (likeUser, index)
+                        query = rootQuery["blind"]["query"] % (queryUser, index)
                     privilege = inject.getValue(query, inband=False)
 
-                    # In PostgreSQL we return 1 if the privilege
-                    # if True, otherwise 0
+                    # In PostgreSQL we get 1 if the privilege is True,
+                    # 0 otherwise
                     if kb.dbms == "PostgreSQL" and ", " in privilege:
                         privilege = privilege.replace(", ", ",")
                         privs = privilege.split(",")
@@ -500,6 +518,12 @@ class Enumeration:
 
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
+
+                    # In MySQL < 5.0 we break the cycle after the first
+                    # time we get the user's privileges otherwise we
+                    # duplicate the same query
+                    if kb.dbms == "MySQL" and not self.has_information_schema:
+                        break
 
                 if privileges:
                     self.cachedUsersPrivileges[user] = list(privileges)

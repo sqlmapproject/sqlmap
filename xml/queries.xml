@@ -29,8 +29,7 @@
         </passwords>
         <privileges>
             <inband query="SELECT grantee, privilege_type FROM information_schema.USER_PRIVILEGES" condition="grantee" query2="SELECT user, select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user" condition2="user"/>
-            <!-- TODO: the LIKE clause only affects MySQL >= 5.0. No way so far to use [...] WHERE grantee='%s' in query and count attributes because the unescaper function will forge it as [...] WHERE grantee="CHAR(114,111,111,116)@CHAR(108,111,99,97,108,104,111,115,116)" -->
-            <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee LIKE '%s' LIMIT %d, 1" query2="SELECT select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee LIKE '%s'" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
+            <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s LIMIT %d, 1" query2="SELECT select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
         </privileges>
         <dbs>
             <inband query="SELECT schema_name FROM information_schema.SCHEMATA" query2="SELECT db FROM mysql.db"/>
@@ -177,10 +176,12 @@
             <inband query="SELECT name FROM master..sysdatabases"/>
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
+        <!-- TODO: condition? -->
         <tables>
             <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
             <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u', 'v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
         </tables>
+        <!-- TODO: getRange like Oracle? -->
         <columns>
             <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'"/>
             <blind query="SELECT TOP 1 name FROM (SELECT TOP %s name FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')) CTABLE" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')"/>

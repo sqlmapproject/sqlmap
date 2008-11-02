@@ -67,30 +67,33 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     @staticmethod
-    def unescape(expression):
-        while True:
-            index = expression.find("'")
-            if index == -1:
-                break
+    def unescape(expression, quote=True):
+        if quote:
+            while True:
+                index = expression.find("'")
+                if index == -1:
+                    break
 
-            firstIndex = index + 1
-            index = expression[firstIndex:].find("'")
+                firstIndex = index + 1
+                index = expression[firstIndex:].find("'")
 
-            if index == -1:
-                raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
+                if index == -1:
+                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
 
-            lastIndex = firstIndex + index
-            old = "'%s'" % expression[firstIndex:lastIndex]
-            #unescaped = ""
-            unescaped = "("
+                lastIndex = firstIndex + index
+                old = "'%s'" % expression[firstIndex:lastIndex]
+                #unescaped = "("
+                unescaped = ""
 
-            for i in range(firstIndex, lastIndex):
-                unescaped += "CHAR(%d)" % (ord(expression[i]))
-                if i < lastIndex - 1:
-                    unescaped += "+"
+                for i in range(firstIndex, lastIndex):
+                    unescaped += "CHAR(%d)" % (ord(expression[i]))
+                    if i < lastIndex - 1:
+                        unescaped += "+"
 
-            unescaped += ")"
-            expression = expression.replace(old, unescaped)
+                #unescaped += ")"
+                expression = expression.replace(old, unescaped)
+        else:
+            expression = "+".join("CHAR(%d)" % ord(c) for c in expression)
 
         return expression
 

@@ -33,8 +33,8 @@ class Unescaper:
         self.__unescaper = unescapeFunction
 
 
-    def unescape(self, expression):
-        return self.__unescaper(expression)
+    def unescape(self, expression, quote=True):
+        return self.__unescaper(expression, quote=quote)
 
 
 unescaper = Unescaper()

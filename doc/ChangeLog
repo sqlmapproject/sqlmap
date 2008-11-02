@@ -3,7 +3,7 @@ sqlmap (0.6.2-1) stable; urgency=low
   * Major bug fix to correctly dump tables entries when --stop is not
     specified;
   * Major bug fix so that the users' privileges enumeration now works
-    properly also on MySQL < 5.0;
+    properly also on both MySQL < 5.0 and MySQL >= 5.0;
   * Major bug fix when the request is POST to also send the url parameters
     if any have been provided;
   * Major improvement to correctly enumerate tables, columns and dump
