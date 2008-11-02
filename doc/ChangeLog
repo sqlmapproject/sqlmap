@@ -10,7 +10,7 @@ sqlmap (0.6.2-1) stable; urgency=low
     variable) is an integer and for some reason the resumed value from
     session file is a string or a binary file, the query is executed again
     and and its new output saved to the session file;
-  * Major improvement to correctly enumerate tables, columns and dump
+  * Minor improvement to correctly enumerate tables, columns and dump
     tables entries on Oracle and on PostgreSQL when the database name is
     not 'public' schema or a system database;
   * Minor improvement to be able to dump entries on MySQL < 5.0 when
@@ -19,7 +19,7 @@ sqlmap (0.6.2-1) stable; urgency=low
     identify MySQL 5.1.x, MySQL 6.0.x and PostgreSQL 8.3;
   * More user-friendly warnin messages.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat,  1 Nov 2008 10:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun,  2 Nov 2008 19:00:00 +0000
 
 
 sqlmap (0.6.1-1) stable; urgency=low
@@ -41,7 +41,7 @@ sqlmap (0.6.1-1) stable; urgency=low
     not forcing the entries' order alphabetically anymore;
   * Minor bug fix to correctly handle parameters' value with % character.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri, 20 Oct 2008 10:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri, 20 Oct 2008 10:00:00 +0000
 
 
 sqlmap (0.6-1) stable; urgency=low
