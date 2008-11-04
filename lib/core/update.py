@@ -243,7 +243,6 @@ def __updateSqlmap():
         return
 
     sqlmapNewestVersion = str(sqlmapNewestVersion).replace("\n", "")
-    sqlmapNewestVersion = "0.6.1"
 
     if not re.search("^([\w\.\-]+)$", sqlmapNewestVersion):
         errMsg = "sqlmap version is in a wrong syntax"
