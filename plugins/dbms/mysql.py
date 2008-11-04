@@ -162,6 +162,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 result  = Request.queryPage(payload)
 
                 if result == kb.defaultResult:
+                    if not prevVer:
+                        prevVer = version
+
                     if version[0] == "3":
                         midVer = prevVer[1:3]
                     else:
