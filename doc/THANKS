@@ -15,6 +15,9 @@ Stefano Di Paola <stefano.dipaola@wisec.it>
 Adam Faheem <faheem.adam@is.co.za>
     for reporting a few bugs
 
+JimForster <jimforster@goldenwest.com>
+    for reporting a bug
+
 Rong-En Fan <rafan@freebsd.org>
     for commiting the sqlmap 0.5 port to the official FreeBSD project
     repository

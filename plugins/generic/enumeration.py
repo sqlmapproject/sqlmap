@@ -824,6 +824,7 @@ class Enumeration:
         rootQuery = queries[kb.dbms].dumpTable
 
         if conf.col:
+            colList = conf.col.split(",")
             self.cachedColumns[conf.db] = {}
             self.cachedColumns[conf.db][conf.tbl] = {}
             for column in colList:
@@ -842,8 +843,6 @@ class Enumeration:
 
         logMsg = "fetching"
         if conf.col:
-            colList = conf.col.split(",")
-            colString = ", ".join(column for column in colList)
             logMsg += " columns '%s'" % colString
         logMsg += " entries for table '%s'" % conf.tbl
         logMsg += " on database '%s'" % conf.db

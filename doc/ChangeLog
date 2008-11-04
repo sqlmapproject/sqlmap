@@ -1,3 +1,11 @@
+sqlmap (0.6.3-1) stable; urgency=low
+
+  * Minor bug fix to correctly dump table entries when the column is
+    provided;
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day,  X YYY 2008 10:00:00 +0000
+
+
 sqlmap (0.6.2-1) stable; urgency=low
 
   * Major bug fix to correctly dump tables entries when --stop is not
