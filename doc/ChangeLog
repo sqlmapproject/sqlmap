@@ -12,6 +12,7 @@ sqlmap (0.6.2-1) stable; urgency=low
     variable) is an integer and, for some reasons, its resumed value from
     the session file is a string or a binary file, the query is executed
     again and its new output saved to the session file;
+  * Minor bug fix in MySQL comment injection fingerprint technique;
   * Minor improvement to correctly enumerate tables, columns and dump
     tables entries on Oracle and on PostgreSQL when the database name is
     not 'public' schema or a system database;
