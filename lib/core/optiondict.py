@@ -40,6 +40,7 @@ optDict = {
                                "aCred":             "string",
                                "proxy":             "string",
                                "threads":           "integer",
+                               "delay":             "float",
                              },
 
             "Injection":     {

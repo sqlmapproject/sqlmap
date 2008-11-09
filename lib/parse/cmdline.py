@@ -89,6 +89,10 @@ def cmdLineParser():
                            help="Maximum number of concurrent HTTP "
                                 "requests (default 1)")
 
+        request.add_option("--delay", dest="delay", type="float",
+                           help="Delay in seconds between each HTTP request")
+
+
         # Injection options
         injection = OptionGroup(parser, "Injection")
 

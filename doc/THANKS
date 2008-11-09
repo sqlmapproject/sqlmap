@@ -9,6 +9,10 @@ Karl Chen <quarl@cs.berkeley.edu>
     for providing with the multithreading patch for the inference
     algorithm
 
+Pierre Chifflier <pollux@debian.org>
+    for uploading the sqlmap 0.6.2 Debian package to the official Debian
+    project repository
+
 Stefano Di Paola <stefano.dipaola@wisec.it>
     for suggesting good features
 
@@ -91,6 +95,10 @@ Richard Safran <allapplyhere@yahoo.com>
 Tomoyuki Sakurai <cherry@trombik.org>
     for submitting to the FreeBSD project the sqlmap 0.5 port
 
+Sven Schluter <sschlueter@netzwerk.cc>
+    for providing with a patch for waiting a number of seconds between
+    each HTTP request
+
 M Simkin <mlsimkin@cox.net>
     for suggesting a feature
 
@@ -112,6 +120,9 @@ Bedirhan Urgun <bedirhanurgun@gmail.com>
     for suggesting some features and improvements
     for benchmarking sqlmap in the context of his SQL injection
     benchmark project, OWASP SQLiBench, http://code.google.com/p/sqlibench
+
+Kyprianos Vassilopoulos <kyprianos.vasilopoulos@gmail.com>
+    for reporting an unhandled connection exception
 
 fufuh <fufuh@users.sourceforge.net>
     for reporting a bug when running on Windows

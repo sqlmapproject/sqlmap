@@ -402,6 +402,9 @@ def __cleanupOptions():
     if conf.user:
         conf.user = conf.user.replace(" ", "")
 
+    if conf.delay:
+        conf.delay = float(conf.delay)
+
 
 def __setConfAttributes():
     """
@@ -488,7 +491,7 @@ def __saveCmdline():
             if value == None:
                 if datatype == "boolean":
                     value = "False"
-                elif datatype == "integer":
+                elif datatype in ( "integer", "float" ):
                     if option == "threads":
                         value = "1"
                     else:

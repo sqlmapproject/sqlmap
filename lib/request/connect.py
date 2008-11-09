@@ -26,6 +26,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import md5
 import re
+import socket
+import time
 import urllib2
 import urlparse
 
@@ -156,8 +158,20 @@ class Connect:
                 status = e.msg
                 responseHeaders = e.info()
 
-        except urllib2.URLError, e:
+        except (urllib2.URLError, socket.error), _:
             warnMsg = "unable to connect to the target url"
+
+            if conf.googleDork:
+                warnMsg += ", skipping to next url"
+                logger.warn(warnMsg)
+
+                return None
+            else:
+                warnMsg += " or proxy"
+                raise sqlmapConnectionException, warnMsg
+
+        except socket.timeout, _:
+            warnMsg = "connection timed out to the target url"
 
             if conf.googleDork:
                 warnMsg += ", skipping to next url"
@@ -177,6 +191,9 @@ class Connect:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
         logger.log(8, responseMsg)
+
+        if conf.delay != None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
+            time.sleep(conf.delay)
 
         return page
 
