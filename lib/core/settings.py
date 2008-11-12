@@ -56,7 +56,7 @@ SQLMAP_SOURCE_URL  = "http://downloads.sourceforge.net/sqlmap/sqlmap-%s.zip"
 MSSQL_SYSTEM_DBS  = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
 MYSQL_SYSTEM_DBS  = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
 PGSQL_SYSTEM_DBS  = ( "information_schema", "pg_catalog" )
-ORACLE_SYSTEM_DBS = ( "SYSTEM", "SYSAUX" )
+ORACLE_SYSTEM_DBS = ( "SYSTEM", "SYSAUX" )                              # These are TABLESPACE_NAME
 
 MSSQL_ALIASES     = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
 MYSQL_ALIASES     = [ "mysql", "my" ]

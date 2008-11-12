@@ -507,15 +507,20 @@ def expandAsteriskForColumns(expression):
     # If the user provided an asterisk rather than the column(s)
     # name, sqlmap will retrieve the columns itself and reprocess
     # the SQL query string (expression)
-    asterisk = re.search("^SELECT\s+\*\s+FROM\s+(\w+)[\.]+(\w+)\s*", expression, re.I)
+    asterisk = re.search("^SELECT\s+\*\s+FROM\s+([\w\.\_]+)\s*", expression, re.I)
 
     if asterisk:
         infoMsg  = "you did not provide the fields in your query. "
         infoMsg += "sqlmap will retrieve the column names itself"
         logger.info(infoMsg)
 
-        conf.db = asterisk.group(1)
-        conf.tbl = asterisk.group(2)
+        dbTbl = asterisk.group(1)
+
+        if dbTbl and "." in dbTbl:
+            conf.db, conf.tbl = dbTbl.split(".")
+        else:
+            conf.tbl = dbTbl
+
         columnsDict = conf.dbmsHandler.getColumns(onlyColNames=True)
 
         if columnsDict and conf.db in columnsDict and conf.tbl in columnsDict[conf.db]:

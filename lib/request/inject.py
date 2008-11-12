@@ -372,7 +372,7 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None)
 
     expression = cleanQuery(expression)
     expression = expandAsteriskForColumns(expression)
-    value = None
+    value      = None
 
     if inband and conf.unionUse and kb.dbms:
         value = __goInband(expression, expected)

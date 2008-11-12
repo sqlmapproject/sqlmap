@@ -54,6 +54,8 @@ def queriesForAutoCompletion():
             autoComplQuery = query
         elif isinstance(query, dict) and "inband" in query:
             autoComplQuery = query["inband"]["query"]
+        else:
+            continue
 
         autoComplQueries[autoComplQuery] = None
 

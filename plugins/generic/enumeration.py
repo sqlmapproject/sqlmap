@@ -730,8 +730,12 @@ class Enumeration:
         self.forceDbmsEnum()
 
         if not conf.db:
-            errMsg = "missing database parameter"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            warnMsg  = "missing database parameter, sqlmap is going to "
+            warnMsg += "use the current database to enumerate table "
+            warnMsg += "'%s' columns" % conf.tbl
+            logger.warn(warnMsg)
+
+            conf.db = self.getCurrentDb()
 
         infoMsg  = "fetching columns "
         infoMsg += "for table '%s' " % conf.tbl
@@ -739,10 +743,6 @@ class Enumeration:
         logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].columns
-
-        if kb.dbms == "Oracle":
-            conf.db = conf.db.upper()
-            conf.tbl = conf.tbl.upper()
 
         if conf.unionUse:
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
@@ -840,8 +840,12 @@ class Enumeration:
         self.forceDbmsEnum()
 
         if not conf.db:
-            errMsg = "missing database parameter"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            warnMsg  = "missing database parameter, sqlmap is going to "
+            warnMsg += "use the current database to dump table "
+            warnMsg += "'%s' entries" % conf.tbl
+            logger.warn(warnMsg)
+
+            conf.db = self.getCurrentDb()
 
         rootQuery = queries[kb.dbms].dumpTable
 
