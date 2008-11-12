@@ -48,6 +48,12 @@ optDict = {
                                "dbms":              "string",
                              },
 
+            "Techniques": {
+                               "timeTest":          "boolean",
+                               "unionTest":         "boolean",
+                               "unionUse":          "boolean",
+                          },
+
             "Fingerprint":   {
                                "extensiveFp":       "boolean",
                              },
@@ -85,8 +91,6 @@ optDict = {
                              },
 
             "Miscellaneous": {
-                               "unionTest":         "boolean",
-                               "unionUse":          "boolean",
                                "eta":               "boolean",
                                "verbose":           "integer",
                                "updateAll":         "boolean",

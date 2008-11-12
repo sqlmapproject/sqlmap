@@ -38,6 +38,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.data import temp
+from lib.core.settings import TIME_SECONDS
+from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.use import unionUse
 from lib.techniques.inference.blind import bisection
 from lib.utils.resume import queryOutputLength
@@ -53,7 +55,7 @@ def __getFieldsProxy(expression):
 
 
 def __goInference(payload, expression):
-    start   = time.time()
+    start = time.time()
 
     if ( conf.eta or conf.threads > 1 ) and kb.dbms:
         _, length, _ = queryOutputLength(expression, payload)
@@ -100,7 +102,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
     parameter through a bisection algorithm.
     """
 
-    query          = agent.prefixQuery(temp.inference)
+    query          = agent.prefixQuery(" %s" % temp.inference)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
     count          = None
@@ -379,3 +381,22 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None)
         value = __goInferenceProxy(expression, fromUser, expected)
 
     return value
+
+
+def goStacked(expression, timeTest=False):
+    """
+    TODO: write description
+    """
+
+    query          = agent.prefixQuery("; %s" % expression)
+    query          = agent.postfixQuery(query)
+    payload        = agent.payload(newValue=query)
+
+    start    = time.time()
+    Request.queryPage(payload)
+    duration = int(time.time() - start)
+
+    if timeTest:
+        return (duration >= TIME_SECONDS, payload)
+    else:
+        return duration >= TIME_SECONDS

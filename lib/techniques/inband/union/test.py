@@ -92,7 +92,7 @@ def unionTest():
 
     value = ""
 
-    query = agent.prefixQuery("UNION ALL SELECT NULL")
+    query = agent.prefixQuery(" UNION ALL SELECT NULL")
 
     for comment in ("--", "#", "/*", ";", "%00"):
         value = __effectiveUnionTest(query, comment)

@@ -103,6 +103,27 @@ def cmdLineParser():
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
 
+        # Techniques options
+        techniques = OptionGroup(parser, "Techniques", "These options can "
+                                 "be used to test for specific SQL injection "
+                                 "technique or to use one of them to exploit "
+                                 "the affected parameter(s) rather than using "
+                                 "the default blind SQL injection technique.")
+
+        techniques.add_option("--time-test", dest="timeTest",
+                              action="store_true",
+                              help="Test for Time based blind SQL injection")
+
+        techniques.add_option("--union-test", dest="unionTest",
+                              action="store_true",
+                              help="Test for UNION SELECT (inband) SQL injection")
+
+        techniques.add_option("--union-use", dest="unionUse",
+                              action="store_true",
+                              help="Use the UNION SELECT (inband) SQL injection "
+                                   "to retrieve the queries output. No "
+                                   "need to go blind")
+
         # Fingerprint options
         fingerprint = OptionGroup(parser, "Fingerprint")
 
@@ -215,16 +236,6 @@ def cmdLineParser():
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
-        miscellaneous.add_option("--union-test", dest="unionTest",
-                                 action="store_true",
-                                 help="Test for UNION SELECT (inband) SQL injection")
-
-        miscellaneous.add_option("--union-use", dest="unionUse",
-                                 action="store_true",
-                                 help="Use the UNION SELECT (inband) SQL injection "
-                                      "to retrieve the queries output. No "
-                                      "need to go blind")
-
         miscellaneous.add_option("--eta", dest="eta", action="store_true",
                                  help="Retrieve each query output length and "
                                       "calculate the estimated time of arrival "
@@ -251,6 +262,7 @@ def cmdLineParser():
 
         parser.add_option_group(request)
         parser.add_option_group(injection)
+        parser.add_option_group(techniques)
         parser.add_option_group(fingerprint)
         parser.add_option_group(enumeration)
         parser.add_option_group(filesystem)

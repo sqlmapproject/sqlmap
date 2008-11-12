@@ -39,6 +39,7 @@ from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.settings import TIME_SECONDS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.request import inject
@@ -68,13 +69,34 @@ class Enumeration:
         temp.inference              = queries[dbms].inference
 
 
+    # TODO: move this function to an appropriate file
+    def timeTest(self):
+        infoMsg  = "testing time based blind sql injection on parameter "
+        infoMsg += "'%s'" % kb.injParameter
+        logger.info(infoMsg)
+
+        # TODO: probably the '; <COMMENT>' will be filled in in all
+        # future time based SQL injection attacks at the end of the
+        # stacked query. Find a way that goStacked() function itself
+        # append it.
+        query  = "%s; " % queries[kb.dbms].timedelay % TIME_SECONDS
+        query += queries[kb.dbms].comment
+
+        self.timeTest = inject.goStacked(query, timeTest=True)
+
+        if self.timeTest[0] == True:
+            return "True, verified with payload: %s" % self.timeTest[1]
+        else:
+            return "False"
+
+
     def forceDbmsEnum(self):
         pass
 
 
     def getBanner(self):
-        logMsg = "fetching banner"
-        logger.info(logMsg)
+        infoMsg = "fetching banner"
+        logger.info(infoMsg)
 
         query = queries[kb.dbms].banner
 
@@ -85,8 +107,8 @@ class Enumeration:
 
 
     def getCurrentUser(self):
-        logMsg = "fetching current user"
-        logger.info(logMsg)
+        infoMsg = "fetching current user"
+        logger.info(infoMsg)
 
         query = queries[kb.dbms].currentUser
 
@@ -97,8 +119,8 @@ class Enumeration:
 
 
     def getCurrentDb(self):
-        logMsg = "fetching current database"
-        logger.info(logMsg)
+        infoMsg = "fetching current database"
+        logger.info(infoMsg)
 
         query = queries[kb.dbms].currentDb
 
@@ -109,8 +131,8 @@ class Enumeration:
 
 
     def getUsers(self):
-        logMsg = "fetching database users"
-        logger.info(logMsg)
+        infoMsg = "fetching database users"
+        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].users
 
@@ -128,8 +150,8 @@ class Enumeration:
                 self.cachedUsers = value
 
         if not self.cachedUsers:
-            logMsg = "fetching number of database users"
-            logger.info(logMsg)
+            infoMsg = "fetching number of database users"
+            logger.info(infoMsg)
 
             if condition:
                 query = rootQuery["blind"]["count2"]
@@ -161,8 +183,8 @@ class Enumeration:
 
 
     def getPasswordHashes(self):
-        logMsg = "fetching database users password hashes"
-        logger.info(logMsg)
+        infoMsg = "fetching database users password hashes"
+        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].passwords
 
@@ -220,9 +242,9 @@ class Enumeration:
                 if user in retrievedUsers:
                     continue
 
-                logMsg  = "fetching number of password hashes "
-                logMsg += "for user '%s'" % user
-                logger.info(logMsg)
+                infoMsg  = "fetching number of password hashes "
+                infoMsg += "for user '%s'" % user
+                logger.info(infoMsg)
 
                 if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
                     query = rootQuery["blind"]["count2"] % user
@@ -236,8 +258,8 @@ class Enumeration:
                     logger.warn(warnMsg)
                     continue
 
-                logMsg = "fetching password hashes for user '%s'" % user
-                logger.info(logMsg)
+                infoMsg = "fetching password hashes for user '%s'" % user
+                logger.info(infoMsg)
 
                 passwords  = []
                 indexRange = getRange(count)
@@ -292,8 +314,8 @@ class Enumeration:
 
 
     def getPrivileges(self):
-        logMsg = "fetching database users privileges"
-        logger.info(logMsg)
+        infoMsg = "fetching database users privileges"
+        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].privileges
 
@@ -443,9 +465,9 @@ class Enumeration:
                 if user in retrievedUsers:
                     continue
 
-                logMsg  = "fetching number of privileges "
-                logMsg += "for user '%s'" % user
-                logger.info(logMsg)
+                infoMsg  = "fetching number of privileges "
+                infoMsg += "for user '%s'" % user
+                logger.info(infoMsg)
 
                 if unescapedUser:
                     queryUser = unescapedUser
@@ -466,8 +488,8 @@ class Enumeration:
                     logger.warn(warnMsg)
                     continue
 
-                logMsg = "fetching privileges for user '%s'" % user
-                logger.info(logMsg)
+                infoMsg = "fetching privileges for user '%s'" % user
+                logger.info(infoMsg)
 
                 privileges = set()
                 indexRange = getRange(count)
@@ -549,8 +571,8 @@ class Enumeration:
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
-        logMsg = "fetching database names"
-        logger.info(logMsg)
+        infoMsg = "fetching database names"
+        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].dbs
 
@@ -565,8 +587,8 @@ class Enumeration:
                 self.cachedDbs = value
 
         if not self.cachedDbs:
-            logMsg = "fetching number of databases"
-            logger.info(logMsg)
+            infoMsg = "fetching number of databases"
+            logger.info(infoMsg)
 
             if kb.dbms == "MySQL" and not self.has_information_schema:
                 query = rootQuery["blind"]["count2"]
@@ -605,10 +627,10 @@ class Enumeration:
 
         self.forceDbmsEnum()
 
-        logMsg = "fetching tables"
+        infoMsg = "fetching tables"
         if conf.db:
-            logMsg += " for database '%s'" % conf.db
-        logger.info(logMsg)
+            infoMsg += " for database '%s'" % conf.db
+        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].tables
 
@@ -626,8 +648,8 @@ class Enumeration:
             elif conf.excludeSysDbs:
                 query += " WHERE "
                 query += " AND ".join("%s != '%s'" % (condition, db) for db in self.excludeDbsList)
-                logMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
-                logger.info(logMsg)
+                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                logger.info(infoMsg)
 
             value = inject.getValue(query, blind=False)
 
@@ -652,14 +674,14 @@ class Enumeration:
 
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    logMsg = "skipping system database '%s'" % db
-                    logger.info(logMsg)
+                    infoMsg = "skipping system database '%s'" % db
+                    logger.info(infoMsg)
 
                     continue
 
-                logMsg  = "fetching number of tables for "
-                logMsg += "database '%s'" % db
-                logger.info(logMsg)
+                infoMsg  = "fetching number of tables for "
+                infoMsg += "database '%s'" % db
+                logger.info(infoMsg)
 
                 query = rootQuery["blind"]["count"] % db
                 count = inject.getValue(query, inband=False, expected="int")
@@ -711,10 +733,10 @@ class Enumeration:
             errMsg = "missing database parameter"
             raise sqlmapMissingMandatoryOptionException, errMsg
 
-        logMsg  = "fetching columns "
-        logMsg += "for table '%s' " % conf.tbl
-        logMsg += "on database '%s'" % conf.db
-        logger.info(logMsg)
+        infoMsg  = "fetching columns "
+        infoMsg += "for table '%s' " % conf.tbl
+        infoMsg += "on database '%s'" % conf.db
+        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].columns
 
@@ -744,10 +766,10 @@ class Enumeration:
                 self.cachedColumns[conf.db] = table
 
         if not self.cachedColumns:
-            logMsg  = "fetching number of columns "
-            logMsg += "for table '%s'" % conf.tbl
-            logMsg += " on database '%s'" % conf.db
-            logger.info(logMsg)
+            infoMsg  = "fetching number of columns "
+            infoMsg += "for table '%s'" % conf.tbl
+            infoMsg += " on database '%s'" % conf.db
+            logger.info(infoMsg)
 
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
                 query = rootQuery["blind"]["count"] % (conf.tbl, conf.db)
@@ -841,12 +863,12 @@ class Enumeration:
         colList.sort(key=lambda x: x.lower())
         colString = ", ".join(column for column in colList)
 
-        logMsg = "fetching"
+        infoMsg = "fetching"
         if conf.col:
-            logMsg += " columns '%s'" % colString
-        logMsg += " entries for table '%s'" % conf.tbl
-        logMsg += " on database '%s'" % conf.db
-        logger.info(logMsg)
+            infoMsg += " columns '%s'" % colString
+        infoMsg += " entries for table '%s'" % conf.tbl
+        infoMsg += " on database '%s'" % conf.db
+        logger.info(infoMsg)
 
         if conf.unionUse:
             if kb.dbms == "Oracle":
@@ -893,12 +915,12 @@ class Enumeration:
                 warnMsg += "blind to confirm"
                 logger.warn(warnMsg)
 
-            logMsg = "fetching number of "
+            infoMsg = "fetching number of "
             if conf.col:
-                logMsg += "columns '%s' " % colString
-            logMsg += "entries for table '%s' " % conf.tbl
-            logMsg += "on database '%s'" % conf.db
-            logger.info(logMsg)
+                infoMsg += "columns '%s' " % colString
+            infoMsg += "entries for table '%s' " % conf.tbl
+            infoMsg += "on database '%s'" % conf.db
+            logger.info(infoMsg)
 
             if kb.dbms == "Oracle":
                 query = rootQuery["blind"]["count"] % conf.tbl.upper()
@@ -1011,8 +1033,8 @@ class Enumeration:
 
 
     def sqlQuery(self, query):
-        logMsg = "fetching SQL SELECT query output: '%s'" % query
-        logger.info(logMsg)
+        infoMsg = "fetching SQL SELECT query output: '%s'" % query
+        logger.info(infoMsg)
 
         if query.startswith("select "):
             query = query.replace("select ", "SELECT ", 1)
@@ -1029,9 +1051,9 @@ class Enumeration:
 
 
     def sqlShell(self):
-        logMsg  = "calling %s shell. To quit type " % kb.dbms
-        logMsg += "'x' or 'q' and press ENTER"
-        logger.info(logMsg)
+        infoMsg  = "calling %s shell. To quit type " % kb.dbms
+        infoMsg += "'x' or 'q' and press ENTER"
+        logger.info(infoMsg)
 
         autoCompletion(sqlShell=True)
 

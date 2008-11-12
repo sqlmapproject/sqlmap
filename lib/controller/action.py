@@ -68,7 +68,10 @@ def action():
 
     print "back-end DBMS:\t%s\n" % conf.dbmsHandler.getFingerprint()
 
-    # Miscellaneous options
+    # Techniques options
+    if conf.timeTest:
+        dumper.string("time based sql injection", conf.dbmsHandler.timeTest())
+
     if conf.unionTest:
         dumper.string("valid union", unionTest())
 

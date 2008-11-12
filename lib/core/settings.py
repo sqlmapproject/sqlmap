@@ -64,3 +64,5 @@ PGSQL_ALIASES     = [ "postgresql", "postgres", "pgsql", "psql", "pg" ]
 ORACLE_ALIASES    = [ "oracle", "orcl", "ora", "or" ]
 
 SUPPORTED_DBMS    = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES
+
+TIME_SECONDS      = 5

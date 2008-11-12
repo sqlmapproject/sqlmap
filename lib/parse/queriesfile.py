@@ -95,6 +95,14 @@ class queriesHandler(ContentHandler):
             data = sanitizeStr(attrs.get("query"))
             self.__queries.count = data
 
+        elif name == "comment":
+            data = sanitizeStr(attrs.get("query"))
+            self.__queries.comment = data
+
+        elif name == "timedelay":
+            data = sanitizeStr(attrs.get("query"))
+            self.__queries.timedelay = data
+
         elif name == "substring":
             data = sanitizeStr(attrs.get("query"))
             self.__queries.substring = data

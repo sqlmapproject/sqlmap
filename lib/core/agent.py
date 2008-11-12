@@ -95,7 +95,7 @@ class Agent:
         else:
             raise sqlmapNoneDataException, "unsupported injection type"
 
-        if kb.parenthesis != None:
+        if kb.parenthesis not in ( None, 0 ):
             query += "%s " % (")" * kb.parenthesis)
 
         query += string
@@ -343,7 +343,7 @@ class Agent:
         @rtype: C{str}
         """
 
-        inbandQuery = self.prefixQuery("UNION ALL SELECT ")
+        inbandQuery = self.prefixQuery(" UNION ALL SELECT ")
 
         if not exprPosition:
             exprPosition = kb.unionPosition
