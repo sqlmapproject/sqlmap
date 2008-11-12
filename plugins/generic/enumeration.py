@@ -39,7 +39,6 @@ from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.settings import TIME_SECONDS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.request import inject
@@ -67,27 +66,6 @@ class Enumeration:
         self.dumpedTable            = {}
 
         temp.inference              = queries[dbms].inference
-
-
-    # TODO: move this function to an appropriate file
-    def timeTest(self):
-        infoMsg  = "testing time based blind sql injection on parameter "
-        infoMsg += "'%s'" % kb.injParameter
-        logger.info(infoMsg)
-
-        # TODO: probably the '; <COMMENT>' will be filled in in all
-        # future time based SQL injection attacks at the end of the
-        # stacked query. Find a way that goStacked() function itself
-        # append it.
-        query  = "%s; " % queries[kb.dbms].timedelay % TIME_SECONDS
-        query += queries[kb.dbms].comment
-
-        self.timeTest = inject.goStacked(query, timeTest=True)
-
-        if self.timeTest[0] == True:
-            return "True, verified with payload: %s" % self.timeTest[1]
-        else:
-            return "False"
 
 
     def forceDbmsEnum(self):

@@ -38,10 +38,10 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.data import temp
-from lib.core.settings import TIME_SECONDS
+from lib.core.settings import TIME_DELAY
 from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.use import unionUse
-from lib.techniques.inference.blind import bisection
+from lib.techniques.blind.inference import bisection
 from lib.utils.resume import queryOutputLength
 from lib.utils.resume import resume
 
@@ -388,8 +388,9 @@ def goStacked(expression, timeTest=False):
     TODO: write description
     """
 
+    comment        = queries[kb.dbms].comment
     query          = agent.prefixQuery("; %s" % expression)
-    query          = agent.postfixQuery(query)
+    query          = agent.postfixQuery("%s; %s" % (query, comment))
     payload        = agent.payload(newValue=query)
 
     start    = time.time()
@@ -397,6 +398,6 @@ def goStacked(expression, timeTest=False):
     duration = int(time.time() - start)
 
     if timeTest:
-        return (duration >= TIME_SECONDS, payload)
+        return (duration >= TIME_DELAY, payload)
     else:
-        return duration >= TIME_SECONDS
+        return duration >= TIME_DELAY

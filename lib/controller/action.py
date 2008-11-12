@@ -31,6 +31,7 @@ from lib.core.data import kb
 from lib.core.dump import dumper
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
+from lib.techniques.blind.timebased import timeTest
 from lib.techniques.inband.union.test import unionTest
 
 
@@ -70,7 +71,7 @@ def action():
 
     # Techniques options
     if conf.timeTest:
-        dumper.string("time based sql injection", conf.dbmsHandler.timeTest())
+        dumper.string("time based blind sql injection payload", timeTest())
 
     if conf.unionTest:
         dumper.string("valid union", unionTest())

@@ -65,4 +65,4 @@ ORACLE_ALIASES    = [ "oracle", "orcl", "ora", "or" ]
 
 SUPPORTED_DBMS    = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES
 
-TIME_SECONDS      = 5
+TIME_DELAY        = 5

@@ -2,10 +2,17 @@ sqlmap (0.6.3-1) stable; urgency=low
 
   * Minor enhancement to be able to specify the number of seconds to wait
     between each HTTP request;
+  * Minor enhancement to be able to enumerate table columns and dump table
+    entries also if the database name is not provided by using the current
+    database on MySQL and MSSQL, the 'public' scheme on PostgreSQL and the
+    'USERS' TABLESPACE_NAME on Oracle;
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded
     to official Debian project repository;
   * Minor bug fix to handle session.error and session.timeout in HTTP
     requests;
+  * Minor bug fix so that when the user provide a SELECT statement to be
+    processed with an asterisk as columns, now it also work if in the FROM
+    there is no database name specified;
   * Minor bug fix to correctly dump table entries when the column is
     provided;
 

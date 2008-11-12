@@ -32,7 +32,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.unescaper import unescaper
-from lib.techniques.inference.blind import bisection
+from lib.techniques.blind.inference import bisection
 
 
 def queryOutputLength(expression, payload):
