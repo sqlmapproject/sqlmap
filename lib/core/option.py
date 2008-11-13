@@ -453,6 +453,7 @@ def __setKnowledgeBaseAttributes():
     kb.parenthesis    = None
     kb.resumedQueries = {}
     kb.targetUrls     = set()
+    kb.timeTest       = None
     kb.unionComment   = ""
     kb.unionCount     = None
     kb.unionPosition  = None

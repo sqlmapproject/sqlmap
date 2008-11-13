@@ -40,6 +40,8 @@ def timeTest():
     timeTest = inject.goStacked(query, timeTest=True)
 
     if timeTest[0] == True:
-        return timeTest[1]
+        kb.timeTest = timeTest[1]
     else:
-        return None
+        kb.timeTest = False
+
+    return kb.timeTest

@@ -1,5 +1,8 @@
 sqlmap (0.6.3-1) stable; urgency=low
 
+  * Minor enhancement to support stacked queries which will be used
+    sometimes by takeover functionality and time based blind SQL injection
+    technique;
   * Minor enhancement to be able to specify the number of seconds to wait
     between each HTTP request;
   * Minor enhancement to be able to enumerate table columns and dump table

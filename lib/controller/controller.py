@@ -96,7 +96,7 @@ def start():
 
     if conf.configFile and not kb.targetUrls:
         errMsg  = "you did not edit the configuration file properly, set "
-        errMsg += "the target url properly"
+        errMsg += "the target url"
         logger.error(errMsg)
 
     hostCount               = 0
