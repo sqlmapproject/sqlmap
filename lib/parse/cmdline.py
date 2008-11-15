@@ -129,7 +129,7 @@ def cmdLineParser():
 
         fingerprint.add_option("-f", "--fingerprint", dest="extensiveFp",
                                action="store_true",
-                               help="Perform an extensive database fingerprint")
+                               help="Perform an extensive DBMS version fingerprint")
 
         # Enumeration options
         enumeration = OptionGroup(parser, "Enumeration", "These options can "

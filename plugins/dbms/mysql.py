@@ -28,7 +28,8 @@ import re
 
 from lib.core.agent import agent
 from lib.core.common import fileToStr
-from lib.core.common import formatFingerprint
+from lib.core.common import formatDBMSfp
+from lib.core.common import formatOSfp
 from lib.core.common import getDirectories
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
@@ -43,6 +44,7 @@ from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import MYSQL_SYSTEM_DBS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
+from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
 #from lib.utils.fuzzer import passiveFuzzing
@@ -180,26 +182,28 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        actVer = formatFingerprint()
+        actVer = formatDBMSfp()
 
         if not conf.extensiveFp:
             return actVer
 
-        blank = " " * 16
-        value = "active fingerprint: %s" % actVer
-        comVer = self.__commentCheck()
+        comVer     = self.__commentCheck()
+        blank      = " " * 16
+        formatInfo = None
+        value      = "active fingerprint: %s" % actVer
 
         if comVer:
-            comVer = formatFingerprint([comVer])
+            comVer = formatDBMSfp([comVer])
             value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
 
         if self.banner:
-            banVer = re.search("^([\d\.]+)", self.banner)
-            banVer = banVer.groups()[0]
+            info       = bannerParser(self.banner)
+            formatInfo = formatOSfp(info)
+
+            banVer = info['version']
             if re.search("-log$", self.banner):
                 banVer += ", logging enabled"
-            banVer = formatFingerprint([banVer])
-
+            banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         #passiveFuzzing()
@@ -207,6 +211,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
         if htmlParsed:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlParsed)
+
+        if formatInfo:
+            value += "\n%s" % formatInfo
 
         return value
 

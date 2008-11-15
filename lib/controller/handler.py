@@ -55,7 +55,7 @@ def setHandler():
 
     for dbmsAliases, dbmsEntry in dbmsMap:
         if conf.dbms and conf.dbms not in dbmsAliases:
-            debugMsg  = "skipping to test for %s" % dbmsNames[count]
+            debugMsg  = "skipping test for %s" % dbmsNames[count]
             logger.debug(debugMsg)
             count += 1
             continue

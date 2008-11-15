@@ -26,7 +26,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
-from lib.core.common import formatFingerprint
+from lib.core.common import formatDBMSfp
+from lib.core.common import formatOSfp
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -37,6 +38,7 @@ from lib.core.session import setDbms
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
+from lib.parse.banner import bannerParser
 from lib.request import inject
 #from lib.utils.fuzzer import passiveFuzzing
 
@@ -119,16 +121,18 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if not conf.extensiveFp:
             return "PostgreSQL"
 
-        actVer = formatFingerprint()
+        actVer = formatDBMSfp()
 
-        blank = " " * 16
-        value = "active fingerprint: %s" % actVer
+        blank      = " " * 16
+        formatInfo = None
+        value      = "active fingerprint: %s" % actVer
 
         if self.banner:
-            banVer = re.search("^PostgreSQL ([\d\.]+)", self.banner)
-            banVer = banVer.groups()[0]
-            banVer = formatFingerprint([banVer])
+            info       = bannerParser(self.banner)
+            formatInfo = formatOSfp(info)
 
+            banVer = info['version']
+            banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         #passiveFuzzing()
@@ -136,6 +140,9 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
         if htmlParsed:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlParsed)
+
+        if formatInfo:
+            value += "\n%s" % formatInfo
 
         return value
 

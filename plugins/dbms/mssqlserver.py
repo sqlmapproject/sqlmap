@@ -28,14 +28,14 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
-from lib.core.common import formatFingerprint
+from lib.core.common import formatDBMSfp
+from lib.core.common import formatOSfp
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSyntaxException
@@ -124,16 +124,21 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        actVer = formatFingerprint()
+        actVer = formatDBMSfp()
 
         if not conf.extensiveFp:
             return actVer
 
-        blank = " " * 16
-        value = "active fingerprint: %s" % actVer
+        blank      = " " * 16
+        formatInfo = None
+        value      = "active fingerprint: %s" % actVer
 
         if self.banner:
-            release, version, servicepack = bannerParser(self.banner, paths.MSSQL_XML)
+            info        = bannerParser(self.banner)
+            release     = info["dbmsRelease"]
+            version     = info["dbmsVersion"]
+            servicepack = info["dbmsServicePack"]
+            formatInfo  = formatOSfp(info)
 
             if release and version and servicepack:
                 banVer  = "Microsoft SQL Server %s " % release
@@ -147,6 +152,9 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
         if htmlParsed:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlParsed)
+
+        if formatInfo:
+            value += "\n%s" % formatInfo
 
         return value
 

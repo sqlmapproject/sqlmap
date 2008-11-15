@@ -26,7 +26,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
-from lib.core.common import formatFingerprint
+from lib.core.common import formatDBMSfp
+from lib.core.common import formatOSfp
 from lib.core.common import getHtmlErrorFp
 from lib.core.data import conf
 from lib.core.data import kb
@@ -36,6 +37,7 @@ from lib.core.session import setDbms
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import ORACLE_SYSTEM_DBS
 from lib.core.unescaper import unescaper
+from lib.parse.banner import bannerParser
 from lib.request import inject
 #from lib.utils.fuzzer import passiveFuzzing
 
@@ -119,25 +121,28 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if not conf.extensiveFp:
             return "Oracle"
 
-        actVer = formatFingerprint()
+        actVer = formatDBMSfp()
 
-        blank = " " * 16
-        value = "active fingerprint: %s" % actVer
+        blank      = " " * 16
+        formatInfo = None
+        value      = "active fingerprint: %s" % actVer
 
         if self.banner:
-            banVer = re.search("^Oracle .*Release ([\d\.]+) ", self.banner)
+            info       = bannerParser(self.banner)
+            formatInfo = formatOSfp(info)
 
-            if banVer:
-                banVer = banVer.groups()[0]
-                banVer = formatFingerprint([banVer])
-
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+            banVer = info['version']
+            banVer = formatDBMSfp([banVer])
+            value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         #passiveFuzzing()
         htmlParsed = getHtmlErrorFp()
 
         if htmlParsed:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlParsed)
+
+        if formatInfo:
+            value += "\n%s" % formatInfo
 
         return value
 
@@ -159,7 +164,7 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
             logMsg = "confirming Oracle"
             logger.info(logMsg)
 
-            query = "SELECT VERSION FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1"
+            query = "SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1"
             version = inject.getValue(query)
 
             if not version:
@@ -173,13 +178,13 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
             if not conf.extensiveFp:
                 return True
 
-            if re.search("^11\.", version):
+            if re.search("^11", version):
                 kb.dbmsVersion = ["11i"]
-            elif re.search("^10\.", version):
+            elif re.search("^10", version):
                 kb.dbmsVersion = ["10g"]
-            elif re.search("^9\.", version):
+            elif re.search("^9", version):
                 kb.dbmsVersion = ["9i"]
-            elif re.search("^8\.", version):
+            elif re.search("^8", version):
                 kb.dbmsVersion = ["8i"]
 
             if conf.getBanner:

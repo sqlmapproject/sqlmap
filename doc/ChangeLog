@@ -1,14 +1,17 @@
 sqlmap (0.6.3-1) stable; urgency=low
 
+  * Major bug fix to correctly handle httplib.BadStatusLine exception;
   * Minor enhancement to support stacked queries which will be used
     sometimes by takeover functionality and time based blind SQL injection
     technique;
   * Minor enhancement to be able to specify the number of seconds to wait
     between each HTTP request;
   * Minor enhancement to be able to enumerate table columns and dump table
-    entries also if the database name is not provided by using the current
-    database on MySQL and MSSQL, the 'public' scheme on PostgreSQL and the
-    'USERS' TABLESPACE_NAME on Oracle;
+    entries, also when the database name is not provided, by using the
+    current database on MySQL and Microsoft SQL Server, the 'public'
+    scheme on PostgreSQL and the 'USERS' TABLESPACE_NAME on Oracle;
+  * Minor improvement to set by default in all HTTP requests the standard
+    HTTP headers (Accept, Accept-Encoding, etc);
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded
     to official Debian project repository;
   * Minor bug fix to handle session.error and session.timeout in HTTP

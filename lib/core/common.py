@@ -112,7 +112,7 @@ def paramToDict(place, parameters=None):
     return testableParameters
 
 
-def formatFingerprint(versions=None):
+def formatDBMSfp(versions=None):
     """
     This function format the back-end DBMS fingerprint value and return its
     values formatted as a human readable string.
@@ -128,6 +128,47 @@ def formatFingerprint(versions=None):
         return "%s %s" % (kb.dbms, versions)
     elif isinstance(versions, (list, set, tuple)):
         return "%s %s" % (kb.dbms, " and ".join([version for version in versions]))
+
+
+def formatOSfp(info):
+    """
+    This function format the back-end operating system fingerprint value
+    and return its values formatted as a human readable string.
+
+    @return: detected back-end operating system based upon fingerprint
+    techniques.
+    @rtype: C{str}
+    """
+
+    infoStr = ""
+
+    # Example of 'info' dictionary:
+    # {
+    #   'distrib': 'Ubuntu',
+    #   'release': '8.10',
+    #   'codename': 'Intrepid',
+    #   'version': '5.0.67',
+    #   'type': 'Linux'
+    # }
+
+    if not info or 'type' not in info:
+        return infoStr
+    elif info['type'] != "None":
+        infoStr += "back-end DBMS operating system: %s" % info['type']
+
+    if 'distrib' in info and info['distrib'] != "None":
+        infoStr += " %s" % info['distrib']
+
+    if 'release' in info and info['release'] != "None":
+        infoStr += " %s" % info['release']
+
+    if 'sp' in info and info['sp'] != "None":
+        infoStr += " %s" % info['sp']
+
+    if 'codename' in info and info['codename'] != "None":
+        infoStr += " (%s)" % info['codename']
+
+    return infoStr
 
 
 def getHtmlErrorFp():
@@ -442,20 +483,25 @@ def cleanQuery(query):
 
 def setPaths():
     # sqlmap paths
-    paths.SQLMAP_SHELL_PATH  = "%s/shell" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_TXT_PATH    = "%s/txt" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_XML_PATH    = "%s/xml" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_OUTPUT_PATH = "%s/output" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_DUMP_PATH   = paths.SQLMAP_OUTPUT_PATH + "/%s/dump"
-    paths.SQLMAP_FILES_PATH  = paths.SQLMAP_OUTPUT_PATH + "/%s/files"
+    paths.SQLMAP_SHELL_PATH      = "%s/shell" % paths.SQLMAP_ROOT_PATH
+    paths.SQLMAP_TXT_PATH        = "%s/txt" % paths.SQLMAP_ROOT_PATH
+    paths.SQLMAP_XML_PATH        = "%s/xml" % paths.SQLMAP_ROOT_PATH
+    paths.SQLMAP_XML_BANNER_PATH = "%s/banner" % paths.SQLMAP_XML_PATH
+    paths.SQLMAP_OUTPUT_PATH     = "%s/output" % paths.SQLMAP_ROOT_PATH
+    paths.SQLMAP_DUMP_PATH       = paths.SQLMAP_OUTPUT_PATH + "/%s/dump"
+    paths.SQLMAP_FILES_PATH      = paths.SQLMAP_OUTPUT_PATH + "/%s/files"
 
     # sqlmap files
-    paths.SQLMAP_HISTORY    = "%s/.sqlmap_history" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_CONFIG     = "%s/sqlmap-%s.conf" % (paths.SQLMAP_ROOT_PATH, randomStr())
-    paths.FUZZ_VECTORS      = "%s/fuzz_vectors.txt" % paths.SQLMAP_TXT_PATH
-    paths.ERRORS_XML        = "%s/errors.xml" % paths.SQLMAP_XML_PATH
-    paths.MSSQL_XML         = "%s/mssql.xml" % paths.SQLMAP_XML_PATH
-    paths.QUERIES_XML       = "%s/queries.xml" % paths.SQLMAP_XML_PATH
+    paths.SQLMAP_HISTORY         = "%s/.sqlmap_history" % paths.SQLMAP_ROOT_PATH
+    paths.SQLMAP_CONFIG          = "%s/sqlmap-%s.conf" % (paths.SQLMAP_ROOT_PATH, randomStr())
+    paths.FUZZ_VECTORS           = "%s/fuzz_vectors.txt" % paths.SQLMAP_TXT_PATH
+    paths.ERRORS_XML             = "%s/errors.xml" % paths.SQLMAP_XML_PATH
+    paths.QUERIES_XML            = "%s/queries.xml" % paths.SQLMAP_XML_PATH
+    paths.GENERIC_XML            = "%s/generic.xml" % paths.SQLMAP_XML_BANNER_PATH
+    paths.MSSQL_XML              = "%s/mssql.xml" % paths.SQLMAP_XML_BANNER_PATH
+    paths.MYSQL_XML              = "%s/mysql.xml" % paths.SQLMAP_XML_BANNER_PATH
+    paths.ORACLE_XML             = "%s/oracle.xml" % paths.SQLMAP_XML_BANNER_PATH
+    paths.PGSQL_XML              = "%s/postgresql.xml" % paths.SQLMAP_XML_BANNER_PATH
 
 
 def weAreFrozen():

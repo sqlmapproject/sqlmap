@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <!-- Windows -->
+    <regexp value="(Windows|Win32)">
+        <info type="Windows"/>
+    </regexp>
+
+    <regexp value="Microsoft.*7\.0.*Service Pack (\d)">
+        <info type="Windows" distrib="Vista" sp="1"/>
+    </regexp>
+
+    <regexp value="Microsoft.*6\.0.*Service Pack (\d)">
+        <info type="Windows" distrib="2003" sp="1"/>
+    </regexp>
+
+    <regexp value="Microsoft.*5\.1.*Service Pack (\d)">
+        <info type="Windows" distrib="XP" sp="1"/>
+    </regexp>
+
+    <regexp value="Microsoft.*5\.0.*Service Pack (\d)">
+        <info type="Windows" distrib="2000" sp="1"/>
+    </regexp>
+
+    <!-- Linux -->
+    <regexp value="Linux">
+        <info type="Linux"/>
+    </regexp>
+
+    <regexp value="Cobalt">
+        <info type="Linux" distrib="Cobalt"/>
+    </regexp>
+
+    <regexp value="Conectiva">
+        <info type="Linux" distrib="Conectiva"/>
+    </regexp>
+
+    <regexp value="Debian">
+        <info type="Linux" distrib="Debian or Ubuntu"/>
+    </regexp>
+
+    <regexp value="Fedora">
+        <info type="Linux" distrib="Fedora"/>
+    </regexp>
+
+    <regexp value="Gentoo">
+        <info type="Linux" distrib="Gentoo"/>
+    </regexp>
+
+    <regexp value="Knoppix">
+        <info type="Linux" distrib="Knoppix"/>
+    </regexp>
+
+    <regexp value="(Mandrake|Mandriva)">
+        <info type="Linux" distrib="Mandrake"/>
+    </regexp>
+
+    <regexp value="Red[\-\_\ ]*Hat">
+        <info type="Linux" distrib="RedHat"/>
+    </regexp>
+
+    <regexp value="SuSE">
+        <info type="Linux" distrib="SuSE"/>
+    </regexp>
+
+    <regexp value="Ubuntu">
+        <info type="Linux" distrib="Ubuntu"/>
+    </regexp>
+
+    <!-- Unices -->
+    <regexp value="FreeBSD">
+        <info type="FreeBSD"/>
+    </regexp>
+
+    <regexp value="NetBSD">
+        <info type="NetBSD"/>
+    </regexp>
+
+    <regexp value="OpenBSD">
+        <info type="OpenBSD"/>
+    </regexp>
+
+    <regexp value="Darwin">
+        <info type="Mac OSX"/>
+    </regexp>
+</root>
