@@ -195,7 +195,8 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getPrivileges(self):
-        warnMsg = "on MySQL is it not possible to fetch database users privileges"
+        warnMsg  = "on Microsoft SQL Server it is not possible to fetch "
+        warnMsg += "database users privileges"
         logger.warn(warnMsg)
 
         return {}
