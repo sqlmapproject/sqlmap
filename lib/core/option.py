@@ -278,6 +278,13 @@ def __setHTTPMethod():
         conf.method = "GET"
 
 
+def __setHTTPStandardHeaders():
+    conf.httpHeaders.append(("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"))
+    conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
+    conf.httpHeaders.append(("Accept-Encoding", "gzip,deflate"))
+    conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
+
+
 def __defaultHTTPUserAgent():
     """
     @return: default sqlmap HTTP User-Agent header
@@ -566,6 +573,7 @@ def init(inputOptions=advancedDict()):
     __setHTTPCookies()
     __setHTTPReferer()
     __setHTTPUserAgent()
+    __setHTTPStandardHeaders()
     __setHTTPMethod()
     __setHTTPAuthentication()
     __setHTTPProxy()

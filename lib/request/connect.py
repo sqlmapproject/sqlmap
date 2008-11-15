@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import httplib
 import md5
 import re
 import socket
@@ -180,6 +181,19 @@ class Connect:
                 return None
             else:
                 warnMsg += " or proxy"
+                raise sqlmapConnectionException, warnMsg
+
+        except httplib.BadStatusLine, _:
+            warnMsg = "the target url responded with an unknown HTTP "
+            warnMsg += "status code, try to force the HTTP User-Agent "
+            warnMsg += "header with option --user-agent or -a"
+
+            if conf.googleDork:
+                warnMsg += ", skipping to next url"
+                logger.warn(warnMsg)
+
+                return None
+            else:
                 raise sqlmapConnectionException, warnMsg
 
         parsePage(page)
