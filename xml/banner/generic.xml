@@ -6,37 +6,26 @@
         <info type="Windows"/>
     </regexp>
 
-    <regexp value="Microsoft.*7\.0">
-        <info type="Windows" distrib="Vista"/>
+    <regexp value="Service Pack (\d)">
+        <info sp="1"/>
     </regexp>
 
-    <regexp value="Microsoft.*7\.0.*Service Pack (\d)">
-        <info type="Windows" distrib="Vista" sp="1"/>
+    <regexp value="Microsoft.*7\.0">
+        <info type="Windows" distrib="Vista"/>
     </regexp>
 
     <regexp value="Microsoft.*6\.0">
         <info type="Windows" distrib="2003"/>
     </regexp>
 
-    <regexp value="Microsoft.*6\.0.*Service Pack (\d)">
-        <info type="Windows" distrib="2003" sp="1"/>
-    </regexp>
-
     <regexp value="Microsoft.*5\.1">
         <info type="Windows" distrib="XP"/>
-    </regexp>
-
-    <regexp value="Microsoft.*5\.1.*Service Pack (\d)">
-        <info type="Windows" distrib="XP" sp="1"/>
     </regexp>
 
     <regexp value="Microsoft.*5\.0">
         <info type="Windows" distrib="2000"/>
     </regexp>
 
-    <regexp value="Microsoft.*5\.0.*Service Pack (\d)">
-        <info type="Windows" distrib="2000" sp="1"/>
-    </regexp>
 
     <!-- Linux -->
     <regexp value="Linux">
@@ -82,6 +71,7 @@
     <regexp value="Ubuntu">
         <info type="Linux" distrib="Ubuntu"/>
     </regexp>
+
 
     <!-- Unices -->
     <regexp value="FreeBSD">

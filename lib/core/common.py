@@ -130,7 +130,11 @@ def formatDBMSfp(versions=None):
         return "%s %s" % (kb.dbms, " and ".join([version for version in versions]))
 
 
-def formatOSfp(info):
+def __formatOSfpString(values):
+    return " or ".join([v for v in values])
+
+
+def formatOSfp():
     """
     This function format the back-end operating system fingerprint value
     and return its values formatted as a human readable string.
@@ -142,31 +146,40 @@ def formatOSfp(info):
 
     infoStr = ""
 
-    # Example of 'info' dictionary:
+    # Examples of kb.bannerFp dictionary:
+    #
     # {
-    #   'distrib': 'Ubuntu',
-    #   'release': '8.10',
-    #   'codename': 'Intrepid',
-    #   'version': '5.0.67',
-    #   'type': 'Linux'
+    #   "distrib": set(["2000"]),
+    #   "dbmsVersion": "8.00.194",
+    #   "dbmsRelease": "2000",
+    #   "dbmsServicePack": "0",
+    #   "type": set(["Windows"])
+    # }
+    #
+    # {
+    #   "distrib": set(["Ubuntu"]),
+    #   "release": set(["8.10"]),
+    #   "codename": set(["Intrepid"]),
+    #   "version": "5.0.67",
+    #   "type": set(["Linux"])
     # }
 
-    if not info or 'type' not in info:
+    if not kb.bannerFp or "type" not in kb.bannerFp:
         return infoStr
-    elif info['type'] != "None":
-        infoStr += "back-end DBMS operating system: %s" % info['type']
+    else:
+        infoStr += "back-end DBMS operating system: %s" % __formatOSfpString(kb.bannerFp["type"])
 
-    if 'distrib' in info and info['distrib'] != "None":
-        infoStr += " %s" % info['distrib']
+    if "distrib" in kb.bannerFp:
+        infoStr += " %s" % __formatOSfpString(kb.bannerFp["distrib"])
 
-    if 'release' in info and info['release'] != "None":
-        infoStr += " %s" % info['release']
+    if "release" in kb.bannerFp:
+        infoStr += " %s" % __formatOSfpString(kb.bannerFp["release"])
 
-    if 'sp' in info and info['sp'] != "None":
-        infoStr += " %s" % info['sp']
+    if "sp" in kb.bannerFp:
+        infoStr += " %s" % __formatOSfpString(kb.bannerFp["sp"])
 
-    if 'codename' in info and info['codename'] != "None":
-        infoStr += " (%s)" % info['codename']
+    if "codename" in kb.bannerFp:
+        infoStr += " (%s)" % __formatOSfpString(kb.bannerFp["codename"])
 
     return infoStr
 
@@ -248,7 +261,7 @@ def getDirectories():
     if kb.docRoot:
         directories.add(kb.docRoot)
 
-    pagePath = re.search('^/(.*)/', conf.path)
+    pagePath = re.search("^/(.*)/", conf.path)
 
     if kb.docRoot and pagePath:
         pagePath = pagePath.groups()[0]

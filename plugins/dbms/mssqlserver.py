@@ -124,15 +124,13 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
     def getFingerprint(self):
         value      = ""
-        info       = None
         formatInfo = None
 
         if self.banner:
-            info       = bannerParser(self.banner)
-            formatInfo = formatOSfp(info)
+            formatInfo = formatOSfp()
 
-        if formatInfo:
-            value += "%s\n" % formatInfo
+            if formatInfo:
+                value += "%s\n" % formatInfo
 
         value  += "back-end DBMS: "
         actVer  = formatDBMSfp()
@@ -145,10 +143,10 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
-        if info:
-            release     = info["dbmsRelease"]
-            version     = info["dbmsVersion"]
-            servicepack = info["dbmsServicePack"]
+        if kb.bannerFp:
+            release     = kb.bannerFp["dbmsRelease"]
+            version     = kb.bannerFp["dbmsVersion"]
+            servicepack = kb.bannerFp["dbmsServicePack"]
 
             if release and version and servicepack:
                 banVer  = "Microsoft SQL Server %s " % release
@@ -169,8 +167,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if conf.dbms in MSSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
             setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
 
-            if conf.getBanner:
-                self.banner = inject.getValue("@@VERSION")
+            self.getPrematureBanner("@@VERSION")
 
             if not conf.extensiveFp:
                 return True
@@ -197,8 +194,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
             else:
                 setDbms("Microsoft SQL Server")
 
-            if conf.getBanner:
-                self.banner = inject.getValue("@@VERSION")
+            self.getPrematureBanner("@@VERSION")
 
             return True
         else:

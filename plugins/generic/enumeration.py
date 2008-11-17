@@ -41,6 +41,7 @@ from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
+from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -70,6 +71,13 @@ class Enumeration:
 
     def forceDbmsEnum(self):
         pass
+
+
+    def getPrematureBanner(self, query):
+        if conf.getBanner:
+            self.banner = inject.getValue(query)
+
+        bannerParser(self.banner)
 
 
     def getBanner(self):

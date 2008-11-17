@@ -182,15 +182,13 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
     def getFingerprint(self):
         value      = ""
-        info       = None
         formatInfo = None
 
         if self.banner:
-            info       = bannerParser(self.banner)
-            formatInfo = formatOSfp(info)
+            formatInfo = formatOSfp()
 
-        if formatInfo:
-            value += "%s\n" % formatInfo
+            if formatInfo:
+                value += "%s\n" % formatInfo
 
         value  += "back-end DBMS: "
         actVer  = formatDBMSfp()
@@ -208,9 +206,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             comVer = formatDBMSfp([comVer])
             value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
 
-        if info:
+        if kb.bannerFp:
             # TODO: move to the XML banner file
-            banVer = info['version']
+            banVer = kb.bannerFp['version']
 
             if re.search("-log$", self.banner):
                 banVer += ", logging enabled"
@@ -241,8 +239,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             if int(kb.dbmsVersion[0]) >= 5:
                 self.has_information_schema = True
 
-            if conf.getBanner:
-                self.banner = inject.getValue("VERSION()")
+            self.getPrematureBanner("VERSION()")
 
             if not conf.extensiveFp:
                 return True
@@ -270,8 +267,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 setDbms("MySQL 5")
                 self.has_information_schema = True
 
-                if conf.getBanner:
-                    self.banner = inject.getValue("VERSION()")
+                self.getPrematureBanner("VERSION()")
 
                 if not conf.extensiveFp:
                     kb.dbmsVersion = [">= 5.0.0"]
@@ -318,8 +314,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 setDbms("MySQL 4")
                 kb.dbmsVersion = ["< 5.0.0"]
 
-                if conf.getBanner:
-                    self.banner = inject.getValue("VERSION()")
+                self.getPrematureBanner("VERSION()")
 
                 if not conf.extensiveFp:
                     return True

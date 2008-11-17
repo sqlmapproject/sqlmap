@@ -44,11 +44,24 @@ class BannerHandler(ContentHandler):
     def __init__(self, banner):
         self.__banner   = sanitizeStr(banner)
 
-        self.__regexp   = None
-        self.__match    = None
-        self.__position = None
+        self.__regexp  = None
+        self.__match   = None
+        self.__version = None
 
-        self.info       = {}
+
+    def __feedInfo(self, key, value):
+        value = sanitizeStr(value)
+
+        if value in ( None, "None" ):
+            return
+
+        if key == "version":
+            kb.bannerFp[key] = value
+        else:
+            if key not in kb.bannerFp.keys():
+                kb.bannerFp[key] = set()
+
+            kb.bannerFp[key].add(value)
 
 
     def startElement(self, name, attrs):
@@ -57,22 +70,23 @@ class BannerHandler(ContentHandler):
             self.__match  = re.search(self.__regexp, self.__banner, re.I | re.M)
 
         if name == "info" and self.__match:
-            self.__position = sanitizeStr(attrs.get("version"))
+            self.__feedInfo("type", attrs.get("type"))
+            self.__feedInfo("distrib", attrs.get("distrib"))
+            self.__feedInfo("release", attrs.get("release"))
+            self.__feedInfo("codename", attrs.get("codename"))
+
+            self.__version = sanitizeStr(attrs.get("version"))
             self.__sp       = sanitizeStr(attrs.get("sp"))
 
-            self.info['type']     = sanitizeStr(attrs.get("type"))
-            self.info['distrib']  = sanitizeStr(attrs.get("distrib"))
-            self.info['release']  = sanitizeStr(attrs.get("release"))
-            self.info['codename'] = sanitizeStr(attrs.get("codename"))
-
-            if self.__position.isdigit():
-                self.info['version'] = self.__match.group(int(self.__position))
+            if self.__version.isdigit():
+                self.__feedInfo("version", self.__match.group(int(self.__version)))
 
             if self.__sp.isdigit():
-                self.info['sp'] = "Service Pack %s" % self.__match.group(int(self.__sp))
+                self.__feedInfo("sp", "Service Pack %s" % self.__match.group(int(self.__sp)))
 
-            self.__match    = None
-            self.__position = None
+            self.__regexp  = None
+            self.__match   = None
+            self.__version = None
 
 
 class MSSQLBannerHandler(ContentHandler):
@@ -90,7 +104,14 @@ class MSSQLBannerHandler(ContentHandler):
         self.__version       = ""
         self.__servicePack   = ""
 
-        self.info            = {}
+
+    def __feedInfo(self, key, value):
+        value = sanitizeStr(value)
+
+        if value in ( None, "None" ):
+            return
+
+        kb.bannerFp[key] = value
 
 
     def startElement(self, name, attrs):
@@ -114,9 +135,9 @@ class MSSQLBannerHandler(ContentHandler):
     def endElement(self, name):
         if name == "signature":
             if re.search(" %s[\.\ ]+" % self.__version, self.__banner):
-                self.info['dbmsRelease']     = self.__release
-                self.info['dbmsVersion']     = self.__version
-                self.info['dbmsServicePack'] = self.__servicePack
+                self.__feedInfo("dbmsRelease", self.__release)
+                self.__feedInfo("dbmsVersion", self.__version)
+                self.__feedInfo("dbmsServicePack", self.__servicePack)
 
             self.__version     = ""
             self.__servicePack = ""
@@ -137,9 +158,6 @@ def bannerParser(banner):
     DBMS banner based upon the data in XML file
     """
 
-    banner = sanitizeStr(banner)
-    info   = {}
-
     if kb.dbms == "Microsoft SQL Server":
         xmlfile = paths.MSSQL_XML
     elif kb.dbms == "MySQL":
@@ -154,24 +172,9 @@ def bannerParser(banner):
     if kb.dbms == "Microsoft SQL Server":
         handler = MSSQLBannerHandler(banner)
         parse(xmlfile, handler)
-        info = handler.info
-
         handler = BannerHandler(banner)
         parse(paths.GENERIC_XML, handler)
-
-        for title, value in handler.info.items():
-            info[title] = value
     else:
         handler = BannerHandler(banner)
         parse(xmlfile, handler)
-        info = handler.info
-
-        if "type" not in info or info["type"] == "None":
-            parse(paths.GENERIC_XML, handler)
-            info["type"] = handler.info["type"]
-
-        if "distrib" not in info or info["distrib"] == "None":
-            parse(paths.GENERIC_XML, handler)
-            info["distrib"] = handler.info["distrib"]
-
-    return info
+        parse(paths.GENERIC_XML, handler)

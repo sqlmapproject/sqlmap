@@ -118,15 +118,13 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
     def getFingerprint(self):
         value      = ""
-        info       = None
         formatInfo = None
 
         if self.banner:
-            info       = bannerParser(self.banner)
-            formatInfo = formatOSfp(info)
+            formatInfo = formatOSfp()
 
-        if formatInfo:
-            value += "%s\n" % formatInfo
+            if formatInfo:
+                value += "%s\n" % formatInfo
 
         value += "back-end DBMS: "
 
@@ -139,8 +137,8 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
-        if info:
-            banVer = info['version']
+        if kb.bannerFp:
+            banVer = kb.bannerFp['version']
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
@@ -160,8 +158,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if conf.dbms in PGSQL_ALIASES:
             setDbms("PostgreSQL")
 
-            if conf.getBanner:
-                self.banner = inject.getValue("VERSION()")
+            self.getPrematureBanner("VERSION()")
 
             if not conf.extensiveFp:
                 return True
@@ -186,8 +183,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             setDbms("PostgreSQL")
 
-            if conf.getBanner:
-                self.banner = inject.getValue("VERSION()")
+            self.getPrematureBanner("VERSION()")
 
             if not conf.extensiveFp:
                 return True

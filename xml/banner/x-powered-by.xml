@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <regexp value="PHP[\-\_\/\ ]([\d\.]+)">
+        <info technology="PHP" tech_version="1"/>
+    </regexp>
+
+    <regexp value="JSP[\-\_\/\ ]([\d\.]+)">
+        <info technology="JSP" tech_version="1"/>
+    </regexp>
+
+    <regexp value="ASP">
+        <info technology="ASP" type="Windows" distrib="2000|XP|2003|2008|Vista"/>
+    </regexp>
+
+    <regexp value="ASP\.NET">
+        <info technology="ASP.NET" type="Windows" distrib="2000|XP|2003|2008|Vista"/>
+    </regexp>
+
+    <regexp value="(JBoss|Servlet|Tomcat)[\-\_\/\ ]([\d\.]+)">
+        <info technology="Tomcat" tech_version="2"/>
+    </regexp>
+</root>

@@ -6,6 +6,7 @@
         <info version="1"/>
     </regexp>
 
+
     <!-- Ubuntu -->
     <regexp value="PostgreSQL\s+(8\.2\.7)\s+on\s+.*?\s+\(Ubuntu 4\.2\.3-2ubuntu4\)">
         <info version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid"/>

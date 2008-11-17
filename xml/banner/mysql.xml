@@ -6,10 +6,12 @@
         <info version="1"/>
     </regexp>
 
+
     <!-- Windows -->
     <regexp value="^([\d\.\-]+)[\-\_\ ].*nt$">
         <info version="1" type="Windows"/>
     </regexp>
+
 
     <!-- Debian -->
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+potato">
@@ -35,6 +37,7 @@
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+testing">
         <info version="1" type="Linux" distrib="Debian" codename="Testing"/>
     </regexp>
+
 
     <!-- Ubuntu -->
     <regexp value="(5\.0\.67)-0ubuntu6">
