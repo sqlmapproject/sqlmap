@@ -26,23 +26,20 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
-from xml.sax import parse
-from xml.sax.handler import ContentHandler
-
 from lib.core.common import checkFile
-from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.banner import BannerHandler
+
 
 def headersParser(headers):
     """
     This function calls a class that parses the input HTTP headers to
     fingerprint the back-end database management system operating system
-    and web application technology
+    and the web application technology
     """
 
-    topHeaders = {
+    topHeaders = (
                    "cookie",
                    "microsoftsharepointteamservices",
                    "server",
@@ -50,8 +47,9 @@ def headersParser(headers):
                    "www-authenticate",
                    "x-aspnet-version",
                    "x-powered-by",
-                 }
+                 )
 
     for header in headers:
         if header in topHeaders:
+            # TODO: fill me
             pass

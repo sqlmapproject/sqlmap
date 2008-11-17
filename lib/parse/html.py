@@ -63,15 +63,13 @@ class htmlHandler(ContentHandler):
                 self.__match = None
 
 
-def htmlParser(page, xmlfile=None):
+def htmlParser(page):
     """
     This function calls a class that parses the input HTML page to
     fingerprint the back-end database management system
     """
 
-    if not xmlfile:
-        xmlfile = paths.ERRORS_XML
-
+    xmlfile = paths.ERRORS_XML
     checkFile(xmlfile)
     page = sanitizeStr(page)
     handler = htmlHandler(page)

@@ -31,7 +31,6 @@ from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import paths
 from lib.core.data import temp
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.session import setUnion
@@ -74,7 +73,7 @@ def __unionPosition(count, expression):
         # HTML code of the result page because, for instance, it is there
         # when the query is wrong and the back-end DBMS is Microsoft SQL
         # server
-        htmlParsed = htmlParser(resultPage, paths.ERRORS_XML)
+        htmlParsed = htmlParser(resultPage)
 
         if randQuery in resultPage and not htmlParsed:
             setUnion(position=exprPosition)
