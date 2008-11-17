@@ -40,7 +40,6 @@ from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
-#from lib.utils.fuzzer import passiveFuzzing
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -118,7 +117,18 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        value  = "back-end DBMS: "
+        value      = ""
+        info       = None
+        formatInfo = None
+
+        if self.banner:
+            info       = bannerParser(self.banner)
+            formatInfo = formatOSfp(info)
+
+        if formatInfo:
+            value += "%s\n" % formatInfo
+
+        value += "back-end DBMS: "
 
         if not conf.extensiveFp:
             value += "PostgreSQL"
@@ -129,22 +139,15 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
-        if self.banner:
-            info       = bannerParser(self.banner)
-            formatInfo = formatOSfp(info)
-
+        if info:
             banVer = info['version']
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        #passiveFuzzing()
         htmlErrorFp = getHtmlErrorFp()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
-
-        if formatInfo:
-            value += "\n%s" % formatInfo
 
         return value
 
@@ -156,6 +159,9 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
         if conf.dbms in PGSQL_ALIASES:
             setDbms("PostgreSQL")
+
+            if conf.getBanner:
+                self.banner = inject.getValue("VERSION()")
 
             if not conf.extensiveFp:
                 return True
@@ -179,6 +185,9 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 return False
 
             setDbms("PostgreSQL")
+
+            if conf.getBanner:
+                self.banner = inject.getValue("VERSION()")
 
             if not conf.extensiveFp:
                 return True
@@ -214,9 +223,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 kb.dbmsVersion = [">= 6.2.0", "< 6.3.0"]
             else:
                 kb.dbmsVersion = ["< 6.2.0"]
-
-            if conf.getBanner:
-                self.banner = inject.getValue("VERSION()")
 
             return True
         else:

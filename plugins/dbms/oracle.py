@@ -39,7 +39,6 @@ from lib.core.settings import ORACLE_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
-#from lib.utils.fuzzer import passiveFuzzing
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -118,7 +117,18 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        value  = "back-end DBMS: "
+        value      = ""
+        info       = None
+        formatInfo = None
+
+        if self.banner:
+            info       = bannerParser(self.banner)
+            formatInfo = formatOSfp(info)
+
+        if formatInfo:
+            value += "%s\n" % formatInfo
+
+        value += "back-end DBMS: "
 
         if not conf.extensiveFp:
             value += "Oracle"
@@ -129,22 +139,15 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
         formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
-        if self.banner:
-            info       = bannerParser(self.banner)
-            formatInfo = formatOSfp(info)
-
+        if info:
             banVer = info['version']
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        #passiveFuzzing()
         htmlErrorFp = getHtmlErrorFp()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
-
-        if formatInfo:
-            value += "\n%s" % formatInfo
 
         return value
 
@@ -152,6 +155,9 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
     def checkDbms(self):
         if conf.dbms in ORACLE_ALIASES:
             setDbms("Oracle")
+
+            if conf.getBanner:
+                self.banner = inject.getValue("SELECT banner FROM v$version WHERE ROWNUM=1")
 
             if not conf.extensiveFp:
                 return True
@@ -177,6 +183,9 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             setDbms("Oracle")
 
+            if conf.getBanner:
+                self.banner = inject.getValue("SELECT banner FROM v$version WHERE ROWNUM=1")
+
             if not conf.extensiveFp:
                 return True
 
@@ -188,9 +197,6 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 kb.dbmsVersion = ["9i"]
             elif re.search("^8", version):
                 kb.dbmsVersion = ["8i"]
-
-            if conf.getBanner:
-                self.banner = inject.getValue("SELECT banner FROM v$version WHERE ROWNUM=1")
 
             return True
         else:

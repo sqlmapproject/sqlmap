@@ -47,7 +47,6 @@ from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
-#from lib.utils.fuzzer import passiveFuzzing
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -182,8 +181,19 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        value  = "back-end DBMS: "
-        actVer = formatDBMSfp()
+        value      = ""
+        info       = None
+        formatInfo = None
+
+        if self.banner:
+            info       = bannerParser(self.banner)
+            formatInfo = formatOSfp(info)
+
+        if formatInfo:
+            value += "%s\n" % formatInfo
+
+        value  += "back-end DBMS: "
+        actVer  = formatDBMSfp()
 
         if not conf.extensiveFp:
             value += actVer
@@ -198,24 +208,20 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             comVer = formatDBMSfp([comVer])
             value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
 
-        if self.banner:
-            info       = bannerParser(self.banner)
-            formatInfo = formatOSfp(info)
-
+        if info:
+            # TODO: move to the XML banner file
             banVer = info['version']
+
             if re.search("-log$", self.banner):
                 banVer += ", logging enabled"
+
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        #passiveFuzzing()
         htmlErrorFp = getHtmlErrorFp()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
-
-        if formatInfo:
-            value += "\n%s" % formatInfo
 
         return value
 
@@ -234,6 +240,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             if int(kb.dbmsVersion[0]) >= 5:
                 self.has_information_schema = True
+
+            if conf.getBanner:
+                self.banner = inject.getValue("VERSION()")
 
             if not conf.extensiveFp:
                 return True
@@ -260,6 +269,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             if inject.getValue("SELECT %s FROM information_schema.TABLES LIMIT 0, 1" % randInt) == randInt:
                 setDbms("MySQL 5")
                 self.has_information_schema = True
+
+                if conf.getBanner:
+                    self.banner = inject.getValue("VERSION()")
 
                 if not conf.extensiveFp:
                     kb.dbmsVersion = [">= 5.0.0"]
@@ -306,6 +318,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 setDbms("MySQL 4")
                 kb.dbmsVersion = ["< 5.0.0"]
 
+                if conf.getBanner:
+                    self.banner = inject.getValue("VERSION()")
+
                 if not conf.extensiveFp:
                     return True
 
@@ -331,9 +346,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                     kb.dbmsVersion = [">= 3.22.11", "< 3.23.14"]
                 else:
                     kb.dbmsVersion = ["< 3.22.11"]
-
-            if conf.getBanner:
-                self.banner = inject.getValue("VERSION()")
 
             return True
         else:

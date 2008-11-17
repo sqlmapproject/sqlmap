@@ -46,7 +46,6 @@ from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
-#from lib.utils.fuzzer import passiveFuzzing
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -124,8 +123,19 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        value  = "back-end DBMS: "
-        actVer = formatDBMSfp()
+        value      = ""
+        info       = None
+        formatInfo = None
+
+        if self.banner:
+            info       = bannerParser(self.banner)
+            formatInfo = formatOSfp(info)
+
+        if formatInfo:
+            value += "%s\n" % formatInfo
+
+        value  += "back-end DBMS: "
+        actVer  = formatDBMSfp()
 
         if not conf.extensiveFp:
             value += actVer
@@ -135,12 +145,10 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
-        if self.banner:
-            info        = bannerParser(self.banner)
+        if info:
             release     = info["dbmsRelease"]
             version     = info["dbmsVersion"]
             servicepack = info["dbmsServicePack"]
-            formatInfo  = formatOSfp(info)
 
             if release and version and servicepack:
                 banVer  = "Microsoft SQL Server %s " % release
@@ -149,14 +157,10 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
                 value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        #passiveFuzzing()
         htmlErrorFp = getHtmlErrorFp()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
-
-        if formatInfo:
-            value += "\n%s" % formatInfo
 
         return value
 
@@ -165,6 +169,9 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if conf.dbms in MSSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
             setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
 
+            if conf.getBanner:
+                self.banner = inject.getValue("@@VERSION")
+
             if not conf.extensiveFp:
                 return True
 
@@ -172,10 +179,10 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logger.info(logMsg)
 
         randInt = str(randomInt(1))
-        query = "LTRIM(STR(LEN(%s)))" % randInt
+        query   = "LTRIM(STR(LEN(%s)))" % randInt
 
         if inject.getValue(query) == "1":
-            query = "SELECT SUBSTRING((@@VERSION), 25, 1)"
+            query   = "SELECT SUBSTRING((@@VERSION), 25, 1)"
             version = inject.getValue(query)
 
             if version == "8":
@@ -189,9 +196,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
             else:
                 setDbms("Microsoft SQL Server")
-
-            if not conf.extensiveFp:
-                return True
 
             if conf.getBanner:
                 self.banner = inject.getValue("@@VERSION")
