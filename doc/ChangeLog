@@ -4,8 +4,10 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Minor enhancement to support stacked queries which will be used
     sometimes by takeover functionality and time based blind SQL injection
     technique;
+  * Minor enhancement to fingerprint the back-end DBMS operating system by
+    parsing the DBMS banner value when both -f and -b are provided;
   * Minor enhancement to be able to specify the number of seconds to wait
-    between each HTTP request;
+    between each HTTP request providing option --delay #;
   * Minor enhancement to be able to enumerate table columns and dump table
     entries, also when the database name is not provided, by using the
     current database on MySQL and Microsoft SQL Server, the 'public'

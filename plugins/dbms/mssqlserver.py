@@ -124,14 +124,16 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
+        value  = "back-end DBMS: "
         actVer = formatDBMSfp()
 
         if not conf.extensiveFp:
-            return actVer
+            value += actVer
+            return value
 
-        blank      = " " * 16
-        formatInfo = None
-        value      = "active fingerprint: %s" % actVer
+        blank       = " " * 15
+        formatInfo  = None
+        value      += "active fingerprint: %s" % actVer
 
         if self.banner:
             info        = bannerParser(self.banner)
@@ -148,10 +150,10 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         #passiveFuzzing()
-        htmlParsed = getHtmlErrorFp()
+        htmlErrorFp = getHtmlErrorFp()
 
-        if htmlParsed:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlParsed)
+        if htmlErrorFp:
+            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
 
         if formatInfo:
             value += "\n%s" % formatInfo

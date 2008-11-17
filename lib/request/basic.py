@@ -29,6 +29,7 @@ import re
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import paths
+from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
 
@@ -51,7 +52,7 @@ def forgeHeaders(cookie, ua):
     return headers
 
 
-def parsePage(page):
+def parseResponse(page, headers):
     """
     @param page: the page to parse to feed the knowledge base htmlFp
     (back-end DBMS fingerprint based upon DBMS error messages return
@@ -63,19 +64,17 @@ def parsePage(page):
     like for DBMS error messages (ERRORS_XML), see above.
     """
 
-    if not page:
-        return
+    if headers:
+        headersParser(headers)
 
-    htmlParsed = htmlParser(page, paths.ERRORS_XML)
+    if page:
+        htmlParser(page)
 
-    if htmlParsed and htmlParsed not in kb.htmlFp:
-        kb.htmlFp.append(htmlParsed)
+        # Detect injectable page absolute system path
+        # NOTE: this regular expression works if the remote web application
+        # is written in PHP and debug/error messages are enabled.
+        absFilePaths = re.findall(" in <b>(.*?)</b> on line", page, re.I)
 
-    # Detect injectable page absolute system path
-    # NOTE: this regular expression works if the remote web application
-    # is written in PHP and debug/error messages are enabled.
-    absFilePaths = re.findall(" in <b>(.*?)</b> on line", page, re.I)
-
-    for absFilePath in absFilePaths:
-        if absFilePath not in kb.absFilePaths:
-            kb.absFilePaths.add(absFilePath)
+        for absFilePath in absFilePaths:
+            if absFilePath not in kb.absFilePaths:
+                kb.absFilePaths.add(absFilePath)

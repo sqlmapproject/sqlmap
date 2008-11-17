@@ -2,7 +2,7 @@
 
 <root>
     <!-- Windows -->
-    <regexp value="(Windows|Win32)">
+    <regexp value="(Microsoft|Windows|Win32)">
         <info type="Windows"/>
     </regexp>
 

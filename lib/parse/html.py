@@ -31,6 +31,8 @@ from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
 from lib.core.common import sanitizeStr
+from lib.core.data import kb
+from lib.core.data import paths
 
 
 class htmlHandler(ContentHandler):
@@ -40,12 +42,12 @@ class htmlHandler(ContentHandler):
     """
 
     def __init__(self, page):
-        self.__dbms = None
-        self.__page = page
+        self.__dbms   = None
+        self.__page   = page
         self.__regexp = None
-        self.__match = None
+        self.__match  = None
 
-        self.dbms = None
+        self.dbms     = None
 
 
     def startElement(self, name, attrs):
@@ -61,15 +63,21 @@ class htmlHandler(ContentHandler):
                 self.__match = None
 
 
-def htmlParser(page, xmlfile):
+def htmlParser(page, xmlfile=None):
     """
     This function calls a class that parses the input HTML page to
     fingerprint the back-end database management system
     """
 
+    if not xmlfile:
+        xmlfile = paths.ERRORS_XML
+
     checkFile(xmlfile)
     page = sanitizeStr(page)
     handler = htmlHandler(page)
     parse(xmlfile, handler)
+
+    if handler.dbms and handler.dbms not in kb.htmlFp:
+        kb.htmlFp.append(handler.dbms)
 
     return handler.dbms

@@ -190,7 +190,7 @@ def getHtmlErrorFp():
         htmlVer = kb.htmlFp[0]
         htmlParsed = htmlVer
     elif len(kb.htmlFp) > 1:
-        htmlParsed = "or ".join([htmlFp for htmlFp in kb.htmlFp])
+        htmlParsed = " or ".join([htmlFp for htmlFp in kb.htmlFp])
 
     return htmlParsed
 

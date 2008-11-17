@@ -39,7 +39,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.request.basic import forgeHeaders
-from lib.request.basic import parsePage
+from lib.request.basic import parseResponse
 
 
 
@@ -196,7 +196,7 @@ class Connect:
             else:
                 raise sqlmapConnectionException, warnMsg
 
-        parsePage(page)
+        parseResponse(page, responseHeaders)
         responseMsg += "(%s - %d):\n" % (status, code)
 
         if conf.verbose <= 4:

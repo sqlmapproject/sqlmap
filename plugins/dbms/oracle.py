@@ -118,14 +118,16 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
+        value  = "back-end DBMS: "
+
         if not conf.extensiveFp:
-            return "Oracle"
+            value += "Oracle"
+            return value
 
-        actVer = formatDBMSfp()
-
-        blank      = " " * 16
-        formatInfo = None
-        value      = "active fingerprint: %s" % actVer
+        actVer      = formatDBMSfp()
+        blank       = " " * 15
+        formatInfo  = None
+        value      += "active fingerprint: %s" % actVer
 
         if self.banner:
             info       = bannerParser(self.banner)
@@ -136,10 +138,10 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         #passiveFuzzing()
-        htmlParsed = getHtmlErrorFp()
+        htmlErrorFp = getHtmlErrorFp()
 
-        if htmlParsed:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlParsed)
+        if htmlErrorFp:
+            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
 
         if formatInfo:
             value += "\n%s" % formatInfo

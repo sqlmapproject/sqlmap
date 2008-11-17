@@ -67,7 +67,7 @@ def action():
 
         raise sqlmapUnsupportedDBMSException, errMsg
 
-    print "back-end DBMS:\t%s\n" % conf.dbmsHandler.getFingerprint()
+    print "%s\n" % conf.dbmsHandler.getFingerprint()
 
     # Techniques options
     if conf.timeTest:

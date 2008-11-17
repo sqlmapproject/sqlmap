@@ -453,6 +453,7 @@ def __setKnowledgeBaseAttributes():
     kb.dbms           = None
     kb.dbmsDetected   = False
     kb.dbmsVersion    = None
+    kb.headersFp      = {}
     kb.htmlFp         = []
     kb.injParameter   = None
     kb.injPlace       = None
