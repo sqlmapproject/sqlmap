@@ -27,7 +27,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 
 from lib.core.common import formatDBMSfp
-from lib.core.common import formatOSfp
+from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -38,7 +38,6 @@ from lib.core.session import setDbms
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-from lib.parse.banner import bannerParser
 from lib.request import inject
 
 from plugins.generic.enumeration import Enumeration
@@ -117,14 +116,17 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        value      = ""
-        formatInfo = None
+        value  = ""
+        wsOsFp = formatFingerprint("web server", kb.headersFp)
+
+        if wsOsFp:
+            value += "%s\n" % wsOsFp
 
         if self.banner:
-            formatInfo = formatOSfp()
+            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
 
-            if formatInfo:
-                value += "%s\n" % formatInfo
+            if dbmsOsFp:
+                value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
 
@@ -134,11 +136,10 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
         actVer      = formatDBMSfp()
         blank       = " " * 15
-        formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
-            banVer = kb.bannerFp['version']
+            banVer = kb.bannerFp["dbmsVersion"]
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 

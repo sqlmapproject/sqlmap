@@ -33,60 +33,7 @@ from lib.core.common import checkFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
-
-
-class BannerHandler(ContentHandler):
-    """
-    This class defines methods to parse and extract information from
-    the given DBMS banner based upon the data in XML file
-    """
-
-    def __init__(self, banner):
-        self.__banner   = sanitizeStr(banner)
-
-        self.__regexp  = None
-        self.__match   = None
-        self.__version = None
-
-
-    def __feedInfo(self, key, value):
-        value = sanitizeStr(value)
-
-        if value in ( None, "None" ):
-            return
-
-        if key == "version":
-            kb.bannerFp[key] = value
-        else:
-            if key not in kb.bannerFp.keys():
-                kb.bannerFp[key] = set()
-
-            kb.bannerFp[key].add(value)
-
-
-    def startElement(self, name, attrs):
-        if name == "regexp":
-            self.__regexp = sanitizeStr(attrs.get("value"))
-            self.__match  = re.search(self.__regexp, self.__banner, re.I | re.M)
-
-        if name == "info" and self.__match:
-            self.__feedInfo("type", attrs.get("type"))
-            self.__feedInfo("distrib", attrs.get("distrib"))
-            self.__feedInfo("release", attrs.get("release"))
-            self.__feedInfo("codename", attrs.get("codename"))
-
-            self.__version = sanitizeStr(attrs.get("version"))
-            self.__sp       = sanitizeStr(attrs.get("sp"))
-
-            if self.__version.isdigit():
-                self.__feedInfo("version", self.__match.group(int(self.__version)))
-
-            if self.__sp.isdigit():
-                self.__feedInfo("sp", "Service Pack %s" % self.__match.group(int(self.__sp)))
-
-            self.__regexp  = None
-            self.__match   = None
-            self.__version = None
+from lib.parse.handler import FingerprintHandler
 
 
 class MSSQLBannerHandler(ContentHandler):
@@ -172,9 +119,10 @@ def bannerParser(banner):
     if kb.dbms == "Microsoft SQL Server":
         handler = MSSQLBannerHandler(banner)
         parse(xmlfile, handler)
-        handler = BannerHandler(banner)
+
+        handler = FingerprintHandler(banner, kb.bannerFp)
         parse(paths.GENERIC_XML, handler)
     else:
-        handler = BannerHandler(banner)
+        handler = FingerprintHandler(banner, kb.bannerFp)
         parse(xmlfile, handler)
         parse(paths.GENERIC_XML, handler)

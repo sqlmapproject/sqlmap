@@ -26,10 +26,25 @@
         <info type="Windows" distrib="2000"/>
     </regexp>
 
+    <regexp value="Microsoft.*4\.0">
+        <info type="Windows" distrib="NT 4.0"/>
+    </regexp>
+
+    <regexp value="Microsoft.*3\.0">
+        <info type="Windows" distrib="NT 4.0"/>
+    </regexp>
+
+    <regexp value="Microsoft.*2\.0">
+        <info type="Windows" distrib="NT 4.0"/>
+    </regexp>
 
     <!-- Linux -->
     <regexp value="Linux">
         <info type="Linux"/>
+    </regexp>
+
+    <regexp value="CentOS">
+        <info type="Linux" distrib="CentOS"/>
     </regexp>
 
     <regexp value="Cobalt">
@@ -61,7 +76,7 @@
     </regexp>
 
     <regexp value="Red[\-\_\ ]*Hat">
-        <info type="Linux" distrib="RedHat"/>
+        <info type="Linux" distrib="Red Hat"/>
     </regexp>
 
     <regexp value="SuSE">
@@ -71,7 +86,6 @@
     <regexp value="Ubuntu">
         <info type="Linux" distrib="Ubuntu"/>
     </regexp>
-
 
     <!-- Unices -->
     <regexp value="FreeBSD">

@@ -29,7 +29,7 @@ import re
 from lib.core.agent import agent
 from lib.core.common import fileToStr
 from lib.core.common import formatDBMSfp
-from lib.core.common import formatOSfp
+from lib.core.common import formatFingerprint
 from lib.core.common import getDirectories
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
@@ -44,7 +44,6 @@ from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import MYSQL_SYSTEM_DBS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
-from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -181,14 +180,17 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        value      = ""
-        formatInfo = None
+        value  = ""
+        wsOsFp = formatFingerprint("web server", kb.headersFp)
+
+        if wsOsFp:
+            value += "%s\n" % wsOsFp
 
         if self.banner:
-            formatInfo = formatOSfp()
+            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
 
-            if formatInfo:
-                value += "%s\n" % formatInfo
+            if dbmsOsFp:
+                value += "%s\n" % dbmsOsFp
 
         value  += "back-end DBMS: "
         actVer  = formatDBMSfp()
@@ -199,7 +201,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
         comVer      = self.__commentCheck()
         blank       = " " * 15
-        formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
         if comVer:
@@ -208,7 +209,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
         if kb.bannerFp:
             # TODO: move to the XML banner file
-            banVer = kb.bannerFp['version']
+            banVer = kb.bannerFp["dbmsVersion"]
 
             if re.search("-log$", self.banner):
                 banVer += ", logging enabled"

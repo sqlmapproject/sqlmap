@@ -27,67 +27,11 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 
 from xml.sax import parse
-from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
-from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
-
-
-class HeadersHandler(ContentHandler):
-    """
-    This class defines methods to parse and extract information from
-    the given HTTP header based upon the data in XML file
-    """
-
-    def __init__(self, header):
-        self.__header   = sanitizeStr(header)
-
-        self.__regexp      = None
-        self.__match       = None
-        self.__techVersion = None
-
-
-    def __feedInfo(self, key, value):
-        value = sanitizeStr(value)
-
-        if value in ( None, "None" ):
-            return
-
-        if key == "techVersion":
-            kb.headersFp[key] = value
-        else:
-            if key not in kb.headersFp.keys():
-                kb.headersFp[key] = set()
-
-            kb.headersFp[key].add(value)
-
-
-    def startElement(self, name, attrs):
-        if name == "regexp":
-            self.__regexp = sanitizeStr(attrs.get("value"))
-            self.__match  = re.search(self.__regexp, self.__header, re.I | re.M)
-
-        if name == "info" and self.__match:
-            self.__feedInfo("type", attrs.get("type"))
-            self.__feedInfo("distrib", attrs.get("distrib"))
-            self.__feedInfo("release", attrs.get("release"))
-            self.__feedInfo("codename", attrs.get("codename"))
-            self.__feedInfo("technology", attrs.get("codename"))
-
-            self.__techVersion = sanitizeStr(attrs.get("tech_version"))
-            self.__sp          = sanitizeStr(attrs.get("sp"))
-
-            if self.__techVersion.isdigit():
-                self.__feedInfo("techVersion", self.__match.group(int(self.__techVersion)))
-
-            if self.__sp.isdigit():
-                self.__feedInfo("sp", "Service Pack %s" % self.__match.group(int(self.__sp)))
-
-            self.__regexp      = None
-            self.__match       = None
-            self.__techVersion = None
+from lib.parse.handler import FingerprintHandler
 
 
 def headersParser(headers):
@@ -97,11 +41,16 @@ def headersParser(headers):
     and the web application technology
     """
 
+    if kb.headersCount > 3:
+        return
+
+    kb.headersCount += 1
+
     # TODO: ahead here
     topHeaders = {
                    #"cookie":                          "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
                    #"microsoftsharepointteamservices": "%s/microsoftsharepointteamservices.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   #"server":                          "%s/server.xml" % paths.SQLMAP_XML_BANNER_PATH,
+                   "server":                          "%s/server.xml" % paths.SQLMAP_XML_BANNER_PATH,
                    #"servlet-engine":                  "%s/servlet-engine.xml" % paths.SQLMAP_XML_BANNER_PATH,
                    #"set-cookie":                      "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
                    #"www-authenticate":                "%s/www-authenticate.xml" % paths.SQLMAP_XML_BANNER_PATH,
@@ -114,6 +63,6 @@ def headersParser(headers):
             value = headers[header]
             xmlfile = topHeaders[header]
             checkFile(xmlfile)
-            handler = HeadersHandler(value)
+            handler = FingerprintHandler(value, kb.headersFp)
             parse(xmlfile, handler)
             parse(paths.GENERIC_XML, handler)

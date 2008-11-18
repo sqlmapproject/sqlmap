@@ -29,7 +29,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import formatDBMSfp
-from lib.core.common import formatOSfp
+from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
 from lib.core.common import readInput
@@ -43,7 +43,6 @@ from lib.core.session import setDbms
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MSSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -123,14 +122,17 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getFingerprint(self):
-        value      = ""
-        formatInfo = None
+        value  = ""
+        wsOsFp = formatFingerprint("web server", kb.headersFp)
+
+        if wsOsFp:
+            value += "%s\n" % wsOsFp
 
         if self.banner:
-            formatInfo = formatOSfp()
+            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
 
-            if formatInfo:
-                value += "%s\n" % formatInfo
+            if dbmsOsFp:
+                value += "%s\n" % dbmsOsFp
 
         value  += "back-end DBMS: "
         actVer  = formatDBMSfp()
@@ -140,7 +142,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
             return value
 
         blank       = " " * 15
-        formatInfo  = None
         value      += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:

@@ -454,6 +454,7 @@ def __setKnowledgeBaseAttributes():
     kb.dbmsDetected   = False
     kb.dbmsVersion    = None
     kb.bannerFp       = {}
+    kb.headersCount   = 0
     kb.headersFp      = {}
     kb.htmlFp         = []
     kb.injParameter   = None

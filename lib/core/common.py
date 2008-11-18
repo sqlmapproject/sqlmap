@@ -130,14 +130,33 @@ def formatDBMSfp(versions=None):
         return "%s %s" % (kb.dbms, " and ".join([version for version in versions]))
 
 
-def __formatOSfpString(values):
-    return " or ".join([v for v in values])
+def __formatFingerprintString(values, chain="or"):
+    string = "|".join([v for v in values])
+    return string.replace("|", " %s " % chain)
 
 
-def formatOSfp():
+def formatFingerprint(target, info):
     """
     This function format the back-end operating system fingerprint value
     and return its values formatted as a human readable string.
+
+    Examples of info dictionary:
+
+    {
+      "distrib": set(["2000"]),
+      "dbmsVersion": "8.00.194",
+      "dbmsRelease": "2000",
+      "dbmsServicePack": "0",
+      "type": set(["Windows"])
+    }
+
+    {
+      "distrib": set(["Ubuntu"]),
+      "release": set(["8.10"]),
+      "codename": set(["Intrepid"]),
+      "version": "5.0.67",
+      "type": set(["Linux"])
+    }
 
     @return: detected back-end operating system based upon fingerprint
     techniques.
@@ -146,40 +165,25 @@ def formatOSfp():
 
     infoStr = ""
 
-    # Examples of kb.bannerFp dictionary:
-    #
-    # {
-    #   "distrib": set(["2000"]),
-    #   "dbmsVersion": "8.00.194",
-    #   "dbmsRelease": "2000",
-    #   "dbmsServicePack": "0",
-    #   "type": set(["Windows"])
-    # }
-    #
-    # {
-    #   "distrib": set(["Ubuntu"]),
-    #   "release": set(["8.10"]),
-    #   "codename": set(["Intrepid"]),
-    #   "version": "5.0.67",
-    #   "type": set(["Linux"])
-    # }
-
-    if not kb.bannerFp or "type" not in kb.bannerFp:
+    if not info or "type" not in info:
         return infoStr
     else:
-        infoStr += "back-end DBMS operating system: %s" % __formatOSfpString(kb.bannerFp["type"])
+        infoStr += "%s operating system: %s" % (target, __formatFingerprintString(info["type"]))
 
-    if "distrib" in kb.bannerFp:
-        infoStr += " %s" % __formatOSfpString(kb.bannerFp["distrib"])
+    if "distrib" in info:
+        infoStr += " %s" % __formatFingerprintString(info["distrib"])
 
-    if "release" in kb.bannerFp:
-        infoStr += " %s" % __formatOSfpString(kb.bannerFp["release"])
+    if "release" in info:
+        infoStr += " %s" % __formatFingerprintString(info["release"])
 
-    if "sp" in kb.bannerFp:
-        infoStr += " %s" % __formatOSfpString(kb.bannerFp["sp"])
+    if "sp" in info:
+        infoStr += " %s" % __formatFingerprintString(info["sp"])
 
-    if "codename" in kb.bannerFp:
-        infoStr += " (%s)" % __formatOSfpString(kb.bannerFp["codename"])
+    if "codename" in info:
+        infoStr += " (%s)" % __formatFingerprintString(info["codename"])
+
+    if "technology" in info:
+        infoStr += "\nweb application technology: %s" % __formatFingerprintString(info["technology"], "and")
 
     return infoStr
 

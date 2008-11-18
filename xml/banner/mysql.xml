@@ -1,46 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root>
-    <!-- Generic -->
     <regexp value="^([\d\.\-]+)[\-\_\ ].*">
-        <info version="1"/>
+        <info dbms_version="1"/>
     </regexp>
-
 
     <!-- Windows -->
     <regexp value="^([\d\.\-]+)[\-\_\ ].*nt$">
-        <info version="1" type="Windows"/>
+        <info dbms_version="1" type="Windows"/>
     </regexp>
-
 
     <!-- Debian -->
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+potato">
-        <info version="1" type="Linux" distrib="Debian" release="2.1" codename="Potato"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="2.1" codename="Potato"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+woody">
-        <info version="1" type="Linux" distrib="Debian" release="3.0" codename="Woody"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="3.0" codename="Woody"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+sarge">
-        <info version="1" type="Linux" distrib="Debian" release="3.1" codename="Sarge"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="3.1" codename="Sarge"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+etch">
-        <info version="1" type="Linux" distrib="Debian" release="4.0" codename="Etch"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="4.0" codename="Etch"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+(sid|unstable)">
-        <info version="1" type="Linux" distrib="Debian" codename="Unstable"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" codename="Unstable"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+testing">
-        <info version="1" type="Linux" distrib="Debian" codename="Testing"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" codename="Testing"/>
     </regexp>
-
 
     <!-- Ubuntu -->
     <regexp value="(5\.0\.67)-0ubuntu6">
-        <info version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid"/>
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid"/>
     </regexp>
 </root>

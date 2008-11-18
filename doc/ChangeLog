@@ -1,11 +1,14 @@
 sqlmap (0.6.3-1) stable; urgency=low
 
-  * Major bug fix to correctly handle httplib.BadStatusLine exception;
-  * Minor enhancement to support stacked queries which will be used
-    sometimes by takeover functionality and time based blind SQL injection
-    technique;
+  * Major enhancement to support stacked queries when the web application
+    supports it which will be used in the long run by takeover
+    functionality;
+  * Minor enhancement to test if the injectable parameter is affected by
+    a time based blind SQL injection technique;
+  * Minor enhancement to fingerprint the web server operating system and
+    the web application technology by parsing some HTTP response headers;
   * Minor enhancement to fingerprint the back-end DBMS operating system by
-    parsing the DBMS banner value when both -f and -b are provided;
+    parsing the DBMS banner value when -b option is provided;
   * Minor enhancement to be able to specify the number of seconds to wait
     between each HTTP request providing option --delay #;
   * Minor enhancement to be able to enumerate table columns and dump table
@@ -16,6 +19,7 @@ sqlmap (0.6.3-1) stable; urgency=low
     HTTP headers (Accept, Accept-Encoding, etc);
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded
     to official Debian project repository;
+  * Major bug fix to correctly handle httplib.BadStatusLine exception;
   * Minor bug fix to handle session.error and session.timeout in HTTP
     requests;
   * Minor bug fix so that when the user provide a SELECT statement to be

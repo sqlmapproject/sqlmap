@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root>
-    <!-- Generic -->
     <regexp value="^Oracle\s+.*Release\s+([\d\.]+)\s+">
-        <info version="1"/>
+        <info dbms_version="1"/>
     </regexp>
 </root>
