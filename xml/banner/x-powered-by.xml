@@ -9,15 +9,15 @@
         <info technology="JSP" tech_version="1"/>
     </regexp>
 
-    <regexp value="ASP">
-        <info technology="ASP" type="Windows" distrib="2000|XP|2003|2008|Vista"/>
+    <regexp value="ASP[\/]*$">
+        <info technology="ASP" type="Windows"/>
     </regexp>
 
     <regexp value="ASP\.NET">
-        <info technology="ASP.NET" type="Windows" distrib="2000|XP|2003|2008|Vista"/>
+        <info technology="ASP.NET" type="Windows"/>
     </regexp>
 
-    <regexp value="(JBoss|Servlet|Tomcat)[\-\_\/\ ]([\d\.]+)">
+    <regexp value="(JBoss|Servlet|Tomcat)[\-\_\/\ ]*([\d\.]+)">
         <info technology="Tomcat" tech_version="2"/>
     </regexp>
 </root>

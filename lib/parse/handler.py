@@ -60,7 +60,8 @@ class FingerprintHandler(ContentHandler):
             if key not in self.__info.keys():
                 self.__info[key] = set()
 
-            self.__info[key].add(value)
+            for v in value.split("|"):
+                self.__info[key].add(v)
 
 
     def startElement(self, name, attrs):

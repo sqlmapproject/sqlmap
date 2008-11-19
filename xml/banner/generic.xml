@@ -56,7 +56,7 @@
     </regexp>
 
     <regexp value="Debian">
-        <info type="Linux" distrib="Debian or Ubuntu"/>
+        <info type="Linux" distrib="Debian|Ubuntu"/>
     </regexp>
 
     <regexp value="Fedora">

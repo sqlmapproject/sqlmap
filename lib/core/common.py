@@ -130,9 +130,9 @@ def formatDBMSfp(versions=None):
         return "%s %s" % (kb.dbms, " and ".join([version for version in versions]))
 
 
-def __formatFingerprintString(values, chain="or"):
+def __formatFingerprintString(values, chain=" or "):
     string = "|".join([v for v in values])
-    return string.replace("|", " %s " % chain)
+    return string.replace("|", chain)
 
 
 def formatFingerprint(target, info):
@@ -140,22 +140,24 @@ def formatFingerprint(target, info):
     This function format the back-end operating system fingerprint value
     and return its values formatted as a human readable string.
 
-    Examples of info dictionary:
+    Example of info (kb.headersFp) dictionary:
 
     {
-      "distrib": set(["2000"]),
-      "dbmsVersion": "8.00.194",
-      "dbmsRelease": "2000",
-      "dbmsServicePack": "0",
-      "type": set(["Windows"])
+      'distrib': set(['Ubuntu']),
+      'type': set(['Linux']),
+      'technology': set(['PHP 5.2.6', 'Apache 2.2.9']),
+      'release': set(['8.10'])
     }
 
+    Example of info (kb.bannerFp) dictionary:
+
     {
-      "distrib": set(["Ubuntu"]),
-      "release": set(["8.10"]),
-      "codename": set(["Intrepid"]),
-      "version": "5.0.67",
-      "type": set(["Linux"])
+      'sp': set(['Service Pack 4']),
+      'dbmsVersion': '8.00.194',
+      'dbmsServicePack': '0',
+      'distrib': set(['2000']),
+      'dbmsRelease': '2000',
+      'type': set(['Windows'])
     }
 
     @return: detected back-end operating system based upon fingerprint
@@ -165,25 +167,23 @@ def formatFingerprint(target, info):
 
     infoStr = ""
 
-    if not info or "type" not in info:
-        return infoStr
-    else:
+    if info and "type" in info:
         infoStr += "%s operating system: %s" % (target, __formatFingerprintString(info["type"]))
 
-    if "distrib" in info:
-        infoStr += " %s" % __formatFingerprintString(info["distrib"])
+        if "distrib" in info:
+            infoStr += " %s" % __formatFingerprintString(info["distrib"])
 
-    if "release" in info:
-        infoStr += " %s" % __formatFingerprintString(info["release"])
+        if "release" in info:
+            infoStr += " %s" % __formatFingerprintString(info["release"])
 
-    if "sp" in info:
-        infoStr += " %s" % __formatFingerprintString(info["sp"])
+        if "sp" in info:
+            infoStr += " %s" % __formatFingerprintString(info["sp"])
 
-    if "codename" in info:
-        infoStr += " (%s)" % __formatFingerprintString(info["codename"])
+        if "codename" in info:
+            infoStr += " (%s)" % __formatFingerprintString(info["codename"])
 
     if "technology" in info:
-        infoStr += "\nweb application technology: %s" % __formatFingerprintString(info["technology"], "and")
+        infoStr += "\nweb application technology: %s" % __formatFingerprintString(info["technology"], ", ")
 
     return infoStr
 

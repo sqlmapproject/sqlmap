@@ -22,7 +22,7 @@
     </regexp>
 
     <regexp value="Apache/2.0.52 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="4.3 or 4.4"/>
+        <info type="Linux" distrib="CentOS" release="4.3|4.4"/>
     </regexp>
 
     <regexp value="Apache/2.0.46 \(CentOS\)">
@@ -77,7 +77,7 @@
     </regexp>
 
     <regexp value="Apache/2.2.6 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="6 or 7" updated="True"/>
+        <info type="Linux" distrib="Fedora" release="6|7" updated="True"/>
     </regexp>
 
     <!-- Apache: Red Hat -->
@@ -116,11 +116,11 @@
     </regexp>
  	
  	<regexp value="Apache/1.3.27 \(Unix\)  \(Red-Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="7.1 or 7.2 or 7.3" updated="True"/>
+        <info type="Linux" distrib="Red Hat" release="7.1|7.2|7.3" updated="True"/>
     </regexp>
 
     <regexp value="Apache/2.0.40 \(Red Hat Linux\)">
-        <info type="Linux" distrib="Red Hat" release="8.0 or 9"/>
+        <info type="Linux" distrib="Red Hat" release="8.0|9"/>
     </regexp>
     
     <regexp value="Apache/1.3.22 \(Unix\)  \(Red-Hat/Linux\)">
@@ -197,7 +197,7 @@
     </regexp>
 
     <regexp value="Apache/2.0.55 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="6.06 or 6.10"/>
+        <info type="Linux" distrib="Ubuntu" release="6.06|6.10"/>
     </regexp>
 
     <regexp value="Apache/2.2.3 \(Ubuntu\)">
@@ -224,7 +224,7 @@
     </regexp>
 
     <regexp value="Apache/1.3.9 \(Unix\)\s+\(NetRevolution Advanced Server/Linux-Mandrake\)">
-        <info type="Linux" distrib="Mandrake" release="6.1 or 7.0"/>
+        <info type="Linux" distrib="Mandrake" release="6.1|7.0"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.12 \(NetRevolution/Linux-Mandrake\)">
@@ -264,7 +264,7 @@
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.47 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="9.1 or 9.2"/>
+        <info type="Linux" distrib="Mandrake" release="9.1|9.2"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.29 \(Mandrake Linux/">
@@ -280,7 +280,7 @@
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.50 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="10.0 or 10.1"/>
+        <info type="Linux" distrib="Mandrake" release="10.0|10.1"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.53 \(Mandriva Linux/">
@@ -308,7 +308,7 @@
 
     <regexp value="Apache/1.3.12 \(Unix\) \(SuSE/Linux\)">
         <info technology="operating-system.type" type="str" value="Linux"/>
-        <info type="Linux" distrib="SuSE" release="6.4 or 7.0"/>
+        <info type="Linux" distrib="SuSE" release="6.4|7.0"/>
     </regexp>
 
     <regexp value="Apache/1.3.17 \(Unix\) \(SuSE/Linux\)">
