@@ -2,6 +2,7 @@
 
 <root>
     <!-- Windows -->
+
     <regexp value="(Microsoft|Windows|Win32)">
         <info type="Windows"/>
     </regexp>
@@ -39,6 +40,7 @@
     </regexp>
 
     <!-- Linux -->
+
     <regexp value="Linux">
         <info type="Linux"/>
     </regexp>
@@ -88,6 +90,7 @@
     </regexp>
 
     <!-- Unices -->
+
     <regexp value="FreeBSD">
         <info type="FreeBSD"/>
     </regexp>

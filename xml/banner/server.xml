@@ -1,7 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+     References:
+     * http://www.http-stats.com/Server
+     * http://en.wikipedia.org
+-->
+
 <root>
+    <!-- Microsoft IIS -->
+
+    <regexp value="Microsoft-IIS/(7\.0)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Microsoft-IIS/(6\.0)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Microsoft-IIS/(5\.1)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Microsoft-IIS/(5\.0)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Microsoft-IIS/(4\.0)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Microsoft-IIS/(3\.0)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Microsoft-IIS/(2\.0)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
     <!-- Apache -->
+
     <regexp value="Apache$">
         <info technology="Apache"/>
     </regexp>
@@ -29,270 +66,236 @@
         <info type="Linux" distrib="CentOS" release="5"/>
     </regexp>
 
-    <!-- Apache: Fedora -->
-    <!-- TODO: add Fedora 8, 9 and 10 -->
-
-    <regexp value="Apache/2.0.47 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="1"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.50 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="1" updated="True"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.49 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="2"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.51 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="2" updated="True"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.52 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="3"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.53 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="3" updated="True"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.54 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="4"/>
-    </regexp>
-
-    <regexp value="Apache/2.2.0 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="5"/>
-    </regexp>
-
-    <regexp value="Apache/2.2.2 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="5" updated="True"/>
-    </regexp>
-
-    <regexp value="Apache/2.2.3 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="6"/>
-    </regexp>
-
-    <regexp value="Apache/2.2.4 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="7"/>
-    </regexp>
-
-    <regexp value="Apache/2.2.6 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="6|7" updated="True"/>
-    </regexp>
-
-    <!-- Apache: Red Hat -->
-    <!-- TODO: add Red Hat 5, 5.1, 5.2 and 5.3 -->
-
-    <regexp value="Apache/1.2.6 Red Hat">
-        <info type="Linux" distrib="Red Hat" release="5.1"/>
-    </regexp>
-
-    <regexp value="Apache/1.3.3 \(Unix\)\s+\(Red Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="5.2"/>
-    </regexp>
-
-    <regexp value="Apache/1.3.6 \(Unix\)\s+\(Red Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="6.0"/>
-    </regexp>
-
-    <regexp value="Apache/1.3.9 \(Unix\)  \(Red Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="6.1"/>
-    </regexp>
-    
-    <regexp value="Apache/1.3.12 \(Unix\)  \(Red Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="7.0"/>
-    </regexp>
-	
-    <regexp value="Apache/1.3.19 \(Unix\)  \(Red-Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="7.1"/>
-    </regexp>
- 	
-    <regexp value="Apache/1.3.20 \(Unix\)  \(Red-Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="7.2"/>
-    </regexp>
- 	
-    <regexp value="Apache/1.3.23 \(Unix\)  \(Red-Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="7.3"/>
-    </regexp>
- 	
- 	<regexp value="Apache/1.3.27 \(Unix\)  \(Red-Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="7.1|7.2|7.3" updated="True"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.40 \(Red Hat Linux\)">
-        <info type="Linux" distrib="Red Hat" release="8.0|9"/>
-    </regexp>
-    
-    <regexp value="Apache/1.3.22 \(Unix\)  \(Red-Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="Enterprise 2.1"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.46 \(Red Hat\)">
-        <info type="Linux" distrib="Red Hat" release="Enterprise 3"/>
-    </regexp>
-
-    <regexp value="Apache/2.0.52 \(Red Hat\)">
-        <info type="Linux" distrib="Red Hat" release="Enterprise 4"/>
-    </regexp>
-
     <!-- Apache: Debian -->
     <!-- TODO: add Debian testing, unstable and experimental -->
 
     <regexp value="Apache/1.0.5 \(Unix\) Debian/GNU">
-        <info type="Linux" distrib="Debian" release="1.1"/>
+        <info type="Linux" distrib="Debian" release="1.1" codename="buzz"/>
     </regexp>
 
     <regexp value="Apache/1.1.1 \(Unix\) Debian/GNU">
-        <info type="Linux" distrib="Debian" release="1.2"/>
+        <info type="Linux" distrib="Debian" release="1.2" codename="rex"/>
     </regexp>
 
     <regexp value="Apache/1.1.3 \(Unix\) Debian/GNU">
-        <info type="Linux" distrib="Debian" release="1.3"/>
+        <info type="Linux" distrib="Debian" release="1.3" codename="bo"/>
     </regexp>
 
     <regexp value="Apache/1.3.0 \(Unix\) Debian/GNU">
-        <info type="Linux" distrib="Debian" release="2.0"/>
+        <info type="Linux" distrib="Debian" release="2.0" codename="hamm"/>
     </regexp>
 
     <regexp value="Apache/1.3.3 \(Unix\) Debian/GNU">
-        <info type="Linux" distrib="Debian" release="2.1"/>
+        <info type="Linux" distrib="Debian" release="2.1" codename="slink"/>
     </regexp>
 
     <regexp value="Apache/1.3.9 \(Unix\) Debian\/GNU">
-        <info type="Linux" distrib="Debian" release="2.2"/>
+        <info type="Linux" distrib="Debian" release="2.2" codename="potato"/>
     </regexp>
 
     <regexp value="Apache/1.3.26 \(Debian GNU\/Linux\)">
-        <info type="Linux" distrib="Debian" release="3.0"/>
+        <info type="Linux" distrib="Debian" release="3.0" codename="woody"/>
     </regexp>
 
     <regexp value="Apache/1.3.33 \(Debian GNU\/Linux\)">
-        <info type="Linux" distrib="Debian" release="3.1"/>
+        <info type="Linux" distrib="Debian" release="3.1" codename="sarge"/>
     </regexp>
 
     <regexp value="Apache/2.0.54 \(Debian GNU\/Linux\)">
-        <info type="Linux" distrib="Debian" release="3.1"/>
+        <info type="Linux" distrib="Debian" release="3.1" codename="sarge"/>
     </regexp>
 
     <regexp value="Apache/2.2.3 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="4.0"/>
+        <info type="Linux" distrib="Debian" release="4.0" codename="etch"/>
     </regexp>
 
     <regexp value="Apache/2.2.6 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="4.0" updated="True"/>
+        <info type="Linux" distrib="Debian" release="4.0" codename="etch" updated="True"/>
     </regexp>
 
-    <!-- Apache: Ubuntu -->
+    <!-- Apache: Fedora -->
+    <!-- TODO: add Fedora 8, 9 and 10 -->
 
-    <regexp value="Apache/2.0.50 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="4.10"/>
+    <regexp value="Apache/2.0.47 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="1" codename="Yarrow"/>
     </regexp>
 
-    <regexp value="Apache/2.0.53 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="5.04"/>
+    <regexp value="Apache/2.0.50 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="1" codename="Yarrow" updated="True"/>
     </regexp>
 
-    <regexp value="Apache/2.0.54 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="5.10"/>
+    <regexp value="Apache/2.0.49 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="2" codename="Tettnang"/>
     </regexp>
 
-    <regexp value="Apache/2.0.55 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="6.06|6.10"/>
+    <regexp value="Apache/2.0.51 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="2" codename="Tettnang" updated="True"/>
     </regexp>
 
-    <regexp value="Apache/2.2.3 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="7.04"/>
+    <regexp value="Apache/2.0.52 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="3" codename="Heidelberg"/>
     </regexp>
 
-    <regexp value="Apache/2.2.4 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="7.10"/>
+    <regexp value="Apache/2.0.53 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="3" codename="Heidelberg" updated="True"/>
     </regexp>
 
-    <regexp value="Apache/2.2.8 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="8.04"/>
+    <regexp value="Apache/2.0.54 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="4" codename="Stentz"/>
     </regexp>
 
-    <regexp value="Apache/2.2.9 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="8.10"/>
+    <regexp value="Apache/2.2.0 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="5" codename="Bordeaux"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.2 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="5" codename="Bordeaux" updated="True"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.3 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="6" codename="Zod"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.4 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="7" codename="Moonshine"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.6 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="6|7" codename="Zod|Moonshine" updated="True"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
     <!-- TODO: add Mandriva 2007.1, 2008.0, 2008.1 and 2009.0 -->
 
     <regexp value="Apache/1.3.6 \(Unix\)\s+\(Mandrake/Linux\)">
-        <info type="Linux" distrib="Mandrake" release="6.0"/>
+        <info type="Linux" distrib="Mandrake" release="6.0" codename="Venus"/>
     </regexp>
 
     <regexp value="Apache/1.3.9 \(Unix\)\s+\(NetRevolution Advanced Server/Linux-Mandrake\)">
-        <info type="Linux" distrib="Mandrake" release="6.1|7.0"/>
+        <info type="Linux" distrib="Mandrake" release="6.1|7.0" codename="Helios|Air"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.12 \(NetRevolution/Linux-Mandrake\)">
-        <info type="Linux" distrib="Mandrake" release="7.1"/>
+        <info type="Linux" distrib="Mandrake" release="7.1" codename="Helium"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.14 \(Linux-Mandrake/">
-        <info type="Linux" distrib="Mandrake" release="7.2"/>
+        <info type="Linux" distrib="Mandrake" release="7.2" codename="Odyssey"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.19 \(Linux-Mandrake/">
-        <info type="Linux" distrib="Mandrake" release="8.0"/>
+        <info type="Linux" distrib="Mandrake" release="8.0" codename="Traktopel"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.20 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="8.1"/>
+        <info type="Linux" distrib="Mandrake" release="8.1" codename="Vitamin"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.23 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="8.2"/>
+        <info type="Linux" distrib="Mandrake" release="8.2" codename="Bluebird"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.26 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="9.0"/>
+        <info type="Linux" distrib="Mandrake" release="9.0" codename="Dolphin"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.27 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="9.1"/>
+        <info type="Linux" distrib="Mandrake" release="9.1" codename="Bamboo"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.44 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="9.1"/>
+        <info type="Linux" distrib="Mandrake" release="9.1" codename="Bamboo"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.28 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="9.2"/>
+        <info type="Linux" distrib="Mandrake" release="9.2" codename="FiveStar"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.47 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="9.1|9.2"/>
+        <info type="Linux" distrib="Mandrake" release="9.1|9.2" codename="Bamboo|FiveStar"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.29 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="10.0"/>
+        <info type="Linux" distrib="Mandrake" release="10.0" codename="Community"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.48 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="10.0"/>
+        <info type="Linux" distrib="Mandrake" release="10.0" codename="Community"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/1.3.31 \(Linux-Mandrake/">
-        <info type="Linux" distrib="Mandrake" release="10.1"/>
+        <info type="Linux" distrib="Mandrake" release="10.1" codename="Official"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.50 \(Mandrake Linux/">
-        <info type="Linux" distrib="Mandrake" release="10.0|10.1"/>
+        <info type="Linux" distrib="Mandrake" release="10.0|10.1" codename="Community|Official"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.53 \(Mandriva Linux/">
-        <info type="Linux" distrib="Mandrake" release="10.2"/>
+        <info type="Linux" distrib="Mandrake" release="10.2" codename="Limited Edition 2005"/>
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.54 \(Mandriva Linux/">
-        <info type="Linux" distrib="Mandrake" release="2006.0"/>
+        <info type="Linux" distrib="Mandrive" release="2006.0"/>
     </regexp>
 
     <regexp value="Apache/2.2.3 \(Mandriva Linux/">
-        <info type="Linux" distrib="Mandrake" release="2007"/>
+        <info type="Linux" distrib="Mandrive" release="2007"/>
+    </regexp>
+
+    <!-- Apache: Red Hat -->
+    <!-- TODO: add Red Hat 5, 5.1, 5.2 and 5.3 -->
+
+    <regexp value="Apache/1.2.6 Red Hat">
+        <info type="Linux" distrib="Red Hat" release="5.1" codename="Manhattan"/>
+    </regexp>
+
+    <regexp value="Apache/1.3.3 \(Unix\)\s+\(Red Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="5.2" codename="Apollo"/>
+    </regexp>
+
+    <regexp value="Apache/1.3.6 \(Unix\)\s+\(Red Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="6.0" codename="Hedwig"/>
+    </regexp>
+
+    <regexp value="Apache/1.3.9 \(Unix\)  \(Red Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="6.1" codename="Cartman"/>
+    </regexp>
+    
+    <regexp value="Apache/1.3.12 \(Unix\)  \(Red Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="7.0" codename="Guinness"/>
+    </regexp>
+	
+    <regexp value="Apache/1.3.19 \(Unix\)  \(Red-Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="7.1" codename="Seawolf"/>
+    </regexp>
+ 	
+    <regexp value="Apache/1.3.20 \(Unix\)  \(Red-Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="7.2" codename="Enigma"/>
+    </regexp>
+ 	
+    <regexp value="Apache/1.3.23 \(Unix\)  \(Red-Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="7.3" codename="Valhalla"/>
+    </regexp>
+ 	
+ 	<regexp value="Apache/1.3.27 \(Unix\)  \(Red-Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="7.1|7.2|7.3" codename="Seawolf|Enigma|Valhalla" updated="True"/>
+    </regexp>
+
+    <regexp value="Apache/2.0.40 \(Red Hat Linux\)">
+        <info type="Linux" distrib="Red Hat" release="8.0|9" codename="Psyche|Shrike"/>
+    </regexp>
+    
+    <regexp value="Apache/1.3.22 \(Unix\)  \(Red-Hat/Linux\)">
+        <info type="Linux" distrib="Red Hat" release="Enterprise 2.1" codename="Panama"/>
+    </regexp>
+
+    <regexp value="Apache/2.0.46 \(Red Hat\)">
+        <info type="Linux" distrib="Red Hat" release="Enterprise 3" codename="Taroon"/>
+    </regexp>
+
+    <regexp value="Apache/2.0.52 \(Red Hat\)">
+        <info type="Linux" distrib="Red Hat" release="Enterprise 4" codename="Nahant"/>
     </regexp>
 
     <!-- Apache: SuSE -->
@@ -365,5 +368,39 @@
 
     <regexp value="Apache/2.0.54 \(Linux/SuSE\)">
         <info type="Linux" distrib="SuSE" release="10.0"/>
+    </regexp>
+
+    <!-- Apache: Ubuntu -->
+
+    <regexp value="Apache/2.0.50 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="4.10" codename="Warty Warthog"/>
+    </regexp>
+
+    <regexp value="Apache/2.0.53 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="5.04" codename="Hoary Hedgehog"/>
+    </regexp>
+
+    <regexp value="Apache/2.0.54 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="5.10" codename="Breezy Badger"/>
+    </regexp>
+
+    <regexp value="Apache/2.0.55 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="6.06|6.10" codename="Dapper Drake|Edgy Eft"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.3 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="7.04" codename="Feisty Fawn"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.4 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="7.10" codename="Gutsy Gibbon"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.8 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="8.04" codename="Hardy Heron"/>
+    </regexp>
+
+    <regexp value="Apache/2.2.9 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid Ibex"/>
     </regexp>
 </root>

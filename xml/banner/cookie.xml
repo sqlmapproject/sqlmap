@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     References:
+     * http://www.http-stats.com/Set-Cookie2
+     * http://www.owasp.org/index.php/Category:OWASP_Cookies_Database
+-->
+
+<root>
+    <regexp value="ASPSESSIONID">
+        <info technology="Microsoft IIS|ASP" type="Windows" distrib="2000"/>
+    </regexp>
+
+    <regexp value="ASP\.NET_SessionId">
+        <info technology="Microsoft IIS|ASP.NET" type="Windows" distrib="2003"/>
+    </regexp>
+
+    <regexp value="JSESSIONID">
+        <info technology="JSP"/>
+    </regexp>
+
+    <regexp value="PHPSESSION">
+        <info technology="PHP"/>
+    </regexp>
+
+    <regexp value="Apache">
+        <info technology="Apache"/>
+    </regexp>
+
+    <regexp value="JServSessionId">
+        <info technology="Apache|JSP"/>
+    </regexp>
+</root>

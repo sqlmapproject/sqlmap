@@ -41,28 +41,30 @@ def headersParser(headers):
     and the web application technology
     """
 
+    # It is enough to parse the headers on first four HTTP responses
     if kb.headersCount > 3:
         return
 
     kb.headersCount += 1
 
-    # TODO: ahead here
     topHeaders = {
-                   #"cookie":                          "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   #"microsoftsharepointteamservices": "%s/microsoftsharepointteamservices.xml" % paths.SQLMAP_XML_BANNER_PATH,
+                   "cookie":                          "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
+                   "microsoftsharepointteamservices": "%s/sharepoint.xml" % paths.SQLMAP_XML_BANNER_PATH,
                    "server":                          "%s/server.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   #"servlet-engine":                  "%s/servlet-engine.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   #"set-cookie":                      "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   #"www-authenticate":                "%s/www-authenticate.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   #"x-aspnet-version":                "%s/x-aspnet-version.xml" % paths.SQLMAP_XML_BANNER_PATH,
+                   "servlet-engine":                  "%s/servlet.xml" % paths.SQLMAP_XML_BANNER_PATH,
+                   "set-cookie":                      "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
+                   "x-aspnet-version":                "%s/x-aspnet-version.xml" % paths.SQLMAP_XML_BANNER_PATH,
                    "x-powered-by":                    "%s/x-powered-by.xml" % paths.SQLMAP_XML_BANNER_PATH,
                  }
 
     for header in headers:
         if header in topHeaders.keys():
-            value = headers[header]
+            value   = headers[header]
             xmlfile = topHeaders[header]
+
             checkFile(xmlfile)
+
             handler = FingerprintHandler(value, kb.headersFp)
+
             parse(xmlfile, handler)
             parse(paths.GENERIC_XML, handler)

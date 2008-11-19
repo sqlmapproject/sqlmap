@@ -280,6 +280,15 @@ option to update it to the latest stable version available on its
 <htmlurl url="http://sourceforge.net/project/showfiles.php?group_id=171598&amp;package_id=196107"
 name="SourceForge File List page">.
 
+<p>
+You can also checkout the source code from the sqlmap
+<htmlurl url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/" name="Subversion">
+repository to give a try to the development release:
+
+<tscreen><verb>
+$ svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev
+</verb></tscreen>
+
 
 <sect>License and copyright
 

@@ -51,6 +51,9 @@ Will Holcomb <wholcomb@gmail.com>
 Luke Jahnke <luke.jahnke@gmail.com>
     for reporting a bug when running against MySQL < 5.0
 
+Nico Leidecker <nico@leidecker.info>
+    for providing with feedback on a few features
+
 Pavol Luptak <pavol.luptak@nethemba.com>
     for reporting a bug when injecting on a POST data parameter
 

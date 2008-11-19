@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Reference: http://www.http-stats.com/Set-Cookie2 -->
+
+<root>
+    <regexp value="([\d\.]+)">
+        <info technology="Microsoft Share Point" tech_version="1" type="Windows"/>
+    </regexp>
+</root>

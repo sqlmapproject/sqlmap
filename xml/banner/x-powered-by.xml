@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- Reference: http://www.http-stats.com/X-Powered-By -->
+
 <root>
     <regexp value="PHP[\-\_\/\ ]([\d\.]+)">
         <info technology="PHP" tech_version="1"/>
@@ -9,7 +11,7 @@
         <info technology="JSP" tech_version="1"/>
     </regexp>
 
-    <regexp value="ASP[\/]*$">
+    <regexp value="ASP[\/\d\.]*$">
         <info technology="ASP" type="Windows"/>
     </regexp>
 
@@ -17,7 +19,11 @@
         <info technology="ASP.NET" type="Windows"/>
     </regexp>
 
-    <regexp value="(JBoss|Servlet|Tomcat)[\-\_\/\ ]*([\d\.]+)">
+    <regexp value="(JBoss|Tomcat)[\-\_\/\ ]*([\d\.]+)">
         <info technology="Tomcat" tech_version="2"/>
+    </regexp>
+
+    <regexp value="Servlet[\-\_\/\ ]*([\d\.]+)">
+        <info technology="Servlet" tech_version="1"/>
     </regexp>
 </root>
