@@ -67,6 +67,10 @@ def __goInference(payload, expression):
     count, value = bisection(payload, expression, length=length)
     duration = int(time.time() - start)
 
+    if conf.eta and length:
+        infoMsg = "retrieved: %s" % value
+        logger.info(infoMsg)
+
     infoMsg = "performed %d queries in %d seconds" % (count, duration)
     logger.info(infoMsg)
 

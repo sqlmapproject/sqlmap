@@ -35,9 +35,9 @@ class ProgressBar:
     def __init__(self, minValue=0, maxValue=10, totalWidth=54):
         self.__progBar = "[]"
         self.__oldProgBar = ""
-        self.__min = minValue
-        self.__max = maxValue
-        self.__span = maxValue - minValue
+        self.__min = int(minValue)
+        self.__max = int(maxValue)
+        self.__span = self.__max - self.__min
         self.__width = totalWidth
         self.__amount = 0
         self.update()
