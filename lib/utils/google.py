@@ -68,11 +68,15 @@ class Google:
         your Google dork search results
         """
 
-        targetUrls = set()
+        targetUrls    = {}
+        targetUrlsSet = set()
 
         for match in self.__matches:
             if re.search("(.*?)\?(.+)", match, re.I):
-                targetUrls.add(match)
+                targetUrlsSet.add(match)
+
+        for targetUrl in targetUrlsSet:
+            targetUrls[targetUrl] = None
 
         return targetUrls
 

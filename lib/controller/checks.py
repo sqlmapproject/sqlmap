@@ -308,7 +308,7 @@ def checkConnection():
     try:
         kb.defaultResult = Request.queryPage()
     except sqlmapConnectionException, exceptionMsg:
-        if conf.googleDork:
+        if conf.multipleTargets:
             exceptionMsg += ", skipping to next url"
             logger.warn(exceptionMsg)
             return False

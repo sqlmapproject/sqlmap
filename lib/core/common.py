@@ -97,7 +97,7 @@ def paramToDict(place, parameters=None):
             warnMsg  = "the testable parameter '%s' " % paramStr
             warnMsg += "you provided is not into the %s" % place
 
-        if conf.googleDork:
+        if conf.multipleTargets:
             warnMsg += ", skipping to next url"
 
         logger.warn(warnMsg)

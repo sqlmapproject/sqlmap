@@ -162,7 +162,7 @@ class Connect:
         except (urllib2.URLError, socket.error), _:
             warnMsg = "unable to connect to the target url"
 
-            if conf.googleDork:
+            if conf.multipleTargets:
                 warnMsg += ", skipping to next url"
                 logger.warn(warnMsg)
 
@@ -174,7 +174,7 @@ class Connect:
         except socket.timeout, _:
             warnMsg = "connection timed out to the target url"
 
-            if conf.googleDork:
+            if conf.multipleTargets:
                 warnMsg += ", skipping to next url"
                 logger.warn(warnMsg)
 
@@ -188,7 +188,7 @@ class Connect:
             warnMsg += "status code, try to force the HTTP User-Agent "
             warnMsg += "header with option --user-agent or -a"
 
-            if conf.googleDork:
+            if conf.multipleTargets:
                 warnMsg += ", skipping to next url"
                 logger.warn(warnMsg)
 

@@ -219,7 +219,7 @@ class Dump:
             db = "All"
         table = tableValues["__infos__"]["table"]
 
-        if not conf.googleDork:
+        if not conf.multipleTargets:
             dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, db)
 
             if not os.path.isdir(dumpDbPath):
@@ -259,7 +259,7 @@ class Dump:
                 blank = " " * (maxlength - len(column))
                 self.__write("| %s%s" % (column, blank), n=False)
 
-                if not conf.googleDork and field == fields:
+                if not conf.multipleTargets and field == fields:
                     dataToDumpFile(dumpFP, "\"%s\"" % column)
                 else:
                     dataToDumpFile(dumpFP, "\"%s\"," % column)
@@ -267,7 +267,7 @@ class Dump:
                 field += 1
 
         self.__write("|\n%s" % separator)
-        if not conf.googleDork:
+        if not conf.multipleTargets:
             dataToDumpFile(dumpFP, "\n")
 
         for i in range(count):
@@ -293,12 +293,12 @@ class Dump:
                     field += 1
 
             self.__write("|")
-            if not conf.googleDork:
+            if not conf.multipleTargets:
                 dataToDumpFile(dumpFP, "\n")
 
         self.__write("%s\n" % separator)
 
-        if not conf.googleDork:
+        if not conf.multipleTargets:
             dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
 

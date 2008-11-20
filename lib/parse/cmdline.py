@@ -49,6 +49,8 @@ def cmdLineParser():
 
         request.add_option("-u", "--url", dest="url", help="Target url")
 
+        request.add_option("-l", dest="list", help="List of target urls")
+
         request.add_option("-g", dest="googleDork",
                            help="Process Google dork results as target urls")
 
@@ -271,7 +273,7 @@ def cmdLineParser():
 
         (args, _) = parser.parse_args()
 
-        if not args.url and not args.googleDork and not args.configFile and not args.updateAll:
+        if not args.url and not args.list and not args.googleDork and not args.configFile and not args.updateAll:
             errMsg  = "missing a mandatory parameter ('-u', '-g', '-c' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)

@@ -92,11 +92,11 @@ def start():
     """
 
     if conf.url:
-        kb.targetUrls.add(conf.url)
+        kb.targetUrls[conf.url] = None
 
     if conf.configFile and not kb.targetUrls:
         errMsg  = "you did not edit the configuration file properly, set "
-        errMsg += "the target url"
+        errMsg += "the target url, list of targets or google dork"
         logger.error(errMsg)
 
     hostCount               = 0
@@ -105,15 +105,17 @@ def start():
     cookieStr               = ""
     setCookieAsInjectable   = True
 
-    for targetUrl in kb.targetUrls:
-        if conf.googleDork:
+    for targetUrl, _ in kb.targetUrls.items():
+        if conf.multipleTargets:
             hostCount += 1
 
             message  = "url %d: %s, " % (hostCount, targetUrl)
             message += "do you want to test this url? [Y/n/q] "
             test = readInput(message, default="Y")
 
-            if test[0] in ("n", "N"):
+            if not test:
+                pass
+            elif test[0] in ("n", "N"):
                 continue
             elif test[0] in ("q", "Q"):
                 break
@@ -166,7 +168,7 @@ def start():
                     errMsg += "to the user's manual paragraph 'String match' "
                     errMsg += "for details"
 
-                    if conf.googleDork:
+                    if conf.multipleTargets:
                         errMsg += ", skipping to next url"
                         logger.warn(errMsg)
 
@@ -219,12 +221,12 @@ def start():
                 kb.injPlace, kb.injParameter, kb.injType = injDataSelected
                 setInjection()
 
-        if not conf.googleDork and ( not kb.injPlace or not kb.injParameter or not kb.injType ):
+        if not conf.multipleTargets and ( not kb.injPlace or not kb.injParameter or not kb.injType ):
             raise sqlmapNotVulnerableException, "all parameters are not injectable"
         elif kb.injPlace and kb.injParameter and kb.injType:
             condition = False
 
-            if conf.googleDork:
+            if conf.multipleTargets:
                 message = "do you want to exploit this SQL injection? [Y/n] "
                 exploit = readInput(message, default="Y")
 

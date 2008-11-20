@@ -129,6 +129,48 @@ def __setGoogleDorking():
         raise sqlmapGenericException, errMsg
 
 
+def __feedTargetsDict(reqFile):
+    pass
+    #kb.targetUrls = googleObj.getTargetUrls()
+    #conf.data
+    #conf.cookie
+
+
+def __setMultipleTargets():
+    """
+    Define a configuration parameter if we are running in multiple target
+    mode.
+    """
+
+    listType = None
+
+    if conf.googleDork or conf.list:
+        conf.multipleTargets = True
+
+    if not conf.list:
+        return
+
+    if not os.path.exists(conf.list):
+        errMsg = "the specified list of target urls does not exist"
+        raise sqlmapFilePathException, errMsg
+
+    if os.path.isfile(conf.list):
+        __feedTargetsDict(conf.list)
+    elif os.path.isdir(conf.list):
+        files = os.listdir(conf.list)
+        files.sort()
+
+        for reqFile in files:
+            if not re.search("([\d]+)\-request", reqFile):
+                continue
+
+            __feedTargetsDict(reqFile)
+    else:
+        errMsg  = "the specified list of target urls is not a file "
+        errMsg += "nor a directory"
+        raise sqlmapFilePathException, errMsg
+
+
 def __setRemoteDBMS():
     """
     Checks and set the back-end DBMS option.
@@ -422,20 +464,21 @@ def __setConfAttributes():
     debugMsg = "initializing the configuration"
     logger.debug(debugMsg)
 
-    conf.cj           = None
-    conf.dbmsHandler  = None
-    conf.dumpPath     = None
-    conf.httpHeaders  = []
-    conf.hostname     = None
-    conf.loggedToOut  = None
-    conf.outputPath   = None
-    conf.paramDict    = {}
-    conf.parameters   = {}
-    conf.path         = None
-    conf.port         = None
-    conf.scheme       = None
-    conf.sessionFP    = None
-    conf.start        = True
+    conf.cj              = None
+    conf.dbmsHandler     = None
+    conf.dumpPath        = None
+    conf.httpHeaders     = []
+    conf.hostname        = None
+    conf.loggedToOut     = None
+    conf.multipleTargets = False
+    conf.outputPath      = None
+    conf.paramDict       = {}
+    conf.parameters      = {}
+    conf.path            = None
+    conf.port            = None
+    conf.scheme          = None
+    conf.sessionFP       = None
+    conf.start           = True
 
 
 def __setKnowledgeBaseAttributes():
@@ -462,7 +505,7 @@ def __setKnowledgeBaseAttributes():
     kb.injType        = None
     kb.parenthesis    = None
     kb.resumedQueries = {}
-    kb.targetUrls     = set()
+    kb.targetUrls     = {}
     kb.timeTest       = None
     kb.unionComment   = ""
     kb.unionCount     = None
@@ -582,6 +625,7 @@ def init(inputOptions=advancedDict()):
     __setHTTPProxy()
     __setThreads()
     __setRemoteDBMS()
+    __setMultipleTargets()
     __setGoogleDorking()
     __urllib2Opener()
 

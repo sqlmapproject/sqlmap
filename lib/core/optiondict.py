@@ -28,6 +28,7 @@ optDict = {
             # Family:        { "parameter_name":    "parameter_datatype",
             "Request":       {
                                "url":               "string",
+                               "list":              "string",
                                "googleDork":        "string",
                                "testParameter":     "string",
                                "method":            "string",
