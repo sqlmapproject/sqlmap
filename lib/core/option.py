@@ -130,10 +130,57 @@ def __setGoogleDorking():
 
 
 def __feedTargetsDict(reqFile):
-    pass
-    #kb.targetUrls = googleObj.getTargetUrls()
-    #conf.data
-    #conf.cookie
+    fp = open(reqFile, "r")
+
+    fread = fp.read()
+    fread = fread.replace("\r", "")
+
+    # TODO: fix for Burp log file
+    reqResList = fread.split("\n\n======================================================\n\n\n\n")
+
+    for request in reqResList:
+        url    = None
+        host   = None
+        method = None
+        data   = None
+        cookie = None
+        params = False
+        lines  = request.split("\n")
+
+        for line in lines:
+            if len(line) == 0 or line == "\n":
+                continue 
+
+            if line.startswith("GET ") or line.startswith("POST "):
+                if line.startswith("GET "):
+                    index = 4
+                else:
+                    index = 5
+
+                url    = line[index:line.index(" HTTP/")]
+                method = line[:index-1]
+
+                if "?" in line and "=" in line:
+                    params = True
+
+            elif "?" in line and "=" in line:
+                data   = line
+                params = True
+
+            elif ": " in line:
+                key, value = line.split(": ", 1)
+
+                if key.lower() == "cookie":
+                    cookie = value
+                elif key.lower() == "host":
+                    host = value
+
+        if params:
+            if not url.startswith("http"):
+                url = "http://%s%s" % (host, url)
+
+            # TODO: exclude duplicated urls
+            kb.targetUrls[url] = ( method, data, cookie )
 
 
 def __setMultipleTargets():
@@ -142,7 +189,7 @@ def __setMultipleTargets():
     mode.
     """
 
-    listType = None
+    initialTargetsCount = len(kb.targetUrls)
 
     if conf.googleDork or conf.list:
         conf.multipleTargets = True
@@ -156,6 +203,7 @@ def __setMultipleTargets():
 
     if os.path.isfile(conf.list):
         __feedTargetsDict(conf.list)
+
     elif os.path.isdir(conf.list):
         files = os.listdir(conf.list)
         files.sort()
@@ -164,11 +212,18 @@ def __setMultipleTargets():
             if not re.search("([\d]+)\-request", reqFile):
                 continue
 
-            __feedTargetsDict(reqFile)
+            __feedTargetsDict(os.path.join(conf.list, reqFile))
+
     else:
         errMsg  = "the specified list of target urls is not a file "
         errMsg += "nor a directory"
         raise sqlmapFilePathException, errMsg
+
+    updatedTargetsCount = len(kb.targetUrls)
+
+    if updatedTargetsCount > initialTargetsCount:
+        infoMsg = "sqlmap parsed %d requests from the targets list" % (updatedTargetsCount - initialTargetsCount)
+        logger.info(infoMsg)
 
 
 def __setRemoteDBMS():

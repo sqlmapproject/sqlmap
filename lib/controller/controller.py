@@ -52,9 +52,9 @@ def __selectInjection(injData):
     message += "one to use to go ahead:\n"
 
     for i in xrange(0, len(injData)):
-        injPlace = injData[i][0]
+        injPlace     = injData[i][0]
         injParameter = injData[i][1]
-        injType = injData[i][2]
+        injType      = injData[i][2]
 
         message += "[%d] place: %s, parameter: " % (i, injPlace)
         message += "%s, type: %s" % (injParameter, injType)
@@ -65,7 +65,7 @@ def __selectInjection(injData):
         message += "\n"
 
     message += "[q] Quit\nChoice: "
-    select = readInput(message, default="0")
+    select   = readInput(message, default="0")
 
     if not select:
         index = 0
@@ -105,7 +105,7 @@ def start():
     cookieStr               = ""
     setCookieAsInjectable   = True
 
-    for targetUrl, _ in kb.targetUrls.items():
+    for targetUrl, targetData in kb.targetUrls.items():
         if conf.multipleTargets:
             hostCount += 1
 
@@ -122,6 +122,9 @@ def start():
 
             logMsg = "testing url %s" % targetUrl
             logger.info(logMsg)
+
+        if targetData:
+            conf.method, conf.data, conf.cookie = targetData
 
         conf.url = targetUrl
         initTargetEnv()
@@ -210,13 +213,19 @@ def start():
         if not kb.injPlace or not kb.injParameter or not kb.injType:
             if len(injData) == 1:
                 injDataSelected = injData[0]
+
             elif len(injData) > 1:
                 injDataSelected = __selectInjection(injData)
+
+            elif conf.multipleTargets:
+                continue
+
             else:
                 return
 
             if injDataSelected == "Quit":
                 return
+
             else:
                 kb.injPlace, kb.injParameter, kb.injType = injDataSelected
                 setInjection()
