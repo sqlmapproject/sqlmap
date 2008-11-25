@@ -105,6 +105,9 @@ Sven Schluter <sschlueter@netzwerk.cc>
 M Simkin <mlsimkin@cox.net>
     for suggesting a feature
 
+Jason Swan <jasoneswan@gmail.com>
+    for reporting a bug when enumerating columns on Microsoft SQL Server
+
 Alessandro Tanasi <alessandro@tanasi.it>
     for extensively beta-testing sqlmap
     for suggesting many features and reporting some bugs

@@ -599,7 +599,7 @@ def expandAsteriskForColumns(expression):
     return expression
 
 
-def getRange(count, dump=False):
+def getRange(count, dump=False, plusOne=False):
     count      = int(count)
     indexRange = None
     limitStart = 1
@@ -612,8 +612,7 @@ def getRange(count, dump=False):
         if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
             limitStart = conf.limitStart
 
-    # TODO: also for Microsoft SQL Server in getColumns method?
-    if kb.dbms == "Oracle":
+    if kb.dbms == "Oracle" or plusOne == True:
         indexRange = range(limitStart, limitStop + 1)
     else:
         indexRange = range(limitStart - 1, limitStop)

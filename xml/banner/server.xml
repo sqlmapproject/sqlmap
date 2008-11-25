@@ -236,11 +236,11 @@
     </regexp>
 
     <regexp value="Apache-AdvancedExtranetServer/2.0.54 \(Mandriva Linux/">
-        <info type="Linux" distrib="Mandrive" release="2006.0"/>
+        <info type="Linux" distrib="Mandriva" release="2006.0"/>
     </regexp>
 
     <regexp value="Apache/2.2.3 \(Mandriva Linux/">
-        <info type="Linux" distrib="Mandrive" release="2007"/>
+        <info type="Linux" distrib="Mandriva" release="2007"/>
     </regexp>
 
     <!-- Apache: Red Hat -->

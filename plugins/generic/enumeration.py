@@ -772,9 +772,14 @@ class Enumeration:
                 errMsg += "on database '%s'" % conf.db
                 raise sqlmapNoneDataException, errMsg
 
+            if kb.dbms == "Microsoft SQL Server":
+                plusOne = True
+            else:
+                plusOne = False
+
             table      = {}
             columns    = {}
-            indexRange = getRange(count)
+            indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
