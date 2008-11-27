@@ -37,7 +37,7 @@ def cmdLineParser():
     This function parses the command line parameters and arguments
     """
 
-    usage = "sqlmap.py [options] {-u \"<URL>\" | -g \"<google dork>\" | -c \"<config file>\"}"
+    usage = "sqlmap.py [options]"
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
@@ -274,7 +274,7 @@ def cmdLineParser():
         (args, _) = parser.parse_args()
 
         if not args.url and not args.list and not args.googleDork and not args.configFile and not args.updateAll:
-            errMsg  = "missing a mandatory parameter ('-u', '-g', '-c' or '--update'), "
+            errMsg  = "missing a mandatory parameter ('-u', '-l', '-g', '-c' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)
 
