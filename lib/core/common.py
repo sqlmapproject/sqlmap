@@ -75,7 +75,7 @@ def paramToDict(place, parameters=None):
         elem = element.split("=")
 
         if len(elem) == 2:
-            parameter = elem[0]
+            parameter = elem[0].replace(" ", "")
 
             condition  = not conf.testParameter
             condition |= parameter in conf.testParameter

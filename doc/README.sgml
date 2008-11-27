@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">
-<date>version 0.6.3, DDth of November 2008
+<date>version 0.6.3, DDth of December 2008
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">
@@ -309,7 +309,7 @@ $ python sqlmap.py -h
     sqlmap/0.6.3 coded by Bernardo Damele A. G. <bernardo.damele@gmail.com>
                         and Daniele Bellucci <daniele.bellucci@gmail.com>
     
-Usage: sqlmap.py [options] {-u <URL> | -g <google dork> | -c <config file>}
+Usage: sqlmap.py [options] {-u "<URL>" | -g "<google dork>" | -c "<config file>"}
 
 Options:
   --version             show program's version number and exit
@@ -344,8 +344,8 @@ Options:
     using the default blind SQL injection technique.
 
     --time-test         Test for Time based blind SQL injection
-    --union-test        Test for UNION SELECT (inband) SQL injection
-    --union-use         Use the UNION SELECT (inband) SQL injection to
+    --union-test        Test for UNION query (inband) SQL injection
+    --union-use         Use the UNION query (inband) SQL injection to
                         retrieve the queries output. No need to go blind
 
   Fingerprint:
@@ -446,7 +446,7 @@ headers and level 5 show also HTTP responses page content.
 Example on a <bf>MySQL 5.0.51</bf> target (verbosity level <bf>1</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 1
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 1
 
 [hh:mm:01] [INFO] testing connection to the target url
 [hh:mm:01] [INFO] testing if the url is stable, wait a few seconds
@@ -482,7 +482,7 @@ back-end DBMS:    MySQL >= 5.0.0
 Example on a <bf>MySQL 5.0.51</bf> target (verbosity level <bf>2</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 2
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 2
 
 [hh:mm:34] [DEBUG] initializing the configuration
 [hh:mm:34] [DEBUG] initializing the knowledge base
@@ -503,7 +503,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 Example on a <bf>MySQL 5.0.51</bf> target (verbosity level <bf>3</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 3
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 3
 
 [...]
 [hh:mm:28] [INFO] testing connection to the target url
@@ -528,7 +528,7 @@ Connection: close
 Example on a <bf>MySQL 5.0.51</bf> target (verbosity level <bf>4</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 4
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 4
 
 [...]
 [hh:mm:32] [INFO] testing connection to the target url
@@ -571,7 +571,7 @@ Content-Type: text/html
 Example on a <bf>MySQL 5.0.51</bf> target (verbosity level <bf>5</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 5
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 5
 
 [...]
 [hh:mm:23] [INFO] testing connection to the target url
@@ -622,6 +622,15 @@ Content-Type: text/html
 &lt;/body&gt;&lt;/html&gt;
 [...]
 </verb></tscreen>
+
+
+<sect2>List of targets
+
+<p>
+Option: <tt>-l</tt>
+
+<p>
+TODO
 
 
 <sect2>Process Google dork results as target urls
@@ -685,7 +694,7 @@ Example on a <bf>PostgreSQL 8.2.7</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p id
+  -p "id"
 
 [hh:mm:48] [INFO] testing connection to the target url
 [hh:mm:48] [INFO] testing if the url is stable, wait a few seconds
@@ -718,7 +727,7 @@ Example on a <bf>MySQL 5.0.51</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p user-agent --user-agent "sqlmap/0.6.3 (http://sqlmap.sourceforge.net)"
+  -p "user-agent" --user-agent "sqlmap/0.6.3 (http://sqlmap.sourceforge.net)"
 
 [hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
 [hh:mm:40] [INFO] testing connection to the target url
@@ -765,7 +774,7 @@ tested for SQL injection like the <tt>GET</tt> parameters.
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/oracle/post_int.php --method POST \
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/post_int.php" --method POST \
   --data "id=1&amp;cat=2"
 
 [hh:mm:53] [INFO] testing connection to the target url
@@ -1158,7 +1167,7 @@ Option: <tt>--time-test</tt>
 TODO
 
 
-<sect2>Test for UNION SELECT query SQL injection
+<sect2>Test for UNION query SQL injection
 
 <p>
 Option: <tt>--union-test</tt>
@@ -1207,7 +1216,7 @@ affected by an inband SQL injection.
 In case this vulnerability is exploitable it is strongly recommended to
 use it.
 
-<sect2>Use the UNION SELECT query SQL injection
+<sect2>Use the UNION query SQL injection
 
 <p>
 Option: <tt>--union-use</tt>

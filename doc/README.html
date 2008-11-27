@@ -8,7 +8,7 @@
 <H1>sqlmap user's manual</H1>
 
 <H2>by 
-<A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A></H2>version 0.6.3, DDth of November 2008
+<A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A></H2>version 0.6.3, DDth of December 2008
 <HR>
 <EM>This document is the user's manual to use 
 <A HREF="http://sqlmap.sourceforge.net">sqlmap</A>.
@@ -349,7 +349,7 @@ $ python sqlmap.py -h
     sqlmap/0.6.3 coded by Bernardo Damele A. G. &lt;bernardo.damele@gmail.com>
                         and Daniele Bellucci &lt;daniele.bellucci@gmail.com>
     
-Usage: sqlmap.py [options] {-u &lt;URL> | -g &lt;google dork> | -c &lt;config file>}
+Usage: sqlmap.py [options] {-u "&lt;URL>" | -g "&lt;google dork>" | -c "&lt;config file>"}
 
 Options:
   --version             show program's version number and exit
@@ -384,8 +384,8 @@ Options:
     using the default blind SQL injection technique.
 
     --time-test         Test for Time based blind SQL injection
-    --union-test        Test for UNION SELECT (inband) SQL injection
-    --union-use         Use the UNION SELECT (inband) SQL injection to
+    --union-test        Test for UNION query (inband) SQL injection
+    --union-use         Use the UNION query (inband) SQL injection to
                         retrieve the queries output. No need to go blind
 
   Fingerprint:
@@ -487,7 +487,7 @@ headers and level 5 show also HTTP responses page content.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 1
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 1
 
 [hh:mm:01] [INFO] testing connection to the target url
 [hh:mm:01] [INFO] testing if the url is stable, wait a few seconds
@@ -525,7 +525,7 @@ back-end DBMS:    MySQL >= 5.0.0
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 2
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 2
 
 [hh:mm:34] [DEBUG] initializing the configuration
 [hh:mm:34] [DEBUG] initializing the knowledge base
@@ -548,7 +548,7 @@ $ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 3
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 3
 
 [...]
 [hh:mm:28] [INFO] testing connection to the target url
@@ -575,7 +575,7 @@ Connection: close
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 4
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 4
 
 [...]
 [hh:mm:32] [INFO] testing connection to the target url
@@ -620,7 +620,7 @@ Content-Type: text/html
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2 -v 5
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 5
 
 [...]
 [hh:mm:23] [INFO] testing connection to the target url
@@ -673,6 +673,13 @@ Content-Type: text/html
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+
+<H3>List of targets</H3>
+
+<P>Option: <CODE>-l</CODE></P>
+
+<P>TODO</P>
 
 
 <H3>Process Google dork results as target urls</H3>
@@ -733,7 +740,7 @@ injection test and inject directly only against the provided parameter(s).</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p id
+  -p "id"
 
 [hh:mm:48] [INFO] testing connection to the target url
 [hh:mm:48] [INFO] testing if the url is stable, wait a few seconds
@@ -769,7 +776,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;ca
 <BLOCKQUOTE><CODE>
 <PRE>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p user-agent --user-agent "sqlmap/0.6.3 (http://sqlmap.sourceforge.net)"
+  -p "user-agent" --user-agent "sqlmap/0.6.3 (http://sqlmap.sourceforge.net)"
 
 [hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
 [hh:mm:40] [INFO] testing connection to the target url
@@ -816,7 +823,7 @@ tested for SQL injection like the <CODE>GET</CODE> parameters.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u http://192.168.1.121/sqlmap/oracle/post_int.php --method POST \
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/post_int.php" --method POST \
   --data "id=1&amp;cat=2"
 
 [hh:mm:53] [INFO] testing connection to the target url
@@ -1216,7 +1223,7 @@ request. The valid value is a float, for instance 0.5.</P>
 <P>TODO</P>
 
 
-<H3>Test for UNION SELECT query SQL injection</H3>
+<H3>Test for UNION query SQL injection</H3>
 
 <P>Option: <CODE>--union-test</CODE></P>
 
@@ -1266,7 +1273,7 @@ affected by an inband SQL injection.
 In case this vulnerability is exploitable it is strongly recommended to
 use it.</P>
 
-<H3>Use the UNION SELECT query SQL injection</H3>
+<H3>Use the UNION query SQL injection</H3>
 
 <P>Option: <CODE>--union-use</CODE></P>
 

@@ -37,7 +37,7 @@ def cmdLineParser():
     This function parses the command line parameters and arguments
     """
 
-    usage = "sqlmap.py [options] {-u <URL> | -g <google dork> | -c <config file>}"
+    usage = "sqlmap.py [options] {-u \"<URL>\" | -g \"<google dork>\" | -c \"<config file>\"}"
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
@@ -49,7 +49,7 @@ def cmdLineParser():
 
         request.add_option("-u", "--url", dest="url", help="Target url")
 
-        request.add_option("-l", dest="list", help="List of target urls")
+        request.add_option("-l", dest="list", help="List of targets")
 
         request.add_option("-g", dest="googleDork",
                            help="Process Google dork results as target urls")
@@ -118,11 +118,11 @@ def cmdLineParser():
 
         techniques.add_option("--union-test", dest="unionTest",
                               action="store_true",
-                              help="Test for UNION SELECT (inband) SQL injection")
+                              help="Test for UNION query (inband) SQL injection")
 
         techniques.add_option("--union-use", dest="unionUse",
                               action="store_true",
-                              help="Use the UNION SELECT (inband) SQL injection "
+                              help="Use the UNION query (inband) SQL injection "
                                    "to retrieve the queries output. No "
                                    "need to go blind")
 

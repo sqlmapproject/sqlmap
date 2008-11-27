@@ -197,6 +197,20 @@ def initTargetEnv():
     Initialize target environment.
     """
 
+    if conf.multipleTargets:
+        conf.paramDict    = {}
+        conf.parameters   = {}
+        kb.dbms           = None
+        kb.dbmsDetected   = False
+        kb.dbmsVersion    = None
+        kb.injParameter   = None
+        kb.injPlace       = None
+        kb.injType        = None
+        kb.parenthesis    = None
+        kb.unionComment   = ""
+        kb.unionCount     = None
+        kb.unionPosition  = None
+
     parseTargetUrl()
     __setRequestParams()
     __setOutputResume()

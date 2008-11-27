@@ -81,6 +81,111 @@ def __urllib2Opener():
     urllib2.install_opener(opener)
 
 
+def __feedTargetsDict(reqFile, addedTargetUrls):
+    fp = open(reqFile, "r")
+
+    fread = fp.read()
+    fread = fread.replace("\r", "")
+
+    reqResList = fread.split("======================================================")
+
+    for request in reqResList:
+        if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I):
+            continue
+
+        getPostReq = False
+        url        = None
+        host       = None
+        method     = None
+        data       = None
+        cookie     = None
+        params     = False
+        lines      = request.split("\n")
+
+        for line in lines:
+            if len(line) == 0 or line == "\n":
+                continue
+
+            if line.startswith("GET ") or line.startswith("POST "):
+                if line.startswith("GET "):
+                    index = 4
+                else:
+                    index = 5
+
+                url    = line[index:line.index(" HTTP/")]
+                method = line[:index-1]
+
+                if "?" in line and "=" in line:
+                    params = True
+
+                getPostReq = True
+
+            elif "?" in line and "=" in line and ": " not in line:
+                data   = line
+                params = True
+
+            elif ": " in line:
+                key, value = line.split(": ", 1)
+
+                if key.lower() == "cookie":
+                    cookie = value
+                elif key.lower() == "host":
+                    host = value
+
+        if getPostReq and params:
+            if not url.startswith("http"):
+                url = "http://%s%s" % (host, url)
+
+            if not kb.targetUrls or url not in addedTargetUrls:
+                kb.targetUrls.add(( url, method, data, cookie ))
+                addedTargetUrls.add(url)
+
+
+def __setMultipleTargets():
+    """
+    Define a configuration parameter if we are running in multiple target
+    mode.
+    """
+
+    initialTargetsCount = len(kb.targetUrls)
+    addedTargetUrls = set()
+
+    if not conf.list:
+        return
+
+    debugMsg = "parsing targets list from '%s'" % conf.list
+    logger.debug(debugMsg)
+
+    if not os.path.exists(conf.list):
+        errMsg = "the specified list of targets does not exist"
+        raise sqlmapFilePathException, errMsg
+
+    if os.path.isfile(conf.list):
+        __feedTargetsDict(conf.list, addedTargetUrls)
+
+    elif os.path.isdir(conf.list):
+        files = os.listdir(conf.list)
+        files.sort()
+
+        for reqFile in files:
+            if not re.search("([\d]+)\-request", reqFile):
+                continue
+
+            __feedTargetsDict(os.path.join(conf.list, reqFile), addedTargetUrls)
+
+    else:
+        errMsg  = "the specified list of targets is not a file "
+        errMsg += "nor a directory"
+        raise sqlmapFilePathException, errMsg
+
+    updatedTargetsCount = len(kb.targetUrls)
+
+    if updatedTargetsCount > initialTargetsCount:
+        infoMsg  = "sqlmap parsed %d " % (updatedTargetsCount - initialTargetsCount)
+        infoMsg += "testable requests from the targets list"
+        logger.info(infoMsg)
+
+
 def __setGoogleDorking():
     """
     This function checks if the way to request testable hosts is through
@@ -109,7 +214,7 @@ def __setGoogleDorking():
         errMsg += "Google dork expression"
         raise sqlmapGenericException, errMsg
 
-    kb.targetUrls = googleObj.getTargetUrls()
+    googleObj.getTargetUrls()
 
     if kb.targetUrls:
         logMsg  = "sqlmap got %d results for your " % len(matches)
@@ -120,110 +225,13 @@ def __setGoogleDorking():
         else:
             logMsg += "%d " % len(kb.targetUrls)
 
-        logMsg += "of them are testable hosts"
+        logMsg += "of them are testable targets"
         logger.info(logMsg)
     else:
         errMsg  = "sqlmap got %d results " % len(matches)
         errMsg += "for your Google dork expression, but none of them "
         errMsg += "have GET parameters to test for SQL injection"
         raise sqlmapGenericException, errMsg
-
-
-def __feedTargetsDict(reqFile):
-    fp = open(reqFile, "r")
-
-    fread = fp.read()
-    fread = fread.replace("\r", "")
-
-    # TODO: fix for Burp log file
-    reqResList = fread.split("\n\n======================================================\n\n\n\n")
-
-    for request in reqResList:
-        url    = None
-        host   = None
-        method = None
-        data   = None
-        cookie = None
-        params = False
-        lines  = request.split("\n")
-
-        for line in lines:
-            if len(line) == 0 or line == "\n":
-                continue 
-
-            if line.startswith("GET ") or line.startswith("POST "):
-                if line.startswith("GET "):
-                    index = 4
-                else:
-                    index = 5
-
-                url    = line[index:line.index(" HTTP/")]
-                method = line[:index-1]
-
-                if "?" in line and "=" in line:
-                    params = True
-
-            elif "?" in line and "=" in line:
-                data   = line
-                params = True
-
-            elif ": " in line:
-                key, value = line.split(": ", 1)
-
-                if key.lower() == "cookie":
-                    cookie = value
-                elif key.lower() == "host":
-                    host = value
-
-        if params:
-            if not url.startswith("http"):
-                url = "http://%s%s" % (host, url)
-
-            # TODO: exclude duplicated urls
-            kb.targetUrls[url] = ( method, data, cookie )
-
-
-def __setMultipleTargets():
-    """
-    Define a configuration parameter if we are running in multiple target
-    mode.
-    """
-
-    initialTargetsCount = len(kb.targetUrls)
-
-    if conf.googleDork or conf.list:
-        conf.multipleTargets = True
-
-    if not conf.list:
-        return
-
-    if not os.path.exists(conf.list):
-        errMsg = "the specified list of target urls does not exist"
-        raise sqlmapFilePathException, errMsg
-
-    if os.path.isfile(conf.list):
-        __feedTargetsDict(conf.list)
-
-    elif os.path.isdir(conf.list):
-        files = os.listdir(conf.list)
-        files.sort()
-
-        for reqFile in files:
-            if not re.search("([\d]+)\-request", reqFile):
-                continue
-
-            __feedTargetsDict(os.path.join(conf.list, reqFile))
-
-    else:
-        errMsg  = "the specified list of target urls is not a file "
-        errMsg += "nor a directory"
-        raise sqlmapFilePathException, errMsg
-
-    updatedTargetsCount = len(kb.targetUrls)
-
-    if updatedTargetsCount > initialTargetsCount:
-        infoMsg = "sqlmap parsed %d requests from the targets list" % (updatedTargetsCount - initialTargetsCount)
-        logger.info(infoMsg)
 
 
 def __setRemoteDBMS():
@@ -359,9 +367,6 @@ def __setHTTPMethod():
     """
 
     if conf.method:
-        debugMsg = "setting the HTTP method to perform HTTP requests through"
-        logger.debug(debugMsg)
-
         conf.method = conf.method.upper()
 
         if conf.method not in ("GET", "POST"):
@@ -373,6 +378,9 @@ def __setHTTPMethod():
             conf.method = "GET"
     else:
         conf.method = "GET"
+
+    debugMsg = "setting the HTTP method to %s" % conf.method
+    logger.debug(debugMsg)
 
 
 def __setHTTPStandardHeaders():
@@ -509,6 +517,9 @@ def __cleanupOptions():
     if conf.delay:
         conf.delay = float(conf.delay)
 
+    if conf.googleDork or conf.list:
+        conf.multipleTargets = True
+
 
 def __setConfAttributes():
     """
@@ -560,7 +571,7 @@ def __setKnowledgeBaseAttributes():
     kb.injType        = None
     kb.parenthesis    = None
     kb.resumedQueries = {}
-    kb.targetUrls     = {}
+    kb.targetUrls     = set()
     kb.timeTest       = None
     kb.unionComment   = ""
     kb.unionCount     = None
@@ -680,8 +691,8 @@ def init(inputOptions=advancedDict()):
     __setHTTPProxy()
     __setThreads()
     __setRemoteDBMS()
-    __setMultipleTargets()
     __setGoogleDorking()
+    __setMultipleTargets()
     __urllib2Opener()
 
     update()

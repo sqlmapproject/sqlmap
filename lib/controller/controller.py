@@ -92,25 +92,40 @@ def start():
     """
 
     if conf.url:
-        kb.targetUrls[conf.url] = None
+        kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
     if conf.configFile and not kb.targetUrls:
         errMsg  = "you did not edit the configuration file properly, set "
         errMsg += "the target url, list of targets or google dork"
         logger.error(errMsg)
 
+    if kb.targetUrls and len(kb.targetUrls) > 1:
+        infoMsg = "sqlmap got a total of %d targets" % len(kb.targetUrls)
+        logger.info(infoMsg)
+
     hostCount               = 0
-    injData                 = []
     receivedCookies         = []
     cookieStr               = ""
     setCookieAsInjectable   = True
 
-    for targetUrl, targetData in kb.targetUrls.items():
+    for targetUrl, targetMethod, targetData, targetCookie in kb.targetUrls:
+        conf.url    = targetUrl
+        conf.method = targetMethod
+        conf.data   = targetData
+        conf.cookie = targetCookie
+        injData     = []
+
         if conf.multipleTargets:
             hostCount += 1
+            message = "url %d:\n%s %s" % (hostCount, conf.method, targetUrl)
 
-            message  = "url %d: %s, " % (hostCount, targetUrl)
-            message += "do you want to test this url? [Y/n/q] "
+            if conf.cookie:
+                message += "\nCookie: %s" % conf.cookie
+
+            if conf.data:
+                message += "\nPOST data: %s" % conf.data
+
+            message += "\ndo you want to test this url? [Y/n/q] "
             test = readInput(message, default="Y")
 
             if not test:
@@ -123,10 +138,6 @@ def start():
             logMsg = "testing url %s" % targetUrl
             logger.info(logMsg)
 
-        if targetData:
-            conf.method, conf.data, conf.cookie = targetData
-
-        conf.url = targetUrl
         initTargetEnv()
 
         if not checkConnection() or not checkString():
@@ -206,9 +217,14 @@ def start():
 
                                 break
                             else:
-                                warnMsg  = "%s parameter '%s' is not " % (place, parameter)
-                                warnMsg += "injectable with %d parenthesis" % parenthesis
-                                logger.warn(warnMsg)
+                                infoMsg  = "%s parameter '%s' is not " % (place, parameter)
+                                infoMsg += "injectable with %d parenthesis" % parenthesis
+                                logger.info(infoMsg)
+
+                        if not injData:
+                            warnMsg  = "%s parameter '%s' is not " % (place, parameter)
+                            warnMsg += "injectable"
+                            logger.warn(warnMsg)
 
         if not kb.injPlace or not kb.injParameter or not kb.injType:
             if len(injData) == 1:
@@ -230,6 +246,7 @@ def start():
                 kb.injPlace, kb.injParameter, kb.injType = injDataSelected
                 setInjection()
 
+        print kb.injPlace, kb.injParameter, kb.injType
         if not conf.multipleTargets and ( not kb.injPlace or not kb.injParameter or not kb.injType ):
             raise sqlmapNotVulnerableException, "all parameters are not injectable"
         elif kb.injPlace and kb.injParameter and kb.injType:

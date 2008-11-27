@@ -126,7 +126,7 @@ def resume(expression, payload):
 
     # If we called this function without providing a payload it means that
     # we have called it from lib/request/inject __goInband() function
-    # in UNION SELECT (inband) SQL injection so we return to the calling
+    # in UNION query (inband) SQL injection so we return to the calling
     # function so that the query output will be retrieved taking advantage
     # of the inband SQL injection vulnerability.
     if not payload:

@@ -51,8 +51,11 @@ Will Holcomb <wholcomb@gmail.com>
 Luke Jahnke <luke.jahnke@gmail.com>
     for reporting a bug when running against MySQL < 5.0
 
+Anant Kochhar <anant.kochhar@secureyes.net>
+    for providing me with feedback on the user's manual
+
 Nico Leidecker <nico@leidecker.info>
-    for providing with feedback on a few features
+    for providing me with feedback on a few features
 
 Pavol Luptak <pavol.luptak@nethemba.com>
     for reporting a bug when injecting on a POST data parameter
@@ -61,6 +64,10 @@ Michael Majchrowicz <mmajchrowicz@gmail.com>
     for extensively beta-testing sqlmap on various MySQL DBMS
     for providing really appreciated feedback
     for suggesting a lot of ideas and features
+
+Ferruh Mavituna <ferruh@mavituna.com>
+    for providing me with ideas on the implementation on a couple of
+    new features
 
 Enrico Milanese <enricomilanese@gmail.com>
     for reporting a bugs when using (-a) a single line User-Agent file

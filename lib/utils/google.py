@@ -30,6 +30,7 @@ import urllib2
 
 from lib.core.convert import urlencode
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapRegExprException
 
@@ -68,17 +69,9 @@ class Google:
         your Google dork search results
         """
 
-        targetUrls    = {}
-        targetUrlsSet = set()
-
         for match in self.__matches:
             if re.search("(.*?)\?(.+)", match, re.I):
-                targetUrlsSet.add(match)
-
-        for targetUrl in targetUrlsSet:
-            targetUrls[targetUrl] = None
-
-        return targetUrls
+                kb.targetUrls.add(( match, None, None, None ))
 
 
     def getCookie(self):

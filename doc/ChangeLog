@@ -3,6 +3,10 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Major enhancement to support stacked queries when the web application
     supports it which will be used in the long run by takeover
     functionality;
+  * Major enhancement to get list of targets to test from Burp proxy
+    (http://portswigger.net/suite/) requests log file path or WebScarab
+    proxy (http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project)
+    'conversations/' folder path;
   * Minor enhancement to test if the injectable parameter is affected by
     a time based blind SQL injection technique;
   * Minor enhancement to fingerprint the web server operating system and
@@ -28,6 +32,7 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Minor bug fix to correctly enumerate columns on Microsoft SQL Server;
   * Minor bug fix to correctly dump table entries when the column is
     provided;
+  * Updated documentation.
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day,  X YYY 2008 10:00:00 +0000
 
@@ -218,14 +223,14 @@ sqlmap (0.4-1) stable; urgency=low
     the remote DBMS;
   * Major improvements in union.UnionCheck() and union.UnionUse()
     functions to make it possible to exploit inband SQL injection also
-    with database comment characters ('--' and '#') in UNION SELECT
+    with database comment characters ('--' and '#') in UNION query
     statements;
   * Added the possibility to save the output into a file while performing
     the queries (-o OUTPUTFILE) so it is possible to stop and resume the
     same query output retrieving in a second time (--resume);
   * Added support to specify the database table column to enumerate
     (-C COL);
-  * Added inband SQL injection (UNION SELECT) support (--union-use);
+  * Added inband SQL injection (UNION query) support (--union-use);
   * Complete code refactoring, a lot of minor and some major fixes in
     libraries, many minor improvements;
   * Reviewed the directory tree structure;
