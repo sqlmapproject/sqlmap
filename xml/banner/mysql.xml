@@ -12,31 +12,31 @@
 
     <!-- Debian -->
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+potato">
-        <info dbms_version="1" type="Linux" distrib="Debian" release="2.1" codename="Potato"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="2.1" codename="potato"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+woody">
-        <info dbms_version="1" type="Linux" distrib="Debian" release="3.0" codename="Woody"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="3.0" codename="woody"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+sarge">
-        <info dbms_version="1" type="Linux" distrib="Debian" release="3.1" codename="Sarge"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="3.1" codename="sarge"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+etch">
-        <info dbms_version="1" type="Linux" distrib="Debian" release="4.0" codename="Etch"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" release="4.0" codename="etch"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+(sid|unstable)">
-        <info dbms_version="1" type="Linux" distrib="Debian" codename="Unstable"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" codename="unstable"/>
     </regexp>
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+testing">
-        <info dbms_version="1" type="Linux" distrib="Debian" codename="Testing"/>
+        <info dbms_version="1" type="Linux" distrib="Debian" codename="testing"/>
     </regexp>
 
     <!-- Ubuntu -->
-    <regexp value="(5\.0\.67)-0ubuntu6">
-        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid"/>
+    <regexp value="^(5\.0\.67)-0ubuntu6">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid Ibex"/>
     </regexp>
 </root>
