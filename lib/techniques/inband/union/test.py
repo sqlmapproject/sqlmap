@@ -28,6 +28,7 @@ from lib.core.agent import agent
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import queries
 from lib.core.session import setUnion
 from lib.request.connect import Connect as Request
 
@@ -94,7 +95,7 @@ def unionTest():
 
     query = agent.prefixQuery(" UNION ALL SELECT NULL")
 
-    for comment in ("--", "#", "/*", ";", "%00"):
+    for comment in ("", queries[kb.dbms].comment):
         value = __effectiveUnionTest(query, comment)
 
         if value:
