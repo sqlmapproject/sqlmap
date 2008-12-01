@@ -189,6 +189,8 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 kb.dbmsVersion = ["2005"]
             elif version == "0":
                 kb.dbmsVersion = ["2000"]
+            else:
+                kb.dbmsVersion = ["Unknown"]
 
             if kb.dbmsVersion:
                 setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
