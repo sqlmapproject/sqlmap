@@ -612,7 +612,7 @@ def __saveCmdline():
                 if datatype == "boolean":
                     value = "False"
                 elif datatype in ( "integer", "float" ):
-                    if option == "threads":
+                    if option in ( "threads", "verbose" ):
                         value = "1"
                     else:
                         value = "0"
@@ -635,13 +635,12 @@ def __setVerbosity():
     This function set the verbosity of sqlmap output messages.
     """
 
-    if not conf.verbose:
-        conf.verbose = 0
-        return
+    if conf.verbose == None:
+        conf.verbose = 1
 
     conf.verbose = int(conf.verbose)
 
-    if conf.verbose <= 1:
+    if conf.verbose == 1:
         logger.setLevel(logging.INFO)
     elif conf.verbose > 1 and conf.eta:
         conf.verbose = 1

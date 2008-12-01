@@ -20,7 +20,7 @@ sqlmap (0.6.3-1) stable; urgency=low
     current database on MySQL and Microsoft SQL Server, the 'public'
     scheme on PostgreSQL and the 'USERS' TABLESPACE_NAME on Oracle;
   * Minor improvement to set by default in all HTTP requests the standard
-    HTTP headers (Accept, Accept-Encoding, etc);
+    client HTTP headers (Accept, Accept-Encoding, etc);
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded
     to official Debian project repository, on queue at the moment;
   * Major bug fix to correctly handle httplib.BadStatusLine exception;
@@ -32,6 +32,7 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Minor bug fix to correctly enumerate columns on Microsoft SQL Server;
   * Minor bug fix to correctly dump table entries when the column is
     provided;
+  * Increased default output level from 0 to 1;
   * Updated documentation.
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day,  X YYY 2008 10:00:00 +0000

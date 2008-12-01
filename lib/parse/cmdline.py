@@ -244,7 +244,7 @@ def cmdLineParser():
                                       "in real time")
 
         miscellaneous.add_option("-v", dest="verbose", type="int",
-                                 help="Verbosity level: 0-5 (default 0)")
+                                 help="Verbosity level: 0-5 (default 1)")
 
         miscellaneous.add_option("--update", dest="updateAll", action="store_true",
                                 help="Update sqlmap to the latest stable version")
