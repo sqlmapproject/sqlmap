@@ -142,12 +142,12 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         # MySQL valid versions updated at 10/2008
         versions = (
                      (32200, 32233),    # MySQL 3.22
-                     (32300, 32354),    # MySQL 3.23
-                     (40000, 40024),    # MySQL 4.0
-                     (40100, 40122),    # MySQL 4.1
-                     (50000, 50072),    # MySQL 5.0
-                     (50100, 50129),    # MySQL 5.1
-                     (60000, 60008),    # MySQL 6.0
+                     (32300, 32359),    # MySQL 3.23
+                     (40000, 40031),    # MySQL 4.0
+                     (40100, 40125),    # MySQL 4.1
+                     (50000, 50074),    # MySQL 5.0
+                     (50100, 50131),    # MySQL 5.1
+                     (60000, 60009),    # MySQL 6.0
                    )
 
         for element in versions:
