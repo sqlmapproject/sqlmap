@@ -59,7 +59,7 @@ sqlmap (0.6.2-1) stable; urgency=low
     database name, table name and column(s) are provided;
   * Updated the database management system fingerprint checks to correctly
     identify MySQL 5.1.x, MySQL 6.0.x and PostgreSQL 8.3;
-  * More user-friendly warnin messages.
+  * More user-friendly warning messages.
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun,  2 Nov 2008 19:00:00 +0000
 
