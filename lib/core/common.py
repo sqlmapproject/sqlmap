@@ -128,6 +128,12 @@ def formatDBMSfp(versions=None):
         return "%s %s" % (kb.dbms, versions)
     elif isinstance(versions, (list, set, tuple)):
         return "%s %s" % (kb.dbms, " and ".join([version for version in versions]))
+    elif not versions:
+        warnMsg  = "unable to extensively fingerprint the back-end "
+        warnMsg += "DBMS version"
+        logger.warn(warnMsg)
+
+        return kb.dbms
 
 
 def __formatFingerprintString(values, chain=" or "):
