@@ -246,7 +246,6 @@ def start():
                 kb.injPlace, kb.injParameter, kb.injType = injDataSelected
                 setInjection()
 
-        print kb.injPlace, kb.injParameter, kb.injType
         if not conf.multipleTargets and ( not kb.injPlace or not kb.injParameter or not kb.injType ):
             raise sqlmapNotVulnerableException, "all parameters are not injectable"
         elif kb.injPlace and kb.injParameter and kb.injType:

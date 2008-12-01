@@ -16,8 +16,7 @@
         <count query="COUNT(%s)"/>
         <comment query="#" query2="/*"/>
         <!--
-             NOTE: In PHP the mysql_query() function does not permit query stacking, or executing multiple queries in a single function call.
-                   MySQL 5.0.12 introduced SLEEP() function
+             NOTE: MySQL 5.0.12 introduced SLEEP() function
                    References:
                    * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-12.html
                    * http://dev.mysql.com/doc/refman/5.0/en/miscellaneous-functions.html#function_sleep

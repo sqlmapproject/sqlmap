@@ -87,7 +87,6 @@ def configFileParser(configFile):
         errMsg += "file (url or googleDork)"
         raise sqlmapMissingMandatoryOptionException, errMsg
 
-
     for family, optionData in optDict.items():
         for option, data in optionData.items():
             boolean = False

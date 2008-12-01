@@ -254,6 +254,7 @@ class Connect:
 
         page = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua)
 
+        # TODO: create a comparison library and move these checks there
         if content:
             return page
         elif conf.string:
