@@ -105,7 +105,9 @@ class Connect:
         requestMsg += " HTTP/1.1"
 
         if cookie:
-            cookie = urlencode(cookie).replace("%%", "%")
+            # TODO: sure about encoding the cookie?
+            #cookie = urlencode(cookie).replace("%%", "%")
+            cookie = cookie.replace("%%", "%")
 
         try:
             # Perform HTTP request

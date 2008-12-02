@@ -77,7 +77,9 @@ def __setRequestParams():
 
     # Perform checks on Cookie parameters
     if conf.cookie:
-        urlDecodedCookie = urldecode(conf.cookie).replace("%", "%%")
+        # TODO: sure about decoding the cookie?
+        #urlDecodedCookie = urldecode(conf.cookie).replace("%", "%%")
+        urlDecodedCookie = conf.cookie.replace("%", "%%")
         conf.parameters["Cookie"] = urlDecodedCookie
         __paramDict = paramToDict("Cookie", urlDecodedCookie)
 
