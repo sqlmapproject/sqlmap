@@ -4,6 +4,6 @@
 
 <root>
     <regexp value="([\d\.]+)">
-        <info technology="ASP.NET" tech_version="1" type="Windows"/>
+        <info technology="ASP.NET" tech_version="1" type="Windows" distrib="2003|2008"/>
     </regexp>
 </root>

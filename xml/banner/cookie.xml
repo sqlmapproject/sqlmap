@@ -8,11 +8,11 @@
 
 <root>
     <regexp value="ASPSESSIONID">
-        <info technology="Microsoft IIS|ASP" type="Windows" distrib="2000"/>
+        <info technology="ASP" type="Windows" distrib="2000"/>
     </regexp>
 
     <regexp value="ASP\.NET_SessionId">
-        <info technology="Microsoft IIS|ASP.NET" type="Windows" distrib="2003"/>
+        <info technology="ASP.NET" type="Windows" distrib="2003|2008"/>
     </regexp>
 
     <regexp value="JSESSIONID">
