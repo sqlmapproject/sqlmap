@@ -95,7 +95,7 @@ def unionTest():
 
     query = agent.prefixQuery(" UNION ALL SELECT NULL")
 
-    for comment in ("", queries[kb.dbms].comment):
+    for comment in (queries[kb.dbms].comment, ""):
         value = __effectiveUnionTest(query, comment)
 
         if value:

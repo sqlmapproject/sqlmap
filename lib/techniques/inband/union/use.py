@@ -40,8 +40,13 @@ from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
 
 
-def __unionPosition(count, expression):
-    logMsg  = "confirming inband sql injection on parameter "
+def __unionPosition(count, expression, negative=False):
+    if negative:
+        negLogMsg = "partial"
+    else:
+        negLogMsg = "full"
+
+    logMsg  = "confirming %s inband sql injection on parameter " % negLogMsg
     logMsg += "'%s'" % kb.injParameter
     logger.info(logMsg)
 
@@ -63,7 +68,7 @@ def __unionPosition(count, expression):
 
         # Forge the inband SQL injection request
         query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition)
-        payload = agent.payload(newValue=query)
+        payload = agent.payload(newValue=query, negative=negative)
 
         # Perform the request
         resultPage = Request.queryPage(payload, content=True)
@@ -82,13 +87,16 @@ def __unionPosition(count, expression):
 
     if isinstance(kb.unionPosition, int):
         logMsg  = "the target url is affected by an exploitable "
-        logMsg += "inband sql injection vulnerability"
+        logMsg += "%s inband sql injection vulnerability" % negLogMsg
         logger.info(logMsg)
     else:
         warnMsg  = "the target url is not affected by an exploitable "
-        warnMsg += "inband sql injection vulnerability, sqlmap will "
-        warnMsg += "retrieve the expression output through blind sql "
-        warnMsg += "injection technique"
+        warnMsg += "%s inband sql injection vulnerability" % negLogMsg
+
+        if negLogMsg == "partial":
+            warnMsg += ", sqlmap will retrieve the expression output "
+            warnMsg += "through blind sql injection technique"
+
         logger.warn(warnMsg)
 
     return count
@@ -101,9 +109,9 @@ def unionUse(expression):
     inband SQL injection on the affected url
     """
 
-    count = 0
+    count    = 0
     origExpr = expression
-    start = time.time()
+    start    = time.time()
 
     if not kb.unionCount:
         unionTest()
@@ -120,10 +128,21 @@ def unionUse(expression):
     if not isinstance(kb.unionPosition, int):
         count = __unionPosition(count, expression)
 
-        # Assure that the above function found the exploitable inband
+        # Assure that the above function found the exploitable full inband
         # SQL injection position
         if not isinstance(kb.unionPosition, int):
-            return
+            count = __unionPosition(count, expression, True)
+
+            # Assure that the above function found the exploitable partial
+            # inband SQL injection position
+            if not isinstance(kb.unionPosition, int):
+                return
+            else:
+                conf.paramNegative = True
+
+    # TODO: if conf.paramNegative == True and query can returns multiple
+    # entries, get once per time in a for cycle, see lib/request/inject.py
+    # like for --sql-query and --sql-shell
 
     # Forge the inband SQL injection request
     query = agent.forgeInbandQuery(expression)

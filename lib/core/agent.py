@@ -47,7 +47,7 @@ class Agent:
         temp.stop      = randomStr(6)
 
 
-    def payload(self, place=None, parameter=None, value=None, newValue=None):
+    def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False):
         """
         This method replaces the affected parameter with the SQL
         injection statement to request
@@ -55,16 +55,21 @@ class Agent:
 
         retValue = ""
 
+        if negative == True or conf.paramNegative == True:
+            negValue = "-"
+        else:
+            negValue = ""
+
         # After identifing the injectable parameter
         if kb.injPlace == "User-Agent":
             retValue = kb.injParameter.replace(kb.injParameter,
-                                               kb.injParameter + newValue)
+                                               "%s%s" % (negValue, kb.injParameter + newValue))
         elif kb.injParameter:
             paramString = conf.parameters[kb.injPlace]
             paramDict = conf.paramDict[kb.injPlace]
             value = paramDict[kb.injParameter]
             retValue = paramString.replace("%s=%s" % (kb.injParameter, value),
-                                           "%s=%s" % (kb.injParameter, value + newValue))
+                                           "%s=%s%s" % (kb.injParameter, negValue, value + newValue))
 
         # Before identifing the injectable parameter
         elif parameter == "User-Agent":

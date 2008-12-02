@@ -540,6 +540,7 @@ def __setConfAttributes():
     conf.outputPath      = None
     conf.paramDict       = {}
     conf.parameters      = {}
+    conf.paramNegative   = False
     conf.path            = None
     conf.port            = None
     conf.scheme          = None
