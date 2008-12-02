@@ -94,7 +94,7 @@ def __unionPosition(count, expression, negative=False):
         warnMsg += "%s inband sql injection vulnerability" % negLogMsg
 
         if negLogMsg == "partial":
-            warnMsg += ", sqlmap will retrieve the expression output "
+            warnMsg += ", sqlmap will retrieve the query output "
             warnMsg += "through blind sql injection technique"
 
         logger.warn(warnMsg)
@@ -143,6 +143,7 @@ def unionUse(expression):
     # TODO: if conf.paramNegative == True and query can returns multiple
     # entries, get once per time in a for cycle, see lib/request/inject.py
     # like for --sql-query and --sql-shell
+    _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
 
     # Forge the inband SQL injection request
     query = agent.forgeInbandQuery(expression)

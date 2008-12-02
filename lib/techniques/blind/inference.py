@@ -47,12 +47,12 @@ def bisection(payload, expression, length=None):
     """
 
     if kb.dbmsDetected:
-        _, _, _, fieldToCast = agent.getFields(expression)
-        nulledCastedField    = agent.nullAndCastField(fieldToCast)
-        expressionReplaced   = expression.replace(fieldToCast, nulledCastedField, 1)
-        expressionUnescaped  = unescaper.unescape(expressionReplaced)
+        _, _, _, _, fieldToCastStr = agent.getFields(expression)
+        nulledCastedField          = agent.nullAndCastField(fieldToCastStr)
+        expressionReplaced         = expression.replace(fieldToCastStr, nulledCastedField, 1)
+        expressionUnescaped        = unescaper.unescape(expressionReplaced)
     else:
-        expressionUnescaped  = unescaper.unescape(expression)
+        expressionUnescaped        = unescaper.unescape(expression)
 
     infoMsg = "query: %s" % expressionUnescaped
     logger.info(infoMsg)

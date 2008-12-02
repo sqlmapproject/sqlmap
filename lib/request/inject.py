@@ -46,14 +46,6 @@ from lib.utils.resume import queryOutputLength
 from lib.utils.resume import resume
 
 
-def __getFieldsProxy(expression):
-    _, _, _, expressionFields = agent.getFields(expression)
-    expressionFieldsList = expressionFields.replace(", ", ",")
-    expressionFieldsList = expressionFieldsList.split(",")
-
-    return expressionFields, expressionFieldsList
-
-
 def __goInference(payload, expression):
     start = time.time()
 
@@ -123,7 +115,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
         return output
 
     if kb.dbmsDetected:
-        expressionFields, expressionFieldsList = __getFieldsProxy(expression)
+        _, _, _, expressionFieldsList, expressionFields = agent.getFields(expression)
 
         if len(expressionFieldsList) > 1:
             infoMsg  = "the SQL query provided has more than a field. "

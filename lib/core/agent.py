@@ -232,17 +232,20 @@ class Agent:
         fieldsNoSelect       = query
 
         if fieldsSelectTop:
-            fieldsToCast = fieldsSelectTop.groups()[0]
+            fieldsToCastStr = fieldsSelectTop.groups()[0]
         elif fieldsSelectDistinct:
-            fieldsToCast = fieldsSelectDistinct.groups()[0]
+            fieldsToCastStr = fieldsSelectDistinct.groups()[0]
         elif fieldsSelectFrom:
-            fieldsToCast = fieldsSelectFrom.groups()[0]
+            fieldsToCastStr = fieldsSelectFrom.groups()[0]
         elif fieldsSelect:
-            fieldsToCast = fieldsSelect.groups()[0]
+            fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsNoSelect:
-            fieldsToCast = fieldsNoSelect
+            fieldsToCastStr = fieldsNoSelect
 
-        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsToCast
+        fieldsToCastList = fieldsToCastStr.replace(", ", ",")
+        fieldsToCastList = fieldsToCastList.split(",")
+
+        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsToCastList, fieldsToCastStr
 
 
     def concatQuery(self, query):
@@ -274,9 +277,9 @@ class Agent:
         concatQuery = ""
         query = query.replace(", ", ",")
 
-        fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsToCast = self.getFields(query)
-        castedFields = self.nullCastConcatFields(fieldsToCast)
-        concatQuery = query.replace(fieldsToCast, castedFields, 1)
+        fieldsSelectFrom, fieldsSelect, fieldsNoSelect, _, fieldsToCastStr = self.getFields(query)
+        castedFields = self.nullCastConcatFields(fieldsToCastStr)
+        concatQuery = query.replace(fieldsToCastStr, castedFields, 1)
 
         if kb.dbms == "MySQL":
             if fieldsSelectFrom:
