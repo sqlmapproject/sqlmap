@@ -26,7 +26,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import sys
 
-from lib.core.settings import REVISION
 from lib.core.settings import VERSION
 from lib.core.settings import VERSION_STRING
 
@@ -91,8 +90,7 @@ def unhandledException():
     errMsg  = "unhandled exception in %s, please copy " % VERSION_STRING
     errMsg += "the command line and the following text and send by e-mail "
     errMsg += "to sqlmap-users@lists.sourceforge.net. The developers will "
-    errMsg += "fix it as soon as possible:\nsqlmap version: %s " % VERSION
-    errMsg += "(SVN revision: %s)\n" % REVISION
+    errMsg += "fix it as soon as possible:\nsqlmap version: %s\n" % VERSION
     errMsg += "Python version: %s\n" % sys.version.split()[0]
     errMsg += "Operating system: %s" % sys.platform
     return errMsg

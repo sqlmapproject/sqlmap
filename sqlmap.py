@@ -29,6 +29,13 @@ import sys
 import time
 import traceback
 
+try:
+    import psyco
+    psyco.full()
+    psyco.profile()
+except ImportError, _:
+    pass
+
 from lib.controller.controller import start
 from lib.core.common import banner
 from lib.core.common import setPaths
