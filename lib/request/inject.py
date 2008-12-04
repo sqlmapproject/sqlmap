@@ -38,7 +38,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.data import temp
-from lib.core.settings import TIME_DELAY
+from lib.core.settings import SECONDS
 from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.use import unionUse
 from lib.techniques.blind.inference import bisection
@@ -394,6 +394,6 @@ def goStacked(expression, timeTest=False):
     duration = int(time.time() - start)
 
     if timeTest:
-        return (duration >= TIME_DELAY, payload)
+        return (duration >= SECONDS, payload)
     else:
-        return duration >= TIME_DELAY
+        return duration >= SECONDS

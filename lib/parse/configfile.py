@@ -79,12 +79,16 @@ def configFileParser(configFile):
     config = ConfigParser()
     config.read(configFile)
 
-    if not config.has_section("Request"):
-        raise NoSectionError, "Request in the configuration file is mandatory"
+    if not config.has_section("Target"):
+        raise NoSectionError, "Target in the configuration file is mandatory"
 
-    if not config.has_option("Request", "url") and not config.has_option("Request", "googleDork"):
+    condition  = not config.has_option("Target", "url")
+    condition &= not config.has_option("Target", "list")
+    condition &= not config.has_option("Target", "googleDork")
+
+    if condition:
         errMsg  = "missing a mandatory option in the configuration "
-        errMsg += "file (url or googleDork)"
+        errMsg += "file (url, list or googleDork)"
         raise sqlmapMissingMandatoryOptionException, errMsg
 
     for family, optionData in optDict.items():

@@ -25,12 +25,14 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 optDict = {
-            # Family:        { "parameter_name":    "parameter_datatype",
-            "Request":       {
+            # Family:        { "parameter_name":    "parameter_datatype" },
+            "Target":        {
                                "url":               "string",
                                "list":              "string",
                                "googleDork":        "string",
-                               "testParameter":     "string",
+                             },
+
+            "Request":       {
                                "method":            "string",
                                "data":              "string",
                                "cookie":            "string",
@@ -42,18 +44,20 @@ optDict = {
                                "proxy":             "string",
                                "threads":           "integer",
                                "delay":             "float",
+                               "timeout":           "int",
                              },
 
             "Injection":     {
+                               "testParameter":     "string",
                                "string":            "string",
                                "dbms":              "string",
                              },
 
-            "Techniques": {
+            "Techniques":    {
                                "timeTest":          "boolean",
                                "unionTest":         "boolean",
                                "unionUse":          "boolean",
-                          },
+                             },
 
             "Fingerprint":   {
                                "extensiveFp":       "boolean",

@@ -114,6 +114,7 @@ M Simkin <mlsimkin@cox.net>
 
 Jason Swan <jasoneswan@gmail.com>
     for reporting a bug when enumerating columns on Microsoft SQL Server
+    for suggesting a couple of improvements
 
 Alessandro Tanasi <alessandro@tanasi.it>
     for extensively beta-testing sqlmap

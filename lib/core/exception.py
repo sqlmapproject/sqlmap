@@ -74,6 +74,10 @@ class sqlmapNotVulnerableException(Exception):
     pass
 
 
+class sqlmapThreadException(Exception):
+    pass
+
+
 class sqlmapUnsupportedDBMSException(Exception):
     pass
 
@@ -108,6 +112,7 @@ exceptionsTuple = (
                     sqlmapUndefinedMethod,
                     sqlmapMissingPrivileges,
                     sqlmapNotVulnerableException,
+                    sqlmapThreadException,
                     sqlmapUnsupportedDBMSException,
                     sqlmapUnsupportedFeatureException,
                     sqlmapValueException,

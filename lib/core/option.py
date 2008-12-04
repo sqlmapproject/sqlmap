@@ -28,6 +28,7 @@ import cookielib
 import logging
 import os
 import re
+import socket
 import time
 import urllib2
 import urlparse
@@ -264,7 +265,7 @@ def __setRemoteDBMS():
 
 
 def __setThreads():
-    if conf.threads <= 0:
+    if not isinstance(conf.threads, int) or conf.threads <= 0:
         conf.threads = 1
 
 
@@ -488,6 +489,29 @@ def __setHTTPCookies():
         conf.httpHeaders.append(("Cookie", conf.cookie))
 
 
+def __setHTTPTimeout():
+    """
+    Set the HTTP timeout
+    """
+
+    if conf.timeout:
+        debugMsg = "setting the HTTP timeout"
+        logger.debug(debugMsg)
+
+        conf.timeout = float(conf.timeout)
+
+        if conf.timeout < 3.0:
+            warnMsg  = "the minimum HTTP timeout is 3 seconds, sqlmap "
+            warnMsg += "will going to reset it"
+            logger.warn(warnMsg)
+
+            conf.timeout = 3.0
+    else:
+        conf.timeout = 10.0
+
+    socket.setdefaulttimeout(conf.timeout)
+
+
 def __cleanupOptions():
     """
     Cleanup configuration attributes.
@@ -543,9 +567,11 @@ def __setConfAttributes():
     conf.paramNegative   = False
     conf.path            = None
     conf.port            = None
+    conf.retries         = 0
     conf.scheme          = None
     conf.sessionFP       = None
     conf.start           = True
+    conf.threadException = False
 
 
 def __setKnowledgeBaseAttributes():
@@ -682,6 +708,7 @@ def init(inputOptions=advancedDict()):
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
     __cleanupOptions()
+    __setHTTPTimeout()
     __setHTTPCookies()
     __setHTTPReferer()
     __setHTTPUserAgent()

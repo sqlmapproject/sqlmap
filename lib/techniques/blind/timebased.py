@@ -27,7 +27,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.settings import TIME_DELAY
+from lib.core.settings import SECONDS
 from lib.request import inject
 
 
@@ -36,7 +36,7 @@ def timeTest():
     infoMsg += "'%s'" % kb.injParameter
     logger.info(infoMsg)
 
-    query    = queries[kb.dbms].timedelay % TIME_DELAY
+    query    = queries[kb.dbms].timedelay % SECONDS
     timeTest = inject.goStacked(query, timeTest=True)
 
     if timeTest[0] == True:

@@ -13,6 +13,8 @@ sqlmap (0.6.3-1) stable; urgency=low
     the web application technology by parsing some HTTP response headers;
   * Minor enhancement to fingerprint the back-end DBMS operating system by
     parsing the DBMS banner value when -b option is provided;
+  * Minor enhancement to be able to specify the number of seconds before
+    timeout the connection, default is set to 10 seconds;
   * Minor enhancement to be able to specify the number of seconds to wait
     between each HTTP request providing option --delay #;
   * Minor enhancement to be able to enumerate table columns and dump table
@@ -23,15 +25,20 @@ sqlmap (0.6.3-1) stable; urgency=low
     client HTTP headers (Accept, Accept-Encoding, etc);
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded
     to official Debian project repository, on queue at the moment;
-  * Major bug fix to correctly handle httplib.BadStatusLine exception;
-  * Minor bug fix to handle session.error and session.timeout in HTTP
-    requests;
-  * Minor bug fix so that when the user provide a SELECT statement to be
+  * Minor improvement to use Python psyco (http://psyco.sourceforge.net/)
+    library if available to speed up the sqlmap algorithmic operations;
+  * Minor improvement to retry the HTTP request up to three times in case
+    an exception is raised during the connection to the target url;
+  * Major bug fix to correctly enumerate columns on Microsoft SQL Server;
+  * Major bug fix so that when the user provide a SELECT statement to be
     processed with an asterisk as columns, now it also work if in the FROM
     there is no database name specified;
-  * Minor bug fix to correctly enumerate columns on Microsoft SQL Server;
   * Minor bug fix to correctly dump table entries when the column is
     provided;
+  * Minor bug fix to correctly handle session.error, session.timeout and
+    httplib.BadStatusLine exceptions in HTTP requests;
+  * Minor bug fix to correctly catch connection exceptions and notify to
+    the user also if they occur within a thread;
   * Increased default output level from 0 to 1;
   * Updated documentation.
 

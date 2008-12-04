@@ -31,6 +31,7 @@ import socket
 import time
 import urllib2
 import urlparse
+import traceback
 
 from lib.contrib import multipartpost
 from lib.core.convert import urlencode
@@ -38,6 +39,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
+from lib.core.settings import RETRIES
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
 
@@ -48,12 +50,21 @@ class Connect:
     This class defines methods used to perform HTTP requests
     """
 
+
+    @staticmethod
+    def __getPageProxy(**kwargs):
+        return Connect.getPage(**kwargs)
+
+
     @staticmethod
     def getPage(**kwargs):
         """
         This method connects to the target url or proxy and returns
         the target url page content
         """
+
+        if conf.delay != None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
+            time.sleep(conf.delay)
 
         url       = kwargs.get('url',       conf.url).replace(" ", "%20")
         get       = kwargs.get('get',       None)
@@ -63,6 +74,7 @@ class Connect:
         direct    = kwargs.get('direct',    False)
         multipart = kwargs.get('multipart', False)
 
+        page            = ""
         cookieStr       = ""
         requestMsg      = "HTTP request:\n%s " % conf.method
         responseMsg     = "HTTP response "
@@ -115,6 +127,9 @@ class Connect:
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 
+            # Reset the number of connection retries
+            conf.retries = 0
+
             if not req.has_header("Accept-Encoding"):
                 requestHeaders += "\nAccept-Encoding: identity"
 
@@ -161,40 +176,37 @@ class Connect:
                 status = e.msg
                 responseHeaders = e.info()
 
-        except (urllib2.URLError, socket.error), _:
-            warnMsg = "unable to connect to the target url"
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine), _:
+            tbMsg = traceback.format_exc()
+
+            if "URLError" in tbMsg or "error" in tbMsg:
+                warnMsg = "unable to connect to the target url"
+
+            elif "timeout" in tbMsg:
+                warnMsg = "connection timed out to the target url"
+
+            elif "BadStatusLine" in tbMsg:
+                warnMsg  = "the target url responded with an unknown HTTP "
+                warnMsg += "status code, try to force the HTTP User-Agent "
+                warnMsg += "header with option --user-agent or -a"
 
             if conf.multipleTargets:
                 warnMsg += ", skipping to next url"
                 logger.warn(warnMsg)
 
                 return None
-            else:
+
+            if "BadStatusLine" not in tbMsg:
                 warnMsg += " or proxy"
-                raise sqlmapConnectionException, warnMsg
 
-        except socket.timeout, _:
-            warnMsg = "connection timed out to the target url"
+            if conf.retries < RETRIES:
+                conf.retries += 1
 
-            if conf.multipleTargets:
-                warnMsg += ", skipping to next url"
+                warnMsg += ", sqlmap is going to retry the request"
                 logger.warn(warnMsg)
 
-                return None
-            else:
-                warnMsg += " or proxy"
-                raise sqlmapConnectionException, warnMsg
-
-        except httplib.BadStatusLine, _:
-            warnMsg = "the target url responded with an unknown HTTP "
-            warnMsg += "status code, try to force the HTTP User-Agent "
-            warnMsg += "header with option --user-agent or -a"
-
-            if conf.multipleTargets:
-                warnMsg += ", skipping to next url"
-                logger.warn(warnMsg)
-
-                return None
+                time.sleep(1)
+                return Connect.__getPageProxy(get=get, post=post, cookie=cookie, ua=ua, direct=direct, multipart=multipart)
             else:
                 raise sqlmapConnectionException, warnMsg
 
@@ -207,9 +219,6 @@ class Connect:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
         logger.log(8, responseMsg)
-
-        if conf.delay != None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
-            time.sleep(conf.delay)
 
         return page
 

@@ -26,6 +26,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import threading
 import time
+import traceback
 
 from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
@@ -34,7 +35,10 @@ from lib.core.common import replaceNewlineTabs
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapValueException
+from lib.core.exception import sqlmapThreadException
+from lib.core.exception import unhandledException
 from lib.core.progress import ProgressBar
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
@@ -45,6 +49,9 @@ def bisection(payload, expression, length=None):
     Bisection algorithm that can be used to perform blind SQL injection
     on an affected host
     """
+
+    partialValue    = ""
+    finalValue      = ""
 
     if kb.dbmsDetected:
         _, _, _, _, fieldToCastStr = agent.getFields(expression)
@@ -102,6 +109,7 @@ def bisection(payload, expression, length=None):
                 maxValue = limit
 
             if (maxValue - minValue) == 1:
+                # NOTE: this first condition should never occur
                 if maxValue == 1:
                     return None
                 else:
@@ -145,7 +153,7 @@ def bisection(payload, expression, length=None):
                 val = getChar(curidx)
 
                 if val == None:
-                    raise sqlmapValueException, "Failed to get character at index %d (expected %d total)" % (curidx, length)
+                    raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
 
                 value[curidx-1] = val
 
@@ -157,9 +165,38 @@ def bisection(payload, expression, length=None):
                     dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), s))
                     iolock.release()
 
+
+        def downloadThreadProxy(numThread):
+            try:
+                downloadThread()
+
+            except (sqlmapConnectionException, sqlmapValueException), errMsg:
+                conf.threadException = True
+                logger.error("thread %d: %s" % (numThread + 1, errMsg))
+
+            except KeyboardInterrupt:
+                conf.threadException = True
+
+                print
+                logger.debug("waiting for threads to finish")
+
+                try:
+                    while (threading.activeCount() > 1):
+                        pass
+
+                except KeyboardInterrupt:
+                    raise sqlmapThreadException, "user aborted"
+
+            except:
+                conf.threadException = True
+                errMsg = unhandledException()
+                logger.error("thread %d: %s" % (numThread + 1, errMsg))
+                traceback.print_exc()
+
+
         # Start the threads
-        for _ in range(numThreads):
-            thread = threading.Thread(target=downloadThread)
+        for numThread in range(numThreads):
+            thread = threading.Thread(target=downloadThreadProxy(numThread))
             thread.start()
             threads.append(thread)
 
@@ -167,19 +204,27 @@ def bisection(payload, expression, length=None):
         for thread in threads:
             thread.join()
 
-        assert None not in value
+        # If we have got one single character not correctly fetched it
+        # can mean that the connection to the target url was lost
+        if None in value:
+            for v in value:
+                if isinstance(v, str) and v != None:
+                    partialValue += v
 
-        value = "".join(value)
+            if partialValue:
+                finalValue = partialValue
+                infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), finalValue)
+        else:
+            finalValue = "".join(value)
+            infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), finalValue)
 
-        assert index[0] == length
+        if isinstance(finalValue, str) and len(finalValue) > 0:
+            dataToSessionFile(replaceNewlineTabs(finalValue))
 
-        dataToSessionFile(replaceNewlineTabs(value))
-
-        if conf.verbose in ( 1, 2 ) and not showEta:
-            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), value))
+        if conf.verbose in ( 1, 2 ) and not showEta and infoMsg:
+            dataToStdout(infoMsg)
 
     else:
-        value = ""
         index = 0
 
         while True:
@@ -190,7 +235,7 @@ def bisection(payload, expression, length=None):
             if val == None:
                 break
 
-            value += val
+            finalValue += val
 
             dataToSessionFile(replaceNewlineTabs(val))
 
@@ -203,9 +248,13 @@ def bisection(payload, expression, length=None):
         dataToStdout("\n")
 
     if ( conf.verbose in ( 1, 2 ) and showEta and len(str(progress)) >= 64 ) or conf.verbose >= 3:
-        infoMsg = "retrieved: %s" % value
+        infoMsg = "retrieved: %s" % finalValue
         logger.info(infoMsg)
 
-    dataToSessionFile("]\n")
+    if not partialValue:
+        dataToSessionFile("]\n")
 
-    return queriesCount[0], value
+    if conf.threadException:
+        raise sqlmapThreadException, "something unexpected happen into the threads"
+
+    return queriesCount[0], finalValue

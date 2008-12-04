@@ -41,21 +41,25 @@ def cmdLineParser():
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
+        # Target options
+        target = OptionGroup(parser, "Target", "At least one of these "
+                             "options has to be specified to set the source "
+                             "to get target urls from.")
+
+        target.add_option("-u", "--url", dest="url", help="Target url")
+
+        target.add_option("-l", dest="list", help="Parse targets from Burp "
+                          "or WebScarab logs")
+
+        target.add_option("-g", dest="googleDork",
+                          help="Process Google dork results as target urls")
+
+        target.add_option("-c", dest="configFile",
+                          help="Load options from a configuration INI file")
+
         # Request options
-        request = OptionGroup(parser, "Request", "These options have to "
-                              "be specified to set the target url, HTTP "
-                              "method, how to connect to the target url "
-                              "or Google dorking results in general.")
-
-        request.add_option("-u", "--url", dest="url", help="Target url")
-
-        request.add_option("-l", dest="list", help="List of targets")
-
-        request.add_option("-g", dest="googleDork",
-                           help="Process Google dork results as target urls")
-
-        request.add_option("-p", dest="testParameter",
-                           help="Testable parameter(s)")
+        request = OptionGroup(parser, "Request", "These options can be used "
+                              "to specify how to connect to the target url.")
 
         request.add_option("--method", dest="method", default="GET",
                            help="HTTP method, GET or POST (default: GET)")
@@ -94,9 +98,16 @@ def cmdLineParser():
         request.add_option("--delay", dest="delay", type="float",
                            help="Delay in seconds between each HTTP request")
 
+        request.add_option("--timeout", dest="timeout", type="float",
+                           help="Seconds to wait before timeout connection "
+                                "(default 10)")
+
 
         # Injection options
         injection = OptionGroup(parser, "Injection")
+
+        injection.add_option("-p", dest="testParameter",
+                             help="Testable parameter(s)")
 
         injection.add_option("--string", dest="string",
                              help="String to match in page when the "
@@ -253,15 +264,13 @@ def cmdLineParser():
                                  help="Save and resume all data retrieved "
                                       "on a session file")
 
-        miscellaneous.add_option("-c", dest="configFile",
-                                 help="Load options from a configuration INI file")
-
         miscellaneous.add_option("--save", dest="saveCmdline", action="store_true",
                                  help="Save options on a configuration INI file")
 
         miscellaneous.add_option("--batch", dest="batch", action="store_true",
                                  help="Never ask for user input, use the default behaviour")
 
+        parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(injection)
         parser.add_option_group(techniques)

