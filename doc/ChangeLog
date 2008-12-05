@@ -27,8 +27,8 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Minor enhancemet to support also --regexp, --excl-str and --excl-reg
     options rather than only --string when comparing HTTP responses page
     content;
-  * Minor improvement to be able to provide CU as user value (-U) when
-    enumerating users privileges or users passwords;
+  * Minor improvement to be able to provide CU (as current user) as user
+    value (-U) when enumerating users privileges or users passwords;
   * Minor improvement to set by default in all HTTP requests the standard
     client HTTP headers (Accept, Accept-Encoding, etc);
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded
