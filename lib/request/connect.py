@@ -42,7 +42,7 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import RETRIES
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
-
+from lib.request.comparison import comparison
 
 
 class Connect:
@@ -190,14 +190,14 @@ class Connect:
                 warnMsg += "status code, try to force the HTTP User-Agent "
                 warnMsg += "header with option --user-agent or -a"
 
+            if "BadStatusLine" not in tbMsg:
+                warnMsg += " or proxy"
+
             if conf.multipleTargets:
                 warnMsg += ", skipping to next url"
                 logger.warn(warnMsg)
 
                 return None
-
-            if "BadStatusLine" not in tbMsg:
-                warnMsg += " or proxy"
 
             if conf.retries < RETRIES:
                 conf.retries += 1
@@ -207,6 +207,7 @@ class Connect:
 
                 time.sleep(1)
                 return Connect.__getPageProxy(get=get, post=post, cookie=cookie, ua=ua, direct=direct, multipart=multipart)
+
             else:
                 raise sqlmapConnectionException, warnMsg
 
@@ -220,7 +221,7 @@ class Connect:
 
         logger.log(8, responseMsg)
 
-        return page
+        return page, responseHeaders
 
 
     @staticmethod
@@ -263,15 +264,9 @@ class Connect:
             else:
                 ua = conf.parameters["User-Agent"]
 
-        page = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua)
+        page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua)
 
-        # TODO: create a comparison library and move these checks there
         if content:
             return page
-        elif conf.string:
-            if conf.string in page:
-                return True
-            else:
-                return False
         else:
-            return md5.new(page).hexdigest()
+            return comparison(page, headers, content)

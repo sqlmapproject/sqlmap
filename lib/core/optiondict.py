@@ -49,8 +49,11 @@ optDict = {
 
             "Injection":     {
                                "testParameter":     "string",
-                               "string":            "string",
                                "dbms":              "string",
+                               "string":            "string",
+                               "regexp":            "string",
+                               "eString":           "string",
+                               "eRegexp":           "string",
                              },
 
             "Techniques":    {

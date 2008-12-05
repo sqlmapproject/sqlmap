@@ -109,12 +109,24 @@ def cmdLineParser():
         injection.add_option("-p", dest="testParameter",
                              help="Testable parameter(s)")
 
+        injection.add_option("--dbms", dest="dbms",
+                             help="Force back-end DBMS to this value")
+
         injection.add_option("--string", dest="string",
                              help="String to match in page when the "
                                   "query is valid")
 
-        injection.add_option("--dbms", dest="dbms",
-                             help="Force back-end DBMS to this value")
+        injection.add_option("--regexp", dest="regexp",
+                             help="Regexp to match in page when the "
+                                  "query is valid")
+
+        injection.add_option("--excl-str", dest="eString",
+                             help="String to be excluded before calculating "
+                                  "page hash")
+
+        injection.add_option("--excl-reg", dest="eRegexp",
+                             help="Regexp matches to be excluded before "
+                                  "calculating page hash")
 
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "

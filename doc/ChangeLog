@@ -1,26 +1,34 @@
 sqlmap (0.6.3-1) stable; urgency=low
 
-  * Major enhancement to support stacked queries when the web application
-    supports it which will be used in the long run by takeover
-    functionality;
   * Major enhancement to get list of targets to test from Burp proxy
     (http://portswigger.net/suite/) requests log file path or WebScarab
     proxy (http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project)
-    'conversations/' folder path;
+    'conversations/' folder path by providing option -l <filepath>;
+  * Major enhancement to support stacked queries (multiple staatements)
+    when the web application supports them which is useful for time based
+    blind sql injection test and will be used someday also by takeover
+    functionality;
   * Minor enhancement to test if the injectable parameter is affected by
-    a time based blind SQL injection technique;
+    a time based blind SQL injection technique by providing option
+    --time-test;
   * Minor enhancement to fingerprint the web server operating system and
     the web application technology by parsing some HTTP response headers;
   * Minor enhancement to fingerprint the back-end DBMS operating system by
     parsing the DBMS banner value when -b option is provided;
   * Minor enhancement to be able to specify the number of seconds before
-    timeout the connection, default is set to 10 seconds;
+    timeout the connection by providing option --timeout #, default is set
+    to 10 seconds and must be 3 or higher;
   * Minor enhancement to be able to specify the number of seconds to wait
-    between each HTTP request providing option --delay #;
+    between each HTTP request by providing option --delay #;
   * Minor enhancement to be able to enumerate table columns and dump table
     entries, also when the database name is not provided, by using the
     current database on MySQL and Microsoft SQL Server, the 'public'
     scheme on PostgreSQL and the 'USERS' TABLESPACE_NAME on Oracle;
+  * Minor enhancemet to support also --regexp, --excl-str and --excl-reg
+    options rather than only --string when comparing HTTP responses page
+    content;
+  * Minor improvement to be able to provide CU as user value (-U) when
+    enumerating users privileges or users passwords;
   * Minor improvement to set by default in all HTTP requests the standard
     client HTTP headers (Accept, Accept-Encoding, etc);
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded

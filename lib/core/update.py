@@ -53,7 +53,7 @@ def __updateMSSQLXML():
     logger.info(infoMsg)
 
     try:
-        mssqlVersionsHtmlString = Request.getPage(url=MSSQL_VERSIONS_URL, direct=True)
+        mssqlVersionsHtmlString, _ = Request.getPage(url=MSSQL_VERSIONS_URL, direct=True)
     except sqlmapConnectionException, _:
         __mssqlPath     = urlparse.urlsplit(MSSQL_VERSIONS_URL)
         __mssqlHostname = __mssqlPath[1]
@@ -231,7 +231,7 @@ def __updateSqlmap():
     logger.debug(debugMsg)
 
     try:
-        sqlmapNewestVersion = Request.getPage(url=SQLMAP_VERSION_URL, direct=True)
+        sqlmapNewestVersion, _ = Request.getPage(url=SQLMAP_VERSION_URL, direct=True)
     except sqlmapConnectionException, _:
         __sqlmapPath     = urlparse.urlsplit(SQLMAP_VERSION_URL)
         __sqlmapHostname = __sqlmapPath[1]
@@ -271,7 +271,7 @@ def __updateSqlmap():
     sqlmapBinaryStringUrl = SQLMAP_SOURCE_URL % sqlmapNewestVersion
 
     try:
-        sqlmapBinaryString = Request.getPage(url=sqlmapBinaryStringUrl, direct=True)
+        sqlmapBinaryString, _ = Request.getPage(url=sqlmapBinaryStringUrl, direct=True)
     except sqlmapConnectionException, _:
         __sqlmapPath     = urlparse.urlsplit(sqlmapBinaryStringUrl)
         __sqlmapHostname = __sqlmapPath[1]

