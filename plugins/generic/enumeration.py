@@ -170,9 +170,14 @@ class Enumeration:
 
     def getPasswordHashes(self):
         infoMsg = "fetching database users password hashes"
-        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].passwords
+
+        if conf.user == "CU":
+            infoMsg += " for current user"
+            conf.user = self.getCurrentUser()
+
+        logger.info(infoMsg)
 
         if conf.unionUse:
             if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
@@ -301,9 +306,14 @@ class Enumeration:
 
     def getPrivileges(self):
         infoMsg = "fetching database users privileges"
-        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].privileges
+
+        if conf.user == "CU":
+            infoMsg += " for current user"
+            conf.user = self.getCurrentUser()
+
+        logger.info(infoMsg)
 
         # Set containing the list of DBMS administrators
         areAdmins = set()
