@@ -335,6 +335,7 @@ Options:
     --referer=REFERER   HTTP Referer header
     --user-agent=AGENT  HTTP User-Agent header
     -a USERAGENTSFILE   Load a random HTTP User-Agent header from file
+    --headers=HEADERS   Extra HTTP headers '\n' separated
     --auth-type=ATYPE   HTTP Authentication type, value: Basic or Digest
     --auth-cred=ACRED   HTTP Authentication credentials, value: name:password
     --proxy=PROXY       Use a HTTP proxy to connect to the target url
@@ -344,8 +345,14 @@ Options:
 
   Injection:
     -p TESTPARAMETER    Testable parameter(s)
-    --string=STRING     String to match in page when the query is valid
     --dbms=DBMS         Force back-end DBMS to this value
+    --prefix=PREFIX     Injection payload prefix string
+    --postfix=POSTFIX   Injection payload postfix string
+    --string=STRING     String to match in page when the query is valid
+    --regexp=REGEXP     Regexp to match in page when the query is valid
+    --excl-str=ESTRING  String to be excluded before calculating page hash
+    --excl-reg=EREGEXP  Regexp matches to be excluded before calculating page
+                        hash
 
   Techniques:
     These options can be used to test for specific SQL injection technique
@@ -1205,12 +1212,71 @@ back-end DBMS:	MySQL >= 5.0.0
 </verb></tscreen>
 
 
-<sect2>String match
+<sect2>Force the database management system name
 
 <p>
-Option: <tt>--string</tt>
+Option: <tt>--dbms</tt>
 
 <p>
+By default sqlmap automatically detects the web application's back-end
+database manangement system.
+At the moment the fully supported database management system are four:
+
+<itemize>
+<item>MySQL
+<item>Oracle
+<item>PostgreSQL
+<item>Microsoft SQL Server
+</itemize>
+
+<p>
+It is possible to force the name if you already know it so that sqlmap
+will skip the fingerprint with an exception for MySQL to only identify if
+it is MySQL &lt; 5.0 or MySQL &gt;= 5.0.
+To avoid also this check you can provide instead <tt>MySQL 4</tt> or
+<tt>MySQL 5</tt>.
+
+Example on a <bf>PostgreSQL 8.2.7</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 2 \
+  --dbms "PostgreSQL"
+
+[...]
+[hh:mm:31] [DEBUG] skipping to test for MySQL
+[hh:mm:31] [DEBUG] skipping to test for Oracle
+back-end DBMS:    PostgreSQL
+</verb></tscreen>
+
+<p>
+In case you provide <tt>--fingerprint</tt> together with <tt>--dbms</tt>,
+sqlmap will only perform the extensive fingerprint for the specified
+database management system, read the following section for further
+details.
+
+<p>
+Note that this option is <bf>not</bf> mandatory and it is strongly
+recommended to use it <bf>only if you are absolutely sure</bf> about the
+back-end database management system. If you do not know it, let sqlmap
+automatically identify it for you.
+
+
+<sect2>Custom injection payload
+
+<p>
+Options: <tt>--prefix</tt> and <tt>--postfix</tt>
+
+<p>
+TODO
+
+
+<sect2>Page comparison
+
+<p>
+Options: <tt>--string</tt> and <tt>--regexp</tt>
+
+<p>
+TODO
 By default the distinction of a True query by a False one (basic concept
 for standard blind SQL injection attacks) is done comparing injected pages
 content MD5 hash with the original not-injected page content MD5. Not
@@ -1352,55 +1418,6 @@ stability test.
 <em>Consider this option a must when you are dealing with a page which
 content that changes itself at each refresh without modifying the user's
 input</em>.
-
-
-<sect2>Force the database management system name
-
-<p>
-Option: <tt>--dbms</tt>
-
-<p>
-By default sqlmap automatically detects the web application's back-end
-database manangement system.
-At the moment the fully supported database management system are four:
-
-<itemize>
-<item>MySQL
-<item>Oracle
-<item>PostgreSQL
-<item>Microsoft SQL Server
-</itemize>
-
-<p>
-It is possible to force the name if you already know it so that sqlmap
-will skip the fingerprint with an exception for MySQL to only identify if
-it is MySQL &lt; 5.0 or MySQL &gt;= 5.0.
-To avoid also this check you can provide instead <tt>MySQL 4</tt> or
-<tt>MySQL 5</tt>.
-
-Example on a <bf>PostgreSQL 8.2.7</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 2 \
-  --dbms "PostgreSQL"
-
-[...]
-[hh:mm:31] [DEBUG] skipping to test for MySQL
-[hh:mm:31] [DEBUG] skipping to test for Oracle
-back-end DBMS:    PostgreSQL
-</verb></tscreen>
-
-<p>
-In case you provide <tt>--fingerprint</tt> together with <tt>--dbms</tt>,
-sqlmap will only perform the extensive fingerprint for the specified
-database management system, read the following section for further
-details.
-
-<p>
-Note that this option is <bf>not</bf> mandatory and it is strongly
-recommended to use it <bf>only if you are absolutely sure</bf> about the
-back-end database management system. If you do not know it, let sqlmap
-automatically identify it for you.
 
 
 <sect1>Techniques

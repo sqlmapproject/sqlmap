@@ -39,6 +39,7 @@ optDict = {
                                "referer":           "string",
                                "agent":             "string",
                                "userAgentsFile":    "string",
+                               "headers":           "string",
                                "aType":             "string",
                                "aCred":             "string",
                                "proxy":             "string",
@@ -50,6 +51,8 @@ optDict = {
             "Injection":     {
                                "testParameter":     "string",
                                "dbms":              "string",
+                               "prefix":            "string",
+                               "postfix":           "string",
                                "string":            "string",
                                "regexp":            "string",
                                "eString":           "string",

@@ -108,6 +108,9 @@ Richard Safran <allapplyhere@yahoo.com>
 Tomoyuki Sakurai <cherry@trombik.org>
     for submitting to the FreeBSD project the sqlmap 0.5 port
 
+Philippe A. R. Schaeffer <schaeff@compuphil.de>
+    for reporting a minor bug
+
 Sven Schluter <sschlueter@netzwerk.cc>
     for providing with a patch for waiting a number of seconds between
     each HTTP request

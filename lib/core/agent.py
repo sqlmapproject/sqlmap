@@ -91,17 +91,20 @@ class Agent:
 
         query = ""
 
-        if kb.injType == "numeric":
-            pass
-        elif kb.injType in ( "stringsingle", "likesingle" ):
-            query = "'"
-        elif kb.injType in ( "stringdouble", "likedouble" ):
-            query = "\""
+        if conf.prefix:
+            query = conf.prefix
         else:
-            raise sqlmapNoneDataException, "unsupported injection type"
+            if kb.injType == "numeric":
+                pass
+            elif kb.injType in ( "stringsingle", "likesingle" ):
+                query = "'"
+            elif kb.injType in ( "stringdouble", "likedouble" ):
+                query = "\""
+            else:
+                raise sqlmapNoneDataException, "unsupported injection type"
 
-        if kb.parenthesis not in ( None, 0 ):
-            query += "%s " % (")" * kb.parenthesis)
+            if kb.parenthesis not in ( None, 0 ):
+                query += "%s " % (")" * kb.parenthesis)
 
         query += string
 
@@ -118,25 +121,28 @@ class Agent:
         randStr = randomStr()
 
         if comment:
-            string += "%s" % comment
+            string += comment
 
-        if kb.parenthesis != None:
-            string += " AND %s" % ("(" * kb.parenthesis)
+        if conf.postfix:
+            string += " %s" % conf.postfix
         else:
-            raise sqlmapNoneDataException, "unable to get the number of parenthesis"
+            if kb.parenthesis != None:
+                string += " AND %s" % ("(" * kb.parenthesis)
+            else:
+                raise sqlmapNoneDataException, "unable to get the number of parenthesis"
 
-        if kb.injType == "numeric":
-            string += "%d=%d" % (randInt, randInt)
-        elif kb.injType == "stringsingle":
-            string += "'%s'='%s" % (randStr, randStr)
-        elif kb.injType == "likesingle":
-            string += "'%s' LIKE '%s" % (randStr, randStr)
-        elif kb.injType == "stringdouble":
-            string += "\"%s\"=\"%s" % (randStr, randStr)
-        elif kb.injType == "likedouble":
-            string += "\"%s\" LIKE \"%s" % (randStr, randStr)
-        else:
-            raise sqlmapNoneDataException, "unsupported injection type"
+            if kb.injType == "numeric":
+                string += "%d=%d" % (randInt, randInt)
+            elif kb.injType == "stringsingle":
+                string += "'%s'='%s" % (randStr, randStr)
+            elif kb.injType == "likesingle":
+                string += "'%s' LIKE '%s" % (randStr, randStr)
+            elif kb.injType == "stringdouble":
+                string += "\"%s\"=\"%s" % (randStr, randStr)
+            elif kb.injType == "likedouble":
+                string += "\"%s\" LIKE \"%s" % (randStr, randStr)
+            else:
+                raise sqlmapNoneDataException, "unsupported injection type"
 
         return string
 

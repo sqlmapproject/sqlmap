@@ -27,6 +27,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 from lib.core.agent import agent
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapNoneDataException
@@ -40,13 +41,13 @@ def checkForParenthesis():
     is within the parenthesis.
     """
 
-    if kb.parenthesis != None:
-        return kb.parenthesis
-
     logMsg = "testing for parenthesis on injectable parameter"
     logger.info(logMsg)
 
     count = 0
+
+    if conf.prefix or conf.postfix:
+        return
 
     for parenthesis in range(1, 4):
         query  = agent.prefixQuery("%s " % (")" * parenthesis))

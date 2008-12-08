@@ -28,13 +28,12 @@ import md5
 import re
 
 from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
 
 
 def comparison(page, headers=None, content=False):
     regExpResults = None
 
+    # String to be excluded before calculating page hash
     if conf.eString and conf.eString in page:
         index              = page.index(conf.eString)
         length             = len(conf.eString)
@@ -42,28 +41,32 @@ def comparison(page, headers=None, content=False):
         pageWithoutString += page[index+length:]
         page               = pageWithoutString
 
+    # Regular expression matches to be excluded before calculating page hash
     if conf.eRegexp:
         regExpResults = re.findall(conf.eRegexp, page, re.I | re.M)
 
-    if conf.eRegexp and regExpResults:
-        for regExpResult in regExpResults:
-            index              = page.index(regExpResult)
-            length             = len(regExpResult)
-            pageWithoutRegExp  = page[:index]
-            pageWithoutRegExp += page[index+length:]
-            page               = pageWithoutRegExp
+        if regExpResults:
+            for regExpResult in regExpResults:
+                index              = page.index(regExpResult)
+                length             = len(regExpResult)
+                pageWithoutRegExp  = page[:index]
+                pageWithoutRegExp += page[index+length:]
+                page               = pageWithoutRegExp
 
+    # String to match in page when the query is valid
     if conf.string:
         if conf.string in page:
             return True
         else:
             return False
 
-    elif conf.regexp:
+    # Regular expression to match in page when the query is valid
+    if conf.regexp:
         if re.search(conf.regexp, page, re.I | re.M):
             return True
         else:
             return False
 
+    # By default it returns the page content MD5 hash
     else:
         return md5.new(page).hexdigest()

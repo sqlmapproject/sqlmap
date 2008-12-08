@@ -94,6 +94,9 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I):
             continue
 
+        if re.search("^[\n]*(GET|POST).*?\.(gif|jpg|png)\sHTTP\/", request, re.I):
+            continue
+
         getPostReq = False
         url        = None
         host       = None
@@ -235,9 +238,9 @@ def __setGoogleDorking():
         raise sqlmapGenericException, errMsg
 
 
-def __setRemoteDBMS():
+def __setDBMS():
     """
-    Checks and set the back-end DBMS option.
+    Force the back-end DBMS option.
     """
 
     if not conf.dbms:
@@ -384,11 +387,23 @@ def __setHTTPMethod():
     logger.debug(debugMsg)
 
 
-def __setHTTPStandardHeaders():
-    conf.httpHeaders.append(("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"))
-    conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
-    conf.httpHeaders.append(("Accept-Encoding", "gzip,deflate"))
-    conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
+def __setHTTPExtraHeaders():
+    if conf.headers:
+        debugMsg = "setting extra HTTP headers"
+        logger.debug(debugMsg)
+
+        conf.headers = conf.headers.split("\n")
+
+        for headerValue in conf.headers:
+            header, value = headerValue.split(": ")
+
+            if header and value:
+                conf.httpHeaders.append((header, value))
+
+    else:
+        conf.httpHeaders.append(("Accept", "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5"))
+        conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
+        conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
 
 
 def __defaultHTTPUserAgent():
@@ -646,6 +661,9 @@ def __saveCmdline():
                 elif datatype == "string":
                     value = ""
 
+            if isinstance(value, str):
+                value = value.replace("\n", "\n ")
+
             confFP.write("%s = %s\n" % (option, value))
 
         confFP.write("\n")
@@ -712,12 +730,12 @@ def init(inputOptions=advancedDict()):
     __setHTTPCookies()
     __setHTTPReferer()
     __setHTTPUserAgent()
-    __setHTTPStandardHeaders()
+    __setHTTPExtraHeaders()
     __setHTTPMethod()
     __setHTTPAuthentication()
     __setHTTPProxy()
     __setThreads()
-    __setRemoteDBMS()
+    __setDBMS()
     __setGoogleDorking()
     __setMultipleTargets()
     __urllib2Opener()

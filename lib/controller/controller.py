@@ -214,6 +214,7 @@ def start():
 
                             if injType:
                                 injData.append((place, parameter, injType))
+                                kb.parenthesis = parenthesis
 
                                 break
                             else:

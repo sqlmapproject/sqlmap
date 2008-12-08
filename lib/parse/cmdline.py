@@ -57,6 +57,7 @@ def cmdLineParser():
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
 
+
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target url.")
@@ -79,6 +80,9 @@ def cmdLineParser():
         request.add_option("-a", dest="userAgentsFile",
                            help="Load a random HTTP User-Agent "
                                 "header from file")
+
+        request.add_option("--headers", dest="headers",
+                           help="Extra HTTP headers '\\n' separated")
 
         request.add_option("--auth-type", dest="aType",
                            help="HTTP Authentication type, value: "
@@ -112,6 +116,12 @@ def cmdLineParser():
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
 
+        injection.add_option("--prefix", dest="prefix",
+                             help="Injection payload prefix string")
+
+        injection.add_option("--postfix", dest="postfix",
+                             help="Injection payload postfix string")
+
         injection.add_option("--string", dest="string",
                              help="String to match in page when the "
                                   "query is valid")
@@ -127,6 +137,7 @@ def cmdLineParser():
         injection.add_option("--excl-reg", dest="eRegexp",
                              help="Regexp matches to be excluded before "
                                   "calculating page hash")
+
 
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
@@ -149,12 +160,14 @@ def cmdLineParser():
                                    "to retrieve the queries output. No "
                                    "need to go blind")
 
+
         # Fingerprint options
         fingerprint = OptionGroup(parser, "Fingerprint")
 
         fingerprint.add_option("-f", "--fingerprint", dest="extensiveFp",
                                action="store_true",
                                help="Perform an extensive DBMS version fingerprint")
+
 
         # Enumeration options
         enumeration = OptionGroup(parser, "Enumeration", "These options can "
@@ -232,6 +245,7 @@ def cmdLineParser():
                                action="store_true",
                                help="Prompt for an interactive SQL shell")
 
+
         # File system options
         filesystem = OptionGroup(parser, "File system access", "These options "
                                  "can be used to access the back-end database "
@@ -245,6 +259,7 @@ def cmdLineParser():
         filesystem.add_option("--write-file", dest="wFile",
                               help="Write to a specific OS file (not yet available)")
 
+
         # Takeover options
         takeover = OptionGroup(parser, "Operating system access", "This "
                                "option can be used to access the back-end "
@@ -257,6 +272,7 @@ def cmdLineParser():
                                  "(only on PHP/MySQL environment with a "
                                  "writable directory within the web "
                                  "server document root for the moment)")
+
 
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
@@ -281,6 +297,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--batch", dest="batch", action="store_true",
                                  help="Never ask for user input, use the default behaviour")
+
 
         parser.add_option_group(target)
         parser.add_option_group(request)

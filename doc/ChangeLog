@@ -27,10 +27,11 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Minor enhancemet to support also --regexp, --excl-str and --excl-reg
     options rather than only --string when comparing HTTP responses page
     content;
+  * Minor enhancement to be able to specify extra HTTP headers by providing
+    option --headers. By default Accept, Accept-Language and Accept-Charset
+    headers are set;
   * Minor improvement to be able to provide CU (as current user) as user
     value (-U) when enumerating users privileges or users passwords;
-  * Minor improvement to set by default in all HTTP requests the standard
-    client HTTP headers (Accept, Accept-Encoding, etc);
   * Minor improvements to sqlmap Debian package files: sqlmap uploaded
     to official Debian project repository, on queue at the moment;
   * Minor improvement to use Python psyco (http://psyco.sourceforge.net/)
