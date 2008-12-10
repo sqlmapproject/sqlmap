@@ -31,6 +31,7 @@ from lib.core.agent import agent
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
+from lib.core.common import parseUnionPage
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.data import conf
@@ -166,8 +167,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
                     if kb.dbms == "Oracle" and expression.endswith("FROM DUAL"):
                         test = "n"
                     else:
-                        message  = "does the SQL query that you provide might "
-                        message += "return multiple entries? [Y/n] "
+                        message  = "can the SQL query provided return "
+                        message += "multiple entries? [Y/n] "
                         test = readInput(message, default="Y")
 
                 if not test or test[0] in ("y", "Y"):
@@ -185,11 +186,11 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
                         if not count or not count.isdigit():
                             count = __goInference(payload, countedExpression)
 
-                        if count.isdigit() and int(count) > 0:
+                        if count and count.isdigit() and int(count) > 0:
                             count = int(count)
 
-                            message  = "the SQL query that you provide can "
-                            message += "return up to %d entries. How many " % count
+                            message  = "the SQL query provided can return "
+                            message += "up to %d entries. How many " % count
                             message += "entries do you want to retrieve?\n"
                             message += "[a] All (default)\n[#] Specific number\n"
                             message += "[q] Quit\nChoice: "
@@ -228,48 +229,21 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
                                 return None
 
                         elif ( not count or int(count) == 0 ):
-                            warnMsg  = "the SQL query that you provided does "
-                            warnMsg += "not return any output"
+                            warnMsg  = "the SQL query provided does not "
+                            warnMsg += "return any output"
                             logger.warn(warnMsg)
 
                             return None
 
                     elif ( not count or int(count) == 0 ) and ( not stopLimit or stopLimit == 0 ):
-                        warnMsg  = "the SQL query that you provided does "
-                        warnMsg += "not return any output"
+                        warnMsg  = "the SQL query provided does not "
+                        warnMsg += "return any output"
                         logger.warn(warnMsg)
 
                         return None
 
                     for num in xrange(startLimit, stopLimit):
-                        limitedExpr = expression
-
-                        if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                            limitStr = queries[kb.dbms].limit % (num, 1)
-                            limitedExpr += " %s" % limitStr
-
-                        elif kb.dbms == "Oracle":
-                            limitStr     = queries[kb.dbms].limit
-                            fromIndex    = limitedExpr.index(" FROM ")
-                            untilFrom    = limitedExpr[:fromIndex]
-                            fromFrom     = limitedExpr[fromIndex+1:]
-                            limitedExpr  = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
-                            limitedExpr  = limitedExpr % fromFrom
-                            limitedExpr += "=%d" % (num + 1)
-
-                        elif kb.dbms == "Microsoft SQL Server":
-                            if re.search(" ORDER BY ", limitedExpr, re.I):
-                                untilOrderChar = limitedExpr.index(" ORDER BY ")
-                                limitedExpr = limitedExpr[:untilOrderChar]
-
-                            limitStr     = queries[kb.dbms].limit
-                            fromIndex    = limitedExpr.index(" FROM ")
-                            untilFrom    = limitedExpr[:fromIndex]
-                            fromFrom     = limitedExpr[fromIndex+1:]
-                            limitedExpr  = limitedExpr.replace("SELECT ", (limitStr % 1), 1)
-                            limitedExpr  = "%s WHERE %s " % (limitedExpr, expressionFieldsList[0])
-                            limitedExpr += "NOT IN (%s" % (limitStr % num)
-                            limitedExpr += "%s %s)" % (expressionFieldsList[0], fromFrom)
+                        limitedExpr = agent.limitQuery(num, expression, expressionFieldsList)
 
                         output = __goInferenceFields(limitedExpr, expressionFields, expressionFieldsList, payload, expected)
                         outputs.append(output)
@@ -282,6 +256,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
         outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected)
 
         returnValue = ", ".join([output for output in outputs])
+
     else:
         returnValue = __goInference(payload, expression)
 
@@ -294,7 +269,6 @@ def __goInband(expression, expected=None):
     injection vulnerability on the affected parameter.
     """
 
-    counter = None
     output  = None
     partial = False
     data    = []
@@ -311,49 +285,10 @@ def __goInband(expression, expected=None):
             partial = True
 
     if not output:
-        output = unionUse(expression)
-
-    fields = expression.split(",")
-    counter = len(fields)
+        output = unionUse(expression, resetCounter=True)
 
     if output:
-        outCond1 = ( output.startswith(temp.start) and output.endswith(temp.stop) )
-        outCond2 = ( output.startswith("__START__") and output.endswith("__STOP__") )
-
-        if outCond1 or outCond2:
-            if outCond1:
-                regExpr = '%s(.*?)%s' % (temp.start, temp.stop)
-            elif outCond2:
-                regExpr = '__START__(.*?)__STOP__'
-
-            output = re.findall(regExpr, output, re.S)
-
-            if partial or not condition:
-                logOutput = "".join(["__START__%s__STOP__" % replaceNewlineTabs(value) for value in output])
-                dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, logOutput))
-
-            output = set(output)
-
-            for entry in output:
-                info = []
-
-                if "__DEL__" in entry:
-                    entry = entry.split("__DEL__")
-                else:
-                    entry = entry.split(temp.delimiter)
-
-                if len(entry) == 1:
-                    data.append(entry[0])
-                else:
-                    for value in entry:
-                        info.append(value)
-
-                    data.append(info)
-        else:
-            data = output
-
-        if len(data) == 1 and isinstance(data[0], str):
-            data = data[0]
+        data = parseUnionPage(output, expression, partial, condition)
 
     return data
 
@@ -372,6 +307,14 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None)
 
     if inband and conf.unionUse and kb.dbms:
         value = __goInband(expression, expected)
+
+        if not value:
+            warnMsg  = "for some reasons it was not possible to retrieve "
+            warnMsg += "the query output through inband SQL injection "
+            warnMsg += "technique, sqlmap is going blind"
+            logger.warn(warnMsg)
+
+            conf.paramNegative = False
 
     if blind and not value:
         value = __goInferenceProxy(expression, fromUser, expected)

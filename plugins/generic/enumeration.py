@@ -909,17 +909,6 @@ class Enumeration:
                     index += 1
 
         if not self.dumpedTable:
-            if conf.unionUse:
-                warnMsg = "unable to retrieve the "
-                if conf.col:
-                    warnMsg += "columns '%s' " % colString
-                warnMsg += "entries for table '%s' " % conf.tbl
-                warnMsg += "on database '%s'" % conf.db
-                warnMsg += " through UNION query SQL injection, "
-                warnMsg += "probably because it has no entries, going "
-                warnMsg += "blind to confirm"
-                logger.warn(warnMsg)
-
             infoMsg = "fetching number of "
             if conf.col:
                 infoMsg += "columns '%s' " % colString
@@ -1040,12 +1029,6 @@ class Enumeration:
     def sqlQuery(self, query):
         infoMsg = "fetching SQL SELECT query output: '%s'" % query
         logger.info(infoMsg)
-
-        if query.startswith("select "):
-            query = query.replace("select ", "SELECT ", 1)
-
-        if " from " in query:
-            query = query.replace(" from ", " FROM ")
 
         output = inject.getValue(query, fromUser=True)
 

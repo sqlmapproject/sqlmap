@@ -500,6 +500,7 @@ def cleanQuery(query):
     upperQuery = upperQuery.replace(" order by ", " ORDER BY ")
     upperQuery = upperQuery.replace(" group by ", " GROUP BY ")
     upperQuery = upperQuery.replace(" union all ", " UNION ALL ")
+    upperQuery = upperQuery.replace(" rownum ", " ROWNUM ")
 
     return upperQuery
 
@@ -624,3 +625,53 @@ def getRange(count, dump=False, plusOne=False):
         indexRange = range(limitStart - 1, limitStop)
 
     return indexRange
+
+
+def parseUnionPage(output, expression, partial=False, condition=None):
+    data = []
+
+    outCond1 = ( output.startswith(temp.start) and output.endswith(temp.stop) )
+    outCond2 = ( output.startswith("__START__") and output.endswith("__STOP__") )
+
+    if outCond1 or outCond2:
+        if outCond1:
+            regExpr = '%s(.*?)%s' % (temp.start, temp.stop)
+        elif outCond2:
+            regExpr = '__START__(.*?)__STOP__'
+
+        output = re.findall(regExpr, output, re.S)
+
+        if condition == None:
+            condition = (
+                          kb.resumedQueries and conf.url in kb.resumedQueries.keys()
+                          and expression in kb.resumedQueries[conf.url].keys()
+                        )
+
+        if partial or not condition:
+            logOutput = "".join(["__START__%s__STOP__" % replaceNewlineTabs(value) for value in output])
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, logOutput))
+
+        output = set(output)
+
+        for entry in output:
+            info = []
+
+            if "__DEL__" in entry:
+                entry = entry.split("__DEL__")
+            else:
+                entry = entry.split(temp.delimiter)
+
+            if len(entry) == 1:
+                data.append(entry[0])
+            else:
+                for value in entry:
+                    info.append(value)
+
+                data.append(info)
+    else:
+        data = output
+
+    if len(data) == 1 and isinstance(data[0], str):
+        data = data[0]
+
+    return data

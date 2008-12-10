@@ -53,12 +53,11 @@ class Agent:
         injection statement to request
         """
 
+        negValue = ""
         retValue = ""
 
         if negative == True or conf.paramNegative == True:
             negValue = "-"
-        else:
-            negValue = ""
 
         # After identifing the injectable parameter
         if kb.injPlace == "User-Agent":
@@ -231,6 +230,22 @@ class Agent:
 
 
     def getFields(self, query):
+        """
+        Take in input a query string and return its fields (columns) and
+        more details.
+
+        Example:
+
+        Input:  SELECT user, password FROM mysql.user
+        Output: user,password
+
+        @param query: query to be processed
+        @type query: C{str}
+
+        @return: query fields (columns) and more details
+        @rtype: C{str}
+        """
+
         fieldsSelectTop      = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectDistinct = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", query, re.I)
         fieldsSelectFrom     = re.search("\ASELECT\s+(.+?)\s+FROM\s+", query, re.I)
@@ -393,6 +408,56 @@ class Agent:
         inbandQuery = self.postfixQuery(inbandQuery, kb.unionComment)
 
         return inbandQuery
+
+
+    def limitQuery(self, num, query, fieldsList=None):
+        """
+        Take in input a query string and return its limited query string.
+
+        Example:
+
+        Input:  SELECT user FROM mysql.users
+        Output: SELECT user FROM mysql.users LIMIT <num>, 1
+
+        @param num: limit number
+        @type num: C{int}
+
+        @param query: query to be processed
+        @type query: C{str}
+
+        @param fieldsList: list of fields within the query
+        @type fieldsList: C{list}
+
+        @return: limited query string
+        @rtype: C{str}
+        """
+
+        limitedQuery  = query
+        limitStr      = queries[kb.dbms].limit
+        fromIndex     = limitedQuery.index(" FROM ")
+        untilFrom     = limitedQuery[:fromIndex]
+        fromFrom      = limitedQuery[fromIndex+1:]
+
+        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            limitStr = queries[kb.dbms].limit % (num, 1)
+            limitedQuery += " %s" % limitStr
+
+        elif kb.dbms == "Oracle":
+            limitedQuery  = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
+            limitedQuery  = limitedQuery % fromFrom
+            limitedQuery += "=%d" % (num + 1)
+
+        elif kb.dbms == "Microsoft SQL Server":
+            if re.search(" ORDER BY ", limitedQuery, re.I):
+                untilOrderChar = limitedQuery.index(" ORDER BY ")
+                limitedQuery   = limitedQuery[:untilOrderChar]
+
+            limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
+            limitedQuery  = "%s WHERE %s " % (limitedQuery, fieldsList[0])
+            limitedQuery += "NOT IN (%s" % (limitStr % num)
+            limitedQuery += "%s %s)" % (fieldsList[0], fromFrom)
+
+        return limitedQuery
 
 
 # SQL agent
