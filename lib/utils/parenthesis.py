@@ -46,7 +46,11 @@ def checkForParenthesis():
 
     count = 0
 
+    if kb.parenthesis != None:
+        return
+
     if conf.prefix or conf.postfix:
+        kb.parenthesis = 0
         return
 
     for parenthesis in range(1, 4):

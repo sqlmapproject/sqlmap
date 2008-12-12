@@ -7,6 +7,10 @@
 
     <!-- Ubuntu -->
     <regexp value="PostgreSQL\s+(8\.2\.7)\s+on\s+.*?\s+\(Ubuntu 4\.2\.3-2ubuntu4\)">
-        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid"/>
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.04" codename="Hardy Heron"/>
+    </regexp>
+
+    <regexp value="PostgreSQL\s+(8\.3\.5)\s+on\s+.*?\s+\(Ubuntu 4\.3\.2-1ubuntu11\)">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid Ibex"/>
     </regexp>
 </root>

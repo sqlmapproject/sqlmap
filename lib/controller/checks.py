@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import re
 import time
 
 from lib.controller.action import action
@@ -35,6 +36,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.session import setString
+from lib.core.session import setRegexp
 from lib.request.connect import Connect as Request
 
 
@@ -332,6 +334,38 @@ def checkString():
         errMsg  = "you provided '%s' as the string to " % conf.string
         errMsg += "match, but such a string is not within the target "
         errMsg += "URL page content, please provide another string."
+        logger.error(errMsg)
+
+        return False
+
+
+def checkRegexp():
+    if not conf.regexp:
+        return True
+
+    condition = (
+                  kb.resumedQueries.has_key(conf.url) and
+                  kb.resumedQueries[conf.url].has_key("Regular expression") and
+                  kb.resumedQueries[conf.url]["Regular expression"][:-1] == conf.regexp
+                )
+
+    if condition:
+        return True
+
+    infoMsg  = "testing if the provided regular expression matches within "
+    infoMsg += "the target URL page content"
+    logger.info(infoMsg)
+
+    page = Request.queryPage(content=True)
+
+    if re.search(conf.regexp, page, re.I | re.M):
+        setRegexp()
+        return True
+    else:
+        errMsg  = "you provided '%s' as the regular expression to " % conf.regexp
+        errMsg += "match, but such a regular expression does not have any "
+        errMsg += "match within the target URL page content, please provide "
+        errMsg += "another regular expression."
         logger.error(errMsg)
 
         return False

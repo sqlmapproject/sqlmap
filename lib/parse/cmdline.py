@@ -24,6 +24,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import sys
+
 from optparse import OptionError
 from optparse import OptionGroup
 from optparse import OptionParser
@@ -37,7 +39,7 @@ def cmdLineParser():
     This function parses the command line parameters and arguments
     """
 
-    usage = "sqlmap.py [options]"
+    usage = "%s [options]" % sys.argv[0]
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
@@ -108,7 +110,12 @@ def cmdLineParser():
 
 
         # Injection options
-        injection = OptionGroup(parser, "Injection")
+        injection = OptionGroup(parser, "Injection", "These options can be "
+                                "used to specify which parameters to test "
+                                "for, provide custom injection payloads and "
+                                "how to parse and compare HTTP responses "
+                                "page content when using the blind SQL "
+                                "injection technique.")
 
         injection.add_option("-p", dest="testParameter",
                              help="Testable parameter(s)")

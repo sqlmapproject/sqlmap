@@ -48,6 +48,20 @@ def setString():
         dataToSessionFile("[%s][None][None][String][%s]\n" % (conf.url, conf.string))
 
 
+def setRegexp():
+    """
+    Save regular expression to match in session file.
+    """
+
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Regular expression") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][None][None][Regular expression][%s]\n" % (conf.url, conf.regexp))
+
+
 def setInjection():
     """
     Save information retrieved about injection place and parameter in the
@@ -177,6 +191,28 @@ def resumeConfKb(expression, url, value):
 
             if not test or test[0] in ("y", "Y"):
                 conf.string = string
+
+    elif expression == "Regular expression" and url == conf.url:
+        regexp = value[:-1]
+
+        logMsg  = "resuming regular expression match '%s' from session file" % regexp
+        logger.info(logMsg)
+
+        if regexp and ( not conf.regexp or regexp != conf.regexp ):
+            if not conf.regexp:
+                message  = "you did not provide any regular expression "
+                message += "to match. "
+            else:
+                message  = "The regular expression you provided does not "
+                message += "match the resumed regular expression. "
+
+            message += "Do you want to use the resumed regular expression "
+            message += "to be matched in page when the query "
+            message += "is valid? [Y/n] "
+            test = readInput(message, default="Y")
+
+            if not test or test[0] in ("y", "Y"):
+                conf.regexp = regexp
 
     elif expression == "Injection point" and url == conf.url:
         injPlace = value[:-1]

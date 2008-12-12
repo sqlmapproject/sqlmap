@@ -29,6 +29,7 @@ from lib.controller.checks import checkSqlInjection
 from lib.controller.checks import checkDynParam
 from lib.controller.checks import checkStability
 from lib.controller.checks import checkString
+from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.core.common import paramToDict
 from lib.core.common import readInput
@@ -117,7 +118,7 @@ def start():
 
         if conf.multipleTargets:
             hostCount += 1
-            message = "url %d:\n%s %s" % (hostCount, conf.method, targetUrl)
+            message = "url %d:\n%s %s" % (hostCount, conf.method or "GET", targetUrl)
 
             if conf.cookie:
                 message += "\nCookie: %s" % conf.cookie
@@ -140,7 +141,7 @@ def start():
 
         initTargetEnv()
 
-        if not checkConnection() or not checkString():
+        if not checkConnection() or not checkString() or not checkRegexp():
             continue
 
         for _, cookie in enumerate(conf.cj):
@@ -173,14 +174,14 @@ def start():
                     __testableParameters = True
 
         if not kb.injPlace or not kb.injParameter or not kb.injType:
-            if not conf.string:
+            if not conf.string and not conf.regexp and not conf.eRegexp:
                 if checkStability():
                     logMsg = "url is stable"
                     logger.info(logMsg)
                 else:
-                    errMsg  = "url is not stable, try with --string option, refer "
-                    errMsg += "to the user's manual paragraph 'String match' "
-                    errMsg += "for details"
+                    errMsg  = "url is not stable, try with --string or "
+                    errMsg += "--regexp options, refer to the user's manual "
+                    errMsg += "paragraph 'Page comparison' for details"
 
                     if conf.multipleTargets:
                         errMsg += ", skipping to next url"
@@ -214,7 +215,6 @@ def start():
 
                             if injType:
                                 injData.append((place, parameter, injType))
-                                kb.parenthesis = parenthesis
 
                                 break
                             else:
