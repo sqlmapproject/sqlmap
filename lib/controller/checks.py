@@ -129,7 +129,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     trueResult = Request.queryPage(payload, place)
 
     if trueResult == kb.defaultResult:
-        payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s'='%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + 'A'))
+        payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s'='%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
         if falseResult != kb.defaultResult:
@@ -160,7 +160,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     trueResult = Request.queryPage(payload, place)
 
     if trueResult == kb.defaultResult:
-        payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s' LIKE '%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + 'A'))
+        payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s' LIKE '%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
         if falseResult != kb.defaultResult:
@@ -191,7 +191,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     trueResult = Request.queryPage(payload, place)
 
     if trueResult == kb.defaultResult:
-        payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\"=\"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + 'A'))
+        payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\"=\"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
         if falseResult != kb.defaultResult:
@@ -222,7 +222,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     trueResult = Request.queryPage(payload, place)
 
     if trueResult == kb.defaultResult:
-        payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\" LIKE \"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + 'A'))
+        payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\" LIKE \"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
         if falseResult != kb.defaultResult:
