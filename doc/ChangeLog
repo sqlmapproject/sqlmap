@@ -6,9 +6,9 @@ sqlmap (0.6.3-1) stable; urgency=low
     'conversations/' folder path by providing option -l <filepath>;
   * Major enhancement to support Partial UNION query SQL injection
     technique too;
-  * Major enhancement to support stacked queries (multiple staatements)
-    when the web application supports them which is useful for time based
-    blind sql injection test and will be used someday also by takeover
+  * Major enhancement to test if the web application technology supports
+    stacked queries (multiple statements) by providing option
+    --stacked-test which will be then used someday also by takeover
     functionality;
   * Major enhancement to test if the injectable parameter is affected by
     a time based blind SQL injection technique by providing option
