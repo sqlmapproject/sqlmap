@@ -21,7 +21,7 @@
                    * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-12.html
                    * http://dev.mysql.com/doc/refman/5.0/en/miscellaneous-functions.html#function_sleep
         -->
-        <timedelay query="SELECT SLEEP(%d)" query2="SELECT BENCHMARK(1000000, MD5('%d'))"/>
+        <timedelay query="SLEEP(%d)" query2="SELECT BENCHMARK(1000000, MD5('%d'))"/>
         <substring query="MID((%s), %d, %d)"/>
         <inference query="AND ORD(MID((%s), %d, 1)) > %d"/>
         <banner query="VERSION()"/>
