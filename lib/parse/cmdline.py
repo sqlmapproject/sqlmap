@@ -153,10 +153,14 @@ def cmdLineParser():
                                  "the affected parameter(s) rather than using "
                                  "the default blind SQL injection technique.")
 
+        techniques.add_option("--stacked-test", dest="stackedTest",
+                              action="store_true",
+                              help="Test for stacked queries (multiple "
+                                   "statements) support")
+
         techniques.add_option("--time-test", dest="timeTest",
                               action="store_true",
                               help="Test for Time based blind SQL injection")
-
         techniques.add_option("--union-test", dest="unionTest",
                               action="store_true",
                               help="Test for UNION query (inband) SQL injection")

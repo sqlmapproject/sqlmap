@@ -322,21 +322,15 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None)
     return value
 
 
-def goStacked(expression, timeTest=False):
+def goStacked(expression):
     """
     TODO: write description
     """
 
-    comment        = queries[kb.dbms].comment
-    query          = agent.prefixQuery("; %s" % expression)
-    query          = agent.postfixQuery("%s; %s" % (query, comment))
-    payload        = agent.payload(newValue=query)
+    comment = queries[kb.dbms].comment
+    query   = agent.prefixQuery("; %s" % expression)
+    query   = agent.postfixQuery("%s;%s" % (query, comment))
+    payload = agent.payload(newValue=query)
+    page    = Request.queryPage(payload, content=True)
 
-    start    = time.time()
-    Request.queryPage(payload)
-    duration = int(time.time() - start)
-
-    if timeTest:
-        return (duration >= SECONDS, payload)
-    else:
-        return duration >= SECONDS
+    return payload, page

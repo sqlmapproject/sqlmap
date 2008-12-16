@@ -33,6 +33,7 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.blind.timebased import timeTest
 from lib.techniques.inband.union.test import unionTest
+from lib.techniques.outband.stacked import stackedTest
 
 
 def action():
@@ -70,6 +71,9 @@ def action():
     print "%s\n" % conf.dbmsHandler.getFingerprint()
 
     # Techniques options
+    if conf.stackedTest:
+        dumper.string("stacked queries support", stackedTest())
+
     if conf.timeTest:
         dumper.string("time based blind sql injection payload", timeTest())
 

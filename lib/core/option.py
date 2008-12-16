@@ -613,6 +613,7 @@ def __setKnowledgeBaseAttributes():
     kb.injType        = None
     kb.parenthesis    = None
     kb.resumedQueries = {}
+    kb.stackedTest    = None
     kb.targetUrls     = set()
     kb.timeTest       = None
     kb.unionComment   = ""
@@ -656,6 +657,8 @@ def __saveCmdline():
                 elif datatype in ( "integer", "float" ):
                     if option in ( "threads", "verbose" ):
                         value = "1"
+                    elif option == "timeout":
+                        value = "10"
                     else:
                         value = "0"
                 elif datatype == "string":
