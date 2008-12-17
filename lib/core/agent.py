@@ -246,7 +246,7 @@ class Agent:
         @rtype: C{str}
         """
 
-        if "(SELECT " in query:
+        if query.startswith("SELECT ") and "(SELECT " in query:
             firstChar = "\\("
         else:
             firstChar = "\\A"
@@ -270,6 +270,9 @@ class Agent:
 
         fieldsToCastList = fieldsToCastStr.replace(", ", ",")
         fieldsToCastList = fieldsToCastList.split(",")
+
+        if query.startswith("SELECT ") and "(SELECT " in query:
+            fieldsSelectFrom = None
 
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsToCastList, fieldsToCastStr
 
@@ -390,7 +393,7 @@ class Agent:
                 inbandQuery += ", "
 
             if element == exprPosition:
-                if " FROM " in query:
+                if " FROM " in query and not query.startswith("SELECT ") and not "(SELECT " in query:
                     conditionIndex = query.rindex(" FROM ")
                     inbandQuery += "%s" % query[:conditionIndex]
                 else:
@@ -398,7 +401,7 @@ class Agent:
             else:
                 inbandQuery += "NULL"
 
-        if " FROM " in query:
+        if " FROM " in query and not query.startswith("SELECT ") and not "(SELECT " in query:
             conditionIndex = query.rindex(" FROM ")
             inbandQuery += "%s" % query[conditionIndex:]
 

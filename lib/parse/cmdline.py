@@ -43,6 +43,9 @@ def cmdLineParser():
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
+        parser.add_option("-v", dest="verbose", type="int",
+                          help="Verbosity level: 0-5 (default 1)")
+
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
                              "options has to be specified to set the source "
@@ -161,6 +164,7 @@ def cmdLineParser():
         techniques.add_option("--time-test", dest="timeTest",
                               action="store_true",
                               help="Test for Time based blind SQL injection")
+
         techniques.add_option("--union-test", dest="unionTest",
                               action="store_true",
                               help="Test for UNION query (inband) SQL injection")
@@ -292,9 +296,6 @@ def cmdLineParser():
                                  help="Retrieve each query output length and "
                                       "calculate the estimated time of arrival "
                                       "in real time")
-
-        miscellaneous.add_option("-v", dest="verbose", type="int",
-                                 help="Verbosity level: 0-5 (default 1)")
 
         miscellaneous.add_option("--update", dest="updateAll", action="store_true",
                                 help="Update sqlmap to the latest stable version")
