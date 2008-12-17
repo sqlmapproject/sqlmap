@@ -36,8 +36,7 @@ sqlmap (0.6.3-1) stable; urgency=low
     headers are set;
   * Minor improvement to be able to provide CU (as current user) as user
     value (-U) when enumerating users privileges or users passwords;
-  * Minor improvements to sqlmap Debian package files: sqlmap uploaded
-    to official Debian project repository, on queue at the moment;
+  * Minor improvements to sqlmap Debian package files;
   * Minor improvement to use Python psyco (http://psyco.sourceforge.net/)
     library if available to speed up the sqlmap algorithmic operations;
   * Minor improvement to retry the HTTP request up to three times in case
