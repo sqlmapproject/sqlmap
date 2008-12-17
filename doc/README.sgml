@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">
-<date>version 0.6.3, DDth of December 2008
+<date>version 0.6.3, 18th of December 2008
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">

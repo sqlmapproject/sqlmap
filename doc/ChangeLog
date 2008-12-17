@@ -55,7 +55,7 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Increased default output level from 0 to 1;
   * Updated documentation.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day,  X YYY 2008 10:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Thu, 18 Dec 2008 10:00:00 +0000
 
 sqlmap (0.6.2-1) stable; urgency=low
 
