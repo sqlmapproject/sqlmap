@@ -356,6 +356,7 @@ Usage: sqlmap.py [options]
 Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
+  -v VERBOSE            Verbosity level: 0-5 (default 1)
 
   Target:
     At least one of these options has to be specified to set the source to
@@ -459,7 +460,6 @@ Options:
   Miscellaneous:
     --eta               Retrieve each query output length and calculate the
                         estimated time of arrival in real time
-    -v VERBOSE          Verbosity level: 0-5 (default 1)
     --update            Update sqlmap to the latest stable version
     -s SESSIONFILE      Save and resume all data retrieved on a session file
     --save              Save options on a configuration INI file
@@ -467,34 +467,7 @@ Options:
 </verb></tscreen>
 
 
-<sect1>Target
-
-<p>
-At least one of these options has to be specified to set the source to get
-target urls from.
-
-<sect2>Target URL
-
-<p>
-Option: <tt>-u</tt> or <tt>--url</tt>
-
-<p>
-To run sqlmap on a single target URL.
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1"
-
-[...]
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
-</verb></tscreen>
-
-
-<sect2>Target URL and verbosity
+<sect1>Output verbosity
 
 <p>
 Option: <tt>-v</tt>
@@ -706,6 +679,33 @@ Content-Type: text/html
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;
 [...]
+</verb></tscreen>
+
+
+<sect1>Target
+
+<p>
+At least one of these options has to be specified to set the source to get
+target urls from.
+
+<sect2>Target URL
+
+<p>
+Option: <tt>-u</tt> or <tt>--url</tt>
+
+<p>
+To run sqlmap on a single target URL.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1"
+
+[...]
+web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
+web application technology: PHP 5.2.6, Apache 2.2.9
+back-end DBMS: MySQL >= 5.0.0
 </verb></tscreen>
 
 
@@ -1513,9 +1513,9 @@ SELECT * FROM users WHERE id=('1') AND 7433=7433 AND ('test'='test') LIMIT 0, 1
 </verb></tscreen>
 
 <p>
-In this simple example sqlmap could detect the SQL injection and exploit it
-without need to provide a custom injection payload, but sometimes on real
-world application it is necessary to provide a custom injection payload.
+In this simple example, sqlmap could detect the SQL injection and exploit
+it without need to provide a custom injection payload, but sometimes in
+the real world application it is necessary to provide it.
 
 
 <sect2>Page comparison
@@ -1864,11 +1864,16 @@ $ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" \
 [...]
 back-end DBMS: Microsoft SQL Server 2005
 
-[15:32:59] [INFO] testing time based blind sql injection on parameter 'name' with AND condition syntax
-[15:32:59] [WARNING] the parameter 'name' is not affected by a time based blind sql injection with AND condition syntax
-[15:32:59] [INFO] testing time based blind sql injection on parameter 'name' with stacked query syntax
-[15:33:13] [INFO] the parameter 'name' is affected by a time based blind sql injection with stacked query syntax
-time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'PmrXn'='PmrXn'
+[hh:mm:59] [INFO] testing time based blind sql injection on parameter 'name' with AND 
+condition syntax
+[hh:mm:59] [WARNING] the parameter 'name' is not affected by a time based blind sql 
+injection with AND condition syntax
+[hh:mm:59] [INFO] testing time based blind sql injection on parameter 'name' with stacked 
+query syntax
+[hh:mm:13] [INFO] the parameter 'name' is affected by a time based blind sql injection with 
+stacked query syntax
+time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 
+'PmrXn'='PmrXn'
 </verb></tscreen>
 
 

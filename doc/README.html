@@ -37,15 +37,16 @@ for the latest version.</EM>
 <H2><A NAME="toc5">5.</A> <A HREF="README.html#s5">Usage</A></H2>
 
 <UL>
-<LI><A NAME="toc5.1">5.1</A> <A HREF="README.html#ss5.1">Target</A>
-<LI><A NAME="toc5.2">5.2</A> <A HREF="README.html#ss5.2">Request</A>
-<LI><A NAME="toc5.3">5.3</A> <A HREF="README.html#ss5.3">Injection</A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="README.html#ss5.4">Techniques</A>
-<LI><A NAME="toc5.5">5.5</A> <A HREF="README.html#ss5.5">Fingerprint</A>
-<LI><A NAME="toc5.6">5.6</A> <A HREF="README.html#ss5.6">Enumeration</A>
-<LI><A NAME="toc5.7">5.7</A> <A HREF="README.html#ss5.7">File system access</A>
-<LI><A NAME="toc5.8">5.8</A> <A HREF="README.html#ss5.8">Operating system access</A>
-<LI><A NAME="toc5.9">5.9</A> <A HREF="README.html#ss5.9">Miscellaneous</A>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="README.html#ss5.1">Output verbosity</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="README.html#ss5.2">Target</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="README.html#ss5.3">Request</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="README.html#ss5.4">Injection</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="README.html#ss5.5">Techniques</A>
+<LI><A NAME="toc5.6">5.6</A> <A HREF="README.html#ss5.6">Fingerprint</A>
+<LI><A NAME="toc5.7">5.7</A> <A HREF="README.html#ss5.7">Enumeration</A>
+<LI><A NAME="toc5.8">5.8</A> <A HREF="README.html#ss5.8">File system access</A>
+<LI><A NAME="toc5.9">5.9</A> <A HREF="README.html#ss5.9">Operating system access</A>
+<LI><A NAME="toc5.10">5.10</A> <A HREF="README.html#ss5.10">Miscellaneous</A>
 </UL>
 <P>
 <H2><A NAME="toc6">6.</A> <A HREF="README.html#s6">Disclaimer</A></H2>
@@ -399,6 +400,7 @@ Usage: sqlmap.py [options]
 Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
+  -v VERBOSE            Verbosity level: 0-5 (default 1)
 
   Target:
     At least one of these options has to be specified to set the source to
@@ -502,7 +504,6 @@ Options:
   Miscellaneous:
     --eta               Retrieve each query output length and calculate the
                         estimated time of arrival in real time
-    -v VERBOSE          Verbosity level: 0-5 (default 1)
     --update            Update sqlmap to the latest stable version
     -s SESSIONFILE      Save and resume all data retrieved on a session file
     --save              Save options on a configuration INI file
@@ -512,34 +513,8 @@ Options:
 </P>
 
 
-<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Target</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Output verbosity</A>
 </H2>
-
-<P>At least one of these options has to be specified to set the source to get
-target urls from.</P>
-
-<H3>Target URL</H3>
-
-<P>Option: <CODE>-u</CODE> or <CODE>--url</CODE></P>
-
-<P>To run sqlmap on a single target URL.</P>
-
-<P>Example on a <B>MySQL 5.0.67</B> target:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1"
-
-[...]
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-
-<H3>Target URL and verbosity</H3>
 
 <P>Option: <CODE>-v</CODE></P>
 
@@ -762,6 +737,33 @@ Content-Type: text/html
 </P>
 
 
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Target</A>
+</H2>
+
+<P>At least one of these options has to be specified to set the source to get
+target urls from.</P>
+
+<H3>Target URL</H3>
+
+<P>Option: <CODE>-u</CODE> or <CODE>--url</CODE></P>
+
+<P>To run sqlmap on a single target URL.</P>
+
+<P>Example on a <B>MySQL 5.0.67</B> target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1"
+
+[...]
+web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
+web application technology: PHP 5.2.6, Apache 2.2.9
+back-end DBMS: MySQL >= 5.0.0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
 <H3>Parse targets from Burp or WebScarab logs</H3>
 
 <P>Option: <CODE>-l</CODE></P>
@@ -903,7 +905,7 @@ evaluated when running sqlmap and overwrite the same options, if set, in
 the provided configuration file.</P>
 
 
-<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Request</A>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Request</A>
 </H2>
 
 <P>These options can be used to specify how to connect to the target url.</P>
@@ -1367,7 +1369,7 @@ the HTTP request timed out. The valid value is a float, for instance
 10.5 means ten seconds and a half.</P>
 
 
-<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Injection</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Injection</A>
 </H2>
 
 <P>These options can be used to specify which parameters to test for, provide
@@ -1573,9 +1575,9 @@ SELECT * FROM users WHERE id=('1') AND 7433=7433 AND ('test'='test') LIMIT 0, 1
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>In this simple example sqlmap could detect the SQL injection and exploit it
-without need to provide a custom injection payload, but sometimes on real
-world application it is necessary to provide a custom injection payload.</P>
+<P>In this simple example, sqlmap could detect the SQL injection and exploit
+it without need to provide a custom injection payload, but sometimes in
+the real world application it is necessary to provide it.</P>
 
 
 <H3>Page comparison</H3>
@@ -1799,7 +1801,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=
 stability test.</P>
 
 
-<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Techniques</A>
+<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Techniques</A>
 </H2>
 
 <H3>Test for stacked queries (multiple statements) support</H3>
@@ -1928,11 +1930,16 @@ $ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" \
 [...]
 back-end DBMS: Microsoft SQL Server 2005
 
-[15:32:59] [INFO] testing time based blind sql injection on parameter 'name' with AND condition syntax
-[15:32:59] [WARNING] the parameter 'name' is not affected by a time based blind sql injection with AND condition syntax
-[15:32:59] [INFO] testing time based blind sql injection on parameter 'name' with stacked query syntax
-[15:33:13] [INFO] the parameter 'name' is affected by a time based blind sql injection with stacked query syntax
-time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'PmrXn'='PmrXn'
+[hh:mm:59] [INFO] testing time based blind sql injection on parameter 'name' with AND 
+condition syntax
+[hh:mm:59] [WARNING] the parameter 'name' is not affected by a time based blind sql 
+injection with AND condition syntax
+[hh:mm:59] [INFO] testing time based blind sql injection on parameter 'name' with stacked 
+query syntax
+[hh:mm:13] [INFO] the parameter 'name' is affected by a time based blind sql injection with 
+stacked query syntax
+time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 
+'PmrXn'='PmrXn'
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -2159,7 +2166,7 @@ SELECT</CODE> statement to produce one entry at a time and display it in the
 page content.</P>
 
 
-<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Fingerprint</A>
+<H2><A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Fingerprint</A>
 </H2>
 
 <H3>Extensive database management system fingerprint</H3>
@@ -2472,7 +2479,7 @@ parsing library that fetches data from Chip Andrews'
 <A HREF="http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx">SQLSecurity.com site</A> and outputs it to the XML versions file.</P>
 
 
-<H2><A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Enumeration</A>
+<H2><A NAME="ss5.7">5.7</A> <A HREF="#toc5.7">Enumeration</A>
 </H2>
 
 <H3>Banner</H3>
@@ -3749,7 +3756,7 @@ column names of the table then asks if the query can return multiple
 entries and goes on.</P>
 
 
-<H2><A NAME="ss5.7">5.7</A> <A HREF="#toc5.7">File system access</A>
+<H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">File system access</A>
 </H2>
 
 <H3>Read a specific file content</H3>
@@ -3793,7 +3800,7 @@ inquis:x:1000:100:Bernardo Damele A. G.,,,:/home/inquis:/bin/bash
 </P>
 
 
-<H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">Operating system access</A>
+<H2><A NAME="ss5.9">5.9</A> <A HREF="#toc5.9">Operating system access</A>
 </H2>
 
 <H3>Prompt for an interactive operating system shell</H3>
@@ -3831,7 +3838,7 @@ $ exit
 functionalities of SQL shell in terms of TAB completion and history support.</P>
 
 
-<H2><A NAME="ss5.9">5.9</A> <A HREF="#toc5.9">Miscellaneous</A>
+<H2><A NAME="ss5.10">5.10</A> <A HREF="#toc5.10">Miscellaneous</A>
 </H2>
 
 <H3>Estimated time of arrival</H3>
