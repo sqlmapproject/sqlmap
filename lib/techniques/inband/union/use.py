@@ -237,6 +237,15 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
                             infoMsg += "%d entries" % stopLimit
                             logger.info(infoMsg)
 
+                        elif count and not count.isdigit():
+                            warnMsg  = "it was not possible to count the number "
+                            warnMsg += "of entries for the SQL query provided. "
+                            warnMsg += "sqlmap will assume that it returns only "
+                            warnMsg += "one entry"
+                            logger.warn(warnMsg)
+
+                            stopLimit = 1
+
                         elif ( not count or int(count) == 0 ):
                             warnMsg  = "the SQL query provided does not "
                             warnMsg += "return any output"

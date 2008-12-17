@@ -19,6 +19,10 @@
         <info type="Windows" distrib="2003"/>
     </regexp>
 
+    <regexp value="Microsoft.*5\.2">
+        <info type="Windows" distrib="2003"/>
+    </regexp>
+
     <regexp value="Microsoft.*5\.1">
         <info type="Windows" distrib="XP"/>
     </regexp>

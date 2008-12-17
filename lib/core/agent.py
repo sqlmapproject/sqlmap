@@ -246,10 +246,15 @@ class Agent:
         @rtype: C{str}
         """
 
-        fieldsSelectTop      = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
-        fieldsSelectDistinct = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", query, re.I)
-        fieldsSelectFrom     = re.search("\ASELECT\s+(.+?)\s+FROM\s+", query, re.I)
-        fieldsSelect         = re.search("\ASELECT\s+(.*)", query, re.I)
+        if "(SELECT " in query:
+            firstChar = "\\("
+        else:
+            firstChar = "\\A"
+
+        fieldsSelectTop      = re.search("%sSELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM" % firstChar, query, re.I)
+        fieldsSelectDistinct = re.search("%sSELECT\s+DISTINCT\((.+?)\)\s+FROM" % firstChar, query, re.I)
+        fieldsSelectFrom     = re.search("%sSELECT\s+(.+?)\s+FROM\s+" % firstChar, query, re.I)
+        fieldsSelect         = re.search("%sSELECT\s+(.*)" % firstChar, query, re.I)
         fieldsNoSelect       = query
 
         if fieldsSelectTop:
@@ -296,11 +301,11 @@ class Agent:
         """
 
         concatQuery = ""
-        query = query.replace(", ", ",")
+        query       = query.replace(", ", ",")
 
         fieldsSelectFrom, fieldsSelect, fieldsNoSelect, _, fieldsToCastStr = self.getFields(query)
         castedFields = self.nullCastConcatFields(fieldsToCastStr)
-        concatQuery = query.replace(fieldsToCastStr, castedFields, 1)
+        concatQuery  = query.replace(fieldsToCastStr, castedFields, 1)
 
         if kb.dbms == "MySQL":
             if fieldsSelectFrom:
