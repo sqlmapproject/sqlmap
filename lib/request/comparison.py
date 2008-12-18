@@ -75,7 +75,11 @@ def comparison(page, headers=None, content=False):
 
     # Comparison algorithm based on Content-Length header value
     elif conf.contentLengths:
-        pass
+        minValue = conf.contentLengths[0] - 10
+        maxValue = conf.contentLengths[1] + 10
+
+        if len(page) >= minValue and len(page) <= maxValue:
+            return True
 
     # Comparison algorithm based on page content's stable lines subset
     elif conf.equalLines:

@@ -320,15 +320,16 @@ def checkStability():
                 contentLengths.append(int(clHeader.group(1)))
 
         if contentLengths:
-            clSum = 0
+            conf.contentLengths = ( min(contentLengths), max(contentLengths) )
 
-            for cl in contentLengths:
-                clSum += cl
+            warnMsg  = "url is not stable, sqlmap inspected the headers "
+            warnMsg += "and identified that Content-Length can be used "
+            warnMsg += "in the comparison algorithm"
+            logger.warn(warnMsg)
 
-            clAverage = clSum / len(contentLengths)
+            kb.defaultResult = True
 
-        # TODO: go ahead here with the technique to compare True/False
-        # based upon clAverage discard (conf.contentLengths)
+            return True
 
         # Prepare for the comparison algorithm based on page content's
         # stable lines subset
@@ -355,6 +356,10 @@ def checkStability():
             kb.defaultResult = True
 
             return True
+
+    if condition == True:
+        logMsg = "url is stable"
+        logger.info(logMsg)
 
     return condition
 

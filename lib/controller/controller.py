@@ -175,10 +175,7 @@ def start():
 
         if not kb.injPlace or not kb.injParameter or not kb.injType:
             if not conf.string and not conf.regexp and not conf.eRegexp:
-                if checkStability():
-                    logMsg = "url is stable"
-                    logger.info(logMsg)
-                else:
+                if not checkStability():
                     errMsg  = "url is not stable, try with --string or "
                     errMsg += "--regexp options, refer to the user's manual "
                     errMsg += "paragraph 'Page comparison' for details"
