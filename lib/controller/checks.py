@@ -306,6 +306,8 @@ def checkStability():
     condition &= secondPage == thirdPage
 
     if condition == False:
+        # Prepare for the comparison algorithm based on Content-Length
+        # header value
         contentLengths  = []
         requestsHeaders = ( firstHeaders, secondHeaders, thirdHeaders )
 
@@ -328,6 +330,8 @@ def checkStability():
         # TODO: go ahead here with the technique to compare True/False
         # based upon clAverage discard (conf.contentLengths)
 
+        # Prepare for the comparison algorithm based on page content's
+        # stable lines subset
         counter     = 0
         firstLines  = firstPage.split("\n")
         secondLines = secondPage.split("\n")

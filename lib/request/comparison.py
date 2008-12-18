@@ -71,7 +71,13 @@ def comparison(page, headers=None, content=False):
     if not conf.equalLines and not conf.contentLengths:
         return md5.new(page).hexdigest()
 
-    # TODO: ahead here
+    # TODO: go ahead from here
+
+    # Comparison algorithm based on Content-Length header value
+    elif conf.contentLengths:
+        pass
+
+    # Comparison algorithm based on page content's stable lines subset
     elif conf.equalLines:
         counter   = 0
         trueLines = 0
@@ -87,8 +93,8 @@ def comparison(page, headers=None, content=False):
             counter += 1
 
         # TODO: just debug prints
-        print "trueLines:", trueLines, "len(conf.equalLines):", len(conf.equalLines)
-        print "result:", ( trueLines * 100 ) / len(conf.equalLines)
+        #print "trueLines:", trueLines, "len(conf.equalLines):", len(conf.equalLines)
+        #print "result:", ( trueLines * 100 ) / len(conf.equalLines)
 
         if ( trueLines * 100 ) / len(conf.equalLines) >= 98:
             return True
