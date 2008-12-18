@@ -93,7 +93,7 @@ class Agent:
         if conf.prefix:
             query = conf.prefix
         else:
-            if kb.injType == "numeric":
+            if kb.injType == "numeric" or conf.postfix:
                 pass
             elif kb.injType in ( "stringsingle", "likesingle" ):
                 query = "'"

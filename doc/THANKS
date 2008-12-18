@@ -126,6 +126,7 @@ Jason Swan <jasoneswan@gmail.com>
 Alessandro Tanasi <alessandro@tanasi.it>
     for extensively beta-testing sqlmap
     for suggesting many features and reporting some bugs
+    for reviewing the documentation
 
 Efrain Torres <et@metasploit.com>
     for helping me out to improve the Metasploit Framework 3 sqlmap

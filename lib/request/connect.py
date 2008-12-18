@@ -97,6 +97,7 @@ class Connect:
                 multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(url, multipart)
                 page = conn.read()
+
                 return page
 
         else:
@@ -197,7 +198,7 @@ class Connect:
                 warnMsg += ", skipping to next url"
                 logger.warn(warnMsg)
 
-                return None
+                return None, None
 
             if conf.retries < RETRIES:
                 conf.retries += 1
@@ -206,6 +207,7 @@ class Connect:
                 logger.warn(warnMsg)
 
                 time.sleep(1)
+
                 return Connect.__getPageProxy(get=get, post=post, cookie=cookie, ua=ua, direct=direct, multipart=multipart)
 
             else:
@@ -268,5 +270,7 @@ class Connect:
 
         if content:
             return page
-        else:
+        elif page and headers:
             return comparison(page, headers, content)
+        else:
+            return False

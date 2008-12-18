@@ -470,7 +470,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                                 "uploadDir": directory,
                               }
             uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            page, _ = Request.getPage(url=uploaderUrl, multipart=multipartParams)
+            page = Request.getPage(url=uploaderUrl, multipart=multipartParams)
 
             if "Backdoor uploaded" not in page:
                 warnMsg  = "unable to upload the backdoor through "
