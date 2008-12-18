@@ -27,6 +27,7 @@
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="DATABASE()"/>
+        <is_dba query="SELECT (CASE WHEN super_priv='Y' THEN 1 ELSE 0 END) FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1" query2="SELECT IF((SELECT privilege_type FROM information_schema.USER_PRIVILEGES WHERE grantee LIKE '%s' AND privilege_type='SUPER' LIMIT 0, 1)='SUPER', 1, 0)"/>
         <users>
             <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES" query2="SELECT user FROM mysql.user"/>
             <blind query="SELECT DISTINCT(grantee) FROM information_schema.USER_PRIVILEGES LIMIT %d, 1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d, 1" count="SELECT COUNT(DISTINCT(grantee)) FROM information_schema.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
@@ -77,6 +78,7 @@
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT SYS.LOGIN_USER FROM DUAL"/>
         <current_db query="SELECT SYS.DATABASE_NAME FROM DUAL"/>
+        <is_dba query="SELECT CASE WHEN ((SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=SYS.LOGIN_USER AND GRANTED_ROLE='DBA')='DBA') THEN 1 ELSE 0 END FROM DUAL"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
             <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS limit FROM SYS.ALL_USERS) WHERE limit=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
@@ -126,6 +128,7 @@
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_DATABASE()"/>
+        <is_dba query="SELECT (CASE WHEN usesuper=true THEN 1 ELSE 0 END) FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1"/>
         <users>
             <inband query="SELECT usename FROM pg_user"/>
             <blind query="SELECT DISTINCT(usename) FROM pg_user OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
@@ -176,6 +179,7 @@
         <banner query="@@VERSION"/>
         <current_user query="SYSTEM_USER"/>
         <current_db query="DB_NAME()"/>
+        <is_dba query="SELECT (CASE WHEN is_srvrolemember('sysadmin')=1 THEN 1 ELSE 0 END)"/>
         <users>
             <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
             <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>

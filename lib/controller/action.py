@@ -90,6 +90,9 @@ def action():
     if conf.getCurrentDb:
         dumper.string("current database", conf.dbmsHandler.getCurrentDb())
 
+    if conf.isDba:
+        dumper.string("current user is DBA", conf.dbmsHandler.isDba())
+
     if conf.getUsers:
         dumper.lister("database management system users", conf.dbmsHandler.getUsers())
 

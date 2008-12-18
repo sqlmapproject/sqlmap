@@ -1,3 +1,14 @@
+sqlmap (0.6.4-1) stable; urgency=low
+
+  * Minor enhancement to support an option (--is-dba) to show if the
+    current user is a database management system administrator;
+  * Major bug fix to avoid tracebacks when multiple targets are specified
+    and one of them is not reachable;
+  * Minor bug fix to make the --postfix work even if --prefix is not
+    provided;
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day, DD MMM 2009 10:00:00 +0000
+
 sqlmap (0.6.3-1) stable; urgency=low
 
   * Major enhancement to get list of targets to test from Burp proxy

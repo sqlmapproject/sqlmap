@@ -123,6 +123,10 @@ class queriesHandler(ContentHandler):
             data = sanitizeStr(attrs.get("query"))
             self.__queries.currentDb = data
 
+        elif name == "is_dba":
+            data = sanitizeStr(attrs.get("query"))
+            self.__queries.isDba = data
+
         elif name == "inband":
             self.__inband    = sanitizeStr(attrs.get("query"))
             self.__inband2   = sanitizeStr(attrs.get("query2"))

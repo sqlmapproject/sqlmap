@@ -116,6 +116,17 @@ class Enumeration:
         return self.currentDb
 
 
+    def isDba(self):
+        infoMsg = "testing if current user is DBA"
+        logger.info(infoMsg)
+
+        query = queries[kb.dbms].isDba
+
+        self.isDba = inject.getValue(query)
+
+        return str(self.isDba == "1")
+
+
     def getUsers(self):
         infoMsg = "fetching database users"
         logger.info(infoMsg)
