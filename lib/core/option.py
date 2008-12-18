@@ -570,8 +570,10 @@ def __setConfAttributes():
     logger.debug(debugMsg)
 
     conf.cj              = None
+    conf.contentLengths  = []
     conf.dbmsHandler     = None
     conf.dumpPath        = None
+    conf.equalLines      = []
     conf.httpHeaders     = []
     conf.hostname        = None
     conf.loggedToOut     = None

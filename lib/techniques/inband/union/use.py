@@ -81,7 +81,7 @@ def __unionPosition(expression, negative=False):
         payload = agent.payload(newValue=query, negative=negative)
 
         # Perform the request
-        resultPage = Request.queryPage(payload, content=True)
+        resultPage, _ = Request.queryPage(payload, content=True)
         reqCount += 1
 
         # We have to assure that the randQuery value is not within the
@@ -280,7 +280,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
         logger.info(infoMsg)
 
         # Perform the request
-        resultPage = Request.queryPage(payload, content=True)
+        resultPage, _ = Request.queryPage(payload, content=True)
         reqCount += 1
 
         if temp.start not in resultPage or temp.stop not in resultPage:

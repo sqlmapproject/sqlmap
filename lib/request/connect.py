@@ -269,7 +269,7 @@ class Connect:
         page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua)
 
         if content:
-            return page
+            return page, headers
         elif page and headers:
             return comparison(page, headers, content)
         else:

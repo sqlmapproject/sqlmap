@@ -294,16 +294,63 @@ def checkStability():
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
 
-    firstResult = Request.queryPage()
+    firstPage, firstHeaders = Request.queryPage(content=True)
     time.sleep(0.5)
 
-    secondResult = Request.queryPage()
+    secondPage, secondHeaders = Request.queryPage(content=True)
     time.sleep(0.5)
 
-    thirdResult = Request.queryPage()
+    thirdPage, thirdHeaders = Request.queryPage(content=True)
 
-    condition  = firstResult == secondResult
-    condition &= secondResult == thirdResult
+    condition  = firstPage == secondPage
+    condition &= secondPage == thirdPage
+
+    if condition == False:
+        contentLengths  = []
+        requestsHeaders = ( firstHeaders, secondHeaders, thirdHeaders )
+
+        for requestHeaders in requestsHeaders:
+            requestHeaders = str(requestHeaders).lower()
+
+            clHeader = re.search("content-length:\s+([\d]+)", requestHeaders, re.I | re.M)
+
+            if clHeader and clHeader.group(1).isdigit():
+                contentLengths.append(int(clHeader.group(1)))
+
+        if contentLengths:
+            clSum = 0
+
+            for cl in contentLengths:
+                clSum += cl
+
+            clAverage = clSum / len(contentLengths)
+
+        # TODO: go ahead here with the technique to compare True/False
+        # based upon clAverage discard (conf.contentLengths)
+
+        counter     = 0
+        firstLines  = firstPage.split("\n")
+        secondLines = secondPage.split("\n")
+        thirdLines  = thirdPage.split("\n")
+
+        for firstLine in firstLines:
+            if counter > len(secondLines) or counter > len(thirdLines):
+                break
+
+            if firstLine in secondLines and firstLine in thirdLines:
+                conf.equalLines.append(firstLine)
+
+            counter += 1
+
+        if conf.equalLines:
+            warnMsg  = "url is not stable, sqlmap inspected the page "
+            warnMsg += "content and identified a stable lines subset "
+            warnMsg += "to be used in the comparison algorithm"
+            logger.warn(warnMsg)
+
+            kb.defaultResult = True
+
+            return True
 
     return condition
 
@@ -325,7 +372,7 @@ def checkString():
     infoMsg += "target URL page content"
     logger.info(infoMsg)
 
-    page = Request.queryPage(content=True)
+    page, _ = Request.queryPage(content=True)
 
     if conf.string in page:
         setString()
@@ -356,7 +403,7 @@ def checkRegexp():
     infoMsg += "the target URL page content"
     logger.info(infoMsg)
 
-    page = Request.queryPage(content=True)
+    page, _ = Request.queryPage(content=True)
 
     if re.search(conf.regexp, page, re.I | re.M):
         setRegexp()
