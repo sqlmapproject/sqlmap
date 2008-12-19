@@ -522,7 +522,7 @@ def __setHTTPTimeout():
 
             conf.timeout = 3.0
     else:
-        conf.timeout = 10.0
+        conf.timeout = 30.0
 
     socket.setdefaulttimeout(conf.timeout)
 

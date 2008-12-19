@@ -45,6 +45,7 @@ from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.techniques.outband.stacked import stackedTest
 
 
 class Enumeration:
@@ -1053,24 +1054,36 @@ class Enumeration:
 
                     break
 
-        if sqlType:
+        if selectQuery == True:
             infoMsg = "fetching %s query output: '%s'" % (sqlType, query)
-        else:
-            infoMsg = "fetching SQL query output: '%s'" % query
+            logger.info(infoMsg)
 
-        logger.info(infoMsg)
-
-        if selectQuery == False:
-            # TODO: test if stacked queries are supported by the web
-            # application before injecting
-            inject.goStacked(query)
-        else:
             output = inject.getValue(query, fromUser=True)
-
-        if output == "Quit":
-            return None
         else:
-            return output
+            if kb.stackedTest == None:
+                stackedTest()
+
+            if kb.stackedTest == False:
+                warnMsg  = "the web application does not support "
+                warnMsg += "stacked queries"
+                logger.warn(warnMsg)
+
+                return None
+            else:
+                if sqlType:
+                    infoMsg = "executing %s query: '%s'" % (sqlType, query)
+                else:
+                    infoMsg = "executing unknown SQL type query: '%s'" % query
+                logger.info(infoMsg)
+
+                inject.goStacked(query)
+
+                infoMsg = "done"
+                logger.info(infoMsg)
+
+                output = False
+
+        return output
 
 
     def sqlShell(self):
@@ -1105,5 +1118,9 @@ class Enumeration:
 
             if output and output != "Quit":
                 dumper.string(query, output)
+
+            elif output == False:
+                pass
+
             elif output != "Quit":
                 print "No output"

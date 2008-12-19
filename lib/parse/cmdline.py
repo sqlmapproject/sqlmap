@@ -109,7 +109,7 @@ def cmdLineParser():
 
         request.add_option("--timeout", dest="timeout", type="float",
                            help="Seconds to wait before timeout connection "
-                                "(default 10)")
+                                "(default 30)")
 
 
         # Injection options
