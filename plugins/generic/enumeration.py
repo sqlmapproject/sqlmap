@@ -39,6 +39,7 @@ from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
@@ -120,7 +121,7 @@ class Enumeration:
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
 
-        query = queries[kb.dbms].isDba
+        query = agent.forgeCaseStatement(queries[kb.dbms].isDba)
 
         self.isDba = inject.getValue(query)
 
@@ -1038,10 +1039,33 @@ class Enumeration:
 
 
     def sqlQuery(self, query):
-        infoMsg = "fetching SQL SELECT query output: '%s'" % query
+        output      = None
+        selectQuery = False
+        sqlType     = None
+
+        for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
+            for sqlStatement in sqlStatements:
+                if query.lower().startswith(sqlStatement):
+                    sqlType = sqlTitle
+
+                    if sqlTitle == "SQL SELECT statement":
+                        selectQuery = True
+
+                    break
+
+        if sqlType:
+            infoMsg = "fetching %s query output: '%s'" % (sqlType, query)
+        else:
+            infoMsg = "fetching SQL query output: '%s'" % query
+
         logger.info(infoMsg)
 
-        output = inject.getValue(query, fromUser=True)
+        if selectQuery == False:
+            # TODO: test if stacked queries are supported by the web
+            # application before injecting
+            inject.goStacked(query)
+        else:
+            output = inject.getValue(query, fromUser=True)
 
         if output == "Quit":
             return None

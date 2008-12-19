@@ -107,6 +107,10 @@ class queriesHandler(ContentHandler):
             data = sanitizeStr(attrs.get("query"))
             self.__queries.substring = data
 
+        elif name == "case":
+            data = sanitizeStr(attrs.get("query"))
+            self.__queries.case = data
+
         elif name == "inference":
             data = sanitizeStr(attrs.get("query"))
             self.__queries.inference = data

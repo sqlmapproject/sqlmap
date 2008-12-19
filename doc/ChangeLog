@@ -1,7 +1,11 @@
 sqlmap (0.6.4-1) stable; urgency=low
 
+  * Major improvement to the comparison algorithm to make it work also if
+    the page content changes at each refresh; (work in progress)
   * Minor enhancement to support an option (--is-dba) to show if the
     current user is a database management system administrator;
+  * Added support internally to forge CASE statements, used only by
+    --is-dba query at the moment;
   * Major bug fix to avoid tracebacks when multiple targets are specified
     and one of them is not reachable;
   * Minor bug fix to make the --postfix work even if --prefix is not

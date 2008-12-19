@@ -336,6 +336,8 @@ def goStacked(expression):
     TODO: write description
     """
 
+    expression = cleanQuery(expression)
+
     comment = queries[kb.dbms].comment
     query   = agent.prefixQuery("; %s" % expression)
     query   = agent.postfixQuery("%s;%s" % (query, comment))

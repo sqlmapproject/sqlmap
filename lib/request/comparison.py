@@ -68,15 +68,13 @@ def comparison(page, headers=None, content=False):
             return False
 
     # By default it returns the page content MD5 hash
-    if not conf.equalLines and not conf.contentLengths:
+    if not conf.equalLines and not conf.pageLengths:
         return md5.new(page).hexdigest()
 
-    # TODO: go ahead from here
-
-    # Comparison algorithm based on Content-Length header value
-    elif conf.contentLengths:
-        minValue = conf.contentLengths[0] - 10
-        maxValue = conf.contentLengths[1] + 10
+    # Comparison algorithm based on page length value
+    elif conf.pageLengths:
+        minValue = conf.pageLengths[0]
+        maxValue = conf.pageLengths[1]
 
         if len(page) >= minValue and len(page) <= maxValue:
             return True

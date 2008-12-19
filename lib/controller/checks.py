@@ -306,30 +306,26 @@ def checkStability():
     condition &= secondPage == thirdPage
 
     if condition == False:
-        # Prepare for the comparison algorithm based on Content-Length
-        # header value
-        contentLengths  = []
-        requestsHeaders = ( firstHeaders, secondHeaders, thirdHeaders )
+        # Prepare for the comparison algorithm based on page length value
+        pageLengths  = []
+        requestsPages = ( firstPage, secondPage, thirdPage )
 
-        for requestHeaders in requestsHeaders:
-            requestHeaders = str(requestHeaders).lower()
+        for requestPages in requestsPages:
+            pageLengths.append(len(str(requestPages)))
 
-            clHeader = re.search("content-length:\s+([\d]+)", requestHeaders, re.I | re.M)
+        if pageLengths:
+            conf.pageLengths = ( min(pageLengths) - ( ( min(pageLengths) * 2 ) / 100 ),
+                                 max(pageLengths) + ( ( max(pageLengths) * 2 ) / 100 ) )
 
-            if clHeader and clHeader.group(1).isdigit():
-                contentLengths.append(int(clHeader.group(1)))
+            if conf.pageLengths[0] < conf.pageLengths[1]:
+                warnMsg  = "url is not stable, sqlmap inspected the page "
+                warnMsg += "and identified that page length can be used "
+                warnMsg += "in the comparison algorithm"
+                logger.warn(warnMsg)
 
-        if contentLengths:
-            conf.contentLengths = ( min(contentLengths), max(contentLengths) )
+                kb.defaultResult = True
 
-            warnMsg  = "url is not stable, sqlmap inspected the headers "
-            warnMsg += "and identified that Content-Length can be used "
-            warnMsg += "in the comparison algorithm"
-            logger.warn(warnMsg)
-
-            kb.defaultResult = True
-
-            return True
+                return True
 
         # Prepare for the comparison algorithm based on page content's
         # stable lines subset

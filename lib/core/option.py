@@ -570,7 +570,7 @@ def __setConfAttributes():
     logger.debug(debugMsg)
 
     conf.cj              = None
-    conf.contentLengths  = []
+    conf.pageLengths     = []
     conf.dbmsHandler     = None
     conf.dumpPath        = None
     conf.equalLines      = []

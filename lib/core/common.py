@@ -40,6 +40,7 @@ from lib.core.data import logger
 from lib.core.data import temp
 from lib.core.exception import sqlmapFilePathException
 from lib.core.data import paths
+from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
 
 
@@ -493,39 +494,11 @@ def parsePasswordHash(password):
 
 
 def cleanQuery(query):
-    # SQL SELECT statement
-    upperQuery = query.replace("select ", "SELECT ")
-    upperQuery = upperQuery.replace(" from ", " FROM ")
-    upperQuery = upperQuery.replace(" where ", " WHERE ")
-    upperQuery = upperQuery.replace(" group by ", " GROUP BY ")
-    upperQuery = upperQuery.replace(" order by ", " ORDER BY ")
-    upperQuery = upperQuery.replace(" having ", " HAVING ")
-    upperQuery = upperQuery.replace(" limit ", " LIMIT ")
-    upperQuery = upperQuery.replace(" offset ", " OFFSET ")
-    upperQuery = upperQuery.replace(" union all ", " UNION ALL ")
-    upperQuery = upperQuery.replace(" rownum ", " ROWNUM ")
+    upperQuery = query
 
-    # SQL data definition
-    upperQuery = upperQuery.replace(" create ", " CREATE ")
-    upperQuery = upperQuery.replace(" drop ", " DROP ")
-    upperQuery = upperQuery.replace(" truncate ", " TRUNCATE ")
-    upperQuery = upperQuery.replace(" alter ", " ALTER ")
-
-    # SQL data manipulation
-    upperQuery = upperQuery.replace(" insert ", " INSERT ")
-    upperQuery = upperQuery.replace(" update ", " UPDATE ")
-    upperQuery = upperQuery.replace(" delete ", " DELETE ")
-    upperQuery = upperQuery.replace(" merge ", " MERGE ")
-
-    # SQL data control
-    upperQuery = upperQuery.replace(" grant ", " GRANT ")
-
-    # SQL transaction control
-    upperQuery = upperQuery.replace(" start transaction ", " START TRANSACTION ")
-    upperQuery = upperQuery.replace(" begin work ", " BEGIN WORK ")
-    upperQuery = upperQuery.replace(" begin transaction ", " BEGIN TRANSACTION ")
-    upperQuery = upperQuery.replace(" commit ", " COMMIT ")
-    upperQuery = upperQuery.replace(" rollback ", " ROLLBACK ")
+    for sqlStatements in SQL_STATEMENTS.values():
+        for sqlStatement in sqlStatements:
+            upperQuery = upperQuery.replace(sqlStatement, sqlStatement.upper())
 
     return upperQuery
 
