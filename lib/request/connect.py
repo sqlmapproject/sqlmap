@@ -227,7 +227,7 @@ class Connect:
 
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -270,7 +270,7 @@ class Connect:
 
         if content:
             return page, headers
-        elif page and headers:
-            return comparison(page, headers, content)
+        elif page:
+            return comparison(page, headers, getSeqMatcher)
         else:
             return False

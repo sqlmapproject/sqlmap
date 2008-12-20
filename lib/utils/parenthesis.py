@@ -76,7 +76,7 @@ def checkForParenthesis():
         payload = agent.payload(newValue=query)
         result = Request.queryPage(payload)
 
-        if result == kb.defaultResult:
+        if result == True:
             count = parenthesis
 
     logMsg = "the injectable parameter requires %d parenthesis" % count

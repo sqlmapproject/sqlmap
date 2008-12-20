@@ -25,6 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 import cookielib
+import difflib
 import logging
 import os
 import re
@@ -570,10 +571,8 @@ def __setConfAttributes():
     logger.debug(debugMsg)
 
     conf.cj              = None
-    conf.pageLengths     = []
     conf.dbmsHandler     = None
     conf.dumpPath        = None
-    conf.equalLines      = []
     conf.httpHeaders     = []
     conf.hostname        = None
     conf.loggedToOut     = None
@@ -586,6 +585,8 @@ def __setConfAttributes():
     conf.port            = None
     conf.retries         = 0
     conf.scheme          = None
+    #conf.seqMatcher      = difflib.SequenceMatcher(lambda x: x in " \t")
+    conf.seqMatcher      = difflib.SequenceMatcher(None)
     conf.sessionFP       = None
     conf.start           = True
     conf.threadException = False
@@ -601,7 +602,6 @@ def __setKnowledgeBaseAttributes():
     logger.debug(debugMsg)
 
     kb.absFilePaths   = set()
-    kb.defaultResult  = None
     kb.docRoot        = None
     kb.dbms           = None
     kb.dbmsDetected   = False

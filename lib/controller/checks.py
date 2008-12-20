@@ -71,11 +71,11 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         payload = agent.payload(place, parameter, value, "%s%s%s AND %s%d=%d %s" % (value, prefix, ")" * parenthesis, "(" * parenthesis, randInt, randInt, postfix))
         trueResult = Request.queryPage(payload, place)
 
-        if trueResult == kb.defaultResult:
+        if trueResult == True:
             payload = agent.payload(place, parameter, value, "%s%s%s AND %s%d=%d %s" % (value, prefix, ")" * parenthesis, "(" * parenthesis, randInt, randInt + 1, postfix))
             falseResult = Request.queryPage(payload, place)
 
-            if falseResult != kb.defaultResult:
+            if falseResult != True:
                 infoMsg  = "confirming custom injection "
                 infoMsg += "on %s parameter '%s'" % (place, parameter)
                 logger.info(infoMsg)
@@ -83,7 +83,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
                 payload = agent.payload(place, parameter, value, "%s%s%s AND %s%s %s" % (value, prefix, ")" * parenthesis, "(" * parenthesis, randStr, postfix))
                 falseResult = Request.queryPage(payload, place)
 
-                if falseResult != kb.defaultResult:
+                if falseResult != True:
                     infoMsg  = "%s parameter '%s' is " % (place, parameter)
                     infoMsg += "custom injectable "
                     logger.info(infoMsg)
@@ -97,11 +97,11 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     payload = agent.payload(place, parameter, value, "%s%s AND %s%d=%d" % (value, ")" * parenthesis, "(" * parenthesis, randInt, randInt))
     trueResult = Request.queryPage(payload, place)
 
-    if trueResult == kb.defaultResult:
+    if trueResult == True:
         payload = agent.payload(place, parameter, value, "%s%s AND %s%d=%d" % (value, ")" * parenthesis, "(" * parenthesis, randInt, randInt + 1))
         falseResult = Request.queryPage(payload, place)
 
-        if falseResult != kb.defaultResult:
+        if falseResult != True:
             infoMsg  = "confirming unescaped numeric injection "
             infoMsg += "on %s parameter '%s'" % (place, parameter)
             logger.info(infoMsg)
@@ -109,7 +109,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
             payload = agent.payload(place, parameter, value, "%s%s AND %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
             falseResult = Request.queryPage(payload, place)
 
-            if falseResult != kb.defaultResult:
+            if falseResult != True:
                 infoMsg  = "%s parameter '%s' is " % (place, parameter)
                 infoMsg += "unescaped numeric injectable "
                 infoMsg += "with %d parenthesis" % parenthesis
@@ -128,11 +128,11 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s'='%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
     trueResult = Request.queryPage(payload, place)
 
-    if trueResult == kb.defaultResult:
+    if trueResult == True:
         payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s'='%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
-        if falseResult != kb.defaultResult:
+        if falseResult != True:
             infoMsg  = "confirming single quoted string injection "
             infoMsg += "on %s parameter '%s'" % (place, parameter)
             logger.info(infoMsg)
@@ -140,7 +140,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
             payload = agent.payload(place, parameter, value, "%s'%s and %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
             falseResult = Request.queryPage(payload, place)
 
-            if falseResult != kb.defaultResult:
+            if falseResult != True:
                 infoMsg  = "%s parameter '%s' is " % (place, parameter)
                 infoMsg += "single quoted string injectable "
                 infoMsg += "with %d parenthesis" % parenthesis
@@ -159,11 +159,11 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s' LIKE '%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
     trueResult = Request.queryPage(payload, place)
 
-    if trueResult == kb.defaultResult:
+    if trueResult == True:
         payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s' LIKE '%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
-        if falseResult != kb.defaultResult:
+        if falseResult != True:
             infoMsg  = "confirming LIKE single quoted string injection "
             infoMsg += "on %s parameter '%s'" % (place, parameter)
             logger.info(infoMsg)
@@ -171,7 +171,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
             payload = agent.payload(place, parameter, value, "%s'%s and %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
             falseResult = Request.queryPage(payload, place)
 
-            if falseResult != kb.defaultResult:
+            if falseResult != True:
                 infoMsg  = "%s parameter '%s' is " % (place, parameter)
                 infoMsg += "LIKE single quoted string injectable "
                 infoMsg += "with %d parenthesis" % parenthesis
@@ -190,11 +190,11 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\"=\"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
     trueResult = Request.queryPage(payload, place)
 
-    if trueResult == kb.defaultResult:
+    if trueResult == True:
         payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\"=\"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
-        if falseResult != kb.defaultResult:
+        if falseResult != True:
             infoMsg  = "confirming double quoted string injection "
             infoMsg += "on %s parameter '%s'" % (place, parameter)
             logger.info(infoMsg)
@@ -202,7 +202,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
             payload = agent.payload(place, parameter, value, "%s\"%s AND %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
             falseResult = Request.queryPage(payload, place)
 
-            if falseResult != kb.defaultResult:
+            if falseResult != True:
                 infoMsg  = "%s parameter '%s' is " % (place, parameter)
                 infoMsg += "double quoted string injectable "
                 infoMsg += "with %d parenthesis" % parenthesis
@@ -221,11 +221,11 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\" LIKE \"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
     trueResult = Request.queryPage(payload, place)
 
-    if trueResult == kb.defaultResult:
+    if trueResult == True:
         payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\" LIKE \"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
         falseResult = Request.queryPage(payload, place)
 
-        if falseResult != kb.defaultResult:
+        if falseResult != True:
             infoMsg  = "confirming LIKE double quoted string injection "
             infoMsg += "on %s parameter '%s'" % (place, parameter)
             logger.info(infoMsg)
@@ -233,7 +233,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
             payload = agent.payload(place, parameter, value, "%s\"%s and %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
             falseResult = Request.queryPage(payload, place)
 
-            if falseResult != kb.defaultResult:
+            if falseResult != True:
                 infoMsg  = "%s parameter '%s' is " % (place, parameter)
                 infoMsg += "LIKE double quoted string injectable "
                 infoMsg += "with %d parenthesis" % parenthesis
@@ -262,7 +262,7 @@ def checkDynParam(place, parameter, value):
     payload = agent.payload(place, parameter, value, str(randInt))
     dynResult1 = Request.queryPage(payload, place)
 
-    if kb.defaultResult == dynResult1:
+    if True == dynResult1:
         return False
 
     infoMsg = "confirming that %s parameter '%s' is dynamic" % (place, parameter)
@@ -274,8 +274,8 @@ def checkDynParam(place, parameter, value):
     payload = agent.payload(place, parameter, value, "\"%s" % randomStr())
     dynResult3 = Request.queryPage(payload, place)
 
-    condition  = kb.defaultResult != dynResult2
-    condition |= kb.defaultResult != dynResult3
+    condition  = True != dynResult2
+    condition |= True != dynResult3
 
     return condition
 
@@ -306,52 +306,12 @@ def checkStability():
     condition &= secondPage == thirdPage
 
     if condition == False:
-        # Prepare for the comparison algorithm based on page length value
-        pageLengths  = []
-        requestsPages = ( firstPage, secondPage, thirdPage )
-
-        for requestPages in requestsPages:
-            pageLengths.append(len(str(requestPages)))
-
-        if pageLengths:
-            conf.pageLengths = ( min(pageLengths) - ( ( min(pageLengths) * 2 ) / 100 ),
-                                 max(pageLengths) + ( ( max(pageLengths) * 2 ) / 100 ) )
-
-            if conf.pageLengths[0] < conf.pageLengths[1]:
-                warnMsg  = "url is not stable, sqlmap inspected the page "
-                warnMsg += "and identified that page length can be used "
-                warnMsg += "in the comparison algorithm"
-                logger.warn(warnMsg)
-
-                kb.defaultResult = True
-
-                return True
-
-        # Prepare for the comparison algorithm based on page content's
-        # stable lines subset
-        counter     = 0
-        firstLines  = firstPage.split("\n")
-        secondLines = secondPage.split("\n")
-        thirdLines  = thirdPage.split("\n")
-
-        for firstLine in firstLines:
-            if counter > len(secondLines) or counter > len(thirdLines):
-                break
-
-            if firstLine in secondLines and firstLine in thirdLines:
-                conf.equalLines.append(firstLine)
-
-            counter += 1
-
-        if conf.equalLines:
-            warnMsg  = "url is not stable, sqlmap inspected the page "
-            warnMsg += "content and identified a stable lines subset "
-            warnMsg += "to be used in the comparison algorithm"
-            logger.warn(warnMsg)
-
-            kb.defaultResult = True
-
-            return True
+        warnMsg  = "url is not stable, sqlmap will base the page "
+        warnMsg += "comparison on a sequence matcher, if no dynamic nor "
+        warnMsg += "injectable parameters are detected, refer to user's "
+        warnMsg += "manual paragraph 'Page comparison' and provide a "
+        warnMsg += "string or regular expression to match on"
+        logger.warn(warnMsg)
 
     if condition == True:
         logMsg = "url is stable"
@@ -428,7 +388,8 @@ def checkConnection():
     logger.info(infoMsg)
 
     try:
-        kb.defaultResult = Request.queryPage()
+        page, _ = Request.getPage()
+        conf.seqMatcher.set_seq1(page)
     except sqlmapConnectionException, exceptionMsg:
         if conf.multipleTargets:
             exceptionMsg += ", skipping to next url"

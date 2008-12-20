@@ -175,18 +175,9 @@ def start():
 
         if not kb.injPlace or not kb.injParameter or not kb.injType:
             if not conf.string and not conf.regexp and not conf.eRegexp:
-                if not checkStability():
-                    errMsg  = "url is not stable, try with --string or "
-                    errMsg += "--regexp options, refer to the user's manual "
-                    errMsg += "paragraph 'Page comparison' for details"
-
-                    if conf.multipleTargets:
-                        errMsg += ", skipping to next url"
-                        logger.warn(errMsg)
-
-                        continue
-                    else:
-                        raise sqlmapConnectionException, errMsg
+                # NOTE: this is not needed anymore, leaving only to display
+                # a warning message to the user in case the page is not stable
+                checkStability()
 
             for place in conf.parameters.keys():
                 if not conf.paramDict.has_key(place):

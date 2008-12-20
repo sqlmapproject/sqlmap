@@ -133,7 +133,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         payload = agent.payload(newValue=query)
         result  = Request.queryPage(payload)
 
-        if result != kb.defaultResult:
+        if result != True:
             warnMsg = "unable to perform MySQL comment injection"
             logger.warn(warnMsg)
 
@@ -161,7 +161,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
 
-                if result == kb.defaultResult:
+                if result == True:
                     if not prevVer:
                         prevVer = version
 

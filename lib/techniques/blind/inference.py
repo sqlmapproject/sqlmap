@@ -97,13 +97,11 @@ def bisection(payload, expression, length=None):
 
         while (maxValue - minValue) != 1:
             queriesCount[0] += 1
-            limit = ((maxValue + minValue) / 2)
-
+            limit         = ((maxValue + minValue) / 2)
             forgedPayload = payload % (expressionUnescaped, idx, limit)
+            result        = Request.queryPage(forgedPayload)
 
-            result = Request.queryPage(forgedPayload)
-
-            if result == kb.defaultResult:
+            if result == True:
                 minValue = limit
             else:
                 maxValue = limit

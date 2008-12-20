@@ -30,7 +30,7 @@ import re
 from lib.core.data import conf
 
 
-def comparison(page, headers=None, content=False):
+def comparison(page, headers=None, getSeqMatcher=False):
     regExpResults = None
 
     # String to be excluded before calculating page hash
@@ -67,38 +67,15 @@ def comparison(page, headers=None, content=False):
         else:
             return False
 
-    # By default it returns the page content MD5 hash
-    if not conf.equalLines and not conf.pageLengths:
-        return md5.new(page).hexdigest()
+    # By default it returns sequence matcher between the first untouched
+    # HTTP response page content and this content
+    conf.seqMatcher.set_seq2(page)
 
-    # Comparison algorithm based on page length value
-    elif conf.pageLengths:
-        minValue = conf.pageLengths[0]
-        maxValue = conf.pageLengths[1]
+    if getSeqMatcher:
+        return round(conf.seqMatcher.ratio(), 5)
 
-        if len(page) >= minValue and len(page) <= maxValue:
-            return True
+    elif round(conf.seqMatcher.ratio(), 5) > 0.9:
+        return True
 
-    # Comparison algorithm based on page content's stable lines subset
-    elif conf.equalLines:
-        counter   = 0
-        trueLines = 0
-        pageLines = page.split("\n")
-
-        for commonLine in conf.equalLines:
-            if counter >= len(pageLines):
-                break
-
-            if commonLine in pageLines:
-                trueLines += 1
-
-            counter += 1
-
-        # TODO: just debug prints
-        #print "trueLines:", trueLines, "len(conf.equalLines):", len(conf.equalLines)
-        #print "result:", ( trueLines * 100 ) / len(conf.equalLines)
-
-        if ( trueLines * 100 ) / len(conf.equalLines) >= 98:
-            return True
-        else:
-            return False
+    else:
+        return False
