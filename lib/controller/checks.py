@@ -390,10 +390,12 @@ def checkConnection():
     try:
         page, _ = Request.getPage()
         conf.seqMatcher.set_seq1(page)
+
     except sqlmapConnectionException, exceptionMsg:
         if conf.multipleTargets:
             exceptionMsg += ", skipping to next url"
             logger.warn(exceptionMsg)
+
             return False
         else:
             raise sqlmapConnectionException, exceptionMsg

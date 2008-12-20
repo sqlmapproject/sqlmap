@@ -24,10 +24,10 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
-import md5
 import re
 
 from lib.core.data import conf
+from lib.core.settings import MATCH_RATIO
 
 
 def comparison(page, headers=None, getSeqMatcher=False):
@@ -74,7 +74,7 @@ def comparison(page, headers=None, getSeqMatcher=False):
     if getSeqMatcher:
         return round(conf.seqMatcher.ratio(), 5)
 
-    elif round(conf.seqMatcher.ratio(), 5) > 0.9:
+    elif round(conf.seqMatcher.ratio(), 5) >= MATCH_RATIO:
         return True
 
     else:

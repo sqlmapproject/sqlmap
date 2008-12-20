@@ -68,44 +68,40 @@ SUPPORTED_DBMS    = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIAS
 # TODO: port to command line/configuration file options?
 SECONDS           = 5
 RETRIES           = 3
+MATCH_RATIO       = 0.9
 
 SQL_STATEMENTS    = {
                       "SQL SELECT statement":  (
-                                                 "select ",
-                                                 " from ",
-                                                 " where ",
-                                                 " group by ",
-                                                 " order by ",
-                                                 " having ",
-                                                 " limit ",
-                                                 " offset ",
-                                                 " union all ",
-                                                 " rownum ",
-                                               ),
+                             "select ",
+                             " from ",
+                             " where ",
+                             " group by ",
+                             " order by ",
+                             " having ",
+                             " limit ",
+                             " offset ",
+                             " union all ",
+                             " rownum ",       ),
 
                       "SQL data definition":   (
-                                                 "create ",
-                                                 "drop ",
-                                                 "truncate ",
-                                                 "alter ",
-                                               ),
+                             "create ",
+                             "drop ",
+                             "truncate ",
+                             "alter ",         ),
 
                       "SQL data manipulation": (
-                                                 "insert ",
-                                                 "update ",
-                                                 "delete ",
-                                                 "merge ",
-                                               ),
+                             "insert ",
+                             "update ",
+                             "delete ",
+                             "merge ",         ),
 
                       "SQL data control":      (
-                                                 "grant ",
-                                               ),
+                             "grant ",         ),
 
                       "SQL transaction":       (
-                                                 "start transaction ",
-                                                 "begin work ",
-                                                 "begin transaction ",
-                                                 "commit ",
-                                                 "rollback ",
-                                               ),
+                             "start transaction ",
+                             "begin work ",
+                             "begin transaction ",
+                             "commit ",
+                             "rollback ",      ),
                     }
