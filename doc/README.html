@@ -181,14 +181,14 @@ in the following section to go ahead with the exploiting.</LI>
 <H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Techniques</A>
 </H2>
 
-<P>sqlmap implements two techniques to exploit a SQL injection vulnerability:</P>
+<P>sqlmap implements three techniques to exploit a SQL injection
+vulnerability:</P>
 <P>
 <UL>
-<LI><B>Blind SQL injection</B>, also known as <B>Inferential Blind SQL
-injection</B> in this implementation: sqlmap appends to the affected
-parameter in the HTTP request, a syntatically valid SQL statement string
-containing a <CODE>SELECT</CODE> sub-statement, or any other SQL statement
-whose the user want to retrieve the output.
+<LI><B>Inferential Blind SQL injection</B>: sqlmap appends to the
+affected parameter in the HTTP request, a syntatically valid SQL statement
+string containing a <CODE>SELECT</CODE> sub-statement, or any other SQL
+statement whose the user want to retrieve the output.
 For each HTTP response, by making a comparison based upon HTML page
 content hashes, or string matches, with the original request, the tool
 determines the output value of the statement character by character.
@@ -196,13 +196,13 @@ The bisection algorithm implemented in sqlmap to perform this technique
 is able to fetch each output character with at maximum seven HTTP
 requests.
 This is sqlmap default SQL injection technique.</LI>
-<LI><B>Inband SQL injection</B>, also known as <B>Full UNION query SQL
-injection</B>: sqlmap appends to the affected parameter in the HTTP
-request, a syntatically valid SQL statement string starting with a
-<CODE>UNION ALL SELECT</CODE>. This techique is useful if the web application
-page passes the output of the <CODE>SELECT</CODE> statement to a <CODE>for</CODE>
-cycle, or similar, so that each line of the query output is printed on the
-page content.
+<LI><B>UNION query (inband) SQL injection</B>, also known as <B>Full
+UNION query SQL injection</B>: sqlmap appends to the affected parameter
+in the HTTP request, a syntatically valid SQL statement string starting
+with a <CODE>UNION ALL SELECT</CODE>. This techique is useful if the web
+application page passes the output of the <CODE>SELECT</CODE> statement to a
+<CODE>for</CODE> cycle, or similar, so that each line of the query output is
+printed on the page content.
 sqlmap is also able to exploit <B>Partial UNION query SQL injection</B>
 vulnerabilities which occur when the output of the statement is not cycled
 in a for construct whereas only the first entry output is displayed.
@@ -210,6 +210,15 @@ This technique is much faster if the target url is affected by because
 in a single HTTP response it returns the whole query output or a entry
 per each response within the page content.
 This SQL injection technique is an alternative to the first one.</LI>
+<LI><B>Stacked queries support</B>, also known as <B>multiple
+statements support</B>: sqlmap tests if the web application supports
+stacked queries then, in case it does support, it appends to the affected
+parameter in the HTTP request, a semi-colon (<CODE>;</CODE>) followed by the
+SQL statement to be executed. This technique is useful if to run SQL
+statements other than <CODE>SELECT</CODE> like, for instance, <EM>data
+definition</EM> or <EM>data manipulation</EM> statements possibly leading
+to file system read and write access and operating system command
+execution depending on the underlying back-end database management system.</LI>
 </UL>
 </P>
 <P>It is strongly recommended to run at least once sqlmap with the
@@ -241,16 +250,17 @@ database management system name if you already know it. sqlmap is also able
 to fingerprint the web server operating system, the web application
 technology and, in some circumstances, the back-end DBMS operating system.
 </LI>
-<LI>Full support for two SQL injection techniques: <B>blind SQL
-injection</B> and <B>inband SQL injection</B>. sqlmap can also test for
-<B>Time based blind SQL injection</B>.
+<LI>Full support for three SQL injection techniques: <B> inferential
+blind SQL injection</B>, <B>UNION query (inband) SQL injection</B> and
+<B>stacked queries (multiple statements) support</B>. sqlmap can also
+test for <B>time based blind SQL injection</B>.
 </LI>
 <LI>Options to retrieve on all four back-end database management system
 <B>banner</B>, <B>current user</B>, <B>current database</B>,
 enumerate <B>users</B>, <B>users password hashes</B>, <B>users
 privileges</B>, <B>databases</B>, <B>tables</B>, <B>columns</B>,
 dump <B>tables entries</B>, dump <B>whole database management
-system</B> and run your <B>own SQL <CODE>SELECT</CODE> statement</B>.
+system</B> and run your <B>own SQL statement</B>.
 </LI>
 <LI>If the back-end database management system is MySQL it is also
 possible to <B>read a specific file content</B> from the ile system and,
@@ -460,7 +470,7 @@ Options:
   Enumeration:
     These options can be used to enumerate the back-end database
     management system information, structure and data contained in the
-    tables. Moreover you can run your own SQL SELECT queries.
+    tables. Moreover you can run your own SQL statements.
 
     -b, --banner        Retrieve DBMS banner
     --current-user      Retrieve DBMS current user
@@ -481,7 +491,7 @@ Options:
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
     --start=LIMITSTART  First table entry to dump
     --stop=LIMITSTOP    Last table entry to dump
-    --sql-query=QUERY   SQL SELECT query to be executed
+    --sql-query=QUERY   SQL statement to be executed
     --sql-shell         Prompt for an interactive SQL shell
 
   File system access:
@@ -3406,7 +3416,7 @@ considered a system database because some database administrators use it
 as a users' database.</P>
 
 
-<H3>Run your own SQL SELECT statement</H3>
+<H3>Run your own SQL statement</H3>
 
 <P>Options: <CODE>--sql-query</CODE> and <CODE>--sql-shell</CODE></P>
 

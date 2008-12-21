@@ -116,6 +116,10 @@ Sven Schluter <sschlueter@netzwerk.cc>
     for providing with a patch for waiting a number of seconds between
     each HTTP request
 
+Sumit Siddharth <sid@notsosecure.com>
+    for providing me with ideas on the implementation on a couple of
+    features
+
 M Simkin <mlsimkin@cox.net>
     for suggesting a feature
 
