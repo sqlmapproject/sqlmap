@@ -1041,7 +1041,7 @@ class Enumeration:
 
     def sqlQuery(self, query):
         output      = None
-        selectQuery = False
+        selectQuery = True
         sqlType     = None
 
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
@@ -1049,8 +1049,8 @@ class Enumeration:
                 if query.lower().startswith(sqlStatement):
                     sqlType = sqlTitle
 
-                    if sqlTitle == "SQL SELECT statement":
-                        selectQuery = True
+                    if sqlTitle != "SQL SELECT statement":
+                        selectQuery = False
 
                     break
 
