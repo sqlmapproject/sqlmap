@@ -169,6 +169,9 @@ def cmdLineParser():
                               action="store_true",
                               help="Test for UNION query (inband) SQL injection")
 
+        techniques.add_option("--union-tech", dest="uTech",
+                              help="Technique to test for UNION query SQL injection")
+
         techniques.add_option("--union-use", dest="unionUse",
                               action="store_true",
                               help="Use the UNION query (inband) SQL injection "

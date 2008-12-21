@@ -1,13 +1,18 @@
 sqlmap (0.6.4-1) stable; urgency=low
 
-  * Major improvement to the comparison algorithm to make it work also if
-    the page content changes at each refresh; (work in progress)
+  * Major enhancement to make the comparison algorithm work properly also
+    on url not stables automatically by using the difflib Sequence Matcher
+    object;
   * Major enhancement to support SQL data definition statements, SQL data
     manipulation statements, etc from user in SQL query and SQL shell if
     stacked queries are supported by the web application technology in
     use;
   * Minor enhancement to support an option (--is-dba) to show if the
     current user is a database management system administrator;
+  * Minor enhancement to support an option (--union-tech) to specify the
+    technique to use to detect the number of columns used in the web
+    application SELECT statement: NULL bruteforcing (default) or ORDER BY
+    clause;
   * Added support internally to forge CASE statements, used only by
     --is-dba query at the moment;
   * Major bug fix to avoid tracebacks when multiple targets are specified

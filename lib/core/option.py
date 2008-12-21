@@ -239,6 +239,25 @@ def __setGoogleDorking():
         raise sqlmapGenericException, errMsg
 
 
+def __setUnionTech():
+    if not conf.uTech:
+        conf.uTech = "bf"
+
+        return
+
+    if conf.uTech and conf.uTech not in ( "bf", "ob" ):
+        infoMsg  = "resetting the UNION query detection technique to "
+        infoMsg += "'bf', '%s' is not a valid technique" % conf.uTech
+        logger.info(infoMsg)
+
+        conf.uTech = "bf"
+
+    else:
+        debugMsg  = "setting UNION query detection technique to "
+        debugMsg += "'%s'" % conf.uTech
+        logger.debug(debugMsg)
+
+
 def __setDBMS():
     """
     Force the back-end DBMS option.
@@ -741,6 +760,7 @@ def init(inputOptions=advancedDict()):
     __setHTTPProxy()
     __setThreads()
     __setDBMS()
+    __setUnionTech()
     __setGoogleDorking()
     __setMultipleTargets()
     __urllib2Opener()

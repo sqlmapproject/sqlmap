@@ -63,6 +63,7 @@ optDict = {
                                "stackedTest":       "boolean",
                                "timeTest":          "boolean",
                                "unionTest":         "boolean",
+                               "uTech":             "string",
                                "unionUse":          "boolean",
                              },
 

