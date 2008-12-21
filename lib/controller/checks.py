@@ -295,15 +295,12 @@ def checkStability():
     logger.info(infoMsg)
 
     firstPage, firstHeaders = Request.queryPage(content=True)
-    time.sleep(0.5)
+    time.sleep(1)
 
     secondPage, secondHeaders = Request.queryPage(content=True)
     time.sleep(0.5)
 
-    thirdPage, thirdHeaders = Request.queryPage(content=True)
-
-    condition  = firstPage == secondPage
-    condition &= secondPage == thirdPage
+    condition = firstPage == secondPage
 
     if condition == False:
         warnMsg  = "url is not stable, sqlmap will base the page "

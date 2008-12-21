@@ -189,7 +189,7 @@ def cmdLineParser():
                                   "be used to enumerate the back-end database "
                                   "management system information, structure "
                                   "and data contained in the tables. Moreover "
-                                  "you can run your own SQL SELECT queries.")
+                                  "you can run your own SQL statements.")
 
         enumeration.add_option("-b", "--banner", dest="getBanner",
                                action="store_true", help="Retrieve DBMS banner")
@@ -258,7 +258,7 @@ def cmdLineParser():
                                help="Last table entry to dump")
 
         enumeration.add_option("--sql-query", dest="query",
-                               help="SQL SELECT query to be executed")
+                               help="SQL statement to be executed")
 
         enumeration.add_option("--sql-shell", dest="sqlShell",
                                action="store_true",

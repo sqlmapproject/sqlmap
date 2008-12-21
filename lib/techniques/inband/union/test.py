@@ -54,27 +54,27 @@ def __effectiveUnionTest(query, comment):
 
         commentedQuery = agent.postfixQuery(query, comment)
         payload = agent.payload(newValue=commentedQuery)
-        newResult = Request.queryPage(payload)
+        newResult = Request.queryPage(payload, getSeqMatcher=True)
 
         if not newResult in resultDict.keys():
             resultDict[newResult] = (1, commentedQuery)
         else:
             resultDict[newResult] = (resultDict[newResult][0] + 1, commentedQuery)
 
-        if count:
-            for element in resultDict.values():
-                if element[0] == 1:
+        if count > 3:
+            for ratio, element in resultDict.items():
+                if element[0] == 1 and ratio > 0.5:
                     if kb.injPlace == "GET":
-                        value = "%s?%s" % (conf.url, payload)
+                        value = "%s?%s" % (conf.url, element[1])
                     elif kb.injPlace == "POST":
                         value  = "URL:\t'%s'" % conf.url
-                        value += "\nPOST:\t'%s'\n" % payload
+                        value += "\nPOST:\t'%s'\n" % element[1]
                     elif kb.injPlace == "Cookie":
                         value  = "URL:\t'%s'" % conf.url
-                        value += "\nCookie:\t'%s'\n" % payload
+                        value += "\nCookie:\t'%s'\n" % element[1]
                     elif kb.injPlace == "User-Agent":
                         value  = "URL:\t\t'%s'" % conf.url
-                        value += "\nUser-Agent:\t'%s'\n" % payload
+                        value += "\nUser-Agent:\t'%s'\n" % element[1]
 
                     return value
 

@@ -72,9 +72,9 @@ def comparison(page, headers=None, getSeqMatcher=False):
     conf.seqMatcher.set_seq2(page)
 
     if getSeqMatcher:
-        return round(conf.seqMatcher.ratio(), 5)
+        return round(conf.seqMatcher.ratio(), 3)
 
-    elif round(conf.seqMatcher.ratio(), 5) >= MATCH_RATIO:
+    elif round(conf.seqMatcher.ratio(), 3) >= MATCH_RATIO:
         return True
 
     else:
