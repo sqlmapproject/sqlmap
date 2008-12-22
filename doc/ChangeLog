@@ -17,6 +17,8 @@ sqlmap (0.6.4-1) stable; urgency=low
     --is-dba query at the moment;
   * Major bug fix to avoid tracebacks when multiple targets are specified
     and one of them is not reachable;
+  * Minor bug fix to make the Partial UNION query SQL injection technique
+    work properly also on Oracle and Microsoft SQL Server;
   * Minor bug fix to make the --postfix work even if --prefix is not
     provided;
 

@@ -74,6 +74,7 @@ SQL_STATEMENTS    = {
                       "SQL SELECT statement":  (
                              "select ",
                              " from ",
+                             " from dual",
                              " where ",
                              " group by ",
                              " order by ",

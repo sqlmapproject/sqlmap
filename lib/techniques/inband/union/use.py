@@ -261,12 +261,19 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
                         return
 
                     for num in xrange(startLimit, stopLimit):
-                        orderBy = re.search(" ORDER BY ([\w\_]+)", expression, re.I)
+                        if kb.dbms == "Microsoft SQL Server":
+                            orderBy = re.search(" ORDER BY ([\w\_]+)", expression, re.I)
 
-                        if orderBy:
-                            field = orderBy.group(1)
+                            if orderBy:
+                                field = orderBy.group(1)
+                            else:
+                                field = expressionFieldsList[0]
+
+                        elif kb.dbms == "Oracle":
+                                field = expressionFieldsList
+
                         else:
-                            field = expressionFieldsList[0]
+                            field = None
 
                         limitedExpr = agent.limitQuery(num, expression, field)
                         output      = unionUse(limitedExpr, direct=True, unescape=False)

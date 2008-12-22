@@ -82,12 +82,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
             expression = agent.limitQuery(num, expression, field)
 
         expressionReplaced = expression.replace(expressionFields, field, 1)
-
-        if " ORDER BY " in expressionReplaced and "(SELECT " in expressionReplaced:
-            orderIndex = expressionReplaced.index(" ORDER BY ")
-            expressionReplaced += expressionReplaced[orderIndex:].replace(")", "")
-
-        output = resume(expressionReplaced, payload)
+        output             = resume(expressionReplaced, payload)
 
         if not output or ( expected == "int" and not output.isdigit() ):
             if output:
@@ -326,6 +321,9 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None)
     value      = None
 
     if inband and conf.unionUse and kb.dbms:
+        if kb.dbms == "Oracle" and " ORDER BY " in expression:
+            expression = expression[:expression.index(" ORDER BY ")]
+
         value = __goInband(expression, expected)
 
         if not value:

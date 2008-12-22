@@ -416,10 +416,6 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if " ORDER BY " in inbandQuery and "(SELECT " in inbandQuery:
-            orderIndex = inbandQuery.index(" ORDER BY ")
-            inbandQuery += inbandQuery[orderIndex:].replace(")", "")
-
         if kb.dbms == "Oracle":
             if " FROM " not in inbandQuery:
                 inbandQuery += " FROM DUAL"
@@ -461,19 +457,20 @@ class Agent:
             limitStr = queries[kb.dbms].limit % (num, 1)
             limitedQuery += " %s" % limitStr
 
-        # TODO: fix Partial UNION query SQL injection technique for Oracle
         elif kb.dbms == "Oracle":
+            if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
+                limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
+
             if query.startswith("SELECT "):
                 limitedQuery = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
             else:
-                limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, field, limitStr)
+                limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, ", ".join(f for f in field), limitStr)
             limitedQuery  = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
         elif kb.dbms == "Microsoft SQL Server":
-            if re.search(" ORDER BY ", limitedQuery, re.I):
-                untilOrderChar = limitedQuery.index(" ORDER BY ")
-                limitedQuery   = limitedQuery[:untilOrderChar]
+            if " ORDER BY " in limitedQuery:
+                limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
             limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
             limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
