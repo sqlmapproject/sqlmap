@@ -261,7 +261,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
                         return
 
                     for num in xrange(startLimit, stopLimit):
-                        limitedExpr = agent.limitQuery(num, expression, expressionFieldsList)
+                        orderBy = re.search(" ORDER BY ([\w\_]+)", expression, re.I)
+
+                        if orderBy:
+                            field = orderBy.group(1)
+                        else:
+                            field = expressionFieldsList[0]
+
+                        limitedExpr = agent.limitQuery(num, expression, field)
                         output      = unionUse(limitedExpr, direct=True, unescape=False)
 
                         if output:

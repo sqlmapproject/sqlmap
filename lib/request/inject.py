@@ -70,13 +70,23 @@ def __goInference(payload, expression):
     return value
 
 
-def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None):
-    outputs = []
+def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None):
+    outputs     = []
+    origExpr    = None
 
     for field in expressionFieldsList:
         output = None
 
+        if isinstance(num, int):
+            origExpr = expression
+            expression = agent.limitQuery(num, expression, field)
+
         expressionReplaced = expression.replace(expressionFields, field, 1)
+
+        if " ORDER BY " in expressionReplaced and "(SELECT " in expressionReplaced:
+            orderIndex = expressionReplaced.index(" ORDER BY ")
+            expressionReplaced += expressionReplaced[orderIndex:].replace(")", "")
+
         output = resume(expressionReplaced, payload)
 
         if not output or ( expected == "int" and not output.isdigit() ):
@@ -86,6 +96,9 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
                 logger.warn(warnMsg)
 
             output = __goInference(payload, expressionReplaced)
+
+        if isinstance(num, int):
+            expression = origExpr
 
         outputs.append(output)
 
@@ -252,9 +265,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
                         return None
 
                     for num in xrange(startLimit, stopLimit):
-                        limitedExpr = agent.limitQuery(num, expression, expressionFieldsList)
-
-                        output = __goInferenceFields(limitedExpr, expressionFields, expressionFieldsList, payload, expected)
+                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num)
                         outputs.append(output)
 
                     return outputs

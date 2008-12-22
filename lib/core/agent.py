@@ -81,6 +81,14 @@ class Agent:
         return retValue
 
 
+    def fullPayload(self, query):
+        query   = self.prefixQuery(query)
+        query   = self.postfixQuery(query)
+        payload = self.payload(newValue=query)
+
+        return payload
+
+
     def prefixQuery(self, string):
         """
         This method defines how the input string has to be escaped
@@ -396,32 +404,32 @@ class Agent:
                 inbandQuery += ", "
 
             if element == exprPosition:
-                if " FROM " in query and not query.startswith("SELECT ") and not "(SELECT " in query:
-                    conditionIndex = query.rindex(" FROM ")
-                    inbandQuery += "%s" % query[:conditionIndex]
+                if " FROM " in query and not query.startswith("SELECT "):
+                    conditionIndex = query.index(" FROM ")
+                    inbandQuery += query[:conditionIndex]
                 else:
-                    inbandQuery += "%s" % query
+                    inbandQuery += query
             else:
                 inbandQuery += "NULL"
 
-        if " FROM " in query and not query.startswith("SELECT ") and not "(SELECT " in query:
-            conditionIndex = query.rindex(" FROM ")
-            inbandQuery += "%s" % query[conditionIndex:]
+        if " FROM " in query and not query.startswith("SELECT "):
+            conditionIndex = query.index(" FROM ")
+            inbandQuery += query[conditionIndex:]
+
+        if " ORDER BY " in inbandQuery and "(SELECT " in inbandQuery:
+            orderIndex = inbandQuery.index(" ORDER BY ")
+            inbandQuery += inbandQuery[orderIndex:].replace(")", "")
 
         if kb.dbms == "Oracle":
             if " FROM " not in inbandQuery:
                 inbandQuery += " FROM DUAL"
-
-            if " ORDER BY " in inbandQuery:
-                orderIndex  = inbandQuery.index(" ORDER BY ")
-                inbandQuery = inbandQuery[:orderIndex]
 
         inbandQuery = self.postfixQuery(inbandQuery, kb.unionComment)
 
         return inbandQuery
 
 
-    def limitQuery(self, num, query, fieldsList=None):
+    def limitQuery(self, num, query, field):
         """
         Take in input a query string and return its limited query string.
 
@@ -436,8 +444,8 @@ class Agent:
         @param query: query to be processed
         @type query: C{str}
 
-        @param fieldsList: list of fields within the query
-        @type fieldsList: C{list}
+        @param field: field within the query
+        @type field: C{list}
 
         @return: limited query string
         @rtype: C{str}
@@ -453,13 +461,12 @@ class Agent:
             limitStr = queries[kb.dbms].limit % (num, 1)
             limitedQuery += " %s" % limitStr
 
-        # TODO: fix for Partial UNION query SQL injection technique both
-        # Oracle and Microsoft SQL Server
+        # TODO: fix Partial UNION query SQL injection technique for Oracle
         elif kb.dbms == "Oracle":
             if query.startswith("SELECT "):
                 limitedQuery = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
             else:
-                limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, ", ".join(field for field in fieldsList), limitStr) 
+                limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, field, limitStr)
             limitedQuery  = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
@@ -469,9 +476,9 @@ class Agent:
                 limitedQuery   = limitedQuery[:untilOrderChar]
 
             limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
-            limitedQuery  = "%s WHERE %s " % (limitedQuery, fieldsList[0])
+            limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
             limitedQuery += "NOT IN (%s" % (limitStr % num)
-            limitedQuery += "%s %s)" % (fieldsList[0], fromFrom)
+            limitedQuery += "%s %s)" % (field, fromFrom)
 
         return limitedQuery
 
