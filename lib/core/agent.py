@@ -456,7 +456,10 @@ class Agent:
         # TODO: fix for Partial UNION query SQL injection technique both
         # Oracle and Microsoft SQL Server
         elif kb.dbms == "Oracle":
-            limitedQuery  = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
+            if query.startswith("SELECT "):
+                limitedQuery = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
+            else:
+                limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, ", ".join(field for field in fieldsList), limitStr) 
             limitedQuery  = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
