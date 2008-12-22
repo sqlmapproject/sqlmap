@@ -176,12 +176,13 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logMsg = "testing Microsoft SQL Server"
         logger.info(logMsg)
 
-        randInt = str(randomInt(1))
-
-        payload = agent.fullPayload(" AND LTRIM(STR(LEN(%s)))='%s'" % (randInt, randInt))
+        payload = agent.fullPayload(" AND LEN(@@version)=LEN(@@version)")
         result  = Request.queryPage(payload)
 
         if result == True:
+            logMsg = "confirming Microsoft SQL Server"
+            logger.info(logMsg)
+
             for version in ( 0, 5, 8 ):
                 payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 25, 1)='%d'" % version)
                 result  = Request.queryPage(payload)

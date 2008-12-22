@@ -7,6 +7,7 @@ sqlmap (0.6.4-1) stable; urgency=low
     manipulation statements, etc from user in SQL query and SQL shell if
     stacked queries are supported by the web application technology in
     use;
+  * Major speed increase in DBMS basic fingerprint;
   * Minor enhancement to support an option (--is-dba) to show if the
     current user is a database management system administrator;
   * Minor enhancement to support an option (--union-tech) to specify the
