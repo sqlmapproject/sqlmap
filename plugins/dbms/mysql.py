@@ -249,15 +249,18 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logger.info(logMsg)
 
         randInt = str(randomInt(1))
-        query = "CONCAT('%s', '%s')" % (randInt, randInt)
 
-        if inject.getValue(query) == (randInt * 2):
+        payload = agent.fullPayload(" AND CONNECTION_ID()=CONNECTION_ID()")
+        result  = Request.queryPage(payload)
+
+        if result == True:
             logMsg = "confirming MySQL"
             logger.info(logMsg)
 
-            query = "LENGTH('%s')" % randInt
+            payload = agent.fullPayload(" AND CONCAT('%s', '%s')='%s%s'" % (randInt, randInt, randInt, randInt))
+            result  = Request.queryPage(payload)
 
-            if not inject.getValue(query) == "1":
+            if result != True:
                 warnMsg = "the back-end DMBS is not MySQL"
                 logger.warn(warnMsg)
 

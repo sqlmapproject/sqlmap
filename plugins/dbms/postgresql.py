@@ -26,6 +26,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
@@ -39,6 +40,7 @@ from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 from lib.request import inject
+from lib.request.connect import Connect as Request
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -168,15 +170,18 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logger.info(logMsg)
 
         randInt = str(randomInt(1))
-        query = "COALESCE(%s, NULL)" % randInt
 
-        if inject.getValue(query) == randInt:
+        payload = agent.fullPayload(" AND %s::int=%s" % (randInt, randInt))
+        result  = Request.queryPage(payload)
+
+        if result == True:
             logMsg = "confirming PostgreSQL"
             logger.info(logMsg)
 
-            query = "LENGTH('%s')" % randInt
+            payload = agent.fullPayload(" AND COALESCE(%s, NULL)=%s" % (randInt, randInt))
+            result  = Request.queryPage(payload)
 
-            if not inject.getValue(query) == "1":
+            if result != True:
                 warnMsg = "the back-end DMBS is not PostgreSQL"
                 logger.warn(warnMsg)
 

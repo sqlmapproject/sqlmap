@@ -177,18 +177,24 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logger.info(logMsg)
 
         randInt = str(randomInt(1))
-        query   = "LTRIM(STR(LEN(%s)))" % randInt
 
-        if inject.getValue(query) == "1":
-            query   = "SELECT SUBSTRING((@@VERSION), 25, 1)"
-            version = inject.getValue(query)
+        payload = agent.fullPayload(" AND LTRIM(STR(LEN(%s)))='%s'" % (randInt, randInt))
+        result  = Request.queryPage(payload)
 
-            if version == "8":
-                kb.dbmsVersion = ["2008"]
-            elif version == "5":
-                kb.dbmsVersion = ["2005"]
-            elif version == "0":
-                kb.dbmsVersion = ["2000"]
+        if result == True:
+            for version in ( 0, 5, 8 ):
+                payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 25, 1)='%d'" % version)
+                result  = Request.queryPage(payload)
+
+                if result == True:
+                    if version == 8:
+                        kb.dbmsVersion = ["2008"]
+                    elif version == 5:
+                        kb.dbmsVersion = ["2005"]
+                    elif version == 0:
+                        kb.dbmsVersion = ["2000"]
+
+                    break
 
             if kb.dbmsVersion:
                 setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])

