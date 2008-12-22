@@ -176,7 +176,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         logMsg = "testing Microsoft SQL Server"
         logger.info(logMsg)
 
-        payload = agent.fullPayload(" AND LEN(@@version)=LEN(@@version)")
+        payload = agent.fullPayload(" AND LEN(@@VERSION)=LEN(@@VERSION)")
         result  = Request.queryPage(payload)
 
         if result == True:
