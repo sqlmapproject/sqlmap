@@ -65,7 +65,7 @@
         <length query="LENGTH(%s)"/>
         <isnull query="NVL(%s, ' ')"/>
         <delimiter query="||"/>
-        <limit query="ROWNUM AS limit %s) WHERE limit"/>
+        <limit query="ROWNUM AS LIMIT %s) WHERE LIMIT"/>
         <limitregexp query="ROWNUM\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+|ROWNUM\s*=\s*[\d]+"/>
         <limitgroupstart/>
         <limitgroupstop/>
@@ -83,30 +83,30 @@
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=SYS.LOGIN_USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
-            <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS limit FROM SYS.ALL_USERS) WHERE limit=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
+            <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
         </users>
         <passwords>
             <inband query="SELECT NAME, PASSWORD FROM SYS.USER$" condition="NAME"/>
-            <blind query="SELECT DISTINCT(PASSWORD) FROM (SELECT DISTINCT(PASSWORD), ROWNUM AS limit FROM SYS.USER$ WHERE NAME='%s') WHERE limit=%d" count="SELECT COUNT(DISTINCT(PASSWORD)) FROM SYS.USER$ WHERE NAME='%s'"/>
+            <blind query="SELECT DISTINCT(PASSWORD) FROM (SELECT DISTINCT(PASSWORD), ROWNUM AS LIMIT FROM SYS.USER$ WHERE NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PASSWORD)) FROM SYS.USER$ WHERE NAME='%s'"/>
         </passwords>
         <privileges>
             <inband query="SELECT GRANTEE, GRANTED_ROLE FROM DBA_ROLE_PRIVS" condition="GRANTEE"/>
-            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS limit FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE limit=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'"/>
+            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'"/>
         </privileges>
         <!-- NOTE: in Oracle there is no query to enumerate DBMS databases. It is possible only through a STATUS request to the Oracle TNS Listener negotiating its protocol -->
         <dbs/>
         <tables>
             <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
             <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES" condition="TABLESPACE_NAME"/>
-            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME, ROWNUM AS limit FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s') WHERE limit=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'"/>
+            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME, ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT COLUMN_NAME, DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'"/>
-            <blind query="SELECT COLUMN_NAME FROM (SELECT COLUMN_NAME, ROWNUM AS limit FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s') WHERE limit=%d" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'"/>
+            <blind query="SELECT COLUMN_NAME FROM (SELECT COLUMN_NAME, ROWNUM AS LIMIT FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s') WHERE LIMIT=%d" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS limit FROM %s) WHERE limit=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS LIMIT FROM %s) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
     </dbms>
 

@@ -176,6 +176,9 @@ class Agent:
         @rtype: C{str}
         """
 
+        if field.upper().endswith(", ROWNUM AS LIMIT"):
+            return field
+
         nulledCastedField = queries[kb.dbms].cast % field
         nulledCastedField = queries[kb.dbms].isnull % nulledCastedField
 
@@ -450,6 +453,8 @@ class Agent:
             limitStr = queries[kb.dbms].limit % (num, 1)
             limitedQuery += " %s" % limitStr
 
+        # TODO: fix for Partial UNION query SQL injection technique both
+        # Oracle and Microsoft SQL Server
         elif kb.dbms == "Oracle":
             limitedQuery  = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
             limitedQuery  = limitedQuery % fromFrom

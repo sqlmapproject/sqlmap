@@ -131,9 +131,6 @@ def unionTest():
         else:
             value, columns = __unionTestByNULLBruteforce(comment)
 
-        print value
-        print columns
-
         if columns:
             setUnion(comment, columns)
 
