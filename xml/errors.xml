@@ -27,6 +27,7 @@
     <dbms value="Microsoft Access">
         <error regexp="Access.*Driver"/>
         <error regexp="Driver.*Access"/>
+        <error regexp="JET Database Engine"/>
     </dbms>
 
     <!-- Oracle -->
