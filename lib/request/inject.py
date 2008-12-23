@@ -77,11 +77,18 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
     for field in expressionFieldsList:
         output = None
 
+        if field.startswith("ROWNUM "):
+            continue
+
         if isinstance(num, int):
             origExpr = expression
             expression = agent.limitQuery(num, expression, field)
 
-        expressionReplaced = expression.replace(expressionFields, field, 1)
+        if "ROWNUM" in expressionFieldsList:
+            expressionReplaced = expression.replace(expressionFields, field, 1)
+        else:
+            expressionReplaced = expression
+
         output             = resume(expressionReplaced, payload)
 
         if not output or ( expected == "int" and not output.isdigit() ):
