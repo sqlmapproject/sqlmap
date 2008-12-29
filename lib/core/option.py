@@ -240,21 +240,24 @@ def __setGoogleDorking():
 
 
 def __setUnionTech():
-    if not conf.uTech:
-        conf.uTech = "bf"
+    if conf.uTech == None:
+        conf.uTech = "NULL"
 
         return
 
-    if conf.uTech and conf.uTech not in ( "bf", "ob" ):
+    uTechOriginal = conf.uTech
+    conf.uTech    = conf.uTech.lower()
+
+    if conf.uTech and conf.uTech not in ( "null", "orderby" ):
         infoMsg  = "resetting the UNION query detection technique to "
-        infoMsg += "'bf', '%s' is not a valid technique" % conf.uTech
+        infoMsg += "'NULL', '%s' is not a valid technique" % uTechOriginal
         logger.info(infoMsg)
 
-        conf.uTech = "bf"
+        conf.uTech = "NULL"
 
     else:
         debugMsg  = "setting UNION query detection technique to "
-        debugMsg += "'%s'" % conf.uTech
+        debugMsg += "'%s'" % uTechOriginal
         logger.debug(debugMsg)
 
 

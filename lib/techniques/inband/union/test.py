@@ -97,6 +97,7 @@ def __unionTestByOrderBy(comment):
 
         if seqMatcher >= 0.6:
             columns = count
+
         elif columns:
             value = __forgeUserFriendlyValue(prevPayload)
 
@@ -113,8 +114,8 @@ def unionTest():
     SQL injection vulnerability. The test is done up to 3*50 times
     """
 
-    if conf.uTech == "ob":
-        technique = "ORDER BY clause"
+    if conf.uTech == "orderby":
+        technique = "ORDER BY clause bruteforcing"
     else:
         technique = "NULL bruteforcing"
 
@@ -126,7 +127,7 @@ def unionTest():
     columns = None
 
     for comment in (queries[kb.dbms].comment, ""):
-        if conf.uTech == "ob":
+        if conf.uTech == "orderby":
             value, columns = __unionTestByOrderBy(comment)
         else:
             value, columns = __unionTestByNULLBruteforce(comment)
