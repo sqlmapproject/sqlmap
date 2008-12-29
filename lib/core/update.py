@@ -28,6 +28,7 @@ import difflib
 import os
 import re
 import shutil
+import sys
 import tempfile
 import urlparse
 import zipfile
@@ -188,13 +189,8 @@ def __updateMSSQLXML():
             logger.info(infoMsg)
 
             # Compare the old XML file with the new one
-            differ = difflib.Differ()
-            differences = list(differ.compare(oldMssqlXmlList, newMssqlXmlList))
-
-            # Show only the different lines
-            for line in differences:
-                if line.startswith("-") or line.startswith("+") or line.startswith("?"):
-                    print line.strip("\n")
+            diff = difflib.unified_diff(oldMssqlXmlList, newMssqlXmlList, "%s.bak" % paths.MSSQL_XML, paths.MSSQL_XML)
+            sys.stdout.writelines(diff)
     else:
         infoMsg  = "no new Microsoft SQL Server versions since the "
         infoMsg += "last update"
@@ -262,7 +258,7 @@ def __updateSqlmap():
         logger.info(infoMsg)
 
     elif sqlmapNewestVersion < VERSION:
-        infoMsg  = "if you are running a version of sqlmap more updated than "
+        infoMsg  = "you are running a version of sqlmap more updated than "
         infoMsg += "the latest stable version (%s)" % sqlmapNewestVersion
         logger.info(infoMsg)
 
