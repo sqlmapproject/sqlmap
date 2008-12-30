@@ -257,7 +257,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             logMsg = "confirming MySQL"
             logger.info(logMsg)
 
-            payload = agent.fullPayload(" AND CONCAT('%s', '%s')='%s%s'" % (randInt, randInt, randInt, randInt))
+            payload = agent.fullPayload(" AND ISNULL(1/0)")
             result  = Request.queryPage(payload)
 
             if result != True:

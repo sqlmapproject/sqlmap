@@ -129,6 +129,8 @@ def setDbms(dbms):
 
     kb.dbms = dbms
 
+    logger.info("the back-end DBMS is %s" % kb.dbms)
+
 
 def setUnion(comment=None, count=None, position=None):
     """
