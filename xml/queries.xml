@@ -169,9 +169,9 @@
         <isnull query="ISNULL(%s, ' ')"/>
         <delimiter query="+"/>
         <limit query="SELECT TOP %d "/>
-        <limitregexp query="SELECT\s+TOP\s+1\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+[\d]+\s+"/>
-        <limitgroupstart/>
-        <limitgroupstop/>
+        <limitregexp query="SELECT\s+TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
         <limitstring/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>

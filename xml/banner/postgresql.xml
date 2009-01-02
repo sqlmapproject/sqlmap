@@ -5,6 +5,11 @@
         <info dbms_version="1"/>
     </regexp>
 
+    <!-- Windows -->
+    <regexp value="Visual C\+\+">
+        <info type="Windows"/>
+    </regexp>
+
     <!-- Ubuntu -->
     <regexp value="PostgreSQL\s+(8\.2\.7)\s+on\s+.*?\s+\(Ubuntu 4\.2\.3-2ubuntu4\)">
         <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.04" codename="Hardy Heron"/>
