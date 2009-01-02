@@ -30,7 +30,7 @@ import sys
 
 
 # sqlmap version and site
-VERSION            = "0.6.4-rc3"
+VERSION            = "0.6.4-rc4"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 SITE               = "http://sqlmap.sourceforge.net"
 
@@ -73,6 +73,7 @@ MATCH_RATIO       = 0.9
 SQL_STATEMENTS    = {
                       "SQL SELECT statement":  (
                              "select ",
+                             "select top ",
                              " from ",
                              " from dual",
                              " where ",

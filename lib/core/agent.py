@@ -285,7 +285,7 @@ class Agent:
         if query.startswith("SELECT ") and "(SELECT " in query:
             fieldsSelectFrom = None
 
-        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsToCastList, fieldsToCastStr
+        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsToCastList, fieldsToCastStr
 
 
     def concatQuery(self, query):
@@ -317,7 +317,7 @@ class Agent:
         concatQuery = ""
         query       = query.replace(", ", ",")
 
-        fieldsSelectFrom, fieldsSelect, fieldsNoSelect, _, fieldsToCastStr = self.getFields(query)
+        fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, _, fieldsToCastStr = self.getFields(query)
         castedFields = self.nullCastConcatFields(fieldsToCastStr)
         concatQuery  = query.replace(fieldsToCastStr, castedFields, 1)
 
@@ -348,7 +348,11 @@ class Agent:
                     concatQuery += " FROM DUAL"
 
         elif kb.dbms == "Microsoft SQL Server":
-            if fieldsSelectFrom:
+            if fieldsSelectTop:
+                topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatQuery, re.I).group(1)
+                concatQuery = concatQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, temp.start), 1)
+                concatQuery = concatQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
+            elif fieldsSelectFrom:
                 concatQuery = concatQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
                 concatQuery = concatQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
             elif fieldsSelect:
@@ -392,6 +396,11 @@ class Agent:
         """
 
         inbandQuery = self.prefixQuery(" UNION ALL SELECT ")
+
+        if query.startswith("TOP"):
+            topNum       = re.search("\ATOP\s+([\d]+)\s+", query, re.I).group(1)
+            query        = query[len("TOP %s " % topNum):]
+            inbandQuery += "TOP %s " % topNum
 
         if not exprPosition:
             exprPosition = kb.unionPosition
@@ -472,10 +481,17 @@ class Agent:
             if " ORDER BY " in limitedQuery:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
-            limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
-            limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
-            limitedQuery += "NOT IN (%s" % (limitStr % num)
-            limitedQuery += "%s %s)" % (field, fromFrom)
+            if not limitedQuery.startswith("SELECT TOP "):
+                limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
+                limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
+                limitedQuery += "NOT IN (%s" % (limitStr % num)
+                limitedQuery += "%s %s)" % (field, fromFrom)
+            else:
+                topNums         = re.search("\ASELECT\s+TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+", limitedQuery, re.I).groups()
+                quantityTopNums = topNums[0]
+                limitedQuery    = limitedQuery.replace("SELECT TOP %s" % quantityTopNums, "SELECT TOP 1", 1)
+                startTopNums    = topNums[1]
+                limitedQuery    = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
 
         return limitedQuery
 

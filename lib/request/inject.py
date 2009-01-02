@@ -81,7 +81,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
             continue
 
         if isinstance(num, int):
-            origExpr = expression
+            origExpr   = expression
             expression = agent.limitQuery(num, expression, field)
 
         if "ROWNUM" in expressionFieldsList:
@@ -89,7 +89,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         else:
             expressionReplaced = expression
 
-        output             = resume(expressionReplaced, payload)
+        output = resume(expressionReplaced, payload)
 
         if not output or ( expected == "int" and not output.isdigit() ):
             if output:
@@ -131,7 +131,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
         return output
 
     if kb.dbmsDetected:
-        _, _, _, expressionFieldsList, expressionFields = agent.getFields(expression)
+        _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(expression)
 
         if len(expressionFieldsList) > 1:
             infoMsg  = "the SQL query provided has more than a field. "
@@ -159,7 +159,17 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms in ( "Oracle", "Microsoft SQL Server" ):
+                elif kb.dbms == "Microsoft SQL Server":
+                    limitGroupStart = queries[kb.dbms].limitgroupstart
+                    limitGroupStop  = queries[kb.dbms].limitgroupstop
+
+                    if limitGroupStart.isdigit():
+                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
+
+                    stopLimit = limitRegExp.group(int(limitGroupStop))
+                    limitCond = int(stopLimit) > 1
+
+                elif kb.dbms == "Oracle":
                     limitCond = False
             else:
                 limitCond = True
@@ -177,6 +187,9 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
                         stopLimit += startLimit
                         untilLimitChar = expression.index(queries[kb.dbms].limitstring)
                         expression = expression[:untilLimitChar]
+
+                    elif kb.dbms == "Microsoft SQL Server":
+                        stopLimit += startLimit
 
                 if not stopLimit or stopLimit <= 1:
                     if kb.dbms == "Oracle" and expression.endswith("FROM DUAL"):

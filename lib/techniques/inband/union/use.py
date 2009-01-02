@@ -159,7 +159,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
                 conf.paramNegative = True
 
     if conf.paramNegative == True and direct == False:
-        _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
+        _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
 
         if len(expressionFieldsList) > 1:
             infoMsg  = "the SQL query provided has more than a field. "
@@ -187,7 +187,17 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms in ( "Oracle", "Microsoft SQL Server" ):
+                elif kb.dbms == "Microsoft SQL Server":
+                    limitGroupStart = queries[kb.dbms].limitgroupstart
+                    limitGroupStop  = queries[kb.dbms].limitgroupstop
+
+                    if limitGroupStart.isdigit():
+                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
+
+                    stopLimit = limitRegExp.group(int(limitGroupStop))
+                    limitCond = int(stopLimit) > 1
+
+                elif kb.dbms == "Oracle":
                     limitCond = False
             else:
                 limitCond = True
@@ -287,7 +297,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
 
     else:
         # Forge the inband SQL injection request
-        query = agent.forgeInbandQuery(expression)
+        query   = agent.forgeInbandQuery(expression)
         payload = agent.payload(newValue=query)
 
         infoMsg = "query: %s" % query
