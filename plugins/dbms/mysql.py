@@ -285,23 +285,15 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                         kb.dbmsVersion = [">= 6.0.3", "< 6.0.5"]
 
                 # Or if it MySQL >= 5.1.2 and < 6.0.3
-                elif inject.getValue("MID(@@plugin_dir, 1, 1)"):
-                    if inject.getValue("SELECT %s FROM information_schema.PROFILING LIMIT 0, 1" % randInt) == randInt:
-                        kb.dbmsVersion = [">= 5.1.28", "< 6.0.3"]
-                    elif inject.getValue("MID(@@innodb_stats_on_metadata, 1, 1)"):
-                        kb.dbmsVersion = [">= 5.1.17", "< 5.1.28"]
-                    elif inject.getValue("SELECT %s FROM information_schema.REFERENTIAL_CONSTRAINTS LIMIT 0, 1" % randInt) == randInt:
-                        kb.dbmsVersion = [">= 5.1.10", "< 5.1.17"]
-                    elif inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt) == randInt:
-                        kb.dbmsVersion = [">= 5.1.7", "< 5.1.10"]
+                elif inject.getValue("MID(@@table_open_cache, 1, 1)"):
+                    if inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt) == randInt:
+                        kb.dbmsVersion = [">= 5.1.7", "< 6.0.3"]
                     elif inject.getValue("SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1" % randInt) == randInt:
                         kb.dbmsVersion = ["= 5.1.6"]
                     elif inject.getValue("SELECT %s FROM information_schema.PLUGINS LIMIT 0, 1" % randInt) == randInt:
                         kb.dbmsVersion = [">= 5.1.5", "< 5.1.6"]
-                    elif inject.getValue("MID(@@table_open_cache, 1, 1)"):
-                        kb.dbmsVersion = [">= 5.1.3", "< 5.1.5"]
                     else:
-                        kb.dbmsVersion = ["= 5.1.2"]
+                        kb.dbmsVersion = [">= 5.1.2", "< 5.1.5"]
 
                 # Or if it is MySQL >= 5.0.0 and < 5.1.2
                 elif inject.getValue("MID(@@hostname, 1, 1)"):
