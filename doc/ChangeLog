@@ -17,6 +17,8 @@ sqlmap (0.6.4-1) stable; urgency=low
     query at the moment;
   * Minor layout adjustment to the --update output;
   * Increased default timeout to 30 seconds;
+  * Major bug fix to correctly handle custom SQL "limited" queries on
+    Microsoft SQL Server and Oracle;
   * Major bug fix to avoid tracebacks when multiple targets are specified
     and one of them is not reachable;
   * Minor bug fix to make the Partial UNION query SQL injection technique
