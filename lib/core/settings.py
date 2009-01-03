@@ -83,7 +83,7 @@ SQL_STATEMENTS    = {
                              " limit ",
                              " offset ",
                              " union all ",
-                             " rownum ",       ),
+                             " rownum as ",    ),
 
                       "SQL data definition":   (
                              "create ",

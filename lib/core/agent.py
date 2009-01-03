@@ -184,9 +184,6 @@ class Agent:
         @rtype: C{str}
         """
 
-        if field.upper().endswith(", ROWNUM AS LIMIT"):
-            return field
-
         nulledCastedField = queries[kb.dbms].cast % field
         nulledCastedField = queries[kb.dbms].isnull % nulledCastedField
 
@@ -257,15 +254,10 @@ class Agent:
         @rtype: C{str}
         """
 
-        if query.startswith("SELECT ") and "(SELECT " in query:
-            firstChar = "\\("
-        else:
-            firstChar = "\\A"
-
-        fieldsSelectTop      = re.search("%sSELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM" % firstChar, query, re.I)
-        fieldsSelectDistinct = re.search("%sSELECT\s+DISTINCT\((.+?)\)\s+FROM" % firstChar, query, re.I)
-        fieldsSelectFrom     = re.search("%sSELECT\s+(.+?)\s+FROM\s+" % firstChar, query, re.I)
-        fieldsSelect         = re.search("%sSELECT\s+(.*)" % firstChar, query, re.I)
+        fieldsSelectTop      = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
+        fieldsSelectDistinct = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", query, re.I)
+        fieldsSelectFrom     = re.search("\ASELECT\s+(.+?)\s+FROM\s+", query, re.I)
+        fieldsSelect         = re.search("\ASELECT\s+(.*)", query, re.I)
         fieldsNoSelect       = query
 
         if fieldsSelectTop:
@@ -282,8 +274,9 @@ class Agent:
         fieldsToCastList = fieldsToCastStr.replace(", ", ",")
         fieldsToCastList = fieldsToCastList.split(",")
 
-        if query.startswith("SELECT ") and "(SELECT " in query:
-            fieldsSelectFrom = None
+        # TODO: really needed?!
+        #if query.startswith("SELECT ") and "(SELECT " in query:
+        #    fieldsSelectFrom = None
 
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsToCastList, fieldsToCastStr
 
@@ -331,21 +324,18 @@ class Agent:
             elif fieldsNoSelect:
                 concatQuery = "CONCAT('%s',%s,'%s')" % (temp.start, concatQuery, temp.stop)
 
-        elif kb.dbms in ( "Oracle", "PostgreSQL" ):
+        elif kb.dbms in ( "PostgreSQL", "Oracle" ):
             if fieldsSelectFrom:
                 concatQuery = concatQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
                 concatQuery = concatQuery.replace(" FROM ", "||'%s' FROM " % temp.stop, 1)
             elif fieldsSelect:
                 concatQuery  = concatQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
                 concatQuery += "||'%s'" % temp.stop
-
-                if kb.dbms == "Oracle":
-                    concatQuery += " FROM DUAL"
             elif fieldsNoSelect:
                 concatQuery = "'%s'||%s||'%s'" % (temp.start, concatQuery, temp.stop)
 
-                if kb.dbms == "Oracle":
-                    concatQuery += " FROM DUAL"
+            if kb.dbms == "Oracle" and ( fieldsSelect or fieldsNoSelect ):
+                concatQuery += " FROM DUAL"
 
         elif kb.dbms == "Microsoft SQL Server":
             if fieldsSelectTop:
