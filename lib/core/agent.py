@@ -481,15 +481,15 @@ class Agent:
             if " ORDER BY " in limitedQuery:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
-            if not limitedQuery.startswith("SELECT TOP "):
+            if not limitedQuery.startswith("SELECT TOP ") and not limitedQuery.startswith("TOP "):
                 limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
                 limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
                 limitedQuery += "%s %s)" % (field, fromFrom)
             else:
-                topNums         = re.search("\ASELECT\s+TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+", limitedQuery, re.I).groups()
+                topNums         = re.search("TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+", limitedQuery, re.I).groups()
                 quantityTopNums = topNums[0]
-                limitedQuery    = limitedQuery.replace("SELECT TOP %s" % quantityTopNums, "SELECT TOP 1", 1)
+                limitedQuery    = limitedQuery.replace("TOP %s" % quantityTopNums, "TOP 1", 1)
                 startTopNums    = topNums[1]
                 limitedQuery    = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
 

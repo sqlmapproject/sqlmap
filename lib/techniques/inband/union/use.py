@@ -216,6 +216,9 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False):
                         untilLimitChar = expression.index(queries[kb.dbms].limitstring)
                         expression = expression[:untilLimitChar]
 
+                    elif kb.dbms == "Microsoft SQL Server":
+                        stopLimit += startLimit
+
                 if not stopLimit or stopLimit <= 1:
                     if kb.dbms == "Oracle" and expression.endswith("FROM DUAL"):
                         test = False
