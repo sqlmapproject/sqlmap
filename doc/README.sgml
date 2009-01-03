@@ -172,19 +172,13 @@ This SQL injection technique is an alternative to the first one.
 statements support</bf>: sqlmap tests if the web application supports
 stacked queries then, in case it does support, it appends to the affected
 parameter in the HTTP request, a semi-colon (<tt>;</tt>) followed by the
-SQL statement to be executed. This technique is useful if to run SQL
+SQL statement to be executed. This technique is useful to run SQL
 statements other than <tt>SELECT</tt> like, for instance, <em>data
 definition</em> or <em>data manipulation</em> statements possibly leading
 to file system read and write access and operating system command
-execution depending on the underlying back-end database management system.
+execution depending on the underlying back-end database management system
+and the session user privileges.
 </itemize>
-
-It is strongly recommended to run at least once sqlmap with the
-<tt>--union-test</tt> option to test if the affected parameter is used
-within a <tt>for</tt> cycle, or similar, and in case use
-<tt>--union-use</tt> option to exploit this vulnerability because it
-saves a lot of time and it does not weight down the web server log file
-with hundreds of HTTP requests.
 
 
 <sect>Features
@@ -1938,6 +1932,14 @@ As you can see, the target URL parameter <tt>id</tt> might be also
 affected by an inband SQL injection.
 In case this vulnerability is exploitable it is strongly recommended to
 use this technique which saves a lot of time.
+
+<p>
+It is strongly recommended to run at least once sqlmap with the
+<tt>--union-test</tt> option to test if the affected parameter is used
+within a <tt>for</tt> cycle, or similar, and in case use
+<tt>--union-use</tt> option to exploit this vulnerability because it
+saves a lot of time and it does not weight down the web server log file
+with hundreds of HTTP requests.
 
 
 <sect2>Use the UNION query SQL injection

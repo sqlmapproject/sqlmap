@@ -34,6 +34,8 @@ import time
 import urllib2
 import urlparse
 
+from ConfigParser import ConfigParser
+
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
@@ -657,6 +659,7 @@ def __saveCmdline():
     debugMsg = "saving command line options on a sqlmap configuration INI file"
     logger.debug(debugMsg)
 
+    config   = ConfigParser()
     userOpts = {}
 
     for family in optDict.keys():
@@ -667,10 +670,8 @@ def __saveCmdline():
             if option in optionData:
                 userOpts[family].append((option, value, optionData[option]))
 
-    confFP = open(paths.SQLMAP_CONFIG, "w")
-
     for family, optionData in userOpts.items():
-        confFP.write("[%s]\n" % family)
+        config.add_section(family)
 
         optionData.sort()
 
@@ -691,12 +692,10 @@ def __saveCmdline():
             if isinstance(value, str):
                 value = value.replace("\n", "\n ")
 
-            confFP.write("%s = %s\n" % (option, value))
+            config.set(family, option, value)
 
-        confFP.write("\n")
-
-    confFP.flush()
-    confFP.close()
+    confFP = open(paths.SQLMAP_CONFIG, "wb")
+    config.write(confFP)
 
     infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
     logger.info(infoMsg)
