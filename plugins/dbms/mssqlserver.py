@@ -184,7 +184,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
             logger.info(logMsg)
 
             for version in ( 0, 5, 8 ):
-                payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 25, 1)='%d'" % version)
+                payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 25, 1)=%d" % version)
                 result  = Request.queryPage(payload)
 
                 if result == True:

@@ -100,6 +100,10 @@ SQL_STATEMENTS    = {
                       "SQL data control":      (
                              "grant ",         ),
 
+                      "SQL data execution":    (
+                             "exec ",
+                             "execute ",       ),
+
                       "SQL transaction":       (
                              "start transaction ",
                              "begin work ",
