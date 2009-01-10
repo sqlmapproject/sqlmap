@@ -298,7 +298,6 @@ def checkStability():
     time.sleep(1)
 
     secondPage, secondHeaders = Request.queryPage(content=True)
-    time.sleep(0.5)
 
     condition = firstPage == secondPage
 
