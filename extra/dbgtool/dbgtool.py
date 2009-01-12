@@ -32,7 +32,7 @@ from optparse import OptionError
 from optparse import OptionParser
 
 
-def convert(inputFile, outputFile):
+def convert(inputFile):
     fileStat = os.stat(inputFile)
     fileSize = fileStat.st_size
 
@@ -81,7 +81,7 @@ def main(inputFile, outputFile):
         print 'ERROR: the provided input file \'%s\' is not a regular file' % inputFile
         sys.exit(1)
 
-    script = convert(inputFile, outputFile)
+    script = convert(inputFile)
 
     if outputFile:
         fpOut      = open(outputFile, 'w')

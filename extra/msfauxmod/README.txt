@@ -76,3 +76,7 @@ SQLMAP: [*] shutting down at: 16:23:21
 SQLMAP: 
 [*] Auxiliary module execution completed
 msf auxiliary(wmap_sqlmap) > 
+
+
+Happy hacking!
+Bernardo Damele A. G. <bernardo.damele@gmail.com>
