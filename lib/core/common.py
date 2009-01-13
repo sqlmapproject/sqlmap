@@ -470,7 +470,7 @@ def banner():
 
     print """
     %s coded by Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+                      and Daniele Bellucci <daniele.bellucci@gmail.com>
     """ % VERSION_STRING
 
 
