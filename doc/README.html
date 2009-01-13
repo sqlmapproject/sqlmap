@@ -58,15 +58,16 @@ for the latest version.</EM>
 <HR>
 <H2><A NAME="s1">1.</A> <A HREF="#toc1">Introduction</A></H2>
 
-<P>sqlmap is an automatic 
-<A HREF="http://www.google.com/search?q=SQL+injection">SQL injection</A> tool. Its goal is to detect and take advantage of
-SQL injection vulnerabilities on web applications. Once it detects one or
-more SQL injections on the target host, the user can choose among a
-variety of options to perform an extensive back-end database management
-system fingerprint, retrieve DBMS session user and database, enumerate
-users, password hashes, privileges, databases, dump entire or user's
-specific DBMS tables/columns, run his own SQL <CODE>SELECT</CODE> statement,
-read specific files on the file system and much more.</P>
+<P>sqlmap is an open source command-line automatic
+<A HREF="http://www.google.com/search?q=SQL+injection">SQL injection</A>
+tool.
+Its goal is to detect and take advantage of SQL injection vulnerabilities
+in web applications. Once it detects one or more SQL injections on the
+target host, the user can choose among a variety of options to perform an
+extensive back-end database management system fingerprint, retrieve DBMS
+session user and database, enumerate users, password hashes, privileges,
+databases, dump entire or user's specific DBMS tables/columns, run his own
+SQL statement, read specific files on the file system and more.</P>
 
 
 <H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">Requirements</A>
@@ -232,8 +233,8 @@ and the session user privileges.</LI>
 <UL>
 <LI>Full support for <B>MySQL</B>, <B>Oracle</B>, <B>PostgreSQL</B>
 and <B>Microsoft SQL Server</B> back-end database management systems.
-Besides these four database management systems, sqlmap can also identify
-Microsoft Access, DB2, Informix, Sybase and Interbase.
+Besides these four database management systems software. sqlmap can also
+identify Microsoft Access, DB2, Informix, Sybase and Interbase.
 </LI>
 <LI><B>Extensive back-end database management system fingerprint</B>
 based upon
@@ -3596,9 +3597,9 @@ SELECT user, host, password FROM mysql.user LIMIT 1, 3 [3]:
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>The SQL shell option gives you access to run your own SQL <CODE>SELECT</CODE>
-statement interactively, like a SQL console logged into the back-end
-database management system.
+<P>The SQL shell option gives you access to run your own SQL statement
+interactively, like a SQL console logged into the back-end database
+management system.
 This feature has TAB completion and history support.</P>
 
 <P>Example of history support on a <B>PostgreSQL 8.3.5</B> target:</P>

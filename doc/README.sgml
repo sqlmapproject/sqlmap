@@ -16,15 +16,16 @@ for the latest version.
 
 <sect>Introduction
 <p>
-sqlmap is an automatic <htmlurl url="http://www.google.com/search?q=SQL+injection"
-name="SQL injection"> tool. Its goal is to detect and take advantage of
-SQL injection vulnerabilities on web applications. Once it detects one or
-more SQL injections on the target host, the user can choose among a
-variety of options to perform an extensive back-end database management
-system fingerprint, retrieve DBMS session user and database, enumerate
-users, password hashes, privileges, databases, dump entire or user's
-specific DBMS tables/columns, run his own SQL <tt>SELECT</tt> statement,
-read specific files on the file system and much more.
+sqlmap is an open source command-line automatic
+<htmlurl url="http://www.google.com/search?q=SQL+injection" name="SQL injection">
+tool.
+Its goal is to detect and take advantage of SQL injection vulnerabilities
+in web applications. Once it detects one or more SQL injections on the
+target host, the user can choose among a variety of options to perform an
+extensive back-end database management system fingerprint, retrieve DBMS
+session user and database, enumerate users, password hashes, privileges,
+databases, dump entire or user's specific DBMS tables/columns, run his own
+SQL statement, read specific files on the file system and more.
 
 
 <sect1>Requirements
@@ -189,8 +190,8 @@ Major features implemented in sqlmap include:
 <itemize>
 <item>Full support for <bf>MySQL</bf>, <bf>Oracle</bf>, <bf>PostgreSQL</bf>
 and <bf>Microsoft SQL Server</bf> back-end database management systems.
-Besides these four database management systems, sqlmap can also identify
-Microsoft Access, DB2, Informix, Sybase and Interbase.
+Besides these four database management systems software. sqlmap can also
+identify Microsoft Access, DB2, Informix, Sybase and Interbase.
 
 <item><bf>Extensive back-end database management system fingerprint</bf>
 based upon
@@ -3497,9 +3498,9 @@ SELECT user, host, password FROM mysql.user LIMIT 1, 3 [3]:
 </verb></tscreen>
 
 <p>
-The SQL shell option gives you access to run your own SQL <tt>SELECT</tt>
-statement interactively, like a SQL console logged into the back-end
-database management system.
+The SQL shell option gives you access to run your own SQL statement
+interactively, like a SQL console logged into the back-end database
+management system.
 This feature has TAB completion and history support.
 
 <p>
