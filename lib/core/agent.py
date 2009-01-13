@@ -334,7 +334,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatQuery = "'%s'||%s||'%s'" % (temp.start, concatQuery, temp.stop)
 
-            if kb.dbms == "Oracle" and ( fieldsSelect or fieldsNoSelect ):
+            if kb.dbms == "Oracle" and " FROM " not in concatQuery and ( fieldsSelect or fieldsNoSelect ):
                 concatQuery += " FROM DUAL"
 
         elif kb.dbms == "Microsoft SQL Server":
