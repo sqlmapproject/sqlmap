@@ -1,0 +1,213 @@
+diff -uN lib_mysqludf_sys/install.sh lib_mysqludf_sys_0.0.3/install.sh
+--- lib_mysqludf_sys/install.sh	1970-01-01 01:00:00.000000000 +0100
++++ lib_mysqludf_sys_0.0.3/install.sh	2009-01-15 16:04:50.000000000 +0000
+@@ -0,0 +1,25 @@
++#!/bin/bash
++
++echo "Compiling the MySQL UDF"
++make
++
++if test $? -ne 0; then
++	echo "ERROR: You need libmysqlclient development software installed "
++	echo "to be able to compile this UDF, on Debian/Ubuntu just run:"
++	echo "apt-get install libmysqlclient15-dev"
++	exit 1
++else
++	echo "MySQL UDF compiled successfully"
++fi
++
++echo -e "\nPlease provide your MySQL root password and press RETURN: \c"
++read PASSWORD
++
++mysql -u root --password=$PASSWORD mysql < lib_mysqludf_sys.sql
++
++if test $? -ne 0; then
++	echo "ERROR: unable to install the UDF"
++	exit 1
++else
++	echo "MySQL UDF installed successfully"
++fi
+Binary files lib_mysqludf_sys/lib_mysqludf_sys_0.0.2.tar.gz and lib_mysqludf_sys_0.0.3/lib_mysqludf_sys_0.0.2.tar.gz differ
+diff -uN lib_mysqludf_sys/lib_mysqludf_sys.c lib_mysqludf_sys_0.0.3/lib_mysqludf_sys.c
+--- lib_mysqludf_sys/lib_mysqludf_sys.c	2007-08-05 13:46:43.000000000 +0100
++++ lib_mysqludf_sys_0.0.3/lib_mysqludf_sys.c	2009-01-15 15:55:33.000000000 +0000
+@@ -1,8 +1,9 @@
+ /* 
+ 	lib_mysqludf_sys - a library with miscellaneous (operating) system level functions
+ 	Copyright (C) 2007  Roland Bouman 
+-	web: http://www.xcdsql.org/MySQL/UDF/ 
+-	email: mysqludfs@gmail.com
++	Copyright (C) 2008-2009  Roland Bouman and Bernardo Damele A. G.
++	web: http://www.mysqludf.org/
++	email: mysqludfs@gmail.com, bernardo.damele@gmail.com
+ 	
+ 	This library is free software; you can redistribute it and/or
+ 	modify it under the terms of the GNU Lesser General Public
+@@ -51,7 +52,7 @@
+ extern "C" {
+ #endif
+ 
+-#define LIBVERSION "lib_mysqludf_sys version 0.0.2"
++#define LIBVERSION "lib_mysqludf_sys version 0.0.3"
+ 
+ #ifdef __WIN__
+ #define SETENV(name,value)		SetEnvironmentVariable(name,value);
+@@ -139,7 +140,7 @@
+ /**
+  * sys_exec
+  * 
+- * executes the argument commandstring.
++ * executes the argument commandstring and returns its exit status.
+  * Beware that this can be a security hazard.
+  */
+ DLLEXP 
+@@ -162,6 +163,34 @@
+ ,	char *error
+ );
+ 
++/**
++ * sys_eval
++ * 
++ * executes the argument commandstring and returns its standard output.
++ * Beware that this can be a security hazard.
++ */
++DLLEXP 
++my_bool sys_eval_init(
++	UDF_INIT *initid
++,	UDF_ARGS *args
++,	char *message
++);
++
++DLLEXP 
++void sys_eval_deinit(
++	UDF_INIT *initid
++);
++
++DLLEXP 
++char* sys_eval(
++	UDF_INIT *initid
++,	UDF_ARGS *args
++,	char* result
++,	unsigned long* length
++,	char *is_null
++,	char *error
++);
++
+ 
+ #ifdef	__cplusplus
+ }
+@@ -336,5 +365,62 @@
+ 	return system(args->args[0]);
+ }
+ 
++my_bool sys_eval_init(
++	UDF_INIT *initid
++,	UDF_ARGS *args
++,	char *message
++){
++	unsigned int i=0;
++	if(args->arg_count == 1
++	&& args->arg_type[i]==STRING_RESULT){
++		return 0;
++	} else {
++		strcpy(
++			message
++		,	"Expected exactly one string type parameter"
++		);		
++		return 1;
++	}
++}
++void sys_eval_deinit(
++	UDF_INIT *initid
++){
++}
++char* sys_eval(
++	UDF_INIT *initid
++,	UDF_ARGS *args
++,	char* result
++,	unsigned long* length
++,	char *is_null
++,	char *error
++){
++	FILE *pipe;
++	char line[1024];
++	unsigned long outlen, linelen;
++
++	result = malloc(1);
++	outlen = 0;
++
++	pipe = popen(args->args[0], "r");
++
++	while (fgets(line, sizeof(line), pipe) != NULL) {
++		linelen = strlen(line);
++		result = realloc(result, outlen + linelen);
++		strncpy(result + outlen, line, linelen);
++		outlen = outlen + linelen;
++	}
++
++	pclose(pipe);
++
++	if (!(*result) || result == NULL) {
++		*is_null = 1;
++	} else {
++    	result[outlen] = 0x00;
++	    *length = strlen(result);
++	}
++
++    return result;
++}
++
+ 
+ #endif /* HAVE_DLOPEN */
+Binary files lib_mysqludf_sys/lib_mysqludf_sys.so and lib_mysqludf_sys_0.0.3/lib_mysqludf_sys.so differ
+diff -uN lib_mysqludf_sys/lib_mysqludf_sys.sql lib_mysqludf_sys_0.0.3/lib_mysqludf_sys.sql
+--- lib_mysqludf_sys/lib_mysqludf_sys.sql	2007-06-02 20:42:53.000000000 +0100
++++ lib_mysqludf_sys_0.0.3/lib_mysqludf_sys.sql	2009-01-15 15:57:34.000000000 +0000
+@@ -1,8 +1,9 @@
+ /* 
+ 	lib_mysqludf_sys - a library with miscellaneous (operating) system level functions
+ 	Copyright (C) 2007  Roland Bouman 
+-	web: http://www.xcdsql.org/MySQL/UDF/ 
+-	email: mysqludfs@gmail.com
++	Copyright (C) 2008-2009  Roland Bouman and Bernardo Damele A. G.
++	web: http://www.mysqludf.org/
++	email: mysqludfs@gmail.com, bernardo.damele@gmail.com
+ 	
+ 	This library is free software; you can redistribute it and/or
+ 	modify it under the terms of the GNU Lesser General Public
+@@ -19,12 +20,14 @@
+ 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+ 
+-drop function lib_mysqludf_sys_info;
+-drop function sys_get;
+-drop function sys_set;
+-drop function sys_exec;
++DROP FUNCTION IF EXISTS lib_mysqludf_sys_info;
++DROP FUNCTION IF EXISTS sys_get;
++DROP FUNCTION IF EXISTS sys_set;
++DROP FUNCTION IF EXISTS sys_exec;
++DROP FUNCTION IF EXISTS sys_eval;
+ 
+-create function lib_mysqludf_sys_info returns string soname 'lib_mysqludf_sys.so';
+-create function sys_get returns string soname 'lib_mysqludf_sys.so';
+-create function sys_set returns int soname 'lib_mysqludf_sys.so';
+-create function sys_exec returns int soname 'lib_mysqludf_sys.so';
++CREATE FUNCTION lib_mysqludf_sys_info RETURNS string SONAME 'lib_mysqludf_sys.so';
++CREATE FUNCTION sys_get RETURNS string SONAME 'lib_mysqludf_sys.so';
++CREATE FUNCTION sys_set RETURNS int SONAME 'lib_mysqludf_sys.so';
++CREATE FUNCTION sys_exec RETURNS int SONAME 'lib_mysqludf_sys.so';
++CREATE FUNCTION sys_eval RETURNS string SONAME 'lib_mysqludf_sys.so';
+diff -uN lib_mysqludf_sys/Makefile lib_mysqludf_sys_0.0.3/Makefile
+--- lib_mysqludf_sys/Makefile	2007-08-05 12:54:53.000000000 +0100
++++ lib_mysqludf_sys_0.0.3/Makefile	2009-01-15 15:52:48.000000000 +0000
+@@ -1,6 +1,4 @@
+-linux: \
+- lib_mysqludf_sys.so
++LIBDIR=/usr/lib
+ 
+-lib_mysqludf_sys.so: \
+- 
+-	gcc -Wall -I/opt/mysql/mysql/include -I. -shared lib_mysqludf_sys.c -o lib_mysqludf_sys.so
++install:
++	gcc -Wall -I/usr/include/mysql -I. -shared lib_mysqludf_sys.c -o $(LIBDIR)/lib_mysqludf_sys.so
