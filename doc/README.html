@@ -236,6 +236,11 @@ and <B>Microsoft SQL Server</B> back-end database management systems.
 Besides these four database management systems software. sqlmap can also
 identify Microsoft Access, DB2, Informix, Sybase and Interbase.
 </LI>
+<LI>Full support for three SQL injection techniques: <B> inferential
+blind SQL injection</B>, <B>UNION query (inband) SQL injection</B> and
+<B>stacked queries (multiple statements) support</B>. sqlmap can also
+test for <B>time based blind SQL injection</B>.
+</LI>
 <LI><B>Extensive back-end database management system fingerprint</B>
 based upon
 <A HREF="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html">inband error messages</A>,
@@ -246,11 +251,6 @@ such as MySQL comment injection. It is also possible to force the back-end
 database management system name if you already know it. sqlmap is also able
 to fingerprint the web server operating system, the web application
 technology and, in some circumstances, the back-end DBMS operating system.
-</LI>
-<LI>Full support for three SQL injection techniques: <B> inferential
-blind SQL injection</B>, <B>UNION query (inband) SQL injection</B> and
-<B>stacked queries (multiple statements) support</B>. sqlmap can also
-test for <B>time based blind SQL injection</B>.
 </LI>
 <LI>Options to retrieve on all four back-end database management system
 <B>banner</B>, <B>current user</B>, <B>current database</B>,
@@ -313,6 +313,8 @@ randomly selected from a text file.
 there exist <B>six levels</B>. The default level is <B>1</B> in which
 information, warnings, errors and tracebacks, if they occur, will be shown.
 </LI>
+<LI>Granularity in the user's options.
+</LI>
 <LI><B>Estimated time of arrival</B> support for each query, updated
 in real time while fetching the information to give to the user an
 overview on how long it will take to retrieve the output.
@@ -328,6 +330,10 @@ save command line options on a configuration INI file.
 <LI>Integration with other IT security related open source projects,
 <A HREF="http://metasploit.com/framework/">Metasploit</A> and 
 <A HREF="http://w3af.sourceforge.net/">w3af</A>.
+</LI>
+<LI><B>File system</B> read and write access and <B>operating
+system</B> command execution by providing own queries, depending on the
+session user privileges and back-end DBMS.
 </LI>
 <LI><B>PHP setting <CODE>magic_quotes_gpc</CODE> bypass</B> by encoding
 every query string, between single quotes, with <CODE>CHAR</CODE>, or similar,
@@ -400,7 +406,7 @@ and
 $ python sqlmap.py -h
 
     sqlmap/0.6.4 coded by Bernardo Damele A. G. &lt;bernardo.damele@gmail.com>
-                        and Daniele Bellucci &lt;daniele.bellucci@gmail.com>
+                      and Daniele Bellucci &lt;daniele.bellucci@gmail.com>
 
 Usage: sqlmap.py [options]
 
@@ -433,7 +439,7 @@ Options:
     --proxy=PROXY       Use a HTTP proxy to connect to the target url
     --threads=THREADS   Maximum number of concurrent HTTP requests (default 1)
     --delay=DELAY       Delay in seconds between each HTTP request
-    --timeout=TIMEOUT   Seconds to wait before timeout connection (default 10)
+    --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
 
   Injection:
     These options can be used to specify which parameters to test for,
@@ -456,8 +462,9 @@ Options:
     using the default blind SQL injection technique.
 
     --stacked-test      Test for stacked queries (multiple statements) support
-    --time-test         Test for Time based blind SQL injection
+    --time-test         Test for time based blind SQL injection
     --union-test        Test for UNION query (inband) SQL injection
+    --union-tech=UTECH  Technique to test for UNION query SQL injection
     --union-use         Use the UNION query (inband) SQL injection to retrieve
                         the queries output. No need to go blind
 
@@ -472,6 +479,7 @@ Options:
     -b, --banner        Retrieve DBMS banner
     --current-user      Retrieve DBMS current user
     --current-db        Retrieve DBMS current database
+    --is-dba            Detect if the DBMS current user is DBA
     --users             Enumerate DBMS users
     --passwords         Enumerate DBMS users password hashes (opt: -U)
     --privileges        Enumerate DBMS users privileges (opt: -U)
@@ -1878,7 +1886,7 @@ stacked queries support:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'wRcBC'=
 </P>
 
 
-<H3>Test for Time based blind SQL injection</H3>
+<H3>Test for time based blind SQL injection</H3>
 
 <P>Option: <CODE>--time-test</CODE></P>
 
@@ -1954,7 +1962,7 @@ time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';
 
 <H3>Test for UNION query SQL injection</H3>
 
-<P>Option: <CODE>--union-test</CODE></P>
+<P>Options: <CODE>--union-test</CODE> and <CODE>--union-tech</CODE></P>
 
 <P>It is possible to test if the target URL is affected by an <B>inband
 SQL injection</B> vulnerability.

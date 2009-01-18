@@ -163,7 +163,7 @@ def cmdLineParser():
 
         techniques.add_option("--time-test", dest="timeTest",
                               action="store_true",
-                              help="Test for Time based blind SQL injection")
+                              help="Test for time based blind SQL injection")
 
         techniques.add_option("--union-test", dest="unionTest",
                               action="store_true",
