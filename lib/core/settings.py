@@ -83,7 +83,8 @@ SQL_STATEMENTS    = {
                              " limit ",
                              " offset ",
                              " union all ",
-                             " rownum as ",    ),
+                             " rownum as ",
+                             "(case ",         ),
 
                       "SQL data definition":   (
                              "create ",

@@ -184,8 +184,11 @@ class Agent:
         @rtype: C{str}
         """
 
-        nulledCastedField = queries[kb.dbms].cast % field
-        nulledCastedField = queries[kb.dbms].isnull % nulledCastedField
+        if field.startswith("(CASE"):
+            nulledCastedField = field
+        else:
+            nulledCastedField = queries[kb.dbms].cast % field
+            nulledCastedField = queries[kb.dbms].isnull % nulledCastedField
 
         return nulledCastedField
 
