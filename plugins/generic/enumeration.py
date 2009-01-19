@@ -206,6 +206,12 @@ class Enumeration:
                     query += " WHERE "
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
                 else:
+                    if kb.dbms == "MySQL":
+                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", conf.user)
+
+                        if parsedUser:
+                            conf.user = parsedUser.groups()[0]
+
                     query += " WHERE %s = '%s'" % (condition, conf.user)
 
             value = inject.getValue(query, blind=False)
@@ -238,7 +244,7 @@ class Enumeration:
 
             for user in users:
                 if kb.dbms == "MySQL":
-                    parsedUser = re.search("\047(.*?)\047@'", user)
+                    parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
 
                     if parsedUser:
                         user = parsedUser.groups()[0]
@@ -386,6 +392,12 @@ class Enumeration:
                     else:
                         query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
                 else:
+                    if kb.dbms == "MySQL":
+                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", conf.user)
+
+                        if parsedUser:
+                            conf.user = parsedUser.groups()[0]
+
                     # NOTE: I assume that the user provided is not in
                     # MySQL >= 5.0 syntax 'user'@'host'
                     if kb.dbms == "MySQL" and self.has_information_schema:
@@ -449,6 +461,11 @@ class Enumeration:
                         for user in conf.user.split(","):
                             users.add("%" + user + "%")
                     else:
+                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", conf.user)
+
+                        if parsedUser:
+                            conf.user = parsedUser.groups()[0]
+
                         users = [ "%" + conf.user + "%" ]
 
                 elif "," in conf.user:
