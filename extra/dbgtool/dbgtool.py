@@ -112,4 +112,4 @@ if __name__ == '__main__':
     inputFile  = args.inputFile
     outputFile = args.outputFile
 
-    script = main(inputFile, outputFile)
+    main(inputFile, outputFile)
