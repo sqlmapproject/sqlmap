@@ -415,11 +415,11 @@ char* sys_eval(
 	if (!(*result) || result == NULL) {
 		*is_null = 1;
 	} else {
-    	result[outlen] = 0x00;
-	    *length = strlen(result);
+		result[outlen] = 0x00;
+		*length = strlen(result);
 	}
 
-    return result;
+	return result;
 }
 
 
