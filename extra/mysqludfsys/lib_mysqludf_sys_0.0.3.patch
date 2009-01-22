@@ -47,7 +47,7 @@ diff -uN lib_mysqludf_sys_0.0.2/install.sh lib_mysqludf_sys/install.sh
 +fi
 Binary files lib_mysqludf_sys_0.0.2/lib_mysqludf_sys_0.0.2.tar.gz and lib_mysqludf_sys/lib_mysqludf_sys_0.0.2.tar.gz differ
 diff -uN lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.c lib_mysqludf_sys/lib_mysqludf_sys.c
---- lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.c	2009-01-21 20:52:54.000000000 +0000
+--- lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.c	2009-01-22 12:01:55.000000000 +0000
 +++ lib_mysqludf_sys/lib_mysqludf_sys.c	2009-01-21 00:06:13.000000000 +0000
 @@ -1,8 +1,9 @@
  /* 
@@ -177,24 +177,146 @@ diff -uN lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.c lib_mysqludf_sys/lib_mysqludf
 +
  
  #endif /* HAVE_DLOPEN */
+diff -uN lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.html lib_mysqludf_sys/lib_mysqludf_sys.html
+--- lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.html	2009-01-22 12:01:55.000000000 +0000
++++ lib_mysqludf_sys/lib_mysqludf_sys.html	2009-01-22 10:21:46.000000000 +0000
+@@ -23,7 +23,8 @@
+ 		This library <code>lib_mysqludf_sys</code> contains a number of functions that allows one to interact with the operating system.		
+ 	</p>
+ 	<ol>
+-		<li><a href="#sys_exec"><code>sys_exec</code></a> - executes an arbitrary command, and can thus be used to launch an external application.</li>
++		<li><a href="#sys_eval"><code>sys_eval</code></a> - executes an arbitrary command, and returns it's output.</li>
++		<li><a href="#sys_exec"><code>sys_exec</code></a> - executes an arbitrary command, and returns it's exit code.</li>
+ 		<li><a href="#sys_get"><code>sys_get</code></a> - gets the value of an environment variable.</li>
+ 		<li><a href="#sys_set"><code>sys_set</code></a> - create an environment variable, or update the value of an existing environment variable.</li>
+ 	</ol>
+@@ -31,6 +32,72 @@
+ 		Use <a href="#lib_mysqludf_sys_info"><code>lib_mysqludf_sys_info()</code></a> to obtain information about the currently installed version of <code>lib_mysqludf_sys</code>.
+ 	</p>
+ 	
++
++	<a name="sys_eval"></a><h2>sys_eval</h2>
++	<p>
++		<code>sys_eval</code> takes one command string argument and executes it, returning its output.
++	</p>
++	<h3>Syntax</h3>
++<pre>sys_eval(<b>arg1</b>)</pre>
++	<h3>Parameters and Return Values</h3>
++	<dl>
++		<dt><code><b>arg1</b></code></dt>
++		<dd>
++			A command string valid for the current operating system or execution environment.
++		</dd>
++		<dt>returns</dt>
++		<dd>
++			Whatever output the command pushed to the standard output stream.
++		</dd>
++	</dl>
++	<h3>Installation</h3>
++	<p>
++		Place the shared library binary in an appropriate location. 
++		Log in to mysql as root or as another user with sufficient privileges, and select any database.		
++		Then, create the function using the following DDL statement:
++	</p>
++	<pre>
++CREATE FUNCTION sys_eval RETURNS STRING SONAME 'lib_mysqludf_sys.so';	
++	</pre>
++	<p>
++		The function will be globally available in all databases.
++	</p>
++	<p>
++		The deinstall the function, run the following statement:
++	</p>
++	<pre>
++DROP FUNCTION sys_eval;
++	</pre>
++	<h3>Examples</h3>
++	<p>
++		None yet
++	</p>
++	<h3>A Note of Caution</h3>
++	<p>
++		Be very careful in deciding whether you need this function. 
++		UDFs are available to all database users - you cannot grant EXECUTE privileges for them.
++		As the commandstring passed to <code>sys_exec</code> can do pretty much everything, 
++		exposing the function poses a very real security hazard.
++	</p>
++	<p>
++		Even for a benign user, it is possible to accidentally do a lot of damage with it.
++		The call will be executed with the privileges of the os user that runs MySQL, 
++		so it is entirely feasible to delete MySQL's data directory, or worse.		
++	</p>
++	<p>	
++		The function is intended for specialized MySQL applications where one needs extended 
++		control over the operating system. 
++		Currently, we do not have UDF's for ftp, email and http, 
++		and this function can be used to implement such functionality in case it is really necessary
++		(datawarehouse staging areas could be a case in example).
++	</p>
++	<p>
++		You have been warned! If you don't see the hazard, please don't try to find it; just trust me on this.
++	</p>
++	<p>
++                If you do decide to use this library in a production environment, make sure that only specific commands can be run and file access is limited by using <a href="http://www.novell.com/documentation/apparmor/index.html">AppArmor</a>.
++	</p>
++
+ 	<a name="sys_exec"></a><h2>sys_exec</h2>
+ 	<p>
+ 		<code>sys_exec</code> takes one command string argument and executes it.
+@@ -92,6 +159,9 @@
+ 	<p>
+ 		You have been warned! If you don't see the hazard, please don't try to find it; just trust me on this.
+ 	</p>
++	<p>
++                If you do decide to use this library in a production environment, make sure that only specific commands can be run and file access is limited by using <a href="http://www.novell.com/documentation/apparmor/index.html">AppArmor</a>.
++	</p>
+ 	<a name="sys_get"></a><h2>sys_get</h2>
+ 	<p>
+ 		<code>sys_get</code> takes the name of an environment variable and returns the value of the variable.
 Binary files lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.so and lib_mysqludf_sys/lib_mysqludf_sys.so differ
 diff -uN lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.sql lib_mysqludf_sys/lib_mysqludf_sys.sql
---- lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.sql	2009-01-21 20:52:54.000000000 +0000
-+++ lib_mysqludf_sys/lib_mysqludf_sys.sql	2009-01-21 00:51:00.000000000 +0000
-@@ -1,8 +1,9 @@
- /* 
- 	lib_mysqludf_sys - a library with miscellaneous (operating) system level functions
- 	Copyright (C) 2007  Roland Bouman 
+--- lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.sql	2009-01-22 12:01:55.000000000 +0000
++++ lib_mysqludf_sys/lib_mysqludf_sys.sql	2009-01-22 10:21:53.000000000 +0000
+@@ -1,30 +1,33 @@
+-/* 
+-	lib_mysqludf_sys - a library with miscellaneous (operating) system level functions
+-	Copyright (C) 2007  Roland Bouman 
 -	web: http://www.xcdsql.org/MySQL/UDF/ 
 -	email: mysqludfs@gmail.com
-+	Copyright (C) 2008-2009  Roland Bouman and Bernardo Damele A. G.
-+	web: http://www.mysqludf.org/
-+	email: mysqludfs@gmail.com, bernardo.damele@gmail.com
- 	
- 	This library is free software; you can redistribute it and/or
- 	modify it under the terms of the GNU Lesser General Public
-@@ -19,12 +20,14 @@
- 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+-	
+-	This library is free software; you can redistribute it and/or
+-	modify it under the terms of the GNU Lesser General Public
+-	License as published by the Free Software Foundation; either
+-	version 2.1 of the License, or (at your option) any later version.
+-	
+-	This library is distributed in the hope that it will be useful,
+-	but WITHOUT ANY WARRANTY; without even the implied warranty of
+-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-	Lesser General Public License for more details.
+-	
+-	You should have received a copy of the GNU Lesser General Public
+-	License along with this library; if not, write to the Free Software
+-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
++/*
++        lib_mysqludf_sys - a library with miscellaneous (operating) system level functions
++        Copyright (C) 2007  Roland Bouman
++        Copyright (C) 2008-2009  Roland Bouman and Bernardo Damele A. G.
++        web: http://www.mysqludf.org/
++        email: roland.bouman@gmail.com, bernardo.damele@gmail.com
++
++        This library is free software; you can redistribute it and/or
++        modify it under the terms of the GNU Lesser General Public
++        License as published by the Free Software Foundation; either
++        version 2.1 of the License, or (at your option) any later version.
++
++        This library is distributed in the hope that it will be useful,
++        but WITHOUT ANY WARRANTY; without even the implied warranty of
++        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++        Lesser General Public License for more details.
++
++        You should have received a copy of the GNU Lesser General Public
++        License along with this library; if not, write to the Free Software
++        Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
 -drop function lib_mysqludf_sys_info;
@@ -217,7 +339,7 @@ diff -uN lib_mysqludf_sys_0.0.2/lib_mysqludf_sys.sql lib_mysqludf_sys/lib_mysqlu
 +CREATE FUNCTION sys_exec RETURNS int SONAME 'lib_mysqludf_sys.so';
 +CREATE FUNCTION sys_eval RETURNS string SONAME 'lib_mysqludf_sys.so';
 diff -uN lib_mysqludf_sys_0.0.2/Makefile lib_mysqludf_sys/Makefile
---- lib_mysqludf_sys_0.0.2/Makefile	2009-01-21 20:52:54.000000000 +0000
+--- lib_mysqludf_sys_0.0.2/Makefile	2009-01-22 12:01:55.000000000 +0000
 +++ lib_mysqludf_sys/Makefile	2009-01-19 09:11:00.000000000 +0000
 @@ -1,6 +1,4 @@
 -linux: \
