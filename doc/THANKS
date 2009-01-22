@@ -116,6 +116,9 @@ Sven Schluter <sschlueter@netzwerk.cc>
     for providing with a patch for waiting a number of seconds between
     each HTTP request
 
+Uemit Seren <uemit.seren@gmail.com>
+    for reporting a minor adjustment when running with python 2.6
+
 Sumit Siddharth <sid@notsosecure.com>
     for providing me with ideas on the implementation on a couple of
     features

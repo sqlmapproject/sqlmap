@@ -23,9 +23,13 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
+try:
+    import md5
+    import sha
+except DeprecationWarning, _:
+    from hashlib import md5
+    from hashlib import sha
 
-import md5
-import sha
 import struct
 import urllib
 

@@ -25,7 +25,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 import httplib
-import md5
 import re
 import socket
 import time
