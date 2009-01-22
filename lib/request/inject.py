@@ -85,9 +85,9 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
             expression = agent.limitQuery(num, expression, field)
 
         if "ROWNUM" in expressionFieldsList:
-            expressionReplaced = expression.replace(expressionFields, field, 1)
-        else:
             expressionReplaced = expression
+        else:
+            expressionReplaced = expression.replace(expressionFields, field, 1)
 
         output = resume(expressionReplaced, payload)
 

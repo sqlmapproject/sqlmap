@@ -131,7 +131,7 @@
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_DATABASE()"/>
-        <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)='true'"/>
+        <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <users>
             <inband query="SELECT usename FROM pg_user"/>
             <blind query="SELECT DISTINCT(usename) FROM pg_user OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
