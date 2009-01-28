@@ -126,6 +126,9 @@ Sumit Siddharth <sid@notsosecure.com>
 M Simkin <mlsimkin@cox.net>
     for suggesting a feature
 
+Konrads Smelkovs <konrads@smelkovs.com>
+    for reporting two bugs in --sql-shell and --sql-query
+
 Jason Swan <jasoneswan@gmail.com>
     for reporting a bug when enumerating columns on Microsoft SQL Server
     for suggesting a couple of improvements

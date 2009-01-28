@@ -498,7 +498,11 @@ def cleanQuery(query):
 
     for sqlStatements in SQL_STATEMENTS.values():
         for sqlStatement in sqlStatements:
-            upperQuery = upperQuery.replace(sqlStatement, sqlStatement.upper())
+            sqlStatementEsc = sqlStatement.replace("(", "\\(")
+            queryMatch = re.search("(%s)" % sqlStatementEsc, query, re.I)
+
+            if queryMatch:
+                upperQuery = upperQuery.replace(queryMatch.group(1), sqlStatement.upper())
 
     return upperQuery
 
