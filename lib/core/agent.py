@@ -476,7 +476,10 @@ class Agent:
 
             if not limitedQuery.startswith("SELECT TOP ") and not limitedQuery.startswith("TOP "):
                 limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
-                limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
+                if " WHERE " in limitedQuery:
+                    limitedQuery  = "%s AND %s " % (limitedQuery, field)
+                else:
+                    limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
                 limitedQuery += "%s %s)" % (field, fromFrom)
             else:
