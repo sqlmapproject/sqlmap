@@ -147,8 +147,9 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
         # can return multiple entries
         if fromUser and " FROM " in expression:
             limitRegExp = re.search(queries[kb.dbms].limitregexp, expression, re.I)
+            topLimit    = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-            if limitRegExp:
+            if limitRegExp or ( kb.dbms == "Microsoft SQL Server" and topLimit ):
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
                     limitGroupStart = queries[kb.dbms].limitgroupstart
                     limitGroupStop  = queries[kb.dbms].limitgroupstop
@@ -160,14 +161,19 @@ def __goInferenceProxy(expression, fromUser=False, expected=None):
                     limitCond = int(stopLimit) > 1
 
                 elif kb.dbms == "Microsoft SQL Server":
-                    limitGroupStart = queries[kb.dbms].limitgroupstart
-                    limitGroupStop  = queries[kb.dbms].limitgroupstop
+                    if limitRegExp:
+                        limitGroupStart = queries[kb.dbms].limitgroupstart
+                        limitGroupStop  = queries[kb.dbms].limitgroupstop
 
-                    if limitGroupStart.isdigit():
-                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
+                        if limitGroupStart.isdigit():
+                            startLimit = int(limitRegExp.group(int(limitGroupStart)))
 
-                    stopLimit = limitRegExp.group(int(limitGroupStop))
-                    limitCond = int(stopLimit) > 1
+                        stopLimit = limitRegExp.group(int(limitGroupStop))
+                        limitCond = int(stopLimit) > 1
+                    elif topLimit:
+                        startLimit = 0
+                        stopLimit  = int(topLimit.group(1))
+                        limitCond  = int(stopLimit) > 1
 
                 elif kb.dbms == "Oracle":
                     limitCond = False

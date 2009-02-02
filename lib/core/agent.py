@@ -471,10 +471,26 @@ class Agent:
             limitedQuery += "=%d" % (num + 1)
 
         elif kb.dbms == "Microsoft SQL Server":
+            forgeNotIn = True
+
             if " ORDER BY " in limitedQuery:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
-            if not limitedQuery.startswith("SELECT TOP ") and not limitedQuery.startswith("TOP "):
+            if limitedQuery.startswith("SELECT TOP ") or limitedQuery.startswith("TOP "):
+                topNums         = re.search(queries[kb.dbms].limitregexp, limitedQuery, re.I)
+
+                if topNums:
+                    topNums = topNums.groups()
+                    quantityTopNums = topNums[0]
+                    limitedQuery    = limitedQuery.replace("TOP %s" % quantityTopNums, "TOP 1", 1)
+                    startTopNums    = topNums[1]
+                    limitedQuery    = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
+                    forgeNotIn      = False
+                else:
+                    topNum          = re.search("TOP\s+([\d]+)\s+", limitedQuery, re.I).group(1)
+                    limitedQuery    = limitedQuery.replace("TOP %s " % topNum, "")
+
+            if forgeNotIn == True:
                 limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
                 if " WHERE " in limitedQuery:
                     limitedQuery  = "%s AND %s " % (limitedQuery, field)
@@ -482,12 +498,6 @@ class Agent:
                     limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
                 limitedQuery += "%s %s)" % (field, fromFrom)
-            else:
-                topNums         = re.search("TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+", limitedQuery, re.I).groups()
-                quantityTopNums = topNums[0]
-                limitedQuery    = limitedQuery.replace("TOP %s" % quantityTopNums, "TOP 1", 1)
-                startTopNums    = topNums[1]
-                limitedQuery    = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
 
         return limitedQuery
 
