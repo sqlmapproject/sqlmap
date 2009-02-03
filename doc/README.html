@@ -8,7 +8,7 @@
 <H1>sqlmap user's manual</H1>
 
 <H2>by 
-<A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A></H2>version 0.6.4, DDth of MMM 2009
+<A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A></H2>version 0.6.4, 3rd of February 2009
 <HR>
 <EM>This document is the user's manual to use 
 <A HREF="http://sqlmap.sourceforge.net">sqlmap</A>.
@@ -407,7 +407,7 @@ $ python sqlmap.py -h
 
     sqlmap/0.6.4 coded by Bernardo Damele A. G. &lt;bernardo.damele@gmail.com>
                       and Daniele Bellucci &lt;daniele.bellucci@gmail.com>
-
+    
 Usage: sqlmap.py [options]
 
 Options:
@@ -3801,7 +3801,8 @@ back-end DBMS: PostgreSQL
 sql> SELECT COUNT(name) FROM users
 [10:11:57] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
 [10:11:57] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
-[10:11:59] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) FROM users
+[10:11:59] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) 
+FROM users
 [10:11:59] [INFO] retrieved: 4
 [10:11:59] [INFO] performed 13 queries in 0 seconds
 SELECT COUNT(name) FROM users:    '4'
@@ -3809,12 +3810,14 @@ SELECT COUNT(name) FROM users:    '4'
 sql> INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');
 [10:12:35] [INFO] testing stacked queries support on parameter 'id'
 [10:12:40] [INFO] the web application supports stacked queries on parameter 'id'
-[10:12:40] [INFO] executing SQL data manipulation query: 'INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');'
+[10:12:40] [INFO] executing SQL data manipulation query: 'INSERT INTO users (id, name, surname) 
+VALUES (5, 'from', 'sql shell');'
 [10:12:40] [INFO] done
 sql> SELECT COUNT(name) FROM users
 [10:12:51] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
 [10:12:51] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
-[10:12:53] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) FROM users
+[10:12:53] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) 
+FROM users
 [10:12:53] [INFO] retrieved: 5
 [10:12:54] [INFO] performed 20 queries in 0 seconds
 SELECT COUNT(name) FROM users:    '5'
@@ -3822,7 +3825,15 @@ SELECT COUNT(name) FROM users:    '5'
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>TODO</P>
+<P>As you can see from this last example, when the user provides a SQL
+statement other than <CODE>SELECT</CODE>, sqlmap recognizes it, tests if the
+web application supports stacked queries and in case it does, it executes
+the provided SQL statement in a multiple statement.</P>
+
+<P>Beware that some web application technologies do not support stacked
+queries on specific database management systems. For instance, PHP does not
+support stacked queries when the back-end DBMS is MySQL, but it does
+support when the back-end DBMS is PostgreSQL.</P>
 
 
 <H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">File system access</A>
