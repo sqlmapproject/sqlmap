@@ -29,9 +29,10 @@ import re
 from lib.core.convert import md5hash
 from lib.core.data import conf
 from lib.core.data import logger
-#from lib.core.settings import MATCH_RATIO
+
 
 MATCH_RATIO = None
+
 
 def comparison(page, headers=None, getSeqMatcher=False):
     global MATCH_RATIO
