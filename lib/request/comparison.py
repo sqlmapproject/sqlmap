@@ -26,11 +26,16 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from lib.core.convert import md5hash
 from lib.core.data import conf
-from lib.core.settings import MATCH_RATIO
+from lib.core.data import logger
+#from lib.core.settings import MATCH_RATIO
 
+MATCH_RATIO = None
 
 def comparison(page, headers=None, getSeqMatcher=False):
+    global MATCH_RATIO
+
     regExpResults = None
 
     # String to be excluded before calculating page hash
@@ -67,15 +72,34 @@ def comparison(page, headers=None, getSeqMatcher=False):
         else:
             return False
 
-    # By default it returns sequence matcher between the first untouched
-    # HTTP response page content and this content
     conf.seqMatcher.set_seq2(page)
+    ratio = round(conf.seqMatcher.ratio(), 3)
 
+    # If the url is stable and we did not set yet the match ratio and the
+    # current injected value changes the url page content
+    if MATCH_RATIO == None:
+        if conf.md5hash != None and ratio != 1:
+            logger.debug("Setting match ratio to %.3f" % ratio)
+            MATCH_RATIO = ratio
+        elif conf.md5hash == None:
+            logger.debug("Setting match ratio to default value 0.900")
+            MATCH_RATIO = 0.900
+
+    # If it has been requested to return the ratio and not a comparison
+    # response
     if getSeqMatcher:
-        return round(conf.seqMatcher.ratio(), 3)
+        return ratio
 
-    elif round(conf.seqMatcher.ratio(), 3) >= MATCH_RATIO:
+    # If the url is stable it returns True if the page has the same MD5
+    # hash of the original one
+    # NOTE: old implementation, it did not handle automatically the fact
+    # that the url could be not stable (due to VIEWSTATE, counter, etc.)
+    #elif conf.md5hash != None:
+    #    return conf.md5hash == md5hash(page)
+
+    # If the url is not stable it returns sequence matcher between the
+    # first untouched HTTP response page content and this content
+    elif ratio > MATCH_RATIO:
         return True
-
     else:
         return False

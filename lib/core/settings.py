@@ -30,7 +30,7 @@ import sys
 
 
 # sqlmap version and site
-VERSION            = "0.6.4"
+VERSION            = "0.6.5-rc1"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 SITE               = "http://sqlmap.sourceforge.net"
 
@@ -64,15 +64,18 @@ PGSQL_ALIASES     = [ "postgresql", "postgres", "pgsql", "psql", "pg" ]
 ORACLE_ALIASES    = [ "oracle", "orcl", "ora", "or" ]
 
 SUPPORTED_DBMS    = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES
+SUPPORTED_OS      = ( "linux", "windows" )
 
 # TODO: port to command line/configuration file options?
 SECONDS           = 5
 RETRIES           = 3
-MATCH_RATIO       = 0.9
+
+MATCH_RATIO       = None
 
 SQL_STATEMENTS    = {
                       "SQL SELECT statement":  (
                              "select ",
+                             "show ",
                              " top ",
                              " from ",
                              " from dual",

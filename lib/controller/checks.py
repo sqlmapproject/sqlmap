@@ -31,6 +31,7 @@ from lib.controller.action import action
 from lib.core.agent import agent
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.convert import md5hash
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -296,22 +297,23 @@ def checkStability():
 
     firstPage, firstHeaders = Request.queryPage(content=True)
     time.sleep(1)
-
     secondPage, secondHeaders = Request.queryPage(content=True)
 
     condition = firstPage == secondPage
 
-    if condition == False:
+    if condition == True:
+        conf.md5hash = md5hash(firstPage)
+
+        logMsg  = "url is stable"
+        logger.info(logMsg)
+
+    elif condition == False:
         warnMsg  = "url is not stable, sqlmap will base the page "
         warnMsg += "comparison on a sequence matcher, if no dynamic nor "
         warnMsg += "injectable parameters are detected, refer to user's "
         warnMsg += "manual paragraph 'Page comparison' and provide a "
         warnMsg += "string or regular expression to match on"
         logger.warn(warnMsg)
-
-    if condition == True:
-        logMsg = "url is stable"
-        logger.info(logMsg)
 
     return condition
 

@@ -1,3 +1,11 @@
+sqlmap (0.6.5-1) stable; urgency=low
+
+  * Major bug fix in the comparison algorithm to correctly handle also the
+    case that the url is stable and the False response changes the page
+    content very little.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day, DD MMM 2009 HH:MM:SS +0000
+
 sqlmap (0.6.4-1) stable; urgency=low
 
   * Major enhancement to make the comparison algorithm work properly also
