@@ -70,8 +70,6 @@ SUPPORTED_OS      = ( "linux", "windows" )
 SECONDS           = 5
 RETRIES           = 3
 
-MATCH_RATIO       = None
-
 SQL_STATEMENTS    = {
                       "SQL SELECT statement":  (
                              "select ",
