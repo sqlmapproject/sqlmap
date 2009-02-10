@@ -3,6 +3,14 @@
     <signatures release="2008">
         <signature>
             <version>
+                10.00.1787
+            </version>
+            <servicepack>
+                + Cumulative Update 3
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
                 10.00.1779
             </version>
             <servicepack>
