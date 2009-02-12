@@ -79,11 +79,11 @@ def comparison(page, headers=None, getSeqMatcher=False):
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
     if MATCH_RATIO == None:
-        if conf.md5hash != None and ratio != 1:
-            logger.debug("Setting match ratio to %.3f" % ratio)
+        if conf.md5hash != None and ratio < 1 and ratio > 0.6:
+            logger.debug("setting match ratio to %.3f" % ratio)
             MATCH_RATIO = ratio
-        elif conf.md5hash == None:
-            logger.debug("Setting match ratio to default value 0.900")
+        elif conf.md5hash == None or ( conf.md5hash != None and ratio < 0.6 ):
+            logger.debug("setting match ratio to default value 0.900")
             MATCH_RATIO = 0.900
 
     # If it has been requested to return the ratio and not a comparison
