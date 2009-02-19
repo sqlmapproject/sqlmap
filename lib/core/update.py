@@ -242,7 +242,7 @@ def __updateSqlmap():
 
     if not re.search("^([\w\.\-]+)$", sqlmapNewestVersion):
         errMsg = "sqlmap version is in a wrong syntax"
-        logger.errMsg(errMsg)
+        logger.error(errMsg)
 
         return
 
