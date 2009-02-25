@@ -268,7 +268,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 query = rootQuery["blind"]["count"] % db
                 count = inject.getValue(query, inband=False)
 
-                if not len(count) or count == "0":
+                if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of "
                     warnMsg += "tables for database '%s'" % db
                     logger.warn(warnMsg)
