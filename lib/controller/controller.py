@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -65,7 +65,7 @@ def __selectInjection(injData):
 
         message += "\n"
 
-    message += "[q] Quit\nChoice: "
+    message += "[q] Quit"
     select   = readInput(message, default="0")
 
     if not select:
@@ -126,7 +126,7 @@ def start():
             if conf.data:
                 message += "\nPOST data: %s" % conf.data
 
-            message += "\ndo you want to test this url? [Y/n/q] "
+            message += "\ndo you want to test this url? [Y/n/q]"
             test = readInput(message, default="Y")
 
             if not test:
@@ -186,13 +186,23 @@ def start():
                 paramDict = conf.paramDict[place]
 
                 for parameter, value in paramDict.items():
-                    if not checkDynParam(place, parameter, value):
+                    testSqlInj = True
+
+                    # Avoid dinamicity test if the user provided the
+                    # parameter manually
+                    if parameter in conf.testParameter:
+                        pass
+
+                    elif not checkDynParam(place, parameter, value):
                         warnMsg = "%s parameter '%s' is not dynamic" % (place, parameter)
                         logger.warn(warnMsg)
+                        testSqlInj = False
+
                     else:
                         logMsg = "%s parameter '%s' is dynamic" % (place, parameter)
                         logger.info(logMsg)
 
+                    if testSqlInj == True:
                         for parenthesis in range(0, 4):
                             logMsg  = "testing sql injection on %s " % place
                             logMsg += "parameter '%s' with " % parameter

@@ -11,35 +11,35 @@
         <info sp="1"/>
     </regexp>
 
-    <regexp value="Microsoft.*7\.0">
+    <regexp value="Windows.*7\.0">
         <info type="Windows" distrib="Vista"/>
     </regexp>
 
-    <regexp value="Microsoft.*6\.0">
+    <regexp value="Windows.*6\.0">
         <info type="Windows" distrib="2003"/>
     </regexp>
 
-    <regexp value="Microsoft.*5\.2">
+    <regexp value="Windows.*5\.2">
         <info type="Windows" distrib="2003"/>
     </regexp>
 
-    <regexp value="Microsoft.*5\.1">
+    <regexp value="Windows.*5\.1">
         <info type="Windows" distrib="XP"/>
     </regexp>
 
-    <regexp value="Microsoft.*5\.0">
+    <regexp value="Windows.*5\.0">
         <info type="Windows" distrib="2000"/>
     </regexp>
 
-    <regexp value="Microsoft.*4\.0">
+    <regexp value="Windows.*4\.0">
         <info type="Windows" distrib="NT 4.0"/>
     </regexp>
 
-    <regexp value="Microsoft.*3\.0">
+    <regexp value="Windows.*3\.0">
         <info type="Windows" distrib="NT 4.0"/>
     </regexp>
 
-    <regexp value="Microsoft.*2\.0">
+    <regexp value="Windows.*2\.0">
         <info type="Windows" distrib="NT 4.0"/>
     </regexp>
 

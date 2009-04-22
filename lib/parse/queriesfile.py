@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -102,6 +102,9 @@ class queriesHandler(ContentHandler):
         elif name == "timedelay":
             data = sanitizeStr(attrs.get("query"))
             self.__queries.timedelay = data
+
+            data = sanitizeStr(attrs.get("query2"))
+            self.__queries.timedelay2 = data
 
         elif name == "substring":
             data = sanitizeStr(attrs.get("query"))

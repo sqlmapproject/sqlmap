@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -27,19 +27,22 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import os
 import random
 import re
+import socket
 import string
 import sys
 import time
 import urlparse
 
 
+from lib.contrib import magic
 from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import paths
+from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.exception import sqlmapFilePathException
-from lib.core.data import paths
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
 
@@ -137,8 +140,9 @@ def formatDBMSfp(versions=None):
         return kb.dbms
 
 
-def __formatFingerprintString(values, chain=" or "):
+def formatFingerprintString(values, chain=" or "):
     string = "|".join([v for v in values])
+
     return string.replace("|", chain)
 
 
@@ -175,22 +179,22 @@ def formatFingerprint(target, info):
     infoStr = ""
 
     if info and "type" in info:
-        infoStr += "%s operating system: %s" % (target, __formatFingerprintString(info["type"]))
+        infoStr += "%s operating system: %s" % (target, formatFingerprintString(info["type"]))
 
         if "distrib" in info:
-            infoStr += " %s" % __formatFingerprintString(info["distrib"])
+            infoStr += " %s" % formatFingerprintString(info["distrib"])
 
         if "release" in info:
-            infoStr += " %s" % __formatFingerprintString(info["release"])
+            infoStr += " %s" % formatFingerprintString(info["release"])
 
         if "sp" in info:
-            infoStr += " %s" % __formatFingerprintString(info["sp"])
+            infoStr += " %s" % formatFingerprintString(info["sp"])
 
         if "codename" in info:
-            infoStr += " (%s)" % __formatFingerprintString(info["codename"])
+            infoStr += " (%s)" % formatFingerprintString(info["codename"])
 
     if "technology" in info:
-        infoStr += "\nweb application technology: %s" % __formatFingerprintString(info["technology"], ", ")
+        infoStr += "\nweb application technology: %s" % formatFingerprintString(info["technology"], ", ")
 
     return infoStr
 
@@ -307,6 +311,21 @@ def dataToDumpFile(dumpFile, data):
     dumpFile.flush()
 
 
+def dataToOutFile(data):
+    if not data:
+        return "No data retrieved"
+
+    rFile     = filePathToString(conf.rFile)
+    rFilePath = "%s%s%s" % (conf.filePath, os.sep, rFile)
+    rFileFP   = open(rFilePath, "wb")
+
+    rFileFP.write(data)
+    rFileFP.flush()
+    rFileFP.close()
+
+    return rFilePath
+
+
 def strToHex(string):
     """
     @param string: string to be converted into its hexadecimal value.
@@ -377,6 +396,9 @@ def readInput(message, default=None):
     @rtype: C{str}
     """
 
+    if "\n" in message:
+        message += "\n> "
+
     if conf.batch and default:
         infoMsg = "%s%s" % (message, str(default))
         logger.info(infoMsg)
@@ -386,7 +408,7 @@ def readInput(message, default=None):
 
         data = default
     else:
-        data = raw_input("[%s] [INPUT] %s" % (time.strftime("%X"), message))
+        data = raw_input(message)
 
     return data
 
@@ -418,7 +440,7 @@ def randomInt(length=4):
     return int("".join([random.choice(string.digits) for _ in xrange(0, length)]))
 
 
-def randomStr(length=5):
+def randomStr(length=5, lowercase=False):
     """
     @param length: length of the random string.
     @type length: C{int}
@@ -427,7 +449,12 @@ def randomStr(length=5):
     @rtype: C{str}
     """
 
-    return "".join([random.choice(string.letters) for _ in xrange(0, length)])
+    if lowercase == True:
+        rndStr = "".join([random.choice(string.lowercase) for _ in xrange(0, length)])
+    else:
+        rndStr = "".join([random.choice(string.letters) for _ in xrange(0, length)])
+
+    return rndStr
 
 
 def sanitizeStr(string):
@@ -469,8 +496,8 @@ def banner():
     """
 
     print """
-    %s coded by Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                      and Daniele Bellucci <daniele.bellucci@gmail.com>
+    %s
+    by Bernardo Damele A. G. <bernardo.damele@gmail.com>
     """ % VERSION_STRING
 
 
@@ -509,8 +536,10 @@ def cleanQuery(query):
 
 def setPaths():
     # sqlmap paths
+    paths.SQLMAP_CONTRIB_PATH    = "%s/lib/contrib" % paths.SQLMAP_ROOT_PATH
     paths.SQLMAP_SHELL_PATH      = "%s/shell" % paths.SQLMAP_ROOT_PATH
     paths.SQLMAP_TXT_PATH        = "%s/txt" % paths.SQLMAP_ROOT_PATH
+    paths.SQLMAP_UDF_PATH        = "%s/udf" % paths.SQLMAP_ROOT_PATH
     paths.SQLMAP_XML_PATH        = "%s/xml" % paths.SQLMAP_ROOT_PATH
     paths.SQLMAP_XML_BANNER_PATH = "%s/banner" % paths.SQLMAP_XML_PATH
     paths.SQLMAP_OUTPUT_PATH     = "%s/output" % paths.SQLMAP_ROOT_PATH
@@ -629,7 +658,7 @@ def getRange(count, dump=False, plusOne=False):
     return indexRange
 
 
-def parseUnionPage(output, expression, partial=False, condition=None):
+def parseUnionPage(output, expression, partial=False, condition=None, sort=True):
     data = []
 
     outCond1 = ( output.startswith(temp.start) and output.endswith(temp.stop) )
@@ -653,7 +682,8 @@ def parseUnionPage(output, expression, partial=False, condition=None):
             logOutput = "".join(["__START__%s__STOP__" % replaceNewlineTabs(value) for value in output])
             dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, logOutput))
 
-        output = set(output)
+        if sort:
+            output = set(output)
 
         for entry in output:
             info = []
@@ -677,3 +707,99 @@ def parseUnionPage(output, expression, partial=False, condition=None):
         data = data[0]
 
     return data
+
+
+def getDelayQuery():
+    query = None
+
+    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+        if not kb.data.banner:
+            conf.dbmsHandler.getVersionFromBanner()
+
+        banVer = kb.bannerFp["dbmsVersion"]
+
+        if ( kb.dbms == "MySQL" and banVer >= "5.0.12" ) or ( kb.dbms == "PostgreSQL" and banVer >= "8.2" ):
+            query = queries[kb.dbms].timedelay % conf.timeSec
+        else:
+            query = queries[kb.dbms].timedelay2 % conf.timeSec
+    else:
+        query = queries[kb.dbms].timedelay % conf.timeSec
+
+    return query
+
+
+def getLocalIP():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((conf.hostname, conf.port))
+    ip, _ = s.getsockname()
+    s.close()
+
+    return ip
+
+
+def getRemoteIP():
+    return socket.gethostbyname(conf.hostname)
+
+
+def getFileType(filePath):
+    magicFileType = magic.from_file(filePath)
+
+    if "ASCII" in magicFileType or "text" in magicFileType:
+        return "text"
+    else:
+        return "binary"
+
+
+def pollProcess(process):
+    while True:
+        dataToStdout(".")
+        time.sleep(1)
+
+        returncode = process.poll()
+
+        if returncode != None:
+            if returncode == 0:
+                dataToStdout(" done\n")
+            else:
+                dataToStdout(" quit unexpectedly by signal %d\n" % returncode)
+
+            break
+
+
+def getCharset(charsetType=None):
+    asciiTbl = []
+
+    if charsetType == None:
+        asciiTbl = range(0, 128)
+
+    # 0 or 1
+    elif charsetType == 1:
+        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend(range(47, 50))
+
+    # Digits
+    elif charsetType == 2:
+        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend(range(47, 58))
+
+    # Hexadecimal
+    elif charsetType == 3:
+        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend(range(47, 58))
+        asciiTbl.extend(range(64, 71))
+        asciiTbl.extend(range(96, 103))
+
+    # Characters
+    elif charsetType == 4:
+        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend(range(64, 91))
+        asciiTbl.extend(range(96, 123))
+
+    # Characters and digits
+    elif charsetType == 5:
+        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend(range(47, 58))
+        asciiTbl.extend(range(64, 91))
+        asciiTbl.extend(range(96, 123))
+
+    return asciiTbl

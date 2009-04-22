@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -77,7 +77,7 @@ def action():
     if conf.timeTest:
         dumper.string("time based blind sql injection payload", timeTest())
 
-    if conf.unionTest:
+    if ( conf.unionUse or conf.unionTest ) and not kb.unionPosition:
         dumper.string("valid union", unionTest())
 
     # Enumeration options
@@ -127,11 +127,27 @@ def action():
 
     # File system options
     if conf.rFile:
-        dumper.string(conf.rFile, conf.dbmsHandler.readFile(conf.rFile))
+        dumper.string("%s file saved to" % conf.rFile, conf.dbmsHandler.readFile(conf.rFile), sort=False)
 
     if conf.wFile:
-        dumper.string(conf.wFile, conf.dbmsHandler.writeFile(conf.wFile))
+        conf.dbmsHandler.writeFile(conf.wFile, conf.dFile, conf.wFileType)
 
-    # Takeover options
+    # Operating system options
+    if conf.osCmd:
+        conf.dbmsHandler.osCmd()
+
     if conf.osShell:
         conf.dbmsHandler.osShell()
+
+    if conf.osPwn:
+        conf.dbmsHandler.osPwn()
+
+    if conf.osSmb:
+        conf.dbmsHandler.osSmb()
+
+    if conf.osBof:
+        conf.dbmsHandler.osBof()
+
+    # Miscellaneous options
+    if conf.cleanup:
+        conf.dbmsHandler.cleanup()

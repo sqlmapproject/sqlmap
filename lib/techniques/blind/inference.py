@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -31,6 +31,7 @@ import traceback
 from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
+from lib.core.common import getCharset
 from lib.core.common import replaceNewlineTabs
 from lib.core.data import conf
 from lib.core.data import kb
@@ -44,25 +45,27 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
 
-def bisection(payload, expression, length=None):
+def bisection(payload, expression, length=None, charsetType=None):
     """
     Bisection algorithm that can be used to perform blind SQL injection
     on an affected host
     """
 
-    partialValue    = ""
-    finalValue      = ""
+    partialValue = ""
+    finalValue   = ""
+
+    asciiTbl = getCharset(charsetType)
 
     if kb.dbmsDetected:
-        _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
-        nulledCastedField             = agent.nullAndCastField(fieldToCastStr)
-        expressionReplaced            = expression.replace(fieldToCastStr, nulledCastedField, 1)
-        expressionUnescaped           = unescaper.unescape(expressionReplaced)
+        _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
+        nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
+        expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
+        expressionUnescaped              = unescaper.unescape(expressionReplaced)
     else:
-        expressionUnescaped           = unescaper.unescape(expression)
+        expressionUnescaped              = unescaper.unescape(expression)
 
-    infoMsg = "query: %s" % expressionUnescaped
-    logger.info(infoMsg)
+    debugMsg = "query: %s" % expressionUnescaped
+    logger.debug(debugMsg)
 
     if length and not isinstance(length, int) and length.isdigit():
         length = int(length)
@@ -91,23 +94,25 @@ def bisection(payload, expression, length=None):
     queriesCount = [0]    # As list to deal with nested scoping rules
 
 
-    def getChar(idx):
-        maxValue = 127
+    def getChar(idx, asciiTbl=asciiTbl):
+        maxValue = asciiTbl[len(asciiTbl)-1]
         minValue = 0
 
-        while (maxValue - minValue) != 1:
+        while len(asciiTbl) != 1:
             queriesCount[0] += 1
-            limit         = ((maxValue + minValue) / 2)
-            forgedPayload = payload % (expressionUnescaped, idx, limit)
+            position      = (len(asciiTbl) / 2)
+            posValue      = asciiTbl[position]
+            forgedPayload = payload % (expressionUnescaped, idx, posValue)
             result        = Request.queryPage(forgedPayload)
 
             if result == True:
-                minValue = limit
+                minValue = posValue
+                asciiTbl = asciiTbl[position:]
             else:
-                maxValue = limit
+                maxValue = posValue
+                asciiTbl = asciiTbl[:position]
 
-            if (maxValue - minValue) == 1:
-                # NOTE: this first condition should never occur
+            if len(asciiTbl) == 1:
                 if maxValue == 1:
                     return None
                 else:
@@ -148,7 +153,7 @@ def bisection(payload, expression, length=None):
                 idxlock.release()
 
                 charStart = time.time()
-                val = getChar(curidx)
+                val       = getChar(curidx)
 
                 if val == None:
                     raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
@@ -226,9 +231,9 @@ def bisection(payload, expression, length=None):
         index = 0
 
         while True:
-            index += 1
+            index    += 1
             charStart = time.time()
-            val = getChar(index)
+            val       = getChar(index, asciiTbl)
 
             if val == None:
                 break

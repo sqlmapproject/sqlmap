@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -27,12 +27,14 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 
 from lib.core.common import dataToSessionFile
+from lib.core.common import formatFingerprintString
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
+
 
 def setString():
     """
@@ -60,6 +62,17 @@ def setRegexp():
 
     if condition:
         dataToSessionFile("[%s][None][None][Regular expression][%s]\n" % (conf.url, conf.regexp))
+
+
+def setMatchRatio():
+    condition = (
+                  not kb.resumedQueries
+                  or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Match ratio") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][None][None][Match ratio][%s]\n" % (conf.url, conf.matchRatio))
 
 
 def setInjection():
@@ -132,6 +145,67 @@ def setDbms(dbms):
     logger.info("the back-end DBMS is %s" % kb.dbms)
 
 
+def setOs():
+    """
+    Example of kb.bannerFp dictionary:
+
+    {
+      'sp': set(['Service Pack 4']),
+      'dbmsVersion': '8.00.194',
+      'dbmsServicePack': '0',
+      'distrib': set(['2000']),
+      'dbmsRelease': '2000',
+      'type': set(['Windows'])
+    }
+    """
+
+    infoMsg   = ""
+    condition = (
+                  not kb.resumedQueries
+                  or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("OS") )
+                )
+
+    if not kb.bannerFp:
+        return
+
+    if "type" in kb.bannerFp:
+        kb.os   = formatFingerprintString(kb.bannerFp["type"])
+        infoMsg = "the back-end DBMS operating system is %s" % kb.os
+
+    if "distrib" in kb.bannerFp:
+        kb.osVersion = formatFingerprintString(kb.bannerFp["distrib"])
+        infoMsg     += " %s" % kb.osVersion
+
+    if "sp" in kb.bannerFp:
+        kb.osSP = int(formatFingerprintString(kb.bannerFp["sp"]).replace("Service Pack ", ""))
+
+    elif "sp" not in kb.bannerFp and kb.os == "Windows":
+        kb.osSP = 0
+
+    if kb.os and kb.osVersion:
+        infoMsg += " Service Pack %d" % kb.osSP
+
+    if infoMsg:
+        logger.info(infoMsg)
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.os))
+
+
+def setStacked():
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Stacked queries") )
+                )
+
+    if not isinstance(kb.stackedTest, str):
+        return
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.stackedTest))
+
+
 def setUnion(comment=None, count=None, position=None):
     """
     @param comment: union comment to save in session file
@@ -170,6 +244,27 @@ def setUnion(comment=None, count=None, position=None):
             dataToSessionFile("[%s][%s][%s][Union position][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], position))
 
         kb.unionPosition = position
+
+
+def setRemoteTempPath():
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Remote temp path") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], conf.tmpPath))
+
+
+def setDEP():
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("DEP") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][DEP][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.dep))
+
 
 
 def resumeConfKb(expression, url, value):
@@ -215,6 +310,14 @@ def resumeConfKb(expression, url, value):
 
             if not test or test[0] in ("y", "Y"):
                 conf.regexp = regexp
+
+    elif expression == "Match ratio" and url == conf.url:
+        matchRatio = value[:-1]
+
+        logMsg  = "resuming match ratio '%s' from session file" % matchRatio
+        logger.info(logMsg)
+
+        conf.matchRatio = round(float(matchRatio), 3)
 
     elif expression == "Injection point" and url == conf.url:
         injPlace = value[:-1]
@@ -278,7 +381,7 @@ def resumeConfKb(expression, url, value):
 
         if dbmsRegExp:
             dbms = dbmsRegExp.group(1)
-            kb.dbmsVersion = [dbmsRegExp.group(2)]
+            kb.dbmsVersion = [ dbmsRegExp.group(2) ]
 
         if conf.dbms and conf.dbms.lower() != dbms:
             message  = "you provided '%s' as back-end DBMS, " % conf.dbms
@@ -292,6 +395,34 @@ def resumeConfKb(expression, url, value):
                 conf.dbms = dbms
         else:
             conf.dbms = dbms
+
+    elif expression == "OS" and url == conf.url:
+        os = value[:-1]
+
+        logMsg  = "resuming back-end DBMS operating system '%s' " % os
+        logMsg += "from session file"
+        logger.info(logMsg)
+
+        if conf.os and conf.os.lower() != os.lower():
+            message  = "you provided '%s' as back-end DBMS operating " % conf.os
+            message += "system, but from a past scan information on the "
+            message += "target URL sqlmap assumes the back-end DBMS "
+            message += "operating system is %s. " % os
+            message += "Do you really want to force the back-end DBMS "
+            message += "OS value? [y/N] "
+            test = readInput(message, default="N")
+
+            if not test or test[0] in ("n", "N"):
+                conf.os = os
+        else:
+            conf.os = os
+
+    elif expression == "Stacked queries" and url == conf.url:
+        kb.stackedTest = value[:-1]
+
+        logMsg  = "resuming stacked queries syntax "
+        logMsg += "'%s' from session file" % kb.stackedTest
+        logger.info(logMsg)
 
     elif expression == "Union comment" and url == conf.url:
         kb.unionComment = value[:-1]
@@ -312,4 +443,18 @@ def resumeConfKb(expression, url, value):
 
         logMsg  = "resuming union position "
         logMsg += "%s from session file" % kb.unionPosition
+        logger.info(logMsg)
+
+    elif expression == "Remote temp path" and url == conf.url:
+        conf.tmpPath = value[:-1]
+
+        logMsg  = "resuming remote absolute path of temporary "
+        logMsg += "files directory '%s' from session file" % conf.tmpPath
+        logger.info(logMsg)
+
+    elif expression == "DEP" and url == conf.url:
+        kb.dep = value[:-1]
+
+        logMsg  = "resuming DEP system policy value '%s' " % kb.dep
+        logMsg += "from session file"
         logger.info(logMsg)

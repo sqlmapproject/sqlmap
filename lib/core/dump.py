@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -28,7 +28,6 @@ import re
 import os
 
 from lib.core.common import dataToDumpFile
-from lib.core.common import filePathToString
 from lib.core.data import conf
 from lib.core.data import logger
 
@@ -45,18 +44,10 @@ class Dump:
         self.__outputFP   = None
 
 
-    def __write(self, data, n=True, rFile=False):
+    def __write(self, data, n=True):
         if n:
             print data
             self.__outputFP.write("%s\n" % data)
-
-            # TODO: do not duplicate queries output in the text file, check
-            # before if the data is already within the text file content
-            if rFile and conf.rFile:
-                rFile = filePathToString(conf.rFile)
-                rFileFP = open("%s%s%s" % (conf.filePath, os.sep, rFile), "w")
-                rFileFP.write(data)
-                rFileFP.close()
         else:
             print data,
             self.__outputFP.write("%s " % data)
@@ -71,11 +62,13 @@ class Dump:
         self.__outputFP = open(self.__outputFile, "a")
 
 
-    def string(self, header, data):
+    def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
-            self.lister(header, data)
+            self.lister(header, data, sort)
 
             return
+
+        data = str(data)
 
         if data:
             data = data.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
@@ -83,23 +76,24 @@ class Dump:
             data = data.replace("__DEL__", ", ")
 
             if "\n" in data:
-                self.__write("%s:\n---\n%s---\n" % (header, data), rFile=header)
+                self.__write("%s:\n---\n%s---\n" % (header, data))
             else:
                 self.__write("%s:    '%s'\n" % (header, data))
         else:
             self.__write("%s:\tNone\n" % header)
 
 
-    def lister(self, header, elements):
+    def lister(self, header, elements, sort=True):
         if elements:
             self.__write("%s [%d]:" % (header, len(elements)))
 
-        try:
-            elements = set(elements)
-            elements = list(elements)
-            elements.sort(key=lambda x: x.lower())
-        except:
-            pass
+        if sort == True:
+            try:
+                elements = set(elements)
+                elements = list(elements)
+                elements.sort(key=lambda x: x.lower())
+            except:
+                pass
 
         for element in elements:
             if isinstance(element, str):

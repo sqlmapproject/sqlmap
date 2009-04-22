@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -57,7 +57,9 @@ def setHandler():
         if conf.dbms and conf.dbms not in dbmsAliases:
             debugMsg  = "skipping test for %s" % dbmsNames[count]
             logger.debug(debugMsg)
+
             count += 1
+
             continue
 
         dbmsHandler = dbmsEntry()

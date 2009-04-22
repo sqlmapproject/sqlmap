@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -26,24 +26,28 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import time
 
+from lib.core.common import getDelayQuery
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.settings import SECONDS
+from lib.core.session import setStacked
 from lib.request import inject
 
 
 def stackedTest():
+    if kb.stackedTest != None:
+        return kb.stackedTest
+
     infoMsg  = "testing stacked queries support on parameter "
     infoMsg += "'%s'" % kb.injParameter
     logger.info(infoMsg)
 
-    query         = queries[kb.dbms].timedelay % SECONDS
-    start         = time.time()
-    payload, _    = inject.goStacked(query)
-    duration      = int(time.time() - start)
+    query      = getDelayQuery()
+    start      = time.time()
+    payload, _ = inject.goStacked(query)
+    duration   = int(time.time() - start)
 
-    if duration >= SECONDS:
+    if duration >= conf.timeSec:
         infoMsg  = "the web application supports stacked queries "
         infoMsg += "on parameter '%s'" % kb.injParameter
         logger.info(infoMsg)
@@ -56,5 +60,7 @@ def stackedTest():
         logger.warn(warnMsg)
 
         kb.stackedTest = False
+
+    setStacked()
 
     return kb.stackedTest

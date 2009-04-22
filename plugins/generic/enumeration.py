@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -29,6 +29,7 @@ import re
 from lib.core.agent import agent
 from lib.core.common import getRange
 from lib.core.common import parsePasswordHash
+from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -39,12 +40,14 @@ from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.session import setOs
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
 
 
@@ -55,43 +58,79 @@ class Enumeration:
     """
 
     def __init__(self, dbms):
-        self.has_information_schema = False
+        kb.data.has_information_schema = False
+        kb.data.banner                 = ""
+        kb.data.currentUser            = ""
+        kb.data.currentDb              = ""
+        kb.data.cachedUsers            = []
+        kb.data.cachedUsersPasswords   = {}
+        kb.data.cachedUsersPrivileges  = {}
+        kb.data.cachedDbs              = []
+        kb.data.cachedTables           = {}
+        kb.data.cachedColumns          = {}
+        kb.data.dumpedTable            = {}
 
-        self.banner                 = ""
-        self.currentUser            = ""
-        self.currentDb              = ""
-        self.cachedUsers            = []
-        self.cachedUsersPassword    = {}
-        self.cachedUsersPrivileges  = {}
-        self.cachedDbs              = []
-        self.cachedTables           = {}
-        self.cachedColumns          = {}
-        self.dumpedTable            = {}
-
-        temp.inference              = queries[dbms].inference
+        temp.inference                 = queries[dbms].inference
 
 
     def forceDbmsEnum(self):
         pass
 
 
-    def getPrematureBanner(self, query):
-        if conf.getBanner:
-            self.banner = inject.getValue(query)
+    def getVersionFromBanner(self):
+        if "dbmsVersion" in kb.bannerFp:
+            return
 
-        bannerParser(self.banner)
+        infoMsg = "detecting back-end DBMS version from its banner"
+        logger.info(infoMsg)
+
+        if kb.dbms == "MySQL":
+            first, last = 1, 6
+
+        elif kb.dbms == "PostgreSQL":
+            first, last = 12, 6
+
+        elif kb.dbms == "Microsoft SQL Server":
+            first, last = 29, 9
+
+        else:
+            raise sqlmapUnsupportedFeatureException, "unsupported DBMS"
+
+        query = queries[kb.dbms].substring % (queries[kb.dbms].banner, first, last)
+
+        kb.bannerFp["dbmsVersion"] = inject.getValue(query, unpack=False)
+        kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
 
 
     def getBanner(self):
+        if not conf.getBanner:
+            return
+
+        kb.dbmsDetected = True
+
         infoMsg = "fetching banner"
         logger.info(infoMsg)
 
-        query = queries[kb.dbms].banner
+        if not kb.data.banner:
+            if conf.unionUse or conf.unionTest:
+                dumper.string("valid union", unionTest())
 
-        if not self.banner:
-            self.banner = inject.getValue(query)
+            query          = queries[kb.dbms].banner
+            kb.data.banner = inject.getValue(query)
+            bannerParser(kb.data.banner)
 
-        return self.banner
+        if conf.os and conf.os == "windows":
+            kb.bannerFp["type"] = set([ "Windows" ])
+
+        elif conf.os and conf.os == "linux":
+            kb.bannerFp["type"] = set([ "Linux" ])
+
+        elif conf.os:
+            kb.bannerFp["type"] = set([ "%s%s" % (conf.os[0].upper(), conf.os[1:]) ])
+
+        setOs()
+
+        return kb.data.banner
 
 
     def getCurrentUser(self):
@@ -100,10 +139,10 @@ class Enumeration:
 
         query = queries[kb.dbms].currentUser
 
-        if not self.currentUser:
-            self.currentUser = inject.getValue(query)
+        if not kb.data.currentUser:
+            kb.data.currentUser = inject.getValue(query)
 
-        return self.currentUser
+        return kb.data.currentUser
 
 
     def getCurrentDb(self):
@@ -112,10 +151,10 @@ class Enumeration:
 
         query = queries[kb.dbms].currentDb
 
-        if not self.currentDb:
-            self.currentDb = inject.getValue(query)
+        if not kb.data.currentDb:
+            kb.data.currentDb = inject.getValue(query)
 
-        return self.currentDb
+        return kb.data.currentDb
 
 
     def isDba(self):
@@ -124,9 +163,9 @@ class Enumeration:
 
         query = agent.forgeCaseStatement(queries[kb.dbms].isDba)
 
-        self.isDba = inject.getValue(query)
+        kb.data.isDba = inject.getValue(query, unpack=False, charsetType=1)
 
-        return str(self.isDba == "1")
+        return kb.data.isDba == "1"
 
 
     def getUsers(self):
@@ -136,9 +175,9 @@ class Enumeration:
         rootQuery = queries[kb.dbms].users
 
         condition  = ( kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ) )
-        condition |= ( kb.dbms == "MySQL" and not self.has_information_schema )
+        condition |= ( kb.dbms == "MySQL" and not kb.data.has_information_schema )
 
-        if conf.unionUse:
+        if kb.unionPosition:
             if condition:
                 query = rootQuery["inband"]["query2"]
             else:
@@ -146,9 +185,9 @@ class Enumeration:
             value = inject.getValue(query, blind=False)
 
             if value:
-                self.cachedUsers = value
+                kb.data.cachedUsers = value
 
-        if not self.cachedUsers:
+        if not kb.data.cachedUsers:
             infoMsg = "fetching number of database users"
             logger.info(infoMsg)
 
@@ -156,7 +195,7 @@ class Enumeration:
                 query = rootQuery["blind"]["count2"]
             else:
                 query = rootQuery["blind"]["count"]
-            count = inject.getValue(query, inband=False, expected="int")
+            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
                 errMsg = "unable to retrieve the number of database users"
@@ -172,13 +211,13 @@ class Enumeration:
                 user = inject.getValue(query, inband=False)
 
                 if user:
-                    self.cachedUsers.append(user)
+                    kb.data.cachedUsers.append(user)
 
-        if not self.cachedUsers:
+        if not kb.data.cachedUsers:
             errMsg = "unable to retrieve the database users"
             raise sqlmapNoneDataException, errMsg
 
-        return self.cachedUsers
+        return kb.data.cachedUsers
 
 
     def getPasswordHashes(self):
@@ -192,7 +231,7 @@ class Enumeration:
 
         logger.info(infoMsg)
 
-        if conf.unionUse:
+        if kb.unionPosition:
             if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
                 query = rootQuery["inband"]["query2"]
             else:
@@ -223,22 +262,22 @@ class Enumeration:
 
                     password = parsePasswordHash(password)
 
-                    if not self.cachedUsersPassword.has_key(user):
-                        self.cachedUsersPassword[user] = [password]
+                    if not kb.data.cachedUsersPasswords.has_key(user):
+                        kb.data.cachedUsersPasswords[user] = [password]
                     else:
-                        self.cachedUsersPassword[user].append(password)
+                        kb.data.cachedUsersPasswords[user].append(password)
 
-        if not self.cachedUsersPassword:
+        if not kb.data.cachedUsersPasswords:
             if conf.user:
                 if "," in conf.user:
                     users = conf.user.split(",")
                 else:
                     users = [conf.user]
             else:
-                if not len(self.cachedUsers):
+                if not len(kb.data.cachedUsers):
                     users = self.getUsers()
                 else:
-                    users = self.cachedUsers
+                    users = kb.data.cachedUsers
 
             retrievedUsers = set()
 
@@ -260,7 +299,7 @@ class Enumeration:
                     query = rootQuery["blind"]["count2"] % user
                 else:
                     query = rootQuery["blind"]["count"] % user
-                count = inject.getValue(query, inband=False, expected="int")
+                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of password "
@@ -287,7 +326,7 @@ class Enumeration:
                     passwords.append(password)
 
                 if passwords:
-                    self.cachedUsersPassword[user] = passwords
+                    kb.data.cachedUsersPasswords[user] = passwords
                 else:
                     warnMsg  = "unable to retrieve the password "
                     warnMsg += "hashes for user '%s'" % user
@@ -295,12 +334,12 @@ class Enumeration:
 
                 retrievedUsers.add(user)
 
-        if not self.cachedUsersPassword:
+        if not kb.data.cachedUsersPasswords:
             errMsg  = "unable to retrieve the password "
             errMsg += "hashes for the database users"
             raise sqlmapNoneDataException, errMsg
 
-        return self.cachedUsersPassword
+        return kb.data.cachedUsersPasswords
 
 
     def __isAdminFromPrivileges(self, privileges):
@@ -314,11 +353,11 @@ class Enumeration:
 
         # In MySQL >= 5.0 the SUPER privilege means
         # that the user is DBA
-        dbaCondition |= ( kb.dbms == "MySQL" and self.has_information_schema and "SUPER" in privileges )
+        dbaCondition |= ( kb.dbms == "MySQL" and kb.data.has_information_schema and "SUPER" in privileges )
 
         # In MySQL < 5.0 the super_priv privilege means
         # that the user is DBA
-        dbaCondition |= ( kb.dbms == "MySQL" and not self.has_information_schema and "super_priv" in privileges )
+        dbaCondition |= ( kb.dbms == "MySQL" and not kb.data.has_information_schema and "super_priv" in privileges )
 
         return dbaCondition
 
@@ -372,8 +411,8 @@ class Enumeration:
                         ( 3, "catupd" ),
                      )
 
-        if conf.unionUse:
-            if kb.dbms == "MySQL" and not self.has_information_schema:
+        if kb.unionPosition:
+            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 query     = rootQuery["inband"]["query2"]
                 condition = rootQuery["inband"]["condition2"]
             else:
@@ -386,7 +425,7 @@ class Enumeration:
                     query += " WHERE "
                     # NOTE: I assume that the user provided is not in
                     # MySQL >= 5.0 syntax 'user'@'host'
-                    if kb.dbms == "MySQL" and self.has_information_schema:
+                    if kb.dbms == "MySQL" and kb.data.has_information_schema:
                         queryUser = "%" + conf.user + "%"
                         query += " OR ".join("%s LIKE '%s'" % (condition, "%" + user + "%") for user in users)
                     else:
@@ -400,7 +439,7 @@ class Enumeration:
 
                     # NOTE: I assume that the user provided is not in
                     # MySQL >= 5.0 syntax 'user'@'host'
-                    if kb.dbms == "MySQL" and self.has_information_schema:
+                    if kb.dbms == "MySQL" and kb.data.has_information_schema:
                         queryUser = "%" + conf.user + "%"
                         query += " WHERE %s LIKE '%s'" % (condition, queryUser)
                     else:
@@ -431,12 +470,12 @@ class Enumeration:
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
-                            elif kb.dbms == "Oracle" or ( kb.dbms == "MySQL" and self.has_information_schema ):
+                            elif kb.dbms == "Oracle" or ( kb.dbms == "MySQL" and kb.data.has_information_schema ):
                                 privileges.add(privilege)
 
                             # In MySQL < 5.0 we get Y if the privilege is 
                             # True, N otherwise
-                            elif kb.dbms == "MySQL" and not self.has_information_schema:
+                            elif kb.dbms == "MySQL" and not kb.data.has_information_schema:
                                 for position, mysqlPriv in mysqlPrivs:
                                     if count == position and privilege.upper() == "Y":
                                         privileges.add(mysqlPriv)
@@ -444,16 +483,16 @@ class Enumeration:
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
 
-                    if self.cachedUsersPrivileges.has_key(user):
-                        self.cachedUsersPrivileges[user].extend(privileges)
+                    if kb.data.cachedUsersPrivileges.has_key(user):
+                        kb.data.cachedUsersPrivileges[user].extend(privileges)
                     else:
-                        self.cachedUsersPrivileges[user] = list(privileges)
+                        kb.data.cachedUsersPrivileges[user] = list(privileges)
 
-        if not self.cachedUsersPrivileges:
+        if not kb.data.cachedUsersPrivileges:
             conditionChar = "="
 
             if conf.user:
-                if kb.dbms == "MySQL" and self.has_information_schema:
+                if kb.dbms == "MySQL" and kb.data.has_information_schema:
                     conditionChar = " LIKE "
 
                     if "," in conf.user:
@@ -475,17 +514,17 @@ class Enumeration:
                     users = [ conf.user ]
 
             else:
-                if not len(self.cachedUsers):
+                if not len(kb.data.cachedUsers):
                     users = self.getUsers()
                 else:
-                    users = self.cachedUsers
+                    users = kb.data.cachedUsers
 
             retrievedUsers = set()
 
             for user in users:
                 unescapedUser = None
 
-                if kb.dbms == "MySQL" and self.has_information_schema:
+                if kb.dbms == "MySQL" and kb.data.has_information_schema:
                     unescapedUser = unescaper.unescape(user, quote=False)
 
                 if user in retrievedUsers:
@@ -500,13 +539,13 @@ class Enumeration:
                 else:
                     queryUser = user
 
-                if kb.dbms == "MySQL" and not self.has_information_schema:
+                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                     query = rootQuery["blind"]["count2"] % queryUser
-                elif kb.dbms == "MySQL" and self.has_information_schema:
+                elif kb.dbms == "MySQL" and kb.data.has_information_schema:
                     query = rootQuery["blind"]["count"] % (conditionChar, queryUser)
                 else:
                     query = rootQuery["blind"]["count"] % queryUser
-                count = inject.getValue(query, inband=False, expected="int")
+                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of "
@@ -521,9 +560,9 @@ class Enumeration:
                 indexRange = getRange(count)
 
                 for index in indexRange:
-                    if kb.dbms == "MySQL" and not self.has_information_schema:
+                    if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                         query = rootQuery["blind"]["query2"] % (queryUser, index)
-                    elif kb.dbms == "MySQL" and self.has_information_schema:
+                    elif kb.dbms == "MySQL" and kb.data.has_information_schema:
                         query = rootQuery["blind"]["query"] % (conditionChar, queryUser, index)
                     else:
                         query = rootQuery["blind"]["query"] % (queryUser, index)
@@ -546,12 +585,12 @@ class Enumeration:
 
                     # In MySQL >= 5.0 and Oracle we get the list
                     # of privileges as string
-                    elif kb.dbms == "Oracle" or ( kb.dbms == "MySQL" and self.has_information_schema ):
+                    elif kb.dbms == "Oracle" or ( kb.dbms == "MySQL" and kb.data.has_information_schema ):
                         privileges.add(privilege)
 
                     # In MySQL < 5.0 we get Y if the privilege is 
                     # True, N otherwise
-                    elif kb.dbms == "MySQL" and not self.has_information_schema:
+                    elif kb.dbms == "MySQL" and not kb.data.has_information_schema:
                         privilege = privilege.replace(", ", ",")
                         privs = privilege.split(",")
                         i = 1
@@ -570,11 +609,11 @@ class Enumeration:
                     # In MySQL < 5.0 we break the cycle after the first
                     # time we get the user's privileges otherwise we
                     # duplicate the same query
-                    if kb.dbms == "MySQL" and not self.has_information_schema:
+                    if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                         break
 
                 if privileges:
-                    self.cachedUsersPrivileges[user] = list(privileges)
+                    kb.data.cachedUsersPrivileges[user] = list(privileges)
                 else:
                     warnMsg  = "unable to retrieve the privileges "
                     warnMsg += "for user '%s'" % user
@@ -582,16 +621,16 @@ class Enumeration:
 
                 retrievedUsers.add(user)
 
-        if not self.cachedUsersPrivileges:
+        if not kb.data.cachedUsersPrivileges:
             errMsg  = "unable to retrieve the privileges "
             errMsg += "for the database users"
             raise sqlmapNoneDataException, errMsg
 
-        return ( self.cachedUsersPrivileges, areAdmins )
+        return ( kb.data.cachedUsersPrivileges, areAdmins )
 
 
     def getDbs(self):
-        if kb.dbms == "MySQL" and not self.has_information_schema:
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             warnMsg  = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
             warnMsg += "names will be fetched from 'mysql' database"
@@ -602,25 +641,25 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].dbs
 
-        if conf.unionUse:
-            if kb.dbms == "MySQL" and not self.has_information_schema:
+        if kb.unionPosition:
+            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 query = rootQuery["inband"]["query2"]
             else:
                 query = rootQuery["inband"]["query"]
             value = inject.getValue(query, blind=False)
 
             if value:
-                self.cachedDbs = value
+                kb.data.cachedDbs = value
 
-        if not self.cachedDbs:
+        if not kb.data.cachedDbs:
             infoMsg = "fetching number of databases"
             logger.info(infoMsg)
 
-            if kb.dbms == "MySQL" and not self.has_information_schema:
+            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 query = rootQuery["blind"]["count2"]
             else:
                 query = rootQuery["blind"]["count"]
-            count = inject.getValue(query, inband=False, expected="int")
+            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
                 errMsg = "unable to retrieve the number of databases"
@@ -629,24 +668,24 @@ class Enumeration:
             indexRange = getRange(count)
 
             for index in indexRange:
-                if kb.dbms == "MySQL" and not self.has_information_schema:
+                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                     query = rootQuery["blind"]["query2"] % index
                 else:
                     query = rootQuery["blind"]["query"] % index
                 db = inject.getValue(query, inband=False)
 
                 if db:
-                    self.cachedDbs.append(db)
+                    kb.data.cachedDbs.append(db)
 
-        if not self.cachedDbs:
+        if not kb.data.cachedDbs:
             errMsg = "unable to retrieve the database names"
             raise sqlmapNoneDataException, errMsg
 
-        return self.cachedDbs
+        return kb.data.cachedDbs
 
 
     def getTables(self):
-        if kb.dbms == "MySQL" and not self.has_information_schema:
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
@@ -660,7 +699,7 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].tables
 
-        if conf.unionUse:
+        if kb.unionPosition:
             query = rootQuery["inband"]["query"]
             condition = rootQuery["inband"]["condition"]
 
@@ -681,22 +720,22 @@ class Enumeration:
 
             if value:
                 for db, table in value:
-                    if not self.cachedTables.has_key(db):
-                        self.cachedTables[db] = [table]
+                    if not kb.data.cachedTables.has_key(db):
+                        kb.data.cachedTables[db] = [table]
                     else:
-                        self.cachedTables[db].append(table)
+                        kb.data.cachedTables[db].append(table)
 
-        if not self.cachedTables:
+        if not kb.data.cachedTables:
             if conf.db:
                 if "," in conf.db:
                     dbs = conf.db.split(",")
                 else:
                     dbs = [conf.db]
             else:
-                if not len(self.cachedDbs):
+                if not len(kb.data.cachedDbs):
                     dbs = self.getDbs()
                 else:
-                    dbs = self.cachedDbs
+                    dbs = kb.data.cachedDbs
 
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
@@ -710,7 +749,7 @@ class Enumeration:
                 logger.info(infoMsg)
 
                 query = rootQuery["blind"]["count"] % db
-                count = inject.getValue(query, inband=False, expected="int")
+                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
                     warnMsg  = "unable to retrieve the number of "
@@ -727,21 +766,21 @@ class Enumeration:
                     tables.append(table)
 
                 if tables:
-                    self.cachedTables[db] = tables
+                    kb.data.cachedTables[db] = tables
                 else:
                     warnMsg  = "unable to retrieve the tables "
                     warnMsg += "for database '%s'" % db
                     logger.warn(warnMsg)
 
-        if not self.cachedTables:
+        if not kb.data.cachedTables:
             errMsg = "unable to retrieve the tables for any database"
             raise sqlmapNoneDataException, errMsg
 
-        return self.cachedTables
+        return kb.data.cachedTables
 
 
     def getColumns(self, onlyColNames=False):
-        if kb.dbms == "MySQL" and not self.has_information_schema:
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
@@ -770,7 +809,7 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].columns
 
-        if conf.unionUse:
+        if kb.unionPosition:
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
                 query = rootQuery["inband"]["query"] % (conf.tbl, conf.db)
             elif kb.dbms == "Oracle":
@@ -789,9 +828,9 @@ class Enumeration:
                 for column, colType in value:
                     columns[column] = colType
                 table[conf.tbl] = columns
-                self.cachedColumns[conf.db] = table
+                kb.data.cachedColumns[conf.db] = table
 
-        if not self.cachedColumns:
+        if not kb.data.cachedColumns:
             infoMsg  = "fetching number of columns "
             infoMsg += "for table '%s'" % conf.tbl
             infoMsg += " on database '%s'" % conf.db
@@ -804,7 +843,7 @@ class Enumeration:
             elif kb.dbms == "Microsoft SQL Server":
                 query = rootQuery["blind"]["count"] % (conf.db, conf.db, conf.tbl)
 
-            count = inject.getValue(query, inband=False, expected="int")
+            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
                 errMsg  = "unable to retrieve the number of columns "
@@ -849,15 +888,15 @@ class Enumeration:
 
             if columns:
                 table[conf.tbl] = columns
-                self.cachedColumns[conf.db] = table
+                kb.data.cachedColumns[conf.db] = table
 
-        if not self.cachedColumns:
+        if not kb.data.cachedColumns:
             errMsg  = "unable to retrieve the columns "
             errMsg += "for table '%s' " % conf.tbl
             errMsg += "on database '%s'" % conf.db
             raise sqlmapNoneDataException, errMsg
 
-        return self.cachedColumns
+        return kb.data.cachedColumns
 
 
     def dumpTable(self):
@@ -882,19 +921,19 @@ class Enumeration:
 
         if conf.col:
             colList = conf.col.split(",")
-            self.cachedColumns[conf.db] = {}
-            self.cachedColumns[conf.db][conf.tbl] = {}
+            kb.data.cachedColumns[conf.db] = {}
+            kb.data.cachedColumns[conf.db][conf.tbl] = {}
             for column in colList:
-                self.cachedColumns[conf.db][conf.tbl][column] = None
-        elif not self.cachedColumns:
-            if kb.dbms == "MySQL" and not self.has_information_schema:
+                kb.data.cachedColumns[conf.db][conf.tbl][column] = None
+        elif not kb.data.cachedColumns:
+            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 errMsg  = "information_schema not available, "
                 errMsg += "back-end DBMS is MySQL < 5.0"
                 raise sqlmapUnsupportedFeatureException, errMsg
 
-            self.cachedColumns = self.getColumns(onlyColNames=True)
+            kb.data.cachedColumns = self.getColumns(onlyColNames=True)
 
-        colList = self.cachedColumns[conf.db][conf.tbl].keys()
+        colList = kb.data.cachedColumns[conf.db][conf.tbl].keys()
         colList.sort(key=lambda x: x.lower())
         colString = ", ".join(column for column in colList)
 
@@ -905,7 +944,7 @@ class Enumeration:
         infoMsg += " on database '%s'" % conf.db
         logger.info(infoMsg)
 
-        if conf.unionUse:
+        if kb.unionPosition:
             if kb.dbms == "Oracle":
                 query = rootQuery["inband"]["query"] % (colString, conf.tbl.upper())
             else:
@@ -919,8 +958,8 @@ class Enumeration:
                 for column in colList:
                     colLen = len(column)
 
-                    if not self.dumpedTable.has_key(column):
-                        self.dumpedTable[column] = { "length": 0, "values": [] }
+                    if not kb.data.dumpedTable.has_key(column):
+                        kb.data.dumpedTable[column] = { "length": 0, "values": [] }
 
                     for entry in entries:
                         if isinstance(entry, str):
@@ -931,14 +970,14 @@ class Enumeration:
                         colEntryLen = len(colEntry)
                         maxLen = max(colLen, colEntryLen)
 
-                        if maxLen > self.dumpedTable[column]["length"]:
-                            self.dumpedTable[column]["length"] = maxLen
+                        if maxLen > kb.data.dumpedTable[column]["length"]:
+                            kb.data.dumpedTable[column]["length"] = maxLen
 
-                        self.dumpedTable[column]["values"].append(colEntry)
+                        kb.data.dumpedTable[column]["values"].append(colEntry)
 
                     index += 1
 
-        if not self.dumpedTable:
+        if not kb.data.dumpedTable:
             infoMsg = "fetching number of "
             if conf.col:
                 infoMsg += "columns '%s' " % colString
@@ -950,7 +989,7 @@ class Enumeration:
                 query = rootQuery["blind"]["count"] % conf.tbl.upper()
             else:
                 query = rootQuery["blind"]["count"] % (conf.db, conf.tbl)
-            count = inject.getValue(query, inband=False, expected="int")
+            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
                 errMsg = "unable to retrieve the number of "
@@ -961,7 +1000,7 @@ class Enumeration:
 
                 if conf.dumpAll:
                     logger.warn(errMsg)
-                    return self.dumpedTable
+                    return kb.data.dumpedTable
                 else:
                     raise sqlmapNoneDataException, errMsg
 
@@ -1001,15 +1040,15 @@ class Enumeration:
                 else:
                     length = lengths[column]
 
-                self.dumpedTable[column] = {
+                kb.data.dumpedTable[column] = {
                                              "length": length,
                                              "values": columnEntries,
                                            }
 
                 entriesCount = len(columnEntries)
 
-        if self.dumpedTable:
-            self.dumpedTable["__infos__"] = {
+        if kb.data.dumpedTable:
+            kb.data.dumpedTable["__infos__"] = {
                                               "count": entriesCount,
                                               "table": conf.tbl,
                                               "db":    conf.db
@@ -1023,32 +1062,32 @@ class Enumeration:
 
             if conf.dumpAll:
                 logger.warn(errMsg)
-                return self.dumpedTable
+                return kb.data.dumpedTable
             else:
                 raise sqlmapNoneDataException, errMsg
 
-        return self.dumpedTable
+        return kb.data.dumpedTable
 
 
     def dumpAll(self):
-        if kb.dbms == "MySQL" and not self.has_information_schema:
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-        conf.db           = None
-        conf.tbl          = None
-        conf.col          = None
-        self.cachedDbs    = []
-        self.cachedTables = self.getTables()
+        conf.db              = None
+        conf.tbl             = None
+        conf.col             = None
+        kb.data.cachedDbs    = []
+        kb.data.cachedTables = self.getTables()
 
-        for db, tables in self.cachedTables.items():
+        for db, tables in kb.data.cachedTables.items():
             conf.db = db
 
             for table in tables:
                 conf.tbl = table
-                self.cachedColumns = {}
-                self.dumpedTable = {}
+                kb.data.cachedColumns = {}
+                kb.data.dumpedTable = {}
 
                 data = self.dumpTable()
 
@@ -1071,20 +1110,22 @@ class Enumeration:
 
                     break
 
-        if selectQuery == True:
+        message   = "do you want to retrieve the SQL statement output? "
+        message  += "[Y/n] "
+        getOutput = readInput(message, default="Y")
+
+        if not getOutput or getOutput in ("y", "Y"):
             infoMsg = "fetching %s query output: '%s'" % (sqlType, query)
             logger.info(infoMsg)
 
             output = inject.getValue(query, fromUser=True)
+
+            return output
         else:
             if kb.stackedTest == None:
                 stackedTest()
 
             if kb.stackedTest == False:
-                warnMsg  = "the web application does not support "
-                warnMsg += "stacked queries"
-                logger.warn(warnMsg)
-
                 return None
             else:
                 if sqlType:
@@ -1114,7 +1155,7 @@ class Enumeration:
             query = None
 
             try:
-                query = raw_input("sql> ")
+                query = raw_input("sql-shell> ")
             except KeyboardInterrupt:
                 print
                 errMsg = "user aborted"

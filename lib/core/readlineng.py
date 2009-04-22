@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -31,8 +31,8 @@ boolean and _outputfile variable used in genutils.
 
 import sys
 
-
 from lib.core.data import logger
+from lib.core.settings import PLATFORM
 
 
 try:
@@ -49,7 +49,7 @@ except ImportError:
     except ImportError:    
         haveReadline = False
 
-if sys.platform == 'win32' and haveReadline:
+if 'win' in PLATFORM and haveReadline:
     try:
         _outputfile=_rl.GetOutputFile()
     except AttributeError:
@@ -63,7 +63,7 @@ if sys.platform == 'win32' and haveReadline:
 # Thanks to Boyd Waters for this patch.
 uses_libedit = False
 
-if sys.platform == 'darwin' and haveReadline:
+if PLATFORM == 'darwin' and haveReadline:
     import commands
 
     (status, result) = commands.getstatusoutput( "otool -L %s | grep libedit" % _rl.__file__ )

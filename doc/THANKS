@@ -5,8 +5,19 @@ Chip Andrews <chip@sqlsecurity.com>
     at SQLSecurity.com and permission to implement the update feature
     taking data from his site
 
+Daniele Bellucci <daniele.bellucci@gmail.com>
+    for starting sqlmap project and developing it between July and August
+    2006
+
 Jack Butler <fattredd@hotmail.com>
     for providing me with the sqlmap site favicon
+
+Cesar Cerrudo <cesar@argeniss.com>
+    for his Windows access token kidnapping tool Churrasco included in
+    sqlmap tree as a contrib library and used to run the stand-alone
+    payload stager on the target Windows machine as SYSTEM user if the
+    user wants to perform a privilege escalation attack,
+    http://www.argeniss.com/research/Churrasco.zip
 
 Karl Chen <quarl@cs.berkeley.edu>
     for providing with the multithreading patch for the inference
@@ -18,6 +29,11 @@ Pierre Chifflier <pollux@debian.org>
 
 Stefano Di Paola <stefano.dipaola@wisec.it>
     for suggesting good features
+
+Dan Guido <dguido@gmail.com>
+    for promoting sqlmap in the context of the Penetration Testing and
+    Vulnerability Analysis class at the Polytechnic University of New York,
+    http://isisblogs.poly.edu/courses/pentest/
 
 Adam Faheem <faheem.adam@is.co.za>
     for reporting a few bugs
@@ -32,6 +48,9 @@ Rong-En Fan <rafan@freebsd.org>
 Giorgio Fedon <giorgio.fedon@gmail.com>
     for suggesting a speed improvement for bisection algorithm
     for reporting a bug when running against Microsoft SQL Server 2005
+
+Alan Franzoni <alan.franzoni@gmail.com>
+    for helping me out with Python subprocess library
 
 Ivan Giacomelli <truemilk@insiberia.net>
     for reporting a bug
@@ -59,10 +78,19 @@ Anant Kochhar <anant.kochhar@secureyes.net>
     for providing me with feedback on the user's manual
 
 Alexander Kornbrust <ak@red-database-security.com>
-    for reporting a bug
+    for reporting a couple of bugs
+
+Guido Landi <lists@keamera.org>
+    for the great technical discussions
+    for Microsoft SQL Server 2000 and Microsoft SQL Server 2005
+    'sp_replwritetovarbin' stored procedure heap-based buffer overflow
+    (MS09-004) exploit development, http://www.milw0rm.com/author/1413
 
 Nico Leidecker <nico@leidecker.info>
     for providing me with feedback on a few features
+
+Gabriel Lima <pato@bugnet.com.br>
+    for reporting a bug
 
 Pavol Luptak <pavol.luptak@nethemba.com>
     for reporting a bug when injecting on a POST data parameter
@@ -73,7 +101,7 @@ Michael Majchrowicz <mmajchrowicz@gmail.com>
     for suggesting a lot of ideas and features
 
 Ferruh Mavituna <ferruh@mavituna.com>
-    for providing me with ideas on the implementation on a couple of
+    for providing me with ideas on the implementation of a couple of
     new features
 
 Enrico Milanese <enricomilanese@gmail.com>
@@ -82,6 +110,14 @@ Enrico Milanese <enricomilanese@gmail.com>
 
 Roberto Nemirovsky <roberto.paes@gmail.com>
     for pointing me out some enhancements
+
+Markus Oberhumer <markus.oberhumer@jk.uni-linz.ac.at>
+Laszlo Molnar <ml1050@cdata.tvnet.hu>
+John F. Reiser <sales@bitwagon.com>
+    for their great tool UPX (Ultimate Packer for eXecutables) included
+    in sqlmap tree as a contrib library and used mainly to pack the
+    Metasploit Framework 3 payload stager portable executable,
+    http://upx.sourceforge.net
 
 Antonio Parata <s4tan@ictsc.it>
     for providing me with some ideas for the PHP backdoor
@@ -123,7 +159,7 @@ Uemit Seren <uemit.seren@gmail.com>
     for reporting a minor adjustment when running with python 2.6
 
 Sumit Siddharth <sid@notsosecure.com>
-    for providing me with ideas on the implementation on a couple of
+    for providing me with ideas on the implementation of a couple of
     features
 
 M Simkin <mlsimkin@cox.net>
@@ -132,6 +168,9 @@ M Simkin <mlsimkin@cox.net>
 Konrads Smelkovs <konrads@smelkovs.com>
     for reporting a few bugs in --sql-shell and --sql-query on Microsoft
     SQL Server
+
+Marek Stiefenhofer <m.stiefenhofer@r-tec.net>
+    for reporting a bug
 
 Jason Swan <jasoneswan@gmail.com>
     for reporting a bug when enumerating columns on Microsoft SQL Server
@@ -142,10 +181,13 @@ Alessandro Tanasi <alessandro@tanasi.it>
     for suggesting many features and reporting some bugs
     for reviewing the documentation
 
+Andres Tarasco <atarasco@gmail.com>
+    for providing me with good feedback
+
 Efrain Torres <et@metasploit.com>
     for helping me out to improve the Metasploit Framework 3 sqlmap
     auxiliary module and for commiting it on the Metasploit official
-    Subversion repository
+    subversion repository
     for his great Metasploit WMAP Framework
 
 Sandro Tosi <matrixhasu@gmail.com>
@@ -160,6 +202,11 @@ Bedirhan Urgun <bedirhanurgun@gmail.com>
 Kyprianos Vassilopoulos <kyprianos.vasilopoulos@gmail.com>
     for reporting an unhandled connection exception
 
+Anthony Zboralski <anthony.zboralski@bellua.com>
+    for providing me with detailed feedback
+    for reporting a few minor bugs
+    for donating to sqlmap development
+
 fufuh <fufuh@users.sourceforge.net>
     for reporting a bug when running on Windows
 
@@ -171,6 +218,19 @@ Sylphid <sylphid.su@sti.com.tw>
 
 
 == Organizations ==
+
+Black Hat team <info@blackhat.com>
+    for the opportunity to present my research on 'Advanced SQL injection
+    to operating system full control' at Black Hat Europe 2009 Briefings on
+    April 16, 2009 in Amsterdam (NL). I unveiled and demonstrated some of
+    the sqlmap 0.7 release candidate version new features during my
+    presentation
+
+Metasploit LLC <msfdev@metasploit.com>
+    for their powerful tool Metasploit Framework 3, used by sqlmap, among
+    others things, to create the payload stager and establish an
+    out-of-band connection between sqlmap and the database server,
+    http://www.metasploit.com/framework
 
 OWASP Board <http://www.owasp.org>
     for sponsoring part of the sqlmap development in the context of OWASP

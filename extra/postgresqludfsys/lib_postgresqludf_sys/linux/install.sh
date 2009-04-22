@@ -1,9 +1,8 @@
 #!/bin/bash
-# lib_mysqludf_sys - a library with miscellaneous (operating) system level functions
-# Copyright (C) 2007  Roland Bouman 
-# Copyright (C) 2008-2009  Roland Bouman and Bernardo Damele A. G.
-# web: http://www.mysqludf.org/
-# email: mysqludfs@gmail.com, bernardo.damele@gmail.com
+# lib_postgresqludf_sys - a library with miscellaneous (operating) system level functions
+# Copyright (C) 2009  Bernardo Damele A. G.
+# web: http://bernardodamele.blogspot.com/
+# email: bernardo.damele@gmail.com
 # 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,25 +18,36 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-echo "Compiling the MySQL UDF"
-make
+# Adapt the following settings to your environment
+PORT="5432"
+VERSION="8.3"
+USER="postgres"
+
+echo "Compiling the PostgreSQL UDF"
+make ${VERSION}
 
 if test $? -ne 0; then
-	echo "ERROR: You need libmysqlclient development software installed "
+	echo "ERROR: You need postgresql-server development software installed"
 	echo "to be able to compile this UDF, on Debian/Ubuntu just run:"
-	echo "apt-get install libmysqlclient15-dev"
+
+	if test "${VERSION}" == "8.2"; then
+		echo "apt-get install postgresql-server-dev-8.2"
+	else
+		echo "apt-get install postgresql-server-dev-8.3"
+	fi
+
 	exit 1
 else
-	echo "MySQL UDF compiled successfully"
+	echo "PostgreSQL UDF compiled successfully"
 fi
 
-echo -e "\nPlease provide your MySQL root password"
+echo -e "\nPlease provide your PostgreSQL 'postgres' user's password"
 
-mysql -u root -p mysql < lib_mysqludf_sys.sql
+psql -h 127.0.0.1 -p ${PORT} -U ${USER} -q template1 < lib_postgresqludf_sys.sql
 
 if test $? -ne 0; then
 	echo "ERROR: unable to install the UDF"
 	exit 1
 else
-	echo "MySQL UDF installed successfully"
+	echo "PostgreSQL UDF installed successfully"
 fi

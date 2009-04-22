@@ -69,6 +69,14 @@
     <signatures release="2005">
         <signature>
             <version>
+                9.00.4211
+            </version>
+            <servicepack>
+                3+Q961930
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
                 9.00.4207
             </version>
             <servicepack>
@@ -81,6 +89,30 @@
             </version>
             <servicepack>
                 +3
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3315
+            </version>
+            <servicepack>
+                2+Q962970
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3303
+            </version>
+            <servicepack>
+                2+Q962209
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3302
+            </version>
+            <servicepack>
+                2+Q961479
             </servicepack>
         </signature>
         <signature>

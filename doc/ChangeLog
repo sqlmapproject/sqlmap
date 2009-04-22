@@ -1,10 +1,34 @@
-sqlmap (0.6.5-1) stable; urgency=low
+sqlmap (0.7rc1-1) stable; urgency=low
 
+  * Added support to execute arbitrary commands on the database server
+    underlying operating system either returning the standard output or not
+    via UDF injection on MySQL and PostgreSQL and via xp_cmdshell() stored
+    procedure on Microsoft SQL Server;
+  * Added support for out-of-band connection between the attacker box and
+    the database server underlying operating system via stand-alone payload
+    stager created by Metasploit and supporting Meterpreter, shell and VNC
+    payloads for both Windows and Linux;
+  * Added support for out-of-band connection via Microsoft SQL Server 2000
+    and 2005 'sp_replwritetovarbin' stored procedure heap-based buffer
+    overflow (MS09-004) exploitation with multi-stage Metasploit payload
+    support;
+  * Added support for out-of-band connection via SMB reflection attack with
+    UNC path request from the database server to the attacker box by using
+    the Metasploit smb_relay exploit;
+  * Added support to read and write (upload) both text and binary files on
+    the database server underlying file system for MySQL, PostgreSQL and
+    Microsoft SQL Server;
+  * Added database process' user privilege escalation via Windows Access
+    Tokens kidnapping on MySQL and Microsoft SQL Server via either
+    Meterpreter's incognito extension or Churrasco stand-alone executable;
+  * Speed up the inference algorithm by providing the minimum required
+    charset for the query output;
   * Major bug fix in the comparison algorithm to correctly handle also the
     case that the url is stable and the False response changes the page
-    content very little.
+    content very little;
+  * Many minor bug fixes, minor enhancements and layout adjustments.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day, DD MMM 2009 HH:MM:SS +0000
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Wed, 22 Apr 2009 10:30:00 +0000
 
 sqlmap (0.6.4-1) stable; urgency=low
 

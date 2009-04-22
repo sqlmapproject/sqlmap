@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -26,6 +26,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import sys
 
+from lib.core.settings import PLATFORM
+from lib.core.settings import PYVERSION
 from lib.core.settings import VERSION
 from lib.core.settings import VERSION_STRING
 
@@ -93,10 +95,10 @@ class sqlmapValueException(Exception):
 def unhandledException():
     errMsg  = "unhandled exception in %s, please copy " % VERSION_STRING
     errMsg += "the command line and the following text and send by e-mail "
-    errMsg += "to sqlmap-users@lists.sourceforge.net. The developers will "
+    errMsg += "to sqlmap-users@lists.sourceforge.net. The developer will "
     errMsg += "fix it as soon as possible:\nsqlmap version: %s\n" % VERSION
-    errMsg += "Python version: %s\n" % sys.version.split()[0]
-    errMsg += "Operating system: %s" % sys.platform
+    errMsg += "Python version: %s\n" % PYVERSION
+    errMsg += "Operating system: %s" % PLATFORM
     return errMsg
 
 

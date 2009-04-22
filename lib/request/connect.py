@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -38,7 +38,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
-from lib.core.settings import RETRIES
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
 from lib.request.comparison import comparison
@@ -72,6 +71,7 @@ class Connect:
         ua        = kwargs.get('ua',        None)
         direct    = kwargs.get('direct',    False)
         multipart = kwargs.get('multipart', False)
+        silent    = kwargs.get('silent',    False)
 
         page            = ""
         cookieStr       = ""
@@ -128,7 +128,7 @@ class Connect:
             conn           = urllib2.urlopen(req)
 
             # Reset the number of connection retries
-            conf.retries = 0
+            conf.retriesCount = 0
 
             if not req.has_header("Accept-Encoding"):
                 requestHeaders += "\nAccept-Encoding: identity"
@@ -199,8 +199,11 @@ class Connect:
 
                 return None, None
 
-            if conf.retries < RETRIES:
-                conf.retries += 1
+            if silent == True:
+                return None, None
+
+            elif conf.retriesCount < conf.retries:
+                conf.retriesCount += 1
 
                 warnMsg += ", sqlmap is going to retry the request"
                 logger.warn(warnMsg)
@@ -226,7 +229,7 @@ class Connect:
 
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -265,7 +268,7 @@ class Connect:
             else:
                 ua = conf.parameters["User-Agent"]
 
-        page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua)
+        page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent)
 
         if content:
             return page, headers

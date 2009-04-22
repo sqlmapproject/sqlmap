@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -90,13 +90,23 @@ def autoCompletion(sqlShell=False, osShell=False):
     if sqlShell:
         completer = CompleterNG(queriesForAutoCompletion())
     elif osShell:
-        # TODO: add more operating system commands; differentiate commands
-        # based on future operating system fingerprint
-        completer = CompleterNG({
-                                  "id": None, "ifconfig": None, "ls": None,
-                                  "netstat -natu": None, "pwd": None,
-                                  "uname": None, "whoami": None,
-                                })
+        if kb.os == "Windows":
+            # Reference: http://en.wikipedia.org/wiki/List_of_DOS_commands
+            completer = CompleterNG({
+                                      "copy": None, "del": None, "dir": None,
+                                      "echo": None, "md": None, "mem": None,
+                                      "move": None, "net": None, "netstat -na": None,
+                                      "ver": None, "xcopy": None, "whoami": None,
+                                    })
+
+        else:
+            # Reference: http://en.wikipedia.org/wiki/List_of_Unix_commands
+            completer = CompleterNG({
+                                      "cp": None, "rm": None, "ls": None, 
+                                      "echo": None, "mkdir": None, "free": None,
+                                      "mv": None, "ifconfig": None, "netstat -natu": None,
+                                      "pwd": None, "uname": None, "id": None,
+                                    })
 
     readline.set_completer(completer.complete)
     readline.parse_and_bind("tab: complete")

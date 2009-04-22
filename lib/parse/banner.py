@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -42,14 +42,14 @@ class MSSQLBannerHandler(ContentHandler):
     given Microsoft SQL Server banner based upon the data in XML file
     """
 
-    def __init__(self, banner):
+    def __init__(self, banner, info):
         self.__banner        = sanitizeStr(banner)
-
         self.__inVersion     = False
         self.__inServicePack = False
         self.__release       = None
         self.__version       = ""
         self.__servicePack   = ""
+        self.__info          = info
 
 
     def __feedInfo(self, key, value):
@@ -58,7 +58,7 @@ class MSSQLBannerHandler(ContentHandler):
         if value in ( None, "None" ):
             return
 
-        kb.bannerFp[key] = value
+        self.__info[key] = value
 
 
     def startElement(self, name, attrs):
@@ -117,7 +117,7 @@ def bannerParser(banner):
     checkFile(xmlfile)
 
     if kb.dbms == "Microsoft SQL Server":
-        handler = MSSQLBannerHandler(banner)
+        handler = MSSQLBannerHandler(banner, kb.bannerFp)
         parse(xmlfile, handler)
 
         handler = FingerprintHandler(banner, kb.bannerFp)

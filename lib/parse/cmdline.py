@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -43,7 +43,7 @@ def cmdLineParser():
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
-        parser.add_option("-v", dest="verbose", type="int",
+        parser.add_option("-v", dest="verbose", type="int", default=1,
                           help="Verbosity level: 0-5 (default 1)")
 
         # Target options
@@ -68,7 +68,7 @@ def cmdLineParser():
                               "to specify how to connect to the target url.")
 
         request.add_option("--method", dest="method", default="GET",
-                           help="HTTP method, GET or POST (default: GET)")
+                           help="HTTP method, GET or POST (default GET)")
 
         request.add_option("--data", dest="data",
                            help="Data string to be sent through POST")
@@ -87,29 +87,33 @@ def cmdLineParser():
                                 "header from file")
 
         request.add_option("--headers", dest="headers",
-                           help="Extra HTTP headers '\\n' separated")
+                           help="Extra HTTP headers newline separated")
 
         request.add_option("--auth-type", dest="aType",
-                           help="HTTP Authentication type, value: "
-                                "Basic or Digest")
+                           help="HTTP Authentication type (value "
+                                "Basic or Digest)")
 
         request.add_option("--auth-cred", dest="aCred",
-                           help="HTTP Authentication credentials, value: "
-                                "name:password")
+                           help="HTTP Authentication credentials (value "
+                                "name:password)")
 
         request.add_option("--proxy", dest="proxy",
                            help="Use a HTTP proxy to connect to the target url")
 
-        request.add_option("--threads", dest="threads", type="int",
+        request.add_option("--threads", dest="threads", type="int", default=1,
                            help="Maximum number of concurrent HTTP "
                                 "requests (default 1)")
 
         request.add_option("--delay", dest="delay", type="float",
                            help="Delay in seconds between each HTTP request")
 
-        request.add_option("--timeout", dest="timeout", type="float",
+        request.add_option("--timeout", dest="timeout", type="float", default=30,
                            help="Seconds to wait before timeout connection "
                                 "(default 30)")
+
+        request.add_option("--retries", dest="retries", type="int", default=3,
+                           help="Retries when the connection timeouts "
+                                "(default 3)")
 
 
         # Injection options
@@ -126,6 +130,10 @@ def cmdLineParser():
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
 
+        injection.add_option("--os", dest="os",
+                             help="Force back-end DBMS operating system "
+                                  "to this value")
+
         injection.add_option("--prefix", dest="prefix",
                              help="Injection payload prefix string")
 
@@ -141,12 +149,12 @@ def cmdLineParser():
                                   "query is valid")
 
         injection.add_option("--excl-str", dest="eString",
-                             help="String to be excluded before calculating "
-                                  "page hash")
+                             help="String to be excluded before comparing "
+                                  "page contents")
 
         injection.add_option("--excl-reg", dest="eRegexp",
-                             help="Regexp matches to be excluded before "
-                                  "calculating page hash")
+                             help="Matches to be excluded before "
+                                  "comparing page contents")
 
 
         # Techniques options
@@ -164,6 +172,11 @@ def cmdLineParser():
         techniques.add_option("--time-test", dest="timeTest",
                               action="store_true",
                               help="Test for time based blind SQL injection")
+
+        techniques.add_option("--time-sec", dest="timeSec",
+                              type="int", default=5,
+                              help="Seconds to delay the DBMS response "
+                                   "(default 5)")
 
         techniques.add_option("--union-test", dest="unionTest",
                               action="store_true",
@@ -214,25 +227,25 @@ def cmdLineParser():
 
         enumeration.add_option("--passwords", dest="getPasswordHashes",
                                action="store_true",
-                               help="Enumerate DBMS users password hashes (opt: -U)")
+                               help="Enumerate DBMS users password hashes (opt -U)")
 
         enumeration.add_option("--privileges", dest="getPrivileges",
                                action="store_true",
-                               help="Enumerate DBMS users privileges (opt: -U)")
+                               help="Enumerate DBMS users privileges (opt -U)")
 
         enumeration.add_option("--dbs", dest="getDbs", action="store_true",
                                help="Enumerate DBMS databases")
 
         enumeration.add_option("--tables", dest="getTables", action="store_true",
-                               help="Enumerate DBMS database tables (opt: -D)")
+                               help="Enumerate DBMS database tables (opt -D)")
 
         enumeration.add_option("--columns", dest="getColumns", action="store_true",
                                help="Enumerate DBMS database table columns "
-                                    "(req:-T opt:-D)")
+                                    "(req -T opt -D)")
 
         enumeration.add_option("--dump", dest="dumpTable", action="store_true",
                                help="Dump DBMS database table entries "
-                                    "(req: -T, opt: -D, -C, --start, --stop)")
+                                    "(req -T, opt -D, -C, --start, --stop)")
 
         enumeration.add_option("--dump-all", dest="dumpAll", action="store_true",
                                help="Dump all DBMS databases tables entries")
@@ -271,38 +284,63 @@ def cmdLineParser():
         # File system options
         filesystem = OptionGroup(parser, "File system access", "These options "
                                  "can be used to access the back-end database "
-                                 "management system file system taking "
-                                 "advantage of native DBMS functions or "
-                                 "specific DBMS design weaknesses.")
+                                 "management system underlying file system.")
 
         filesystem.add_option("--read-file", dest="rFile",
-                              help="Read a specific OS file content (only on MySQL)")
+                              help="Read a file from the back-end DBMS "
+                                   "file system")
 
         filesystem.add_option("--write-file", dest="wFile",
-                              help="Write to a specific OS file (not yet available)")
+                              help="Write a local file on the back-end "
+                                   "DBMS file system")
 
+        filesystem.add_option("--dest-file", dest="dFile",
+                              help="Back-end DBMS absolute filepath to "
+                                   "write to")
 
         # Takeover options
         takeover = OptionGroup(parser, "Operating system access", "This "
                                "option can be used to access the back-end "
-                               "database management system operating "
-                               "system taking advantage of specific DBMS "
-                               "design weaknesses.")
+                               "database management system underlying "
+                               "operating system.")
+
+        takeover.add_option("--os-cmd", dest="osCmd",
+                            help="Execute an operating system command")
 
         takeover.add_option("--os-shell", dest="osShell", action="store_true",
-                            help="Prompt for an interactive OS shell "
-                                 "(only on PHP/MySQL environment with a "
-                                 "writable directory within the web "
-                                 "server document root for the moment)")
+                            help="Prompt for an interactive operating "
+                                 "system shell")
 
+        takeover.add_option("--os-pwn", dest="osPwn", action="store_true",
+                            help="Prompt for an out-of-band shell, "
+                                 "meterpreter or VNC")
+
+        takeover.add_option("--os-smbrelay", dest="osSmb", action="store_true",
+                            help="One click prompt for an OOB shell, "
+                                 "meterpreter or VNC")
+
+        takeover.add_option("--os-bof", dest="osBof", action="store_true",
+                            help="Stored procedure buffer overflow "
+                                 "exploitation")
+
+        takeover.add_option("--priv-esc", dest="privEsc", action="store_true",
+                            help="User priv escalation by abusing Windows "
+                                 "access tokens")
+
+        takeover.add_option("--msf-path", dest="msfPath",
+                            help="Local path where Metasploit Framework 3 "
+                                 "is installed")
+
+        takeover.add_option("--tmp-path", dest="tmpPath",
+                            help="Remote absolute path of temporary files "
+                                 "directory")
 
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
         miscellaneous.add_option("--eta", dest="eta", action="store_true",
-                                 help="Retrieve each query output length and "
-                                      "calculate the estimated time of arrival "
-                                      "in real time")
+                                 help="Display for each output the "
+                                      "estimated time of arrival")
 
         miscellaneous.add_option("--update", dest="updateAll", action="store_true",
                                 help="Update sqlmap to the latest stable version")
@@ -317,6 +355,9 @@ def cmdLineParser():
         miscellaneous.add_option("--batch", dest="batch", action="store_true",
                                  help="Never ask for user input, use the default behaviour")
 
+        miscellaneous.add_option("--cleanup", dest="cleanup", action="store_true",
+                                 help="Clean up the DBMS by sqlmap specific "
+                                      "UDF and tables")
 
         parser.add_option_group(target)
         parser.add_option_group(request)

@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -29,14 +29,10 @@ import re
 from lib.core.convert import md5hash
 from lib.core.data import conf
 from lib.core.data import logger
-
-
-MATCH_RATIO = None
+from lib.core.session import setMatchRatio
 
 
 def comparison(page, headers=None, getSeqMatcher=False):
-    global MATCH_RATIO
-
     regExpResults = None
 
     # String to be excluded before calculating page hash
@@ -78,13 +74,16 @@ def comparison(page, headers=None, getSeqMatcher=False):
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
-    if MATCH_RATIO == None:
-        if conf.md5hash != None and ratio < 1 and ratio > 0.6:
+    if conf.matchRatio == None:
+        if conf.md5hash != None and ratio > 0.6 and ratio < 1:
             logger.debug("setting match ratio to %.3f" % ratio)
-            MATCH_RATIO = ratio
+            conf.matchRatio = ratio
         elif conf.md5hash == None or ( conf.md5hash != None and ratio < 0.6 ):
             logger.debug("setting match ratio to default value 0.900")
-            MATCH_RATIO = 0.900
+            conf.matchRatio = 0.900
+
+        if conf.matchRatio != None:
+            setMatchRatio()
 
     # If it has been requested to return the ratio and not a comparison
     # response
@@ -100,7 +99,7 @@ def comparison(page, headers=None, getSeqMatcher=False):
 
     # If the url is not stable it returns sequence matcher between the
     # first untouched HTTP response page content and this content
-    elif ratio > MATCH_RATIO:
+    elif ratio > conf.matchRatio:
         return True
     else:
         return False

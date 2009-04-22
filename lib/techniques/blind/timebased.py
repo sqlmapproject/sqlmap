@@ -5,8 +5,8 @@ $Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
-Copyright (c) 2006-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
-                        and Daniele Bellucci <daniele.bellucci@gmail.com>
+Copyright (c) 2007-2009 Bernardo Damele A. G. <bernardo.damele@gmail.com>
+Copyright (c) 2006 Daniele Bellucci <daniele.bellucci@gmail.com>
 
 sqlmap is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -27,10 +27,10 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import time
 
 from lib.core.agent import agent
+from lib.core.common import getDelayQuery
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.settings import SECONDS
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -40,8 +40,7 @@ def timeTest():
     infoMsg += "'%s' with AND condition syntax" % kb.injParameter
     logger.info(infoMsg)
 
-    timeQuery = queries[kb.dbms].timedelay % SECONDS
-
+    timeQuery = getDelayQuery()
     query     = agent.prefixQuery(" AND %s" % timeQuery)
     query     = agent.postfixQuery(query)
     payload   = agent.payload(newValue=query)
@@ -49,7 +48,7 @@ def timeTest():
     _         = Request.queryPage(payload)
     duration  = int(time.time() - start)
 
-    if duration >= SECONDS:
+    if duration >= conf.timeSec:
         infoMsg  = "the parameter '%s' is affected by a time " % kb.injParameter
         infoMsg += "based blind sql injection with AND condition syntax"
         logger.info(infoMsg)
@@ -69,7 +68,7 @@ def timeTest():
         payload, _    = inject.goStacked(timeQuery)
         duration      = int(time.time() - start)
 
-        if duration >= SECONDS:
+        if duration >= conf.timeSec:
             infoMsg  = "the parameter '%s' is affected by a time " % kb.injParameter
             infoMsg += "based blind sql injection with stacked query syntax"
             logger.info(infoMsg)
@@ -83,3 +82,11 @@ def timeTest():
             kb.timeTest = False
 
     return kb.timeTest
+
+
+def timeUse(query):
+    start      = time.time()
+    _, _       = inject.goStacked(query)
+    duration   = int(time.time() - start)
+
+    return duration
