@@ -742,7 +742,10 @@ def getRemoteIP():
 
 
 def getFileType(filePath):
-    magicFileType = magic.from_file(filePath)
+    try:
+        magicFileType = magic.from_file(filePath)
+    except:
+        return "unknown"
 
     if "ASCII" in magicFileType or "text" in magicFileType:
         return "text"
