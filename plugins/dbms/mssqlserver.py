@@ -212,6 +212,11 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
                         break
 
+                    elif version == 0:
+                        kb.dbmsVersion = [ "2000" ]
+
+                        break
+
                     else:
                         payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 22, 1)=7")
                         result  = Request.queryPage(payload)
