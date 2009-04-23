@@ -134,10 +134,12 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
                 getPostReq = True
 
+            # GET parameters
             elif "?" in line and "=" in line and ": " not in line:
                 data   = line
                 params = True
 
+            # Cookie and Host headers
             elif ": " in line:
                 key, value = line.split(": ", 1)
 
@@ -145,6 +147,11 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     cookie = value
                 elif key.lower() == "host":
                     host = value
+
+            # POST parameters
+            elif method is not None and method == "POST" and "=" in line:
+                data   = line
+                params = True
 
         if getPostReq and params:
             if not url.startswith("http"):
