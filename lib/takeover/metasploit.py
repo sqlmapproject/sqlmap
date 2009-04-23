@@ -539,7 +539,8 @@ class Metasploit:
             debugMsg = "the shellcode size is %s bytes" % payloadSize
             logger.debug(debugMsg)
         else:
-            raise sqlmapFilePathException, "failed to create the shellcode"
+            errMsg = "failed to create the shellcode (%s)" % payloadStderr
+            raise sqlmapFilePathException, errMsg
 
         self.__shellcodeFileP  = open(self.__shellcodeFilePath, "rb")
         self.__shellcodeString = self.__shellcodeFileP.read()
@@ -612,7 +613,8 @@ class Metasploit:
 
             logger.debug(debugMsg)
         else:
-            raise sqlmapFilePathException, "failed to create the payload stager"
+            errMsg = "failed to create the payload stager (%s)" % payloadStderr
+            raise sqlmapFilePathException, errMsg
 
 
     def uploadMsfPayloadStager(self):

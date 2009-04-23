@@ -284,10 +284,6 @@ class Agent:
         fieldsToCastList = fieldsToCastStr.replace(", ", ",")
         fieldsToCastList = fieldsToCastList.split(",")
 
-        # TODO: really needed?!
-        #if query.startswith("SELECT ") and "(SELECT " in query:
-        #    fieldsSelectFrom = None
-
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr
 
 
