@@ -30,6 +30,7 @@ from lib.core.agent import agent
 from lib.core.common import getRange
 from lib.core.common import parsePasswordHash
 from lib.core.common import readInput
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -1099,6 +1100,8 @@ class Enumeration:
         output      = None
         selectQuery = True
         sqlType     = None
+
+        query = urlencode(query, convall=True)
 
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:
