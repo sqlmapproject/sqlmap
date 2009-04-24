@@ -28,6 +28,9 @@ import os
 import sys
 import time
 import traceback
+import warnings
+
+warnings.filterwarnings(action="ignore", message=".*(md5|sha) module is deprecated", category=DeprecationWarning)
 
 try:
     import psyco
