@@ -198,7 +198,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             logger.info(infoMsg)
 
             for version in ( 0, 5, 8 ):
-                payload = agent.fullPayload(" AND ( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d ) " % (version, version))
+                payload = agent.fullPayload(" AND ( ( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d ) )" % (version, version))
                 result  = Request.queryPage(payload)
 
                 if result == True:
