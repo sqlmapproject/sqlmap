@@ -245,7 +245,7 @@ def cmdLineParser():
 
         enumeration.add_option("--dump", dest="dumpTable", action="store_true",
                                help="Dump DBMS database table entries "
-                                    "(req -T, opt -D, -C, --start, --stop)")
+                                    "(req -T, opt -D, -C)")
 
         enumeration.add_option("--dump-all", dest="dumpAll", action="store_true",
                                help="Dump all DBMS databases tables entries")
@@ -268,10 +268,10 @@ def cmdLineParser():
                                     "enumerating tables")
 
         enumeration.add_option("--start", dest="limitStart", type="int",
-                               help="First table entry to dump")
+                               help="First query output entry to retrieve")
 
         enumeration.add_option("--stop", dest="limitStop", type="int",
-                               help="Last table entry to dump")
+                               help="Last query output entry to retrieve")
 
         enumeration.add_option("--sql-query", dest="query",
                                help="SQL statement to be executed")
