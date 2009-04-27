@@ -34,6 +34,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setDbms
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import ORACLE_SYSTEM_DBS

@@ -48,7 +48,6 @@ from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.request.connect import Connect as Request
-from lib.techniques.outband.stacked import stackedTest
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -302,8 +301,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
 
     def stackedReadFile(self, rFile):
-        # TODO: write a UDF to retrieve the hexadecimal encoded content of
-        # the requested file
         warnMsg  = "binary file read on PostgreSQL is not yet supported, "
         warnMsg += "if the requested file is binary, its content will not "
         warnMsg += "be retrieved"

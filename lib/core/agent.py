@@ -33,7 +33,6 @@ from lib.core.data import kb
 from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedDBMSException
 
 
 class Agent:

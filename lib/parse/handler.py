@@ -29,7 +29,6 @@ import re
 from xml.sax.handler import ContentHandler
 
 from lib.core.common import sanitizeStr
-from lib.core.data import kb
 
 
 class FingerprintHandler(ContentHandler):

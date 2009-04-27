@@ -26,7 +26,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
-from lib.core.convert import md5hash
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.session import setMatchRatio

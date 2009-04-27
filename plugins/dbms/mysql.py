@@ -28,7 +28,6 @@ import os
 import re
 
 from lib.core.agent import agent
-from lib.core.common import fileToStr
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
@@ -49,7 +48,6 @@ from lib.request import inject
 from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.inband.union.use import unionUse
-from lib.techniques.outband.stacked import stackedTest
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem

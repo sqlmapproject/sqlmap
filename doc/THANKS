@@ -27,6 +27,9 @@ Pierre Chifflier <pollux@debian.org>
     for uploading the sqlmap 0.6.2 Debian package to the official Debian
     project repository
 
+Ulises U. Cune <ulises2k@gmail.com>
+    for reporting a bug
+
 Stefano Di Paola <stefano.dipaola@wisec.it>
     for suggesting good features
 
@@ -79,6 +82,9 @@ Anant Kochhar <anant.kochhar@secureyes.net>
 
 Alexander Kornbrust <ak@red-database-security.com>
     for reporting a couple of bugs
+
+Nicolas Krassas <krasn@ans.gr>
+    for reporting a bug
 
 Guido Landi <lists@keamera.org>
     for the great technical discussions

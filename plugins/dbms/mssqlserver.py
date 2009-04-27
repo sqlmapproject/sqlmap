@@ -28,15 +28,11 @@ import os
 import time
 
 from lib.core.agent import agent
-from lib.core.common import dataToOutFile
-from lib.core.common import dataToStdout
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import getRange
-from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import readInput
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -48,11 +44,9 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setDbms
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MSSQL_SYSTEM_DBS
-from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.request.connect import Connect as Request
-from lib.techniques.outband.stacked import stackedTest
 
 from plugins.generic.enumeration import Enumeration
 from plugins.generic.filesystem import Filesystem
@@ -521,7 +515,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         wFilePointer.close()
 
         if wFileSize < debugSize:
-            chunkName = self.updateBinChunk(wFileContent, dFile, tmpPath)
+            chunkName = self.updateBinChunk(wFileContent, tmpPath)
             sFile     = "%s\%s" % (tmpPath, dFileName)
 
             logger.debug("moving binary file %s to %s" % (sFile, dFile))

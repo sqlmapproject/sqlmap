@@ -33,7 +33,6 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import parseUnionPage
 from lib.core.common import readInput
-from lib.core.common import replaceNewlineTabs
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

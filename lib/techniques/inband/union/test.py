@@ -175,8 +175,9 @@ def __unionTestByNULLBruteforce(comment):
 
 
 def __unionTestByOrderBy(comment):
-    columns = None
-    value   = None
+    columns     = None
+    value       = None
+    prevPayload = ""
 
     for count in range(1, 51):
         query        = agent.prefixQuery(" ORDER BY %d" % count)

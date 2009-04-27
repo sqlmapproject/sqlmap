@@ -29,6 +29,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dump import dumper
+from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.takeover.udf import UDF
 from lib.takeover.xp_cmdshell import xp_cmdshell

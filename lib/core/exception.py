@@ -24,8 +24,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
-import sys
-
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import VERSION

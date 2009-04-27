@@ -24,8 +24,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
-import re
-
 from xml.sax import parse
 
 from lib.core.common import checkFile

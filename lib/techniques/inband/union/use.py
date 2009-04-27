@@ -29,14 +29,11 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import parseUnionPage
-from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.data import temp
-from lib.core.exception import sqlmapUnsupportedDBMSException
-from lib.core.session import setUnion
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
@@ -202,7 +199,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                                 field = expressionFieldsList[0]
 
                         elif kb.dbms == "Oracle":
-                                field = expressionFieldsList
+                            field = expressionFieldsList
 
                         else:
                             field = None

@@ -205,7 +205,7 @@ def __createFile(pathname, data):
     fileFP.close()
 
 
-def __extractZipFile(tempDir, zipFile, sqlmapNewestVersion):
+def __extractZipFile(tempDir, zipFile):
     # Check if the saved binary file is really a ZIP file
     if zipfile.is_zipfile(zipFile):
         sqlmapZipFile = zipfile.ZipFile(zipFile)
@@ -285,13 +285,13 @@ def __updateSqlmap():
     tempDir = tempfile.gettempdir()
     zipFile = os.path.join(tempDir, "sqlmap-%s.zip" % sqlmapNewestVersion)
     __createFile(zipFile, sqlmapBinaryString)
-    __extractZipFile(tempDir, zipFile, sqlmapNewestVersion)
+    __extractZipFile(tempDir, zipFile)
 
     # For each file and directory in the temporary directory copy it
     # to the sqlmap root path and set right permission
     # TODO: remove files not needed anymore and all pyc within the
     # sqlmap root path in the end
-    for root, dirs, files in os.walk(os.path.join(tempDir, "sqlmap-%s" % sqlmapNewestVersion)):
+    for root, _, files in os.walk(os.path.join(tempDir, "sqlmap-%s" % sqlmapNewestVersion)):
         # Just for development release
         if '.svn' in root:
             continue

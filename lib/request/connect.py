@@ -93,11 +93,11 @@ class Connect:
                 requestMsg += "?%s" % params
 
         elif multipart:
-                multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
-                conn = multipartOpener.open(url, multipart)
-                page = conn.read()
+            multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
+            conn = multipartOpener.open(url, multipart)
+            page = conn.read()
 
-                return page
+            return page
 
         else:
             if conf.parameters.has_key("GET") and not get:

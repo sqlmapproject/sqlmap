@@ -28,7 +28,6 @@ import re
 
 from lib.core.data import conf
 from lib.core.data import kb
-from lib.core.data import paths
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -73,8 +72,11 @@ def parseResponse(page, headers):
         # Detect injectable page absolute system path
         # NOTE: this regular expression works if the remote web application
         # is written in PHP and debug/error messages are enabled.
-        absFilePaths = re.findall(" in <b>(.*?)</b> on line", page, re.I)
+        absFilePathsRegExp = ( " in <b>(.*?)</b> on line", "([\w]\:[\/\\\\]+)" )
 
-        for absFilePath in absFilePaths:
-            if absFilePath not in kb.absFilePaths:
-                kb.absFilePaths.add(absFilePath)
+        for absFilePathRegExp in absFilePathsRegExp:
+            absFilePaths = re.findall(absFilePathRegExp, page, re.I)
+
+            for absFilePath in absFilePaths:
+                if absFilePath not in kb.absFilePaths:
+                    kb.absFilePaths.add(absFilePath)

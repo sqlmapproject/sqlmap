@@ -39,7 +39,6 @@ from lib.core.data import temp
 from lib.core.dump import dumper
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setOs
 from lib.core.settings import SQL_STATEMENTS
@@ -47,7 +46,6 @@ from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
-from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
 
@@ -1098,7 +1096,6 @@ class Enumeration:
 
     def sqlQuery(self, query):
         output      = None
-        selectQuery = True
         sqlType     = None
 
         query = urlencode(query, convall=True)
@@ -1107,9 +1104,6 @@ class Enumeration:
             for sqlStatement in sqlStatements:
                 if query.lower().startswith(sqlStatement):
                     sqlType = sqlTitle
-
-                    if sqlTitle != "SQL SELECT statement":
-                        selectQuery = False
 
                     break
 

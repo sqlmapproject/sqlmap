@@ -135,14 +135,14 @@ class Metasploit:
 
     def __skeletonSelection(self, msg, lst=None, maxValue=1, default=1):
         if kb.os == "Windows":
-            os = "windows"
+            opSys = "windows"
         else:
-            os = "linux"
+            opSys = "linux"
 
         message = "which %s do you want to use?" % msg
 
         if lst:
-            for num, data in lst[os].items():
+            for num, data in lst[opSys].items():
                 description = data[0]
 
                 if num > maxValue:
@@ -174,7 +174,7 @@ class Metasploit:
         choice = int(choice)
 
         if lst:
-            choice = lst[os][choice][1]
+            choice = lst[opSys][choice][1]
 
         return choice
 

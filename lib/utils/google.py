@@ -32,7 +32,6 @@ from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapRegExprException
 
 
 class Google:
@@ -84,9 +83,9 @@ class Google:
 
         try:
             conn = self.opener.open("http://www.google.com/ncr")
-            headers = conn.info()
+            _ = conn.info()
         except urllib2.HTTPError, e:
-            headers = e.info()
+            _ = e.info()
         except urllib2.URLError, e:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg

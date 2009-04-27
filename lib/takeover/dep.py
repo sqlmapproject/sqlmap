@@ -24,11 +24,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
-import os
-
-from lib.core.common import randomStr
-from lib.core.common import readInput
-from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDEP

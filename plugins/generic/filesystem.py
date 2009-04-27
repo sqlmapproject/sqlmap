@@ -31,10 +31,8 @@ from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
 
@@ -215,7 +213,7 @@ class Filesystem:
         return fcEncodedList
 
 
-    def updateBinChunk(self, binaryData, dFile, tmpPath):
+    def updateBinChunk(self, binaryData, tmpPath):
         """
         Called by Microsoft SQL Server plugin to write a binary file on the
         back-end DBMS underlying file system

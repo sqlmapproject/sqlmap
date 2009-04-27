@@ -36,7 +36,6 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.session import setInjection
 from lib.core.target import createTargetDirs
@@ -105,7 +104,6 @@ def start():
         logger.info(infoMsg)
 
     hostCount               = 0
-    receivedCookies         = []
     cookieStr               = ""
     setCookieAsInjectable   = True
 

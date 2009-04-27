@@ -31,8 +31,6 @@ import logging
 import os
 import re
 import socket
-import sys
-import time
 import urllib2
 import urlparse
 
@@ -42,8 +40,6 @@ from lib.core.common import getFileType
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
-from lib.core.common import randomStr
-from lib.core.common import readInput
 from lib.core.common import sanitizeStr
 from lib.core.data import conf
 from lib.core.data import kb
@@ -60,8 +56,10 @@ from lib.core.optiondict import optDict
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import PLATFORM
+from lib.core.settings import SITE
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
+from lib.core.settings import VERSION_STRING
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.queriesfile import queriesParser
@@ -600,9 +598,14 @@ def __defaultHTTPUserAgent():
     @rtype: C{str}
     """
 
+    return "%s (%s)" % (VERSION_STRING, SITE)
+
+    # Firefox 3 running on Ubuntu 9.04 updated at April 2009
+    #return "Mozilla/5.0 (X11; U; Linux i686; en-GB; rv:1.9.0.9) Gecko/2009042113 Ubuntu/9.04 (jaunty) Firefox/3.0.9"
+
     # Internet Explorer 7.0 running on Windows 2003 Service Pack 2 english
     # updated at March 2009
-    return "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
+    #return "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
 
 
 def __setHTTPUserAgent():

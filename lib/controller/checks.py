@@ -27,7 +27,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 import time
 
-from lib.controller.action import action
 from lib.core.agent import agent
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -295,9 +294,9 @@ def checkStability():
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
 
-    firstPage, firstHeaders = Request.queryPage(content=True)
+    firstPage, _ = Request.queryPage(content=True)
     time.sleep(1)
-    secondPage, secondHeaders = Request.queryPage(content=True)
+    secondPage, _ = Request.queryPage(content=True)
 
     condition = firstPage == secondPage
 

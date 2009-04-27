@@ -54,11 +54,11 @@ class MultipartPostHandler(urllib2.BaseHandler):
             v_files = []
             v_vars = []
             try:
-                 for(key, value) in data.items():
-                     if type(value) == file:
-                         v_files.append((key, value))
-                     else:
-                         v_vars.append((key, value))
+                for(key, value) in data.items():
+                    if type(value) == file:
+                        v_files.append((key, value))
+                    else:
+                        v_vars.append((key, value))
             except TypeError:
                 systype, value, traceback = sys.exc_info()
                 raise sqlmapDataException, "not a valid non-string sequence or mapping object", traceback

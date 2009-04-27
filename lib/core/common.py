@@ -141,9 +141,9 @@ def formatDBMSfp(versions=None):
 
 
 def formatFingerprintString(values, chain=" or "):
-    string = "|".join([v for v in values])
+    strJoin = "|".join([v for v in values])
 
-    return string.replace("|", chain)
+    return strJoin.replace("|", chain)
 
 
 def formatFingerprint(target, info):
@@ -224,73 +224,91 @@ def getHtmlErrorFp():
 
 
 def getDocRoot():
-    """
-    This method returns the web application document root based on the
-    detected absolute files paths in the knowledge base.
-    """
-
     docRoot = None
 
-    if kb.absFilePaths:
-        logMsg  = "retrieved the possible injectable "
-        logMsg += "file absolute system paths: "
-        logMsg += "'%s'" % ", ".join(path for path in kb.absFilePaths)
-        logger.info(logMsg)
+    if kb.os == "Windows":
+        defaultDocRoot = "C:\\Inetput\\wwwroot\\"
     else:
-        warnMsg  = "unable to retrieve the injectable file "
-        warnMsg += "absolute system path"
-        logger.warn(warnMsg)
+        defaultDocRoot = "/var/www/"
 
-    for absFilePath in kb.absFilePaths:
-        if conf.path in absFilePath:
-            index = absFilePath.index(conf.path)
-            docRoot = absFilePath[:index]
-            break
+    if kb.absFilePaths:
+        for absFilePath in kb.absFilePaths:
+            absFilePathWin = None
+
+            if re.search("([\w]\:[\/\\\\]+)", absFilePath):
+                absFilePathWin = absFilePath
+                absFilePath    = absFilePath[2:].replace("\\", "/")
+
+            absFilePath = os.path.normpath(absFilePath)
+
+            if os.path.dirname(conf.path) in absFilePath:
+                index   = absFilePath.index(conf.path)
+                docRoot = absFilePath[:index]
+
+                if absFilePathWin:
+                    docRoot = "C:\\%s" % docRoot.replace("/", "\\")
+
+                break
 
     if docRoot:
-        logMsg  = "retrieved the remote web server "
-        logMsg += "document root: '%s'" % docRoot
-        logger.info(logMsg)
+        infoMsg = "retrieved the web server document root: '%s'" % docRoot
+        logger.info(infoMsg)
     else:
-        warnMsg  = "unable to retrieve the remote web server "
-        warnMsg += "document root"
+        warnMsg = "unable to retrieve the web server document root"
         logger.warn(warnMsg)
+
+        message  = "please provide the web server document root "
+        message += "[%s]: " % defaultDocRoot
+        inputDocRoot = readInput(message, default=defaultDocRoot)
+
+        if inputDocRoot:
+            docRoot = inputDocRoot
+        else:
+            docRoot = defaultDocRoot
 
     return docRoot
 
 
-def getDirectories():
-    """
-    This method calls a function that returns the web application document
-    root and injectable file absolute system path.
-
-    @return: a set of paths (document root and absolute system path).
-    @rtype: C{set}
-    @todo: replace this function with a site crawling functionality.
-    """
-
+def getDirs():
     directories = set()
 
-    kb.docRoot = getDocRoot()
+    if kb.os == "Windows":
+        defaultDir = "C:\\Inetput\\wwwroot\\test\\"
+    else:
+        defaultDir = "/var/www/test/"
 
-    if kb.docRoot:
-        directories.add(kb.docRoot)
+    if kb.absFilePaths:
+        infoMsg  = "retrieved web server full paths: "
+        infoMsg += "'%s'" % ", ".join(path for path in kb.absFilePaths)
+        logger.info(infoMsg)
 
-    pagePath = re.search("^/(.*)/", conf.path)
+        for absFilePath in kb.absFilePaths:
+            directories.add(os.path.dirname(absFilePath))
+    else:
+        warnMsg = "unable to retrieve any web server path"
+        logger.warn(warnMsg)
 
-    if kb.docRoot and pagePath:
-        pagePath = pagePath.groups()[0]
+    message   = "please provide any additional web server full path to try "
+    message  += "to upload the agent [%s]: " % defaultDir
+    inputDirs = readInput(message, default=defaultDir)
 
-        directories.add("%s/%s" % (kb.docRoot, pagePath))
+    if inputDirs:
+        inputDirs = inputDirs.replace(", ", ",")
+        inputDirs = inputDirs.split(",")
+
+        for inputDir in inputDirs:
+            directories.add(inputDir)
+    else:
+        directories.add(defaultDir)
 
     return directories
 
 
 def filePathToString(filePath):
-    string = filePath.replace("/", "_").replace("\\", "_")
-    string = string.replace(" ", "_").replace(":", "_")
+    strRepl = filePath.replace("/", "_").replace("\\", "_")
+    strRepl = strRepl.replace(" ", "_").replace(":", "_")
 
-    return string
+    return strRepl
 
 
 def dataToStdout(data):
@@ -326,18 +344,18 @@ def dataToOutFile(data):
     return rFilePath
 
 
-def strToHex(string):
+def strToHex(inpStr):
     """
-    @param string: string to be converted into its hexadecimal value.
-    @type string: C{str}
+    @param inpStr: inpStr to be converted into its hexadecimal value.
+    @type inpStr: C{str}
 
-    @return: the hexadecimal converted string.
+    @return: the hexadecimal converted inpStr.
     @rtype: C{str}
     """
 
     hexStr = ""
 
-    for character in string:
+    for character in inpStr:
         if character == "\n":
             character = " "
 
@@ -457,17 +475,17 @@ def randomStr(length=5, lowercase=False):
     return rndStr
 
 
-def sanitizeStr(string):
+def sanitizeStr(inpStr):
     """
-    @param string: string to sanitize: cast to str datatype and replace
+    @param inpStr: inpStr to sanitize: cast to str datatype and replace
     newlines with one space and strip carriage returns.
-    @type string: C{str}
+    @type inpStr: C{str}
 
-    @return: sanitized string
+    @return: sanitized inpStr
     @rtype: C{str}
     """
 
-    cleanString = str(string)
+    cleanString = str(inpStr)
     cleanString = cleanString.replace("\n", " ").replace("\r", "")
 
     return cleanString
@@ -483,8 +501,8 @@ def checkFile(filename):
         raise sqlmapFilePathException, "unable to read file '%s'" % filename
 
 
-def replaceNewlineTabs(string):
-    replacedString = string.replace("\n", "__NEWLINE__").replace("\t", "__TAB__")
+def replaceNewlineTabs(inpStr):
+    replacedString = inpStr.replace("\n", "__NEWLINE__").replace("\t", "__TAB__")
     replacedString = replacedString.replace(temp.delimiter, "__DEL__")
 
     return replacedString

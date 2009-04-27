@@ -33,7 +33,7 @@ class Fingerprint:
     """
 
     @staticmethod
-    def unescape(expression):
+    def unescape(expression, quote=True):
         errMsg  = "'unescape' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg

@@ -64,7 +64,7 @@ class Magic:
         try:
             magic_close(self.cookie)
         except Exception, e:
-            print "got thig: ", e
+            print "got this:", e
 
 
 _magic_mime = None
