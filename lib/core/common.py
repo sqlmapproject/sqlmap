@@ -225,6 +225,7 @@ def getHtmlErrorFp():
 
 def getDocRoot():
     docRoot = None
+    pagePath = os.path.dirname(conf.path)
 
     if kb.os == "Windows":
         defaultDocRoot = "C:\\Inetput\\wwwroot\\"
@@ -241,8 +242,8 @@ def getDocRoot():
 
             absFilePath = os.path.normpath(absFilePath)
 
-            if os.path.dirname(conf.path) in absFilePath:
-                index   = absFilePath.index(conf.path)
+            if pagePath in absFilePath:
+                index   = absFilePath.index(pagePath)
                 docRoot = absFilePath[:index]
 
                 if absFilePathWin:

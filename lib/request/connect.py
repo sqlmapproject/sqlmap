@@ -160,9 +160,9 @@ class Connect:
             logger.log(9, requestMsg)
 
             # Get HTTP response
-            page = conn.read()
-            code = conn.code
-            status = conn.msg
+            page            = conn.read()
+            code            = conn.code
+            status          = conn.msg
             responseHeaders = conn.info()
 
         except urllib2.HTTPError, e:

@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import os
 import re
 
 from lib.core.data import conf
@@ -79,4 +80,4 @@ def parseResponse(page, headers):
 
             for absFilePath in absFilePaths:
                 if absFilePath not in kb.absFilePaths:
-                    kb.absFilePaths.add(absFilePath)
+                    kb.absFilePaths.add(os.path.dirname(absFilePath))
