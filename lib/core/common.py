@@ -228,7 +228,7 @@ def getDocRoot():
     pagePath = os.path.dirname(conf.path)
 
     if kb.os == "Windows":
-        defaultDocRoot = "C:\\Inetput\\wwwroot\\"
+        defaultDocRoot = "C:/Inetpub/wwwroot/"
     else:
         defaultDocRoot = "/var/www/"
 
@@ -247,7 +247,7 @@ def getDocRoot():
                 docRoot = absFilePath[:index]
 
                 if absFilePathWin:
-                    docRoot = "C:\\%s" % docRoot.replace("/", "\\")
+                    docRoot = "C:/%s" % docRoot.replace("\\", "/")
 
                 break
 
@@ -274,7 +274,7 @@ def getDirs():
     directories = set()
 
     if kb.os == "Windows":
-        defaultDir = "C:\\Inetput\\wwwroot\\test\\"
+        defaultDir = "C:/Inetpub/wwwroot/test/"
     else:
         defaultDir = "/var/www/test/"
 

