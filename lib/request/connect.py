@@ -210,7 +210,7 @@ class Connect:
 
                 time.sleep(1)
 
-                return Connect.__getPageProxy(get=get, post=post, cookie=cookie, ua=ua, direct=direct, multipart=multipart)
+                return Connect.__getPageProxy(url=url, get=get, post=post, cookie=cookie, ua=ua, direct=direct, multipart=multipart, silent=silent)
 
             else:
                 raise sqlmapConnectionException, warnMsg
