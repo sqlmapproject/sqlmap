@@ -134,6 +134,11 @@ class Dump:
 
 
     def dbTables(self, dbTables):
+        if not isinstance(dbTables, dict):
+            self.string("tables", dbTables)
+
+            return
+
         maxlength = 0
 
         for tables in dbTables.values():
