@@ -48,9 +48,20 @@ class UPX:
     """
 
     def __initialize(self, srcFile, dstFile=None):
-        if "win" in PLATFORM:
+        if "darwin" in PLATFORM:
+            self.__upxPath = "%s/upx/macosx/upx" % paths.SQLMAP_CONTRIB_PATH
+
+        elif "win" in PLATFORM:
             self.__upxPath = "%s/upx/windows/upx.exe" % paths.SQLMAP_CONTRIB_PATH
+
         elif "linux" in PLATFORM:
+            self.__upxPath = "%s/upx/linux/upx" % paths.SQLMAP_CONTRIB_PATH
+
+        else:
+            warnMsg  = "unsupported platform for the compression tool "
+            warnMsg += "(upx), sqlmap will continue anyway"
+            logger.warn(warnMsg)
+
             self.__upxPath = "%s/upx/linux/upx" % paths.SQLMAP_CONTRIB_PATH
 
         self.__upxCmd = "%s -9 -qq %s" % (self.__upxPath, srcFile)

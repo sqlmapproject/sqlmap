@@ -74,6 +74,9 @@ Will Holcomb <wholcomb@gmail.com>
     for his MultipartPostHandler class to handle multipart POST forms and
     permission to include it within sqlmap source code
 
+Mounir Idrassi <mounir.idrassi@idrix.net>
+    for his compiled version of UPX for Mac OS X
+
 Luke Jahnke <luke.jahnke@gmail.com>
     for reporting a bug when running against MySQL < 5.0
 

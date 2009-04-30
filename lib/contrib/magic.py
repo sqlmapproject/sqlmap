@@ -63,8 +63,8 @@ class Magic:
     def __del__(self):
         try:
             magic_close(self.cookie)
-        except Exception, e:
-            print "got this:", e
+        except Exception, _:
+            pass
 
 
 _magic_mime = None

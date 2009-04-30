@@ -258,6 +258,12 @@ def __setMetasploit():
     if conf.osSmb:
         isAdmin = False
 
+        # TODO: add support for Mac OS X
+        #if "darwin" in PLATFORM:
+        #    pass
+        #
+        #elif "win" in PLATFORM:
+
         if "win" in PLATFORM:
             isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
 
@@ -269,10 +275,6 @@ def __setMetasploit():
 
             if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
                 isAdmin = True
-
-        # TODO: add support for Mac OS X
-        #elif "darwin" in PLATFORM:
-        #    pass
 
         else:
             warnMsg  = "sqlmap is not able to check if you are running it "
