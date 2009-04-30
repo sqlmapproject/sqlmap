@@ -258,22 +258,16 @@ def __setMetasploit():
     if conf.osSmb:
         isAdmin = False
 
-        # TODO: add support for Mac OS X
-        #if "darwin" in PLATFORM:
-        #    pass
-        #
-        #elif "win" in PLATFORM:
-
-        if "win" in PLATFORM:
-            isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
-
-            if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
-                isAdmin = True
-
-        elif "linux" in PLATFORM:
+        if "linux" in PLATFORM or "darwin" in PLATFORM:
             isAdmin = os.geteuid()
 
             if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
+                isAdmin = True
+
+        elif "win" in PLATFORM:
+            isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
+
+            if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
                 isAdmin = True
 
         else:
