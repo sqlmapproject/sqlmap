@@ -146,15 +146,16 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
             return None
 
-        # MySQL valid versions updated on 02/2009
+        # MySQL valid versions updated on 05/2009
         versions = (
                      (32200, 32233),    # MySQL 3.22
                      (32300, 32359),    # MySQL 3.23
                      (40000, 40031),    # MySQL 4.0
                      (40100, 40122),    # MySQL 4.1
                      (50000, 50077),    # MySQL 5.0
-                     (50100, 50132),    # MySQL 5.1
-                     (60000, 60009),    # MySQL 6.0
+                     (50100, 50134),    # MySQL 5.1
+                     (50400, 50401),    # MySQL 5.4
+                     (60000, 60010),    # MySQL 6.0
                    )
 
         for element in versions:
@@ -206,7 +207,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             value += actVer
             return value
 
-        # TODO: comment injection fingerprint is broken, fix
         comVer = self.__commentCheck()
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer

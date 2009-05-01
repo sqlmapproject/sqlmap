@@ -47,6 +47,7 @@ UPDATE udftest SET data=CONCAT(data,0x000000000000000004000000000000006500000001
 -- Note that /TODO/plugin DOES NOT
 -- exist by default so it is NOT possible to save the SO in the proper
 -- folder where MySQL server looks for SOs.
+-- SHOW VARIABLES WHERE variable_name='plugin_dir';
 -- 
 -- References:
 -- http://dev.mysql.com/doc/refman/5.1/en/create-function-udf.html
