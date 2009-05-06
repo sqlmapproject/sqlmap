@@ -92,6 +92,9 @@ class Connect:
                 url = "%s?%s" % (url, params)
                 requestMsg += "?%s" % params
 
+            if post:
+                post = urlencode(post).replace("%%", "%")
+
         elif multipart:
             multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
             conn = multipartOpener.open(url, multipart)
