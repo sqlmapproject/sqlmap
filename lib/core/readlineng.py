@@ -49,7 +49,7 @@ except ImportError:
     except ImportError:    
         haveReadline = False
 
-if 'win' in PLATFORM and haveReadline:
+if 'win' in PLATFORM and 'darwin' not in PLATFORM and haveReadline:
     try:
         _outputfile=_rl.GetOutputFile()
     except AttributeError:

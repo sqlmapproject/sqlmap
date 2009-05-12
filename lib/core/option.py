@@ -325,12 +325,13 @@ def __setMetasploit():
 
         envPaths = os.environ["PATH"]
 
-        if "win" in PLATFORM:
+        if "darwin" not in PLATFORM and "win" in PLATFORM:
             envPaths = envPaths.split(";")
         else:
             envPaths = envPaths.split(":")
 
         for envPath in envPaths:
+            envPath    = envPath.replace(";", "")
             condition  = os.path.exists(os.path.normpath(envPath))
             condition &= os.path.exists(os.path.normpath("%s/msfcli" % envPath))
             condition &= os.path.exists(os.path.normpath("%s/msfconsole" % envPath))
