@@ -43,6 +43,7 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.exception import sqlmapFilePathException
+from lib.core.settings import PLATFORM
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
 
@@ -825,3 +826,22 @@ def getCharset(charsetType=None):
         asciiTbl.extend(range(96, 123))
 
     return asciiTbl
+
+
+def searchEnvPath(fileName):
+    envPaths = os.environ["PATH"]
+    result   = None
+
+    if "darwin" not in PLATFORM and "win" in PLATFORM:
+        envPaths = envPaths.split(";")
+    else:
+        envPaths = envPaths.split(":")
+
+    for envPath in envPaths:
+        envPath = envPath.replace(";", "")
+        result  = os.path.exists(os.path.normpath("%s/%s" % (envPath, fileName)))
+
+        if result == True:
+            break
+
+    return result
