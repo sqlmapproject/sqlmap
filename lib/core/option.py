@@ -571,6 +571,10 @@ def __setHTTPMethod():
 
 
 def __setHTTPExtraHeaders():
+    parseTargetUrl()
+
+    conf.httpHeaders.append(("Host", conf.hostname))
+
     if conf.headers:
         debugMsg = "setting extra HTTP headers"
         logger.debug(debugMsg)
