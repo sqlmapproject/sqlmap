@@ -60,6 +60,9 @@ Ivan Giacomelli <truemilk@insiberia.net>
     for suggesting a minor enhancement
     for reviewing the documentation
 
+Oliver Gruskovnjak <coma@0x3f.net>
+    for providing me with a minor patch
+
 Davide Guerri <d.guerri@caspur.it>
     for suggesting an enhancement
 
@@ -97,6 +100,7 @@ Guido Landi <lists@keamera.org>
 
 Nico Leidecker <nico@leidecker.info>
     for providing me with feedback on a few features
+    for reporting a couple of bugs
 
 Gabriel Lima <pato@bugnet.com.br>
     for reporting a couple of bugs
