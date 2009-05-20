@@ -1098,8 +1098,6 @@ class Enumeration:
         output      = None
         sqlType     = None
 
-        query = urlencode(query, convall=True)
-
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:
                 if query.lower().startswith(sqlStatement):
@@ -1119,6 +1117,8 @@ class Enumeration:
 
             return output
         else:
+            query = urlencode(query, convall=True)
+
             if kb.stackedTest == None:
                 stackedTest()
 
