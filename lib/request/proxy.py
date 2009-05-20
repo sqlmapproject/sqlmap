@@ -57,7 +57,7 @@ class ProxyHTTPConnection(httplib.HTTPConnection):
         self._real_host = host
         self._real_port = int(port)
 
-        httplib.HTTPConnection.request(self, method, url, body, headers)
+        httplib.HTTPConnection.request(self, method, rest, body, headers)
 
 
     def connect(self):
@@ -89,7 +89,7 @@ class ProxyHTTPConnection(httplib.HTTPConnection):
 class ProxyHTTPSConnection(ProxyHTTPConnection):
     default_port = 443
 
-    def __init__(self, host, port=None, key_file=None, cert_file=None, strict=None):
+    def __init__(self, host, port=None, key_file=None, cert_file=None, strict=None, timeout=None):
         ProxyHTTPConnection.__init__(self, host, port)
         self.key_file = key_file
         self.cert_file = cert_file
