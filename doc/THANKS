@@ -23,9 +23,12 @@ Karl Chen <quarl@cs.berkeley.edu>
     for providing with the multithreading patch for the inference
     algorithm
 
-Pierre Chifflier <pollux@debian.org>
-    for uploading the sqlmap 0.6.2 Debian package to the official Debian
-    project repository
+Y P Chien <ypchien@cox.net>
+    for reporting a minor bug
+
+Pierre Chifflier <pollux@debian.org> and Mark Hymers <ftpmaster@debian.org>
+    for uploading and accepting the sqlmap Debian package to the official
+    Debian project repository
 
 Ulises U. Cune <ulises2k@gmail.com>
     for reporting a bug

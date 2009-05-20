@@ -237,8 +237,8 @@ class Dump:
 
         for column in columns:
             if column != "__infos__":
-                info = tableValues[column]
-                lines = "-" * (int(info["length"]) + 2)
+                info       = tableValues[column]
+                lines      = "-" * (int(info["length"]) + 2)
                 separator += "+%s" % lines
 
         separator += "+"
@@ -253,19 +253,21 @@ class Dump:
 
         for column in columns:
             if column != "__infos__":
-                info = tableValues[column]
+                info      = tableValues[column]
                 maxlength = int(info["length"])
-                blank = " " * (maxlength - len(column))
+                blank     = " " * (maxlength - len(column))
+
                 self.__write("| %s%s" % (column, blank), n=False)
 
                 if not conf.multipleTargets and field == fields:
                     dataToDumpFile(dumpFP, "\"%s\"" % column)
-                else:
+                elif not conf.multipleTargets:
                     dataToDumpFile(dumpFP, "\"%s\"," % column)
 
                 field += 1
 
         self.__write("|\n%s" % separator)
+
         if not conf.multipleTargets:
             dataToDumpFile(dumpFP, "\n")
 
@@ -284,14 +286,15 @@ class Dump:
                     blank = " " * (maxlength - len(value))
                     self.__write("| %s%s" % (value, blank), n=False)
 
-                    if field == fields:
+                    if not conf.multipleTargets and field == fields:
                         dataToDumpFile(dumpFP, "\"%s\"" % value)
-                    else:
+                    elif not conf.multipleTargets:
                         dataToDumpFile(dumpFP, "\"%s\"," % value)
 
                     field += 1
 
             self.__write("|")
+
             if not conf.multipleTargets:
                 dataToDumpFile(dumpFP, "\n")
 
