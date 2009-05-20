@@ -29,6 +29,12 @@ import socket
 import urllib
 import urllib2
 
+from lib.core.settings import PYVERSION
+
+
+if PYVERSION >= "2.6":
+    import ssl
+
 
 class ProxyHTTPConnection(httplib.HTTPConnection):
     _ports = {"http" : 80, "https" : 443}
@@ -98,8 +104,12 @@ class ProxyHTTPSConnection(ProxyHTTPConnection):
         ProxyHTTPConnection.connect(self)
 
         # Make the sock ssl-aware
-        ssl = socket.ssl(self.sock, self.key_file, self.cert_file)
-        self.sock = httplib.FakeSocket(self.sock, ssl)
+        if PYVERSION >= "2.6":
+            sslobj    = ssl.wrap_socket(self.sock, self.key_file, self.cert_file)
+            self.sock = sslobj
+        else:
+            sslobj    = socket.ssl(self.sock, self.key_file, self.cert_file)
+            self.sock = httplib.FakeSocket(self.sock, sslobj)
 
 
 class ProxyHTTPHandler(urllib2.HTTPHandler):
