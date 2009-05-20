@@ -140,38 +140,34 @@ def bisection(payload, expression, length=None, charsetType=None):
 
 
         def downloadThread():
-            while True:
-                idxlock.acquire()
+            try:
+                while True:
+                    idxlock.acquire()
 
-                if index[0] >= length:
+                    if index[0] >= length:
+                        idxlock.release()
+
+                        return
+
+                    index[0] += 1
+                    curidx = index[0]
                     idxlock.release()
 
-                    return
+                    charStart = time.time()
+                    val       = getChar(curidx)
 
-                index[0] += 1
-                curidx = index[0]
-                idxlock.release()
+                    if val == None:
+                        raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
 
-                charStart = time.time()
-                val       = getChar(curidx)
+                    value[curidx-1] = val
 
-                if val == None:
-                    raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
-
-                value[curidx-1] = val
-
-                if showEta:
-                    etaProgressUpdate(time.time() - charStart, index[0])
-                elif conf.verbose in ( 1, 2 ):
-                    s = "".join([c or "_" for c in value])
-                    iolock.acquire()
-                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), s))
-                    iolock.release()
-
-
-        def downloadThreadProxy(numThread):
-            try:
-                downloadThread()
+                    if showEta:
+                        etaProgressUpdate(time.time() - charStart, index[0])
+                    elif conf.verbose in ( 1, 2 ):
+                        s = "".join([c or "_" for c in value])
+                        iolock.acquire()
+                        dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), s))
+                        iolock.release()
 
             except (sqlmapConnectionException, sqlmapValueException), errMsg:
                 conf.threadException = True
@@ -199,7 +195,7 @@ def bisection(payload, expression, length=None, charsetType=None):
 
         # Start the threads
         for numThread in range(numThreads):
-            thread = threading.Thread(target=downloadThreadProxy(numThread))
+            thread = threading.Thread(target=downloadThread)
             thread.start()
             threads.append(thread)
 
