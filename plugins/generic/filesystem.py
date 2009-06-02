@@ -65,6 +65,14 @@ class Filesystem:
     def __unhexString(self, hexStr):
         unhexStr = ""
 
+        if ( len(hexStr) % 2 ) != 0:
+            errMsg  = "for some reasons sqlmap retrieved an odd-length "
+            errMsg += "hexadecimal string which it is not able to convert "
+            errMsg += "to raw string"
+            logger.error(errMsg)
+
+            return hexStr
+
         if isinstance(hexStr, (list, tuple, set)):
             for chunk in hexStr:
                 if isinstance(chunk, (list, tuple, set)):
