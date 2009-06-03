@@ -100,7 +100,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
     for request in reqResList:
         if scheme is None:
-            scheme = re.search("\d\d\:\d\d\:\d\d\s+(http[\w]*)\:", request, re.I)
+            scheme = re.search("\d\d[\:|\.]\d\d[\:|\.]\d\d\s+(http[\w]*)\:", request, re.I)
 
             if scheme:
                 scheme = scheme.group(1)
