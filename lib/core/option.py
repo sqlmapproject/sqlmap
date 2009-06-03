@@ -96,7 +96,15 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
     reqResList = fread.split("======================================================")
 
+    scheme = None
+
     for request in reqResList:
+        if scheme is None:
+            scheme = re.search("\d\d\:\d\d\:\d\d\s+(http[\w]*)\:", request, re.I)
+
+            if scheme:
+                scheme = scheme.group(1)
+
         if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I):
             continue
 
@@ -151,7 +159,8 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
         if getPostReq and params:
             if not url.startswith("http"):
-                url = "http://%s%s" % (host, url)
+                url    = "%s://%s%s" % (scheme or "http", host, url)
+                scheme = None
 
             if not kb.targetUrls or url not in addedTargetUrls:
                 kb.targetUrls.add(( url, method, data, cookie ))
