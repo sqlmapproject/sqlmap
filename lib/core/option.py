@@ -101,7 +101,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
     for request in reqResList:
         if scheme is None:
-            schemePort = re.search("\d\d[\:|\.]\d\d[\:|\.]\d\d\s+(http[\w]*)\:([\d]+)", request, re.I)
+            schemePort = re.search("\d\d[\:|\.]\d\d[\:|\.]\d\d\s+(http[\w]*)\:\/\/.*?\:([\d]+)", request, re.I)
 
             if schemePort:
                 scheme = schemePort.group(1)
