@@ -949,7 +949,12 @@ def __mergeOptions(inputOptions):
     if inputOptions.configFile:
         configFileParser(inputOptions.configFile)
 
-    for key, value in inputOptions.__dict__.items():
+    if hasattr(inputOptions, "items"):
+        inputOptionsItems = inputOptions.items()
+    else:
+        inputOptionsItems = inputOptions.__dict__.items()
+
+    for key, value in inputOptionsItems:
         if not conf.has_key(key) or conf[key] == None or value != None:
             conf[key] = value
 
