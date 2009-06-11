@@ -32,6 +32,7 @@ boolean and _outputfile variable used in genutils.
 import sys
 
 from lib.core.data import logger
+from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 
 
@@ -49,7 +50,7 @@ except ImportError:
     except ImportError:    
         haveReadline = False
 
-if 'win' in PLATFORM and 'darwin' not in PLATFORM and haveReadline:
+if IS_WIN is True and haveReadline:
     try:
         _outputfile=_rl.GetOutputFile()
     except AttributeError:

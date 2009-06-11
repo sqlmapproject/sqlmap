@@ -24,17 +24,21 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
-import fcntl
 import errno
 import os
 import sys
 import time
 
+from lib.core.settings import IS_WIN
 
-if (sys.hexversion >> 16) >= 0x202:
-    FCNTL = fcntl
-else:
-    import FCNTL
+
+if IS_WIN is not True:
+    import fcntl
+
+    if (sys.hexversion >> 16) >= 0x202:
+        FCNTL = fcntl
+    else:
+        import FCNTL
 
 
 def blockingReadFromFD(fd):
@@ -84,6 +88,7 @@ def setNonBlocking(fd):
     Make a file descriptor non-blocking
     """
 
-    flags = fcntl.fcntl(fd, FCNTL.F_GETFL)
-    flags = flags | os.O_NONBLOCK
-    fcntl.fcntl(fd, FCNTL.F_SETFL, flags)
+    if IS_WIN is not True:
+        flags = fcntl.fcntl(fd, FCNTL.F_GETFL)
+        flags = flags | os.O_NONBLOCK
+        fcntl.fcntl(fd, FCNTL.F_SETFL, flags)

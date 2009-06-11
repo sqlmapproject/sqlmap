@@ -25,11 +25,12 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 import logging
+import subprocess
 import sys
 
 
 # sqlmap version and site
-VERSION            = "0.7rc2"
+VERSION            = "0.7rc3"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 SITE               = "http://sqlmap.sourceforge.net"
 
@@ -46,6 +47,7 @@ LOGGER.addHandler(LOGGER_HANDLER)
 LOGGER.setLevel(logging.WARN)
 
 # System variables
+IS_WIN             = subprocess.mswindows
 PLATFORM           = sys.platform.lower()
 PYVERSION          = sys.version.split()[0]
 

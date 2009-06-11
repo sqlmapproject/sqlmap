@@ -43,7 +43,7 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.exception import sqlmapFilePathException
-from lib.core.settings import PLATFORM
+from lib.core.settings import IS_WIN
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
 
@@ -832,7 +832,7 @@ def searchEnvPath(fileName):
     envPaths = os.environ["PATH"]
     result   = None
 
-    if "darwin" not in PLATFORM and "win" in PLATFORM:
+    if IS_WIN is True:
         envPaths = envPaths.split(";")
     else:
         envPaths = envPaths.split(":")

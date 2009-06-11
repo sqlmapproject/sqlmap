@@ -55,6 +55,7 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.optiondict import optDict
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import SITE
 from lib.core.settings import SUPPORTED_DBMS
@@ -267,6 +268,26 @@ def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
         return
 
+    debugMsg = "setting the takeover out-of-band functionality"
+    logger.debug(debugMsg)
+
+    msfEnvPathExists = False
+
+    if IS_WIN is True:
+        warnMsg  = "Metasploit's msfconsole and msfcli are not supported "
+        warnMsg += "on the native Windows Ruby interpreter. Please "
+        warnMsg += "install Metasploit, Python interpreter and sqlmap on "
+        warnMsg += "Cygwin or use Linux in VMWare to use sqlmap takeover "
+        warnMsg += "out-of-band features. sqlmap will now continue "
+        warnMsg += "without calling any takeover feature"
+        logger.warn(warnMsg)
+
+        conf.osPwn = None
+        conf.osSmb = None
+        conf.osBof = None
+
+        return
+
     if conf.osSmb:
         isAdmin = False
 
@@ -276,7 +297,7 @@ def __setMetasploit():
             if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
                 isAdmin = True
 
-        elif "win" in PLATFORM:
+        elif IS_WIN is True:
             isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
 
             if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
@@ -292,17 +313,12 @@ def __setMetasploit():
 
             isAdmin = True
 
-        if isAdmin != True:
-            errMsg  = "you need to run sqlmap as an administrator/root "
+        if isAdmin is not True:
+            errMsg  = "you need to run sqlmap as an Administrator/root "
             errMsg += "user if you want to perform a SMB relay attack "
             errMsg += "because it will need to listen on a user-specified "
             errMsg += "SMB TCP port for incoming connection attempts"
             raise sqlmapMissingPrivileges, errMsg
-
-    debugMsg = "setting the out-of-band functionality"
-    logger.debug(debugMsg)
-
-    msfEnvPathExists = False
 
     if conf.msfPath:
         condition  = os.path.exists(os.path.normpath(conf.msfPath))
@@ -337,7 +353,7 @@ def __setMetasploit():
 
         envPaths = os.environ["PATH"]
 
-        if "darwin" not in PLATFORM and "win" in PLATFORM:
+        if IS_WIN is True:
             envPaths = envPaths.split(";")
         else:
             envPaths = envPaths.split(":")
