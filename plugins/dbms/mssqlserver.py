@@ -604,13 +604,14 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         logger.info("restarting Microsoft SQL Server, wait..")
         time.sleep(15)
+
         # TODO: use 'sc' to:
         # * Warn the user that sqlmap needs to restart the SQL Server
         #   service, ask for confirmation
         # * Stop the SQL Server service (after handling DEP)
         # * Start the SQL Server service (after handling DEP)
 
-        # Another way to restart MSSQL consists of writing a  bat file with
+        # Another way to restart MSSQL consists of writing a bat file with
         # the following text:
         #
         #@ECHO OFF

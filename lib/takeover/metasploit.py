@@ -399,8 +399,13 @@ class Metasploit:
             if extra is not None:
                 self.__payloadCmd += " %s" % extra
 
-        # TODO: payload stager for Linux can not be encoded as long as
-        # Metasploit developers do not commit my minor patch for msfencode
+        # NOTE: payload stager for Linux can only be encoded if the
+        # Metasploit working copy has been updated after May 11, 2009
+        # (http://trac.metasploit.com/changeset/6543)
+        #
+        # TODO: remember to update this code as soon as Metasploit
+        # Framework 3.3 is out officially and update the user's manual to
+        # notify that sqlmap depends upon Metasploit Framework 3.3
         else:
             self.__payloadCmd += " X > %s" % outFile
 
