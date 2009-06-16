@@ -109,12 +109,15 @@ def __updateMSSQLXML():
                 servicePack = servicePack[:servicePack.index("-")]
             if "*" in servicePack:
                 servicePack = servicePack[:servicePack.index("*")]
+            if servicePack.startswith("+"):
+                servicePack = "0%s" % servicePack
 
             servicePack = servicePack.replace("\t", " ")
             servicePack = servicePack.replace("  ", " ")
             servicePack = servicePack.replace("No SP", "0")
             servicePack = servicePack.replace("RTM", "0")
             servicePack = servicePack.replace("SP", "")
+            servicePack = servicePack.replace("Service Pack", "")
             servicePack = servicePack.replace("<a href=\"http:", "")
 
             if servicePack.endswith(" "):

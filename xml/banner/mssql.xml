@@ -3,15 +3,31 @@
     <signatures release="2008">
         <signature>
             <version>
-                10.0.2531
+                10.00.2714
             </version>
             <servicepack>
-                0 + Service Pack 1
+                1 + Cumulative Update 2 for Service Pack 1
             </servicepack>
         </signature>
         <signature>
             <version>
-                10.0.1798.0
+                10.00.2710
+            </version>
+            <servicepack>
+                1 + Cumulative Update 1 for Service Pack 1
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.00.2531
+            </version>
+            <servicepack>
+                1
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.00.1798
             </version>
             <servicepack>
                 0 + Cumulative Update 4
@@ -51,7 +67,7 @@
         </signature>
         <signature>
             <version>
-                10.0.1600.22
+                10.00.1600.22
             </version>
             <servicepack>
                 0
@@ -83,6 +99,22 @@
         </signature>
     </signatures>
     <signatures release="2005">
+        <signature>
+            <version>
+                9.00.4220
+            </version>
+            <servicepack>
+                3+Q967909
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.4216
+            </version>
+            <servicepack>
+                3+Q967101
+            </servicepack>
+        </signature>
         <signature>
             <version>
                 9.00.4211

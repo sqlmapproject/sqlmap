@@ -493,8 +493,6 @@ def __setHTTPProxy():
     if not conf.proxy:
         return
 
-    parseTargetUrl()
-
     debugMsg = "setting the HTTP proxy to pass by all HTTP requests"
     logger.debug(debugMsg)
 
@@ -516,8 +514,8 @@ def __setHTTPProxy():
 
     # Workaround for http://bugs.python.org/issue1424152 (urllib/urllib2:
     # HTTPS over (Squid) Proxy fails) as long as HTTP over SSL requests
-    # can't be tunneled over an HTTP proxy natively by Python urllib2
-    # standard library
+    # can't be tunneled over an HTTP proxy natively by Python (<= 2.5)
+    # urllib2 standard library
     if conf.scheme == "https":
         proxyHandler = ProxyHTTPSHandler(__proxyString)
     else:
@@ -544,8 +542,6 @@ def __setHTTPAuthentication():
         errMsg  = "you specified the HTTP Authentication credentials, "
         errMsg += "but did not provide the type"
         raise sqlmapSyntaxException, errMsg
-
-    parseTargetUrl()
 
     debugMsg = "setting the HTTP Authentication type and credentials"
     logger.debug(debugMsg)
@@ -599,9 +595,8 @@ def __setHTTPMethod():
 
 
 def __setHTTPExtraHeaders():
-    parseTargetUrl()
-
-    conf.httpHeaders.append(("Host", conf.hostname))
+    if conf.hostname:
+        conf.httpHeaders.append(("Host", conf.hostname))
 
     if conf.headers:
         debugMsg = "setting extra HTTP headers"
@@ -987,6 +982,9 @@ def init(inputOptions=advancedDict()):
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
     __cleanupOptions()
+
+    parseTargetUrl()
+
     __setHTTPTimeout()
     __setHTTPCookies()
     __setHTTPReferer()
