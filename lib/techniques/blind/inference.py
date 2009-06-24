@@ -73,7 +73,7 @@ def bisection(payload, expression, length=None, charsetType=None):
     if length == 0:
         return 0, ""
 
-    showEta = conf.eta and length
+    showEta = conf.eta and isinstance(length, int)
     numThreads = min(conf.threads, length)
     threads = []
 
