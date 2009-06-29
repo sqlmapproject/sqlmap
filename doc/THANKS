@@ -5,6 +5,9 @@ Chip Andrews <chip@sqlsecurity.com>
     at SQLSecurity.com and permission to implement the update feature
     taking data from his site
 
+Simon Baker <simonb@sec-1.com>
+    for reporting some bugs
+
 Daniele Bellucci <daniele.bellucci@gmail.com>
     for starting sqlmap project and developing it between July and August
     2006

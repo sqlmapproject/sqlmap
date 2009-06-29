@@ -999,7 +999,7 @@ class Enumeration:
 
                 if conf.dumpAll:
                     logger.warn(errMsg)
-                    return kb.data.dumpedTable
+                    return None
                 else:
                     raise sqlmapNoneDataException, errMsg
 
