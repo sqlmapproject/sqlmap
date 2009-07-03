@@ -80,9 +80,11 @@ class Metasploit:
 
         self.__msfPayloadsList    = {
                                       "windows": {
-                                                   1: ( "Meterpreter (default)", "windows/meterpreter" ),
-                                                   2: ( "Shell", "windows/shell" ),
-                                                   3: ( "VNC", "windows/vncinject" ),
+                                                   1: ( "Reflective Meterpreter (default)", "windows/reflectivemeterpreter" ),
+                                                   2: ( "Meterpreter", "windows/meterpreter" ),
+                                                   3: ( "Shell", "windows/shell" ),
+                                                   4: ( "Reflective VNC", "windows/reflectivevncinject" ),
+                                                   5: ( "VNC", "windows/vncinject" ),
                                                  },
                                       "linux":   {
                                                    1: ( "Shell", "linux/x86/shell" ),
@@ -196,7 +198,7 @@ class Metasploit:
             infoMsg += "'incognito' extension to privilege escalate"
             logger.info(infoMsg)
 
-            __payloadStr = "windows/meterpreter"
+            __payloadStr = "windows/reflectivemeterpreter"
 
         else:
             __payloadStr = self.__skeletonSelection("payload", self.__msfPayloadsList)
@@ -230,14 +232,14 @@ class Metasploit:
             if choose == True:
                 message  = "what do you want to do?\n"
                 message += "[1] Give it a try anyway\n"
-                message += "[2] Fall back to Meterpreter payload (default)\n"
+                message += "[2] Fall back to reflective Meterpreter payload (default)\n"
                 message += "[3] Fall back to Shell payload"
 
                 while True:
                     choice = readInput(message, default="2")
 
                     if not choice or choice == "2":
-                        __payloadStr = "windows/meterpreter"
+                        __payloadStr = "windows/reflectivemeterpreter"
 
                         break
 
@@ -622,7 +624,7 @@ class Metasploit:
             packedSize  = upx.pack(self.exeFilePathLocal)
             debugMsg    = "the encoded payload size is %s bytes, " % payloadSize
 
-            if packedSize:
+            if packedSize and packedSize != exeSize:
                 debugMsg += "as a compressed portable executable its size "
                 debugMsg += "is %d bytes, decompressed it " % packedSize
                 debugMsg += "was %s bytes large" % exeSize
