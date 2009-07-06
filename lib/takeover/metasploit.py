@@ -80,11 +80,11 @@ class Metasploit:
 
         self.__msfPayloadsList    = {
                                       "windows": {
-                                                   1: ( "Reflective Meterpreter (default)", "windows/reflectivemeterpreter" ),
-                                                   2: ( "Meterpreter", "windows/meterpreter" ),
+                                                   1: ( "Reflective Meterpreter (default)", "windows/meterpreter" ),
+                                                   2: ( "PatchUp Meterpreter (only from Metasploit development revision 6742)", "windows/patchupmeterpreter" ),
                                                    3: ( "Shell", "windows/shell" ),
-                                                   4: ( "Reflective VNC", "windows/reflectivevncinject" ),
-                                                   5: ( "VNC", "windows/vncinject" ),
+                                                   4: ( "Reflective VNC", "windows/vncinject" ),
+                                                   5: ( "PatchUp VNC (only from Metasploit development revision 6742)", "windows/patchupvncinject" ),
                                                  },
                                       "linux":   {
                                                    1: ( "Shell", "linux/x86/shell" ),
@@ -150,7 +150,7 @@ class Metasploit:
                 if num > maxValue:
                     maxValue = num
 
-                if "default" in description:
+                if "(default)" in description:
                     default = num
 
                 message += "\n[%d] %s" % (num, description)
@@ -198,7 +198,7 @@ class Metasploit:
             infoMsg += "'incognito' extension to privilege escalate"
             logger.info(infoMsg)
 
-            __payloadStr = "windows/reflectivemeterpreter"
+            __payloadStr = "windows/meterpreter"
 
         else:
             __payloadStr = self.__skeletonSelection("payload", self.__msfPayloadsList)
@@ -239,7 +239,7 @@ class Metasploit:
                     choice = readInput(message, default="2")
 
                     if not choice or choice == "2":
-                        __payloadStr = "windows/reflectivemeterpreter"
+                        __payloadStr = "windows/meterpreter"
 
                         break
 

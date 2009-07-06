@@ -541,7 +541,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
             for i in range(0, wFileSize, debugSize):
                 wFileChunk = wFileContent[i:i+debugSize]
-                chunkName  = self.updateBinChunk(wFileChunk, dFile, tmpPath)
+                chunkName  = self.updateBinChunk(wFileChunk, tmpPath)
 
                 if i == 0:
                     infoMsg = "renaming chunk "
