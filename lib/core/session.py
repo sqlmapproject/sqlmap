@@ -34,6 +34,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import ORACLE_ALIASES
 
 
 def setString():
@@ -133,8 +135,10 @@ def setDbms(dbms):
     if condition:
         dataToSessionFile("[%s][%s][%s][DBMS][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], dbms))
 
-    firstRegExp = "(%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
-                               "|".join([alias for alias in MYSQL_ALIASES]))
+    firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
+                                     "|".join([alias for alias in MYSQL_ALIASES]),
+                                     "|".join([alias for alias in PGSQL_ALIASES]),
+                                     "|".join([alias for alias in ORACLE_ALIASES]))
     dbmsRegExp = re.search("^%s" % firstRegExp, dbms, re.I)
 
     if dbmsRegExp:
@@ -368,20 +372,23 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
     elif expression == "DBMS" and url == conf.url:
-        dbms = value[:-1]
+        dbms        = value[:-1]
+        dbms        = dbms.lower()
+        dbmsVersion = None
 
         logMsg  = "resuming back-end DBMS '%s' " % dbms
         logMsg += "from session file"
         logger.info(logMsg)
 
-        dbms = dbms.lower()
-        firstRegExp = "(%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
-                                   "|".join([alias for alias in MYSQL_ALIASES]))
+        firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
+                                         "|".join([alias for alias in MYSQL_ALIASES]),
+                                         "|".join([alias for alias in PGSQL_ALIASES]),
+                                         "|".join([alias for alias in ORACLE_ALIASES]))
         dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, dbms)
 
         if dbmsRegExp:
-            dbms = dbmsRegExp.group(1)
-            kb.dbmsVersion = [ dbmsRegExp.group(2) ]
+            dbms        = dbmsRegExp.group(1)
+            dbmsVersion = [ dbmsRegExp.group(2) ]
 
         if conf.dbms and conf.dbms.lower() != dbms:
             message  = "you provided '%s' as back-end DBMS, " % conf.dbms
@@ -392,9 +399,11 @@ def resumeConfKb(expression, url, value):
             test = readInput(message, default="N")
 
             if not test or test[0] in ("n", "N"):
-                conf.dbms = dbms
+                conf.dbms      = dbms
+                kb.dbmsVersion = dbmsVersion
         else:
-            conf.dbms = dbms
+            conf.dbms      = dbms
+            kb.dbmsVersion = dbmsVersion
 
     elif expression == "OS" and url == conf.url:
         os = value[:-1]

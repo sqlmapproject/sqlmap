@@ -1571,11 +1571,13 @@ At the moment the fully supported database management system are four:</P>
 </UL>
 </P>
 
-<P>It is possible to force the name if you already know it so that sqlmap
-will skip the fingerprint with an exception for MySQL to only identify if
-it is MySQL &lt; 5.0 or MySQL &gt;= 5.0.
-To avoid also this check you can provide instead <CODE>MySQL 4</CODE> or
-<CODE>MySQL 5</CODE>.</P>
+<P>It is possible to force the DBMS name if you already know it so that sqlmap
+will skip the fingerprint with an exception for MySQL and Microsoft SQL
+Server to only identify the version.
+To avoid also this check you can provide instead <CODE>MySQL VERSION</CODE> or
+<CODE>Microsoft SQL Server VERSION</CODE> where version is a valid version for
+the DBMS, for instance <CODE>5.0</CODE> for MySQL and <CODE>2005</CODE> for
+Microsoft SQL Server.</P>
 <P>Example on a <B>PostgreSQL 8.3.5</B> target:</P>
 <P>
 <BLOCKQUOTE><CODE>

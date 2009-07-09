@@ -55,6 +55,8 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.optiondict import optDict
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import SITE
@@ -461,8 +463,10 @@ def __setDBMS():
     logger.debug(debugMsg)
 
     conf.dbms = conf.dbms.lower()
-    firstRegExp = "(%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
-                               "|".join([alias for alias in MYSQL_ALIASES]))
+    firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
+                                     "|".join([alias for alias in MYSQL_ALIASES]),
+                                     "|".join([alias for alias in PGSQL_ALIASES]),
+                                     "|".join([alias for alias in ORACLE_ALIASES]))
     dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms)
 
     if dbmsRegExp:
