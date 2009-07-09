@@ -87,8 +87,7 @@ def paramToDict(place, parameters=None):
 
             if condition:
                 value = elem[1]
-                if value:
-                    testableParameters[parameter] = value
+                testableParameters[parameter] = value
 
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
