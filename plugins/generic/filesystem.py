@@ -48,24 +48,13 @@ class Filesystem:
 
 
     def __unbase64String(self, base64Str):
-        unbase64Str = ""
-
-        if isinstance(base64Str, (list, tuple, set)):
-            for chunk in base64Str:
-                if isinstance(chunk, (list, tuple, set)):
-                    chunk = chunk[0]
-
-                unbase64Str += "%s\n" % chunk.decode("base64")
-        else:
-            unbase64Str = "%s\n" % base64Str.decode("base64")
+        unbase64Str = "%s\n" % base64Str.decode("base64")
 
         return unbase64Str
 
 
     def __unhexString(self, hexStr):
-        unhexStr = ""
-
-        if ( len(hexStr) % 2 ) != 0:
+        if len(hexStr) % 2 != 0:
             errMsg  = "for some reasons sqlmap retrieved an odd-length "
             errMsg += "hexadecimal string which it is not able to convert "
             errMsg += "to raw string"
@@ -73,16 +62,7 @@ class Filesystem:
 
             return hexStr
 
-        if isinstance(hexStr, (list, tuple, set)):
-            for chunk in hexStr:
-                if isinstance(chunk, (list, tuple, set)):
-                    chunk = chunk[0]
-
-                unhexStr += binascii.unhexlify(chunk)
-        else:
-            unhexStr = binascii.unhexlify(hexStr)
-
-        return unhexStr
+        return binascii.unhexlify(hexStr)
 
 
     def __binDataToScr(self, binaryData, chunkName):
@@ -301,10 +281,20 @@ class Filesystem:
 
             fileContent = self.stackedReadFile(rFile)
 
-        if fileContent == None:
+        if fileContent in ( None, "" ):
             self.cleanup(onlyFileTbl=True)
 
             return
+        elif isinstance(fileContent, (list, tuple, set)):
+            newFileContent = ""
+
+            for chunk in fileContent:
+                if isinstance(chunk, (list, tuple, set)):
+                    chunk = chunk[0]
+
+                newFileContent += chunk
+
+            fileContent = newFileContent
 
         if kb.dbms in ( "MySQL", "Microsoft SQL Server" ):
             fileContent = self.__unhexString(fileContent)
