@@ -285,7 +285,8 @@ def getDirs():
         logger.info(infoMsg)
 
         for absFilePath in kb.absFilePaths:
-            directories.add(os.path.dirname(absFilePath))
+            if absFilePath:
+                directories.add(os.path.dirname(absFilePath))
     else:
         warnMsg = "unable to retrieve any web server path"
         logger.warn(warnMsg)
@@ -299,7 +300,8 @@ def getDirs():
         inputDirs = inputDirs.split(",")
 
         for inputDir in inputDirs:
-            directories.add(inputDir)
+            if inputDir:
+                directories.add(inputDir)
     else:
         directories.add(defaultDir)
 
