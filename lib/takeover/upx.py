@@ -78,14 +78,24 @@ class UPX:
 
         dataToStdout("\r[%s] [INFO] compression in progress " % time.strftime("%X"))
         pollProcess(process)
-        upxStderr = process.communicate()[1]
+        upxStdout, upxStderr = process.communicate()
 
-        if upxStderr:
-            logger.warn("failed to compress the file")
+        warnMsg = "failed to compress the file"
 
-            return None
+        if "NotCompressibleException" in upxStdout:
+            warnMsg += " because you provided a Metasploit version above "
+            warnMsg += "3.3-dev revision 6681. This will not inficiate "
+            warnMsg += "the correct execution of sqlmap. It might "
+            warnMsg += "only slow down a bit the execution of sqlmap"
+            logger.info(warnMsg)
+
+        elif upxStderr:
+            logger.warn(warnMsg)
+
         else:
             return os.path.getsize(srcFile)
+
+        return None
 
 
     def unpack(self, srcFile, dstFile=None):

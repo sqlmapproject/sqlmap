@@ -781,11 +781,13 @@ def pollProcess(process):
 
         returncode = process.poll()
 
-        if returncode != None:
+        if returncode is not None:
             if returncode == 0:
                 dataToStdout(" done\n")
-            else:
-                dataToStdout(" quit unexpectedly by signal %d\n" % returncode)
+            elif returncode < 0:
+                dataToStdout(" process terminated by signal %d\n" % returncode)
+            elif returncode > 0:
+                dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
 
             break
 
