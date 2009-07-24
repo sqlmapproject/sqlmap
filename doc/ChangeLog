@@ -1,3 +1,27 @@
+sqlmap (0.7-1) stable; urgency=low
+
+  * Adapted Metasploit wrapping functions to work with latest 3.3
+    development version too.
+  * Adjusted code to make sqlmap 0.7 to work again on Mac OSX too.
+  * Reset takeover OOB features (if any of --os-pwn, --os-smbrelay or
+    --os-bof is selected) when running under Windows because msfconsole
+    and msfcli are not supported on the native Windows Ruby interpreter.
+    This make sqlmap 0.7 to work again on Windows too.
+  * Minor improvement so that sqlmap tests also all parameters with no
+    value (eg. par=).
+  * HTTPS requests over HTTP proxy now work on either Python 2.4, 2.5 and
+    2.6+.
+  * Major bug fix to sql-query/sql-shell features.
+  * Major bug fix in --read-file option.
+  * Major silent bug fix to multi-threading functionality.
+  * Fixed the web backdoor functionality (for MySQL) when (usually) stacked
+    queries are not supported and --os-shell is provided.
+  * Fixed MySQL 'comment injection' version fingerprint.
+  * Fixed basic Microsoft SQL Server 2000 fingerprint.
+  * Many minor bug fixes and code refactoring.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat, 25 Jul 2009 10:00:00 +0000
+
 sqlmap (0.7rc1-1) stable; urgency=low
 
   * Added support to execute arbitrary commands on the database server
