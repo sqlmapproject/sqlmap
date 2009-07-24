@@ -590,37 +590,19 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
 
     def overflowBypassDEP(self):
-        # TODO: use 'sc' to:
-        # * Get the SQL Server 'Service name' (usually MSSQLSERVER)
-        # * Detect the absolute SQL Server executable file path
-        #
-        # References:
-        # * http://www.ss64.com/nt/sc.html
-        # * http://www.ss64.com/nt/for_cmd.html
         self.handleDep("C:\Program Files\Microsoft SQL Server\MSSQL.1\MSSQL\Binn\sqlservr.exe")
 
         if self.bypassDEP == False:
             return
-
-        logger.info("restarting Microsoft SQL Server, wait..")
-        time.sleep(15)
-
-        # TODO: use 'sc' to:
-        # * Warn the user that sqlmap needs to restart the SQL Server
-        #   service, ask for confirmation
-        # * Stop the SQL Server service (after handling DEP)
-        # * Start the SQL Server service (after handling DEP)
-
-        # Another way to restart MSSQL consists of writing a bat file with
-        # the following text:
-        #
-        #@ECHO OFF
-        #NET STOP MSSQLSERVER
-        #NET START MSSQLSERVER
-        #
-        # Then run the following statement and wait a few seconds:
-        #
-        # exec master..xp_cmdshell 'start C:\WINDOWS\Temp\sqlmaprandom.bat'
+        else:
+            warnMsg  = "sqlmap tried to add the expection for "
+            warnMsg += "'sqlservr.exe' within the registry, but will not "
+            warnMsg += "restart the MSSQLSERVER process to avoid denial "
+            warnMsg += "of service. The buffer overflow trigger could not "
+            warnMsg += "work, however sqlmap will give it a try. Soon "
+            warnMsg += "it will come a new MS09-004 exploit to "
+            warnMsg += "automatically bypass DEP."
+            logger.warn(warnMsg)
 
 
     def spHeapOverflow(self):
