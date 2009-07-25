@@ -219,6 +219,8 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         query = agent.forgeInbandQuery(expression, nullChar=nullChar)
         payload = agent.payload(newValue=query)
 
+        # NOTE: for debug purposes only
+        #debugMsg = "query: %s" % payload
         debugMsg = "query: %s" % query
         logger.debug(debugMsg)
 

@@ -217,4 +217,4 @@ class xp_cmdshell:
         debugMsg += "output to"
         logger.debug(debugMsg)
 
-        self.createSupportTbl(self.cmdTblName, self.tblField, "text")
+        self.createSupportTbl(self.cmdTblName, self.tblField, "varchar(8000)")
