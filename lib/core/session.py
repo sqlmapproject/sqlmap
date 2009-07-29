@@ -187,7 +187,7 @@ def setOs():
     elif "sp" not in kb.bannerFp and kb.os == "Windows":
         kb.osSP = 0
 
-    if kb.os and kb.osVersion:
+    if kb.os and kb.osVersion and kb.osSP:
         infoMsg += " Service Pack %d" % kb.osSP
 
     if infoMsg:

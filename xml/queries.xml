@@ -151,8 +151,8 @@
             <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
         </privileges>
         <dbs>
-            <inband query="SELECT schemaname FROM pg_tables"/>
-            <blind query="SELECT DISTINCT(schemaname) FROM pg_tables OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
+            <inband query="SELECT datname FROM pg_database"/>
+            <blind query="SELECT DISTINCT(datname) FROM pg_database OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database"/>
         </dbs>
         <tables>
             <inband query="SELECT schemaname, tablename FROM pg_tables" condition="schemaname"/>
