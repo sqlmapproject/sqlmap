@@ -95,6 +95,9 @@ Mounir Idrassi <mounir.idrassi@idrix.net>
 Luke Jahnke <luke.jahnke@gmail.com>
     for reporting a bug when running against MySQL < 5.0
 
+Sven Klemm <sven@c3d2.de>
+    for reporting two minor bugs with PostgreSQL
+
 Anant Kochhar <anant.kochhar@secureyes.net>
     for providing me with feedback on the user's manual
 
