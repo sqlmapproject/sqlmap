@@ -29,7 +29,7 @@ optDict = {
             "Target":        {
                                "url":               "string",
                                "list":              "string",
-                               "googleDork":        "string",
+                               "googleDork":        "string"
                              },
 
             "Request":       {
@@ -45,7 +45,7 @@ optDict = {
                                "proxy":             "string",
                                "threads":           "integer",
                                "delay":             "float",
-                               "timeout":           "float",
+                               "timeout":           "float"
                              },
 
             "Injection":     {
@@ -57,7 +57,7 @@ optDict = {
                                "string":            "string",
                                "regexp":            "string",
                                "eString":           "string",
-                               "eRegexp":           "string",
+                               "eRegexp":           "string"
                              },
 
             "Techniques":    {
@@ -65,11 +65,11 @@ optDict = {
                                "timeTest":          "boolean",
                                "unionTest":         "boolean",
                                "uTech":             "string",
-                               "unionUse":          "boolean",
+                               "unionUse":          "boolean"
                              },
 
             "Fingerprint":   {
-                               "extensiveFp":       "boolean",
+                               "extensiveFp":       "boolean"
                              },
 
             "Enumeration":   {
@@ -92,14 +92,21 @@ optDict = {
                                "excludeSysDbs":     "boolean",
                                "limitStart":        "integer",
                                "limitStop":         "integer",
+                               "firstChar":         "integer",
+                               "lastChar":          "integer",
                                "query":             "string",
-                               "sqlShell":          "boolean",
+                               "sqlShell":          "boolean"
+                             },
+
+            "User-defined function": {
+                               "udfInject":         "boolean",
+                               "shLib":             "string"
                              },
 
             "File system":   {
                                "rFile":             "string",
                                "wFile":             "string",
-                               "dFile":             "string",
+                               "dFile":             "string"
                              },
 
             "Takeover":      {
@@ -110,7 +117,17 @@ optDict = {
                                "osBof":             "boolean",
                                "privEsc":           "boolean",
                                "msfPath":           "string",
-                               "tmpPath":           "string",
+                               "tmpPath":           "string"
+                             },
+
+            "Windows":       {
+                               "regRead":           "boolean",
+                               "regAdd":            "boolean",
+                               "regDel":            "boolean",
+                               "regKey":            "string",
+                               "regVal":            "string",
+                               "regData":           "string",
+                               "regType":           "string"
                              },
 
             "Miscellaneous": {
@@ -119,6 +136,6 @@ optDict = {
                                "updateAll":         "boolean",
                                "sessionFile":       "string",
                                "batch":             "boolean",
-                               "cleanup":           "boolean",
+                               "cleanup":           "boolean"
                              },
           }

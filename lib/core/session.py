@@ -260,17 +260,6 @@ def setRemoteTempPath():
         dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], conf.tmpPath))
 
 
-def setDEP():
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("DEP") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][DEP][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.dep))
-
-
-
 def resumeConfKb(expression, url, value):
     if expression == "String" and url == conf.url:
         string = value[:-1]
@@ -459,11 +448,4 @@ def resumeConfKb(expression, url, value):
 
         logMsg  = "resuming remote absolute path of temporary "
         logMsg += "files directory '%s' from session file" % conf.tmpPath
-        logger.info(logMsg)
-
-    elif expression == "DEP" and url == conf.url:
-        kb.dep = value[:-1]
-
-        logMsg  = "resuming DEP system policy value '%s' " % kb.dep
-        logMsg += "from session file"
         logger.info(logMsg)

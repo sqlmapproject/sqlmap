@@ -137,6 +137,7 @@ def start():
             logMsg = "testing url %s" % targetUrl
             logger.info(logMsg)
 
+        createTargetDirs()
         initTargetEnv()
 
         if not checkConnection() or not checkString() or not checkRegexp():
@@ -259,7 +260,6 @@ def start():
 
             if condition:
                 checkForParenthesis()
-                createTargetDirs()
                 action()
 
     if conf.loggedToOut:

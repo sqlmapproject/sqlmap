@@ -20,7 +20,7 @@ Cesar Cerrudo <cesar@argeniss.com>
     sqlmap tree as a contrib library and used to run the stand-alone
     payload stager on the target Windows machine as SYSTEM user if the
     user wants to perform a privilege escalation attack,
-    http://www.argeniss.com/research/Churrasco.zip
+    http://www.argeniss.com/research/TokenKidnapping.pdf
 
 Karl Chen <quarl@cs.berkeley.edu>
     for providing with the multithreading patch for the inference
@@ -50,6 +50,11 @@ Dan Guido <dguido@gmail.com>
 Adam Faheem <faheem.adam@is.co.za>
     for reporting a few bugs
 
+James Fisher <www@sittinglittleduck.com>
+    for providing me with two very good feature requests
+    for his great tool too brute force directories and files names on
+    web/application servers, Dir Buster, http://tinyurl.com/dirbuster
+
 Jim Forster <jimforster@goldenwest.com>
     for reporting a bug
 
@@ -70,6 +75,7 @@ Ivan Giacomelli <truemilk@insiberia.net>
     for reviewing the documentation
 
 Oliver Gruskovnjak <oliver.gruskovnjak@gmail.com>
+    for reporting a bug
     for providing me with a minor patch
 
 Davide Guerri <d.guerri@caspur.it>
@@ -108,10 +114,13 @@ Nicolas Krassas <krasn@ans.gr>
     for reporting a bug
 
 Guido Landi <lists@keamera.org>
+    for reporting a couple of bugs
     for the great technical discussions
     for Microsoft SQL Server 2000 and Microsoft SQL Server 2005
     'sp_replwritetovarbin' stored procedure heap-based buffer overflow
-    (MS09-004) exploit development, http://www.milw0rm.com/author/1413
+    (MS09-004) exploit development
+    for presenting with me at SOURCE Conference 2009 in Barcelona (Spain)
+    on September 21, 2009
 
 Lee Lawson <Lee.Lawson@dns.co.uk>
     for reporting a minor bug
@@ -152,6 +161,9 @@ John F. Reiser <sales@bitwagon.com>
 
 Antonio Parata <s4tan@ictsc.it>
     for providing me with some ideas for the PHP backdoor
+
+Adrian Pastor <ap@gnucitizen.org>
+    for donating to sqlmap development
 
 Chris Patten <cpatten@sunera.com>
     for reporting a bug in the blind SQL injection bisection algorithm

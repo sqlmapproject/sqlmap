@@ -62,7 +62,6 @@ def cmdLineParser():
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
 
-
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target url.")
@@ -115,7 +114,6 @@ def cmdLineParser():
                            help="Retries when the connection timeouts "
                                 "(default 3)")
 
-
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
                                 "used to specify which parameters to test "
@@ -156,7 +154,6 @@ def cmdLineParser():
                              help="Matches to be excluded before "
                                   "comparing page contents")
 
-
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
                                  "be used to test for specific SQL injection "
@@ -190,7 +187,6 @@ def cmdLineParser():
                               help="Use the UNION query (inband) SQL injection "
                                    "to retrieve the queries output. No "
                                    "need to go blind")
-
 
         # Fingerprint options
         fingerprint = OptionGroup(parser, "Fingerprint")
@@ -273,6 +269,12 @@ def cmdLineParser():
         enumeration.add_option("--stop", dest="limitStop", type="int",
                                help="Last query output entry to retrieve")
 
+        enumeration.add_option("--first", dest="firstChar", type="int",
+                               help="First query output word character to retrieve")
+
+        enumeration.add_option("--last", dest="lastChar", type="int",
+                               help="Last query output word character to retrieve")
+
         enumeration.add_option("--sql-query", dest="query",
                                help="SQL statement to be executed")
 
@@ -280,6 +282,16 @@ def cmdLineParser():
                                action="store_true",
                                help="Prompt for an interactive SQL shell")
 
+        # User-defined function options
+        udf = OptionGroup(parser, "User-defined function injection", "These "
+                          "options can be used to create custom user-defined "
+                          "functions.")
+
+        udf.add_option("--udf-inject", dest="udfInject", action="store_true",
+                       help="Inject custom user-defined functions")
+
+        udf.add_option("--shared-lib", dest="shLib",
+                       help="Local path of the shared library")
 
         # File system options
         filesystem = OptionGroup(parser, "File system access", "These options "
@@ -335,6 +347,33 @@ def cmdLineParser():
                             help="Remote absolute path of temporary files "
                                  "directory")
 
+        # Windows registry options
+        windows = OptionGroup(parser, "Windows registry access", "This "
+                               "option can be used to access the back-end "
+                               "database management system Windows "
+                               "registry.")
+
+        windows.add_option("--reg-read", dest="regRead", action="store_true",
+                            help="Read a Windows registry key value")
+
+        windows.add_option("--reg-add", dest="regAdd", action="store_true",
+                            help="Write a Windows registry key value data")
+
+        windows.add_option("--reg-del", dest="regDel", action="store_true",
+                            help="Delete a Windows registry key value")
+
+        windows.add_option("--reg-key", dest="regKey",
+                            help="Windows registry key")
+
+        windows.add_option("--reg-value", dest="regVal",
+                            help="Windows registry key value")
+
+        windows.add_option("--reg-data", dest="regData",
+                            help="Windows registry key value data")
+
+        windows.add_option("--reg-type", dest="regType",
+                            help="Windows registry key value type")
+
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
@@ -365,8 +404,10 @@ def cmdLineParser():
         parser.add_option_group(techniques)
         parser.add_option_group(fingerprint)
         parser.add_option_group(enumeration)
+        parser.add_option_group(udf)
         parser.add_option_group(filesystem)
         parser.add_option_group(takeover)
+        parser.add_option_group(windows)
         parser.add_option_group(miscellaneous)
 
         (args, _) = parser.parse_args()

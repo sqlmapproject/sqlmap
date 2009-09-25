@@ -19,6 +19,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Adapt the following settings to your environment
+#PORT="5433"
+#VERSION="8.2"
 PORT="5432"
 VERSION="8.3"
 USER="postgres"

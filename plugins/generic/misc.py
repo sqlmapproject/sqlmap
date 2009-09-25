@@ -46,12 +46,15 @@ class Miscellaneous:
             if kb.os == "Windows":
                 # NOTES:
                 #
-                # * MySQL runs by default as SYSTEM and the system-wide
-                #   temporary files directory is C:\WINDOWS\Temp
+                # * The system-wide temporary files directory is
+                # C:\WINDOWS\Temp
+                #
+                # * MySQL runs by default as SYSTEM
                 #
                 # * PostgreSQL runs by default as postgres user and the
                 #   temporary files directory is C:\Documents and Settings\postgres\Local Settings\Temp,
-                #    however the system-wide folder is writable too
+                #   however the system-wide folder is writable too
+                #
                 #infoMsg  = "retrieving remote absolute path of temporary files "
                 #infoMsg += "directory"
                 #logger.info(infoMsg)
@@ -70,12 +73,28 @@ class Miscellaneous:
         setRemoteTempPath()
 
 
+    def delRemoteTempFile(self, tempFile, bat=False):
+        self.checkDbmsOs()
+
+        if kb.os == "Windows":
+            if bat is True:
+                tempFile = tempFile.replace("/", "\\\\")
+            else:
+                tempFile = tempFile.replace("/", "\\")
+
+            cmd = "del /F /Q %s" % tempFile
+        else:
+            cmd = "rm -f %s" % tempFile
+
+        self.execCmd(cmd, forgeCmd=True)
+
+
     def createSupportTbl(self, tblName, tblField, tblType):
         inject.goStacked("DROP TABLE %s" % tblName)
         inject.goStacked("CREATE TABLE %s(%s %s)" % (tblName, tblField, tblType))
 
 
-    def cleanup(self, onlyFileTbl=False):
+    def cleanup(self, onlyFileTbl=False, udfDict=None):
         """
         Cleanup database from sqlmap create tables and functions
         """
@@ -108,17 +127,21 @@ class Miscellaneous:
             if kb.dbms == "Microsoft SQL Server":
                 return
 
-            for udf in ( "sys_exec", "sys_eval" ):
-                message = "do you want to remove %s UDF? [Y/n] " % udf
+            if udfDict is None:
+                udfDict = self.sysUdfs
+
+            for udf, inpRet in udfDict.items():
+                message = "do you want to remove UDF '%s'? [Y/n] " % udf
                 output  = readInput(message, default="Y")
 
                 if not output or output in ("y", "Y"):
                     dropStr = "DROP FUNCTION %s" % udf
 
                     if kb.dbms == "PostgreSQL":
-                        dropStr += "(text)"
+                        inp      = ", ".join(i for i in inpRet["input"])
+                        dropStr += "(%s)" % inp
 
-                    logger.debug("removing %s UDF" % udf)
+                    logger.debug("removing UDF '%s'" % udf)
                     inject.goStacked(dropStr)
 
             logger.info("database management system cleanup finished")

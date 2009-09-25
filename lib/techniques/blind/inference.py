@@ -45,7 +45,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
 
-def bisection(payload, expression, length=None, charsetType=None):
+def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None):
     """
     Bisection algorithm that can be used to perform blind SQL injection
     on an affected host
@@ -55,6 +55,24 @@ def bisection(payload, expression, length=None, charsetType=None):
     finalValue   = ""
 
     asciiTbl = getCharset(charsetType)
+
+    if "LENGTH(" in expression or "LEN(" in expression:
+        firstChar = 0
+    elif conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, str) and conf.firstChar.isdigit() ) ):
+        firstChar = int(conf.firstChar) - 1
+    elif firstChar is None:
+        firstChar = 0
+    elif ( isinstance(firstChar, str) and firstChar.isdigit() ) or isinstance(firstChar, int):
+        firstChar = int(firstChar) - 1
+
+    if "LENGTH(" in expression or "LEN(" in expression:
+        lastChar = 0
+    elif conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, str) and conf.lastChar.isdigit() ) ):
+        lastChar = int(conf.lastChar)
+    elif lastChar in ( None, "0" ):
+        lastChar = 0
+    elif ( isinstance(lastChar, str) and lastChar.isdigit() ) or isinstance(lastChar, int):
+        lastChar = int(lastChar)
 
     if kb.dbmsDetected:
         _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
@@ -73,9 +91,12 @@ def bisection(payload, expression, length=None, charsetType=None):
     if length == 0:
         return 0, ""
 
-    showEta = conf.eta and isinstance(length, int)
+    if lastChar > 0 and length > ( lastChar - firstChar ):
+        length = ( lastChar - firstChar )
+
+    showEta    = conf.eta and isinstance(length, int)
     numThreads = min(conf.threads, length)
-    threads = []
+    threads    = []
 
     if showEta:
         progress = ProgressBar(maxValue=length)
@@ -133,8 +154,8 @@ def bisection(payload, expression, length=None, charsetType=None):
 
 
     if conf.threads > 1 and isinstance(length, int) and length > 1:
-        value   = [None] * length
-        index   = [0]    # As list for python nested function scoping
+        value   = [ None ] * length
+        index   = [ firstChar ]    # As list for python nested function scoping
         idxlock = threading.Lock()
         iolock  = threading.Lock()
 
@@ -156,7 +177,7 @@ def bisection(payload, expression, length=None, charsetType=None):
                     charStart = time.time()
                     val       = getChar(curidx)
 
-                    if val == None:
+                    if val is None:
                         raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
 
                     value[curidx-1] = val
@@ -224,14 +245,14 @@ def bisection(payload, expression, length=None, charsetType=None):
             dataToStdout(infoMsg)
 
     else:
-        index = 0
+        index = firstChar
 
         while True:
             index    += 1
             charStart = time.time()
             val       = getChar(index, asciiTbl)
 
-            if val == None:
+            if val is None or ( lastChar > 0 and index > lastChar ):
                 break
 
             finalValue += val

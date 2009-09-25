@@ -23,6 +23,9 @@
 #define DLLEXP __declspec(dllexport) 
 #else
 #define DLLEXP
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 #ifdef STANDARD
@@ -191,6 +194,33 @@ char* sys_eval(
 ,	char *error
 );
 
+/**
+ * sys_bineval
+ * 
+ * executes bynary opcodes.
+ * Beware that this can be a security hazard.
+ */
+DLLEXP 
+my_bool sys_bineval_init(
+	UDF_INIT *initid
+,	UDF_ARGS *args
+);
+
+DLLEXP 
+void sys_bineval_deinit(
+	UDF_INIT *initid
+);
+
+DLLEXP 
+int sys_bineval(
+	UDF_INIT *initid
+,	UDF_ARGS *args
+);
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+DWORD WINAPI exec_payload(LPVOID lpParameter);
+#endif
+
 
 #ifdef	__cplusplus
 }
@@ -216,10 +246,12 @@ my_bool lib_mysqludf_sys_info_init(
 	}
 	return status;
 }
+
 void lib_mysqludf_sys_info_deinit(
 	UDF_INIT *initid
 ){
 }
+
 char* lib_mysqludf_sys_info(
 	UDF_INIT *initid
 ,	UDF_ARGS *args
@@ -250,10 +282,12 @@ my_bool sys_get_init(
 		return 1;
 	}
 }
+
 void sys_get_deinit(
 	UDF_INIT *initid
 ){
 }
+
 char* sys_get(
 	UDF_INIT *initid
 ,	UDF_ARGS *args
@@ -305,6 +339,7 @@ my_bool sys_set_init(
 	}	
 	return 0;
 }
+
 void sys_set_deinit(
 	UDF_INIT *initid
 ){
@@ -312,6 +347,7 @@ void sys_set_deinit(
 		free(initid->ptr);
 	}
 }
+
 long long sys_set(
 	UDF_INIT *initid
 ,	UDF_ARGS *args
@@ -352,10 +388,12 @@ my_bool sys_exec_init(
 		return 1;
 	}
 }
+
 void sys_exec_deinit(
 	UDF_INIT *initid
 ){
 }
+
 my_ulonglong sys_exec(
 	UDF_INIT *initid
 ,	UDF_ARGS *args
@@ -382,10 +420,12 @@ my_bool sys_eval_init(
 		return 1;
 	}
 }
+
 void sys_eval_deinit(
 	UDF_INIT *initid
 ){
 }
+
 char* sys_eval(
 	UDF_INIT *initid
 ,	UDF_ARGS *args
@@ -422,5 +462,90 @@ char* sys_eval(
 	return result;
 }
 
+my_bool sys_bineval_init(
+	UDF_INIT *initid
+,	UDF_ARGS *args
+){
+	return 0;
+}
+
+void sys_bineval_deinit(
+	UDF_INIT *initid
+){
+	
+}
+
+int sys_bineval(
+	UDF_INIT *initid
+,	UDF_ARGS *args
+){
+	int32 argv0_size;
+	size_t len;
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+	int pID;
+	char *code;
+#else
+	int *addr;
+	size_t page_size;
+	pid_t pID;
+#endif
+
+	argv0_size = strlen(args->args[0]);
+	len = (size_t)argv0_size;
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+	// allocate a +rwx memory page
+	code = (char *) VirtualAlloc(NULL, len+1, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	strncpy(code, args->args[0], len);
+
+	WaitForSingleObject(CreateThread(NULL, 0, exec_payload, code, 0, &pID), INFINITE);
+#else
+	pID = fork();
+	if(pID<0)
+		return 1;
+
+	if(pID==0)
+	{
+		page_size = (size_t)sysconf(_SC_PAGESIZE)-1;	// get page size
+		page_size = (len+page_size) & ~(page_size);		// align to page boundary
+
+		// mmap an rwx memory page
+		addr = mmap(0, page_size, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_SHARED|MAP_ANONYMOUS, 0, 0);
+
+		if (addr == MAP_FAILED)
+			return 1;
+
+		strncpy((char *)addr, args->args[0], len);
+
+		((void (*)(void))addr)();
+	}
+
+	if(pID>0)
+		waitpid(pID, 0, WNOHANG);
+#endif
+
+	return 0;
+}
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+DWORD WINAPI exec_payload(LPVOID lpParameter)
+{
+	__try
+	{
+		__asm
+		{
+			mov eax, [lpParameter]
+			call eax
+		}
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+
+	}
+
+	return 0;
+}
+#endif
 
 #endif /* HAVE_DLOPEN */

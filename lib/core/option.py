@@ -861,7 +861,7 @@ def __setKnowledgeBaseAttributes():
     kb.injType        = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
-    # parsing or when knowing the OS is mandatory (i.g. dealing with DEP)
+    # parsing
     kb.os             = None
     kb.osVersion      = None
     kb.osSP           = None

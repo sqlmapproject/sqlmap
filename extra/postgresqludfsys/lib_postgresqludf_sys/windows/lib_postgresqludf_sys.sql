@@ -21,3 +21,4 @@
 
 CREATE OR REPLACE FUNCTION sys_exec(text) RETURNS int4 AS 'lib_postgresqludf_sys.dll', 'sys_exec' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE;
 CREATE OR REPLACE FUNCTION sys_eval(text) RETURNS text AS 'lib_postgresqludf_sys.dll', 'sys_eval' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE;
+CREATE OR REPLACE FUNCTION sys_bineval(text) RETURNS int4 AS 'lib_postgresqludf_sys.dll', 'sys_bineval' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE;

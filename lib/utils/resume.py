@@ -107,7 +107,7 @@ def resume(expression, payload):
     if resumedValue[-1] == "]":
         resumedValue = resumedValue[:-1]
 
-        infoMsg   = "read from file '%s': " % conf.sessionFile
+        infoMsg  = "read from file '%s': " % conf.sessionFile
         logValue = re.findall("__START__(.*?)__STOP__", resumedValue, re.S)
 
         if logValue:

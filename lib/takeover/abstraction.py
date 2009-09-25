@@ -48,9 +48,22 @@ class Abstraction(UDF, xp_cmdshell):
         xp_cmdshell.__init__(self)
 
 
+    def __cmdShellCleanup(self):
+        if not conf.cleanup:
+            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                self.cleanup()
+
+            elif kb.dbms == "Microsoft SQL Server":
+                self.cleanup(onlyFileTbl=True)
+
+            else:
+                errMsg = "Feature not yet implemented for the back-end DBMS"
+                raise sqlmapUnsupportedFeatureException, errMsg
+
+
     def execCmd(self, cmd, silent=False, forgeCmd=False):
         if kb.dbms in ( "MySQL", "PostgreSQL" ):
-            self.udfExecCmd(cmd, silent)
+            self.udfExecCmd(cmd, silent=silent)
 
         elif kb.dbms == "Microsoft SQL Server":
             self.xpCmdshellExecCmd(cmd, silent, forgeCmd)
@@ -60,12 +73,12 @@ class Abstraction(UDF, xp_cmdshell):
             raise sqlmapUnsupportedFeatureException, errMsg
 
 
-    def evalCmd(self, cmd):
+    def evalCmd(self, cmd, first=None, last=None):
         if kb.dbms in ( "MySQL", "PostgreSQL" ):
-            return self.udfEvalCmd(cmd)
+            return self.udfEvalCmd(cmd, first, last)
 
         elif kb.dbms == "Microsoft SQL Server":
-            return self.xpCmdshellEvalCmd(cmd)
+            return self.xpCmdshellEvalCmd(cmd, first, last)
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
@@ -89,8 +102,8 @@ class Abstraction(UDF, xp_cmdshell):
         else:
             self.execCmd(cmd, forgeCmd=True)
 
-        if kb.dbms == "Microsoft SQL Server":
-            self.cleanup(onlyFileTbl=True)
+        if not conf.osShell and not conf.cleanup:
+            self.__cmdShellCleanup()
 
 
     def absOsShell(self):
@@ -138,20 +151,11 @@ class Abstraction(UDF, xp_cmdshell):
 
             self.runCmd(command)
 
-        if not conf.cleanup:
-            if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                self.cleanup()
-
-            elif kb.dbms == "Microsoft SQL Server":
-                self.cleanup(onlyFileTbl=True)
-
-            else:
-                errMsg = "Feature not yet implemented for the back-end DBMS"
-                raise sqlmapUnsupportedFeatureException, errMsg
+        self.__cmdShellCleanup()
 
 
     def initEnv(self, mandatory=True, detailed=False):
-        if self.envInitialized == True:
+        if self.envInitialized is True:
             return
 
         self.checkDbmsOs(detailed)
@@ -162,11 +166,11 @@ class Abstraction(UDF, xp_cmdshell):
             logger.warn(warnMsg)
 
         if kb.dbms in ( "MySQL", "PostgreSQL" ):
-            self.udfInit()
+            self.udfInjectCmd()
 
         elif kb.dbms == "Microsoft SQL Server":
             self.xpCmdshellInit(mandatory)
 
         else:
-            errMsg = "Feature not yet implemented for the back-end DBMS"
+            errMsg = "feature not yet implemented for the back-end DBMS"
             raise sqlmapUnsupportedFeatureException, errMsg

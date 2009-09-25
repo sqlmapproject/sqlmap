@@ -33,6 +33,7 @@ from lib.core.common import parseTargetUrl
 from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.dump import dumper
 from lib.core.exception import sqlmapFilePathException
@@ -116,7 +117,12 @@ def __setOutputResume():
     Check and set the output text file and the resume functionality.
     """
 
-    if conf.sessionFile and os.path.exists(conf.sessionFile):
+    if not conf.sessionFile:
+        conf.sessionFile = "%s%ssession" % (conf.outputPath, os.sep)
+
+    logger.info("using '%s' as session file" % conf.sessionFile)
+
+    if os.path.exists(conf.sessionFile):
         readSessionFP = open(conf.sessionFile, "r")
         lines = readSessionFP.readlines()
 
@@ -154,13 +160,12 @@ def __setOutputResume():
 
         readSessionFP.close()
 
-    if conf.sessionFile:
-        try:
-            conf.sessionFP = open(conf.sessionFile, "a")
-            dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
-        except IOError:
-            errMsg = "unable to write on the session file specified"
-            raise sqlmapFilePathException, errMsg
+    try:
+        conf.sessionFP = open(conf.sessionFile, "a")
+        dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
+    except IOError:
+        errMsg = "unable to write on the session file specified"
+        raise sqlmapFilePathException, errMsg
 
 
 def __createFilesDir():
@@ -191,6 +196,25 @@ def __createDumpDir():
         os.makedirs(conf.dumpPath, 0755)
 
 
+def createTargetDirs():
+    """
+    Create the output directory.
+    """
+
+    conf.outputPath = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, conf.hostname)
+
+    if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
+        os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+
+    if not os.path.isdir(conf.outputPath):
+        os.makedirs(conf.outputPath, 0755)
+
+    dumper.setOutputFile()
+
+    __createDumpDir()
+    __createFilesDir()
+
+
 def initTargetEnv():
     """
     Initialize target environment.
@@ -213,22 +237,3 @@ def initTargetEnv():
     parseTargetUrl()
     __setRequestParams()
     __setOutputResume()
-
-
-def createTargetDirs():
-    """
-    Create the output directory.
-    """
-
-    conf.outputPath = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, conf.hostname)
-
-    if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-        os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
-
-    if not os.path.isdir(conf.outputPath):
-        os.makedirs(conf.outputPath, 0755)
-
-    dumper.setOutputFile()
-
-    __createDumpDir()
-    __createFilesDir()

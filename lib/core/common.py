@@ -431,6 +431,9 @@ def readInput(message, default=None):
     else:
         data = raw_input(message)
 
+        if not data:
+            data = default
+
     return data
 
 

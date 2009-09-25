@@ -45,7 +45,7 @@ from lib.utils.resume import queryOutputLength
 from lib.utils.resume import resume
 
 
-def __goInference(payload, expression, charsetType=None):
+def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None):
     start = time.time()
 
     if ( conf.eta or conf.threads > 1 ) and kb.dbms:
@@ -55,7 +55,7 @@ def __goInference(payload, expression, charsetType=None):
 
     dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression))
 
-    count, value = bisection(payload, expression, length, charsetType)
+    count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar)
     duration = int(time.time() - start)
 
     if conf.eta and length:
@@ -68,7 +68,7 @@ def __goInference(payload, expression, charsetType=None):
     return value
 
 
-def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None, resumeValue=True, charsetType=None):
+def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None, resumeValue=True, charsetType=None, firstChar=None, lastChar=None):
     outputs     = []
     origExpr    = None
 
@@ -96,7 +96,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
                 warnMsg += "sqlmap is going to retrieve the value again"
                 logger.warn(warnMsg)
 
-            output = __goInference(payload, expressionReplaced, charsetType)
+            output = __goInference(payload, expressionReplaced, charsetType, firstChar, lastChar)
 
         if isinstance(num, int):
             expression = origExpr
@@ -106,7 +106,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
     return outputs
 
 
-def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None):
+def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None, firstChar=None, lastChar=None):
     """
     Retrieve the output of a SQL query characted by character taking
     advantage of an blind SQL injection vulnerability on the affected
@@ -133,7 +133,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         return output
 
     if unpack == False:
-        return __goInference(payload, expression, charsetType)
+        return __goInference(payload, expression, charsetType, firstChar, lastChar)
 
     if kb.dbmsDetected:
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(expression)
@@ -226,7 +226,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     if not stopLimit:
                         if not count or not count.isdigit():
-                            count = __goInference(payload, countedExpression, charsetType)
+                            count = __goInference(payload, countedExpression, charsetType, firstChar, lastChar)
 
                         if count and count.isdigit() and int(count) > 0:
                             count = int(count)
@@ -297,7 +297,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         return None
 
                     for num in xrange(startLimit, stopLimit):
-                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType)
+                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
                         outputs.append(output)
 
                     return outputs
@@ -305,12 +305,12 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         elif kb.dbms == "Oracle" and expression.startswith("SELECT ") and " FROM " not in expression:
             expression = "%s FROM DUAL" % expression
 
-        outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType)
+        outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
 
         returnValue = ", ".join([output for output in outputs])
 
     else:
-        returnValue = __goInference(payload, expression, charsetType)
+        returnValue = __goInference(payload, expression, charsetType, firstChar, lastChar)
 
     return returnValue
 
@@ -345,7 +345,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     return data
 
 
-def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None):
+def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -375,7 +375,7 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     conf.paramNegative  = False
 
     if blind and not value:
-        value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType)
+        value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
     conf.paramFalseCond = oldParamFalseCond
     conf.paramNegative  = oldParamNegative

