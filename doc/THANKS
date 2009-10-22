@@ -159,6 +159,10 @@ John F. Reiser <sales@bitwagon.com>
     Metasploit Framework 3 payload stager portable executable,
     http://upx.sourceforge.net
 
+Simone Onofri <simone.onofri@gmail.com>
+    for patching the PHP web backdoor to make it work properly also on
+    Windows
+
 Antonio Parata <s4tan@ictsc.it>
     for providing me with some ideas for the PHP backdoor
 

