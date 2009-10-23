@@ -1,4 +1,4 @@
-sqlmap (0.8-1) stable; urgency=low
+sqlmap (0.8rc1-1) stable; urgency=low
 
   * Major enhancement to the Microsoft SQL Server stored procedure
     heap-based buffer overflow exploit (--os-bof) to automatically bypass
@@ -19,7 +19,7 @@ sqlmap (0.8-1) stable; urgency=low
   * Minor bugs fixed.
   * Major code refactoring.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  DAY, DD MMM 20YY 10:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon, 21 Sep 2009 15:00:00 +0000
 
 sqlmap (0.7-1) stable; urgency=low
 
