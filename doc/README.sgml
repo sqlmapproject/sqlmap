@@ -107,7 +107,7 @@ common"> and important web application vulnerability, second only to
 <htmlurl url="http://www.owasp.org/index.php/Top_10_2007-A1"
 name="Cross-Site Scripting">.
 
-Back to the scenario, probably the SQL <tt>SELECT</tt> statemenet into
+Back to the scenario, probably the SQL <tt>SELECT</tt> statement into
 <tt>get_int.php</tt> has a syntax similar to the following SQL query, in
 pseudo PHP code:
 
