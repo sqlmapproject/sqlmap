@@ -80,11 +80,9 @@ class Metasploit:
 
         self.__msfPayloadsList    = {
                                       "windows": {
-                                                   1: ( "Reflective Meterpreter (default)", "windows/meterpreter" ),
-                                                   2: ( "PatchUp Meterpreter (only from Metasploit development revision 6742)", "windows/patchupmeterpreter" ),
+                                                   1: ( "Meterpreter (default)", "windows/meterpreter" ),
                                                    3: ( "Shell", "windows/shell" ),
-                                                   4: ( "Reflective VNC", "windows/vncinject" ),
-                                                   5: ( "PatchUp VNC (only from Metasploit development revision 6742)", "windows/patchupvncinject" ),
+                                                   4: ( "VNC", "windows/vncinject" ),
                                                  },
                                       "linux":   {
                                                    1: ( "Shell", "linux/x86/shell" ),
@@ -93,13 +91,13 @@ class Metasploit:
 
         self.__msfConnectionsList = {
                                       "windows": {
-                                                   1: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
-                                                   2: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
-                                                   3: ( "Reverse TCP: Try to connect back from the database host to this machine, on all ports between the specified and 65535", "reverse_tcp_allports" ),
+                                                   1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
+                                                   2: ( "Reverse TCP: Try to connect back from the database host to this machine, on all ports between the specified and 65535", "reverse_tcp_allports" ),
+                                                   3: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
                                                  },
                                       "linux":   {
-                                                   1: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
-                                                   2: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
+                                                   1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
+                                                   2: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
                                                  }
                                     }
 
