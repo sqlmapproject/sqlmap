@@ -51,9 +51,7 @@ sqlmap relies on the <htmlurl url="http://metasploit.com/framework/"
 name="Metasploit Framework"> for some of its post-exploitation takeover
 functionalities. You need to grab a copy of it from the
 <htmlurl url="http://metasploit.com/framework/download/" name="download">
-page. The required version is <bf>3.2</bf> or above, recommended is the
-latest <bf>3.3 development</bf> version from Metasploit's subversion
-repository.
+page. The required version is <bf>3.3</bf> or above.
 
 Optionally, if you are running sqlmap on Windows, you may wish to install
 <htmlurl url="http://ipython.scipy.org/moin/PyReadline/Intro" name="PyReadline">
@@ -4358,8 +4356,7 @@ PostgreSQL and Microsoft SQL Server.
 sqlmap relies on the <htmlurl url="http://metasploit.com/framework"
 name="Metasploit"> to perform this attack, so you need to have it already
 on your system: it's free and can be downloaded from the homepage. It is
-advised to use Metasploit 3.3 development version from the subversion
-repository.
+required to use Metasploit Framework version 3.3 or above.
 
 <p>
 Note that this feature is not supported by sqlmap running on Windows
