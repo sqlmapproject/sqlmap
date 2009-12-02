@@ -46,11 +46,23 @@ class sqlmapGenericException(Exception):
     pass
 
 
+class sqlmapMissingDependence(Exception):
+    pass
+
+
 class sqlmapMissingMandatoryOptionException(Exception):
     pass
 
 
+class sqlmapMissingPrivileges(Exception):
+    pass
+
+
 class sqlmapNoneDataException(Exception):
+    pass
+
+
+class sqlmapNotVulnerableException(Exception):
     pass
 
 
@@ -62,19 +74,11 @@ class sqlmapSyntaxException(Exception):
     pass
 
 
-class sqlmapUndefinedMethod(Exception):
-    pass
-
-
-class sqlmapMissingPrivileges(Exception):
-    pass
-
-
-class sqlmapNotVulnerableException(Exception):
-    pass
-
-
 class sqlmapThreadException(Exception):
+    pass
+
+
+class sqlmapUndefinedMethod(Exception):
     pass
 
 
@@ -105,6 +109,7 @@ exceptionsTuple = (
                     sqlmapDataException,
                     sqlmapFilePathException,
                     sqlmapGenericException,
+                    sqlmapMissingDependence,
                     sqlmapMissingMandatoryOptionException,
                     sqlmapNoneDataException,
                     sqlmapRegExprException,

@@ -48,6 +48,7 @@ from lib.core.data import paths
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
+from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapMissingPrivileges
 from lib.core.exception import sqlmapSyntaxException
@@ -528,7 +529,7 @@ def __setHTTPProxy():
 
 def __setHTTPAuthentication():
     """
-    Check and set the HTTP authentication method (Basic or Digest),
+    Check and set the HTTP authentication method (Basic, Digest or NTLM),
     username and password to perform HTTP requests with.
     """
 
@@ -538,29 +539,29 @@ def __setHTTPAuthentication():
         return
 
     elif conf.aType and not conf.aCred:
-        errMsg  = "you specified the HTTP Authentication type, but "
+        errMsg  = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
         raise sqlmapSyntaxException, errMsg
 
     elif not conf.aType and conf.aCred:
-        errMsg  = "you specified the HTTP Authentication credentials, "
+        errMsg  = "you specified the HTTP authentication credentials, "
         errMsg += "but did not provide the type"
         raise sqlmapSyntaxException, errMsg
 
-    debugMsg = "setting the HTTP Authentication type and credentials"
+    debugMsg = "setting the HTTP authentication type and credentials"
     logger.debug(debugMsg)
 
     aTypeLower = conf.aType.lower()
 
-    if aTypeLower not in ( "basic", "digest" ):
-        errMsg  = "HTTP Authentication type value must be "
-        errMsg += "Basic or Digest"
+    if aTypeLower not in ( "basic", "digest", "ntlm" ):
+        errMsg  = "HTTP authentication type value must be "
+        errMsg += "Basic, Digest or NTLM"
         raise sqlmapSyntaxException, errMsg
 
     aCredRegExp = re.search("^(.*?)\:(.*?)$", conf.aCred)
 
     if not aCredRegExp:
-        errMsg  = "HTTP Authentication credentials value must be "
+        errMsg  = "HTTP authentication credentials value must be "
         errMsg += "in format username:password"
         raise sqlmapSyntaxException, errMsg
 
@@ -572,8 +573,20 @@ def __setHTTPAuthentication():
 
     if aTypeLower == "basic":
         authHandler = urllib2.HTTPBasicAuthHandler(passwordMgr)
+
     elif aTypeLower == "digest":
         authHandler = urllib2.HTTPDigestAuthHandler(passwordMgr)
+
+    elif aTypeLower == "ntlm":
+        try:
+            from ntlm import HTTPNtlmAuthHandler
+        except ImportError, _:
+            errMsg  = "sqlmap requires Python NTLM third-party library "
+            errMsg += "in order to authenticate via NTLM, "
+            errMsg += "http://code.google.com/p/python-ntlm/"
+            raise sqlmapMissingDependence, errMsg
+
+        authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passwordMgr)
 
 
 def __setHTTPMethod():
