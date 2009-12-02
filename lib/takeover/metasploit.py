@@ -193,9 +193,9 @@ class Metasploit:
     def __selectPayload(self, askChurrasco=True):
         if kb.os == "Windows" and conf.privEsc == True:
             infoMsg  = "forcing Metasploit payload to Meterpreter because "
-            infoMsg += "it is the only payload that can be used to abuse "
-            infoMsg += "Windows Impersonation Tokens via Meterpreter "
-            infoMsg += "'incognito' extension to privilege escalate"
+            infoMsg += "it is the only payload that can abuse Windows "
+            infoMsg += "Access Tokens via Meterpreter 'incognito' "
+            infoMsg += "extension to privilege escalate"
             logger.info(infoMsg)
 
             __payloadStr = "windows/meterpreter"
@@ -224,7 +224,7 @@ class Metasploit:
                 choose = True
 
                 warnMsg  = "it is unlikely that the VNC injection will be "
-                warnMsg += "successful because often Microsoft SQL Server "
+                warnMsg += "successful because usually Microsoft SQL Server "
                 warnMsg += "%s runs as Network Service " % kb.dbmsVersion[0]
                 warnMsg += "or the Administrator is not logged in"
                 logger.warn(warnMsg)
@@ -232,7 +232,7 @@ class Metasploit:
             if choose == True:
                 message  = "what do you want to do?\n"
                 message += "[1] Give it a try anyway\n"
-                message += "[2] Fall back to reflective Meterpreter payload (default)\n"
+                message += "[2] Fall back to Meterpreter payload (default)\n"
                 message += "[3] Fall back to Shell payload"
 
                 while True:
@@ -572,8 +572,8 @@ class Metasploit:
             errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", "")
             raise sqlmapFilePathException, errMsg
 
-        self.__shellcodeFP     = open(self.__shellcodeFilePath, "rb")
-        self.shellcodeString   = self.__shellcodeFP.read()
+        self.__shellcodeFP   = open(self.__shellcodeFilePath, "rb")
+        self.shellcodeString = self.__shellcodeFP.read()
         self.__shellcodeFP.close()
 
         os.unlink(self.__shellcodeFilePath)
