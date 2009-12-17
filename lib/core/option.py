@@ -325,10 +325,10 @@ def __setMetasploit():
 
     if conf.msfPath:
         condition  = os.path.exists(os.path.normpath(conf.msfPath))
-        condition &= os.path.exists(os.path.normpath("%s/msfcli" % conf.msfPath))
-        condition &= os.path.exists(os.path.normpath("%s/msfconsole" % conf.msfPath))
-        condition &= os.path.exists(os.path.normpath("%s/msfencode" % conf.msfPath))
-        condition &= os.path.exists(os.path.normpath("%s/msfpayload" % conf.msfPath))
+        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfcli")))
+        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfconsole")))
+        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfencode")))
+        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfpayload")))
 
         if condition:
             debugMsg  = "provided Metasploit Framework 3 path "
@@ -364,10 +364,10 @@ def __setMetasploit():
         for envPath in envPaths:
             envPath    = envPath.replace(";", "")
             condition  = os.path.exists(os.path.normpath(envPath))
-            condition &= os.path.exists(os.path.normpath("%s/msfcli" % envPath))
-            condition &= os.path.exists(os.path.normpath("%s/msfconsole" % envPath))
-            condition &= os.path.exists(os.path.normpath("%s/msfencode" % envPath))
-            condition &= os.path.exists(os.path.normpath("%s/msfpayload" % envPath))
+            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfcli")))
+            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfconsole")))
+            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfencode")))
+            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfpayload")))
 
             if condition:
                 infoMsg  = "Metasploit Framework 3 has been found "

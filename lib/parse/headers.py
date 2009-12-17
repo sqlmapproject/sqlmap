@@ -24,6 +24,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+import os
+
 from xml.sax import parse
 
 from lib.core.common import checkFile
@@ -46,13 +48,13 @@ def headersParser(headers):
     kb.headersCount += 1
 
     topHeaders = {
-                   "cookie":                          "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   "microsoftsharepointteamservices": "%s/sharepoint.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   "server":                          "%s/server.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   "servlet-engine":                  "%s/servlet.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   "set-cookie":                      "%s/cookie.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   "x-aspnet-version":                "%s/x-aspnet-version.xml" % paths.SQLMAP_XML_BANNER_PATH,
-                   "x-powered-by":                    "%s/x-powered-by.xml" % paths.SQLMAP_XML_BANNER_PATH,
+                   "cookie":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
+                   "microsoftsharepointteamservices": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "sharepoint.xml"),
+                   "server":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "server.xml"),
+                   "servlet-engine":                  os.path.join(paths.SQLMAP_XML_BANNER_PATH, "servlet.xml"),
+                   "set-cookie":                      os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
+                   "x-aspnet-version":                os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-aspnet-version.xml"),
+                   "x-powered-by":                    os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml")
                  }
 
     for header in headers:

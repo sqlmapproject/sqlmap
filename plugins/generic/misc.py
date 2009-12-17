@@ -73,11 +73,11 @@ class Miscellaneous:
         setRemoteTempPath()
 
 
-    def delRemoteTempFile(self, tempFile, bat=False):
+    def delRemoteFile(self, tempFile, doubleslash=False):
         self.checkDbmsOs()
 
         if kb.os == "Windows":
-            if bat is True:
+            if doubleslash is True:
                 tempFile = tempFile.replace("/", "\\\\")
             else:
                 tempFile = tempFile.replace("/", "\\")

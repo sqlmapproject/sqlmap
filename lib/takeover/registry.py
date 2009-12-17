@@ -45,7 +45,7 @@ class Registry:
 
         self.__randStr       = randomStr(lowercase=True)
         self.__batPathRemote = "%s/sqlmapreg%s%s.bat" % (conf.tmpPath, self.__operation, self.__randStr)
-        self.__batPathLocal  = "%s/sqlmapreg%s%s.bat" % (conf.outputPath, self.__operation, self.__randStr)
+        self.__batPathLocal  = os.path.join(conf.outputPath, "sqlmapreg%s%s.bat" % (self.__operation, self.__randStr))
 
         if parse == True:
             readParse = "FOR /F \"tokens=2* delims==\" %%A IN ('REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"
@@ -108,7 +108,7 @@ class Registry:
 
         data = self.evalCmd(self.__batPathRemote, first)
 
-        self.delRemoteTempFile(self.__batPathRemote, bat=True)
+        self.delRemoteFile(self.__batPathRemote, doubleslash=True)
 
         return data
 
@@ -124,7 +124,7 @@ class Registry:
         logger.debug(debugMsg)
 
         self.execCmd(cmd=self.__batPathRemote, forgeCmd=True)
-        self.delRemoteTempFile(self.__batPathRemote, bat=True)
+        self.delRemoteFile(self.__batPathRemote, doubleslash=True)
 
 
     def delRegKey(self, regKey, regValue):
@@ -138,4 +138,4 @@ class Registry:
         logger.debug(debugMsg)
 
         self.execCmd(cmd=self.__batPathRemote, forgeCmd=True)
-        self.delRemoteTempFile(self.__batPathRemote, bat=True)
+        self.delRemoteFile(self.__batPathRemote, doubleslash=True)

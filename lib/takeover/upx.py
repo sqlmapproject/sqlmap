@@ -52,7 +52,7 @@ class UPX:
             self.__upxPath = "%s/upx/macosx/upx" % paths.SQLMAP_CONTRIB_PATH
 
         elif "win" in PLATFORM:
-            self.__upxPath = "%s/upx/windows/upx.exe" % paths.SQLMAP_CONTRIB_PATH
+            self.__upxPath = "%s\upx\windows\upx.exe" % paths.SQLMAP_CONTRIB_PATH
 
         elif "linux" in PLATFORM:
             self.__upxPath = "%s/upx/linux/upx" % paths.SQLMAP_CONTRIB_PATH
@@ -80,17 +80,17 @@ class UPX:
         pollProcess(process)
         upxStdout, upxStderr = process.communicate()
 
-        warnMsg = "failed to compress the file"
+        msg = "failed to compress the file"
 
         if "NotCompressibleException" in upxStdout:
-            warnMsg += " because you provided a Metasploit version above "
-            warnMsg += "3.3-dev revision 6681. This will not inficiate "
-            warnMsg += "the correct execution of sqlmap. It might "
-            warnMsg += "only slow down a bit the execution of sqlmap"
-            logger.info(warnMsg)
+            msg += " because you provided a Metasploit version above "
+            msg += "3.3-dev revision 6681. This will not inficiate "
+            msg += "the correct execution of sqlmap. It might "
+            msg += "only slow down a bit the execution"
+            logger.debug(msg)
 
         elif upxStderr:
-            logger.warn(warnMsg)
+            logger.warn(msg)
 
         else:
             return os.path.getsize(srcFile)

@@ -144,7 +144,7 @@ class xp_cmdshell:
 
         inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, tmpFile, randomStr(10), randomStr(10)))
 
-        self.delRemoteTempFile(tmpFile)
+        self.delRemoteFile(tmpFile)
 
         output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, sort=False, firstChar=first, lastChar=last)
         inject.goStacked("DELETE FROM %s" % self.cmdTblName)

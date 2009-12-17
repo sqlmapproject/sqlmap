@@ -73,16 +73,16 @@ class Metasploit:
         self.localIP        = getLocalIP()
         self.remoteIP       = getRemoteIP()
 
-        self.__msfCli       = os.path.normpath("%s/msfcli" % conf.msfPath)
-        self.__msfConsole   = os.path.normpath("%s/msfconsole" % conf.msfPath)
-        self.__msfEncode    = os.path.normpath("%s/msfencode" % conf.msfPath)
-        self.__msfPayload   = os.path.normpath("%s/msfpayload" % conf.msfPath)
+        self.__msfCli       = os.path.normpath(os.path.join(conf.msfPath, "msfcli"))
+        self.__msfConsole   = os.path.normpath(os.path.join(conf.msfPath, "msfconsole"))
+        self.__msfEncode    = os.path.normpath(os.path.join(conf.msfPath, "msfencode"))
+        self.__msfPayload   = os.path.normpath(os.path.join(conf.msfPath, "msfpayload"))
 
         self.__msfPayloadsList    = {
                                       "windows": {
                                                    1: ( "Meterpreter (default)", "windows/meterpreter" ),
-                                                   3: ( "Shell", "windows/shell" ),
-                                                   4: ( "VNC", "windows/vncinject" ),
+                                                   2: ( "Shell", "windows/shell" ),
+                                                   3: ( "VNC", "windows/vncinject" ),
                                                  },
                                       "linux":   {
                                                    1: ( "Shell", "linux/x86/shell" ),
@@ -254,7 +254,7 @@ class Metasploit:
 
                             break
 
-                        elif askChurrasco == False:
+                        elif askChurrasco is False:
                             logger.warn("beware that the VNC injection might not work")
 
                             break
@@ -361,7 +361,7 @@ class Metasploit:
 
 
     def __forgeMsfConsoleResource(self):
-        self.resourceFile = "%s/%s" % (conf.outputPath, self.__randFile)
+        self.resourceFile = os.path.join(conf.outputPath, self.__randFile)
 
         self.__prepareIngredients(encode=False, askChurrasco=False)
 
@@ -542,7 +542,7 @@ class Metasploit:
         logger.info(infoMsg)
 
         self.__randStr           = randomStr(lowercase=True)
-        self.__shellcodeFilePath = "%s/sqlmapmsf%s" % (conf.outputPath, self.__randStr)
+        self.__shellcodeFilePath = os.path.join(conf.outputPath, "sqlmapmsf%s" % self.__randStr)
 
         self.__initVars()
         self.__prepareIngredients(encode=encode, askChurrasco=False)
@@ -592,10 +592,20 @@ class Metasploit:
         self.__randStr = randomStr(lowercase=True)
 
         if kb.os == "Windows":
-            self.exeFilePathLocal = "%s/sqlmapmsf%s.exe" % (conf.outputPath, self.__randStr)
-            self.__fileFormat     = "exe"
+            self.exeFilePathLocal = os.path.join(conf.outputPath, "sqlmapmsf%s.exe" % self.__randStr)
+
+            # Metasploit developers added support for the old exe format
+            # to msfencode using '-t exe-small' (>= 3.3.3-dev),
+            # http://www.metasploit.com/redmine/projects/framework/repository/revisions/7840
+            # This is useful for sqlmap because on PostgreSQL it is not
+            # possible to write files bigger than 8192 bytes abusing the
+            # lo_export() feature implemented in sqlmap.
+            if kb.dbms == "PostgreSQL":
+                self.__fileFormat = "exe-small"
+            else:
+                self.__fileFormat = "exe"
         else:
-            self.exeFilePathLocal = "%s/sqlmapmsf%s" % (conf.outputPath, self.__randStr)
+            self.exeFilePathLocal = os.path.join(conf.outputPath, "sqlmapmsf%s" % self.__randStr)
             self.__fileFormat     = "elf"
 
         if initialize == True:
@@ -614,7 +624,7 @@ class Metasploit:
         payloadStderr = process.communicate()[1]
 
         if kb.os == "Windows":
-            payloadSize = re.search("size ([\d]+)", payloadStderr, re.I)
+            payloadSize = re.search("size\s([\d]+)", payloadStderr, re.I)
         else:
             payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)
 
@@ -623,10 +633,18 @@ class Metasploit:
         if payloadSize:
             payloadSize = payloadSize.group(1)
             exeSize     = os.path.getsize(self.exeFilePathLocal)
-            packedSize  = upx.pack(self.exeFilePathLocal)
+
+            # Only pack the payload stager if the back-end DBMS is not
+            # PostgreSQL because for this DBMS, sqlmap uses the
+            # Metasploit's old exe format
+            if self.__fileFormat != "exe-small":
+                packedSize = upx.pack(self.exeFilePathLocal)
+            else:
+                packedSize = None
+
             debugMsg    = "the encoded payload size is %s bytes, " % payloadSize
 
-            if packedSize and packedSize != exeSize:
+            if packedSize and packedSize < exeSize:
                 debugMsg += "as a compressed portable executable its size "
                 debugMsg += "is %d bytes, decompressed it " % packedSize
                 debugMsg += "was %s bytes large" % exeSize
@@ -665,6 +683,9 @@ class Metasploit:
         debugMsg  = "Metasploit Framework 3 command line interface exited "
         debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, func)
         logger.debug(debugMsg)
+
+        if goUdf is False:
+            self.delRemoteFile(self.exeFilePathRemote, doubleslash=True)
 
 
     def smb(self):

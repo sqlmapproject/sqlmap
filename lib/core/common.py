@@ -560,27 +560,27 @@ def cleanQuery(query):
 
 def setPaths():
     # sqlmap paths
-    paths.SQLMAP_CONTRIB_PATH    = "%s/lib/contrib" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_SHELL_PATH      = "%s/shell" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_TXT_PATH        = "%s/txt" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_UDF_PATH        = "%s/udf" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_XML_PATH        = "%s/xml" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_XML_BANNER_PATH = "%s/banner" % paths.SQLMAP_XML_PATH
-    paths.SQLMAP_OUTPUT_PATH     = "%s/output" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_DUMP_PATH       = paths.SQLMAP_OUTPUT_PATH + "/%s/dump"
-    paths.SQLMAP_FILES_PATH      = paths.SQLMAP_OUTPUT_PATH + "/%s/files"
+    paths.SQLMAP_CONTRIB_PATH    = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "contrib")
+    paths.SQLMAP_SHELL_PATH      = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
+    paths.SQLMAP_TXT_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
+    paths.SQLMAP_UDF_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "udf")
+    paths.SQLMAP_XML_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "xml")
+    paths.SQLMAP_XML_BANNER_PATH = os.path.join(paths.SQLMAP_XML_PATH, "banner")
+    paths.SQLMAP_OUTPUT_PATH     = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
+    paths.SQLMAP_DUMP_PATH       = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
+    paths.SQLMAP_FILES_PATH      = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
     # sqlmap files
-    paths.SQLMAP_HISTORY         = "%s/.sqlmap_history" % paths.SQLMAP_ROOT_PATH
-    paths.SQLMAP_CONFIG          = "%s/sqlmap-%s.conf" % (paths.SQLMAP_ROOT_PATH, randomStr())
-    paths.FUZZ_VECTORS           = "%s/fuzz_vectors.txt" % paths.SQLMAP_TXT_PATH
-    paths.ERRORS_XML             = "%s/errors.xml" % paths.SQLMAP_XML_PATH
-    paths.QUERIES_XML            = "%s/queries.xml" % paths.SQLMAP_XML_PATH
-    paths.GENERIC_XML            = "%s/generic.xml" % paths.SQLMAP_XML_BANNER_PATH
-    paths.MSSQL_XML              = "%s/mssql.xml" % paths.SQLMAP_XML_BANNER_PATH
-    paths.MYSQL_XML              = "%s/mysql.xml" % paths.SQLMAP_XML_BANNER_PATH
-    paths.ORACLE_XML             = "%s/oracle.xml" % paths.SQLMAP_XML_BANNER_PATH
-    paths.PGSQL_XML              = "%s/postgresql.xml" % paths.SQLMAP_XML_BANNER_PATH
+    paths.SQLMAP_HISTORY         = os.path.join(paths.SQLMAP_ROOT_PATH, ".sqlmap_history")
+    paths.SQLMAP_CONFIG          = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
+    paths.FUZZ_VECTORS           = os.path.join(paths.SQLMAP_TXT_PATH, "fuzz_vectors.txt")
+    paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
+    paths.QUERIES_XML            = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
+    paths.GENERIC_XML            = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
+    paths.MSSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mssql.xml")
+    paths.MYSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
+    paths.ORACLE_XML             = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
+    paths.PGSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
 
 
 def weAreFrozen():
@@ -845,7 +845,7 @@ def searchEnvPath(fileName):
 
     for envPath in envPaths:
         envPath = envPath.replace(";", "")
-        result  = os.path.exists(os.path.normpath("%s/%s" % (envPath, fileName)))
+        result  = os.path.exists(os.path.normpath(os.path.join(envPath, fileName)))
 
         if result == True:
             break
