@@ -15,6 +15,9 @@ Daniele Bellucci <daniele.bellucci@gmail.com>
 Jack Butler <fattredd@hotmail.com>
     for providing me with the sqlmap site favicon
 
+Roberto Castrogiovanni <castrogiovanni.roberto@gmail.com>
+    for reporting a minor bug
+
 Cesar Cerrudo <cesar@argeniss.com>
     for his Windows access token kidnapping tool Churrasco included in
     sqlmap tree as a contrib library and used to run the stand-alone

@@ -554,7 +554,7 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         if not conf.regVal:
             msg    = "which registry key value do you want to delete? "
-            regVal = readInput(msg, default=default)
+            regVal = readInput(msg)
 
             if not regVal:
                 raise sqlmapMissingMandatoryOptionException, errMsg
