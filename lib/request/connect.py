@@ -217,7 +217,7 @@ class Connect:
                 time.sleep(1)
 
                 socket.setdefaulttimeout(conf.timeout)
-                return Connect.__getPageProxy(url=url, get=get, post=post, cookie=cookie, ua=ua, direct=direct, multipart=multipart, silent=silent)
+                return Connect.__getPageProxy(**kwargs)
 
             else:
                 socket.setdefaulttimeout(conf.timeout)
