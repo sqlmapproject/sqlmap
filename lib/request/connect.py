@@ -196,6 +196,9 @@ class Connect:
                 warnMsg += "status code, try to force the HTTP User-Agent "
                 warnMsg += "header with option --user-agent or -a"
 
+            else:
+                warnMsg = "unable to connect to the target url"
+
             if "BadStatusLine" not in tbMsg:
                 warnMsg += " or proxy"
 
