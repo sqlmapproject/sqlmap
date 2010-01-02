@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import re
 
@@ -84,7 +82,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         unescaper.setUnescape(PostgreSQLMap.unescape)
 
-
     @staticmethod
     def unescape(expression, quote=True):
         if quote:
@@ -116,7 +113,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         return expression
 
-
     @staticmethod
     def escape(expression):
         while True:
@@ -140,7 +136,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             expression = expression.replace(old, escaped)
 
         return expression
-
 
     def getFingerprint(self):
         value  = ""
@@ -177,7 +172,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         return value
 
-
     def checkDbms(self):
         """
         Reference for fingerprint: http://www.postgresql.org/docs/8.3/interactive/release-8-3.html
@@ -199,14 +193,14 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
         payload = agent.fullPayload(" AND %s::int=%s" % (randInt, randInt))
         result  = Request.queryPage(payload)
 
-        if result == True:
+        if result:
             infoMsg = "confirming PostgreSQL"
             logger.info(infoMsg)
 
             payload = agent.fullPayload(" AND COALESCE(%s, NULL)=%s" % (randInt, randInt))
             result  = Request.queryPage(payload)
 
-            if result != True:
+            if not result:
                 warnMsg = "the back-end DMBS is not PostgreSQL"
                 logger.warn(warnMsg)
 
@@ -258,7 +252,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
             return False
 
-
     def checkDbmsOs(self, detailed=False):
         if kb.os:
             return
@@ -283,14 +276,13 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
                 break
 
-        if kb.os == None:
+        if kb.os is None:
             kb.os = "Linux"
 
         infoMsg = "the back-end DBMS operating system is %s" % kb.os
         logger.info(infoMsg)
 
         self.cleanup(onlyFileTbl=True)
-
 
     def forceDbmsEnum(self):
         if conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
@@ -302,12 +294,10 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             warnMsg += "database name"
             logger.warn(warnMsg)
 
-
     def unionReadFile(self, rFile):
         errMsg  = "PostgreSQL does not support file reading with UNION "
         errMsg += "query SQL injection technique"
         raise sqlmapUnsupportedFeatureException, errMsg
-
 
     def stackedReadFile(self, rFile):
         warnMsg  = "binary file read on PostgreSQL is not yet supported, "
@@ -345,12 +335,10 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         return result
 
-
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
         errMsg  = "PostgreSQL does not support file upload with UNION "
         errMsg += "query SQL injection technique"
         raise sqlmapUnsupportedFeatureException, errMsg
-
 
     def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
         wFileSize = os.path.getsize(wFile)
@@ -419,11 +407,10 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
         # (pg_largeobject 'data' field)
         inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, dFile), silent=True)
 
-        if confirm == True:
+        if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)
 
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)
-
 
     def udfSetRemotePath(self):
         # On Windows
@@ -441,7 +428,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             # read/write/execute access is valid
             self.udfRemoteFile = "/tmp/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
 
-
     def udfCreateFromSharedLib(self, udf, inpRet):
         if udf in self.udfToCreate:
             logger.info("creating UDF '%s' from the binary UDF file" % udf)
@@ -456,7 +442,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             self.createdUdf.add(udf)
         else:
             logger.debug("keeping existing UDF '%s' as requested" % udf)
-
 
     def udfInjectCmd(self):
         self.udfLocalFile     = paths.SQLMAP_UDF_PATH
@@ -480,7 +465,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         self.udfInjectCore(self.sysUdfs)
         self.envInitialized = True
-
 
     def uncPathRequest(self):
         self.createSupportTbl(self.fileTblName, self.tblField, "text")

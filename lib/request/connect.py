@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import httplib
 import re
 import socket
@@ -33,11 +31,13 @@ import urlparse
 import traceback
 
 from lib.contrib import multipartpost
+from lib.core.common import sanitizeCookie
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
+from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
 from lib.request.comparison import comparison
@@ -48,11 +48,9 @@ class Connect:
     This class defines methods used to perform HTTP requests
     """
 
-
     @staticmethod
     def __getPageProxy(**kwargs):
         return Connect.getPage(**kwargs)
-
 
     @staticmethod
     def getPage(**kwargs):
@@ -61,7 +59,7 @@ class Connect:
         the target url page content
         """
 
-        if conf.delay != None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
+        if conf.delay is not None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
 
         url       = kwargs.get('url',       conf.url).replace(" ", "%20")
@@ -85,23 +83,24 @@ class Connect:
         else:
             requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
 
-        if silent is True:
+        if silent:
             socket.setdefaulttimeout(3)
 
         if direct:
             if "?" in url:
                 url, params = url.split("?")
-                params = urlencode(params).replace("%%", "%")
+                params = urlencode(params)
                 url = "%s?%s" % (url, params)
                 requestMsg += "?%s" % params
-
-            if post:
-                post = urlencode(post).replace("%%", "%")
 
         elif multipart:
             multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
             conn = multipartOpener.open(url, multipart)
             page = conn.read()
+            responseHeaders = conn.info()
+
+            encoding = responseHeaders.get("Content-Encoding")
+            page = decodePage(page, encoding)
 
             return page
 
@@ -110,7 +109,7 @@ class Connect:
                 get = conf.parameters["GET"]
 
             if get:
-                get = urlencode(get).replace("%%", "%")
+                get = urlencode(get)
                 url = "%s?%s" % (url, get)
                 requestMsg += "?%s" % get
 
@@ -118,18 +117,11 @@ class Connect:
                 if conf.parameters.has_key("POST") and not post:
                     post = conf.parameters["POST"]
 
-                post = urlencode(post).replace("%%", "%")
-
         requestMsg += " HTTP/1.1"
-
-        if cookie:
-            # TODO: sure about encoding the cookie?
-            #cookie = urlencode(cookie).replace("%%", "%")
-            cookie = cookie.replace("%%", "%")
 
         try:
             # Perform HTTP request
-            headers        = forgeHeaders(cookie, ua)
+            headers        = forgeHeaders(sanitizeCookie(cookie), ua)
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 
@@ -141,14 +133,15 @@ class Connect:
 
             requestHeaders = "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
 
-            for _, cookie in enumerate(conf.cj):
-                if not cookieStr:
-                    cookieStr = "Cookie: "
-
-                cookie = str(cookie)
-                index  = cookie.index(" for ")
-
-                cookieStr += "%s; " % cookie[8:index]
+            if not conf.dropSetCookie:
+                for _, cookie in enumerate(conf.cj):
+                    if not cookieStr:
+                        cookieStr = "Cookie: "
+    
+                    cookie = str(cookie)
+                    index  = cookie.index(" for ")
+    
+                    cookieStr += "%s; " % cookie[8:index]
 
             if not req.has_header("Cookie") and cookieStr:
                 requestHeaders += "\n%s" % cookieStr[:-2]
@@ -170,6 +163,9 @@ class Connect:
             code            = conn.code
             status          = conn.msg
             responseHeaders = conn.info()
+
+            encoding = responseHeaders.get("Content-Encoding")
+            page = decodePage(page, encoding)
 
         except urllib2.HTTPError, e:
             if e.code == 401:
@@ -208,7 +204,7 @@ class Connect:
 
                 return None, None
 
-            if silent is True:
+            if silent:
                 return None, None
 
             elif conf.retriesCount < conf.retries:
@@ -239,7 +235,6 @@ class Connect:
         logger.log(8, responseMsg)
 
         return page, responseHeaders
-
 
     @staticmethod
     def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False):

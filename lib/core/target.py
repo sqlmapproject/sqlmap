@@ -22,15 +22,13 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import time
 
 from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
-from lib.core.convert import urldecode
+from lib.core.common import sanitizeCookie
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -40,7 +38,6 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.session import resumeConfKb
-
 
 def __setRequestParams():
     """
@@ -65,21 +62,20 @@ def __setRequestParams():
         raise sqlmapSyntaxException, errMsg
 
     if conf.data:
-        urlDecodedData = urldecode(conf.data).replace("%", "%%")
-        conf.parameters["POST"] = urlDecodedData
-        __paramDict = paramToDict("POST", urlDecodedData)
+        conf.parameters["POST"] = conf.data
+        __paramDict = paramToDict("POST", conf.data)
 
         if __paramDict:
             conf.paramDict["POST"] = __paramDict
             __testableParameters = True
 
+        conf.method = "POST"
+
     # Perform checks on Cookie parameters
     if conf.cookie:
-        # TODO: sure about decoding the cookie?
-        #urlDecodedCookie = urldecode(conf.cookie).replace("%", "%%")
-        urlDecodedCookie = conf.cookie.replace("%", "%%")
-        conf.parameters["Cookie"] = urlDecodedCookie
-        __paramDict = paramToDict("Cookie", urlDecodedCookie)
+        conf.cookie = sanitizeCookie(conf.cookie)
+        conf.parameters["Cookie"] = conf.cookie
+        __paramDict = paramToDict("Cookie", conf.cookie)
 
         if __paramDict:
             conf.paramDict["Cookie"] = __paramDict
@@ -89,7 +85,8 @@ def __setRequestParams():
     if conf.httpHeaders:
         for httpHeader, headerValue in conf.httpHeaders:
             if httpHeader == "User-Agent":
-                conf.parameters["User-Agent"] = urldecode(headerValue).replace("%", "%%")
+                # No need for url encoding/decoding the user agent
+                conf.parameters["User-Agent"] = headerValue
 
                 condition  = not conf.testParameter
                 condition |= "User-Agent" in conf.testParameter
@@ -110,7 +107,6 @@ def __setRequestParams():
         errMsg  = "all testable parameters you provided are not present "
         errMsg += "within the GET, POST and Cookie parameters"
         raise sqlmapGenericException, errMsg
-
 
 def __setOutputResume():
     """
@@ -167,7 +163,6 @@ def __setOutputResume():
         errMsg = "unable to write on the session file specified"
         raise sqlmapFilePathException, errMsg
 
-
 def __createFilesDir():
     """
     Create the file directory.
@@ -181,7 +176,6 @@ def __createFilesDir():
     if not os.path.isdir(conf.filePath):
         os.makedirs(conf.filePath, 0755)
 
-
 def __createDumpDir():
     """
     Create the dump directory.
@@ -194,7 +188,6 @@ def __createDumpDir():
 
     if not os.path.isdir(conf.dumpPath):
         os.makedirs(conf.dumpPath, 0755)
-
 
 def createTargetDirs():
     """
@@ -213,7 +206,6 @@ def createTargetDirs():
 
     __createDumpDir()
     __createFilesDir()
-
 
 def initTargetEnv():
     """

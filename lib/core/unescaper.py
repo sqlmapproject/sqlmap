@@ -22,19 +22,14 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 class Unescaper:
     def __init__(self):
         self.__unescaper = None
 
-
     def setUnescape(self, unescapeFunction):
         self.__unescaper = unescapeFunction
 
-
     def unescape(self, expression, quote=True):
         return self.__unescaper(expression, quote=quote)
-
 
 unescaper = Unescaper()

@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import VERSION
@@ -33,66 +31,50 @@ from lib.core.settings import VERSION_STRING
 class sqlmapConnectionException(Exception):
     pass
 
-
 class sqlmapDataException(Exception):
     pass
-
 
 class sqlmapFilePathException(Exception):
     pass
 
-
 class sqlmapGenericException(Exception):
     pass
-
 
 class sqlmapMissingDependence(Exception):
     pass
 
-
 class sqlmapMissingMandatoryOptionException(Exception):
     pass
-
 
 class sqlmapMissingPrivileges(Exception):
     pass
 
-
 class sqlmapNoneDataException(Exception):
     pass
-
 
 class sqlmapNotVulnerableException(Exception):
     pass
 
-
 class sqlmapRegExprException(Exception):
     pass
-
 
 class sqlmapSyntaxException(Exception):
     pass
 
-
 class sqlmapThreadException(Exception):
     pass
-
 
 class sqlmapUndefinedMethod(Exception):
     pass
 
-
 class sqlmapUnsupportedDBMSException(Exception):
     pass
-
 
 class sqlmapUnsupportedFeatureException(Exception):
     pass
 
-
 class sqlmapValueException(Exception):
     pass
-
 
 def unhandledException():
     errMsg  = "unhandled exception in %s, please copy " % VERSION_STRING
@@ -102,7 +84,6 @@ def unhandledException():
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s" % PLATFORM
     return errMsg
-
 
 exceptionsTuple = (
                     sqlmapConnectionException,

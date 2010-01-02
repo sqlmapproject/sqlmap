@@ -22,15 +22,12 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 
 from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-
 
 class Registry:
     """
@@ -47,7 +44,7 @@ class Registry:
         self.__batPathRemote = "%s/sqlmapreg%s%s.bat" % (conf.tmpPath, self.__operation, self.__randStr)
         self.__batPathLocal  = os.path.join(conf.outputPath, "sqlmapreg%s%s.bat" % (self.__operation, self.__randStr))
 
-        if parse == True:
+        if parse:
             readParse = "FOR /F \"tokens=2* delims==\" %%A IN ('REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"
         else:
             readParse = "REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\""
@@ -67,7 +64,6 @@ class Registry:
                            "REG DELETE \"%s\" /v \"%s\" /f" % (self.__regKey, self.__regValue)
                          )
 
-
     def __createLocalBatchFile(self):
         self.__batPathFp = open(self.__batPathLocal, "w")
 
@@ -83,7 +79,6 @@ class Registry:
 
         self.__batPathFp.close()
 
-
     def __createRemoteBatchFile(self):
         logger.debug("creating batch file '%s'" % self.__batPathRemote)
 
@@ -91,7 +86,6 @@ class Registry:
         self.writeFile(self.__batPathLocal, self.__batPathRemote, "text", False)
 
         os.unlink(self.__batPathLocal)
-
 
     def readRegKey(self, regKey, regValue, parse=False):
         self.__operation = "read"
@@ -112,7 +106,6 @@ class Registry:
 
         return data
 
-
     def addRegKey(self, regKey, regValue, regType, regData):
         self.__operation = "add"
 
@@ -125,7 +118,6 @@ class Registry:
 
         self.execCmd(cmd=self.__batPathRemote, forgeCmd=True)
         self.delRemoteFile(self.__batPathRemote, doubleslash=True)
-
 
     def delRegKey(self, regKey, regValue):
         self.__operation = "delete"

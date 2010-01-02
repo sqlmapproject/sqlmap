@@ -22,8 +22,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import mimetools
 import mimetypes
 import os
@@ -39,7 +37,6 @@ class Callable:
     def __init__(self, anycallable):
         self.__call__ = anycallable
 
-
 # Controls how sequences are uncoded. If true, elements may be given
 # multiple values by assigning a sequence.
 doseq = 1
@@ -50,9 +47,11 @@ class MultipartPostHandler(urllib2.BaseHandler):
 
     def http_request(self, request):
         data = request.get_data()
+        
         if data is not None and type(data) != str:
             v_files = []
             v_vars = []
+            
             try:
                 for(key, value) in data.items():
                     if type(value) == file:
@@ -75,16 +74,18 @@ class MultipartPostHandler(urllib2.BaseHandler):
             request.add_data(data)
         return request
 
-
     def multipart_encode(vars, files, boundary = None, buffer = None):
         if boundary is None:
             boundary = mimetools.choose_boundary()
+
         if buffer is None:
             buffer = ''
+
         for(key, value) in vars:
             buffer += '--%s\r\n' % boundary
             buffer += 'Content-Disposition: form-data; name="%s"' % key
             buffer += '\r\n\r\n' + value + '\r\n'
+
         for(key, fd) in files:
             file_size = os.fstat(fd.fileno())[stat.ST_SIZE]
             filename = fd.name.split('/')[-1]
@@ -95,9 +96,11 @@ class MultipartPostHandler(urllib2.BaseHandler):
             # buffer += 'Content-Length: %s\r\n' % file_size
             fd.seek(0)
             buffer += '\r\n' + fd.read() + '\r\n'
+
         buffer += '--%s--\r\n\r\n' % boundary
+
         return boundary, buffer
+
     multipart_encode = Callable(multipart_encode)
 
     https_request = http_request
-

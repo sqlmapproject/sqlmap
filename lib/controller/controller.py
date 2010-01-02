@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.controller.action import action
 from lib.controller.checks import checkSqlInjection
 from lib.controller.checks import checkDynParam
@@ -33,6 +31,7 @@ from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.core.common import paramToDict
 from lib.core.common import readInput
+from lib.core.common import sanitizeCookie
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -41,7 +40,6 @@ from lib.core.session import setInjection
 from lib.core.target import createTargetDirs
 from lib.core.target import initTargetEnv
 from lib.utils.parenthesis import checkForParenthesis
-
 
 def __selectInjection(injData):
     """
@@ -82,7 +80,6 @@ def __selectInjection(injData):
         __selectInjection(injData)
 
     return injData[index]
-
 
 def start():
     """
@@ -143,34 +140,36 @@ def start():
         if not checkConnection() or not checkString() or not checkRegexp():
             continue
 
-        for _, cookie in enumerate(conf.cj):
-            cookie = str(cookie)
-            index  = cookie.index(" for ")
+        if not conf.dropSetCookie:
+            for _, cookie in enumerate(conf.cj):
+                cookie = str(cookie)
+                index  = cookie.index(" for ")
+    
+                cookieStr += "%s;" % cookie[8:index]
 
-            cookieStr += "%s;" % cookie[8:index]
-
-        if cookieStr:
-            cookieStr = cookieStr[:-1]
-
-            if "Cookie" in conf.parameters:
-                message  = "you provided an HTTP Cookie header value. "
-                message += "The target url provided its own Cookie within "
-                message += "the HTTP Set-Cookie header. Do you want to "
-                message += "continue using the HTTP Cookie values that "
-                message += "you provided? [Y/n] "
-                test = readInput(message, default="Y")
-
-                if not test or test[0] in ("y", "Y"):
-                    setCookieAsInjectable = False
-
-            if setCookieAsInjectable:
-                conf.httpHeaders.append(("Cookie", cookieStr))
-                conf.parameters["Cookie"] = cookieStr.replace("%", "%%")
-                __paramDict = paramToDict("Cookie", cookieStr)
-
-                if __paramDict:
-                    conf.paramDict["Cookie"] = __paramDict
-                    __testableParameters = True
+            if cookieStr:
+                cookieStr = cookieStr[:-1]
+    
+                if "Cookie" in conf.parameters:
+                    message  = "you provided an HTTP Cookie header value. "
+                    message += "The target url provided its own Cookie within "
+                    message += "the HTTP Set-Cookie header. Do you want to "
+                    message += "continue using the HTTP Cookie values that "
+                    message += "you provided? [Y/n] "
+                    test = readInput(message, default="Y")
+    
+                    if not test or test[0] in ("y", "Y"):
+                        setCookieAsInjectable = False
+    
+                if setCookieAsInjectable:
+                    safeCookie = sanitizeCookie(cookieStr)
+                    conf.httpHeaders.append(("Cookie", safeCookie))
+                    conf.parameters["Cookie"] = safeCookie
+                    __paramDict = paramToDict("Cookie", safeCookie)
+    
+                    if __paramDict:
+                        conf.paramDict["Cookie"] = __paramDict
+                        __testableParameters = True
 
         if not kb.injPlace or not kb.injParameter or not kb.injType:
             if not conf.string and not conf.regexp and not conf.eRegexp:
@@ -201,7 +200,7 @@ def start():
                         logMsg = "%s parameter '%s' is dynamic" % (place, parameter)
                         logger.info(logMsg)
 
-                    if testSqlInj == True:
+                    if testSqlInj:
                         for parenthesis in range(0, 4):
                             logMsg  = "testing sql injection on %s " % place
                             logMsg += "parameter '%s' with " % parameter
@@ -247,14 +246,11 @@ def start():
         if not conf.multipleTargets and ( not kb.injPlace or not kb.injParameter or not kb.injType ):
             raise sqlmapNotVulnerableException, "all parameters are not injectable"
         elif kb.injPlace and kb.injParameter and kb.injType:
-            condition = False
-
             if conf.multipleTargets:
                 message = "do you want to exploit this SQL injection? [Y/n] "
                 exploit = readInput(message, default="Y")
 
-                if not exploit or exploit[0] in ("y", "Y"):
-                    condition = True
+                condition = not exploit or exploit[0] in ("y", "Y")
             else:
                 condition = True
 

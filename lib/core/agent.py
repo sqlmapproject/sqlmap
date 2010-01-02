@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from lib.core.common import randomInt
@@ -45,7 +43,6 @@ class Agent:
         temp.start     = randomStr(6)
         temp.stop      = randomStr(6)
 
-
     def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False, falseCond=False):
         """
         This method replaces the affected parameter with the SQL
@@ -56,9 +53,9 @@ class Agent:
         negValue   = ""
         retValue   = ""
 
-        if negative == True or conf.paramNegative == True:
+        if negative or conf.paramNegative:
             negValue = "-"
-        elif falseCond == True or conf.paramFalseCond == True:
+        elif falseCond or conf.paramFalseCond:
             randInt = randomInt()
             falseValue = " AND %d=%d" % (randInt, randInt + 1)
 
@@ -83,14 +80,12 @@ class Agent:
 
         return retValue
 
-
     def fullPayload(self, query):
         query   = self.prefixQuery(query)
         query   = self.postfixQuery(query)
         payload = self.payload(newValue=query)
 
         return payload
-
 
     def prefixQuery(self, string):
         """
@@ -120,7 +115,6 @@ class Agent:
 
         return query
 
-
     def postfixQuery(self, string, comment=None):
         """
         This method appends the DBMS comment to the
@@ -136,7 +130,7 @@ class Agent:
         if conf.postfix:
             string += " %s" % conf.postfix
         else:
-            if kb.parenthesis != None:
+            if kb.parenthesis is not None:
                 string += " AND %s" % ("(" * kb.parenthesis)
             else:
                 raise sqlmapNoneDataException, "unable to get the number of parenthesis"
@@ -155,7 +149,6 @@ class Agent:
                 raise sqlmapNoneDataException, "unsupported injection type"
 
         return string
-
 
     def nullAndCastField(self, field):
         """
@@ -194,7 +187,6 @@ class Agent:
             nulledCastedField = queries[kb.dbms].isnull % nulledCastedField
 
         return nulledCastedField
-
 
     def nullCastConcatFields(self, fields):
         """
@@ -242,7 +234,6 @@ class Agent:
 
         return nulledCastedConcatFields
 
-
     def getFields(self, query):
         """
         Take in input a query string and return its fields (columns) and
@@ -285,7 +276,6 @@ class Agent:
 
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr
 
-
     def simpleConcatQuery(self, query1, query2):
         concatenatedQuery = ""
 
@@ -299,7 +289,6 @@ class Agent:
             concatenatedQuery = "%s+%s" % (query1, query2)
 
         return concatenatedQuery
-
 
     def concatQuery(self, query, unpack=True):
         """
@@ -327,7 +316,7 @@ class Agent:
         @rtype: C{str}
         """
 
-        if unpack == True:
+        if unpack:
             concatenatedQuery = ""
             query             = query.replace(", ", ",")
 
@@ -385,7 +374,6 @@ class Agent:
                 concatenatedQuery = "'%s'+%s+'%s'" % (temp.start, concatenatedQuery, temp.stop)
 
         return concatenatedQuery
-
 
     def forgeInbandQuery(self, query, exprPosition=None, nullChar="NULL"):
         """
@@ -465,7 +453,6 @@ class Agent:
 
         return inbandQuery
 
-
     def limitQuery(self, num, query, field):
         """
         Take in input a query string and return its limited query string.
@@ -529,7 +516,7 @@ class Agent:
                     topNum          = re.search("TOP\s+([\d]+)\s+", limitedQuery, re.I).group(1)
                     limitedQuery    = limitedQuery.replace("TOP %s " % topNum, "")
 
-            if forgeNotIn == True:
+            if forgeNotIn:
                 limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
                 if " WHERE " in limitedQuery:
                     limitedQuery  = "%s AND %s " % (limitedQuery, field)
@@ -539,7 +526,6 @@ class Agent:
                 limitedQuery += "%s %s)" % (field, fromFrom)
 
         return limitedQuery
-
 
     def forgeCaseStatement(self, expression):
         """
@@ -559,7 +545,6 @@ class Agent:
         """
 
         return queries[kb.dbms].case % expression
-
 
 # SQL agent
 agent = Agent()

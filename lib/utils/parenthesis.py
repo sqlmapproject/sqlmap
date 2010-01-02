@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.agent import agent
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -33,7 +31,6 @@ from lib.core.data import logger
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.session import setParenthesis
 from lib.request.connect import Connect as Request
-
 
 def checkForParenthesis():
     """
@@ -46,7 +43,7 @@ def checkForParenthesis():
 
     count = 0
 
-    if kb.parenthesis != None:
+    if kb.parenthesis is not None:
         return
 
     if conf.prefix or conf.postfix:
@@ -76,7 +73,7 @@ def checkForParenthesis():
         payload = agent.payload(newValue=query)
         result = Request.queryPage(payload)
 
-        if result == True:
+        if result:
             count = parenthesis
 
     logMsg = "the injectable parameter requires %d parenthesis" % count

@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import binascii
 import os
 
@@ -46,12 +44,10 @@ class Filesystem:
         self.fileTblName = "sqlmapfile"
         self.tblField    = "data"
 
-
     def __unbase64String(self, base64Str):
         unbase64Str = "%s\n" % base64Str.decode("base64")
 
         return unbase64Str
-
 
     def __unhexString(self, hexStr):
         if len(hexStr) % 2 != 0:
@@ -63,7 +59,6 @@ class Filesystem:
             return hexStr
 
         return binascii.unhexlify(hexStr)
-
 
     def __binDataToScr(self, binaryData, chunkName):
         """
@@ -100,7 +95,6 @@ class Filesystem:
         fileLines.append("q")
 
         return fileLines
-
 
     def __checkWrittenFile(self, wFile, dFile, fileType):
         if kb.dbms == "MySQL":
@@ -141,7 +135,6 @@ class Filesystem:
             warnMsg += "privileges in the destination path"
             logger.warn(warnMsg)
 
-
     def fileToSqlQueries(self, fcEncodedList):
         """
         Called by MySQL and PostgreSQL plugins to write a file on the
@@ -162,7 +155,6 @@ class Filesystem:
 
         return sqlQueries
 
-
     def fileEncode(self, fileName, encoding, single):
         """
         Called by MySQL and PostgreSQL plugins to write a file on the
@@ -173,7 +165,7 @@ class Filesystem:
         fp            = open(fileName, "rb")
         fcEncodedStr  = fp.read().encode(encoding).replace("\n", "")
 
-        if single == False:
+        if not single:
             fcLength = len(fcEncodedStr)
 
             if fcLength > 1024:
@@ -199,7 +191,6 @@ class Filesystem:
             fcEncodedList = [ fcEncodedStr ]
 
         return fcEncodedList
-
 
     def updateBinChunk(self, binaryData, tmpPath):
         """
@@ -250,7 +241,6 @@ class Filesystem:
 
         return chunkName
 
-
     def askCheckWrittenFile(self, wFile, dFile, fileType):
         message  = "do you want confirmation that the file '%s' " % dFile
         message += "has been successfully written on the back-end DBMS "
@@ -260,7 +250,6 @@ class Filesystem:
         if not output or output in ("y", "Y"):
             self.__checkWrittenFile(wFile, dFile, fileType)
 
-
     def readFile(self, rFile):
         fileContent = None
 
@@ -268,7 +257,7 @@ class Filesystem:
 
         self.checkDbmsOs()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             debugMsg  = "going to read the file with UNION query SQL "
             debugMsg += "injection technique"
             logger.debug(debugMsg)
@@ -308,13 +297,12 @@ class Filesystem:
 
         return rFilePath
 
-
     def writeFile(self, wFile, dFile, fileType=None, confirm=True):
         stackedTest()
 
         self.checkDbmsOs()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             debugMsg  = "going to upload the %s file with " % fileType
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)

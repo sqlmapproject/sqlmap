@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import atexit
 import os
 import rlcompleter
@@ -33,18 +31,15 @@ from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.data import queries
 
-
 def saveHistory():
     historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
     readline.write_history_file(historyPath)
-
 
 def loadHistory():
     historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
 
     if os.path.exists(historyPath):
         readline.read_history_file(historyPath)
-
 
 def queriesForAutoCompletion():
     autoComplQueries = {}
@@ -60,7 +55,6 @@ def queriesForAutoCompletion():
         autoComplQueries[autoComplQuery] = None
 
     return autoComplQueries
-
 
 class CompleterNG(rlcompleter.Completer):
     def global_matches(self, text):
@@ -79,7 +73,6 @@ class CompleterNG(rlcompleter.Completer):
                     matches.append(word)
 
         return matches
-
 
 def autoCompletion(sqlShell=False, osShell=False):
     # First of all we check if the readline is available, by default

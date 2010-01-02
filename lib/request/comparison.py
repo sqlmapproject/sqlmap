@@ -22,14 +22,11 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.session import setMatchRatio
-
 
 def comparison(page, headers=None, getSeqMatcher=False):
     regExpResults = None
@@ -73,15 +70,16 @@ def comparison(page, headers=None, getSeqMatcher=False):
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
-    if conf.matchRatio == None:
-        if conf.md5hash != None and ratio > 0.6 and ratio < 1:
+    if conf.matchRatio is None:
+        if conf.md5hash is not None and ratio > 0.6 and ratio < 1:
             logger.debug("setting match ratio to %.3f" % ratio)
             conf.matchRatio = ratio
-        elif conf.md5hash == None or ( conf.md5hash != None and ratio < 0.6 ):
+
+        elif conf.md5hash is None or ( conf.md5hash is not None and ratio < 0.6 ):
             logger.debug("setting match ratio to default value 0.900")
             conf.matchRatio = 0.900
 
-        if conf.matchRatio != None:
+        if conf.matchRatio is not None:
             setMatchRatio()
 
     # If it has been requested to return the ratio and not a comparison
@@ -93,7 +91,7 @@ def comparison(page, headers=None, getSeqMatcher=False):
     # hash of the original one
     # NOTE: old implementation, it did not handle automatically the fact
     # that the url could be not stable (due to VIEWSTATE, counter, etc.)
-    #elif conf.md5hash != None:
+    #elif conf.md5hash is not None:
     #    return conf.md5hash == md5hash(page)
 
     # If the url is not stable it returns sequence matcher between the

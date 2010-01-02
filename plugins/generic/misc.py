@@ -22,10 +22,8 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
-import re
 import os
+import re
 
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -72,12 +70,11 @@ class Miscellaneous:
 
         setRemoteTempPath()
 
-
     def delRemoteFile(self, tempFile, doubleslash=False):
         self.checkDbmsOs()
 
         if kb.os == "Windows":
-            if doubleslash is True:
+            if doubleslash:
                 tempFile = tempFile.replace("/", "\\\\")
             else:
                 tempFile = tempFile.replace("/", "\\")
@@ -88,11 +85,9 @@ class Miscellaneous:
 
         self.execCmd(cmd, forgeCmd=True)
 
-
     def createSupportTbl(self, tblName, tblField, tblType):
         inject.goStacked("DROP TABLE %s" % tblName)
         inject.goStacked("CREATE TABLE %s(%s %s)" % (tblName, tblField, tblType))
-
 
     def cleanup(self, onlyFileTbl=False, udfDict=None):
         """
@@ -101,7 +96,7 @@ class Miscellaneous:
 
         stackedTest()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             return
 
         if kb.os == "Windows":
@@ -113,7 +108,7 @@ class Miscellaneous:
         else:
             libtype = "shared library"
 
-        if onlyFileTbl == True:
+        if onlyFileTbl:
             logger.debug("cleaning up the database management system")
         else:
             logger.info("cleaning up the database management system")
@@ -121,7 +116,7 @@ class Miscellaneous:
         logger.debug("removing support tables")
         inject.goStacked("DROP TABLE %s" % self.fileTblName)
 
-        if onlyFileTbl == False:
+        if not onlyFileTbl:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName)
 
             if kb.dbms == "Microsoft SQL Server":

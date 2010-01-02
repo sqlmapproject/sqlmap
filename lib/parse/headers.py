@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 
 from xml.sax import parse
@@ -32,7 +30,6 @@ from lib.core.common import checkFile
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.handler import FingerprintHandler
-
 
 def headersParser(headers):
     """

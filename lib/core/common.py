@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import random
 import re
@@ -32,10 +30,7 @@ import string
 import sys
 import time
 import urlparse
-
-
 from lib.contrib import magic
-from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -115,7 +110,6 @@ def paramToDict(place, parameters=None):
 
     return testableParameters
 
-
 def formatDBMSfp(versions=None):
     """
     This function format the back-end DBMS fingerprint value and return its
@@ -139,12 +133,10 @@ def formatDBMSfp(versions=None):
 
         return kb.dbms
 
-
 def formatFingerprintString(values, chain=" or "):
     strJoin = "|".join([v for v in values])
 
     return strJoin.replace("|", chain)
-
 
 def formatFingerprint(target, info):
     """
@@ -198,7 +190,6 @@ def formatFingerprint(target, info):
 
     return infoStr
 
-
 def getHtmlErrorFp():
     """
     This function parses the knowledge base htmlFp list and return its
@@ -222,7 +213,6 @@ def getHtmlErrorFp():
 
     return htmlParsed
 
-
 def getDocRoot():
     docRoot = None
     pagePath = os.path.dirname(conf.path)
@@ -236,7 +226,7 @@ def getDocRoot():
         for absFilePath in kb.absFilePaths:
             absFilePathWin = None
 
-            if re.search("([\w]\:[\/\\\\]+)", absFilePath):
+            if re.search("[A-Za-z]:(\\[\w.\\]*)?", absFilePath):
                 absFilePathWin = absFilePath
                 absFilePath    = absFilePath[2:].replace("\\", "/")
 
@@ -268,7 +258,6 @@ def getDocRoot():
             docRoot = defaultDocRoot
 
     return docRoot
-
 
 def getDirs():
     directories = set()
@@ -305,33 +294,28 @@ def getDirs():
         directories.add(defaultDir)
 
     return directories
-
-
+    
 def filePathToString(filePath):
     strRepl = filePath.replace("/", "_").replace("\\", "_")
     strRepl = strRepl.replace(" ", "_").replace(":", "_")
 
     return strRepl
 
-
 def dataToStdout(data):
     sys.stdout.write(data)
     sys.stdout.flush()
-
-
+    
 def dataToSessionFile(data):
     if not conf.sessionFile:
         return
 
     conf.sessionFP.write(data)
     conf.sessionFP.flush()
-
-
+    
 def dataToDumpFile(dumpFile, data):
     dumpFile.write(data)
     dumpFile.flush()
-
-
+    
 def dataToOutFile(data):
     if not data:
         return "No data retrieved"
@@ -345,7 +329,6 @@ def dataToOutFile(data):
     rFileFP.close()
 
     return rFilePath
-
 
 def strToHex(inpStr):
     """
@@ -369,8 +352,7 @@ def strToHex(inpStr):
         hexStr += hexChar
 
     return hexStr
-
-
+        
 def fileToStr(fileName):
     """
     @param fileName: file path to read the content and return as a no
@@ -384,13 +366,7 @@ def fileToStr(fileName):
     filePointer = open(fileName, "r")
     fileText = filePointer.read()
 
-    fileText = fileText.replace("    ", "")
-    fileText = fileText.replace("\t", "")
-    fileText = fileText.replace("\r", "")
-    fileText = fileText.replace("\n", " ")
-
-    return fileText
-
+    return fileText.replace("    ", "").replace("\t", "").replace("\r", "").replace("\n", " ")
 
 def fileToHex(fileName):
     """
@@ -406,7 +382,6 @@ def fileToHex(fileName):
     hexFile = strToHex(fileText)
 
     return hexFile
-
 
 def readInput(message, default=None):
     """
@@ -435,8 +410,7 @@ def readInput(message, default=None):
             data = default
 
     return data
-
-
+        
 def randomRange(start=0, stop=1000):
     """
     @param start: starting number.
@@ -451,7 +425,6 @@ def randomRange(start=0, stop=1000):
 
     return int(random.randint(start, stop))
 
-
 def randomInt(length=4):
     """
     @param length: length of the random string.
@@ -463,7 +436,6 @@ def randomInt(length=4):
 
     return int("".join([random.choice(string.digits) for _ in xrange(0, length)]))
 
-
 def randomStr(length=5, lowercase=False):
     """
     @param length: length of the random string.
@@ -473,14 +445,13 @@ def randomStr(length=5, lowercase=False):
     @rtype: C{str}
     """
 
-    if lowercase == True:
+    if lowercase:
         rndStr = "".join([random.choice(string.lowercase) for _ in xrange(0, length)])
     else:
         rndStr = "".join([random.choice(string.letters) for _ in xrange(0, length)])
 
     return rndStr
-
-
+    
 def sanitizeStr(inpStr):
     """
     @param inpStr: inpStr to sanitize: cast to str datatype and replace
@@ -496,7 +467,6 @@ def sanitizeStr(inpStr):
 
     return cleanString
 
-
 def checkFile(filename):
     """
     @param filename: filename to check if it exists.
@@ -505,14 +475,12 @@ def checkFile(filename):
 
     if not os.path.exists(filename):
         raise sqlmapFilePathException, "unable to read file '%s'" % filename
-
-
+    
 def replaceNewlineTabs(inpStr):
     replacedString = inpStr.replace("\n", "__NEWLINE__").replace("\t", "__TAB__")
     replacedString = replacedString.replace(temp.delimiter, "__DEL__")
 
     return replacedString
-
 
 def banner():
     """
@@ -523,8 +491,7 @@ def banner():
     %s
     by Bernardo Damele A. G. <bernardo.damele@gmail.com>
     """ % VERSION_STRING
-
-
+    
 def parsePasswordHash(password):
     blank = " " * 8
 
@@ -542,8 +509,7 @@ def parsePasswordHash(password):
             password += "%suppercase: %s" % (blank, hexPassword[54:])
 
     return password
-
-
+        
 def cleanQuery(query):
     upperQuery = query
 
@@ -556,8 +522,7 @@ def cleanQuery(query):
                 upperQuery = upperQuery.replace(queryMatch.group(1), sqlStatement.upper())
 
     return upperQuery
-
-
+            
 def setPaths():
     # sqlmap paths
     paths.SQLMAP_CONTRIB_PATH    = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "contrib")
@@ -581,8 +546,7 @@ def setPaths():
     paths.MYSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
     paths.ORACLE_XML             = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
     paths.PGSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
-
-
+    
 def weAreFrozen():
     """
     Returns whether we are frozen via py2exe.
@@ -591,7 +555,6 @@ def weAreFrozen():
     """
 
     return hasattr(sys, "frozen")
-
 
 def parseTargetUrl():
     """
@@ -623,11 +586,10 @@ def parseTargetUrl():
         conf.port = 80
 
     if __urlSplit[3]:
-        conf.parameters["GET"] = urldecode(__urlSplit[3]).replace("%", "%%")
+        conf.parameters["GET"] = __urlSplit[3]
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
-
-
+    
 def expandAsteriskForColumns(expression):
     # If the user provided an asterisk rather than the column(s)
     # name, sqlmap will retrieve the columns itself and reprocess
@@ -659,8 +621,7 @@ def expandAsteriskForColumns(expression):
             logger.info(infoMsg)
 
     return expression
-
-
+        
 def getRange(count, dump=False, plusOne=False):
     count      = int(count)
     indexRange = None
@@ -674,14 +635,13 @@ def getRange(count, dump=False, plusOne=False):
         if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
             limitStart = conf.limitStart
 
-    if kb.dbms == "Oracle" or plusOne == True:
+    if kb.dbms == "Oracle" or plusOne:
         indexRange = range(limitStart, limitStop + 1)
     else:
         indexRange = range(limitStart - 1, limitStop)
 
     return indexRange
-
-
+    
 def parseUnionPage(output, expression, partial=False, condition=None, sort=True):
     data = []
 
@@ -696,7 +656,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 
         output = re.findall(regExpr, output, re.S)
 
-        if condition == None:
+        if condition is None:
             condition = (
                           kb.resumedQueries and conf.url in kb.resumedQueries.keys()
                           and expression in kb.resumedQueries[conf.url].keys()
@@ -731,18 +691,17 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
         data = data[0]
 
     return data
-
-
+    
 def getDelayQuery():
     query = None
 
-    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+    if kb.dbms in ("MySQL", "PostgreSQL"):
         if not kb.data.banner:
             conf.dbmsHandler.getVersionFromBanner()
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if ( kb.dbms == "MySQL" and banVer >= "5.0.12" ) or ( kb.dbms == "PostgreSQL" and banVer >= "8.2" ):
+        if (kb.dbms == "MySQL" and banVer >= "5.0.12") or (kb.dbms == "PostgreSQL" and banVer >= "8.2"):
             query = queries[kb.dbms].timedelay % conf.timeSec
         else:
             query = queries[kb.dbms].timedelay2 % conf.timeSec
@@ -750,8 +709,7 @@ def getDelayQuery():
         query = queries[kb.dbms].timedelay % conf.timeSec
 
     return query
-
-
+    
 def getLocalIP():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((conf.hostname, conf.port))
@@ -760,10 +718,8 @@ def getLocalIP():
 
     return ip
 
-
 def getRemoteIP():
     return socket.gethostbyname(conf.hostname)
-
 
 def getFileType(filePath):
     try:
@@ -775,8 +731,7 @@ def getFileType(filePath):
         return "text"
     else:
         return "binary"
-
-
+    
 def pollProcess(process):
     while True:
         dataToStdout(".")
@@ -793,12 +748,11 @@ def pollProcess(process):
                 dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
 
             break
-
-
+            
 def getCharset(charsetType=None):
     asciiTbl = []
 
-    if charsetType == None:
+    if charsetType is None:
         asciiTbl = range(0, 128)
 
     # 0 or 1
@@ -832,22 +786,49 @@ def getCharset(charsetType=None):
         asciiTbl.extend(range(96, 123))
 
     return asciiTbl
-
-
+    
 def searchEnvPath(fileName):
     envPaths = os.environ["PATH"]
-    result   = None
+    result = None
 
-    if IS_WIN is True:
+    if IS_WIN:
         envPaths = envPaths.split(";")
     else:
         envPaths = envPaths.split(":")
 
     for envPath in envPaths:
         envPath = envPath.replace(";", "")
-        result  = os.path.exists(os.path.normpath(os.path.join(envPath, fileName)))
+        result = os.path.exists(os.path.normpath(os.path.join(envPath, fileName)))
 
-        if result == True:
+        if result:
             break
 
     return result
+
+def sanitizeCookie(cookieStr, warn=False):
+    if cookieStr:
+        result = ""
+        changed = False
+        for part in cookieStr.split(';'):
+            index = part.find('=') + 1
+            if index > 0:
+                name = part[:index - 1].strip()
+                value = part[index:].replace(",","%2C").replace(";","%3B").replace(" ","%20")
+                if value != part[index:]:
+                    changed = True
+                result += ";%s=%s" % (name, value)
+            elif part.strip().lower() != "secure":
+                result += "%s%s" % ("%3B", part.replace(",","%2C").replace(";","%3B").replace(" ","%20"))
+            else:
+                result += ";secure"
+        if result.startswith(';'):
+            result = result[1:]
+        elif result.startswith('%3B'):
+            result = result[3:]
+        if changed and warn:
+            warnMsg = "cookie is provided in HTTP unsafe format containing one "
+            warnMsg += "of problematic characters: ' ,;'. temporary sanitized."
+            logger.warn(warnMsg)
+        return result
+    else:
+        return None

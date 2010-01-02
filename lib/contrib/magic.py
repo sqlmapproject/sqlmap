@@ -10,8 +10,6 @@ Reference: http://hupp.org/adam/hg/python-magic
 License: PSF (http://www.python.org/psf/license/)
 """
 
-
-
 import os.path
 import ctypes
 import ctypes.util
@@ -42,7 +40,6 @@ class Magic:
 
         magic_load(self.cookie, magic_file)
 
-
     def from_buffer(self, buf):
         """
         Identify the contents of `buf`
@@ -65,7 +62,6 @@ class Magic:
             magic_close(self.cookie)
         except Exception, _:
             pass
-
 
 _magic_mime = None
 _magic = None
@@ -95,8 +91,6 @@ def from_file(filename, mime=False):
 def from_buffer(buffer, mime=False):
     m = _get_magic_type(mime)
     return m.from_buffer(buffer)
-
-
 
 try:
     libmagic = ctypes.CDLL(ctypes.util.find_library('magic'))
@@ -132,16 +126,13 @@ try:
     magic_file.argtypes = [magic_t, c_char_p]
     magic_file.errcheck = errorcheck
 
-
     _magic_buffer = libmagic.magic_buffer
     _magic_buffer.restype = c_char_p
     _magic_buffer.argtypes = [magic_t, c_void_p, c_size_t]
     _magic_buffer.errcheck = errorcheck
 
-
     def magic_buffer(cookie, buf):
         return _magic_buffer(cookie, buf, len(buf))
-
 
     magic_load = libmagic.magic_load
     magic_load.restype = c_int
@@ -161,7 +152,6 @@ try:
     magic_compile.argtypes = [magic_t, c_char_p]
 except:
     pass
-
 
 MAGIC_NONE = 0x000000 # No flags
 

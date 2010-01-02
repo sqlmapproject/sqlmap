@@ -22,20 +22,16 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
 import md5
 import sha
 import struct
 import urllib
 
-
 def base64decode(string):
     return string.decode("base64")
 
-
 def base64encode(string):
     return string.encode("base64")[:-1]
-
 
 def hexdecode(string):
     string = string.lower()
@@ -44,45 +40,40 @@ def hexdecode(string):
         string = string[2:]
 
     return string.decode("hex")
-
-
+    
 def hexencode(string):
     return string.encode("hex")
 
-
 def md5hash(string):
     return md5.new(string).hexdigest()
-
 
 def orddecode(string):
     packedString = struct.pack("!"+"I" * len(string), *string)
     return "".join([chr(char) for char in struct.unpack("!"+"I"*(len(packedString)/4), packedString)])
 
-
 def ordencode(string):
     return tuple([ord(char) for char in string])
-
 
 def sha1hash(string):
     return sha.new(string).hexdigest()
 
-
 def urldecode(string):
-    if not string:
-        return
+    result = None
+    
+    if string:
+        result = urllib.unquote_plus(string)
 
-    doublePercFreeString = string.replace("%%", "__DPERC__")
-    unquotedString = urllib.unquote_plus(doublePercFreeString)
-    unquotedString = unquotedString.replace("__DPERC__", "%%")
-
-    return unquotedString
-
+    return result
 
 def urlencode(string, safe=":/?%&=", convall=False):
-    if not string:
-        return
+    result = None
 
-    if convall == True:
-        return urllib.quote(string)
+    if string is None:
+        return result
+
+    if convall:
+        result = urllib.quote(string)
     else:
-        return urllib.quote(string, safe)
+        result = urllib.quote(string, safe)
+
+    return result

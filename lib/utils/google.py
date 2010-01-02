@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import cookielib
 import re
 import urllib2
@@ -31,8 +29,9 @@ import urllib2
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
-
+from lib.request.basic import decodePage
 
 class Google:
     """
@@ -47,7 +46,6 @@ class Google:
         self.opener = urllib2.build_opener(proxyHandler, urllib2.HTTPCookieProcessor(self.__cj))
         self.opener.addheaders = conf.httpHeaders
 
-
     def __parsePage(self, page):
         """
         Parse Google dork search results page to get the list of
@@ -61,7 +59,6 @@ class Google:
 
         return matches
 
-
     def getTargetUrls(self):
         """
         This method returns the list of hosts with parameters out of
@@ -71,7 +68,6 @@ class Google:
         for match in self.__matches:
             if re.search("(.*?)\?(.+)", match, re.I):
                 kb.targetUrls.add(( match, None, None, None ))
-
 
     def getCookie(self):
         """
@@ -90,12 +86,13 @@ class Google:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
-
     def search(self, googleDork):
         """
         This method performs the effective search on Google providing
         the google dork and the Google session cookie
         """
+
+        gpage = conf.googlePage if conf.googlePage > 1 else 1
 
         if not googleDork:
             return None
@@ -103,10 +100,33 @@ class Google:
         url  = "http://www.google.com/search?"
         url += "q=%s&" % urlencode(googleDork)
         url += "num=100&hl=en&safe=off&filter=0&btnG=Search"
+        url += "&start=%d" % ((gpage-1) * 100)
 
         try:
             conn = self.opener.open(url)
-            page = conn.read()
+
+            requestMsg = "HTTP request:\nGET %s HTTP/1.1" % url
+            #requestHeaders = "\n".join(["%s: %s" % (header, value) for header, value in conn.headers.items()])
+            #requestMsg += "\n%s" % requestHeaders
+            requestMsg += "\n"
+            logger.log(9, requestMsg)
+
+            page            = conn.read()
+            code            = conn.code
+            status          = conn.msg
+            responseHeaders = conn.info()
+
+            encoding = responseHeaders.get("Content-Encoding")
+            page = decodePage(page, encoding)
+
+            responseMsg = "HTTP response (%s - %d):\n" % (status, code)
+    
+            if conf.verbose <= 4:
+                responseMsg += str(responseHeaders)
+            elif conf.verbose > 4:
+                responseMsg += "%s\n%s\n" % (responseHeaders, page)
+    
+            logger.log(8, responseMsg)
         except urllib2.HTTPError, e:
             page = e.read()
         except urllib2.URLError, e:

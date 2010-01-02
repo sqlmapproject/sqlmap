@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import cookielib
 import ctypes
 import difflib
@@ -40,6 +38,7 @@ from lib.core.common import getFileType
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
+from lib.core.common import sanitizeCookie
 from lib.core.common import sanitizeStr
 from lib.core.data import conf
 from lib.core.data import kb
@@ -70,10 +69,8 @@ from lib.parse.queriesfile import queriesParser
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.utils.google import Google
 
-
 authHandler  = urllib2.BaseHandler()
 proxyHandler = urllib2.BaseHandler()
-
 
 def __urllib2Opener():
     """
@@ -85,12 +82,14 @@ def __urllib2Opener():
 
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
-
-    conf.cj = cookielib.LWPCookieJar()
-    opener  = urllib2.build_opener(proxyHandler, authHandler, urllib2.HTTPCookieProcessor(conf.cj))
+    
+    if conf.dropSetCookie:
+        opener  = urllib2.build_opener(proxyHandler, authHandler)
+    else:
+        conf.cj = cookielib.LWPCookieJar()
+        opener  = urllib2.build_opener(proxyHandler, authHandler, urllib2.HTTPCookieProcessor(conf.cj))
 
     urllib2.install_opener(opener)
-
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
     fp = open(reqFile, "r")
@@ -173,7 +172,6 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 kb.targetUrls.add(( url, method, data, cookie ))
                 addedTargetUrls.add(url)
 
-
 def __setMultipleTargets():
     """
     Define a configuration parameter if we are running in multiple target
@@ -217,7 +215,6 @@ def __setMultipleTargets():
         infoMsg  = "sqlmap parsed %d " % (updatedTargetsCount - initialTargetsCount)
         infoMsg += "testable requests from the targets list"
         logger.info(infoMsg)
-
 
 def __setGoogleDorking():
     """
@@ -266,7 +263,6 @@ def __setGoogleDorking():
         errMsg += "have GET parameters to test for SQL injection"
         raise sqlmapGenericException, errMsg
 
-
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
         return
@@ -276,7 +272,7 @@ def __setMetasploit():
 
     msfEnvPathExists = False
 
-    if IS_WIN is True:
+    if IS_WIN:
         warnMsg  = "Metasploit's msfconsole and msfcli are not supported "
         warnMsg += "on the native Windows Ruby interpreter. Please "
         warnMsg += "install Metasploit, Python interpreter and sqlmap on "
@@ -300,7 +296,7 @@ def __setMetasploit():
             if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
                 isAdmin = True
 
-        elif IS_WIN is True:
+        elif IS_WIN:
             isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
 
             if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
@@ -349,14 +345,14 @@ def __setMetasploit():
         warnMsg += "Framework 3 is installed"
         logger.warn(warnMsg)
 
-    if msfEnvPathExists != True:
+    if not msfEnvPathExists:
         warnMsg  = "sqlmap is going to look for Metasploit Framework 3 "
         warnMsg += "installation into the environment paths"
         logger.warn(warnMsg)
 
         envPaths = os.environ["PATH"]
 
-        if IS_WIN is True:
+        if IS_WIN:
             envPaths = envPaths.split(";")
         else:
             envPaths = envPaths.split(":")
@@ -379,11 +375,10 @@ def __setMetasploit():
 
                 break
 
-    if msfEnvPathExists != True:
+    if not msfEnvPathExists:
         errMsg  = "unable to locate Metasploit Framework 3 installation. "
         errMsg += "Get it from http://metasploit.com/framework/download/"
         raise sqlmapFilePathException, errMsg
-
 
 def __setWriteFile():
     if not conf.wFile:
@@ -403,9 +398,8 @@ def __setWriteFile():
 
     conf.wFileType = getFileType(conf.wFile)
 
-
 def __setUnionTech():
-    if conf.uTech == None:
+    if conf.uTech is None:
         conf.uTech = "NULL"
 
         return
@@ -428,7 +422,6 @@ def __setUnionTech():
         debugMsg += "'%s'" % uTechOriginal
         logger.debug(debugMsg)
 
-
 def __setOS():
     """
     Force the back-end DBMS operating system option.
@@ -450,7 +443,6 @@ def __setOS():
         errMsg += "do not provide it and sqlmap will fingerprint it for "
         errMsg += "you."
         raise sqlmapUnsupportedDBMSException, errMsg
-
 
 def __setDBMS():
     """
@@ -482,11 +474,9 @@ def __setDBMS():
         errMsg += "fingerprint it for you."
         raise sqlmapUnsupportedDBMSException, errMsg
 
-
 def __setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
         conf.threads = 1
-
 
 def __setHTTPProxy():
     """
@@ -525,7 +515,6 @@ def __setHTTPProxy():
         proxyHandler = ProxyHTTPSHandler(__proxyString)
     else:
         proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
-
 
 def __setHTTPAuthentication():
     """
@@ -588,7 +577,6 @@ def __setHTTPAuthentication():
 
         authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passwordMgr)
 
-
 def __setHTTPMethod():
     """
     Check and set the HTTP method to perform HTTP requests through.
@@ -609,7 +597,6 @@ def __setHTTPMethod():
 
     debugMsg = "setting the HTTP method to %s" % conf.method
     logger.debug(debugMsg)
-
 
 def __setHTTPExtraHeaders():
     if conf.hostname:
@@ -632,7 +619,6 @@ def __setHTTPExtraHeaders():
         conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
         conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
 
-
 def __defaultHTTPUserAgent():
     """
     @return: default sqlmap HTTP User-Agent header
@@ -647,7 +633,6 @@ def __defaultHTTPUserAgent():
     # Internet Explorer 7.0 running on Windows 2003 Service Pack 2 english
     # updated at March 2009
     #return "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
-
 
 def __setHTTPUserAgent():
     """
@@ -712,7 +697,6 @@ def __setHTTPUserAgent():
     logMsg += "file '%s': %s" % (conf.userAgentsFile, __userAgent)
     logger.info(logMsg)
 
-
 def __setHTTPReferer():
     """
     Set the HTTP Referer
@@ -724,7 +708,6 @@ def __setHTTPReferer():
 
         conf.httpHeaders.append(("Referer", conf.referer))
 
-
 def __setHTTPCookies():
     """
     Set the HTTP Cookie header
@@ -733,10 +716,11 @@ def __setHTTPCookies():
     if conf.cookie:
         debugMsg = "setting the HTTP Cookie header"
         logger.debug(debugMsg)
-
+        
+        conf.cookie = sanitizeCookie(conf.cookie, True)
+        
         conf.httpHeaders.append(("Connection", "Keep-Alive"))
         conf.httpHeaders.append(("Cookie", conf.cookie))
-
 
 def __setHTTPTimeout():
     """
@@ -759,7 +743,6 @@ def __setHTTPTimeout():
         conf.timeout = 30.0
 
     socket.setdefaulttimeout(conf.timeout)
-
 
 def __cleanupOptions():
     """
@@ -808,7 +791,6 @@ def __cleanupOptions():
     if conf.googleDork or conf.list:
         conf.multipleTargets = True
 
-
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration
@@ -843,7 +825,6 @@ def __setConfAttributes():
     conf.threadException = False
     conf.wFileType       = None
 
-
 def __setKnowledgeBaseAttributes():
     """
     This function set some needed attributes into the knowledge base
@@ -862,7 +843,7 @@ def __setKnowledgeBaseAttributes():
     kb.dbmsDetected   = False
 
     # Active (extensive) back-end DBMS fingerprint
-    kb.dbmsVersion    = []
+    kb.dbmsVersion    = [ "Unknown" ]
 
     kb.dep            = None
     kb.docRoot        = None
@@ -887,7 +868,6 @@ def __setKnowledgeBaseAttributes():
     kb.unionComment   = ""
     kb.unionCount     = None
     kb.unionPosition  = None
-
 
 def __saveCmdline():
     """
@@ -918,7 +898,7 @@ def __saveCmdline():
         optionData.sort()
 
         for option, value, datatype in optionData:
-            if value == None:
+            if value is None:
                 if datatype == "boolean":
                     value = "False"
                 elif datatype in ( "integer", "float" ):
@@ -942,13 +922,12 @@ def __saveCmdline():
     infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
     logger.info(infoMsg)
 
-
 def __setVerbosity():
     """
     This function set the verbosity of sqlmap output messages.
     """
 
-    if conf.verbose == None:
+    if conf.verbose is None:
         conf.verbose = 1
 
     conf.verbose = int(conf.verbose)
@@ -964,7 +943,6 @@ def __setVerbosity():
         logger.setLevel(9)
     elif conf.verbose >= 4:
         logger.setLevel(8)
-
 
 def __mergeOptions(inputOptions):
     """
@@ -983,9 +961,8 @@ def __mergeOptions(inputOptions):
         inputOptionsItems = inputOptions.__dict__.items()
 
     for key, value in inputOptionsItems:
-        if not conf.has_key(key) or conf[key] == None or value != None:
+        if not conf.has_key(key) or conf[key] is None or value is not None:
             conf[key] = value
-
 
 def init(inputOptions=advancedDict()):
     """

@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import errno
 import os
 import sys
@@ -31,15 +29,13 @@ import time
 
 from lib.core.settings import IS_WIN
 
-
-if IS_WIN is not True:
+if not IS_WIN:
     import fcntl
 
     if (sys.hexversion >> 16) >= 0x202:
         FCNTL = fcntl
     else:
         import FCNTL
-
 
 def blockingReadFromFD(fd):
     # Quick twist around original Twisted function
@@ -62,8 +58,7 @@ def blockingReadFromFD(fd):
     if not output:
         raise EOFError, "fd %s has been closed." % fd 
 
-    return output 
-
+    return output
 
 def blockingWriteToFD(fd, data):
     # Another quick twist
@@ -81,7 +76,6 @@ def blockingWriteToFD(fd, data):
             blockingWriteToFD(fd, data[wrote_data:])
 
         break
-
 
 def setNonBlocking(fd):
     """

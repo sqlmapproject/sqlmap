@@ -21,15 +21,12 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import sys
 import struct
 
 from optparse import OptionError
 from optparse import OptionParser
-
 
 def convert(inputFile):
     fileStat = os.stat(inputFile)
@@ -73,8 +70,7 @@ def convert(inputFile):
     script += "w\r\nq\r\n"
 
     return script
-
-
+        
 def main(inputFile, outputFile):
     if not os.path.isfile(inputFile):
         print 'ERROR: the provided input file \'%s\' is not a regular file' % inputFile
@@ -89,8 +85,7 @@ def main(inputFile, outputFile):
         sys.stdout.close()
     else:
         print script
-
-
+        
 if __name__ == '__main__':
     usage = '%s -i <input file> [-o <output file>]' % sys.argv[0]
     parser  = OptionParser(usage=usage, version='0.1')

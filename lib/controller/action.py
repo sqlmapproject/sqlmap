@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.controller.handler import setHandler
 from lib.core.common import getHtmlErrorFp
 from lib.core.data import conf
@@ -34,7 +32,6 @@ from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.blind.timebased import timeTest
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
-
 
 def action():
     """

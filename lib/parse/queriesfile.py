@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from xml.sax import parse
 from xml.sax.handler import ContentHandler
 
@@ -34,7 +32,6 @@ from lib.core.data import queries
 from lib.core.data import paths
 from lib.core.datatype import advancedDict
 
-
 class queriesHandler(ContentHandler):
     """
     This class defines methods to parse the default DBMS queries
@@ -44,7 +41,6 @@ class queriesHandler(ContentHandler):
     def __init__(self):
         self.__dbms    = ''
         self.__queries = advancedDict()
-
 
     def startElement(self, name, attrs):
         if name == "dbms":
@@ -150,7 +146,6 @@ class queriesHandler(ContentHandler):
             self.__count  = sanitizeStr(attrs.get("count"))
             self.__count2 = sanitizeStr(attrs.get("count2"))
 
-
     def endElement(self, name):
         if name == "dbms":
             queries[self.__dbms] = self.__queries
@@ -208,7 +203,6 @@ class queriesHandler(ContentHandler):
             self.__dumpTable["blind"]  = { "query": self.__blind, "count": self.__count }
 
             self.__queries.dumpTable = self.__dumpTable
-
 
 def queriesParser():
     """

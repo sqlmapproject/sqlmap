@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -36,7 +34,6 @@ from plugins.dbms.mssqlserver import MSSQLServerMap
 from plugins.dbms.mysql import MySQLMap
 from plugins.dbms.oracle import OracleMap
 from plugins.dbms.postgresql import PostgreSQLMap
-
 
 def setHandler():
     """

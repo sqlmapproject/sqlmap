@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -33,7 +31,6 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.takeover.udf import UDF
 from lib.takeover.xp_cmdshell import xp_cmdshell
-
 
 class Abstraction(UDF, xp_cmdshell):
     """
@@ -47,7 +44,6 @@ class Abstraction(UDF, xp_cmdshell):
         UDF.__init__(self)
         xp_cmdshell.__init__(self)
 
-
     def __cmdShellCleanup(self):
         if not conf.cleanup:
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
@@ -60,7 +56,6 @@ class Abstraction(UDF, xp_cmdshell):
                 errMsg = "Feature not yet implemented for the back-end DBMS"
                 raise sqlmapUnsupportedFeatureException, errMsg
 
-
     def execCmd(self, cmd, silent=False, forgeCmd=False):
         if kb.dbms in ( "MySQL", "PostgreSQL" ):
             self.udfExecCmd(cmd, silent=silent)
@@ -72,7 +67,6 @@ class Abstraction(UDF, xp_cmdshell):
             errMsg = "Feature not yet implemented for the back-end DBMS"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-
     def evalCmd(self, cmd, first=None, last=None):
         if kb.dbms in ( "MySQL", "PostgreSQL" ):
             return self.udfEvalCmd(cmd, first, last)
@@ -83,7 +77,6 @@ class Abstraction(UDF, xp_cmdshell):
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
             raise sqlmapUnsupportedFeatureException, errMsg
-
 
     def runCmd(self, cmd):
         getOutput = None
@@ -104,7 +97,6 @@ class Abstraction(UDF, xp_cmdshell):
 
         if not conf.osShell and not conf.cleanup:
             self.__cmdShellCleanup()
-
 
     def absOsShell(self):
         if kb.dbms in ( "MySQL", "PostgreSQL" ):
@@ -153,14 +145,13 @@ class Abstraction(UDF, xp_cmdshell):
 
         self.__cmdShellCleanup()
 
-
     def initEnv(self, mandatory=True, detailed=False):
-        if self.envInitialized is True:
+        if self.envInitialized:
             return
 
         self.checkDbmsOs(detailed)
 
-        if self.isDba() == False:
+        if not self.isDba():
             warnMsg  = "the functionality requested might not work because "
             warnMsg += "the session user is not a database administrator"
             logger.warn(warnMsg)

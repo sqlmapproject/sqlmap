@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import difflib
 import os
 import re
@@ -47,7 +45,6 @@ from lib.core.settings import SQLMAP_VERSION_URL
 from lib.core.settings import SQLMAP_SOURCE_URL
 from lib.core.settings import VERSION
 from lib.request.connect import Connect as Request
-
 
 def __updateMSSQLXML():
     infoMsg = "updating Microsoft SQL Server XML versions file"
@@ -199,14 +196,12 @@ def __updateMSSQLXML():
         infoMsg += "last update"
         logger.info(infoMsg)
 
-
 def __createFile(pathname, data):
     mkpath(os.path.dirname(pathname))
 
     fileFP = open(pathname, "wb")
     fileFP.write(data)
     fileFP.close()
-
 
 def __extractZipFile(tempDir, zipFile):
     # Check if the saved binary file is really a ZIP file
@@ -220,7 +215,6 @@ def __extractZipFile(tempDir, zipFile):
         if info.filename[-1] != '/':
             data = sqlmapZipFile.read(info.filename)
             __createFile(os.path.join(tempDir, info.filename), data)
-
 
 def __updateSqlmap():
     infoMsg = "updating sqlmap"
@@ -292,8 +286,6 @@ def __updateSqlmap():
 
     # For each file and directory in the temporary directory copy it
     # to the sqlmap root path and set right permission
-    # TODO: remove files not needed anymore and all pyc within the
-    # sqlmap root path in the end
     for root, _, files in os.walk(os.path.join(tempDir, "sqlmap-%s" % sqlmapNewestVersion)):
         # Just for development release
         if '.svn' in root:
@@ -333,7 +325,6 @@ def __updateSqlmap():
 
     infoMsg = "sqlmap updated successfully"
     logger.info(infoMsg)
-
 
 def update():
     if not conf.updateAll:

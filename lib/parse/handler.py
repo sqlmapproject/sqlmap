@@ -22,14 +22,9 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
-
 from xml.sax.handler import ContentHandler
-
 from lib.core.common import sanitizeStr
-
 
 class FingerprintHandler(ContentHandler):
     """
@@ -45,7 +40,6 @@ class FingerprintHandler(ContentHandler):
         self.__techVersion = None
         self.__info        = info
 
-
     def __feedInfo(self, key, value):
         value = sanitizeStr(value)
 
@@ -60,7 +54,6 @@ class FingerprintHandler(ContentHandler):
 
             for v in value.split("|"):
                 self.__info[key].add(v)
-
 
     def startElement(self, name, attrs):
         if name == "regexp":

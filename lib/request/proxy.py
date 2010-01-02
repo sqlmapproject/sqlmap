@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import httplib
 import socket
 import urllib
@@ -31,10 +29,8 @@ import urllib2
 
 from lib.core.settings import PYVERSION
 
-
 if PYVERSION >= "2.6":
     import ssl
-
 
 class ProxyHTTPConnection(httplib.HTTPConnection):
     _ports = {"http" : 80, "https" : 443}
@@ -65,7 +61,6 @@ class ProxyHTTPConnection(httplib.HTTPConnection):
 
         httplib.HTTPConnection.request(self, method, rest, body, headers)
 
-
     def connect(self):
         httplib.HTTPConnection.connect(self)
 
@@ -91,7 +86,6 @@ class ProxyHTTPConnection(httplib.HTTPConnection):
             if line == "\r\n":
                 break
 
-
 class ProxyHTTPSConnection(ProxyHTTPConnection):
     default_port = 443
 
@@ -111,7 +105,6 @@ class ProxyHTTPSConnection(ProxyHTTPConnection):
             sslobj    = socket.ssl(self.sock, self.key_file, self.cert_file)
             self.sock = httplib.FakeSocket(self.sock, sslobj)
 
-
 class ProxyHTTPHandler(urllib2.HTTPHandler):
     def __init__(self, proxy=None, debuglevel=0):
         self.proxy = proxy
@@ -123,7 +116,6 @@ class ProxyHTTPHandler(urllib2.HTTPHandler):
             req.set_proxy(self.proxy, "http")
 
         return urllib2.HTTPHandler.do_open(self, ProxyHTTPConnection, req)
-
 
 class ProxyHTTPSHandler(urllib2.HTTPSHandler):
     def __init__(self, proxy=None, debuglevel=0):

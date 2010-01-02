@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from xml.sax import parse
@@ -34,7 +32,6 @@ from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.handler import FingerprintHandler
-
 
 class MSSQLBannerHandler(ContentHandler):
     """
@@ -51,7 +48,6 @@ class MSSQLBannerHandler(ContentHandler):
         self.__servicePack   = ""
         self.__info          = info
 
-
     def __feedInfo(self, key, value):
         value = sanitizeStr(value)
 
@@ -59,7 +55,6 @@ class MSSQLBannerHandler(ContentHandler):
             return
 
         self.__info[key] = value
-
 
     def startElement(self, name, attrs):
         if name == "signatures":
@@ -71,13 +66,11 @@ class MSSQLBannerHandler(ContentHandler):
         elif name == "servicepack":
             self.__inServicePack = True
 
-
     def characters(self, data):
         if self.__inVersion:
             self.__version += sanitizeStr(data)
         elif self.__inServicePack:
             self.__servicePack += sanitizeStr(data)
-
 
     def endElement(self, name):
         if name == "signature":
@@ -89,7 +82,6 @@ class MSSQLBannerHandler(ContentHandler):
             self.__version     = ""
             self.__servicePack = ""
 
-
         elif name == "version":
             self.__inVersion = False
             self.__version = self.__version.replace(" ", "")
@@ -97,7 +89,6 @@ class MSSQLBannerHandler(ContentHandler):
         elif name == "servicepack":
             self.__inServicePack = False
             self.__servicePack = self.__servicePack.replace(" ", "")
-
 
 def bannerParser(banner):
     """

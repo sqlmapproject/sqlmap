@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.agent import agent
 from lib.core.common import randomStr
 from lib.core.data import conf
@@ -34,7 +32,6 @@ from lib.core.session import setUnion
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
-
 
 def __unionPosition(negative=False, falseCond=False):
     if negative or falseCond:
@@ -93,7 +90,6 @@ def __unionPosition(negative=False, falseCond=False):
 
         logger.warn(warnMsg)
 
-
 def __unionConfirm():
     # Confirm the inband SQL injection and get the exact column
     # position
@@ -121,7 +117,6 @@ def __unionConfirm():
             else:
                 conf.paramFalseCond = True
 
-
 def __forgeUserFriendlyValue(payload):
     value = ""
 
@@ -138,7 +133,6 @@ def __forgeUserFriendlyValue(payload):
         value += "\nUser-Agent:\t'%s'\n" % payload
 
     return value
-
 
 def __unionTestByNULLBruteforce(comment):
     """
@@ -173,7 +167,6 @@ def __unionTestByNULLBruteforce(comment):
 
     return value, columns
 
-
 def __unionTestByOrderBy(comment):
     columns     = None
     value       = None
@@ -196,7 +189,6 @@ def __unionTestByOrderBy(comment):
         prevPayload = payload
 
     return value, columns
-
 
 def unionTest():
     """

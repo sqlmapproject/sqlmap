@@ -22,10 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.common import dataToStdout
-
 
 class ProgressBar:
     """
@@ -42,14 +39,12 @@ class ProgressBar:
         self.__amount = 0
         self.update()
 
-
     def __convertSeconds(self, value):
         seconds = value
         minutes = seconds / 60
         seconds = seconds - (minutes * 60)
 
         return "%.2d:%.2d" % (minutes, seconds)
-
 
     def update(self, newAmount=0):
         """
@@ -87,7 +82,6 @@ class ProgressBar:
         percentString = str(percentDone) + "%"
         self.__progBar = "%s %s" % (percentString, self.__progBar)
 
-
     def draw(self, eta=0):
         """
         This method draws the progress bar if it has changed
@@ -101,7 +95,6 @@ class ProgressBar:
             else:
                 blank = " " * (80 - len("\r%s %d/%d" % (self.__progBar, self.__amount, self.__max)))
                 dataToStdout("\r%s %d/%d%s" % (self.__progBar, self.__amount, self.__max, blank))
-
 
     def __str__(self):
         """

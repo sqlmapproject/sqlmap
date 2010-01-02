@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import re
 
@@ -59,7 +57,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         Abstraction.__init__(self)
 
-
     def __webBackdoorRunCmd(self, backdoorUrl, cmd):
         output = None
 
@@ -76,7 +73,6 @@ class Takeover(Abstraction, Metasploit, Registry):
             print "No output"
 
         return output
-
 
     def __webBackdoorShell(self, backdoorUrl):
         infoMsg  = "calling OS shell. To quit type "
@@ -108,7 +104,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
             self.__webBackdoorRunCmd(backdoorUrl, command)
 
-
     def __webBackdoorInit(self):
         """
         This method is used to write a web backdoor (agent) on a writable
@@ -138,23 +133,16 @@ class Takeover(Abstraction, Metasploit, Registry):
 
             if not choice or choice == "2":
                 language = "php"
-
                 break
 
             elif choice == "1":
                 language = "asp"
-
                 break
 
             elif choice == "3":
-                # TODO: add also JSP backdoor/uploader support
                 errMsg  = "JSP web backdoor functionality is not yet "
                 errMsg += "implemented"
-                raise sqlmapUnsupportedDBMSException, errMsg
-
-                #language = "jsp"
-
-                #break
+                raise sqlmapUnsupportedDBMSException(errMsg)
 
             elif not choice.isdigit():
                 logger.warn("invalid value, only digits are allowed")
@@ -226,7 +214,6 @@ class Takeover(Abstraction, Metasploit, Registry):
                     continue
 
             elif language == "jsp":
-                # TODO: add also JSP backdoor/uploader support
                 pass
 
             backdoorUrl = "%s/%s" % (baseUrl, backdoorName)
@@ -240,7 +227,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         return backdoorUrl
 
-
     def uploadChurrasco(self):
         msg  = "do you want sqlmap to upload Churrasco and call the "
         msg += "Metasploit payload stager as its argument so that it "
@@ -249,7 +235,6 @@ class Takeover(Abstraction, Metasploit, Registry):
         output = readInput(msg, default="Y")
 
         if not output or output[0] in ( "y", "Y" ):
-            # TODO: add also compiled/packed Churrasco for Windows 2008
             wFile = os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe")
 
             self.churrascoPath    = "%s/sqlmapchur%s.exe" % (conf.tmpPath, randomStr(lowercase=True))
@@ -261,11 +246,10 @@ class Takeover(Abstraction, Metasploit, Registry):
         else:
             return False
 
-
     def osCmd(self):
         stackedTest()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             infoMsg  = "going to upload a web page backdoor for command "
             infoMsg += "execution"
             logger.info(infoMsg)
@@ -278,11 +262,10 @@ class Takeover(Abstraction, Metasploit, Registry):
             self.initEnv()
             self.runCmd(conf.osCmd)
 
-
     def osShell(self):
         stackedTest()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             infoMsg  = "going to upload a web page backdoor for command "
             infoMsg += "execution"
             logger.info(infoMsg)
@@ -295,11 +278,10 @@ class Takeover(Abstraction, Metasploit, Registry):
             self.initEnv()
             self.absOsShell()
 
-
     def osPwn(self):
         stackedTest()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             return
 
         self.initEnv()
@@ -330,7 +312,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             if choice == 1:
                 goUdf = True
 
-        if goUdf is True:
+        if goUdf:
             self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
         else:
             self.createMsfPayloadStager()
@@ -359,7 +341,7 @@ class Takeover(Abstraction, Metasploit, Registry):
 
                 uploaded = self.uploadChurrasco()
 
-                if uploaded == False:
+                if not uploaded:
                     warnMsg  = "beware that the privilege escalation "
                     warnMsg += "might not work"
                     logger.warn(warnMsg)
@@ -371,7 +353,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         self.pwn(goUdf)
 
-
     def osSmb(self):
         stackedTest()
 
@@ -381,14 +362,14 @@ class Takeover(Abstraction, Metasploit, Registry):
             errMsg  = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows: it is not possible to perform the SMB "
             errMsg += "relay attack"
-            raise sqlmapUnsupportedDBMSException, errMsg
+            raise sqlmapUnsupportedDBMSException(errMsg)
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             if kb.dbms in ( "PostgreSQL", "Microsoft SQL Server" ):
                 errMsg  = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
                 errMsg += "queries are supported"
-                raise sqlmapUnsupportedDBMSException, errMsg
+                raise sqlmapUnsupportedDBMSException(errMsg)
 
             elif kb.dbms == "MySQL":
                 debugMsg  = "since stacked queries are not supported, "
@@ -419,16 +400,15 @@ class Takeover(Abstraction, Metasploit, Registry):
         else:
             printWarn = False
 
-        if printWarn == True:
+        if printWarn:
             logger.warn(warnMsg)
 
         self.smb()
 
-
     def osBof(self):
         stackedTest()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             return
 
         if not kb.dbms == "Microsoft SQL Server" or kb.dbmsVersion[0] not in ( "2000", "2005" ):
@@ -436,7 +416,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             errMsg += "2000 or 2005 to be able to exploit the heap-based "
             errMsg += "buffer overflow in the 'sp_replwritetovarbin' "
             errMsg += "stored procedure (MS09-004)"
-            raise sqlmapUnsupportedDBMSException, errMsg
+            raise sqlmapUnsupportedDBMSException(errMsg)
 
         infoMsg  = "going to exploit the Microsoft SQL Server %s " % kb.dbmsVersion[0]
         infoMsg += "'sp_replwritetovarbin' stored procedure heap-based "
@@ -448,11 +428,10 @@ class Takeover(Abstraction, Metasploit, Registry):
         self.createMsfShellcode(exitfunc="seh", format="raw", extra="-b 27", encode=True)
         self.bof()
 
-
     def __regInit(self):
         stackedTest()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             return
 
         self.checkDbmsOs()
@@ -460,11 +439,10 @@ class Takeover(Abstraction, Metasploit, Registry):
         if kb.os != "Windows":
             errMsg  = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows"
-            raise sqlmapUnsupportedDBMSException, errMsg
+            raise sqlmapUnsupportedDBMSException(errMsg)
 
         self.initEnv()
         self.getRemoteTempPath()
-
 
     def regRead(self):
         self.__regInit()
@@ -488,7 +466,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         return self.readRegKey(regKey, regVal, False)
 
-
     def regAdd(self):
         self.__regInit()
 
@@ -499,7 +476,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             regKey = readInput(msg)
 
             if not regKey:
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise sqlmapMissingMandatoryOptionException(errMsg)
         else:
             regKey = conf.regKey
 
@@ -508,7 +485,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             regVal = readInput(msg)
 
             if not regVal:
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise sqlmapMissingMandatoryOptionException(errMsg)
         else:
             regVal = conf.regVal
 
@@ -517,7 +494,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             regData = readInput(msg)
 
             if not regData:
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise sqlmapMissingMandatoryOptionException(errMsg)
         else:
             regData = conf.regData
 
@@ -537,7 +514,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         self.addRegKey(regKey, regVal, regType, regData)
 
-
     def regDel(self):
         self.__regInit()
 
@@ -548,7 +524,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             regKey = readInput(msg)
 
             if not regKey:
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise sqlmapMissingMandatoryOptionException(errMsg)
         else:
             regKey = conf.regKey
 
@@ -557,7 +533,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             regVal = readInput(msg)
 
             if not regVal:
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise sqlmapMissingMandatoryOptionException(errMsg)
         else:
             regVal = conf.regVal
 

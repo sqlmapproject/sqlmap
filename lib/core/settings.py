@@ -22,15 +22,12 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import logging
 import subprocess
 import sys
 
-
 # sqlmap version and site
-VERSION            = "0.8-rc2"
+VERSION            = "0.8-rc3"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 SITE               = "http://sqlmap.sourceforge.net"
 

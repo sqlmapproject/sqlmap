@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from lib.core.agent import agent
@@ -48,12 +46,10 @@ from plugins.generic.fingerprint import Fingerprint
 from plugins.generic.misc import Miscellaneous
 from plugins.generic.takeover import Takeover
 
-
 class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Oracle methods
     """
-
 
     def __init__(self):
         self.excludeDbsList = ORACLE_SYSTEM_DBS
@@ -63,7 +59,6 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         Takeover.__init__(self)
 
         unescaper.setUnescape(OracleMap.unescape)
-
 
     @staticmethod
     def unescape(expression, quote=True):
@@ -96,7 +91,6 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
         return expression
 
-
     @staticmethod
     def escape(expression):
         while True:
@@ -120,7 +114,6 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             expression = expression.replace(old, escaped)
 
         return expression
-
 
     def getFingerprint(self):
         value  = ""
@@ -157,7 +150,6 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
         return value
 
-
     def checkDbms(self):
         if conf.dbms in ORACLE_ALIASES:
             setDbms("Oracle")
@@ -173,14 +165,14 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         payload = agent.fullPayload(" AND ROWNUM=ROWNUM")
         result  = Request.queryPage(payload)
 
-        if result == True:
+        if result:
             logMsg = "confirming Oracle"
             logger.info(logMsg)
 
             payload = agent.fullPayload(" AND LENGTH(SYSDATE)=LENGTH(SYSDATE)")
             result  = Request.queryPage(payload)
 
-            if result != True:
+            if not result:
                 warnMsg = "the back-end DMBS is not Oracle"
                 logger.warn(warnMsg)
 
@@ -212,7 +204,6 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
             return False
 
-
     def forceDbmsEnum(self):
         if conf.db:
             conf.db = conf.db.upper()
@@ -228,43 +219,36 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         if conf.tbl:
             conf.tbl = conf.tbl.upper()
 
-
     def getDbs(self):
         warnMsg = "on Oracle it is not possible to enumerate databases"
         logger.warn(warnMsg)
 
         return []
 
-
     def readFile(self, rFile):
         errMsg  = "File system read access not yet implemented for "
         errMsg += "Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
-
 
     def writeFile(self, wFile, dFile, fileType=None, confirm=True):
         errMsg  = "File system write access not yet implemented for "
         errMsg += "Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
 
-
     def osCmd(self):
         errMsg  = "Operating system command execution functionality not "
         errMsg += "yet implemented for Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
-
 
     def osShell(self):
         errMsg  = "Operating system shell functionality not yet "
         errMsg += "implemented for Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
 
-
     def osPwn(self):
         errMsg  = "Operating system out-of-band control functionality "
         errMsg += "not yet implemented for Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
-
 
     def osSmb(self):
         errMsg  = "One click operating system out-of-band control "

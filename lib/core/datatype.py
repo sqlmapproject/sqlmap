@@ -22,9 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
 from lib.core.exception import sqlmapDataException
-
 
 class advancedDict(dict):
     """
@@ -45,7 +43,6 @@ class advancedDict(dict):
         # After initialisation, setting attributes
         # is the same as setting an item
 
-
     def __getattr__(self, item):
         """
         Maps values to attributes
@@ -56,7 +53,6 @@ class advancedDict(dict):
             return self.__getitem__(item)
         except KeyError:
             raise sqlmapDataException, "Unable to access item '%s'" % item
-
 
     def __setattr__(self, item, value):
         """

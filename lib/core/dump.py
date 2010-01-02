@@ -22,15 +22,12 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
-import re
 import os
+import re
 
 from lib.core.common import dataToDumpFile
 from lib.core.data import conf
 from lib.core.data import logger
-
 
 class Dump:
     """
@@ -42,8 +39,7 @@ class Dump:
     def __init__(self):
         self.__outputFile = None
         self.__outputFP   = None
-
-
+        
     def __write(self, data, n=True):
         if n:
             print data
@@ -55,13 +51,11 @@ class Dump:
         self.__outputFP.flush()
 
         conf.loggedToOut = True
-
-
+        
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
         self.__outputFP = open(self.__outputFile, "a")
-
-
+        
     def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
             self.lister(header, data, sort)
@@ -81,13 +75,12 @@ class Dump:
                 self.__write("%s:    '%s'\n" % (header, data))
         else:
             self.__write("%s:\tNone\n" % header)
-
-
+            
     def lister(self, header, elements, sort=True):
         if elements:
             self.__write("%s [%d]:" % (header, len(elements)))
 
-        if sort == True:
+        if sort:
             try:
                 elements = set(elements)
                 elements = list(elements)
@@ -103,8 +96,7 @@ class Dump:
 
         if elements:
             self.__write("")
-
-
+            
     def userSettings(self, header, userSettings, subHeader):
         self.__areAdmins = set()
 
@@ -131,8 +123,7 @@ class Dump:
             for setting in settings:
                 self.__write("    %s: %s" % (subHeader, setting))
         print
-
-
+        
     def dbTables(self, dbTables):
         if not isinstance(dbTables, dict):
             self.string("tables", dbTables)
@@ -164,8 +155,7 @@ class Dump:
                 self.__write("| %s%s |" % (table, blank))
 
             self.__write("+%s+\n" % lines)
-
-
+            
     def dbTableColumns(self, tableColumns):
         for db, tables in tableColumns.items():
             if not db:
@@ -210,8 +200,7 @@ class Dump:
                     self.__write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
 
                 self.__write("+%s+%s+\n" % (lines1, lines2))
-
-
+                
     def dbTableValues(self, tableValues):
         db = tableValues["__infos__"]["db"]
         if not db:
@@ -305,7 +294,6 @@ class Dump:
             dumpFP.close()
 
             logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
-
 
 # object to manage how to print the retrieved queries output to
 # standard output and sessions file

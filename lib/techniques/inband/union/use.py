@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 import time
 
@@ -39,9 +37,7 @@ from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
 from lib.utils.resume import resume
 
-
 reqCount = 0
-
 
 def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullChar="NULL", unpack=True):
     """
@@ -60,7 +56,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
     global reqCount
 
-    if resetCounter == True:
+    if resetCounter:
         reqCount = 0
 
     if not kb.unionCount:
@@ -74,7 +70,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         expression = agent.concatQuery(expression, unpack)
         expression = unescaper.unescape(expression)
 
-    if ( conf.paramNegative == True or conf.paramFalseCond == True ) and direct == False:
+    if ( conf.paramNegative or conf.paramFalseCond ) and not direct:
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
 
         if len(expressionFieldsList) > 1:
@@ -141,7 +137,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     else:
                         test = True
 
-                if test == True:
+                if test:
                     # Count the number of SQL query entries output
                     countFirstField   = queries[kb.dbms].count % expressionFieldsList[0]
                     countedExpression = origExpr.replace(expressionFields, countFirstField, 1)

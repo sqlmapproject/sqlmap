@@ -22,10 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.exception import sqlmapUndefinedMethod
-
 
 class Fingerprint:
     """
@@ -38,19 +35,16 @@ class Fingerprint:
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
-
     @staticmethod
     def escape(expression):
         errMsg  = "'escape' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
-
     def getFingerprint(self):
         errMsg  = "'getFingerprint' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
-
 
     def checkDbms(self):
         errMsg  = "'checkDbms' method must be defined "

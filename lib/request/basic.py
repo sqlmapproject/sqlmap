@@ -22,16 +22,16 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
+import gzip
 import os
 import re
+import StringIO
+import zlib
 
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
-
 
 def forgeHeaders(cookie, ua):
     """
@@ -51,17 +51,12 @@ def forgeHeaders(cookie, ua):
 
     return headers
 
-
 def parseResponse(page, headers):
     """
     @param page: the page to parse to feed the knowledge base htmlFp
     (back-end DBMS fingerprint based upon DBMS error messages return
     through the web application) list and absFilePaths (absolute file
     paths) set.
-
-    @todo: in the future parse the page content scrolling an XML file to
-    identify the dynamic language used and, most, the absolute path,
-    like for DBMS error messages (ERRORS_XML), see above.
     """
 
     if headers:
@@ -73,11 +68,29 @@ def parseResponse(page, headers):
         # Detect injectable page absolute system path
         # NOTE: this regular expression works if the remote web application
         # is written in PHP and debug/error messages are enabled.
-        absFilePathsRegExp = ( " in <b>(.*?)</b> on line", "([\w]\:[\/\\\\]+)" )
+        absFilePathsRegExp = ( r" in <b>(.*?)</b> on line",  r"\b[A-Za-z]:(\\[\w.\\]*)?", r"/[/\w.]+" )
 
         for absFilePathRegExp in absFilePathsRegExp:
-            absFilePaths = re.findall(absFilePathRegExp, page, re.I)
+            reobj = re.compile(absFilePathRegExp)
 
-            for absFilePath in absFilePaths:
+            for match in reobj.finditer(page):
+                absFilePath = match.group()
+
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(os.path.dirname(absFilePath))
+
+def decodePage(page, encoding):
+    """
+    Decode gzip/deflate HTTP response
+    """
+
+    if str(encoding).lower() in ('gzip', 'x-gzip', 'deflate'):
+        if encoding == 'deflate':
+            # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
+            data = StringIO.StringIO(zlib.decompress(page, -15))
+        else:
+            data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(page))
+
+        page = data.read()
+
+    return page

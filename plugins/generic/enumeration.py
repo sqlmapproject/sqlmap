@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from lib.core.agent import agent
@@ -49,7 +47,6 @@ from lib.request import inject
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
 
-
 class Enumeration:
     """
     This class defines generic enumeration functionalities for plugins.
@@ -71,10 +68,8 @@ class Enumeration:
 
         temp.inference                 = queries[dbms].inference
 
-
     def forceDbmsEnum(self):
         pass
-
 
     def getVersionFromBanner(self):
         if "dbmsVersion" in kb.bannerFp:
@@ -99,7 +94,6 @@ class Enumeration:
 
         kb.bannerFp["dbmsVersion"] = inject.getValue(query, unpack=False)
         kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
-
 
     def getBanner(self):
         if not conf.getBanner:
@@ -131,7 +125,6 @@ class Enumeration:
 
         return kb.data.banner
 
-
     def getCurrentUser(self):
         infoMsg = "fetching current user"
         logger.info(infoMsg)
@@ -142,7 +135,6 @@ class Enumeration:
             kb.data.currentUser = inject.getValue(query)
 
         return kb.data.currentUser
-
 
     def getCurrentDb(self):
         infoMsg = "fetching current database"
@@ -155,7 +147,6 @@ class Enumeration:
 
         return kb.data.currentDb
 
-
     def isDba(self):
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
@@ -165,7 +156,6 @@ class Enumeration:
         kb.data.isDba = inject.getValue(query, unpack=False, charsetType=1)
 
         return kb.data.isDba == "1"
-
 
     def getUsers(self):
         infoMsg = "fetching database users"
@@ -217,7 +207,6 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedUsers
-
 
     def getPasswordHashes(self):
         infoMsg = "fetching database users password hashes"
@@ -340,7 +329,6 @@ class Enumeration:
 
         return kb.data.cachedUsersPasswords
 
-
     def __isAdminFromPrivileges(self, privileges):
         # In PostgreSQL the usesuper privilege means that the
         # user is DBA
@@ -359,7 +347,6 @@ class Enumeration:
         dbaCondition |= ( kb.dbms == "MySQL" and not kb.data.has_information_schema and "super_priv" in privileges )
 
         return dbaCondition
-
 
     def getPrivileges(self):
         infoMsg = "fetching database users privileges"
@@ -627,7 +614,6 @@ class Enumeration:
 
         return ( kb.data.cachedUsersPrivileges, areAdmins )
 
-
     def getDbs(self):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             warnMsg  = "information_schema not available, "
@@ -681,7 +667,6 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedDbs
-
 
     def getTables(self):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
@@ -776,7 +761,6 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedTables
-
 
     def getColumns(self, onlyColNames=False):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
@@ -896,7 +880,6 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedColumns
-
 
     def dumpTable(self):
         if not conf.tbl:
@@ -1067,7 +1050,6 @@ class Enumeration:
 
         return kb.data.dumpedTable
 
-
     def dumpAll(self):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
@@ -1092,7 +1074,6 @@ class Enumeration:
 
                 if data:
                     dumper.dbTableValues(data)
-
 
     def sqlQuery(self, query):
         output      = None
@@ -1119,10 +1100,10 @@ class Enumeration:
         else:
             query = urlencode(query, convall=True)
 
-            if kb.stackedTest == None:
+            if kb.stackedTest is None:
                 stackedTest()
 
-            if kb.stackedTest == False:
+            if not kb.stackedTest:
                 return None
             else:
                 if sqlType:
@@ -1139,7 +1120,6 @@ class Enumeration:
                 output = False
 
         return output
-
 
     def sqlShell(self):
         infoMsg  = "calling %s shell. To quit type " % kb.dbms
@@ -1174,7 +1154,7 @@ class Enumeration:
             if output and output != "Quit":
                 dumper.string(query, output)
 
-            elif output == False:
+            elif not output:
                 pass
 
             elif output != "Quit":

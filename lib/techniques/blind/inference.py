@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import threading
 import time
 import traceback
@@ -43,8 +41,6 @@ from lib.core.exception import unhandledException
 from lib.core.progress import ProgressBar
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
-
-
 def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None):
     """
     Bisection algorithm that can be used to perform blind SQL injection
@@ -102,7 +98,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progress = ProgressBar(maxValue=length)
         progressTime = []
 
-    if conf.verbose in ( 1, 2 ) and not showEta:
+    if conf.verbose >= 1 and not showEta:
         if isinstance(length, int) and conf.threads > 1:
             infoMsg = "starting %d threads" % numThreads
             logger.info(infoMsg)
@@ -113,8 +109,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
 
     queriesCount = [0]    # As list to deal with nested scoping rules
-
-
     def getChar(idx, asciiTbl=asciiTbl):
         maxValue = asciiTbl[len(asciiTbl)-1]
         minValue = 0
@@ -126,7 +120,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             forgedPayload = payload % (expressionUnescaped, idx, posValue)
             result        = Request.queryPage(forgedPayload)
 
-            if result == True:
+            if result:
                 minValue = posValue
                 asciiTbl = asciiTbl[position:]
             else:
@@ -138,8 +132,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     return None
                 else:
                     return chr(minValue + 1)
-
-
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):
             eta = 0
@@ -151,15 +143,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progressTime.append(charTime)
         progress.update(index)
         progress.draw(eta)
-
-
     if conf.threads > 1 and isinstance(length, int) and length > 1:
         value   = [ None ] * length
         index   = [ firstChar ]    # As list for python nested function scoping
         idxlock = threading.Lock()
         iolock  = threading.Lock()
-
-
         def downloadThread():
             try:
                 while True:
@@ -184,7 +172,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                     if showEta:
                         etaProgressUpdate(time.time() - charStart, index[0])
-                    elif conf.verbose in ( 1, 2 ):
+                    elif conf.verbose >= 1:
                         s = "".join([c or "_" for c in value])
                         iolock.acquire()
                         dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), s))
@@ -212,8 +200,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 errMsg = unhandledException()
                 logger.error("thread %d: %s" % (numThread + 1, errMsg))
                 traceback.print_exc()
-
-
         # Start the threads
         for numThread in range(numThreads):
             thread = threading.Thread(target=downloadThread)
@@ -228,7 +214,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         # can mean that the connection to the target url was lost
         if None in value:
             for v in value:
-                if isinstance(v, str) and v != None:
+                if isinstance(v, str) and v is not None:
                     partialValue += v
 
             if partialValue:
@@ -241,7 +227,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if isinstance(finalValue, str) and len(finalValue) > 0:
             dataToSessionFile(replaceNewlineTabs(finalValue))
 
-        if conf.verbose in ( 1, 2 ) and not showEta and infoMsg:
+        if conf.verbose >= 1 and not showEta and infoMsg:
             dataToStdout(infoMsg)
 
     else:
@@ -261,10 +247,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if showEta:
                 etaProgressUpdate(time.time() - charStart, index)
-            elif conf.verbose in ( 1, 2 ):
+            elif conf.verbose >= 1:
                 dataToStdout(val)
 
-    if conf.verbose in ( 1, 2 ) or showEta:
+    if conf.verbose >= 1 or showEta:
         dataToStdout("\n")
 
     if ( conf.verbose in ( 1, 2 ) and showEta and len(str(progress)) >= 64 ) or conf.verbose >= 3:

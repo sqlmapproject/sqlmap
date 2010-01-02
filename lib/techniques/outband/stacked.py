@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import time
 
 from lib.core.common import getDelayQuery
@@ -33,9 +31,8 @@ from lib.core.data import logger
 from lib.core.session import setStacked
 from lib.request import inject
 
-
 def stackedTest():
-    if kb.stackedTest != None:
+    if kb.stackedTest is not None:
         return kb.stackedTest
 
     infoMsg  = "testing stacked queries support on parameter "
@@ -53,7 +50,6 @@ def stackedTest():
         logger.info(infoMsg)
 
         kb.stackedTest = payload
-
     else:
         warnMsg  = "the web application does not support stacked queries "
         warnMsg += "on parameter '%s'" % kb.injParameter

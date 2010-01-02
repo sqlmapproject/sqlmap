@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 import time
 
@@ -43,7 +41,6 @@ from lib.techniques.inband.union.use import unionUse
 from lib.techniques.blind.inference import bisection
 from lib.utils.resume import queryOutputLength
 from lib.utils.resume import resume
-
 
 def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None):
     start = time.time()
@@ -67,7 +64,6 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     return value
 
-
 def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None, resumeValue=True, charsetType=None, firstChar=None, lastChar=None):
     outputs     = []
     origExpr    = None
@@ -87,7 +83,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
 
-        if resumeValue == True:
+        if resumeValue:
             output = resume(expressionReplaced, payload)
 
         if not output or ( expected == "int" and not output.isdigit() ):
@@ -104,7 +100,6 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         outputs.append(output)
 
     return outputs
-
 
 def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None, firstChar=None, lastChar=None):
     """
@@ -124,15 +119,15 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     untilLimitChar = None
     untilOrderChar = None
 
-    if resumeValue == True:
+    if resumeValue:
         output = resume(expression, payload)
     else:
         output = None
 
-    if output and ( expected == None or ( expected == "int" and output.isdigit() ) ):
+    if output and ( expected is None or ( expected == "int" and output.isdigit() ) ):
         return output
 
-    if unpack == False:
+    if not unpack:
         return __goInference(payload, expression, charsetType, firstChar, lastChar)
 
     if kb.dbmsDetected:
@@ -205,7 +200,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                 if not stopLimit or stopLimit <= 1:
                     if kb.dbms == "Oracle" and expression.endswith("FROM DUAL"):
                         test = "n"
-                    elif batch == True:
+                    elif batch:
                         test = "y"
                     else:
                         message  = "can the SQL query provided return "
@@ -221,7 +216,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         untilOrderChar = countedExpression.index(" ORDER BY ")
                         countedExpression = countedExpression[:untilOrderChar]
 
-                    if resumeValue == True:
+                    if resumeValue:
                         count = resume(countedExpression, payload)
 
                     if not stopLimit:
@@ -231,7 +226,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         if count and count.isdigit() and int(count) > 0:
                             count = int(count)
 
-                            if batch == True:
+                            if batch:
                                 stopLimit = count
                             else:
                                 message  = "the SQL query provided can return "
@@ -314,7 +309,6 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
     return returnValue
 
-
 def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=True):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
@@ -330,7 +324,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
                   and expression in kb.resumedQueries[conf.url].keys()
                 )
 
-    if condition and resumeValue == True:
+    if condition and resumeValue:
         output = resume(expression, None)
 
         if not output or ( expected == "int" and not output.isdigit() ):
@@ -343,7 +337,6 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
         data = parseUnionPage(output, expression, partial, condition, sort)
 
     return data
-
 
 def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None):
     """
@@ -381,7 +374,6 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     conf.paramNegative  = oldParamNegative
 
     return value
-
 
 def goStacked(expression, silent=False):
     expression = cleanQuery(expression)

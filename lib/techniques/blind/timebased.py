@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import time
 
 from lib.core.agent import agent
@@ -33,8 +31,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.request import inject
 from lib.request.connect import Connect as Request
-
-
 def timeTest():
     infoMsg  = "testing time based blind sql injection on parameter "
     infoMsg += "'%s' with AND condition syntax" % kb.injParameter
@@ -82,8 +78,6 @@ def timeTest():
             kb.timeTest = False
 
     return kb.timeTest
-
-
 def timeUse(query):
     start      = time.time()
     _, _       = inject.goStacked(query)

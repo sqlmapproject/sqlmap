@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 optDict = {
             # Family:        { "parameter_name":    "parameter_datatype" },
             "Target":        {
@@ -36,6 +34,7 @@ optDict = {
                                "method":            "string",
                                "data":              "string",
                                "cookie":            "string",
+                               "dropSetCookie":     "boolean",
                                "referer":           "string",
                                "agent":             "string",
                                "userAgentsFile":    "string",
@@ -131,11 +130,12 @@ optDict = {
                              },
 
             "Miscellaneous": {
-                               "eta":               "boolean",
-                               "verbose":           "integer",
-                               "updateAll":         "boolean",
                                "sessionFile":       "string",
+                               "eta":               "boolean",
+                               "googlePage":        "integer",
+                               "updateAll":         "boolean",
                                "batch":             "boolean",
-                               "cleanup":           "boolean"
+                               "cleanup":           "boolean",
+                               "verbose":           "integer"
                              },
           }

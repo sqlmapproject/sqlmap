@@ -22,15 +22,13 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import sys
 import time
 import traceback
 import warnings
 
-warnings.filterwarnings(action="ignore", message=".*(md5|sha) module is deprecated", category=DeprecationWarning)
+warnings.filterwarnings(action = "ignore", message = ".*(md5|sha) module is deprecated", category = DeprecationWarning)
 
 try:
     import psyco
@@ -51,7 +49,6 @@ from lib.core.exception import unhandledException
 from lib.core.option import init
 from lib.parse.cmdline import cmdLineParser
 
-
 def modulePath():
     """
     This will get us the program's directory, even if we are frozen
@@ -62,7 +59,6 @@ def modulePath():
         return os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding()))
     else:
         return os.path.dirname(os.path.realpath(__file__))
-
 
 def main():
     """
@@ -102,7 +98,6 @@ def main():
         traceback.print_exc()
 
     print "\n[*] shutting down at: %s\n" % time.strftime("%X")
-
 
 if __name__ == "__main__":
     main()

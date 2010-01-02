@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import time
 
@@ -36,7 +34,6 @@ from lib.core.common import pollProcess
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.settings import PLATFORM
-
 
 class UPX:
     """
@@ -69,7 +66,6 @@ class UPX:
         if dstFile:
             self.__upxCmd += " -o %s" % dstFile
 
-
     def pack(self, srcFile, dstFile=None):
         self.__initialize(srcFile, dstFile)
 
@@ -97,13 +93,10 @@ class UPX:
 
         return None
 
-
     def unpack(self, srcFile, dstFile=None):
         pass
 
-
     def verify(self, filePath):
         pass
-
 
 upx = UPX()

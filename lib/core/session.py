@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from lib.core.common import dataToSessionFile
@@ -36,7 +34,6 @@ from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
-
 
 def setString():
     """
@@ -51,7 +48,6 @@ def setString():
     if condition:
         dataToSessionFile("[%s][None][None][String][%s]\n" % (conf.url, conf.string))
 
-
 def setRegexp():
     """
     Save regular expression to match in session file.
@@ -65,7 +61,6 @@ def setRegexp():
     if condition:
         dataToSessionFile("[%s][None][None][Regular expression][%s]\n" % (conf.url, conf.regexp))
 
-
 def setMatchRatio():
     condition = (
                   not kb.resumedQueries
@@ -75,7 +70,6 @@ def setMatchRatio():
 
     if condition:
         dataToSessionFile("[%s][None][None][Match ratio][%s]\n" % (conf.url, conf.matchRatio))
-
 
 def setInjection():
     """
@@ -100,7 +94,6 @@ def setInjection():
         dataToSessionFile("[%s][%s][%s][Injection parameter][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.injParameter))
         dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.injType))
 
-
 def setParenthesis(parenthesisCount):
     """
     @param parenthesisCount: number of parenthesis to be set into the
@@ -117,7 +110,6 @@ def setParenthesis(parenthesisCount):
         dataToSessionFile("[%s][%s][%s][Parenthesis][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], parenthesisCount))
 
     kb.parenthesis = parenthesisCount
-
 
 def setDbms(dbms):
     """
@@ -147,7 +139,6 @@ def setDbms(dbms):
     kb.dbms = dbms
 
     logger.info("the back-end DBMS is %s" % kb.dbms)
-
 
 def setOs():
     """
@@ -196,7 +187,6 @@ def setOs():
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.os))
 
-
 def setStacked():
     condition = (
                   not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
@@ -208,7 +198,6 @@ def setStacked():
 
     if condition:
         dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.stackedTest))
-
 
 def setUnion(comment=None, count=None, position=None):
     """
@@ -249,7 +238,6 @@ def setUnion(comment=None, count=None, position=None):
 
         kb.unionPosition = position
 
-
 def setRemoteTempPath():
     condition = (
                   not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
@@ -258,7 +246,6 @@ def setRemoteTempPath():
 
     if condition:
         dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], conf.tmpPath))
-
 
 def resumeConfKb(expression, url, value):
     if expression == "String" and url == conf.url:

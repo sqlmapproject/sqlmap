@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from ConfigParser import NoSectionError
 from ConfigParser import ConfigParser
 
@@ -33,9 +31,7 @@ from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.optiondict import optDict
 
-
 config = None
-
 
 def configFileProxy(section, option, boolean=False, integer=False):
     """
@@ -62,7 +58,6 @@ def configFileProxy(section, option, boolean=False, integer=False):
         debugMsg += "'%s') into the configuration file, " % section
         debugMsg += "ignoring. Skipping to next."
         logger.debug(debugMsg)
-
 
 def configFileParser(configFile):
     """

@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 
 from lib.core.agent import agent
@@ -52,7 +50,6 @@ class UDF:
         self.udfs        = {}
         self.udfToCreate = set()
 
-
     def __askOverwriteUdf(self, udf):
         message  = "UDF '%s' already exists, do you " % udf
         message += "want to overwrite it? [y/N] "
@@ -62,7 +59,6 @@ class UDF:
             return True
         else:
             return False
-
 
     def __checkExistUdf(self, udf):
         logger.info("checking if UDF '%s' already exist" % udf)
@@ -74,18 +70,16 @@ class UDF:
             return True
         else:
             return False
-        
 
     def udfCheckAndOverwrite(self, udf):
         exists    = self.__checkExistUdf(udf)
         overwrite = True
 
-        if exists is True:
+        if exists:
             overwrite = self.__askOverwriteUdf(udf)
 
-        if overwrite is True:
+        if overwrite:
             self.udfToCreate.add(udf)
-
 
     def udfCreateSupportTbl(self, dataType):
         debugMsg  = "creating a support table to write commands standard "
@@ -93,7 +87,6 @@ class UDF:
         logger.debug(debugMsg)
 
         self.createSupportTbl(self.cmdTblName, self.tblField, dataType)
-
 
     def udfExecCmd(self, cmd, silent=False, udfName=None):
         cmd = urlencode(cmd, convall=True)
@@ -103,7 +96,6 @@ class UDF:
             udfName = "sys_exec"
 
         inject.goStacked("SELECT %s(%s)" % (udfName, cmd), silent)
-
 
     def udfEvalCmd(self, cmd, first=None, last=None, udfName=None):
         cmd = urlencode(cmd, convall=True)
@@ -124,21 +116,17 @@ class UDF:
 
         return output
 
-
     def udfCreateFromSharedLib(self):
         errMsg = "udfSetRemotePath() method must be defined within the plugin"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
+        raise sqlmapUnsupportedFeatureException(errMsg)
 
     def udfSetRemotePath(self):
         errMsg = "udfSetRemotePath() method must be defined within the plugin"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
+        raise sqlmapUnsupportedFeatureException(errMsg)
 
     def udfInjectCmd(self):
         errMsg = "udfInjectCmd() method must be defined within the plugin"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
+        raise sqlmapUnsupportedFeatureException(errMsg)
 
     def udfInjectCore(self, udfDict):
         for udf in udfDict.keys():
@@ -162,15 +150,14 @@ class UDF:
 
         self.udfCreateSupportTbl(supportTblType)
 
-
     def udfInjectCustom(self):
         if kb.dbms not in ( "MySQL", "PostgreSQL" ):
             errMsg = "UDF injection feature is not yet implemented on %s" % kb.dbms
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise sqlmapUnsupportedFeatureException(errMsg)
 
         stackedTest()
 
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             return
 
         self.checkDbmsOs()
@@ -195,21 +182,21 @@ class UDF:
 
         if not os.path.exists(self.udfLocalFile):
             errMsg = "the specified shared library file does not exist"
-            raise sqlmapFilePathException, errMsg
+            raise sqlmapFilePathException(errMsg)
 
         if not self.udfLocalFile.endswith(".dll") and not self.udfLocalFile.endswith(".so"):
             errMsg = "shared library file must end with '.dll' or '.so'"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            raise sqlmapMissingMandatoryOptionException(errMsg)
 
         elif self.udfLocalFile.endswith(".so") and kb.os == "Windows":
             errMsg  = "you provided a shared object as shared library, but "
             errMsg += "the database underlying operating system is Windows"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            raise sqlmapMissingMandatoryOptionException(errMsg)
 
         elif self.udfLocalFile.endswith(".dll") and kb.os == "Linux":
             errMsg  = "you provided a dynamic-link library as shared library, "
             errMsg += "but the database underlying operating system is Linux"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            raise sqlmapMissingMandatoryOptionException(errMsg)
 
         self.udfSharedLibName = os.path.basename(self.udfLocalFile).split(".")[0]
         self.udfSharedLibExt  = os.path.basename(self.udfLocalFile).split(".")[1]

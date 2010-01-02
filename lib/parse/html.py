@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from xml.sax import parse
@@ -33,7 +31,6 @@ from lib.core.common import checkFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
-
 
 class htmlHandler(ContentHandler):
     """
@@ -49,7 +46,6 @@ class htmlHandler(ContentHandler):
 
         self.dbms     = None
 
-
     def startElement(self, name, attrs):
         if name == "dbms":
             self.__dbms = attrs.get("value")
@@ -61,7 +57,6 @@ class htmlHandler(ContentHandler):
             if self.__match:
                 self.dbms = self.__dbms
                 self.__match = None
-
 
 def htmlParser(page):
     """

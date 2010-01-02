@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import sys
 
 from optparse import OptionError
@@ -32,7 +30,6 @@ from optparse import OptionParser
 
 from lib.core.data import logger
 from lib.core.settings import VERSION_STRING
-
 
 def cmdLineParser():
     """
@@ -75,8 +72,8 @@ def cmdLineParser():
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
 
-        request.add_option("--referer", dest="referer",
-                           help="HTTP Referer header")
+        request.add_option("--drop-set-cookie", dest="dropSetCookie", action="store_true",
+                           help="Ignore Set-Cookie header from response")
 
         request.add_option("--user-agent", dest="agent",
                            help="HTTP User-Agent header")
@@ -84,6 +81,9 @@ def cmdLineParser():
         request.add_option("-a", dest="userAgentsFile",
                            help="Load a random HTTP User-Agent "
                                 "header from file")
+
+        request.add_option("--referer", dest="referer",
+                           help="HTTP Referer header")
 
         request.add_option("--headers", dest="headers",
                            help="Extra HTTP headers newline separated")
@@ -194,7 +194,6 @@ def cmdLineParser():
         fingerprint.add_option("-f", "--fingerprint", dest="extensiveFp",
                                action="store_true",
                                help="Perform an extensive DBMS version fingerprint")
-
 
         # Enumeration options
         enumeration = OptionGroup(parser, "Enumeration", "These options can "
@@ -377,16 +376,19 @@ def cmdLineParser():
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
+        miscellaneous.add_option("-s", dest="sessionFile",
+                                 help="Save and resume all data retrieved "
+                                      "on a session file")
+                                      
         miscellaneous.add_option("--eta", dest="eta", action="store_true",
                                  help="Display for each output the "
                                       "estimated time of arrival")
 
+        miscellaneous.add_option("--gpage", dest="googlePage", type="int",
+                               help="Use google dork results from specified page number")
+
         miscellaneous.add_option("--update", dest="updateAll", action="store_true",
                                 help="Update sqlmap to the latest stable version")
-
-        miscellaneous.add_option("-s", dest="sessionFile",
-                                 help="Save and resume all data retrieved "
-                                      "on a session file")
 
         miscellaneous.add_option("--save", dest="saveCmdline", action="store_true",
                                  help="Save options on a configuration INI file")

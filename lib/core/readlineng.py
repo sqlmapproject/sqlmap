@@ -27,14 +27,11 @@ In addition to normal readline stuff, this module provides haveReadline
 boolean and _outputfile variable used in genutils.
 """
 
-
-
 import sys
 
 from lib.core.data import logger
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
-
 
 try:
     from readline import *
@@ -50,7 +47,7 @@ except ImportError:
     except ImportError:    
         haveReadline = False
 
-if IS_WIN is True and haveReadline:
+if IS_WIN and haveReadline:
     try:
         _outputfile=_rl.GetOutputFile()
     except AttributeError:
@@ -78,7 +75,6 @@ if PLATFORM == 'darwin' and haveReadline:
         logger.debug(debugMsg)
 
         uses_libedit = True
-
 
 # the clear_history() function was only introduced in Python 2.4 and is
 # actually optional in the readline API, so we must explicitly check for its

