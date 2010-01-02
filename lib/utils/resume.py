@@ -22,8 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-
-
 import re
 
 from lib.core.common import dataToSessionFile
@@ -33,7 +31,6 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
-
 
 def queryOutputLength(expression, payload):
     """
@@ -45,14 +42,17 @@ def queryOutputLength(expression, payload):
     select              = re.search("\ASELECT\s+", expression, re.I)
     selectTopExpr       = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
     selectDistinctExpr  = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
-    selectExpr          = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
+    selectFromExpr      = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
+    selectExpr          = re.search("\ASELECT\s+(.+)$", expression, re.I)
     miscExpr            = re.search("\A(.+)", expression, re.I)
 
-    if selectTopExpr or selectDistinctExpr or selectExpr:
+    if selectTopExpr or selectDistinctExpr or selectFromExpr or selectExpr:
         if selectTopExpr:
             regExpr = selectTopExpr.groups()[0]
         elif selectDistinctExpr:
             regExpr = selectDistinctExpr.groups()[0]
+        elif selectFromExpr:
+            regExpr = selectFromExpr.groups()[0]
         elif selectExpr:
             regExpr = selectExpr.groups()[0]
     elif miscExpr:
@@ -83,7 +83,6 @@ def queryOutputLength(expression, payload):
         length = 0
 
     return count, length, regExpr
-
 
 def resume(expression, payload):
     """
