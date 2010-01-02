@@ -222,6 +222,9 @@ Konrads Smelkovs <konrads@smelkovs.com>
     for reporting a few bugs in --sql-shell and --sql-query on Microsoft
     SQL Server
 
+Miroslav Stampar <miroslav.stampar@gmail.com>
+    for developing some parts of sqlmap since version 0.8-rc3
+
 Marek Stiefenhofer <m.stiefenhofer@r-tec.net>
     for reporting a bug
 
