@@ -27,6 +27,8 @@ import os
 import re
 import StringIO
 import zlib
+import ntpath
+import posixpath
 
 from lib.core.data import conf
 from lib.core.data import kb
@@ -77,7 +79,11 @@ def parseResponse(page, headers):
                 absFilePath = match.group("result")
 
                 if absFilePath not in kb.absFilePaths:
-                    kb.absFilePaths.add(os.path.dirname(absFilePath))
+                    if absFilePath.find('/') != -1:
+                        dirname = posixpath.dirname(absFilePath)
+                    else:
+                        dirname = ntpath.dirname(absFilePath)
+                    kb.absFilePaths.add(dirname)
 
 def decodePage(page, encoding):
     """
