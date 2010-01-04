@@ -95,7 +95,7 @@ class Abstraction(UDF, xp_cmdshell):
         else:
             self.execCmd(cmd, forgeCmd=True)
 
-        if not conf.osShell and not conf.cleanup:
+        if not conf.osShell and not conf.osPwn and not conf.cleanup:
             self.__cmdShellCleanup()
 
     def absOsShell(self):
@@ -151,7 +151,7 @@ class Abstraction(UDF, xp_cmdshell):
 
         self.checkDbmsOs(detailed)
 
-        if not self.isDba():
+        if mandatory and not self.isDba():
             warnMsg  = "the functionality requested might not work because "
             warnMsg += "the session user is not a database administrator"
             logger.warn(warnMsg)
@@ -160,8 +160,11 @@ class Abstraction(UDF, xp_cmdshell):
             self.udfInjectCmd()
 
         elif kb.dbms == "Microsoft SQL Server":
-            self.xpCmdshellInit(mandatory)
+            if mandatory:
+                self.xpCmdshellInit()
 
         else:
             errMsg = "feature not yet implemented for the back-end DBMS"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise sqlmapUnsupportedFeatureException(errMsg)
+
+        self.envInitialized = True

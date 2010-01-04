@@ -464,7 +464,6 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             self.udfSharedLibExt = "so"
 
         self.udfInjectCore(self.sysUdfs)
-        self.envInitialized = True
 
     def uncPathRequest(self):
         self.createSupportTbl(self.fileTblName, self.tblField, "text")

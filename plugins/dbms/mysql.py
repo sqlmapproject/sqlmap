@@ -550,7 +550,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             self.udfSharedLibExt = "so"
 
         self.udfInjectCore(self.sysUdfs)
-        self.envInitialized = True
         
     def uncPathRequest(self):
         if not kb.stackedTest:

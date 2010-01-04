@@ -145,7 +145,7 @@ class xp_cmdshell:
 
         return output
 
-    def xpCmdshellInit(self, mandatory=True):
+    def xpCmdshellInit(self):
         self.__xpCmdshellAvailable = False
 
         infoMsg  = "checking if xp_cmdshell extended procedure is "
@@ -187,18 +187,9 @@ class xp_cmdshell:
                         warnMsg += "because sp_OACreate is disabled"
                         logger.warn(warnMsg)
 
-        if not self.__xpCmdshellAvailable and not mandatory:
-            warnMsg  = "unable to get xp_cmdshell working, sqlmap will "
-            warnMsg += "try to proceed without it"
-            logger.warn(warnMsg)
-
-            self.envInitialized = True
-
-        elif not self.__xpCmdshellAvailable:
+        if not self.__xpCmdshellAvailable:
             errMsg = "unable to proceed without xp_cmdshell"
             raise sqlmapUnsupportedFeatureException, errMsg
-
-        self.envInitialized = True
 
         debugMsg  = "creating a support table to write commands standard "
         debugMsg += "output to"
