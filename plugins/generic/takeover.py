@@ -169,7 +169,7 @@ class Takeover(Abstraction, Metasploit, Registry):
             requestDir  = os.path.normpath(directory.replace(kb.docRoot, "/").replace("\\", "/"))
             baseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            uploaderUrl = uploaderUrl.replace("./", "/").replace("\\", "/").replace("//", "/")
+            uploaderUrl = uploaderUrl.replace("./", "/").replace("\\", "/")
             uplPage, _  = Request.getPage(url=uploaderUrl, direct=True)
 
             if "sqlmap backdoor uploader" not in uplPage:
