@@ -352,9 +352,6 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         infoMsg = "fingerprinting the back-end DBMS operating system"
         logger.info(infoMsg)
 
-        self.createSupportTbl(self.fileTblName, self.tblField, "text")
-        inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "VERSION()"))
-
         datadirSubstr = inject.getValue("SELECT MID(@@datadir, 1, 1)", unpack=False)
 
         if datadirSubstr == "/":
