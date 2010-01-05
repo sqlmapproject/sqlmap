@@ -30,6 +30,8 @@ import string
 import sys
 import time
 import urlparse
+import ntpath
+import posixpath
 from lib.contrib import magic
 from lib.core.data import conf
 from lib.core.data import kb
@@ -215,7 +217,7 @@ def getHtmlErrorFp():
 
 def getDocRoot():
     docRoot = None
-    pagePath = os.path.dirname(conf.path)
+    pagePath = directoryPath(conf.path)
 
     if kb.os == "Windows":
         defaultDocRoot = "C:/Inetpub/wwwroot/"
@@ -224,14 +226,13 @@ def getDocRoot():
 
     if kb.absFilePaths:
         for absFilePath in kb.absFilePaths:
+            absFilePath = normalizePath(absFilePath)
             absFilePathWin = None
 
-            if re.search("[A-Za-z]:(\\[\w.\\]*)?", absFilePath):
+            if re.match("[A-Za-z]:(\\[\w.\\]*)?", absFilePath):
                 absFilePathWin = absFilePath
                 absFilePath    = absFilePath[2:].replace("\\", "/")
-
-            absFilePath = os.path.normpath(absFilePath)
-
+            
             if pagePath in absFilePath:
                 index   = absFilePath.index(pagePath)
                 docRoot = absFilePath[:index]
@@ -832,3 +833,19 @@ def sanitizeCookie(cookieStr, warn=False):
         return result
     else:
         return None
+
+def directoryPath(path):
+    retVal = None
+    if path.find('/') != -1:
+        retVal = posixpath.dirname(path)
+    else:
+        retVal = ntpath.dirname(path)
+    return retVal
+    
+def normalizePath(path):
+    retVal = None
+    if path.find('/') != -1:
+        retVal = posixpath.normpath(path)
+    else:
+        retVal = ntpath.normpath(path)
+    return retVal

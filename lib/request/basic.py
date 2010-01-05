@@ -27,11 +27,10 @@ import os
 import re
 import StringIO
 import zlib
-import ntpath
-import posixpath
 
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.common import directoryPath
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -76,13 +75,10 @@ def parseResponse(page, headers):
             reobj = re.compile(absFilePathRegExp)
 
             for match in reobj.finditer(page):
-                absFilePath = match.group("result")
+                absFilePath = match.group("result").strip()
 
                 if absFilePath not in kb.absFilePaths:
-                    if absFilePath.find('/') != -1:
-                        dirname = posixpath.dirname(absFilePath)
-                    else:
-                        dirname = ntpath.dirname(absFilePath)
+                    dirname = directoryPath(absFilePath)
                     kb.absFilePaths.add(dirname)
 
 def decodePage(page, encoding):
