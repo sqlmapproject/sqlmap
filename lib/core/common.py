@@ -692,8 +692,8 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
         data = data[0]
 
     return data
-    
-def getDelayQuery():
+
+def getDelayQuery(andCond=False):
     query = None
 
     if kb.dbms in ("MySQL", "PostgreSQL"):
@@ -704,6 +704,10 @@ def getDelayQuery():
 
         if (kb.dbms == "MySQL" and banVer >= "5.0.12") or (kb.dbms == "PostgreSQL" and banVer >= "8.2"):
             query = queries[kb.dbms].timedelay % conf.timeSec
+
+            if kb.dbms == "MySQL" and andCond:
+                query = query.replace("SELECT ", "")
+
         else:
             query = queries[kb.dbms].timedelay2 % conf.timeSec
     else:

@@ -31,12 +31,13 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.request import inject
 from lib.request.connect import Connect as Request
+
 def timeTest():
     infoMsg  = "testing time based blind sql injection on parameter "
     infoMsg += "'%s' with AND condition syntax" % kb.injParameter
     logger.info(infoMsg)
 
-    timeQuery = getDelayQuery()
+    timeQuery = getDelayQuery(andCond=True)
     query     = agent.prefixQuery(" AND %s" % timeQuery)
     query     = agent.postfixQuery(query)
     payload   = agent.payload(newValue=query)
@@ -60,9 +61,10 @@ def timeTest():
         infoMsg += "'%s' with stacked query syntax" % kb.injParameter
         logger.info(infoMsg)
 
-        start         = time.time()
-        payload, _    = inject.goStacked(timeQuery)
-        duration      = int(time.time() - start)
+        timeQuery  = getDelayQuery(andCond=True)
+        start      = time.time()
+        payload, _ = inject.goStacked(timeQuery)
+        duration   = int(time.time() - start)
 
         if duration >= conf.timeSec:
             infoMsg  = "the parameter '%s' is affected by a time " % kb.injParameter
@@ -78,6 +80,7 @@ def timeTest():
             kb.timeTest = False
 
     return kb.timeTest
+
 def timeUse(query):
     start      = time.time()
     _, _       = inject.goStacked(query)
