@@ -510,7 +510,7 @@ def parsePasswordHash(password):
             password += "%suppercase: %s" % (blank, hexPassword[54:])
 
     return password
-        
+
 def cleanQuery(query):
     upperQuery = query
 

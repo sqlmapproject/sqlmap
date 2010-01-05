@@ -1076,8 +1076,8 @@ class Enumeration:
                     dumper.dbTableValues(data)
 
     def sqlQuery(self, query):
-        output      = None
-        sqlType     = None
+        output  = None
+        sqlType = None
 
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:

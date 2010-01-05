@@ -74,6 +74,7 @@ SQL_STATEMENTS     = {
                              "select ",
                              "show ",
                              " top ",
+                             " distinct ",
                              " from ",
                              " from dual",
                              " where ",

@@ -502,6 +502,12 @@ class Agent:
             if " ORDER BY " in limitedQuery:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
+            notDistincts = re.findall("DISTINCT[\(\s+](.+?)\)*\s+", limitedQuery, re.I)
+
+            for notDistinct in notDistincts:
+                limitedQuery = limitedQuery.replace("DISTINCT(%s)" % notDistinct, notDistinct)
+                limitedQuery = limitedQuery.replace("DISTINCT %s" % notDistinct, notDistinct)
+
             if limitedQuery.startswith("SELECT TOP ") or limitedQuery.startswith("TOP "):
                 topNums         = re.search(queries[kb.dbms].limitregexp, limitedQuery, re.I)
 
@@ -517,11 +523,13 @@ class Agent:
                     limitedQuery    = limitedQuery.replace("TOP %s " % topNum, "")
 
             if forgeNotIn:
-                limitedQuery  = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
+                limitedQuery = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
+
                 if " WHERE " in limitedQuery:
                     limitedQuery  = "%s AND %s " % (limitedQuery, field)
                 else:
                     limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
+
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
                 limitedQuery += "%s %s)" % (field, fromFrom)
 

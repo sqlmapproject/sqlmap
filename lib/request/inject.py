@@ -350,6 +350,8 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     expression = expandAsteriskForColumns(expression)
     value      = None
 
+    expression = expression.replace("DISTINCT ", "")
+
     if inband and kb.unionPosition:
         if kb.dbms == "Oracle" and " ORDER BY " in expression:
             expression = expression[:expression.index(" ORDER BY ")]
