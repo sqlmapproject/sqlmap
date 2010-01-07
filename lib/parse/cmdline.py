@@ -89,15 +89,15 @@ def cmdLineParser():
                            help="Extra HTTP headers newline separated")
 
         request.add_option("--auth-type", dest="aType",
-                           help="HTTP Authentication type (value "
-                                "Basic, Digest or NTLM)")
+                           help="HTTP Authentication type "
+                                "(Basic, Digest or NTLM)")
 
         request.add_option("--auth-cred", dest="aCred",
-                           help="HTTP Authentication credentials (value "
-                                "name:password)")
+                           help="HTTP Authentication credentials "
+                                "(name:password)")
                                 
         request.add_option("--auth-cert", dest="aCert",
-                           help="HTTP(s) Authentication certificate (value "
+                           help="HTTPs Authentication certificate ("
                                 "key_file,cert_file)")
 
         request.add_option("--proxy", dest="proxy",
