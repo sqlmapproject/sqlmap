@@ -22,8 +22,11 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import sys
 import httplib
 import urllib2
+
+from lib.core.data import conf
 
 class HTTPSCertAuthHandler(urllib2.HTTPSHandler):
     def __init__(self, key_file, cert_file):
@@ -35,4 +38,8 @@ class HTTPSCertAuthHandler(urllib2.HTTPSHandler):
         return self.do_open(self.getConnection, req)
 
     def getConnection(self, host):
-        return httplib.HTTPSConnection(host, key_file=self.key_file, cert_file=self.cert_file)
+        if sys.version_info >= (2,6):
+            retVal = httplib.HTTPSConnection(host, key_file=self.key_file, cert_file=self.cert_file, timeout=conf.timeout)
+        else:
+            retVal = httplib.HTTPSConnection(host, key_file=self.key_file, cert_file=self.cert_file)
+        return retVal

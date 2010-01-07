@@ -95,6 +95,10 @@ def cmdLineParser():
         request.add_option("--auth-cred", dest="aCred",
                            help="HTTP Authentication credentials (value "
                                 "name:password)")
+                                
+        request.add_option("--auth-cert", dest="aCert",
+                           help="HTTP(s) Authentication certificate (value "
+                                "key_file,cert_file)")
 
         request.add_option("--proxy", dest="proxy",
                            help="Use a HTTP proxy to connect to the target url")

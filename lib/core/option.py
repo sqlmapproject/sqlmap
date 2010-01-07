@@ -67,6 +67,7 @@ from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.queriesfile import queriesParser
 from lib.request.proxy import ProxyHTTPSHandler
+from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.utils.google import Google
 
 authHandler  = urllib2.BaseHandler()
@@ -518,13 +519,14 @@ def __setHTTPProxy():
 
 def __setHTTPAuthentication():
     """
-    Check and set the HTTP authentication method (Basic, Digest or NTLM),
-    username and password to perform HTTP requests with.
+    Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or Certificate),
+    username and password for first three methods, or key file and certification file for
+    certificate authentication
     """
 
     global authHandler
 
-    if not conf.aType and not conf.aCred:
+    if not conf.aType and not conf.aCred and not conf.aCert:
         return
 
     elif conf.aType and not conf.aCred:
@@ -537,45 +539,67 @@ def __setHTTPAuthentication():
         errMsg += "but did not provide the type"
         raise sqlmapSyntaxException, errMsg
 
-    debugMsg = "setting the HTTP authentication type and credentials"
-    logger.debug(debugMsg)
-
-    aTypeLower = conf.aType.lower()
-
-    if aTypeLower not in ( "basic", "digest", "ntlm" ):
-        errMsg  = "HTTP authentication type value must be "
-        errMsg += "Basic, Digest or NTLM"
-        raise sqlmapSyntaxException, errMsg
-
-    aCredRegExp = re.search("^(.*?)\:(.*?)$", conf.aCred)
-
-    if not aCredRegExp:
-        errMsg  = "HTTP authentication credentials value must be "
-        errMsg += "in format username:password"
-        raise sqlmapSyntaxException, errMsg
-
-    authUsername = aCredRegExp.group(1)
-    authPassword = aCredRegExp.group(2)
-
-    passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), authUsername, authPassword)
-
-    if aTypeLower == "basic":
-        authHandler = urllib2.HTTPBasicAuthHandler(passwordMgr)
-
-    elif aTypeLower == "digest":
-        authHandler = urllib2.HTTPDigestAuthHandler(passwordMgr)
-
-    elif aTypeLower == "ntlm":
-        try:
-            from ntlm import HTTPNtlmAuthHandler
-        except ImportError, _:
-            errMsg  = "sqlmap requires Python NTLM third-party library "
-            errMsg += "in order to authenticate via NTLM, "
-            errMsg += "http://code.google.com/p/python-ntlm/"
-            raise sqlmapMissingDependence, errMsg
-
-        authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passwordMgr)
+    if not conf.aCert:
+        debugMsg = "setting the HTTP authentication type and credentials"
+        logger.debug(debugMsg)
+    
+        aTypeLower = conf.aType.lower()
+    
+        if aTypeLower not in ( "basic", "digest", "ntlm" ):
+            errMsg  = "HTTP authentication type value must be "
+            errMsg += "Basic, Digest or NTLM"
+            raise sqlmapSyntaxException, errMsg
+    
+        aCredRegExp = re.search("^(.*?)\:(.*?)$", conf.aCred)
+    
+        if not aCredRegExp:
+            errMsg  = "HTTP authentication credentials value must be "
+            errMsg += "in format username:password"
+            raise sqlmapSyntaxException, errMsg
+    
+        authUsername = aCredRegExp.group(1)
+        authPassword = aCredRegExp.group(2)
+    
+        passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), authUsername, authPassword)
+    
+        if aTypeLower == "basic":
+            authHandler = urllib2.HTTPBasicAuthHandler(passwordMgr)
+    
+        elif aTypeLower == "digest":
+            authHandler = urllib2.HTTPDigestAuthHandler(passwordMgr)
+    
+        elif aTypeLower == "ntlm":
+            try:
+                from ntlm import HTTPNtlmAuthHandler
+            except ImportError, _:
+                errMsg  = "sqlmap requires Python NTLM third-party library "
+                errMsg += "in order to authenticate via NTLM, "
+                errMsg += "http://code.google.com/p/python-ntlm/"
+                raise sqlmapMissingDependence, errMsg
+    
+            authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passwordMgr)
+    else:
+        debugMsg = "setting the HTTP(s) authentication certificate"
+        logger.debug(debugMsg)
+        
+        aCertRegExp = re.search("^(.+?),\s*(.+?)$", conf.aCert)
+    
+        if not aCertRegExp:
+            errMsg  = "HTTP authentication certificate option "
+            errMsg += "must be in format key_file,cert_file"
+            raise sqlmapSyntaxException, errMsg
+    
+        #os.path.expanduser for support of paths with ~
+        key_file = os.path.expanduser(aCertRegExp.group(1))
+        cert_file = os.path.expanduser(aCertRegExp.group(2))
+        
+        for file in (key_file, cert_file):
+            if not os.path.exists(file):
+                errMsg  = "File '%s' doesn't exist" % file
+                raise sqlmapSyntaxException, errMsg
+        
+        authHandler = HTTPSCertAuthHandler(key_file, cert_file)
 
 def __setHTTPMethod():
     """

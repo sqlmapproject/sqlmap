@@ -41,6 +41,7 @@ optDict = {
                                "headers":           "string",
                                "aType":             "string",
                                "aCred":             "string",
+                               "aCert":             "string",
                                "proxy":             "string",
                                "threads":           "integer",
                                "delay":             "float",
