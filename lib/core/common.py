@@ -622,7 +622,7 @@ def expandAsteriskForColumns(expression):
             logger.info(infoMsg)
 
     return expression
-        
+
 def getRange(count, dump=False, plusOne=False):
     count      = int(count)
     indexRange = None
@@ -636,7 +636,7 @@ def getRange(count, dump=False, plusOne=False):
         if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
             limitStart = conf.limitStart
 
-    if kb.dbms == "Oracle" or plusOne:
+    if plusOne:
         indexRange = range(limitStart, limitStop + 1)
     else:
         indexRange = range(limitStart - 1, limitStop)
