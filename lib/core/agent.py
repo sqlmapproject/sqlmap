@@ -453,7 +453,7 @@ class Agent:
 
         return inbandQuery
 
-    def limitQuery(self, num, query, field):
+    def limitQuery(self, num, query, field=None):
         """
         Take in input a query string and return its limited query string.
 
