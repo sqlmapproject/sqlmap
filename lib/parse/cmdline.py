@@ -51,7 +51,7 @@ def cmdLineParser():
         target.add_option("-u", "--url", dest="url", help="Target url")
 
         target.add_option("-l", dest="list", help="Parse targets from Burp "
-                          "or WebScarab logs")
+                          "or WebScarab proxy logs")
 
         target.add_option("-g", dest="googleDork",
                           help="Process Google dork results as target urls")
@@ -117,9 +117,9 @@ def cmdLineParser():
         request.add_option("--retries", dest="retries", type="int", default=3,
                            help="Retries when the connection timeouts "
                                 "(default 3)")
+
         request.add_option("--scope", dest="scope", 
-                           help="Regex expression for filtering targets "
-                                "from provided Burp or WebScarab log")
+                           help="Regexp to filter targets from provided proxy log")
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
