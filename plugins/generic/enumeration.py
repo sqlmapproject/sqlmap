@@ -1141,11 +1141,11 @@ class Enumeration:
         message = "do you want to dump entries? [Y/n] "
         output = readInput(message, default="Y")
 
-        if output not in ("y", "Y"):
+        if output and output[0] not in ("y", "Y"):
             return
 
         dumpFromDbs = []
-        message = "which database?\n[a]ll (default)\n"
+        message = "which database(s)?\n[a]ll (default)\n"
 
         for db in dbs:
             message += "[%s]\n" % db
@@ -1153,10 +1153,10 @@ class Enumeration:
         message += "[q]uit"
         test = readInput(message, default="a")
 
-        if not test or test[0] in ("a", "A"):
+        if not test or test in ("a", "A"):
             dumpFromDbs = dbs.keys()
 
-        elif test[0] in ("q", "Q"):
+        elif test in ("q", "Q"):
             return
 
         else:
@@ -1167,8 +1167,33 @@ class Enumeration:
                 continue
 
             conf.db = db
+            dumpFromTbls = []
+            message = "which table(s) of database '%s'?\n" % db
+            message += "[a]ll (default)\n"
+
+            for tbl in tblData:
+                message += "[%s]\n" % tbl
+
+            message += "[s]kip\n"
+            message += "[q]uit"
+            test = readInput(message, default="a")
+
+            if not test or test in ("a", "A"):
+                dumpFromTbls = tblData
+
+            elif test in ("s", "S"):
+                continue
+
+            elif test in ("q", "Q"):
+                return
+
+            else:
+                dumpFromTbls = test.replace(" ", "").split(",")
 
             for table, columns in tblData.items():
+                if table not in dumpFromTbls:
+                    continue
+
                 conf.tbl = table
                 conf.col = ",".join(column for column in columns)
                 kb.data.cachedColumns = {}
