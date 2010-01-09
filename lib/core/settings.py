@@ -27,7 +27,7 @@ import subprocess
 import sys
 
 # sqlmap version and site
-VERSION            = "0.8-rc3"
+VERSION            = "0.8-rc4"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 SITE               = "http://sqlmap.sourceforge.net"
 
@@ -58,7 +58,7 @@ SQLMAP_SOURCE_URL  = "http://downloads.sourceforge.net/sqlmap/sqlmap-%s.zip"
 # Database managemen system specific variables
 MSSQL_SYSTEM_DBS   = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
 MYSQL_SYSTEM_DBS   = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
-PGSQL_SYSTEM_DBS   = ( "information_schema", "pg_catalog" )
+PGSQL_SYSTEM_DBS   = ( "information_schema", "pg_catalog", "pg_toast" )
 ORACLE_SYSTEM_DBS  = ( "SYSTEM", "SYSAUX" )                              # These are TABLESPACE_NAME
 
 MSSQL_ALIASES      = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]

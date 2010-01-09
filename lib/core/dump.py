@@ -123,7 +123,32 @@ class Dump:
             for setting in settings:
                 self.__write("    %s: %s" % (subHeader, setting))
         print
-        
+
+    def dbColumns(self, dbColumns, colConsider, dbs):
+        for column, dbTables in dbColumns.items():
+            if colConsider == "1":
+                colConsiderStr = "s like '" + column + "' were"
+            else:
+                colConsiderStr = " '%s' was" % column
+
+            msg  = "Column%s found in the " % colConsiderStr
+            msg += "following databases:"
+            self.__write(msg)
+
+            printDbs = {}
+
+            for db, tblData in dbs.items():
+                for tbl, colData in tblData.items():
+                    for col in colData:
+                        if column in col:
+                            if db in printDbs:
+                                printDbs[db][tbl] = colData
+                            else:
+                                printDbs[db] = { tbl: colData }
+                            break 
+
+            self.dbTableColumns(printDbs)
+
     def dbTables(self, dbTables):
         if not isinstance(dbTables, dict):
             self.string("tables", dbTables)
@@ -155,7 +180,7 @@ class Dump:
                 self.__write("| %s%s |" % (table, blank))
 
             self.__write("+%s+\n" % lines)
-            
+
     def dbTableColumns(self, tableColumns):
         for db, tables in tableColumns.items():
             if not db:
@@ -171,12 +196,16 @@ class Dump:
                 for column in colList:
                     colType = columns[column]
                     maxlength1 = max(maxlength1, len(column))
-                    maxlength2 = max(maxlength2, len(colType))
+
+                    if colType is not None:
+                        maxlength2 = max(maxlength2, len(colType))
 
                 maxlength1 = max(maxlength1, len("COLUMN"))
-                maxlength2 = max(maxlength2, len("TYPE"))
                 lines1 = "-" * (int(maxlength1) + 2)
-                lines2 = "-" * (int(maxlength2) + 2)
+
+                if colType is not None:
+                    maxlength2 = max(maxlength2, len("TYPE"))
+                    lines2 = "-" * (int(maxlength2) + 2)
 
                 self.__write("Database: %s\nTable: %s" % (db, table))
 
@@ -185,23 +214,42 @@ class Dump:
                 else:
                     self.__write("[%d columns]" % len(columns))
 
-                self.__write("+%s+%s+" % (lines1, lines2))
+                if colType is not None:
+                    self.__write("+%s+%s+" % (lines1, lines2))
+                else:
+                    self.__write("+%s+" % lines1)
 
                 blank1 = " " * (maxlength1 - len("COLUMN"))
-                blank2 = " " * (maxlength2 - len("TYPE"))
 
-                self.__write("| Column%s | Type%s |" % (blank1, blank2))
-                self.__write("+%s+%s+" % (lines1, lines2))
+                if colType is not None:
+                    blank2 = " " * (maxlength2 - len("TYPE"))
+
+                if colType is not None:
+                    self.__write("| Column%s | Type%s |" % (blank1, blank2))
+                    self.__write("+%s+%s+" % (lines1, lines2))
+                else:
+                    self.__write("| Column%s |" % blank1)
+                    self.__write("+%s+" % lines1)
 
                 for column in colList:
                     colType = columns[column]
                     blank1 = " " * (maxlength1 - len(column))
-                    blank2 = " " * (maxlength2 - len(colType))
-                    self.__write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
 
-                self.__write("+%s+%s+\n" % (lines1, lines2))
-                
+                    if colType is not None:
+                        blank2 = " " * (maxlength2 - len(colType))
+                        self.__write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
+                    else:
+                        self.__write("| %s%s |" % (column, blank1))
+
+                if colType is not None:
+                    self.__write("+%s+%s+\n" % (lines1, lines2))
+                else:
+                    self.__write("+%s+\n" % lines1)
+
     def dbTableValues(self, tableValues):
+        if tableValues is None:
+            return
+
         db = tableValues["__infos__"]["db"]
         if not db:
             db = "All"

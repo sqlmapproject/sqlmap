@@ -145,6 +145,8 @@ class queriesHandler(ContentHandler):
             self.__blind2 = sanitizeStr(attrs.get("query2"))
             self.__count  = sanitizeStr(attrs.get("count"))
             self.__count2 = sanitizeStr(attrs.get("count2"))
+            self.__condition = sanitizeStr(attrs.get("condition"))
+            self.__condition2 = sanitizeStr(attrs.get("condition2"))
 
     def endElement(self, name):
         if name == "dbms":
@@ -192,10 +194,17 @@ class queriesHandler(ContentHandler):
 
         elif name == "columns":
             self.__columns = {}
-            self.__columns["inband"] = { "query": self.__inband }
-            self.__columns["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count }
+            self.__columns["inband"] = { "query": self.__inband, "condition": self.__condition }
+            self.__columns["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "condition": self.__condition }
 
             self.__queries.columns = self.__columns
+
+        elif name == "dump_column":
+            self.__dumpColumn = {}
+            self.__dumpColumn["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__condition, "condition2": self.__condition2 }
+            self.__dumpColumn["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "count2": self.__count2, "condition": self.__condition, "condition2": self.__condition2 }
+
+            self.__queries.dumpColumn = self.__dumpColumn
 
         elif name == "dump_table":
             self.__dumpTable = {}
