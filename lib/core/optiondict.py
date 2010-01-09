@@ -45,7 +45,9 @@ optDict = {
                                "proxy":             "string",
                                "threads":           "integer",
                                "delay":             "float",
-                               "timeout":           "float"
+                               "timeout":           "float",
+                               "retries":           "integer",
+                               "scope":             "string"
                              },
 
             "Injection":     {
@@ -63,6 +65,7 @@ optDict = {
             "Techniques":    {
                                "stackedTest":       "boolean",
                                "timeTest":          "boolean",
+                               "timesec":           "integer",
                                "unionTest":         "boolean",
                                "uTech":             "string",
                                "unionUse":          "boolean"

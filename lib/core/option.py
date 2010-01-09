@@ -162,7 +162,10 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
             elif method is not None and method == "POST" and "=" in line:
                 data   = line
                 params = True
-
+        
+        if conf.scope:
+            getPostReq &= re.search(conf.scope, host) is not None
+            
         if getPostReq and params:
             if not url.startswith("http"):
                 url    = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)

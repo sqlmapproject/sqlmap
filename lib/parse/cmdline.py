@@ -117,6 +117,9 @@ def cmdLineParser():
         request.add_option("--retries", dest="retries", type="int", default=3,
                            help="Retries when the connection timeouts "
                                 "(default 3)")
+        request.add_option("--scope", dest="scope", 
+                           help="Regex expression for filtering targets "
+                                "from provided Burp or WebScarab log")
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
