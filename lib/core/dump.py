@@ -139,13 +139,18 @@ class Dump:
 
             for db, tblData in dbs.items():
                 for tbl, colData in tblData.items():
-                    for col in colData:
+                    for col, dataType in colData.items():
                         if column in col:
                             if db in printDbs:
-                                printDbs[db][tbl] = colData
+                                if tbl in printDbs[db]:
+                                    printDbs[db][tbl][col] = dataType
+                                else:
+                                    printDbs[db][tbl] = { col: dataType }
                             else:
-                                printDbs[db] = { tbl: colData }
-                            break 
+                                printDbs[db] = {}
+                                printDbs[db][tbl] = { col: dataType }
+
+                            continue
 
             self.dbTableColumns(printDbs)
 
