@@ -223,8 +223,8 @@
             <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u', 'v') ORDER BY name ASC) ORDER BY name ASC" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
         </tables>
         <columns>
-            <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'"/>
-            <blind query="SELECT TOP 1 name FROM (SELECT TOP %s name FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s') ORDER BY name ASC) CTABLE ORDER BY name DESC" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')"/>
+            <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
+            <blind query="SELECT %s..syscolumns.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
         </columns>
         <dump_column/>
         <dump_table>

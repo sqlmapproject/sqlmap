@@ -805,6 +805,7 @@ class Enumeration:
             conf.db = self.getCurrentDb()
 
         rootQuery = queries[kb.dbms].columns
+        condition = rootQuery["blind"]["condition"]
 
         infoMsg = "fetching columns "
 
@@ -812,7 +813,6 @@ class Enumeration:
             if kb.dbms == "Oracle":
                 conf.col = conf.col.upper()
             colList = conf.col.split(",")
-            condition = rootQuery["blind"]["condition"]
             condQuery = " AND (" + " OR ".join("%s LIKE '%s'" % (condition, "%" + col + "%") for col in colList) + ")"
             infoMsg += "like '%s' " % ", ".join(col for col in colList)
         else:
@@ -825,16 +825,17 @@ class Enumeration:
         if kb.unionPosition:
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
                 query = rootQuery["inband"]["query"] % (conf.tbl, conf.db)
+                query += condQuery
             elif kb.dbms == "Oracle":
                 query = rootQuery["inband"]["query"] % conf.tbl.upper()
+                query += condQuery
             elif kb.dbms == "Microsoft SQL Server":
-                # TODO: adjust with condQuery
                 query = rootQuery["inband"]["query"] % (conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.tbl)
+                query += condQuery.replace("[DB]", conf.db)
 
-            query += condQuery
             value = inject.getValue(query, blind=False)
 
             if value:
@@ -855,13 +856,14 @@ class Enumeration:
 
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
                 query = rootQuery["blind"]["count"] % (conf.tbl, conf.db)
+                query += condQuery
             elif kb.dbms == "Oracle":
                 query = rootQuery["blind"]["count"] % conf.tbl.upper()
+                query += condQuery
             elif kb.dbms == "Microsoft SQL Server":
-                # TODO: adjust with condQuery
                 query = rootQuery["blind"]["count"] % (conf.db, conf.db, conf.tbl)
+                query += condQuery.replace("[DB]", conf.db)
 
-            query += condQuery
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
@@ -873,7 +875,8 @@ class Enumeration:
             table   = {}
             columns = {}
 
-            if kb.dbms == "Microsoft SQL Server":
+            # TODO: check on Oracle
+            if kb.dbms == "Oracle":
                 plusOne = True
             else:
                 plusOne = False
@@ -882,15 +885,21 @@ class Enumeration:
             for index in indexRange:
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
                     query = rootQuery["blind"]["query"] % (conf.tbl, conf.db)
+                    query += condQuery
+                    field = None
                 elif kb.dbms == "Oracle":
                     query = rootQuery["blind"]["query"] % (conf.tbl.upper())
+                    query += condQuery
+                    field = None
                 elif kb.dbms == "Microsoft SQL Server":
-                    # TODO: adjust with condQuery
-                    query = rootQuery["blind"]["query"] % (index, conf.db,
-                                                           conf.db, conf.tbl)
+                    query = rootQuery["blind"]["query"] % (conf.db, conf.db,
+                                                           conf.db, conf.db,
+                                                           conf.db, conf.db,
+                                                           conf.tbl)
+                    query += condQuery.replace("[DB]", conf.db)
+                    field = condition.replace("[DB]", conf.db)
 
-                query += condQuery
-                query = agent.limitQuery(index, query)
+                query = agent.limitQuery(index, query, field)
                 column = inject.getValue(query, inband=False)
 
                 if not onlyColNames:
