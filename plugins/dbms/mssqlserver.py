@@ -392,11 +392,6 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
 
         return kb.data.cachedTables
 
-    def dumpColumn(self):
-        errMsg  = "Table(s) dump by providing only -C is not "
-        errMsg += "yet implemented for Microsoft SQL Server"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
     def unionReadFile(self, rFile):
         errMsg  = "Microsoft SQL Server does not support file reading "
         errMsg += "with UNION query SQL injection technique"

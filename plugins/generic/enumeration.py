@@ -960,15 +960,18 @@ class Enumeration:
             errMsg = "invalid value"
             raise sqlmapNoneDataException, errMsg
 
-        if kb.dbms == "Microsoft SQL Server":
-            plusOne = True
-        else:
-            plusOne = False
-
         for column in colList:
             if kb.dbms == "Oracle":
                 column = column.upper()
                 conf.db = "USERS"
+            elif kb.dbms == "Microsoft SQL Server":
+                if not conf.db:
+                    if not len(kb.data.cachedDbs):
+                        enumDbs = self.getDbs()
+                    else:
+                        enumDbs = kb.data.cachedDbs
+
+                    conf.db = ",".join(db for db in enumDbs)
 
             foundCols[column] = {}
 
@@ -1053,11 +1056,16 @@ class Enumeration:
 
                 if kb.unionPosition:
                     query = rootQuery["inband"]["query2"]
-                    if kb.dbms == "Oracle":
-                        query += " WHERE %s" % colQuery
-                    else:
+
+                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
                         query = query % db
                         query += " AND %s" % colQuery
+                    elif kb.dbms == "Oracle":
+                        query += " WHERE %s" % colQuery
+                    elif kb.dbms == "Microsoft SQL Server":
+                        query = query % (db, db, db, db, db)
+                        query += " AND %s" % colQuery.replace("[DB]", db)
+
                     values = inject.getValue(query, blind=False)
 
                     if values:
@@ -1078,18 +1086,23 @@ class Enumeration:
                     logger.info(infoMsg)
 
                     query = rootQuery["blind"]["count2"]
-                    if kb.dbms == "Oracle":
-                        query += " WHERE %s" % colQuery
-                    else:
+
+                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
                         query = query % db
                         query += " AND %s" % colQuery
+                    elif kb.dbms == "Oracle":
+                        query += " WHERE %s" % colQuery
+                    elif kb.dbms == "Microsoft SQL Server":
+                        query = query % (db, db, db, db, db)
+                        query += " AND %s" % colQuery.replace("[DB]", db)
+
                     count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                     if not count.isdigit() or not len(count) or count == "0":
                         warnMsg = "no tables contain column"
                         if colConsider == "1":
                             warnMsg += "s like"
-                        warnMsg += " '%s'" % column
+                        warnMsg += " '%s' " % column
                         warnMsg += "in database '%s'" % db
                         logger.warn(warnMsg)
 
@@ -1099,12 +1112,20 @@ class Enumeration:
 
                     for index in indexRange:
                         query = rootQuery["blind"]["query2"]
-                        if kb.dbms == "Oracle":
-                            query += " WHERE %s" % colQuery
-                        else:
+
+                        if kb.dbms in ( "MySQL", "PostgreSQL" ):
                             query = query % db
                             query += " AND %s" % colQuery
-                        query = agent.limitQuery(index, query)
+                            field = None
+                        elif kb.dbms == "Oracle":
+                            query += " WHERE %s" % colQuery
+                            field = None
+                        elif kb.dbms == "Microsoft SQL Server":
+                            query = query % (db, db, db, db, db)
+                            query += " AND %s" % colQuery.replace("[DB]", db)
+                            field = colCond.replace("[DB]", db)
+
+                        query = agent.limitQuery(index, query, field)
                         tbl = inject.getValue(query, inband=False)
 
                         if tbl not in dbs[db]:
@@ -1154,23 +1175,22 @@ class Enumeration:
         dumpFromDbs = []
         message = "which database(s)?\n[a]ll (default)\n"
 
-        for db in dbs:
-            message += "[%s]\n" % db
+        for db, tblData in dbs.items():
+            if tblData:
+                message += "[%s]\n" % db
 
         message += "[q]uit"
         test = readInput(message, default="a")
 
         if not test or test in ("a", "A"):
             dumpFromDbs = dbs.keys()
-
         elif test in ("q", "Q"):
             return
-
         else:
             dumpFromDbs = test.replace(" ", "").split(",")
 
         for db, tblData in dbs.items():
-            if db not in dumpFromDbs:
+            if db not in dumpFromDbs or not tblData:
                 continue
 
             conf.db = db
@@ -1187,13 +1207,10 @@ class Enumeration:
 
             if not test or test in ("a", "A"):
                 dumpFromTbls = tblData
-
             elif test in ("s", "S"):
                 continue
-
             elif test in ("q", "Q"):
                 return
-
             else:
                 dumpFromTbls = test.replace(" ", "").split(",")
 
