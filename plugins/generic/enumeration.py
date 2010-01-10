@@ -930,8 +930,6 @@ class Enumeration:
         return kb.data.cachedColumns
 
     def dumpColumn(self):
-        # TODO: adjust for MSSQL
-
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
