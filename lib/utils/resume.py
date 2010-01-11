@@ -131,7 +131,6 @@ def resume(expression, payload):
     if not payload:
         return None
 
-    expressionUnescaped = unescaper.unescape(expression)
     substringQuery = queries[kb.dbms].substring
     select = re.search("\ASELECT ", expression, re.I)
 
@@ -156,9 +155,9 @@ def resume(expression, payload):
         dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
 
         if select:
-            newExpr = expressionUnescaped.replace(regExpr, substringQuery % (regExpr, len(resumedValue) + 1, int(length)), 1)
+            newExpr = expression.replace(regExpr, substringQuery % (regExpr, len(resumedValue) + 1, int(length)), 1)
         else:
-            newExpr = substringQuery % (expressionUnescaped, len(resumedValue) + 1, int(length))
+            newExpr = substringQuery % (expression, len(resumedValue) + 1, int(length))
 
         missingCharsLength = int(length) - len(resumedValue)
 
