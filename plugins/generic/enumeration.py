@@ -875,12 +875,7 @@ class Enumeration:
             table   = {}
             columns = {}
 
-            # TODO: check on Oracle
-            if kb.dbms == "Oracle":
-                plusOne = True
-            else:
-                plusOne = False
-            indexRange = getRange(count, plusOne=plusOne)
+            indexRange = getRange(count)
 
             for index in indexRange:
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
@@ -1032,7 +1027,7 @@ class Enumeration:
 
                     continue
 
-                indexRange = getRange(count, plusOne=plusOne)
+                indexRange = getRange(count)
 
                 for index in indexRange:
                     query = rootQuery["blind"]["query"]
@@ -1108,7 +1103,7 @@ class Enumeration:
 
                         continue
 
-                    indexRange = getRange(count, plusOne=plusOne)
+                    indexRange = getRange(count)
 
                     for index in indexRange:
                         query = rootQuery["blind"]["query2"]
@@ -1343,7 +1338,12 @@ class Enumeration:
 
             lengths    = {}
             entries    = {}
-            indexRange = getRange(count, True)
+
+            if kb.dbms == "Oracle":
+                plusOne = True
+            else:
+                plusOne = False
+            indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
                 for column in colList:
