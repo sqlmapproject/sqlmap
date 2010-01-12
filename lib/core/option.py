@@ -298,7 +298,7 @@ def __setRequestFromFile():
         errMsg += "'%s' has no content" % conf.requestFile
         raise sqlmapFilePathException, errMsg
     
-    if not (lines[0].startswith("GET ") or lines[0].startswith("POST ")):
+    if not (lines[0].upper().startswith("GET ") or lines[0].upper().startswith("POST ")):
         errMsg =  "the specified HTTP request file "
         errMsg += "doesn't start with GET or POST keyword"
         raise sqlmapFilePathException, errMsg
@@ -309,7 +309,7 @@ def __setRequestFromFile():
     else:
         index = 5
 
-    if lines[0].find(" HTTP/") == -1:
+    if lines[0].upper().find(" HTTP/") == -1:
         errMsg  = "the specified HTTP request file " 
         errMsg += "has a syntax error at line: 1"
         raise sqlmapFilePathException, errMsg
