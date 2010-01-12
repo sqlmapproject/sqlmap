@@ -146,16 +146,17 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
             return None
 
-        # MySQL valid versions updated on 12/2009
+        # MySQL valid versions updated on 01/2010
         versions = (
-                     (32200, 32233),    # MySQL 3.22
-                     (32300, 32359),    # MySQL 3.23
-                     (40000, 40031),    # MySQL 4.0
-                     (40100, 40122),    # MySQL 4.1
-                     (50000, 50089),    # MySQL 5.0
-                     (50100, 50141),    # MySQL 5.1
-                     (50400, 50401),    # MySQL 5.4
-                     (60000, 60010),    # MySQL 6.0
+                     (32200, 32234),    # MySQL 3.22
+                     (32300, 32360),    # MySQL 3.23
+                     (40000, 40032),    # MySQL 4.0
+                     (40100, 40123),    # MySQL 4.1
+                     (50000, 50090),    # MySQL 5.0
+                     (50100, 50142),    # MySQL 5.1
+                     (50400, 50405),    # MySQL 5.4
+                     (50500, 50502),    # MySQL 5.5
+                     (60000, 60011),    # MySQL 6.0
                    )
 
         for element in versions:
@@ -234,9 +235,11 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         """
         References for fingerprint:
 
-        * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-x.html
-        * http://dev.mysql.com/doc/refman/5.1/en/news-5-1-x.html
-        * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html
+        * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-x.html (up to 5.0.89)
+        * http://dev.mysql.com/doc/refman/5.1/en/news-5-1-x.html (up to 5.1.42)
+        * http://dev.mysql.com/doc/refman/5.4/en/news-5-4-x.html (up to 5.4.4)
+        * http://dev.mysql.com/doc/refman/5.5/en/news-5-5-x.html (up to 5.5.0)
+        * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
         if conf.dbms in MYSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
@@ -283,10 +286,16 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
                 if not conf.extensiveFp:
                     return True
 
-                # Check if it is MySQL >= 5.1.2
-                if inject.getValue("MID(@@table_open_cache, 1, 1)", unpack=False):
-                    if inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
-                        kb.dbmsVersion = [">= 5.1.7"]
+                # Check if it is MySQL >= 5.5.0
+                if inject.getValue("SELECT MID(TO_SECONDS(950501), 1, 1)", unpack=False) == "6":
+                    kb.dbmsVersion = [">= 5.5.0"]
+
+                # Check if it is MySQL >= 5.1.2 and < 5.5.0
+                elif inject.getValue("MID(@@table_open_cache, 1, 1)", unpack=False):
+                    if inject.getValue("SELECT %s FROM information_schema.GLOBAL_STATUS LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
+                        kb.dbmsVersion = [">= 5.1.12", "< 5.5.0"]
+                    elif inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
+                        kb.dbmsVersion = [">= 5.1.7", "< 5.1.12"]
                     elif inject.getValue("SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
                         kb.dbmsVersion = ["= 5.1.6"]
                     elif inject.getValue("SELECT %s FROM information_schema.PLUGINS LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
@@ -294,7 +303,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
                     else:
                         kb.dbmsVersion = [">= 5.1.2", "< 5.1.5"]
 
-                # Or if it is MySQL >= 5.0.0 and < 5.1.2
+                # Check if it is MySQL >= 5.0.0 and < 5.1.2
                 elif inject.getValue("MID(@@hostname, 1, 1)", unpack=False):
                     kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
                 elif inject.getValue("SELECT 1 FROM DUAL", charsetType=1) == "1":
