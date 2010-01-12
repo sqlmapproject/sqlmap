@@ -27,7 +27,8 @@ optDict = {
             "Target":        {
                                "url":               "string",
                                "list":              "string",
-                               "googleDork":        "string"
+                               "googleDork":        "string",
+                               "configFile":        "string"
                              },
 
             "Request":       {
@@ -47,7 +48,8 @@ optDict = {
                                "delay":             "float",
                                "timeout":           "float",
                                "retries":           "integer",
-                               "scope":             "string"
+                               "scope":             "string",
+                               "requestFile":       "string"
                              },
 
             "Injection":     {

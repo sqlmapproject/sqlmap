@@ -267,6 +267,121 @@ def __setGoogleDorking():
         errMsg += "have GET parameters to test for SQL injection"
         raise sqlmapGenericException, errMsg
 
+def __setRequestFromFile():
+    """
+    This function checks if the way to make a HTTP request is through supplied
+    textual file, parses it and saves the information into the knowledge base.
+    """
+
+    if not conf.requestFile:
+        return
+    
+    conf.requestFile = os.path.expanduser(conf.requestFile)
+    
+    debugMsg = "parsing HTTP request from '%s'" % conf.requestFile
+    logger.debug(debugMsg)
+
+    if not os.path.isfile(conf.requestFile):
+        errMsg  = "the specified HTTP request file "
+        errMsg += "'%s' does not exist" % conf.requestFile
+        raise sqlmapFilePathException, errMsg
+    
+    fp = open(conf.requestFile, "r")
+    fread = fp.read()
+    fread = fread.replace("\r", "")
+    fp.close()
+    
+    lines = fread.split("\n")
+    
+    if len(lines) == 0:
+        errMsg  = "the specified HTTP request file "
+        errMsg += "'%s' has no content" % conf.requestFile
+        raise sqlmapFilePathException, errMsg
+    
+    if not (lines[0].startswith("GET ") or lines[0].startswith("POST ")):
+        errMsg =  "the specified HTTP request file "
+        errMsg += "doesn't start with GET or POST keyword"
+        raise sqlmapFilePathException, errMsg
+
+    
+    if lines[0].upper().startswith("GET "):
+        index = 4
+    else:
+        index = 5
+
+    if lines[0].find(" HTTP/") == -1:
+        errMsg  = "the specified HTTP request file " 
+        errMsg += "has a syntax error at line: 1"
+        raise sqlmapFilePathException, errMsg
+        
+    host = None
+    headers = ""
+    page = lines[0][index:lines[0].index(" HTTP/")]
+    
+    if conf.method:
+        warnMsg  = "HTTP method previously set. overriding it with "
+        warnMsg += "the value supplied from the HTTP request file"
+        logger.warn(warnMsg)
+    conf.method = lines[0][:index-1]
+
+    for index in xrange(1, len(lines) - 1):
+        line = lines[index]
+        valid = True
+        
+        if len(line) == 0:
+            break
+        
+        headers += line + "\n"
+        
+        items = line.split(': ')
+        if len(items) != 2:
+            valid = False
+        else:
+            if items[0].upper() == "HOST":
+                host = items[1]
+                
+        if not valid:
+            errMsg  = "the specified HTTP request file" 
+            errMsg += "has a syntax error at line: %d" % (index + 1)
+            raise sqlmapFilePathException, errMsg
+    
+    if conf.headers and headers:
+        warnMsg  = "HTTP headers previously set. overriding it with "
+        warnMsg += "the value(s) supplied from the HTTP request file"
+        logger.warn(warnMsg)
+    conf.headers = headers.strip("\n")
+    
+    if fread.find("\n\n") != -1:
+        if conf.data:
+            warnMsg  = "HTTP POST data previously set. overriding it with "
+            warnMsg += "the value supplied from the HTTP request file"
+            logger.warn(warnMsg)
+        conf.data = fread[fread.index('\n\n')+2:].strip("\n")
+    
+    if conf.url:
+        warnMsg  = "target url previously set. overriding it with "
+        warnMsg += "the value supplied from the HTTP request file"
+        logger.warn(warnMsg)
+        
+    if host:
+        conf.url = "%s%s" % (host, page)
+    elif conf.url: #insert page into here
+        index = conf.url.find("://")
+        if index != -1:
+            index += len("://")
+        else:
+            index = 0
+            
+        index = conf.url.find("/", index)
+        if index != -1:
+            conf.url = "%s%s" % (conf.url[:conf.url.find("/", index)], page)
+        else:
+            conf.url = "%s%s" % (conf.url, page)
+        pass #mirek
+    else:
+        errMsg = "target url is not known"
+        raise sqlmapFilePathException, errMsg
+            
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
         return
@@ -1004,6 +1119,8 @@ def init(inputOptions=advancedDict()):
     __setKnowledgeBaseAttributes()
     __cleanupOptions()
 
+    __setRequestFromFile()
+    
     parseTargetUrl()
 
     __setHTTPTimeout()

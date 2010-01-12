@@ -58,7 +58,7 @@ def cmdLineParser():
 
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
-
+                          
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target url.")
@@ -120,6 +120,9 @@ def cmdLineParser():
 
         request.add_option("--scope", dest="scope", 
                            help="Regexp to filter targets from provided proxy log")
+
+        request.add_option("-r", dest="requestFile",
+                          help="Load HTTP request from a file")
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
@@ -421,8 +424,8 @@ def cmdLineParser():
 
         (args, _) = parser.parse_args()
 
-        if not args.url and not args.list and not args.googleDork and not args.configFile and not args.updateAll:
-            errMsg  = "missing a mandatory parameter ('-u', '-l', '-g', '-c' or '--update'), "
+        if not args.url and not args.list and not args.googleDork and not args.configFile and not args.requestFile and not args.updateAll:
+            errMsg  = "missing a mandatory parameter ('-u', '-l', '-g', '-c', '-r' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)
 
