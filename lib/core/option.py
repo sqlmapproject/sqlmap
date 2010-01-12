@@ -365,21 +365,9 @@ def __setRequestFromFile():
         
     if host:
         conf.url = "%s%s" % (host, page)
-    elif conf.url: #insert page into here
-        index = conf.url.find("://")
-        if index != -1:
-            index += len("://")
-        else:
-            index = 0
-            
-        index = conf.url.find("/", index)
-        if index != -1:
-            conf.url = "%s%s" % (conf.url[:conf.url.find("/", index)], page)
-        else:
-            conf.url = "%s%s" % (conf.url, page)
-        pass #mirek
     else:
-        errMsg = "target url is not known"
+        errMsg  = "mandatory HTTP header HOST is missing in "
+        errMsg += "the HTTP request file"
         raise sqlmapFilePathException, errMsg
             
 def __setMetasploit():
