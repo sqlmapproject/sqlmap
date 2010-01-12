@@ -174,7 +174,9 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
     def checkDbms(self):
         """
-        Reference for fingerprint: http://www.postgresql.org/docs/8.3/interactive/release-8-3.html
+        References for fingerprint:
+
+        * http://www.postgresql.org/docs/8.4/interactive/release.html (up to 8.4.2)
         """
 
         if conf.dbms in PGSQL_ALIASES:
@@ -213,16 +215,15 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             if not conf.extensiveFp:
                 return True
 
-            transTimeCasted = inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)", unpack=False) in ( "1", "2" )
-            transTime       = inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False) in ( "1", "2" )
-
-            if transTimeCasted and not transTime:
-                kb.dbmsVersion = [">= 8.3.0"]
+            if inject.getValue("DIV(6, 3)", unpack=False, charsetType=2) == "2":
+                kb.dbmsVersion = [">= 8.4.0"]
+            elif inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)", unpack=False, charsetType=2) in ( "1", "2" ) and not inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2) in ( "1", "2" ):
+                kb.dbmsVersion = [">= 8.3.0", "< 8.4"]
             elif transTime:
                 kb.dbmsVersion = [">= 8.2.0", "< 8.3.0"]
-            elif inject.getValue("GREATEST(5, 9, 1)", unpack=False) == "9":
+            elif inject.getValue("GREATEST(5, 9, 1)", unpack=False, charsetType=2) == "9":
                 kb.dbmsVersion = [">= 8.1.0", "< 8.2.0"]
-            elif inject.getValue("WIDTH_BUCKET(5.35, 0.024, 10.06, 5)", unpack=False) == "3":
+            elif inject.getValue("WIDTH_BUCKET(5.35, 0.024, 10.06, 5)", unpack=False, charsetType=2) == "3":
                 kb.dbmsVersion = [">= 8.0.0", "< 8.1.0"]
             elif inject.getValue("SUBSTR(MD5('sqlmap'), 1, 1)", unpack=False):
                 kb.dbmsVersion = [">= 7.4.0", "< 8.0.0"]
@@ -232,13 +233,13 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
                 kb.dbmsVersion = [">= 7.2.0", "< 7.3.0"]
             elif inject.getValue("SUBSTR(QUOTE_LITERAL('a'), 2, 1)", unpack=False) == "a":
                 kb.dbmsVersion = [">= 7.1.0", "< 7.2.0"]
-            elif inject.getValue("POW(2, 3)", unpack=False) == "8":
+            elif inject.getValue("POW(2, 3)", unpack=False, charsetType=2) == "8":
                 kb.dbmsVersion = [">= 7.0.0", "< 7.1.0"]
             elif inject.getValue("MAX('a')") == "a":
                 kb.dbmsVersion = [">= 6.5.0", "< 6.5.3"]
             elif re.search("([\d\.]+)", inject.getValue("SUBSTR(VERSION(), 12, 5)", unpack=False)):
                 kb.dbmsVersion = [">= 6.4.0", "< 6.5.0"]
-            elif inject.getValue("SUBSTR(CURRENT_DATE, 1, 1)", unpack=False) == "2":
+            elif inject.getValue("SUBSTR(CURRENT_DATE, 1, 1)", unpack=False, charsetType=2) == "2":
                 kb.dbmsVersion = [">= 6.3.0", "< 6.4.0"]
             elif inject.getValue("SUBSTRING('sqlmap', 1, 1)", unpack=False) == "s":
                 kb.dbmsVersion = [">= 6.2.0", "< 6.3.0"]
