@@ -137,16 +137,16 @@ class queriesHandler(ContentHandler):
         elif name == "inband":
             self.__inband    = sanitizeStr(attrs.get("query"))
             self.__inband2   = sanitizeStr(attrs.get("query2"))
-            self.__condition = sanitizeStr(attrs.get("condition"))
-            self.__condition2 = sanitizeStr(attrs.get("condition2"))
+            self.__conditionInband = sanitizeStr(attrs.get("condition"))
+            self.__conditionInband2 = sanitizeStr(attrs.get("condition2"))
 
         elif name == "blind":
             self.__blind  = sanitizeStr(attrs.get("query"))
             self.__blind2 = sanitizeStr(attrs.get("query2"))
             self.__count  = sanitizeStr(attrs.get("count"))
             self.__count2 = sanitizeStr(attrs.get("count2"))
-            self.__condition = sanitizeStr(attrs.get("condition"))
-            self.__condition2 = sanitizeStr(attrs.get("condition2"))
+            self.__conditionBlind = sanitizeStr(attrs.get("condition"))
+            self.__conditionBlind2 = sanitizeStr(attrs.get("condition2"))
 
     def endElement(self, name):
         if name == "dbms":
@@ -163,7 +163,7 @@ class queriesHandler(ContentHandler):
 
         elif name == "passwords":
             self.__passwords = {}
-            self.__passwords["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__condition }
+            self.__passwords["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband }
             self.__passwords["blind"]  = { "query": self.__blind, "query2": self.__blind2,
                                            "count": self.__count, "count2": self.__count2 }
 
@@ -171,7 +171,7 @@ class queriesHandler(ContentHandler):
 
         elif name == "privileges":
             self.__privileges = {}
-            self.__privileges["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__condition, "condition2": self.__condition2 }
+            self.__privileges["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband, "condition2": self.__conditionInband2 }
             self.__privileges["blind"]  = { "query": self.__blind, "query2": self.__blind2,
                                            "count": self.__count, "count2": self.__count2 }
 
@@ -187,22 +187,22 @@ class queriesHandler(ContentHandler):
 
         elif name == "tables":
             self.__tables = {}
-            self.__tables["inband"] = { "query": self.__inband, "condition": self.__condition }
+            self.__tables["inband"] = { "query": self.__inband, "condition": self.__conditionInband }
             self.__tables["blind"]  = { "query": self.__blind, "count": self.__count }
 
             self.__queries.tables = self.__tables
 
         elif name == "columns":
             self.__columns = {}
-            self.__columns["inband"] = { "query": self.__inband, "condition": self.__condition }
-            self.__columns["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "condition": self.__condition }
+            self.__columns["inband"] = { "query": self.__inband, "condition": self.__conditionInband }
+            self.__columns["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "condition": self.__conditionBlind }
 
             self.__queries.columns = self.__columns
 
         elif name == "dump_column":
             self.__dumpColumn = {}
-            self.__dumpColumn["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__condition, "condition2": self.__condition2 }
-            self.__dumpColumn["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "count2": self.__count2, "condition": self.__condition, "condition2": self.__condition2 }
+            self.__dumpColumn["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband, "condition2": self.__conditionInband2 }
+            self.__dumpColumn["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "count2": self.__count2, "condition": self.__conditionBlind, "condition2": self.__conditionBlind2 }
 
             self.__queries.dumpColumn = self.__dumpColumn
 
