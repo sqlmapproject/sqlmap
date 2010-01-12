@@ -287,7 +287,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
                     return True
 
                 # Check if it is MySQL >= 5.5.0
-                if inject.getValue("SELECT MID(TO_SECONDS(950501), 1, 1)", unpack=False) == "6":
+                if inject.getValue("SELECT MID(TO_SECONDS(950501), 1, 1)", unpack=False, charsetType=2) == "6":
                     kb.dbmsVersion = [">= 5.5.0"]
 
                 # Check if it is MySQL >= 5.1.2 and < 5.5.0
