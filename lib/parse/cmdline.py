@@ -59,6 +59,9 @@ def cmdLineParser():
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
                           
+        target.add_option("-r", dest="requestFile",
+                          help="Load HTTP request from a file")
+                          
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target url.")
@@ -120,9 +123,6 @@ def cmdLineParser():
 
         request.add_option("--scope", dest="scope", 
                            help="Regexp to filter targets from provided proxy log")
-
-        request.add_option("-r", dest="requestFile",
-                          help="Load HTTP request from a file")
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
