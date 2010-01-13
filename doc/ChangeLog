@@ -1,3 +1,36 @@
+sqlmap (0.8-1) stable; urgency=low
+
+  * Added support to enumerate and dump all databases' tables containing
+    user provided column(s) by specifying for instance '--dump -C
+    user,pass'. Useful to identify for instance tables containing custom
+    application credentials (Bernardo).
+  * Added support to parse -C (column name(s)) when fetching
+    columns of a table with --columns: it will enumerate only columns like
+    the provided one(s) within the specified table (Bernardo).
+  * Added support to automatically decode deflate, gzip and x-gzip HTTP
+    responses (Miroslav).
+  * Support for NTLM authentication via python-ntlm third party library,
+    http://code.google.com/p/python-ntlm/, --auth-type NTLM (Bernardo).
+  * Support for Certificate authentication, --auth-cert option added
+    (Miroslav).
+  * Added support for regular expression based scope when parsing Burp or
+    Web Scarab proxy log file (-l), --scope (Miroslav).
+  * Updated active fingerprint and comment injection fingerprint for
+    MySQL 5.1, MySQL 5.4 and MySQL 5.5 (Bernardo).
+  * Updated active fingerprint for PostgreSQL 8.4 (Bernardo).
+  * Added support to ignore Set-Cookie in HTTP responses,
+    --drop-set-cookie (Miroslav).
+  * Added support to specify which Google dork result page to parse,
+    --gpage to use together with -g (Miroslav).
+  * Fixed --os-shell web backdoor functionality useful when web
+    application does not support stacked queries (Bernardo).
+  * Fixed URL encoding/decoding of GET/POST parameters and Cookies
+    (Miroslav).
+  * Major bugs fixed (Bernardo and Miroslav).
+  * Minor code cleanup (Miroslav).
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon,  1 Mar 2010 10:00:00 +0000
+
 sqlmap (0.8rc1-1) stable; urgency=low
 
   * Major enhancement to the Microsoft SQL Server stored procedure
