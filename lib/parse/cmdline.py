@@ -395,10 +395,10 @@ def cmdLineParser():
                                       "estimated time of arrival")
 
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
-                               help="Use google dork results from specified page number")
+                                 help="Use google dork results from specified page number")
 
         miscellaneous.add_option("--update", dest="updateAll", action="store_true",
-                                help="Update sqlmap to the latest stable version")
+                                  help="Update Microsoft SQL Server XML signature file")
 
         miscellaneous.add_option("--save", dest="saveCmdline", action="store_true",
                                  help="Save options on a configuration INI file")
