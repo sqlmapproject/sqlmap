@@ -3,10 +3,34 @@
     <signatures release="2008">
         <signature>
             <version>
+                10.00.2734
+            </version>
+            <servicepack>
+                1 + Cumulative Update 4
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.00.2723
+            </version>
+            <servicepack>
+                1 + Cumulative Update 3
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
                 10.00.2714
             </version>
             <servicepack>
-                1 + Cumulative Update 2 for Service Pack 1
+                1 + Cumulative Update 2
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.00.2712
+            </version>
+            <servicepack>
+                0+Q970507
             </servicepack>
         </signature>
         <signature>
@@ -14,7 +38,7 @@
                 10.00.2710
             </version>
             <servicepack>
-                1 + Cumulative Update 1 for Service Pack 1
+                1 + Cumulative Update 1
             </servicepack>
         </signature>
         <signature>
@@ -23,6 +47,22 @@
             </version>
             <servicepack>
                 1
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.00.1812
+            </version>
+            <servicepack>
+                0 + Cumulative Update 6
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.1806
+            </version>
+            <servicepack>
+                0 + Cumulative Update 5
             </servicepack>
         </signature>
         <signature>
@@ -101,6 +141,38 @@
     <signatures release="2005">
         <signature>
             <version>
+                9.00.4266
+            </version>
+            <servicepack>
+                3+Q974648
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.4230
+            </version>
+            <servicepack>
+                3+Q972511
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.4226
+            </version>
+            <servicepack>
+                3+Q970279
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.4224
+            </version>
+            <servicepack>
+                0+ Q971409
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
                 9.00.4220
             </version>
             <servicepack>
@@ -141,10 +213,74 @@
         </signature>
         <signature>
             <version>
+                9.00.3355
+            </version>
+            <servicepack>
+                2+Q216793
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3330
+            </version>
+            <servicepack>
+                2+Q972510
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3328
+            </version>
+            <servicepack>
+                2+Q970278
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3327
+            </version>
+            <servicepack>
+                2+Q948567
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3325
+            </version>
+            <servicepack>
+                2+Q967908
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3320
+            </version>
+            <servicepack>
+                2+Q969142
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3318
+            </version>
+            <servicepack>
+                2+Q967199
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
                 9.00.3315
             </version>
             <servicepack>
                 2+Q962970
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3310
+            </version>
+            <servicepack>
+                2+Q960090
             </servicepack>
         </signature>
         <signature>
@@ -197,10 +333,10 @@
         </signature>
         <signature>
             <version>
-                9.00.3282
+                9.00.3289
             </version>
             <servicepack>
-                2+Q953752
+                2+Q937137
             </servicepack>
         </signature>
         <signature>
@@ -208,7 +344,7 @@
                 9.00.3282
             </version>
             <servicepack>
-                2+Q954607
+                2+Q953752
             </servicepack>
         </signature>
         <signature>
@@ -561,6 +697,14 @@
             </version>
             <servicepack>
                 2+Q933097
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.3077
+            </version>
+            <servicepack>
+                2+Q960089
             </servicepack>
         </signature>
         <signature>
@@ -1727,6 +1871,22 @@
         </signature>
     </signatures>
     <signatures release="2000">
+        <signature>
+            <version>
+                8.00.2283
+            </version>
+            <servicepack>
+                0+ Q971524
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                8.00.2279
+            </version>
+            <servicepack>
+                4+Q959678
+            </servicepack>
+        </signature>
         <signature>
             <version>
                 8.00.2271
