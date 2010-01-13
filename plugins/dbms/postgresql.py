@@ -219,7 +219,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
                 kb.dbmsVersion = [">= 8.4.0"]
             elif inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)", unpack=False, charsetType=2) in ( "1", "2" ) and not inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2) in ( "1", "2" ):
                 kb.dbmsVersion = [">= 8.3.0", "< 8.4"]
-            elif transTime:
+            elif inject.getValue("SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2):
                 kb.dbmsVersion = [">= 8.2.0", "< 8.3.0"]
             elif inject.getValue("GREATEST(5, 9, 1)", unpack=False, charsetType=2) == "9":
                 kb.dbmsVersion = [">= 8.1.0", "< 8.2.0"]
