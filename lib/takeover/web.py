@@ -53,7 +53,7 @@ class Web:
         self.webUploaderUrl = None
         self.webDirectories = set()
 
-    def webBackdoorRunCmd(self, cmd, silent=False):
+    def webBackdoorRunCmd(self, cmd):
         if self.webBackdoorUrl is None:
             return
 
@@ -66,48 +66,12 @@ class Web:
         page, _ = Request.getPage(url=cmdUrl, direct=True, silent=True)
 
         if page is not None:
-            output  = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
+            output = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
 
-        if not silent:
             if output:
-                print output.group(1)
-            else:
-                print "No output"
+                output = output.group(1)
 
         return output
-
-    def webBackdoorShell(self):
-        if self.webBackdoorUrl is None:
-            return
-
-        infoMsg  = "calling OS shell. To quit type "
-        infoMsg += "'x' or 'q' and press ENTER"
-        logger.info(infoMsg)
-
-        autoCompletion(osShell=True)
-
-        while True:
-            command = None
-
-            try:
-                command = raw_input("os-shell> ")
-            except KeyboardInterrupt:
-                print
-                errMsg = "user aborted"
-                logger.error(errMsg)
-            except EOFError:
-                print
-                errMsg = "exit"
-                logger.error(errMsg)
-                break
-
-            if not command:
-                continue
-
-            if command.lower() in ( "x", "q", "exit", "quit" ):
-                break
-
-            self.webBackdoorRunCmd(command)
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
         if self.webApi == "php":

@@ -60,7 +60,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
 
     def execCmd(self, cmd, silent=False, forgeCmd=False):
         if self.webBackdoorUrl and not kb.stackedTest:
-            self.webBackdoorRunCmd(cmd, silent=True)
+            self.webBackdoorRunCmd(cmd)
 
         elif kb.dbms in ( "MySQL", "PostgreSQL" ):
             self.udfExecCmd(cmd, silent=silent)
@@ -73,7 +73,10 @@ class Abstraction(Web, UDF, xp_cmdshell):
             raise sqlmapUnsupportedFeatureException, errMsg
 
     def evalCmd(self, cmd, first=None, last=None):
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+        if self.webBackdoorUrl and not kb.stackedTest:
+            return self.webBackdoorRunCmd(cmd)
+
+        elif kb.dbms in ( "MySQL", "PostgreSQL" ):
             return self.udfEvalCmd(cmd, first, last)
 
         elif kb.dbms == "Microsoft SQL Server":
@@ -103,25 +106,31 @@ class Abstraction(Web, UDF, xp_cmdshell):
         if not conf.osShell and not conf.osPwn and not conf.cleanup:
             self.__cmdShellCleanup()
 
-    def absOsShell(self):
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
-            infoMsg  = "going to use injected sys_eval and sys_exec "
-            infoMsg += "user-defined functions for operating system "
-            infoMsg += "command execution"
-            logger.info(infoMsg)
-
-        elif kb.dbms == "Microsoft SQL Server":
-            infoMsg  = "going to use xp_cmdshell extended procedure for "
-            infoMsg += "operating system command execution"
+    def shell(self):
+        if self.webBackdoorUrl and not kb.stackedTest:
+            infoMsg  = "calling OS shell. To quit type "
+            infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)
 
         else:
-            errMsg = "feature not yet implemented for the back-end DBMS"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                infoMsg  = "going to use injected sys_eval and sys_exec "
+                infoMsg += "user-defined functions for operating system "
+                infoMsg += "command execution"
+                logger.info(infoMsg)
 
-        infoMsg  = "calling %s OS shell. To quit type " % kb.os or "Windows"
-        infoMsg += "'x' or 'q' and press ENTER"
-        logger.info(infoMsg)
+            elif kb.dbms == "Microsoft SQL Server":
+                infoMsg  = "going to use xp_cmdshell extended procedure for "
+                infoMsg += "operating system command execution"
+                logger.info(infoMsg)
+
+            else:
+                errMsg = "feature not yet implemented for the back-end DBMS"
+                raise sqlmapUnsupportedFeatureException, errMsg
+
+            infoMsg  = "calling %s OS shell. To quit type " % kb.os or "Windows"
+            infoMsg += "'x' or 'q' and press ENTER"
+            logger.info(infoMsg)
 
         autoCompletion(osShell=True)
 

