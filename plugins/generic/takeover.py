@@ -36,6 +36,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.shell import autoCompletion
 from lib.request.connect import Connect as Request
@@ -79,27 +80,35 @@ class Takeover(Abstraction, Metasploit, Registry):
     def osCmd(self):
         stackedTest()
 
-        if not kb.stackedTest:
+        if kb.stackedTest:
+            web = False
+        elif not kb.stackedTest and kb.dbms == "MySQL":
+            web = True
             infoMsg = "going to use a web backdoor for command execution"
             logger.info(infoMsg)
-
-            self.webInit()
         else:
-            self.initEnv()
+            errMsg  = "unable to execute operating system commands via "
+            errMsg += "the back-end DBMS"
+            raise sqlmapNotVulnerableException(errMsg)
 
+        self.initEnv(web=web)
         self.runCmd(conf.osCmd)
 
     def osShell(self):
         stackedTest()
 
-        if not kb.stackedTest:
+        if kb.stackedTest:
+            web = False
+        elif not kb.stackedTest and kb.dbms == "MySQL":
+            web = True
             infoMsg = "going to use a web backdoor for command prompt"
             logger.info(infoMsg)
-
-            self.webInit()
         else:
-            self.initEnv()
+            errMsg  = "unable to prompt for an interactive operating "
+            errMsg += "system shell via the back-end DBMS"
+            raise sqlmapNotVulnerableException(errMsg)
 
+        self.initEnv(web=web)
         self.shell()
 
     def osPwn(self):
@@ -107,19 +116,10 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         stackedTest()
 
-        if not kb.stackedTest:
-            infoMsg  = "going to use a web backdoor to execute the "
-            infoMsg += "payload stager"
-            logger.info(infoMsg)
+        if kb.stackedTest:
+            web = False
 
-            self.webInit()
-
-            if self.webBackdoorUrl:
-                self.getRemoteTempPath()
-                self.createMsfPayloadStager()
-                self.uploadMsfPayloadStager(web=True)
-        else:
-            self.initEnv()
+            self.initEnv(web=web)
             self.getRemoteTempPath()
 
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
@@ -183,6 +183,23 @@ class Takeover(Abstraction, Metasploit, Registry):
                 # Unset --priv-esc if the back-end DBMS underlying operating
                 # system is not Windows
                 conf.privEsc = False
+
+        elif not kb.stackedTest and kb.dbms == "MySQL":
+            web = True
+            infoMsg  = "going to use a web backdoor to execute the "
+            infoMsg += "payload stager"
+            logger.info(infoMsg)
+
+            self.initEnv(web=web)
+
+            if self.webBackdoorUrl:
+                self.getRemoteTempPath()
+                self.createMsfPayloadStager()
+                self.uploadMsfPayloadStager(web=True)
+        else:
+            errMsg  = "unable to prompt for an out-of-band session via "
+            errMsg += "the back-end DBMS"
+            raise sqlmapNotVulnerableException(errMsg)
 
         self.pwn(goUdf)
 

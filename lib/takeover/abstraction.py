@@ -159,26 +159,27 @@ class Abstraction(Web, UDF, xp_cmdshell):
 
         self.__cmdShellCleanup()
 
-    def initEnv(self, mandatory=True, detailed=False):
+    def initEnv(self, mandatory=True, detailed=False, web=False):
         if self.envInitialized:
             return
 
-        self.checkDbmsOs(detailed)
-
-        if mandatory and not self.isDba():
-            warnMsg  = "the functionality requested might not work because "
-            warnMsg += "the session user is not a database administrator"
-            logger.warn(warnMsg)
-
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
-            self.udfInjectCmd()
-
-        elif kb.dbms == "Microsoft SQL Server":
-            if mandatory:
-                self.xpCmdshellInit()
-
+        if web:
+            self.webInit()
         else:
-            errMsg = "feature not yet implemented for the back-end DBMS"
-            raise sqlmapUnsupportedFeatureException(errMsg)
+            self.checkDbmsOs(detailed)
+
+            if mandatory and not self.isDba():
+                warnMsg  = "the functionality requested might not work because "
+                warnMsg += "the session user is not a database administrator"
+                logger.warn(warnMsg)
+
+            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                self.udfInjectCmd()
+            elif kb.dbms == "Microsoft SQL Server":
+                if mandatory:
+                    self.xpCmdshellInit()
+            else:
+                errMsg = "feature not yet implemented for the back-end DBMS"
+                raise sqlmapUnsupportedFeatureException(errMsg)
 
         self.envInitialized = True
