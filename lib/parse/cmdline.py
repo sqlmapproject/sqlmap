@@ -53,15 +53,15 @@ def cmdLineParser():
         target.add_option("-l", dest="list", help="Parse targets from Burp "
                           "or WebScarab proxy logs")
 
+        target.add_option("-r", dest="requestFile",
+                          help="Load HTTP request from a file")
+
         target.add_option("-g", dest="googleDork",
                           help="Process Google dork results as target urls")
 
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
-                          
-        target.add_option("-r", dest="requestFile",
-                          help="Load HTTP request from a file")
-                          
+
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target url.")
@@ -75,7 +75,12 @@ def cmdLineParser():
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
 
-        request.add_option("--drop-set-cookie", dest="dropSetCookie", action="store_true",
+        request.add_option("--cookie-urlencode", dest="cookieUrlencode",
+                             action="store_true",
+                             help="URL-encode generated cookie injections")
+
+        request.add_option("--drop-set-cookie", dest="dropSetCookie",
+                           action="store_true",
                            help="Ignore Set-Cookie header from response")
 
         request.add_option("--user-agent", dest="agent",
@@ -164,10 +169,6 @@ def cmdLineParser():
                              help="Matches to be excluded before "
                                   "comparing page contents")
 
-        injection.add_option("--cookie-urlencode", dest="cookieUrlencode",
-                              action="store_true",
-                              help="URLEncode generated cookie injections")
-                                   
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
                                  "be used to test for specific SQL injection "

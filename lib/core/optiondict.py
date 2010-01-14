@@ -27,15 +27,16 @@ optDict = {
             "Target":        {
                                "url":               "string",
                                "list":              "string",
+                               "requestFile":       "string",
                                "googleDork":        "string",
-                               "configFile":        "string",
-                               "requestFile":       "string"
+                               "configFile":        "string"
                              },
 
             "Request":       {
                                "method":            "string",
                                "data":              "string",
                                "cookie":            "string",
+                               "cookieUrlencode":   "boolean",
                                "dropSetCookie":     "boolean",
                                "referer":           "string",
                                "agent":             "string",
@@ -62,7 +63,6 @@ optDict = {
                                "regexp":            "string",
                                "eString":           "string",
                                "eRegexp":           "string",
-                               "cookieUrlencode":   "boolean"
                              },
 
             "Techniques":    {

