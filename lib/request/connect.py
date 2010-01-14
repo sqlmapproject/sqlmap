@@ -31,7 +31,6 @@ import urlparse
 import traceback
 
 from lib.contrib import multipartpost
-from lib.core.common import sanitizeCookie
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -121,7 +120,7 @@ class Connect:
 
         try:
             # Perform HTTP request
-            headers        = forgeHeaders(sanitizeCookie(cookie), ua)
+            headers        = forgeHeaders(cookie, ua)
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 

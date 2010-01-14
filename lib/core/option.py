@@ -38,7 +38,6 @@ from lib.core.common import getFileType
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
-from lib.core.common import sanitizeCookie
 from lib.core.common import sanitizeStr
 from lib.core.data import conf
 from lib.core.data import kb
@@ -846,8 +845,6 @@ def __setHTTPCookies():
     if conf.cookie:
         debugMsg = "setting the HTTP Cookie header"
         logger.debug(debugMsg)
-        
-        conf.cookie = sanitizeCookie(conf.cookie, True)
         
         conf.httpHeaders.append(("Connection", "Keep-Alive"))
         conf.httpHeaders.append(("Cookie", conf.cookie))

@@ -28,7 +28,6 @@ import time
 from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
-from lib.core.common import sanitizeCookie
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -73,7 +72,6 @@ def __setRequestParams():
 
     # Perform checks on Cookie parameters
     if conf.cookie:
-        conf.cookie = sanitizeCookie(conf.cookie)
         conf.parameters["Cookie"] = conf.cookie
         __paramDict = paramToDict("Cookie", conf.cookie)
 

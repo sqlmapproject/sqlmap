@@ -31,7 +31,6 @@ from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.core.common import paramToDict
 from lib.core.common import readInput
-from lib.core.common import sanitizeCookie
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -162,10 +161,9 @@ def start():
                         setCookieAsInjectable = False
     
                 if setCookieAsInjectable:
-                    safeCookie = sanitizeCookie(cookieStr)
-                    conf.httpHeaders.append(("Cookie", safeCookie))
-                    conf.parameters["Cookie"] = safeCookie
-                    __paramDict = paramToDict("Cookie", safeCookie)
+                    conf.httpHeaders.append(("Cookie", cookieStr))
+                    conf.parameters["Cookie"] = cookieStr
+                    __paramDict = paramToDict("Cookie", cookieStr)
     
                     if __paramDict:
                         conf.paramDict["Cookie"] = __paramDict

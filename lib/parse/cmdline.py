@@ -164,6 +164,10 @@ def cmdLineParser():
                              help="Matches to be excluded before "
                                   "comparing page contents")
 
+        injection.add_option("--cookie-urlencode", dest="cookieUrlencode",
+                              action="store_true",
+                              help="URLEncode generated cookie injections")
+                                   
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
                                  "be used to test for specific SQL injection "

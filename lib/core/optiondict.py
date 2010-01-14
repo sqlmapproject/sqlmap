@@ -61,7 +61,8 @@ optDict = {
                                "string":            "string",
                                "regexp":            "string",
                                "eString":           "string",
-                               "eRegexp":           "string"
+                               "eRegexp":           "string",
+                               "cookieUrlencode":   "boolean"
                              },
 
             "Techniques":    {

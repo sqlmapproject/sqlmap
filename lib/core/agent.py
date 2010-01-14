@@ -26,6 +26,7 @@ import re
 
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
@@ -77,7 +78,12 @@ class Agent:
             paramString = conf.parameters[place]
             retValue = paramString.replace("%s=%s" % (parameter, value),
                                            "%s=%s" % (parameter, newValue))
-
+        
+        if conf.cookieUrlencode and (kb.injPlace == "Cookie" or place == "Cookie"):
+            name = retValue[:retValue.find('=')]
+            value = retValue[retValue.find('=') + 1:]
+            retValue = "%s=%s" % (name, urlencode(value, convall=True))
+            
         return retValue
 
     def fullPayload(self, query):
