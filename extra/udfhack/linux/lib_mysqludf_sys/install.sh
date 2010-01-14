@@ -29,7 +29,7 @@ make
 if test $? -ne 0; then
 	echo "ERROR: You need libmysqlclient development software installed"
 	echo "to be able to compile this UDF, on Debian/Ubuntu just run:"
-	echo "apt-get install libmysqlclient15-dev"
+	echo "apt-get install libmysqlclient-dev"
 	exit 1
 else
 	echo "MySQL UDF compiled successfully"
