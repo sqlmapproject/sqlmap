@@ -452,10 +452,15 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if banVer >= "8.3":
+        if banVer >= "8.4":
+            majorVer = "8.4"
+        elif banVer >= "8.3":
             majorVer = "8.3"
-        else:
+        elif banVer >= "8.2":
             majorVer = "8.2"
+        else:
+            errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
+            raise sqlmapUnsupportedFeatureException, errMsg
 
         if kb.os == "Windows":
             self.udfLocalFile += "/postgresql/windows/%s/lib_postgresqludf_sys.dll" % majorVer
