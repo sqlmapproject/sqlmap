@@ -47,7 +47,11 @@ PG_MODULE_MAGIC;
 #endif
 
 PG_FUNCTION_INFO_V1(sys_exec);
+#ifdef PGDLLIMPORT
 extern PGDLLIMPORT Datum sys_exec(PG_FUNCTION_ARGS) {
+#else
+extern DLLIMPORT Datum sys_exec(PG_FUNCTION_ARGS) {
+#endif
 	text *argv0 = PG_GETARG_TEXT_P(0);
 	int32 argv0_size;
 	int32 result = 0;
@@ -72,7 +76,11 @@ extern PGDLLIMPORT Datum sys_exec(PG_FUNCTION_ARGS) {
 }
 
 PG_FUNCTION_INFO_V1(sys_eval);
+#ifdef PGDLLIMPORT
 extern PGDLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
+#else
+extern DLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
+#endif
 	text *argv0 = PG_GETARG_TEXT_P(0);
 	text *result_text;
 	int32 argv0_size;
@@ -112,15 +120,22 @@ extern PGDLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 	}
 
 	result_text = (text *)malloc(VARHDRSZ + strlen(result));
-	//VARATT_SIZEP(result_text) = strlen(result) + VARHDRSZ;
+#ifdef SET_VARSIZE
 	SET_VARSIZE(result_text, VARHDRSZ + strlen(result));
+#else
+	VARATT_SIZEP(result_text) = strlen(result) + VARHDRSZ;
+#endif
 	memcpy(VARDATA(result_text), result, strlen(result));
 
 	PG_RETURN_POINTER(result_text);
 }
 
 PG_FUNCTION_INFO_V1(sys_bineval);
+#ifdef PGDLLIMPORT
 extern PGDLLIMPORT Datum sys_bineval(PG_FUNCTION_ARGS) {
+#else
+extern DLLIMPORT Datum sys_bineval(PG_FUNCTION_ARGS) {
+#endif
 	text *argv0 = PG_GETARG_TEXT_P(0);
 	int32 argv0_size;
 	size_t len;

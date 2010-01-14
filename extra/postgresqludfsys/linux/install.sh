@@ -19,11 +19,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Adapt the following settings to your environment
-#PORT="5433"
-#VERSION="8.2"
-PORT="5432"
-VERSION="8.3"
 USER="postgres"
+PORT="5434"
+VERSION="8.4"
+#PORT="5433"
+#VERSION="8.3"
+#PORT="5432"
+#VERSION="8.2"
 
 echo "Compiling the PostgreSQL UDF"
 make ${VERSION}
@@ -34,8 +36,10 @@ if test $? -ne 0; then
 
 	if test "${VERSION}" == "8.2"; then
 		echo "apt-get install postgresql-server-dev-8.2"
-	else
+	else if test "${VERSION}" == "8.3"; then
 		echo "apt-get install postgresql-server-dev-8.3"
+	else if test "${VERSION}" == "8.4"; then
+		echo "apt-get install postgresql-server-dev-8.4"
 	fi
 
 	exit 1
