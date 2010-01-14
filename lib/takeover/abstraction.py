@@ -30,9 +30,10 @@ from lib.core.dump import dumper
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.takeover.udf import UDF
+from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import xp_cmdshell
 
-class Abstraction(UDF, xp_cmdshell):
+class Abstraction(Web, UDF, xp_cmdshell):
     """
     This class defines an abstraction layer for OS takeover functionalities
     to UDF / xp_cmdshell objects
@@ -42,6 +43,7 @@ class Abstraction(UDF, xp_cmdshell):
         self.envInitialized = False
 
         UDF.__init__(self)
+        Web.__init__(self)
         xp_cmdshell.__init__(self)
 
     def __cmdShellCleanup(self):
@@ -57,7 +59,10 @@ class Abstraction(UDF, xp_cmdshell):
                 raise sqlmapUnsupportedFeatureException, errMsg
 
     def execCmd(self, cmd, silent=False, forgeCmd=False):
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+        if self.webBackdoorUrl and not kb.stackedTest:
+            self.webBackdoorRunCmd(cmd, silent=True)
+
+        elif kb.dbms in ( "MySQL", "PostgreSQL" ):
             self.udfExecCmd(cmd, silent=silent)
 
         elif kb.dbms == "Microsoft SQL Server":

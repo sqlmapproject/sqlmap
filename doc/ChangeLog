@@ -7,6 +7,11 @@ sqlmap (0.8-1) stable; urgency=low
   * Added support to parse -C (column name(s)) when fetching
     columns of a table with --columns: it will enumerate only columns like
     the provided one(s) within the specified table (Bernardo).
+  * Added support for takeover features on PostgreSQL 8.4 (Bernardo).
+  * Added automatic support in --os-pwn to use the web uploader/backdoor
+    to upload and execute the Metasploit payload stager when stacked
+    queries SQL injection is not supported, for instance on MySQL/PHP and
+    MySQL/ASP (Bernardo).
   * Added support to automatically decode deflate, gzip and x-gzip HTTP
     responses (Miroslav).
   * Support for NTLM authentication via python-ntlm third party library,
@@ -27,6 +32,9 @@ sqlmap (0.8-1) stable; urgency=low
   * Fixed URL encoding/decoding of GET/POST parameters and Cookies
     (Miroslav).
   * Major bugs fixed (Bernardo and Miroslav).
+  * Cleanup of UDF source code repository,
+    https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack (Bernardo
+    and Miroslav).
   * Minor code cleanup (Miroslav).
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon,  1 Mar 2010 10:00:00 +0000

