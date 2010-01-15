@@ -92,7 +92,9 @@ class Takeover(Abstraction, Metasploit, Registry):
             raise sqlmapNotVulnerableException(errMsg)
 
         self.initEnv(web=web)
-        self.runCmd(conf.osCmd)
+
+        if not web or (web and self.webBackdoorUrl is not None):
+            self.runCmd(conf.osCmd)
 
     def osShell(self):
         stackedTest()
@@ -109,7 +111,9 @@ class Takeover(Abstraction, Metasploit, Registry):
             raise sqlmapNotVulnerableException(errMsg)
 
         self.initEnv(web=web)
-        self.shell()
+
+        if not web or (web and self.webBackdoorUrl is not None):
+            self.shell()
 
     def osPwn(self):
         goUdf = False
@@ -201,7 +205,8 @@ class Takeover(Abstraction, Metasploit, Registry):
             errMsg += "the back-end DBMS"
             raise sqlmapNotVulnerableException(errMsg)
 
-        self.pwn(goUdf)
+        if not web or (web and self.webBackdoorUrl is not None):
+            self.pwn(goUdf)
 
     def osSmb(self):
         stackedTest()
