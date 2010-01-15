@@ -39,6 +39,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.data import temp
+from lib.core.convert import urlencode
 from lib.core.exception import sqlmapFilePathException
 from lib.core.settings import IS_WIN
 from lib.core.settings import SQL_STATEMENTS
@@ -810,7 +811,7 @@ def searchEnvPath(fileName):
 
     return result
 
-def sanitizeCookie(cookieStr, warn=False):
+def urlEncodeCookieValues(cookieStr, warn=False):
     if cookieStr:
         result = ""
         changed = False
@@ -818,16 +819,16 @@ def sanitizeCookie(cookieStr, warn=False):
             index = part.find('=') + 1
             if index > 0:
                 name = part[:index - 1].strip()
-                value = part[index:].replace(",","%2C").replace(";","%3B").replace(" ","%20")
+                value = urlencode(part[index:], convall=True)
                 if value != part[index:]:
                     changed = True
-                result += ";%s=%s" % (name, value)
+                result += "; %s=%s" % (name, value)
             elif part.strip().lower() != "secure":
-                result += "%s%s" % ("%3B", part.replace(",","%2C").replace(";","%3B").replace(" ","%20"))
+                result += "%s%s" % ("%3B", urlencode(part, convall=True))
             else:
-                result += ";secure"
-        if result.startswith(';'):
-            result = result[1:]
+                result += "; secure"
+        if result.startswith('; '):
+            result = result[2:]
         elif result.startswith('%3B'):
             result = result[3:]
         if changed and warn:
