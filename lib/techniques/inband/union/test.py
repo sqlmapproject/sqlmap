@@ -24,7 +24,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from lib.core.agent import agent
 from lib.core.common import randomStr
-from lib.core.common import safeStringFormat
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -122,7 +121,7 @@ def __forgeUserFriendlyValue(payload):
     value = ""
 
     if kb.injPlace == "GET":
-        value = safeStringFormat("%s?%s", (conf.url, payload))
+        value = "%s?%s" % (conf.url, payload)
     elif kb.injPlace == "POST":
         value  = "URL:\t'%s'" % conf.url
         value += "\nPOST:\t'%s'\n" % payload
@@ -203,7 +202,7 @@ def unionTest():
         technique = "NULL bruteforcing"
 
     infoMsg  = "testing inband sql injection on parameter "
-    infoMsg += safeStringFormat("'%s' with %s technique", (kb.injParameter, technique))
+    infoMsg += "'%s' with %s technique" % (kb.injParameter, technique)
     logger.info(infoMsg)
 
     value   = ""

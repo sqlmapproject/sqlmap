@@ -75,7 +75,7 @@ def queryOutputLength(expression, payload):
     if output:
         return 0, output, regExpr
 
-    dataToSessionFile(safeStringFormat("[%s][%s][%s][%s][", (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr)))
+    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr))
 
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
     count, length       = bisection(payload, lengthExprUnescaped)
@@ -145,7 +145,7 @@ def resume(expression, payload):
         infoMsg += "%s" % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        dataToSessionFile(safeStringFormat("[%s][%s][%s][%s][%s]\n", (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue)))
+        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
 
         return resumedValue
     elif len(resumedValue) < int(length):
@@ -153,7 +153,7 @@ def resume(expression, payload):
         infoMsg += "%s..." % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        dataToSessionFile(safeStringFormat("[%s][%s][%s][%s][%s", (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue)))
+        dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
 
         if select:
             newExpr = expression.replace(regExpr, safeStringFormat(substringQuery, (regExpr, len(resumedValue) + 1, int(length))), 1)
@@ -176,6 +176,6 @@ def resume(expression, payload):
 
             return None
 
-        return safeStringFormat("%s%s", (resumedValue, finalValue))
+        return "%s%s" % (resumedValue, finalValue)
 
     return None
