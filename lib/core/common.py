@@ -811,17 +811,14 @@ def searchEnvPath(fileName):
 
     return result
 
-def urlEncodeCookieValues(cookieStr, warn=False):
+def urlEncodeCookieValues(cookieStr):
     if cookieStr:
         result = ""
-        changed = False
         for part in cookieStr.split(';'):
             index = part.find('=') + 1
             if index > 0:
                 name = part[:index - 1].strip()
                 value = urlencode(part[index:], convall=True)
-                if value != part[index:]:
-                    changed = True
                 result += "; %s=%s" % (name, value)
             elif part.strip().lower() != "secure":
                 result += "%s%s" % ("%3B", urlencode(part, convall=True))
@@ -831,10 +828,6 @@ def urlEncodeCookieValues(cookieStr, warn=False):
             result = result[2:]
         elif result.startswith('%3B'):
             result = result[3:]
-        if changed and warn:
-            warnMsg = "cookie is provided in HTTP unsafe format containing one "
-            warnMsg += "of problematic characters: ' ,;'. temporary sanitized."
-            logger.warn(warnMsg)
         return result
     else:
         return None
