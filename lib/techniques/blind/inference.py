@@ -31,6 +31,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import getCharset
 from lib.core.common import replaceNewlineTabs
+from lib.core.common import safeStringFormat
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -117,7 +118,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             queriesCount[0] += 1
             position      = (len(asciiTbl) / 2)
             posValue      = asciiTbl[position]
-            forgedPayload = payload % (expressionUnescaped, idx, posValue)
+            forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
             result        = Request.queryPage(forgedPayload)
 
             if result:

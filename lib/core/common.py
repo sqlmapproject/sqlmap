@@ -41,6 +41,7 @@ from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.convert import urlencode
 from lib.core.exception import sqlmapFilePathException
+from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import IS_WIN
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
@@ -846,4 +847,21 @@ def normalizePath(path):
         retVal = posixpath.normpath(path)
     else:
         retVal = ntpath.normpath(path)
+    return retVal
+
+def safeStringFormat(formatStr, params):
+    index = 0
+    count = 0
+    
+    retVal = formatStr.replace('%d', '%s')
+    
+    while index !=- 1:
+        index = retVal.find('%s')
+        if index != -1:
+            if count < len(params):
+                retVal = retVal[:index] + str(params[count]) + retVal[index+2:]
+            else:
+                raise sqlmapNoneDataException, "wrong number of parameters during string formatting"
+            count += 1
+            
     return retVal

@@ -25,6 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 
 from lib.core.common import dataToSessionFile
+from lib.core.common import safeStringFormat
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -74,7 +75,7 @@ def queryOutputLength(expression, payload):
     if output:
         return 0, output, regExpr
 
-    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr))
+    dataToSessionFile(safeStringFormat("[%s][%s][%s][%s][", (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr)))
 
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
     count, length       = bisection(payload, lengthExprUnescaped)
@@ -144,7 +145,7 @@ def resume(expression, payload):
         infoMsg += "%s" % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+        dataToSessionFile(safeStringFormat("[%s][%s][%s][%s][%s]\n", (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue)))
 
         return resumedValue
     elif len(resumedValue) < int(length):
@@ -152,12 +153,12 @@ def resume(expression, payload):
         infoMsg += "%s..." % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+        dataToSessionFile(safeStringFormat("[%s][%s][%s][%s][%s", (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue)))
 
         if select:
-            newExpr = expression.replace(regExpr, substringQuery % (regExpr, len(resumedValue) + 1, int(length)), 1)
+            newExpr = expression.replace(regExpr, safeStringFormat(substringQuery, (regExpr, len(resumedValue) + 1, int(length))), 1)
         else:
-            newExpr = substringQuery % (expression, len(resumedValue) + 1, int(length))
+            newExpr = safeStringFormat(substringQuery, (expression, len(resumedValue) + 1, int(length)))
 
         missingCharsLength = int(length) - len(resumedValue)
 
@@ -175,6 +176,6 @@ def resume(expression, payload):
 
             return None
 
-        return "%s%s" % (resumedValue, finalValue)
+        return safeStringFormat("%s%s", (resumedValue, finalValue))
 
     return None
