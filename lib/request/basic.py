@@ -28,9 +28,10 @@ import re
 import StringIO
 import zlib
 
+from lib.core.common import directoryPath
+from lib.core.common import sanitizeCookie
 from lib.core.data import conf
 from lib.core.data import kb
-from lib.core.common import directoryPath
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -44,6 +45,9 @@ def forgeHeaders(cookie, ua):
 
     for header, value in conf.httpHeaders:
         if cookie and header == "Cookie":
+            if conf.cookieUrlencode:
+                cookie = sanitizeCookie(cookie)
+
             headers[header] = cookie
         elif ua and header == "User-Agent":
             headers[header] = ua
