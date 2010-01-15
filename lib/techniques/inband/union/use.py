@@ -27,7 +27,6 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import parseUnionPage
-from lib.core.common import safeStringFormat
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
