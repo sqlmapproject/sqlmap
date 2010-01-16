@@ -73,14 +73,10 @@ class Connect:
         page            = ""
         cookieStr       = ""
         requestMsg      = "HTTP request:\n%s " % conf.method
+        requestMsg     += "%s" % urlparse.urlsplit(url)[2] or "/"
         responseMsg     = "HTTP response "
         requestHeaders  = ""
         responseHeaders = ""
-
-        if re.search("http[s]*://%s" % conf.hostname, url, re.I):
-            requestMsg += "%s" % conf.path or "/"
-        else:
-            requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
 
         if silent:
             socket.setdefaulttimeout(3)
