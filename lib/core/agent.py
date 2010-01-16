@@ -26,6 +26,7 @@ import re
 
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
@@ -52,6 +53,7 @@ class Agent:
         falseValue = ""
         negValue   = ""
         retValue   = ""
+        newValue   = urlencode(newValue)
 
         if negative or conf.paramNegative:
             negValue = "-"
@@ -77,7 +79,7 @@ class Agent:
             paramString = conf.parameters[place]
             retValue = paramString.replace("%s=%s" % (parameter, value),
                                            "%s=%s" % (parameter, newValue))
-        
+
         return retValue
 
     def fullPayload(self, query):
