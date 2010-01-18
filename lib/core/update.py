@@ -34,7 +34,12 @@ import zipfile
 from distutils.dir_util import mkpath
 from xml.dom.minidom import Document
 
+from subprocess import PIPE
+from subprocess import Popen as execute
+
 from lib.core.common import readInput
+from lib.core.common import pollProcess
+from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
@@ -197,7 +202,37 @@ def __updateMSSQLXML():
         logger.info(infoMsg)
 
 def __updateSqlmap():
-    pass
+    infoMsg = "updating sqlmap directly from the repository"
+    logger.info(infoMsg)
+    rootDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    try:
+        import pysvn
+        def notify(event_dict):
+            action = str(event_dict['action'])
+            if action.find('_update') != -1:
+                return
+            index = action.find('_')
+            prefix = action[index + 1].upper() if index != -1 else action.capitalize()
+            if action.find('_completed') == -1:
+                print "%s    %s" % (prefix, event_dict['path'])
+            else:
+                revision = str(event_dict['revision'])
+                index = revision.find('number ')
+                if index != -1:
+                    revision = revision[index+7:].strip('>')
+                logger.info('updated to the latest revision %s' % revision)
+        client = pysvn.Client()
+        client.callback_notify = notify
+        client.update(rootDir)
+    except ImportError:
+        process = execute("svn update %s" % (rootDir), shell=True, stdout=None, stderr=PIPE)
+
+        pollProcess(process)
+        svnStdout, svnStderr = process.communicate()
+
+        if svnStderr:
+            errMsg = svnStderr.strip()
+            logger.error(errMsg)
 
 def update():
     if not conf.updateAll:
