@@ -78,7 +78,7 @@
                 10.00.1787
             </version>
             <servicepack>
-                0 + Cumulative Update 3
+                0+ Cumulative Update 3
             </servicepack>
         </signature>
         <signature>
@@ -139,6 +139,14 @@
         </signature>
     </signatures>
     <signatures release="2005">
+        <signature>
+            <version>
+                9.00.4273
+            </version>
+            <servicepack>
+                3+Q976951
+            </servicepack>
+        </signature>
         <signature>
             <version>
                 9.00.4266
