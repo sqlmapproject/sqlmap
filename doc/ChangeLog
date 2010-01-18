@@ -31,6 +31,9 @@ sqlmap (0.8-1) stable; urgency=low
     application does not support stacked queries (Bernardo).
   * Fixed URL encoding/decoding of GET/POST parameters and Cookies
     (Miroslav).
+  * Refactor --update to use python-svn third party library if available
+    or svn command to update sqlmap to the latest development version from
+    subversion repository (Bernardo and Miroslav).
   * Major bugs fixed (Bernardo and Miroslav).
   * Cleanup of UDF source code repository,
     https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack (Bernardo
