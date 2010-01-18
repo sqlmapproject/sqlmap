@@ -218,15 +218,14 @@ def __updateSqlmap():
 
         def notify(event_dict):
             action = str(event_dict['action'])
+            index = action.find('_')
+            prefix = action[index + 1].upper() if index != -1 else action.capitalize()
 
             if action.find('_update') != -1:
                 return
 
-            index = action.find('_')
-            prefix = action[index + 1].upper() if index != -1 else action.capitalize()
-
             if action.find('_completed') == -1:
-                print "%s    %s" % (prefix, event_dict['path'])
+                print "%s\t%s" % (prefix, event_dict['path'])
             else:
                 revision = str(event_dict['revision'])
                 index = revision.find('number ')
