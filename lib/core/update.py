@@ -28,6 +28,7 @@ import re
 import shutil
 import sys
 import tempfile
+import time
 import urlparse
 import zipfile
 
@@ -37,9 +38,9 @@ from xml.dom.minidom import Document
 from subprocess import PIPE
 from subprocess import Popen as execute
 
-from lib.core.common import readInput
-from lib.core.common import pollProcess
 from lib.core.common import dataToStdout
+from lib.core.common import pollProcess
+from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
@@ -202,37 +203,59 @@ def __updateMSSQLXML():
         logger.info(infoMsg)
 
 def __updateSqlmap():
-    infoMsg = "updating sqlmap directly from the repository"
+    rootDir = paths.SQLMAP_ROOT_PATH
+
+    infoMsg = "updating sqlmap to latest development version from the "
+    infoMsg += "subversion repository"
     logger.info(infoMsg)
-    rootDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+
     try:
         import pysvn
+
+        debugMsg = "sqlmap will update itself using installed python-svn "
+        debugMsg += "third-party library, http://pysvn.tigris.org/"
+        logger.debug(debugMsg)
+
         def notify(event_dict):
             action = str(event_dict['action'])
+
             if action.find('_update') != -1:
                 return
+
             index = action.find('_')
             prefix = action[index + 1].upper() if index != -1 else action.capitalize()
+
             if action.find('_completed') == -1:
                 print "%s    %s" % (prefix, event_dict['path'])
             else:
                 revision = str(event_dict['revision'])
                 index = revision.find('number ')
+
                 if index != -1:
                     revision = revision[index+7:].strip('>')
+
                 logger.info('updated to the latest revision %s' % revision)
+
         client = pysvn.Client()
         client.callback_notify = notify
         client.update(rootDir)
-    except ImportError:
-        process = execute("svn update %s" % (rootDir), shell=True, stdout=None, stderr=PIPE)
+    except ImportError, _:
+        debugMsg = "sqlmap will try to update itself using 'svn' command"
+        logger.debug(debugMsg)
 
+        process = execute("svn update %s" % rootDir, shell=True, stdout=PIPE, stderr=PIPE)
+
+        dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
         pollProcess(process)
         svnStdout, svnStderr = process.communicate()
 
         if svnStderr:
             errMsg = svnStderr.strip()
             logger.error(errMsg)
+        elif svnStdout:
+            revision = re.search("revision\s+([\d]+)", svnStdout, re.I)
+            if revision:
+                logger.info('updated to the latest revision %s' % revision.group(1))
 
 def update():
     if not conf.updateAll:
