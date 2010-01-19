@@ -205,3 +205,69 @@ DWORD WINAPI exec_payload(LPVOID lpParameter)
 	return 0;
 }
 #endif
+
+PG_FUNCTION_INFO_V1(sys_fileread);
+#ifdef PGDLLIMPORT
+extern PGDLLIMPORT Datum sys_fileread(PG_FUNCTION_ARGS) {
+#else
+extern DLLIMPORT Datum sys_fileread(PG_FUNCTION_ARGS) {
+#endif
+	text *argv0 = PG_GETARG_TEXT_P(0);
+	text *result_text;
+	int32 argv0_size;
+	int32 len;
+	int32 i, j;
+	char *filename;
+	char *result;
+	char *buffer;
+	char table[] = "0123456789ABCDEF";
+	FILE *file;
+
+	argv0_size = VARSIZE(argv0) - VARHDRSZ;
+	filename = (char *)malloc(argv0_size + 1);
+
+	memcpy(filename, VARDATA(argv0), argv0_size);
+	filename[argv0_size] = '\0';
+	
+	file = fopen(filename, "rb");
+	if (!file)
+	{
+		PG_RETURN_POINTER(NULL);
+	}
+	
+	fseek(file, 0, SEEK_END);
+	len = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	buffer=(char *)malloc(len + 1);
+	if (!buffer)
+	{
+		fclose(file);
+		PG_RETURN_POINTER(NULL);
+	}
+
+	fread(buffer, len, 1, file);
+	fclose(file);
+
+	result = (char *)malloc(2*len + 1);
+	for (i=0, j=0; i<len; i++)
+	{
+		result[j++] = table[(buffer[i] >> 4) & 0x0f];
+		result[j++] = table[ buffer[i]	   & 0x0f];
+	}
+	result[j] = '\0';
+	
+	result_text = (text *)malloc(VARHDRSZ + strlen(result));
+#ifdef SET_VARSIZE
+	SET_VARSIZE(result_text, VARHDRSZ + strlen(result));
+#else
+	VARATT_SIZEP(result_text) = strlen(result) + VARHDRSZ;
+#endif
+	memcpy(VARDATA(result_text), result, strlen(result));
+	
+	free(result);
+	free(buffer);
+	free(filename);
+
+	PG_RETURN_POINTER(result_text);
+}
