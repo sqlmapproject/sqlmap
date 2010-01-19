@@ -592,6 +592,8 @@ def __setHTTPProxy():
     global proxyHandler
 
     if not conf.proxy:
+        if conf.hostname in ('localhost', '127.0.0.1'):
+            proxyHandler = urllib2.ProxyHandler({})
         return
 
     debugMsg = "setting the HTTP proxy to pass by all HTTP requests"
