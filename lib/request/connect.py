@@ -167,26 +167,29 @@ class Connect:
                 exceptionMsg  = "not authorized, try to provide right HTTP "
                 exceptionMsg += "authentication type and valid credentials"
                 raise sqlmapConnectionException, exceptionMsg
+            elif e.code == 404:
+                exceptionMsg = "page not found"
+                raise sqlmapConnectionException, exceptionMsg
             else:
                 page = e.read()
                 code = e.code
                 status = e.msg
                 responseHeaders = e.info()
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine), _:
+                debugMsg = "got HTTP error code: %d" % code
+                logger.debug(debugMsg)
+
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine), e:
             tbMsg = traceback.format_exc()
 
             if "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target url"
-
             elif "timeout" in tbMsg:
                 warnMsg = "connection timed out to the target url"
-
             elif "BadStatusLine" in tbMsg:
                 warnMsg  = "the target url responded with an unknown HTTP "
                 warnMsg += "status code, try to force the HTTP User-Agent "
                 warnMsg += "header with option --user-agent or -a"
-
             else:
                 warnMsg = "unable to connect to the target url"
 
@@ -201,7 +204,6 @@ class Connect:
 
             if silent:
                 return None, None
-
             elif conf.retriesCount < conf.retries:
                 conf.retriesCount += 1
 
@@ -212,7 +214,6 @@ class Connect:
 
                 socket.setdefaulttimeout(conf.timeout)
                 return Connect.__getPageProxy(**kwargs)
-
             else:
                 socket.setdefaulttimeout(conf.timeout)
                 raise sqlmapConnectionException, warnMsg
