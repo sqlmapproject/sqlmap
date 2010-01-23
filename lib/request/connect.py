@@ -29,6 +29,7 @@ import time
 import urllib2
 import urlparse
 import traceback
+import unicodedata
 
 from lib.contrib import multipartpost
 from lib.core.convert import urlencode
@@ -74,7 +75,7 @@ class Connect:
         cookieStr       = ""
         requestMsg      = "HTTP request:\n%s " % conf.method
         requestMsg     += "%s" % urlparse.urlsplit(url)[2] or "/"
-        responseMsg     = "HTTP response "
+        responseMsg     = u"HTTP response "
         requestHeaders  = ""
         responseHeaders = ""
 
@@ -227,7 +228,8 @@ class Connect:
             responseMsg += str(responseHeaders)
         elif conf.verbose > 4:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
-
+        
+        responseMsg = unicodedata.normalize('NFKD', responseMsg).encode('ascii','ignore')
         logger.log(8, responseMsg)
 
         return page, responseHeaders
