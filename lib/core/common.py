@@ -32,6 +32,7 @@ import time
 import urlparse
 import ntpath
 import posixpath
+
 from lib.contrib import magic
 from lib.core.data import conf
 from lib.core.data import kb
@@ -869,3 +870,7 @@ def safeStringFormat(formatStr, params):
                 count += 1
 
     return retVal
+
+def sanitizeAsciiString(string):
+    return "".join(char if ord(char) <= 128 else '?' for char in string)
+    

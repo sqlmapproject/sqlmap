@@ -29,13 +29,13 @@ import time
 import urllib2
 import urlparse
 import traceback
-import unicodedata
 
 from lib.contrib import multipartpost
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.common import sanitizeAsciiString
 from lib.core.exception import sqlmapConnectionException
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
@@ -75,7 +75,7 @@ class Connect:
         cookieStr       = ""
         requestMsg      = "HTTP request:\n%s " % conf.method
         requestMsg     += "%s" % urlparse.urlsplit(url)[2] or "/"
-        responseMsg     = u"HTTP response "
+        responseMsg     = "HTTP response "
         requestHeaders  = ""
         responseHeaders = ""
 
@@ -92,7 +92,7 @@ class Connect:
         elif multipart:
             multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
             conn = multipartOpener.open(url, multipart)
-            page = conn.read()
+            page = conn.read()            
             responseHeaders = conn.info()
 
             encoding = responseHeaders.get("Content-Encoding")
@@ -159,7 +159,7 @@ class Connect:
             code            = conn.code
             status          = conn.msg
             responseHeaders = conn.info()
-
+            
             encoding = responseHeaders.get("Content-Encoding")
             page = decodePage(page, encoding)
 
@@ -221,15 +221,16 @@ class Connect:
 
         socket.setdefaulttimeout(conf.timeout)
 
+        page = sanitizeAsciiString(page)
+        
         parseResponse(page, responseHeaders)
         responseMsg += "(%s - %d):\n" % (status, code)
-
+        
         if conf.verbose <= 4:
             responseMsg += str(responseHeaders)
         elif conf.verbose > 4:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
         
-        responseMsg = unicodedata.normalize('NFKD', responseMsg).encode('ascii','ignore')
         logger.log(8, responseMsg)
 
         return page, responseHeaders
