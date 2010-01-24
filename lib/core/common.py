@@ -872,5 +872,5 @@ def safeStringFormat(formatStr, params):
     return retVal
 
 def sanitizeAsciiString(string):
-    return "".join(char if ord(char) <= 128 else '?' for char in string)
+    return "".join(char if ord(char) < 128 else '?' for char in string)
     
