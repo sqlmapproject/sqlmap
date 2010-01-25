@@ -31,7 +31,7 @@ rules = None
 
 def checkPayload(string):
     """
-    This method checks if the generated payload is detectable by an PHPIDS filter rules
+    This method checks if the generated payload is detectable by the PHPIDS filter rules
     """
     global rules
 
