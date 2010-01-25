@@ -21,13 +21,22 @@ You should have received a copy of the GNU General Public License along
 with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
-import re
-import urllib2
+import re, sre_constants
 from xml.dom import minidom
 
+from lib.core.data import conf
+from lib.core.data import paths
 from lib.core.data import logger
 
 rules = None
+
+def __adjustGrammar(string):
+    string = re.sub('\ADetects', 'Detected', string)
+    string = re.sub('\Afinds', 'Found', string)
+    string = re.sub('attempts\Z', 'attempt', string)
+    string = re.sub('injections\Z', 'injection', string)
+    string = re.sub('attacks\Z', 'attack', string)
+    return string
 
 def checkPayload(string):
     """
@@ -36,19 +45,16 @@ def checkPayload(string):
     global rules
 
     if not rules:
-        url = 'https://svn.phpids.org/svn/trunk/lib/IDS/default_filter.xml'
-        request = urllib2.Request(url)
-        response = urllib2.urlopen(request)
-        xmlrules = minidom.parse(response).documentElement
-        response.close()
+        file = open(paths.DETECTION_RULES_XML, 'r')
+        xmlrules = minidom.parse(file).documentElement
+        file.close()
         rules = []
         for xmlrule in xmlrules.getElementsByTagName("filter"):
             try:
                 rule = re.compile(xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue)
-                desc = xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue
-                desc = desc.replace('Detects', 'Detected').replace('finds', 'Found').replace('attempts', 'attempt').replace('injections', 'injection').replace('attacks', 'attack')
+                desc = __adjustGrammar(xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue)
                 rules.append((rule, desc))
-            except:
+            except sre_constants.error: #some issues with some regex expressions in Python 2.5
                 pass
     
     for rule, desc in rules:
