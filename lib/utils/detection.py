@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: parenthesis.py 1003 2010-01-02 02:02:12Z inquisb $
+$Id: $
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
