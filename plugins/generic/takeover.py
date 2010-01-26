@@ -165,15 +165,16 @@ class Takeover(Abstraction, Metasploit, Registry):
                     warnMsg  = "by default PostgreSQL on Windows runs as postgres "
                     warnMsg += "user which has no Windows Impersonation "
                     warnMsg += "Tokens: it is unlikely that the privilege "
-                    warnMsg += "escalation will be successful"
+                    warnMsg += "escalation via 'incognito' extension will "
+                    warnMsg += "be successful"
                     logger.warn(warnMsg)
 
                 elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
                     warnMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
                     warnMsg += "runs as Network Service which has no Windows "
                     warnMsg += "Impersonation Tokens within all threads, this "
-                    warnMsg += "makes Meterpreter's incognito extension to "
-                    warnMsg += "fail to list tokens"
+                    warnMsg += "makes Meterpreter's 'incognito' extension "
+                    warnMsg += "to fail to list tokens"
                     logger.warn(warnMsg)
 
                     uploaded = self.uploadChurrasco()

