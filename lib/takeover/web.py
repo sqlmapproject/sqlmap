@@ -158,6 +158,7 @@ class Web:
 
         backdoorName = "backdoor.%s" % self.webApi
         backdoorStream = NamedTemporaryFile()
+        originalTempName = backdoorStream.name
         backdoorStream.name = backdoorName
         backdoorStream.write(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_')))
         backdoorStream.seek(0)
@@ -203,3 +204,5 @@ class Web:
             logger.info(infoMsg)
 
             break
+        
+        backdoorStream.name = originalTempName
