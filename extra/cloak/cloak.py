@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-cloak.py - Simple file encryption and/or compression utility
+cloak.py - Simple file encryption/compression utility
 Copyright (C) 2010  Miroslav Stampar, Bernardo Damele A. G.
 email(s): miroslav.stampar@gmail.com, bernardo.damele@gmail.com
 
@@ -20,9 +20,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import bz2
 import os
 import sys
-import bz2
 
 from optparse import OptionError
 from optparse import OptionParser
@@ -38,24 +38,16 @@ def hideAscii(data):
     return retVal
 
 def cloak(inputFile):
-    retVal = ""
-    
     f = open(inputFile, 'rb')
-    original = f.read()
+    data = bz2.compress(f.read())
     f.close()
-    
-    data = bz2.compress(original)
     
     return hideAscii(data)
         
 def decloak(inputFile):
-    retVal = ""
-    
     f = open(inputFile, 'rb')
-    original = f.read()
+    data = bz2.decompress(hideAscii(f.read()))
     f.close()
-    
-    data = bz2.decompress(hideAscii(original))
     
     return data
 
@@ -76,9 +68,7 @@ def main():
     except (OptionError, TypeError), e:
         parser.error(e)
     
-    if args.inputFile == '*':
-        pass
-    elif not os.path.isfile(args.inputFile):
+    if not os.path.isfile(args.inputFile):
         print 'ERROR: the provided input file \'%s\' is not a regular file' % args.inputFile
         sys.exit(1)
     
