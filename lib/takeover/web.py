@@ -76,9 +76,11 @@ class Web:
         return output
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
-        webStreamUpload(self, open(fileToUpload, "r"), destFileName, directory)
+        file = open(fileToUpload, "r")
+        webStreamUpload(self, file, destFileName, directory)
+        file.close()
         
-    def webFileStreamUpload(self, stream, destFileName, directory):
+    def webStreamUpload(self, stream, destFileName, directory):
         if self.webApi == "php":
             multipartParams = {
                                 "upload":    "1",
@@ -190,7 +192,7 @@ class Web:
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
 
-            self.webFileStreamUpload(backdoorStream, backdoorName, directory)
+            self.webStreamUpload(backdoorStream, backdoorName, directory)
             self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
             self.webDirectory = directory
 
