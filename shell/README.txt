@@ -3,7 +3,7 @@ we needed to somehow circumvent this. As from the plain sqlmap users perspective
 has to be done prior to their usage by sqlmap, but if you want to have access to their
 original source code use the decrypt functionality of the ../extra/cloak/cloak.py utility.
 
-To prepare the original scripts to the cloacked form use this command:
+To prepare the original scripts to the cloaked form use this command:
 find backdoor.* uploader.* -type f -exec python ../extra/cloak/cloak.py -i '{}' \;
 
 To get back them into the original form use this:
