@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: $
+$Id$
 
 This file is part of the sqlmap project, http://sqlmap.sourceforge.net.
 
