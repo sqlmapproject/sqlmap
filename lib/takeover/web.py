@@ -24,7 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import re
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 
 from lib.core.agent import agent
 from lib.core.common import fileToStr
@@ -157,7 +157,8 @@ class Web:
                 logger.warn("invalid value, it must be 1 or 3")
 
         backdoorName = "backdoor.%s" % self.webApi
-        backdoorStream = TemporaryFile()
+        backdoorStream = NamedTemporaryFile()
+        backdoorStream.name = backdoorName
         backdoorStream.write(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_')))
         backdoorStream.seek(0)
         
