@@ -77,7 +77,7 @@ class Web:
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
         file = open(fileToUpload, "r")
-        self.webFileStreamUpload(self, file, destFileName, directory)
+        self.webFileStreamUpload(file, destFileName, directory)
         file.close()
         
     def webFileStreamUpload(self, stream, destFileName, directory):
@@ -118,7 +118,7 @@ class Web:
         if self.webBackdoorUrl is not None and self.webUploaderUrl is not None and self.webApi is not None:
             return
 
-        #self.checkDbmsOs()
+        self.checkDbmsOs()
 
         kb.docRoot  = getDocRoot()
         directories = getDirs()
