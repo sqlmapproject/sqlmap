@@ -26,19 +26,23 @@ sqlmap (0.8-1) stable; urgency=low
   * Added support to ignore Set-Cookie in HTTP responses,
     --drop-set-cookie (Miroslav).
   * Added support to specify which Google dork result page to parse,
-    --gpage to use together with -g (Miroslav).
-  * Fixed --os-shell web backdoor functionality useful when web
-    application does not support stacked queries (Bernardo).
-  * Fixed URL encoding/decoding of GET/POST parameters and Cookies
+    --gpage to be used together with -g (Miroslav).
+  * Fixed web backdoor functionality for --os-cmd, --os-shell and --os-pwn
+    useful when web application does not support stacked queries (Bernardo).
+  * Fixed URL encoding/decoding of GET/POST parameters and Cookie header
     (Miroslav).
   * Refactor --update to use python-svn third party library if available
-    or svn command to update sqlmap to the latest development version from
-    subversion repository (Bernardo and Miroslav).
+    or 'svn' command to update sqlmap to the latest development version
+    from subversion repository (Bernardo and Miroslav).
   * Major bugs fixed (Bernardo and Miroslav).
   * Cleanup of UDF source code repository,
     https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack (Bernardo
     and Miroslav).
-  * Minor code cleanup (Miroslav).
+  * Major code cleanup and refactoring (Bernardo and Miroslav).
+  * Added simple file encryption/compression utility, extra/cloak/cloak.py
+    used by sqlmap to decrypt on the fly Churrasco executable and web
+    shells consequently reduced drastically the number of anti virus
+    softwares that mistakenly mark sqlmap as a malware (Miroslav)
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon,  1 Mar 2010 10:00:00 +0000
 
