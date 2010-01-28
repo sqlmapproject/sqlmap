@@ -24,10 +24,9 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import re
-from tempfile import NamedTemporaryFile
 
-from extra.cloak.cloak import decloak
 from lib.core.agent import agent
+from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import fileToStr
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
@@ -67,9 +66,7 @@ class Takeover(Abstraction, Metasploit, Registry):
         output = readInput(msg, default="Y")
 
         if not output or output[0] in ( "y", "Y" ):
-            tmpFile = NamedTemporaryFile()
-            tmpFile.write(decloak(os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe_")))
-            tmpFile.seek(0)
+            tmpFile = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe_"))
             
             wFile                 = tmpFile.name
             self.churrascoPath    = "%s/sqlmapchur%s.exe" % (conf.tmpPath, randomStr(lowercase=True))

@@ -24,10 +24,9 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import re
-from tempfile import NamedTemporaryFile
 
-from extra.cloak.cloak import decloak
 from lib.core.agent import agent
+from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import fileToStr
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
@@ -77,10 +76,10 @@ class Web:
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
         file = open(fileToUpload, "r")
-        self.webFileStreamUpload(file, destFileName, directory)
+        self.__webFileStreamUpload(file, destFileName, directory)
         file.close()
         
-    def webFileStreamUpload(self, stream, destFileName, directory):
+    def __webFileStreamUpload(self, stream, destFileName, directory):
         if self.webApi == "php":
             multipartParams = {
                                 "upload":    "1",
@@ -157,11 +156,7 @@ class Web:
                 logger.warn("invalid value, it must be 1 or 3")
 
         backdoorName = "backdoor.%s" % self.webApi
-        backdoorStream = NamedTemporaryFile()
-        originalTempName = backdoorStream.name
-        backdoorStream.name = backdoorName
-        backdoorStream.write(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_')))
-        backdoorStream.seek(0)
+        backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_'), backdoorName)
         
         uploaderName = "uploader.%s" % self.webApi
         uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_'))
@@ -194,7 +189,7 @@ class Web:
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
 
-            self.webFileStreamUpload(backdoorStream, backdoorName, directory)
+            self.__webFileStreamUpload(backdoorStream, backdoorName, directory)
             self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
             self.webDirectory = directory
 
@@ -205,5 +200,5 @@ class Web:
 
             break
         
-        backdoorStream.name = originalTempName
+        backdoorStream.name = backdoorStream.old_name
         

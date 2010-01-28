@@ -32,7 +32,9 @@ import time
 import urlparse
 import ntpath
 import posixpath
+from tempfile import NamedTemporaryFile
 
+from extra.cloak.cloak import decloak
 from lib.contrib import magic
 from lib.core.data import conf
 from lib.core.data import kb
@@ -46,7 +48,6 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import IS_WIN
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
-
 
 def paramToDict(place, parameters=None):
     """
@@ -874,4 +875,12 @@ def safeStringFormat(formatStr, params):
 
 def sanitizeAsciiString(string):
     return "".join(char if ord(char) < 128 else '?' for char in string)
-    
+
+def decloakToNamedTemporaryFile(filepath, name=None):
+    retVal = NamedTemporaryFile()
+    retVal.write(decloak(filepath))
+    retVal.seek(0)
+    if name:
+        retVal.old_name = retVal.name
+        retVal.name = name
+    return retVal
