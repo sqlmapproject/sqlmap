@@ -77,7 +77,7 @@ class Web:
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
         file = open(fileToUpload, "r")
-        webFileStreamUpload(self, file, destFileName, directory)
+        self.webFileStreamUpload(self, file, destFileName, directory)
         file.close()
         
     def webFileStreamUpload(self, stream, destFileName, directory):
