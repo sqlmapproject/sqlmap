@@ -86,9 +86,10 @@ class Takeover(Abstraction, Metasploit, Registry):
         if kb.stackedTest:
             web = False
         elif not kb.stackedTest and kb.dbms == "MySQL":
-            web = True
             infoMsg = "going to use a web backdoor for command execution"
             logger.info(infoMsg)
+
+            web = True
         else:
             errMsg  = "unable to execute operating system commands via "
             errMsg += "the back-end DBMS"
@@ -105,9 +106,10 @@ class Takeover(Abstraction, Metasploit, Registry):
         if kb.stackedTest:
             web = False
         elif not kb.stackedTest and kb.dbms == "MySQL":
-            web = True
             infoMsg = "going to use a web backdoor for command prompt"
             logger.info(infoMsg)
+
+            web = True
         else:
             errMsg  = "unable to prompt for an interactive operating "
             errMsg += "system shell via the back-end DBMS"
@@ -187,20 +189,36 @@ class Takeover(Abstraction, Metasploit, Registry):
                         warnMsg += "might not work"
                         logger.warn(warnMsg)
 
-            else:
+            elif kb.os != "Windows" and conf.privEsc:
                 # Unset --priv-esc if the back-end DBMS underlying operating
                 # system is not Windows
                 conf.privEsc = False
 
+                warnMsg  = "sqlmap does not implement any operating system "
+                warnMsg += "user privilege escalation technique when the "
+                warnMsg += "back-end DBMS underlying system is not Windows"
+                logger.warn(warnMsg)
+
         elif not kb.stackedTest and kb.dbms == "MySQL":
-            web = True
             infoMsg  = "going to use a web backdoor to execute the "
             infoMsg += "payload stager"
             logger.info(infoMsg)
 
+            web = True
+
             self.initEnv(web=web)
 
             if self.webBackdoorUrl:
+                if kb.os != "Windows" and conf.privEsc:
+                    # Unset --priv-esc if the back-end DBMS underlying operating
+                    # system is not Windows
+                    conf.privEsc = False
+
+                    warnMsg  = "sqlmap does not implement any operating system "
+                    warnMsg += "user privilege escalation technique when the "
+                    warnMsg += "back-end DBMS underlying system is not Windows"
+                    logger.warn(warnMsg)
+
                 self.getRemoteTempPath()
                 self.createMsfPayloadStager()
                 self.uploadMsfPayloadStager(web=True)
