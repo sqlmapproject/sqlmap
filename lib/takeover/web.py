@@ -76,10 +76,10 @@ class Web:
         return output
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
-        file = open(fileToUpload, "r")
-        self.__webFileStreamUpload(file, destFileName, directory)
-        file.close()
-        
+        inputFile = open(fileToUpload, "r")
+        self.__webFileStreamUpload(inputFile, destFileName, directory)
+        inputFile.close()
+
     def __webFileStreamUpload(self, stream, destFileName, directory):
         if self.webApi == "php":
             multipartParams = {
@@ -89,7 +89,7 @@ class Web:
                               }
             page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams)
 
-            if "Backdoor uploaded" not in page:
+            if "File uploaded" not in page:
                 warnMsg  = "unable to upload the backdoor through "
                 warnMsg += "the uploader agent on '%s'" % directory
                 logger.warn(warnMsg)
@@ -179,7 +179,7 @@ class Web:
             self.webUploaderUrl = self.webUploaderUrl.replace("./", "/").replace("\\", "/")
             uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True)
 
-            if "sqlmap backdoor uploader" not in uplPage:
+            if "sqlmap file uploader" not in uplPage:
                 warnMsg  = "unable to upload the uploader "
                 warnMsg += "agent on '%s'" % directory
                 logger.warn(warnMsg)
@@ -200,6 +200,5 @@ class Web:
             logger.info(infoMsg)
 
             break
-        
+
         backdoorStream.name = backdoorStream.old_name
-        

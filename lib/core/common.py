@@ -32,6 +32,7 @@ import time
 import urlparse
 import ntpath
 import posixpath
+
 from tempfile import NamedTemporaryFile
 
 from extra.cloak.cloak import decloak

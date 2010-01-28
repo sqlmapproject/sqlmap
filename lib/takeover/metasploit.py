@@ -36,6 +36,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import getLocalIP
 from lib.core.common import getRemoteIP
+from lib.core.common import normalizePath
 from lib.core.common import pollProcess
 from lib.core.common import randomRange
 from lib.core.common import randomStr
@@ -646,6 +647,8 @@ class Metasploit:
             self.exeFilePathRemote = "%s/%s" % (self.webDirectory, os.path.basename(self.exeFilePathLocal))
         else:
             self.exeFilePathRemote = "%s/%s" % (conf.tmpPath, os.path.basename(self.exeFilePathLocal))
+
+        self.exeFilePathRemote = normalizePath(self.exeFilePathRemote)
 
         logger.info("uploading payload stager to '%s'" % self.exeFilePathRemote)
 
