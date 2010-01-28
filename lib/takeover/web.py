@@ -25,6 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import os
 import re
 
+from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import fileToStr
