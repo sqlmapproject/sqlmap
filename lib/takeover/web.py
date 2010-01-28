@@ -26,6 +26,7 @@ import os
 import re
 from tempfile import NamedTemporaryFile
 
+from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import fileToStr
 from lib.core.common import getDirs
@@ -38,7 +39,6 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.shell import autoCompletion
-from extra.cloak.cloak import decloak
 from lib.request.connect import Connect as Request
 
 

