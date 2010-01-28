@@ -24,7 +24,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re, sre_constants
 from xml.dom import minidom
 
-from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.data import logger
 
