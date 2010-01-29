@@ -79,7 +79,7 @@ class UPX:
         pollProcess(process)
         upxStdout, upxStderr = process.communicate()
 
-        if (self, hasattr('__upxTempExe')):
+        if hasattr(self, '__upxTempExe'):
             os.remove(self.__upxTempExe.name)
 
         msg = "failed to compress the file"

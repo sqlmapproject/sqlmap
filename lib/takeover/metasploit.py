@@ -453,7 +453,7 @@ class Metasploit:
         if conf.privEsc:
             print
 
-            infoMsg  = "trying to escalate privileges using Meterpreter"
+            infoMsg  = "trying to escalate privileges using Meterpreter "
             infoMsg += "'getsystem' command which tries different "
             infoMsg += "techniques, including kitrap0d"
             logger.info(infoMsg)
