@@ -75,12 +75,12 @@ class UPX:
         logger.debug("executing local command: %s" % self.__upxCmd)
         process = execute(self.__upxCmd, shell=True, stdout=PIPE, stderr=STDOUT)
         
-        if (self, hasattr('__upxTempExe')):
-            os.remove(self.__upxTempExe.name)
-
         dataToStdout("\r[%s] [INFO] compression in progress " % time.strftime("%X"))
         pollProcess(process)
         upxStdout, upxStderr = process.communicate()
+
+        if (self, hasattr('__upxTempExe')):
+            os.remove(self.__upxTempExe.name)
 
         msg = "failed to compress the file"
 
