@@ -103,7 +103,7 @@ class xp_cmdshell:
         self.xpCmdshellExecCmd(cmd)
 
     def __xpCmdshellCheck(self):
-        query    = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec + 2))
+        query    = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec * 2))
         duration = timeUse(query)
 
         if duration >= conf.timeSec:
@@ -112,13 +112,14 @@ class xp_cmdshell:
             return False
 
     def xpCmdshellForgeCmd(self, cmd):
-        return "EXEC %s '%s'" % (self.xpCmdshellStr, cmd)
+        forgedCmd = "EXEC %s '%s'" % (self.xpCmdshellStr, cmd)
+        forgedCmd = urlencode(forgedCmd, convall=True)
+
+        return forgedCmd
 
     def xpCmdshellExecCmd(self, cmd, silent=False, forgeCmd=False):
         if forgeCmd:
             cmd = self.xpCmdshellForgeCmd(cmd)
-
-        cmd = urlencode(cmd, convall=True)
 
         inject.goStacked(cmd, silent)
 
