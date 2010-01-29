@@ -190,8 +190,7 @@ class Metasploit:
             infoMsg  = "forcing Metasploit payload to Meterpreter because "
             infoMsg += "it is the only payload that can be used to "
             infoMsg += "escalate privileges, either via 'incognito' "
-            infoMsg += "extension or via 'kitrap0d' script, "
-            infoMsg += "http://tinyurl.com/kitrap0d for details"
+            infoMsg += "extension or via 'getsystem' command"
             logger.info(infoMsg)
 
             __payloadStr = "windows/meterpreter"
