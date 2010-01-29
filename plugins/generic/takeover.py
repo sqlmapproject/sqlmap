@@ -167,23 +167,24 @@ class Takeover(Abstraction, Metasploit, Registry):
                     logger.debug(debugMsg)
 
                 elif kb.dbms == "PostgreSQL":
-                    warnMsg  = "by default PostgreSQL on Windows runs as postgres "
-                    warnMsg += "user which has no access to LSASS: it is "
-                    warnMsg += "unlikely that the privilege escalation "
-                    warnMsg += "via 'incognito' extension will be successful"
-                    logger.warn(warnMsg)
+                    debugMsg  = "by default PostgreSQL on Windows runs as postgres "
+                    debugMsg += "user which has no access to LSASS: it is "
+                    debugMsg += "unlikely that the privilege escalation "
+                    debugMsg += "via 'incognito' extension will be successful"
+                    logger.debug(debugMsg)
 
                 elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
-                    warnMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
-                    warnMsg += "runs as Network Service which has Windows "
-                    warnMsg += "Impersonation Tokens"
-                    logger.warn(warnMsg)
+                    debugMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
+                    debugMsg += "runs as Network Service which has Windows "
+                    debugMsg += "Impersonation Tokens"
+                    logger.debug(debugMsg)
 
                     uploaded = self.uploadChurrasco()
 
                     if not uploaded:
-                        warnMsg  = "beware that the privilege escalation "
-                        warnMsg += "might not work"
+                        debugMsg  = "beware that the privilege escalation "
+                        debugMsg += "might not work via Churrasco if "
+                        debugMsg += "MS09-012 patch is installed"
                         logger.warn(warnMsg)
 
             elif kb.os != "Windows" and conf.privEsc:
