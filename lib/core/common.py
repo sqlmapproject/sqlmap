@@ -34,6 +34,7 @@ import ntpath
 import posixpath
 
 from tempfile import NamedTemporaryFile
+from tempfile import mkstemp
 
 from extra.cloak.cloak import decloak
 from lib.contrib import magic
@@ -884,4 +885,11 @@ def decloakToNamedTemporaryFile(filepath, name=None):
     if name:
         retVal.old_name = retVal.name
         retVal.name = name
+    return retVal
+
+def decloakToMkstemp(filepath, **kwargs):
+    name = mkstemp(**kwargs)[1]
+    retVal = open(name, 'w+b')
+    retVal.write(decloak(filepath))
+    retVal.seek(0)
     return retVal

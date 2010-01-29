@@ -30,6 +30,7 @@ from subprocess import STDOUT
 from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
+from lib.core.common import decloakToMkstemp
 from lib.core.common import pollProcess
 from lib.core.data import logger
 from lib.core.data import paths
@@ -49,7 +50,9 @@ class UPX:
             self.__upxPath = "%s/upx/macosx/upx" % paths.SQLMAP_CONTRIB_PATH
 
         elif "win" in PLATFORM:
-            self.__upxPath = "%s\upx\windows\upx.exe" % paths.SQLMAP_CONTRIB_PATH
+            self.__upxTempExe = decloakToMkstemp("%s\upx\windows\upx.exe_" % paths.SQLMAP_CONTRIB_PATH, suffix=".exe")
+            self.__upxPath = self.__upxTempExe.name
+            self.__upxTempExe.close() #needed for execution rights
 
         elif "linux" in PLATFORM:
             self.__upxPath = "%s/upx/linux/upx" % paths.SQLMAP_CONTRIB_PATH
@@ -71,6 +74,9 @@ class UPX:
 
         logger.debug("executing local command: %s" % self.__upxCmd)
         process = execute(self.__upxCmd, shell=True, stdout=PIPE, stderr=STDOUT)
+        
+        if (self, hasattr('__upxTempExe')):
+            os.remove(self.__upxTempExe.name)
 
         dataToStdout("\r[%s] [INFO] compression in progress " % time.strftime("%X"))
         pollProcess(process)
