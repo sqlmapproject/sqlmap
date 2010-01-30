@@ -1,47 +1,51 @@
 sqlmap (0.8-1) stable; urgency=low
 
-  * Added support to enumerate and dump all databases' tables containing
-    user provided column(s) by specifying for instance '--dump -C
-    user,pass'. Useful to identify for instance tables containing custom
-    application credentials (Bernardo).
-  * Added support to parse -C (column name(s)) when fetching
+  * Support to enumerate and dump all databases' tables containing user
+    provided column(s) by specifying for instance '--dump -C 'user,pass'.
+    Useful to identify for instance tables containing custom application
+    credentials (Bernardo).
+  * Support to parse -C (column name(s)) when fetching
     columns of a table with --columns: it will enumerate only columns like
     the provided one(s) within the specified table (Bernardo).
-  * Added support for takeover features on PostgreSQL 8.4 (Bernardo).
-  * Added automatic support in --os-pwn to use the web uploader/backdoor
-    to upload and execute the Metasploit payload stager when stacked
-    queries SQL injection is not supported, for instance on MySQL/PHP and
-    MySQL/ASP (Bernardo).
-  * Added support to automatically decode deflate, gzip and x-gzip HTTP
-    responses (Miroslav).
+  * Support for takeover features on PostgreSQL 8.4 (Bernardo).
+  * Enhanced --priv-esc to rely on new Metasploit Meterpreter's
+    'getsystem' command to elevate privileges of the user running the
+    back-end DBMS instance to SYSTEM (Bernardo).
+  * Automatic support in --os-pwn to use the web uploader/backdoor to
+    upload and execute the Metasploit payload stager when stacked queries
+    SQL injection is not supported, for instance on MySQL/PHP and
+    MySQL/ASP but there is a writable folder within the web server
+    document root (Bernardo).
+  * Fixed web backdoor functionality for --os-cmd, --os-shell and --os-pwn
+    useful when web application does not support stacked queries (Bernardo).
+  * Updated active fingerprint and comment injection fingerprint for
+    MySQL 5.1, MySQL 5.4 and MySQL 5.5 (Bernardo).
+  * Updated active fingerprint for PostgreSQL 8.4 (Bernardo).
   * Support for NTLM authentication via python-ntlm third party library,
     http://code.google.com/p/python-ntlm/, --auth-type NTLM (Bernardo).
+  * Support to automatically decode deflate, gzip and x-gzip HTTP
+    responses (Miroslav).
   * Support for Certificate authentication, --auth-cert option added
     (Miroslav).
   * Added support for regular expression based scope when parsing Burp or
     Web Scarab proxy log file (-l), --scope (Miroslav).
-  * Updated active fingerprint and comment injection fingerprint for
-    MySQL 5.1, MySQL 5.4 and MySQL 5.5 (Bernardo).
-  * Updated active fingerprint for PostgreSQL 8.4 (Bernardo).
   * Added support to ignore Set-Cookie in HTTP responses,
     --drop-set-cookie (Miroslav).
   * Added support to specify which Google dork result page to parse,
     --gpage to be used together with -g (Miroslav).
-  * Fixed web backdoor functionality for --os-cmd, --os-shell and --os-pwn
-    useful when web application does not support stacked queries (Bernardo).
   * Fixed URL encoding/decoding of GET/POST parameters and Cookie header
     (Miroslav).
-  * Refactor --update to use python-svn third party library if available
+  * Refactored --update to use python-svn third party library if available
     or 'svn' command to update sqlmap to the latest development version
     from subversion repository (Bernardo and Miroslav).
   * Major bugs fixed (Bernardo and Miroslav).
   * Cleanup of UDF source code repository,
     https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack (Bernardo
     and Miroslav).
-  * Major code cleanup and refactoring (Bernardo and Miroslav).
+  * Major code cleanup (Miroslav).
   * Added simple file encryption/compression utility, extra/cloak/cloak.py
-    used by sqlmap to decrypt on the fly Churrasco executable and web
-    shells consequently reduced drastically the number of anti virus
+    used by sqlmap to decrypt on the fly Churrasco and UPX executables and
+    web shells consequently reducing drastically the number of anti virus
     softwares that mistakenly mark sqlmap as a malware (Miroslav).
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon,  1 Mar 2010 10:00:00 +0000
