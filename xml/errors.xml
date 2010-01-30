@@ -6,6 +6,7 @@
         <error regexp="SQL syntax.*MySQL"/>
         <error regexp="Warning.*mysql_.*"/>
         <error regexp="valid MySQL result"/>
+        <error regexp="MySqlClient\."/>
     </dbms>
 
     <!-- PostgreSQL -->
@@ -13,6 +14,7 @@
         <error regexp="PostgreSQL.*ERROR"/>
         <error regexp="Warning.*pg_.*"/>
         <error regexp="valid PostgreSQL result"/>
+        <error regexp="Npgsql\."/>
     </dbms>
 
     <!-- Microsoft SQL Server -->

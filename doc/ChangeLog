@@ -1,7 +1,7 @@
 sqlmap (0.8-1) stable; urgency=low
 
   * Support to enumerate and dump all databases' tables containing user
-    provided column(s) by specifying for instance '--dump -C 'user,pass'.
+    provided column(s) by specifying for instance '--dump -C user,pass'.
     Useful to identify for instance tables containing custom application
     credentials (Bernardo).
   * Support to parse -C (column name(s)) when fetching
@@ -10,7 +10,7 @@ sqlmap (0.8-1) stable; urgency=low
   * Support for takeover features on PostgreSQL 8.4 (Bernardo).
   * Enhanced --priv-esc to rely on new Metasploit Meterpreter's
     'getsystem' command to elevate privileges of the user running the
-    back-end DBMS instance to SYSTEM (Bernardo).
+    back-end DBMS instance on Windows to SYSTEM (Bernardo).
   * Automatic support in --os-pwn to use the web uploader/backdoor to
     upload and execute the Metasploit payload stager when stacked queries
     SQL injection is not supported, for instance on MySQL/PHP and
