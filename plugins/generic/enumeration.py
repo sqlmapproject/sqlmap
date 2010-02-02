@@ -1343,7 +1343,7 @@ class Enumeration:
                 plusOne = True
             else:
                 plusOne = False
-            indexRange = getRange(count, plusOne=plusOne)
+            indexRange = getRange(count, dump=True, plusOne=plusOne)
 
             for index in indexRange:
                 for column in colList:
