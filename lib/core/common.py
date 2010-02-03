@@ -245,7 +245,8 @@ def getDocRoot():
 
                 if absFilePathWin:
                     docRoot = "C:/%s" % docRoot.replace("\\", "/")
-
+                    
+                docRoot = docRoot.replace("//", "/")
                 break
 
     if docRoot:
