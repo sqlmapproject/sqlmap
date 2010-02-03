@@ -235,7 +235,7 @@ def getDocRoot():
             absFilePath = normalizePath(absFilePath)
             absFilePathWin = None
 
-            if re.match("[A-Za-z]:(\\[\w.\\]*)?", absFilePath):
+            if re.match("[A-Za-z]:([\\/][\w.\\/]*)?", absFilePath):
                 absFilePathWin = absFilePath
                 absFilePath    = absFilePath[2:].replace("\\", "/")
             
