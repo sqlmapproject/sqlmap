@@ -81,6 +81,8 @@ def parseResponse(page, headers):
             for match in reobj.finditer(page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
+                if re.search("\A[A-Za-z]:", absFilePath):
+                    absFilePath = absFilePath.replace("/", "\\")
                 if absFilePath not in kb.absFilePaths:
                     dirname = directoryPath(absFilePath)
                     kb.absFilePaths.add(dirname)
