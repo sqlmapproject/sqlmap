@@ -880,6 +880,14 @@ def sanitizeAsciiString(string):
 
 def decloakToNamedTemporaryFile(filepath, name=None):
     retVal = NamedTemporaryFile()
+    def __del__():
+        try:
+            if hasattr(retVal, 'old_name'):
+                retVal.name = old_name
+            retVal.close()
+        except OSError:
+            pass
+    retVal.__del__ = __del__
     retVal.write(decloak(filepath))
     retVal.seek(0)
     if name:
