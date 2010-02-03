@@ -181,7 +181,7 @@ class Web:
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl, uploaderName)
             self.webUploaderUrl = self.webUploaderUrl.replace("./", "/").replace("\\", "/")
-            uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True)
+            uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True, raise404=False)
 
             if "sqlmap file uploader" not in uplPage:
                 warnMsg  = "unable to upload the uploader "
