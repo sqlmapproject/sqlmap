@@ -236,7 +236,7 @@ def getDocRoot():
             absFilePathWin = None
 
             if re.match("[A-Za-z]:([\\/][\w.\\/]*)?", absFilePath):
-                absFilePathWin = absFilePath
+                absFilePathWin = absFilePath.replace("/", "\\")
                 absFilePath    = absFilePath[2:].replace("\\", "/")
             
             if pagePath in absFilePath:
@@ -282,7 +282,7 @@ def getDirs():
 
         for absFilePath in kb.absFilePaths:
             if absFilePath:
-                directories.add(os.path.dirname(absFilePath))
+                directories.add(directoryPath(absFilePath))
     else:
         warnMsg = "unable to retrieve any web server path"
         logger.warn(warnMsg)
