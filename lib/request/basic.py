@@ -84,8 +84,7 @@ def parseResponse(page, headers):
                 if re.search("\A[A-Za-z]:", absFilePath):
                     absFilePath = absFilePath.replace("/", "\\")
                 if absFilePath not in kb.absFilePaths:
-                    dirname = directoryPath(absFilePath)
-                    kb.absFilePaths.add(dirname)
+                    kb.absFilePaths.add(absFilePath)
                     
 
 def decodePage(page, encoding):

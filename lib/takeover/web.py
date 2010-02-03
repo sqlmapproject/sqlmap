@@ -175,9 +175,10 @@ class Web:
             payload     = agent.payload(newValue=query)
             page        = Request.queryPage(payload)
             
-            requestDir  = normalizePath(directory.replace(kb.docRoot, "/").replace("\\", "/"))
+            requestDir  = directory.replace('\\', '/').replace(kb.docRoot.replace('\\', '/'), "/").replace("//", "/")
             if re.search("\A[A-Za-z]:", requestDir):
                 requestDir = requestDir[2:]
+            requestDir  = normalizePath(requestDir)
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl, uploaderName)
             self.webUploaderUrl = self.webUploaderUrl.replace("./", "/").replace("\\", "/")
