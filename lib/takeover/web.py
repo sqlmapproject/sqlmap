@@ -162,9 +162,6 @@ class Web:
         uploaderName = "uploader.%s" % self.webApi
         uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_'))
         
-        import pdb
-        pdb.set_trace()
-        
         for directory in directories:
             # Upload the uploader agent
             outFile     = os.path.normpath("%s/%s" % (directory, uploaderName))
