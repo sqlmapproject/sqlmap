@@ -72,10 +72,10 @@ class Metasploit:
         self.localIP        = getLocalIP()
         self.remoteIP       = getRemoteIP()
 
-        self.__msfCli       = os.path.normpath(os.path.join(conf.msfPath, "msfcli"))
-        self.__msfConsole   = os.path.normpath(os.path.join(conf.msfPath, "msfconsole"))
-        self.__msfEncode    = os.path.normpath(os.path.join(conf.msfPath, "msfencode"))
-        self.__msfPayload   = os.path.normpath(os.path.join(conf.msfPath, "msfpayload"))
+        self.__msfCli       = normalizePath(os.path.join(conf.msfPath, "msfcli"))
+        self.__msfConsole   = normalizePath(os.path.join(conf.msfPath, "msfconsole"))
+        self.__msfEncode    = normalizePath(os.path.join(conf.msfPath, "msfencode"))
+        self.__msfPayload   = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
 
         self.__msfPayloadsList    = {
                                       "windows": {

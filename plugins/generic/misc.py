@@ -25,6 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import os
 import re
 
+from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import posixToNtSlashes
 from lib.core.common import readInput
@@ -68,7 +69,7 @@ class Miscellaneous:
             kb.os = "Windows"
 
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
-        conf.tmpPath = os.path.normpath(conf.tmpPath)
+        conf.tmpPath = normalizePath(conf.tmpPath)
 
         setRemoteTempPath()
 

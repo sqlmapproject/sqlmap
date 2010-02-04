@@ -35,6 +35,7 @@ import urlparse
 from ConfigParser import ConfigParser
 
 from lib.core.common import getFileType
+from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
@@ -427,11 +428,11 @@ def __setMetasploit():
             raise sqlmapMissingPrivileges, errMsg
 
     if conf.msfPath:
-        condition  = os.path.exists(os.path.normpath(conf.msfPath))
-        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfcli")))
-        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfconsole")))
-        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfencode")))
-        condition &= os.path.exists(os.path.normpath(os.path.join(conf.msfPath, "msfpayload")))
+        condition  = os.path.exists(normalizePath(conf.msfPath))
+        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfcli")))
+        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfconsole")))
+        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfencode")))
+        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfpayload")))
 
         if condition:
             debugMsg  = "provided Metasploit Framework 3 path "
@@ -466,11 +467,11 @@ def __setMetasploit():
 
         for envPath in envPaths:
             envPath    = envPath.replace(";", "")
-            condition  = os.path.exists(os.path.normpath(envPath))
-            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfcli")))
-            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfconsole")))
-            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfencode")))
-            condition &= os.path.exists(os.path.normpath(os.path.join(envPath, "msfpayload")))
+            condition  = os.path.exists(normalizePath(envPath))
+            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfcli")))
+            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfconsole")))
+            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfencode")))
+            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfpayload")))
 
             if condition:
                 infoMsg  = "Metasploit Framework 3 has been found "
@@ -904,19 +905,19 @@ def __cleanupOptions():
         conf.delay = float(conf.delay)
 
     if conf.rFile:
-        conf.rFile = os.path.normpath(ntToPosixSlashes(conf.rFile))
+        conf.rFile = normalizePath(ntToPosixSlashes(conf.rFile))
 
     if conf.wFile:
-        conf.wFile = os.path.normpath(ntToPosixSlashes(conf.wFile))
+        conf.wFile = normalizePath(ntToPosixSlashes(conf.wFile))
 
     if conf.dFile:
-        conf.dFile = os.path.normpath(ntToPosixSlashes(conf.dFile))
+        conf.dFile = normalizePath(ntToPosixSlashes(conf.dFile))
 
     if conf.msfPath:
-        conf.msfPath = os.path.normpath(ntToPosixSlashes(conf.msfPath))
+        conf.msfPath = normalizePath(ntToPosixSlashes(conf.msfPath))
 
     if conf.tmpPath:
-        conf.tmpPath = os.path.normpath(ntToPosixSlashes(conf.tmpPath))
+        conf.tmpPath = normalizePath(ntToPosixSlashes(conf.tmpPath))
 
     if conf.googleDork or conf.list:
         conf.multipleTargets = True
