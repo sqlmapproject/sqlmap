@@ -42,6 +42,7 @@ from lib.core.exception import unhandledException
 from lib.core.progress import ProgressBar
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
+
 def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None):
     """
     Bisection algorithm that can be used to perform blind SQL injection
@@ -110,6 +111,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
 
     queriesCount = [0]    # As list to deal with nested scoping rules
+
     def getChar(idx, asciiTbl=asciiTbl):
         maxValue = asciiTbl[len(asciiTbl)-1]
         minValue = 0
@@ -133,6 +135,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     return None
                 else:
                     return chr(minValue + 1)
+
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):
             eta = 0
@@ -144,11 +147,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progressTime.append(charTime)
         progress.update(index)
         progress.draw(eta)
+
     if conf.threads > 1 and isinstance(length, int) and length > 1:
         value   = [ None ] * length
         index   = [ firstChar ]    # As list for python nested function scoping
         idxlock = threading.Lock()
         iolock  = threading.Lock()
+
         def downloadThread():
             try:
                 while True:
@@ -201,6 +206,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 errMsg = unhandledException()
                 logger.error("thread %d: %s" % (numThread + 1, errMsg))
                 traceback.print_exc()
+
         # Start the threads
         for numThread in range(numThreads):
             thread = threading.Thread(target=downloadThread)
