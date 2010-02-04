@@ -31,6 +31,7 @@ from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import fileToStr
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
+from lib.core.common import isWindowsPath
 from lib.core.common import normalizePath
 from lib.core.common import readInput
 from lib.core.convert import hexencode
@@ -165,7 +166,6 @@ class Web:
         
         for directory in directories:
             # Upload the uploader agent
-            
             outFile     = normalizePath("%s/%s" % (directory, uploaderName))
             uplQuery    = uploaderContent.replace("WRITABLE_DIR", directory)
             query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
@@ -176,7 +176,7 @@ class Web:
             page        = Request.queryPage(payload)
             
             requestDir  = directory.replace('\\', '/').replace(kb.docRoot.replace('\\', '/'), "/").replace("//", "/")
-            if re.search("\A[A-Za-z]:", requestDir):
+            if isWindowsPath(requestDir):
                 requestDir = requestDir[2:]
             requestDir  = normalizePath(requestDir)
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)

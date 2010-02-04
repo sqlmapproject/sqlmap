@@ -29,6 +29,7 @@ import StringIO
 import zlib
 
 from lib.core.common import directoryPath
+from lib.core.common import isWindowsPath
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
 from lib.core.data import kb
@@ -81,7 +82,7 @@ def parseResponse(page, headers):
             for match in reobj.finditer(page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
-                if re.search("\A[A-Za-z]:", absFilePath):
+                if isWindowsPath(absFilePath):
                     absFilePath = absFilePath.replace("/", "\\")
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)

@@ -235,7 +235,7 @@ def getDocRoot():
             absFilePath = normalizePath(absFilePath)
             absFilePathWin = None
 
-            if re.match("[A-Za-z]:([\\/][\w.\\/]*)?", absFilePath):
+            if isWindowsPath(absFilePath):
                 absFilePathWin = absFilePath.replace("/", "\\")
                 absFilePath    = absFilePath[2:].replace("\\", "/")
             
@@ -282,7 +282,10 @@ def getDirs():
 
         for absFilePath in kb.absFilePaths:
             if absFilePath:
-                directories.add(directoryPath(absFilePath))
+                directory = directoryPath(absFilePath)
+                if isWindowsPath(directory):
+                    directory = directory.replace('\\', '/')
+                directories.add(directory)
     else:
         warnMsg = "unable to retrieve any web server path"
         logger.warn(warnMsg)
@@ -902,3 +905,6 @@ def decloakToMkstemp(filepath, **kwargs):
     retVal.write(decloak(filepath))
     retVal.seek(0)
     return retVal
+
+def isWindowsPath(filepath):
+    return re.search("\A[A-Za-z]:", filepath) is not None
