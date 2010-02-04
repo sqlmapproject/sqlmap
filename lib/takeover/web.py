@@ -185,7 +185,7 @@ class Web:
             payload     = agent.payload(newValue=query)
             page        = Request.queryPage(payload)
             
-            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixBrackets(kb.docRoot), "/").replace("//", "/")
+            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixSlashes(kb.docRoot), "/").replace("//", "/")
             if isWindowsPath(requestDir):
                 requestDir = requestDir[2:]
             requestDir  = normalizePath(requestDir)
