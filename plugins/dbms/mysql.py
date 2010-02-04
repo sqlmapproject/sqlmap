@@ -29,6 +29,7 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
+from lib.core.common import ntToPosixSlashes
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.data import conf
@@ -496,7 +497,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
                     # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
                     self.__basedir = inject.getValue("SELECT @@basedir")
-                    self.__basedir = os.path.normpath(self.__basedir.replace("\\", "/"))
+                    self.__basedir = os.path.normpath(ntToPosixSlashes(self.__basedir))
 
                     if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
                         kb.os = "Windows"
@@ -517,7 +518,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
                 # NOTE: specifying the relative path as './udf.dll'
                 # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
                 self.__datadir = "."
-                self.__datadir = os.path.normpath(self.__datadir.replace("\\", "/"))
+                self.__datadir = os.path.normpath(ntToPosixSlashes(self.__datadir))
 
                 if re.search("[\w]\:\/", self.__datadir, re.I):
                     kb.os = "Windows"

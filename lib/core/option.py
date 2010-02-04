@@ -35,6 +35,7 @@ import urlparse
 from ConfigParser import ConfigParser
 
 from lib.core.common import getFileType
+from lib.core.common import ntToPosixSlashes
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
@@ -903,19 +904,19 @@ def __cleanupOptions():
         conf.delay = float(conf.delay)
 
     if conf.rFile:
-        conf.rFile = os.path.normpath(conf.rFile.replace("\\", "/"))
+        conf.rFile = os.path.normpath(ntToPosixSlashes(conf.rFile))
 
     if conf.wFile:
-        conf.wFile = os.path.normpath(conf.wFile.replace("\\", "/"))
+        conf.wFile = os.path.normpath(ntToPosixSlashes(conf.wFile))
 
     if conf.dFile:
-        conf.dFile = os.path.normpath(conf.dFile.replace("\\", "/"))
+        conf.dFile = os.path.normpath(ntToPosixSlashes(conf.dFile))
 
     if conf.msfPath:
-        conf.msfPath = os.path.normpath(conf.msfPath.replace("\\", "/"))
+        conf.msfPath = os.path.normpath(ntToPosixSlashes(conf.msfPath))
 
     if conf.tmpPath:
-        conf.tmpPath = os.path.normpath(conf.tmpPath.replace("\\", "/"))
+        conf.tmpPath = os.path.normpath(ntToPosixSlashes(conf.tmpPath))
 
     if conf.googleDork or conf.list:
         conf.multipleTargets = True

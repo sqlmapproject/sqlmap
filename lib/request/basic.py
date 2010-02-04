@@ -30,6 +30,7 @@ import zlib
 
 from lib.core.common import directoryPath
 from lib.core.common import isWindowsPath
+from lib.core.common import posixToNtSlashes
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
 from lib.core.data import kb
@@ -83,7 +84,7 @@ def parseResponse(page, headers):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
                 if isWindowsPath(absFilePath):
-                    absFilePath = absFilePath.replace("/", "\\")
+                    absFilePath = posixToNtSlashes(absFilePath)
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)
                     

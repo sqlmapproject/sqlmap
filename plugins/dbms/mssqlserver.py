@@ -31,6 +31,7 @@ from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import getRange
+from lib.core.common import posixToNtSlashes
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import urlencode
@@ -496,9 +497,9 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         logger.debug(debugMsg)
 
         debugSize    = 0xFF00
-        tmpPath      = conf.tmpPath.replace("/", "\\")
+        tmpPath      = posixToNtSlashes(conf.tmpPath)
         dFileName    = os.path.split(dFile)[1]
-        dFile        = dFile.replace("/", "\\")
+        dFile        = posixToNtSlashes(dFile)
         wFileSize    = os.path.getsize(wFile)
         wFilePointer = open(wFile, "rb")
         wFileContent = wFilePointer.read()

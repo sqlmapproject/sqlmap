@@ -236,15 +236,15 @@ def getDocRoot():
             absFilePathWin = None
 
             if isWindowsPath(absFilePath):
-                absFilePathWin = absFilePath.replace("/", "\\")
-                absFilePath    = absFilePath[2:].replace("\\", "/")
+                absFilePathWin = posixToNtSlashes(absFilePath)
+                absFilePath    = ntToPosixSlashes(absFilePath[2:])
             
             if pagePath in absFilePath:
                 index   = absFilePath.index(pagePath)
                 docRoot = absFilePath[:index]
 
                 if absFilePathWin:
-                    docRoot = "C:/%s" % docRoot.replace("\\", "/")
+                    docRoot = "C:/%s" % ntToPosixSlashes(docRoot)
                     
                 docRoot = normalizePath(docRoot)
                 break
@@ -908,3 +908,9 @@ def decloakToMkstemp(filepath, **kwargs):
 
 def isWindowsPath(filepath):
     return re.search("\A[A-Za-z]:", filepath) is not None
+
+def posixToNtSlashes(filepath):
+    return filepath.replace('/', '\\')
+
+def ntToPosixSlashes(filepath):
+    return filepath.replace('\\', '/')

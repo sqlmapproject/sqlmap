@@ -25,6 +25,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import os
 import re
 
+from lib.core.common import ntToPosixSlashes
+from lib.core.common import posixToNtSlashes
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -65,7 +67,7 @@ class Miscellaneous:
         if re.search("^[\w]\:[\/\\\\]+", conf.tmpPath, re.I):
             kb.os = "Windows"
 
-        conf.tmpPath = conf.tmpPath.replace("\\", "/")
+        conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
         conf.tmpPath = os.path.normpath(conf.tmpPath)
 
         setRemoteTempPath()
@@ -77,7 +79,7 @@ class Miscellaneous:
             if doubleslash:
                 tempFile = tempFile.replace("/", "\\\\")
             else:
-                tempFile = tempFile.replace("/", "\\")
+                tempFile = posixToNtSlashes(tempFile)
 
             cmd = "del /F /Q %s" % tempFile
         else:
