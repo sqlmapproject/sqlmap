@@ -79,8 +79,9 @@ class Web:
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
         inputFile = open(fileToUpload, "r")
-        self.__webFileStreamUpload(inputFile, destFileName, directory)
+        retVal = self.__webFileStreamUpload(inputFile, destFileName, directory)
         inputFile.close()
+        return retVal
 
     def __webFileStreamUpload(self, stream, destFileName, directory):
         if self.webApi == "php":
@@ -95,6 +96,9 @@ class Web:
                 warnMsg  = "unable to upload the backdoor through "
                 warnMsg += "the uploader agent on '%s'" % directory
                 logger.warn(warnMsg)
+                return False
+            else:
+                return True
 
         elif self.webApi == "asp":
             backdoorRemotePath = "%s/%s" % (directory, destFileName)
@@ -107,9 +111,12 @@ class Web:
                 warnMsg  = "unable to upload the backdoor through "
                 warnMsg += "the uploader agent on '%s'" % directory
                 logger.warn(warnMsg)
+                return False
+            else:
+                return True
 
         elif self.webApi == "jsp":
-            pass
+            return False
 
     def webInit(self):
         """
@@ -195,13 +202,17 @@ class Web:
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
 
-            self.__webFileStreamUpload(backdoorStream, backdoorName, directory)
-            self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
-            self.webDirectory = directory
-
-            infoMsg  = "the backdoor has probably been successfully "
-            infoMsg += "uploaded on '%s', go with your browser " % directory
-            infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
-            logger.info(infoMsg)
+            if self.__webFileStreamUpload(backdoorStream, backdoorName, directory):
+                self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
+                self.webDirectory = directory
+    
+                infoMsg  = "the backdoor has probably been successfully "
+                infoMsg += "uploaded on '%s', go with your browser " % directory
+                infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
+                logger.info(infoMsg)
+            else:
+                infoMsg  = "the backdoor hasn't been successfully "
+                infoMsg += "uploaded on '%s'" % directory
+                logger.warn(infoMsg)
 
             break
