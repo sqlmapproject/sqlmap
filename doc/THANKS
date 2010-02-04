@@ -129,7 +129,8 @@ Guido Landi <lists@keamera.org>
     'sp_replwritetovarbin' stored procedure heap-based buffer overflow
     (MS09-004) exploit development
     for presenting with me at SOURCE Conference 2009 in Barcelona (Spain)
-    on September 21, 2009
+    on September 21, 2009 and at CONfidence 2009 in Warsaw (Poland) on
+    November 20, 2009
 
 Lee Lawson <Lee.Lawson@dns.co.uk>
     for reporting a minor bug
