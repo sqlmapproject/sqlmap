@@ -560,6 +560,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             self.udfLocalFile   += "/mysql/linux/lib_mysqludf_sys.so"
             self.udfSharedLibExt = "so"
 
+        self.checkNeededUdfs()
         self.udfInjectCore(self.sysUdfs)
         
     def uncPathRequest(self):

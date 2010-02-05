@@ -116,6 +116,13 @@ class UDF:
 
         return output
 
+    def checkNeededUdfs(self):
+        if not conf.osPwn:
+            self.sysUdfs.pop("sys_bineval")
+
+        if not conf.osCmd and not conf.osShell and not conf.regRead:
+            self.sysUdfs.pop("sys_eval")
+
     def udfCreateFromSharedLib(self):
         errMsg = "udfSetRemotePath() method must be defined within the plugin"
         raise sqlmapUnsupportedFeatureException(errMsg)

@@ -100,6 +100,9 @@ class Takeover(Abstraction, Metasploit, Registry):
         if not web or (web and self.webBackdoorUrl is not None):
             self.runCmd(conf.osCmd)
 
+        if not conf.osShell and not conf.osPwn and not conf.cleanup:
+            self.cleanup()
+
     def osShell(self):
         stackedTest()
 
@@ -119,6 +122,9 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         if not web or (web and self.webBackdoorUrl is not None):
             self.shell()
+
+        if not conf.osPwn and not conf.cleanup:
+            self.cleanup()
 
     def osPwn(self):
         goUdf = False
@@ -227,6 +233,9 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         if not web or (web and self.webBackdoorUrl is not None):
             self.pwn(goUdf)
+
+        if not conf.cleanup:
+            self.cleanup()
 
     def osSmb(self):
         stackedTest()

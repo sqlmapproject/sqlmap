@@ -469,6 +469,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             self.udfLocalFile += "/postgresql/linux/%s/lib_postgresqludf_sys.so" % majorVer
             self.udfSharedLibExt = "so"
 
+        self.checkNeededUdfs()
         self.udfInjectCore(self.sysUdfs)
 
     def uncPathRequest(self):

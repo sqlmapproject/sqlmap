@@ -46,18 +46,6 @@ class Abstraction(Web, UDF, xp_cmdshell):
         Web.__init__(self)
         xp_cmdshell.__init__(self)
 
-    def __cmdShellCleanup(self):
-        if not conf.cleanup:
-            if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                self.cleanup()
-
-            elif kb.dbms == "Microsoft SQL Server":
-                self.cleanup(onlyFileTbl=True)
-
-            else:
-                errMsg = "Feature not yet implemented for the back-end DBMS"
-                raise sqlmapUnsupportedFeatureException, errMsg
-
     def execCmd(self, cmd, silent=False, forgeCmd=False):
         if self.webBackdoorUrl and not kb.stackedTest:
             self.webBackdoorRunCmd(cmd)
@@ -102,9 +90,6 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 print "No output"
         else:
             self.execCmd(cmd, forgeCmd=True)
-
-        if not conf.osShell and not conf.osPwn and not conf.cleanup:
-            self.__cmdShellCleanup()
 
     def shell(self):
         if self.webBackdoorUrl and not kb.stackedTest:
@@ -156,8 +141,6 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 break
 
             self.runCmd(command)
-
-        self.__cmdShellCleanup()
 
     def initEnv(self, mandatory=True, detailed=False, web=False):
         if self.envInitialized:
