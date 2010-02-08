@@ -1081,7 +1081,7 @@ Option: <tt>--referer</tt>
 
 <p>
 It is possible to fake the HTTP <tt>Referer</tt> header value with this
-option. By default no HTTP <tt>Referer</tt> heder is sent in HTTP
+option. By default no HTTP <tt>Referer</tt> header is sent in HTTP
 requests.
 
 <p>
@@ -1204,7 +1204,7 @@ Option: <tt>--headers</tt>
 
 <p>
 It is possible to provide extra HTTP headers by providing <tt>--headers</tt>
-options. Each header must be separated by a "\n" string and it's much easier
+options. Each header must be separated by a newline and it's much easier
 to provide them from the configuration INI file. Have a look at the sample
 <tt>sqlmap.conf</tt> file.
 
@@ -1483,8 +1483,8 @@ Option: <tt>--dbms</tt>
 
 <p>
 By default sqlmap automatically detects the web application's back-end
-database manangement system.
-At the moment the fully supported database management system are four:
+database management system.
+At the moment, fully supported database management systems are:
 
 <itemize>
 <item>MySQL
@@ -1497,9 +1497,9 @@ At the moment the fully supported database management system are four:
 It is possible to force the DBMS name if you already know it so that sqlmap
 will skip the fingerprint with an exception for MySQL and Microsoft SQL
 Server to only identify the version.
-To avoid also this check you can provide instead <tt>MySQL VERSION</tt> or
-<tt>Microsoft SQL Server VERSION</tt> where version is a valid version for
-the DBMS, for instance <tt>5.0</tt> for MySQL and <tt>2005</tt> for
+To avoid also this check you can provide instead <tt>MySQL &lt;version&gt;</tt> or
+<tt>Microsoft SQL Server &lt;version&gt;</tt>, where &lt;version&gt; is a valid version for
+the DBMS; for instance <tt>5.0</tt> for MySQL and <tt>2005</tt> for
 Microsoft SQL Server.
 
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
@@ -1535,7 +1535,7 @@ Option: <tt>--os</tt>
 
 <p>
 By default sqlmap automatically detects the web application's back-end
-database manangement system underlying operating system when requested by
+database management system underlying operating system when requested by
 any other functionality.
 At the moment the fully supported operating systems are two:
 
@@ -1797,8 +1797,8 @@ As you can see, when one of these options is specified, sqlmap skips the
 URL stability test.
 
 <p>
-<bf>Consider one of these options a must when you are dealing with a page
-which content that changes itself at each refresh without modifying the
+<bf>Consider one of these options a MUST when dealing with a page
+with content that changes itself at each refresh without modifying the
 user's input</bf>.
 
 
@@ -1808,7 +1808,7 @@ user's input</bf>.
 Options: <tt>--excl-str</tt> and <tt>--excl-reg</tt>
 
 <p>
-Another way to get around the dynamicity issue above explained is to exclude
+Another way to get around the dynamicity issue explained above is to exclude
 the dynamic part from the page content before processing it.
 
 <p>
@@ -1979,8 +1979,8 @@ time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';
 
 <p>
 It is also possible to set the seconds to delay the response by providing
-the <tt>--time-sec</tt> option followed by an integer. By default it delays
-five seconds.
+the <tt>--time-sec</tt> option followed by an integer. By default delay
+is set to five seconds.
 
 
 <sect2>Test for UNION query SQL injection
@@ -2215,12 +2215,12 @@ available databases [4]:
 
 <p>
 As you can see, sqlmap identified that the parameter is affected by a
-partial inband SQL injection, consequently counted the number of query
-output entries and retrieved once per time by forcing the parameter
+partial inband SQL injection. Consequently, it counted the number of query
+output entries and retrieved them once per time. It forces the parameter
 (<tt>id</tt>) value <tt>1</tt> to its negative value <tt>-1</tt> so that
-it does not returns, presumibly, any output leaving our own <tt>UNION ALL
-SELECT</tt> statement to produce one entry at a time and display it in the
-page content.
+it does not return, presumibly, any output. That leaves our own <tt>UNION ALL
+SELECT</tt> statement to produce one entry at a time and display only it in 
+the page content.
 
 
 <sect1>Fingerprint
@@ -2345,7 +2345,7 @@ back-end DBMS: active fingerprint: PostgreSQL >= 8.3.0
 </verb></tscreen>
 
 <p>
-As you can see from this last example, sqlmap first tested for MySQL,
+As you can see from the last example, sqlmap first tested for MySQL,
 then for Oracle, then for PostgreSQL since the user did not forced the
 back-end database management system name with option <tt>--dbms</tt>.
 
@@ -2424,7 +2424,7 @@ back-end DBMS: active fingerprint: MySQL >= 5.0.38 and < 5.1.2
 </verb></tscreen>
 
 <p>
-As you can see, sqlmap was able to fingerprint also the back-end DBMS
+As you can see, sqlmap was also able to fingerprint the back-end DBMS
 operating system by parsing the DBMS banner value.
 
 <p>
@@ -2501,12 +2501,12 @@ name="SQLSecurity.com site"> and outputs it to the XML versions file.
 Option: <tt>-b</tt> or <tt>--banner</tt>
 
 <p>
-Most of the modern database management systems have a function or an
-environment variable which returns details on the database managemet
-system version. Sometimes also the operating system where the daemon has
-been compiled on, the operating system architecture, its service pack.
-Usually this function is <tt>version()</tt> or the <tt>@@version</tt>
-environment variable.
+Most of the modern database management systems have a function and/or 
+an environment variable which returns details on the database management
+system version. Also, sometimes it returns the operating system version 
+where the daemon has been compiled on, the operating system architecture, 
+and its service pack. Usually the function is <tt>version()</tt> and the 
+environment variable <tt>@@version</tt>.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -2611,7 +2611,7 @@ current database:    'master'
 Option: <tt>--is-dba</tt>
 
 <p>
-It is possible to detect if the  database management system session user is
+It is possible to detect if the current database management system session user is
 a database administrator.
 
 <p>
@@ -2849,8 +2849,8 @@ database management system users privileges:
 
 <p>
 As you can see, depending on the user privileges, sqlmap identifies if the
-user is a database management system administrator and show next to the
-username this information.
+user is a database management system administrator and shows this information
+next to the username.
 
 <p>
 If you provide <tt>CU</tt> as username it will consider it as an alias for
@@ -2941,7 +2941,7 @@ Options: <tt>--tables</tt> and <tt>-D</tt>
 
 <p>
 It is possible to enumerate the list of tables for all database
-manangement system's databases.
+management system's databases.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -3041,9 +3041,9 @@ Database: USERS
 
 <p>
 Note that on Oracle you have to provide the <tt>TABLESPACE_NAME</tt>
-instead of the database name, in my example that is <tt>users</tt> to
-retrieve all tables owned by an Oracle database management system
-user.
+instead of the database name. In provided example <tt>users</tt> was
+used to retrieve all tables owned by an Oracle database management 
+system user.
 
 
 <sect2>Database table columns
@@ -3054,7 +3054,7 @@ Options: <tt>--columns</tt>, <tt>-T</tt> and <tt>-D</tt>
 <p>
 It is possible to enumerate the list of columns for a specific database
 table.
-This functionality depends on the <tt>-T</tt> to specify the table name
+This functionality depends on the option <tt>-T</tt> to specify the table name
 and optionally on <tt>-D</tt> to specify the database name.
 
 <p>
@@ -3128,8 +3128,8 @@ Table: users
 
 <p>
 Note that on PostgreSQL you have to provide <tt>public</tt> or the
-name of a system database because it is not possible to enumerate other
-databases tables, only the tables under the schema that the web
+name of a system database. That's because it is not possible to enumerate 
+other databases tables, only the tables under the schema that the web
 application's user is connected to, which is always <tt>public</tt>.
 
 <p>
@@ -3180,7 +3180,7 @@ Options: <tt>--dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
 
 <p>
 It is possible to dump the entries for a specific database table.
-This functionality depends on the <tt>-T</tt> to specify the table name
+This functionality depends on the option <tt>-T</tt> to specify the table name
 and optionally on <tt>-D</tt> to specify the database name.
 If the database name is not specified, the current database name is used.
 
@@ -3249,7 +3249,7 @@ Table: users
 
 <p>
 sqlmap also stores for each table the dumped entries in a CSV format file.
-You can see the absolute path where it stored the dumped tables entries
+You can see the absolute path where sqlmap stores the dumped tables entries
 by providing a verbosity level greater than or equal to 1.
 
 <p>
@@ -3315,7 +3315,7 @@ Table: users
 </verb></tscreen>
 
 <p>
-As you can see, sqlmap is very flexible: you can leave it automatically
+As you can see, sqlmap is very flexible. You can leave it to automatically
 enumerate the whole database table up to a single column of a specific
 table entry.
 
@@ -3395,7 +3395,7 @@ Table: CHARACTER_SETS
 
 <p>
 You can also provide the <tt>--exclude-sysdbs</tt> option to exclude all
-system databases so that sqlmap will only dump entries of users' databases
+system databases. In that case sqlmap will only dump entries of users' databases
 tables.
 
 <p>
@@ -3455,13 +3455,13 @@ Options: <tt>--sql-query</tt> and <tt>--sql-shell</tt>
 <p>
 The SQL query and the SQL shell features makes the user able to run
 custom SQL statement on the web application's back-end database management.
-sqlmap automatically recognize the type of SQL statement provided and
-choose which SQL injection technique to use to execute it: if it is a
-<tt>SELECT</tt> statement it will retrieve its output through the blind SQL
-injection or UNION query SQL injection technique depending on the user's
-options, otherwise it will execute the query through the stacked query
-SQL injection technique if the web application supports multiple
-statements on the back-end database management system.
+sqlmap recognizes the type of SQL statement provided and automatically
+chooses which SQL injection technique to use for it to be able to execute it.
+If it is a <tt>SELECT</tt> statement it will retrieve its output through 
+the blind SQL injection or UNION query SQL injection technique depending
+on the user's options. Otherwise it will execute the query through the 
+stacked query SQL injection technique if the web application supports 
+multiple statements on the back-end database management system.
 
 <p>
 Examples on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
@@ -3497,10 +3497,10 @@ SELECT 'foo', 'bar':    'foo, bar'
 </verb></tscreen>
 
 <p>
-As you can see from this last example, sqlmap splits the query in two
-different <tt>SELECT</tt> statement to be able to retrieve the output even
-when using the blind SQL injection technique.
-Otherwise in UNION query SQL injection technique it only performs a single
+As you can see from the last example, sqlmap splits provided query into two
+different <tt>SELECT</tt> statements for it to be able to retrieve the 
+output even in case when using the blind SQL injection technique.
+Otherwise, in UNION query SQL injection technique it only performs a single
 HTTP request to get the user's query output:
 
 <tscreen><verb>
@@ -3527,11 +3527,11 @@ SELECT 'foo', 'bar' [1]:
 
 <p>
 If your <tt>SELECT</tt> statement contains a <tt>FROM</tt> clause, sqlmap
-asks the user if such statement can return multiple entries and in such
+asks the user if such statement can return multiple entries. In that
 case the tool knows how to unpack the query correctly to retrieve its
-whole output entry per entry when going through blind SQL injection
-technique. Through UNION query SQL injection it retrieved the whole output
-in a single response.
+whole output, entry per entry, when going through blind SQL injection
+technique. In provided example, UNION query SQL injection it retrieved 
+the whole output in a single response.
 
 <p>
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
@@ -3553,13 +3553,13 @@ SELECT usename FROM pg_user [2]:
 </verb></tscreen>
 
 <p>
-As you can see from the last example, sqlmap counted the number of entries
-for your query and asks how many entries you want to dump.
-Otherwise if you specify also the <tt>LIMIT</tt>, or similar, clause
-sqlmap will not ask anything, it just unpacks the query and return its
-output entry per entry when going through blind SQL injection technique.
-Through UNION query SQL injection it retrieved the whole output in a
-single response.
+As you can see from the last example, sqlmap counts the number of entries
+for a given query and asks for number of entries to dump.
+Otherwise, if the <tt>LIMIT</tt> is also specified, or similar clause,
+sqlmap will not ask for anything. It will just unpack the query and return its
+output, entry per entry, when going through blind SQL injection technique.
+In a given example, sqlmap used UNION query SQL injection to retrieve the 
+whole output in a single response.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -3606,10 +3606,10 @@ SELECT host, password FROM mysql.user LIMIT 1, 3 [3]:
 </verb></tscreen>
 
 <p>
-The SQL shell option gives you access to run your own SQL statement
-interactively, like a SQL console logged to the back-end database
+The SQL shell option gives you an access to run your own SQL statement
+interactively, like a SQL console connected to the back-end database
 management system.
-This feature has TAB completion and history support.
+Note that this feature provides TAB completion and history support.
 
 <p>
 Example of history support on a <bf>PostgreSQL 8.3.5</bf> target:
@@ -3682,7 +3682,7 @@ sql> SELECT
 <p>
 As you can see the TAB functionality shows the queries defined for the
 back-end database management system in sqlmap XML queries file, but you
-can run whatever <tt>SELECT</tt> statement that you want.
+can run whatever <tt>SELECT</tt> statement you want.
 
 <p>
 Example of asterisk expansion on a <bf>MySQL 5.0.67</bf> target:
@@ -3776,9 +3776,9 @@ SELECT * FROM test.users [3]:
 </verb></tscreen>
 
 <p>
-As you can see in this last example, if the <tt>SELECT</tt> statement has
-an asterisk instead of the column(s) name, sqlmap first retrieves the
-column names of the table then asks if the query can return multiple
+As you can see from the example, if the <tt>SELECT</tt> statement has
+an asterisk instead of the column(s) name, sqlmap first retrieves all
+column names of the current table, asks if the query can return multiple
 entries and goes on.
 
 <p>
@@ -3818,10 +3818,10 @@ SELECT COUNT(name) FROM users:    '5'
 </verb></tscreen>
 
 <p>
-As you can see from this last example, when the user provides a SQL
-statement other than <tt>SELECT</tt>, sqlmap recognizes it, tests if the
-web application supports stacked queries and in case it does, it executes
-the provided SQL statement in a multiple statement.
+As you can see from the example, when the user provides a SQL statement 
+other than <tt>SELECT</tt>, sqlmap recognizes it, tests if the web 
+application supports stacked queries and in case it does, it executes
+the provided SQL statement in a multiple statement mode.
 
 <p>
 Beware that some web application technologies do not support stacked
@@ -3840,14 +3840,14 @@ Option: <tt>--read-file</tt>
 <p>
 It is possible to retrieve the content of files from the underlying file
 system when the back-end database management system is either MySQL,
-PostgreSQL or Microsoft SQL Server and the session user has the needed
+PostgreSQL or Microsoft SQL Server, and the session user has the needed
 privileges to abuse database specific functionalities and architectural
 weaknesses.
-The file specified can be either a text or a binary file, sqlmap will
+The file specified can be either a text or a binary file. sqlmap will
 handle either cases automatically.
 
 <p>
-These techniques are detailed on the white paper
+These techniques are detailed in white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
@@ -3963,13 +3963,13 @@ Options: <tt>--write-file</tt> and <tt>--dest-file</tt>
 <p>
 It is possible to upload a local file to the underlying file system when
 the back-end database management system is either MySQL, PostgreSQL or
-Microsoft SQL Server and the session user has the needed privileges to
+Microsoft SQL Server, and the session user has the needed privileges to
 abuse database specific functionalities and architectural weaknesses.
-The file specified can be either a text or a binary file, sqlmap will
+The file specified can be either a text or a binary file. sqlmap will
 handle either cases automatically.
 
 <p>
-These techniques are detailed on the white paper
+These techniques are detailed in white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
@@ -4017,7 +4017,7 @@ Options: <tt>--os-cmd</tt> and <tt>--os-shell</tt>
 <p>
 It is possible to execute arbitrary commands on the underlying operating
 system when the back-end database management system is either MySQL,
-PostgreSQL or Microsoft SQL Server and the session user has the needed
+PostgreSQL or Microsoft SQL Server, and the session user has the needed
 privileges to abuse database specific functionalities and architectural
 weaknesses.
 
@@ -4035,11 +4035,11 @@ sqlmap creates it from scratch.
 <p>
 If the user wants to retrieve the command standard output, sqlmap will use
 one of the enumeration SQL injection techniques (blind or inband) to
-retrieve it, viceversa sqlmap will use the stacked query SQL injection
-technique to execute the command without returning anything to the user.
+retrieve it, or in case of stacked query SQL injection technique 
+sqlmap will execute the command without returning anything to the user.
 
 <p>
-These techniques are detailed on the white paper
+These techniques are detailed in white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
@@ -4120,7 +4120,7 @@ nt authority\network service
 <p>
 It is also possible to simulate a real shell where you can type as many
 arbitrary commands as you wish. The option is <tt>--os-shell</tt> and has
-the same TAB completion and history functionalities implemented for
+the same TAB completion and history functionalities as provided by
 <tt>--sql-shell</tt>.
 
 <p>
@@ -4355,7 +4355,7 @@ exploited SQL injection as a stepping stone. This is implemented for MySQL,
 PostgreSQL and Microsoft SQL Server.
 sqlmap relies on the <htmlurl url="http://metasploit.com/framework"
 name="Metasploit"> to perform this attack, so you need to have it already
-on your system: it's free and can be downloaded from the homepage. It is
+on your system - it's free and can be downloaded from the homepage. It is
 required to use Metasploit Framework version 3.3.3 or above.
 
 <p>
@@ -4364,7 +4364,7 @@ because Metasploit's msfconsole and msfcli are not supported on the native
 Windows Ruby interpreter.
 
 <p>
-These techniques are detailed on the white paper
+These techniques are detailed in white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
@@ -4488,10 +4488,10 @@ stand-alone exploit if the user wants so.
 <p>
 Note that this feature is not supported by sqlmap installed from the
 DEB package because it relies on Churrasco, which is not explicitly free
-software so it has not been included in the package.
+software, so it has not been included in the package.
 
 <p>
-This technique is detailed on the white paper
+This technique is detailed in white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
@@ -4611,19 +4611,19 @@ stateful channel</bf> between the attacker host and the target database
 server.
 sqlmap relies on <htmlurl url="http://metasploit.com/framework"
 name="Metasploit">'s SMB relay exploit to perform this attack, so you need
-to have it already on your system: it's free and can be downloaded from the
+to have it already on your system - it's free and can be downloaded from the
 homepage.
 You need to run sqlmap as <bf>root</bf> user if you want to perform a SMB
 relay attack because it will need to listen on a user-specified SMB TCP
 port for incoming connection attempts.
 
 <p>
-Note that this feature is not supported by sqlmap running on Windows
+Note that this feature is not supported by sqlmap running on Windows platform
 because Metasploit's msfconsole and msfcli are not supported on the native
 Windows Ruby interpreter.
 
 <p>
-This technique is detailed on the white paper
+This technique is detailed in white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
@@ -4768,15 +4768,15 @@ target database server.
 sqlmap has its own exploit to trigger the vulnerability, but it relies on
 <htmlurl url="http://metasploit.com/framework" name="Metasploit"> to
 generate the shellcode used within the exploit, so you need to have it
-already on your system: it's free and can be downloaded from the homepage.
+already on your system - it's free and can be downloaded from the homepage.
 
 <p>
-Note that this feature is not supported by sqlmap running on Windows
+Note that this feature is not supported by sqlmap running on Windows platform
 because Metasploit's msfconsole and msfcli are not supported on the native
 Windows Ruby interpreter.
 
 <p>
-This technique is detailed on the white paper
+This technique is detailed in white paper
 <htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf" name="Advanced SQL injection to operating system full control">.
 
 <p>
@@ -4940,7 +4940,7 @@ database management system users [3]:
 
 <p>
 As you can see, sqlmap first calculates the length of the query output,
-then estimated the time of arrival, shows the progress in percentage and
+then estimates the time of arrival, shows the progress in percentage and
 counts the number of retrieved query output characters.
 
 
@@ -4952,7 +4952,7 @@ Option: <tt>--update</tt>
 <p>
 
 It is possible to update sqlmap to the latest stable version available on
-its <htmlurl url="http://sourceforge.net/projects/sqlmap/files/"
+project's <htmlurl url="http://sourceforge.net/projects/sqlmap/files/"
 name="SourceForge File List page"> by running it with the
 <tt>--update</tt> option.
 
@@ -5011,16 +5011,16 @@ Set-Cookie: language=en-US; path=/; HttpOnly
 </verb></tscreen>
 
 <p>
-As you can see, sqlmap first check if a new stable version is available,
-then in case it is, download it, unzip it and update the Microsoft SQL
+As you can see, sqlmap first checks if a new stable version is available,
+and then in case it is, downloads it, unzips it and updates the Microsoft SQL
 Server XML versions file from Chip Andrews'
 <htmlurl url="http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx"
 name="SQLSecurity.com site">.
 
 <p>
 Note that the default configuration file <tt>sqlmap.conf</tt> is backupped
-to <tt>sqlmap.conf.bak</tt> in case a new stable version is available and
-your copy is updated.
+to <tt>sqlmap.conf.bak</tt> each time a new stable version is available and
+your copy is outdated.
 
 
 <sect2>Save and resume all data retrieved on a session file
@@ -5029,7 +5029,7 @@ your copy is updated.
 Option: <tt>-s</tt>
 
 <p>
-It is possible to log all queries and their output on a text file while
+It is possible to log all queries and their output into a text file while
 performing whatever request, both in blind SQL injection and in inband SQL
 injection.
 This is useful if you stop the injection and resume it after some time.
@@ -5258,9 +5258,9 @@ banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real
 Option: <tt>--batch</tt>
 
 <p>
-If you want sqlmap to run as a batch tool, without interacting with you in
-case of a choice has to be done, you can force it by using <tt>--batch</tt>
-option than letting sqlmap go for a default behaviour.
+If you want sqlmap to run as a batch tool, without any users interaction 
+when a choice has to be done, you can force it by using <tt>--batch</tt>
+option, and leave sqlmap to go for a default behaviour.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -5297,8 +5297,8 @@ back-end DBMS:	MySQL >= 5.0.0
 </verb></tscreen>
 
 <p>
-As you can see, sqlmap choosed automatically to injection on the first
-vulnerable parameter which is the default behaviour.
+As you can see, sqlmap by default automatically chooses to inject payload 
+to the first vulnerable parameter.
 
 
 <sect2>Clean up the DBMS by sqlmap specific UDF and tables
