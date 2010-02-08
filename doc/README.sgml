@@ -753,7 +753,7 @@ target urls from.
 <sect2>Target URL
 
 <p>
-Option: <tt>-u</tt> or <tt>--url</tt>
+Option: <tt>-u</tt> or <tt>-</tt><tt>-url</tt>
 
 <p>
 To run sqlmap on a single target URL.
@@ -920,7 +920,7 @@ These options can be used to specify how to connect to the target url.
 <sect2>HTTP method: <tt>GET</tt> or <tt>POST</tt>
 
 <p>
-Options: <tt>--method</tt> and <tt>--data</tt>
+Options: <tt>-</tt><tt>-method</tt> and <tt>-</tt><tt>-data</tt>
 
 <p>
 By default the HTTP method used to perform HTTP requests is <tt>GET</tt>,
@@ -963,7 +963,7 @@ back-end DBMS:    Oracle
 <sect2>HTTP <tt>Cookie</tt> header
 
 <p>
-Option: <tt>--cookie</tt>
+Option: <tt>-</tt><tt>-cookie</tt>
 
 <p>
 This feature can be useful in two scenarios:
@@ -1077,7 +1077,7 @@ values that you provided? [Y/n]
 <sect2>HTTP <tt>Referer</tt> header
 
 <p>
-Option: <tt>--referer</tt>
+Option: <tt>-</tt><tt>-referer</tt>
 
 <p>
 It is possible to fake the HTTP <tt>Referer</tt> header value with this
@@ -1110,7 +1110,7 @@ Connection: close
 <sect2>HTTP <tt>User-Agent</tt> header
 
 <p>
-Options: <tt>--user-agent</tt> and <tt>-a</tt>
+Options: <tt>-</tt><tt>-user-agent</tt> and <tt>-a</tt>
 
 <p>
 By default sqlmap perform HTTP requests providing the following HTTP
@@ -1121,7 +1121,7 @@ sqlmap/0.7 (http://sqlmap.sourceforge.net)
 </verb></tscreen>
 
 <p>
-It is possible to fake it with the <tt>--user-agent</tt> option.
+It is possible to fake it with the <tt>-</tt><tt>-user-agent</tt> option.
 
 <p>
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
@@ -1200,10 +1200,10 @@ to force the HTTP User-Agent header with option --user-agent or -a
 <sect2>Extra HTTP headers
 
 <p>
-Option: <tt>--headers</tt>
+Option: <tt>-</tt><tt>-headers</tt>
 
 <p>
-It is possible to provide extra HTTP headers by providing <tt>--headers</tt>
+It is possible to provide extra HTTP headers by providing <tt>-</tt><tt>-headers</tt>
 options. Each header must be separated by a newline and it's much easier
 to provide them from the configuration INI file. Have a look at the sample
 <tt>sqlmap.conf</tt> file.
@@ -1212,7 +1212,7 @@ to provide them from the configuration INI file. Have a look at the sample
 <sect2>HTTP <tt>Basic</tt> and <tt>Digest</tt> authentications
 
 <p>
-Options: <tt>--auth-type</tt> and <tt>--auth-cred</tt>
+Options: <tt>-</tt><tt>-auth-type</tt> and <tt>-</tt><tt>-auth-cred</tt>
 
 <p>
 These options can be used to specify which HTTP authentication type the
@@ -1268,7 +1268,7 @@ Connection: close
 <sect2>HTTP proxy
 
 <p>
-Option: <tt>--proxy</tt>
+Option: <tt>-</tt><tt>-proxy</tt>
 
 <p>
 It is possible to provide an anonymous HTTP proxy address to pass by the
@@ -1309,7 +1309,7 @@ settings.
 <sect2>Concurrent HTTP requests
 
 <p>
-Option: <tt>--threads</tt>
+Option: <tt>-</tt><tt>-threads</tt>
 
 <p>
 It is possible to specify the number of maximum concurrent HTTP requests
@@ -1350,14 +1350,14 @@ with the blind SQL injection bisection algorithm implemented in sqlmap.
 
 <p>
 Note that the multithreading option is not needed if the target is affected
-by an inband SQL injection vulnerability and the <tt>--union-use</tt>
+by an inband SQL injection vulnerability and the <tt>-</tt><tt>-union-use</tt>
 option has been provided.
 
 
 <sect2>Delay in seconds between each HTTP request
 
 <p>
-Option: <tt>--delay</tt>
+Option: <tt>-</tt><tt>-delay</tt>
 
 <p>
 It is possible to specify a number of seconds to wait between each HTTP
@@ -1367,7 +1367,7 @@ request. The valid value is a float, for instance 0.5 means half a second.
 <sect2>Seconds to wait before timeout connection
 
 <p>
-Option: <tt>--timeout</tt>
+Option: <tt>-</tt><tt>-timeout</tt>
 
 <p>
 It is possible to specify a number of seconds to wait before considering
@@ -1378,7 +1378,7 @@ the HTTP request timed out. The valid value is a float, for instance
 <sect2>Maximum number of retries when the HTTP connection timeouts
 
 <p>
-Option: <tt>--retries</tt>
+Option: <tt>-</tt><tt>-retries</tt>
 
 <p>
 It is possible to specify the maximum number of retries when the HTTP
@@ -1479,7 +1479,7 @@ back-end DBMS: MySQL >= 5.0.0
 <sect2>Force the database management system name
 
 <p>
-Option: <tt>--dbms</tt>
+Option: <tt>-</tt><tt>-dbms</tt>
 
 <p>
 By default sqlmap automatically detects the web application's back-end
@@ -1517,7 +1517,7 @@ back-end DBMS:    PostgreSQL
 </verb></tscreen>
 
 <p>
-In case you provide <tt>--fingerprint</tt> together with <tt>--dbms</tt>,
+In case you provide <tt>-</tt><tt>-fingerprint</tt> together with <tt>-</tt><tt>-dbms</tt>,
 sqlmap will only perform the extensive fingerprint for the specified
 database management system, read below for further details.
 
@@ -1531,7 +1531,7 @@ automatically identify it for you.
 <sect2>Force the database management system operating system name
 
 <p>
-Option: <tt>--os</tt>
+Option: <tt>-</tt><tt>-os</tt>
 
 <p>
 By default sqlmap automatically detects the web application's back-end
@@ -1558,7 +1558,7 @@ not know it, let sqlmap automatically identify it for you.
 <sect2>Custom injection payload
 
 <p>
-Options: <tt>--prefix</tt> and <tt>--postfix</tt>
+Options: <tt>-</tt><tt>-prefix</tt> and <tt>-</tt><tt>-postfix</tt>
 
 <p>
 In some circumstances the vulnerable parameter is exploitable only if the
@@ -1622,7 +1622,7 @@ the real world application it is necessary to provide it.
 <sect2>Page comparison
 
 <p>
-Options: <tt>--string</tt> and <tt>--regexp</tt>
+Options: <tt>-</tt><tt>-string</tt> and <tt>-</tt><tt>-regexp</tt>
 
 <p>
 By default the distinction of a True query by a False one (basic concept
@@ -1805,7 +1805,7 @@ user's input</bf>.
 <sect2>Exclude specific page content
 
 <p>
-Options: <tt>--excl-str</tt> and <tt>--excl-reg</tt>
+Options: <tt>-</tt><tt>-excl-str</tt> and <tt>-</tt><tt>-excl-reg</tt>
 
 <p>
 Another way to get around the dynamicity issue explained above is to exclude
@@ -1847,7 +1847,7 @@ stability test.
 <sect2>Test for stacked queries (multiple statements) support
 
 <p>
-Option: <tt>--stacked-test</tt>
+Option: <tt>-</tt><tt>-stacked-test</tt>
 
 <p>
 It is possible to test if the web application technology supports
@@ -1911,7 +1911,7 @@ stacked queries support:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'wRcBC'=
 <sect2>Test for time based blind SQL injection
 
 <p>
-Options: <tt>--time-test</tt> and <tt>--time-sec</tt>
+Options: <tt>-</tt><tt>-time-test</tt> and <tt>-</tt><tt>-time-sec</tt>
 
 <p>
 It is possible to test if the target URL is affected by a <bf>time based
@@ -1979,14 +1979,14 @@ time based blind sql injection payload:    'name=luther'; WAITFOR DELAY '0:0:5';
 
 <p>
 It is also possible to set the seconds to delay the response by providing
-the <tt>--time-sec</tt> option followed by an integer. By default delay
+the <tt>-</tt><tt>-time-sec</tt> option followed by an integer. By default delay
 is set to five seconds.
 
 
 <sect2>Test for UNION query SQL injection
 
 <p>
-Options: <tt>--union-test</tt> and <tt>--union-tech</tt>
+Options: <tt>-</tt><tt>-union-test</tt> and <tt>-</tt><tt>-union-tech</tt>
 
 <p>
 It is possible to test if the target URL is affected by a <bf>UNION query
@@ -2015,7 +2015,7 @@ NULL, NULL, NULL FROM DUAL-- AND 6558=6558'
 By default sqlmap uses the <bf><tt>NULL</tt> bruteforcing</bf> technique to
 detect the number of columns within the original <tt>SELECT</tt> statement.
 It is also possible to change it to <bf><tt>ORDER BY</tt> clause
-bruteforcing</bf> with the <tt>--union-tech</tt> option.
+bruteforcing</bf> with the <tt>-</tt><tt>-union-tech</tt> option.
 
 <p>
 Further details on these techniques can be found <htmlurl
@@ -2046,9 +2046,9 @@ a lot of time.
 
 <p>
 It is strongly recommended to run at least once sqlmap with the
-<tt>--union-test</tt> option to test if the affected parameter is used
+<tt>-</tt><tt>-union-test</tt> option to test if the affected parameter is used
 within a <tt>for</tt> cycle, or similar, and in case use
-<tt>--union-use</tt> option to exploit this vulnerability because it
+<tt>-</tt><tt>-union-use</tt> option to exploit this vulnerability because it
 saves a lot of time and it does not weight down the web server log file
 with hundreds of HTTP requests.
 
@@ -2056,12 +2056,12 @@ with hundreds of HTTP requests.
 <sect2>Use the UNION query SQL injection
 
 <p>
-Option: <tt>--union-use</tt>
+Option: <tt>-</tt><tt>-union-use</tt>
 
 <p>
-Providing the <tt>--union-use</tt> parameter, sqlmap will first test if
+Providing the <tt>-</tt><tt>-union-use</tt> parameter, sqlmap will first test if
 the target URL is affected by an <bf>inband SQL injection</bf>
-(<tt>--union-test</tt>) vulnerability then, in case it seems to be
+(<tt>-</tt><tt>-union-test</tt>) vulnerability then, in case it seems to be
 vulnerable, it will confirm that the parameter is affected by a <bf>Full
 UNION query SQL injection</bf> and use this technique to go ahead with the
 exploiting.
@@ -2228,7 +2228,7 @@ the page content.
 <sect2>Extensive database management system fingerprint
 
 <p>
-Options: <tt>-f</tt> or <tt>--fingerprint</tt>
+Options: <tt>-f</tt> or <tt>-</tt><tt>-fingerprint</tt>
 
 <p>
 By default the web application's back-end database management system
@@ -2268,7 +2268,7 @@ system and the web application technology by parsing some HTTP response headers.
 <p>
 If you want to perform an extensive database management system fingerprint
 based on various techniques like specific SQL dialects and inband error
-messages, you can  provide the <tt>--fingerprint</tt> option.
+messages, you can  provide the <tt>-</tt><tt>-fingerprint</tt> option.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -2347,7 +2347,7 @@ back-end DBMS: active fingerprint: PostgreSQL >= 8.3.0
 <p>
 As you can see from the last example, sqlmap first tested for MySQL,
 then for Oracle, then for PostgreSQL since the user did not forced the
-back-end database management system name with option <tt>--dbms</tt>.
+back-end database management system name with option <tt>-</tt><tt>-dbms</tt>.
 
 <p>
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
@@ -2385,7 +2385,7 @@ back-end DBMS: active fingerprint: Microsoft SQL Server 2005
 
 <p>
 If you want an even more accurate result, based also on banner parsing,
-you can also provide the <tt>-b</tt> or <tt>--banner</tt> option.
+you can also provide the <tt>-b</tt> or <tt>-</tt><tt>-banner</tt> option.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -2498,7 +2498,7 @@ name="SQLSecurity.com site"> and outputs it to the XML versions file.
 <sect2>Banner
 
 <p>
-Option: <tt>-b</tt> or <tt>--banner</tt>
+Option: <tt>-b</tt> or <tt>-</tt><tt>-banner</tt>
 
 <p>
 Most of the modern database management systems have a function and/or 
@@ -2570,7 +2570,7 @@ Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86)
 <sect2>Current user
 
 <p>
-Option: <tt>--current-user</tt>
+Option: <tt>-</tt><tt>-current-user</tt>
 
 <p>
 It is possible to retrieve the database management system's user which is
@@ -2589,7 +2589,7 @@ current user:    'testuser@localhost'
 <sect2>Current database
 
 <p>
-Option: <tt>--current-db</tt>
+Option: <tt>-</tt><tt>-current-db</tt>
 
 <p>
 It is possible to retrieve the database management system's database the
@@ -2608,7 +2608,7 @@ current database:    'master'
 <sect2>Detect if the DBMS current user is a database administrator
 
 <p>
-Option: <tt>--is-dba</tt>
+Option: <tt>-</tt><tt>-is-dba</tt>
 
 <p>
 It is possible to detect if the current database management system session user is
@@ -2653,7 +2653,7 @@ current user is DBA:    'True'
 <sect2>Users
 
 <p>
-Option: <tt>--users</tt>
+Option: <tt>-</tt><tt>-users</tt>
 
 <p>
 It is possible to enumerate the list of database management system users.
@@ -2674,7 +2674,7 @@ database management system users [3]:
 <sect2>Users password hashes
 
 <p>
-Options: <tt>--passwords</tt> and <tt>-U</tt>
+Options: <tt>-</tt><tt>-passwords</tt> and <tt>-U</tt>
 
 <p>
 It is possible to enumerate the password hashes for each database
@@ -2759,7 +2759,7 @@ database management system users password hashes:
 <sect2>Users privileges
 
 <p>
-Options: <tt>--privileges</tt> and <tt>-U</tt>
+Options: <tt>-</tt><tt>-privileges</tt> and <tt>-U</tt>
 
 <p>
 It is possible to enumerate the privileges for each database management
@@ -2910,7 +2910,7 @@ management system is Microsoft SQL Server.
 <sect2>Available databases
 
 <p>
-Option: <tt>--dbs</tt>
+Option: <tt>-</tt><tt>-dbs</tt>
 
 <p>
 It is possible to enumerate the list of databases.
@@ -2937,7 +2937,7 @@ management system is Oracle.
 <sect2>Databases tables
 
 <p>
-Options: <tt>--tables</tt> and <tt>-D</tt>
+Options: <tt>-</tt><tt>-tables</tt> and <tt>-D</tt>
 
 <p>
 It is possible to enumerate the list of tables for all database
@@ -3049,7 +3049,7 @@ system user.
 <sect2>Database table columns
 
 <p>
-Options: <tt>--columns</tt>, <tt>-T</tt> and <tt>-D</tt>
+Options: <tt>-</tt><tt>-columns</tt>, <tt>-T</tt> and <tt>-D</tt>
 
 <p>
 It is possible to enumerate the list of columns for a specific database
@@ -3175,8 +3175,8 @@ Table: users
 <sect2>Dump database table entries
 
 <p>
-Options: <tt>--dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
-<tt>--start</tt> and <tt>--stop</tt>
+Options: <tt>-</tt><tt>-dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
+<tt>-</tt><tt>-start</tt> and <tt>-</tt><tt>-stop</tt>
 
 <p>
 It is possible to dump the entries for a specific database table.
@@ -3287,12 +3287,12 @@ $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv
 </verb></tscreen>
 
 <p>
-You can also provide the <tt>--start</tt> and/or the <tt>--stop</tt>
+You can also provide the <tt>-</tt><tt>-start</tt> and/or the <tt>-</tt><tt>-stop</tt>
 options to limit the dump to a range of entries.
 
 <itemize>
-<item><tt>--start</tt> specifies the first entry to enumerate
-<item><tt>--stop</tt> specifies the last entry to enumerate
+<item><tt>-</tt><tt>-start</tt> specifies the first entry to enumerate
+<item><tt>-</tt><tt>-stop</tt> specifies the last entry to enumerate
 </itemize>
 
 <p>
@@ -3323,7 +3323,7 @@ table entry.
 <sect2>Dump all databases tables entries
 
 <p>
-Options: <tt>--dump-all</tt> and <tt>--exclude-sysdbs</tt>
+Options: <tt>-</tt><tt>-dump-all</tt> and <tt>-</tt><tt>-exclude-sysdbs</tt>
 
 <p>
 It is possible to dump all databases tables entries at once.
@@ -3394,7 +3394,7 @@ Table: CHARACTER_SETS
 </verb></tscreen>
 
 <p>
-You can also provide the <tt>--exclude-sysdbs</tt> option to exclude all
+You can also provide the <tt>-</tt><tt>-exclude-sysdbs</tt> option to exclude all
 system databases. In that case sqlmap will only dump entries of users' databases
 tables.
 
@@ -3450,7 +3450,7 @@ as a users' database.
 <sect2>Run your own SQL statement
 
 <p>
-Options: <tt>--sql-query</tt> and <tt>--sql-shell</tt>
+Options: <tt>-</tt><tt>-sql-query</tt> and <tt>-</tt><tt>-sql-shell</tt>
 
 <p>
 The SQL query and the SQL shell features makes the user able to run
@@ -3835,7 +3835,7 @@ support when the back-end DBMS is PostgreSQL.
 <sect2>Read a file from the back-end DBMS file system
 
 <p>
-Option: <tt>--read-file</tt>
+Option: <tt>-</tt><tt>-read-file</tt>
 
 <p>
 It is possible to retrieve the content of files from the underlying file
@@ -3958,7 +3958,7 @@ output/192.168.1.121/files/C__example.exe: PE32 executable for MS Windows (GUI) 
 <sect2>Write a local file on the back-end DBMS file system
 
 <p>
-Options: <tt>--write-file</tt> and <tt>--dest-file</tt>
+Options: <tt>-</tt><tt>-write-file</tt> and <tt>-</tt><tt>-dest-file</tt>
 
 <p>
 It is possible to upload a local file to the underlying file system when
@@ -4012,7 +4012,7 @@ same size as the local file '/tmp/nc.exe.packed'
 <sect2>Execute arbitrary operating system command
 
 <p>
-Options: <tt>--os-cmd</tt> and <tt>--os-shell</tt>
+Options: <tt>-</tt><tt>-os-cmd</tt> and <tt>-</tt><tt>-os-shell</tt>
 
 <p>
 It is possible to execute arbitrary commands on the underlying operating
@@ -4044,7 +4044,7 @@ These techniques are detailed in white paper
 
 <p>
 It is possible to specify a single command to be executed with the
-<tt>--os-cmd</tt> option.
+<tt>-</tt><tt>-os-cmd</tt> option.
 
 <p>
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
@@ -4119,9 +4119,9 @@ nt authority\network service
 
 <p>
 It is also possible to simulate a real shell where you can type as many
-arbitrary commands as you wish. The option is <tt>--os-shell</tt> and has
+arbitrary commands as you wish. The option is <tt>-</tt><tt>-os-shell</tt> and has
 the same TAB completion and history functionalities as provided by
-<tt>--sql-shell</tt>.
+<tt>-</tt><tt>-sql-shell</tt>.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -4237,7 +4237,7 @@ can only be deleted manually
 </verb></tscreen>
 
 <p>
-Now run it again, but specifying the <tt>--union-use</tt> to retrieve the
+Now run it again, but specifying the <tt>-</tt><tt>-union-use</tt> to retrieve the
 command standard output quicker, via UNION based SQL injection, when the
 parameter is affected also by inband SQL injection vulnerability:
 
@@ -4346,7 +4346,7 @@ wants to recreate them or keep them and save time.
 <sect2>Prompt for an out-of-band shell, meterpreter or VNC
 
 <p>
-Options: <tt>--os-pwn</tt>, <tt>--priv-esc</tt>, <tt>--msf-path</tt> and <tt>--tmp-path</tt>
+Options: <tt>-</tt><tt>-os-pwn</tt>, <tt>-</tt><tt>-priv-esc</tt>, <tt>-</tt><tt>-msf-path</tt> and <tt>-</tt><tt>-tmp-path</tt>
 
 <p>
 It is possible to establish an <bf>out-of-band TCP stateful channel</bf>
@@ -4471,7 +4471,7 @@ Microsoft SQL Server 2000 by default runs as <tt>SYSTEM</tt>, whereas
 Microsoft SQL Server 2005 and 2008 run most of the times as <tt>NETWORK
 SERVICE</tt> and sometimes as <tt>LOCAL SERVICE</tt>.
 
-It is possible to provide sqlmap with the <tt>--priv-esc</tt> option to
+It is possible to provide sqlmap with the <tt>-</tt><tt>-priv-esc</tt> option to
 abuse Windows access tokens and escalate privileges to <tt>SYSTEM</tt>
 within the Meterpreter session created if the underlying operating system
 is not patched against Microsoft Security Bulletin
@@ -4597,7 +4597,7 @@ meterpreter > exit
 <sect2>One click prompt for an out-of-band shell, meterpreter or VNC
 
 <p>
-Options: <tt>--os-smbrelay</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
+Options: <tt>-</tt><tt>-os-smbrelay</tt>, <tt>-</tt><tt>-priv-esc</tt> and <tt>-</tt><tt>-msf-path</tt>
 
 <p>
 If the back-end database management system runs as <tt>Administrator</tt>
@@ -4756,7 +4756,7 @@ msf exploit(smb_relay) > exit
 <sect2>Stored procedure buffer overflow exploitation
 
 <p>
-Options: <tt>--os-bof</tt>, <tt>--priv-esc</tt> and <tt>--msf-path</tt>
+Options: <tt>-</tt><tt>-os-bof</tt>, <tt>-</tt><tt>-priv-esc</tt> and <tt>-</tt><tt>-msf-path</tt>
 
 <p>
 If the back-end database management system is not patched against Microsoft
@@ -4863,7 +4863,7 @@ meterpreter > exit
 <sect2>Estimated time of arrival
 
 <p>
-Option: <tt>--eta</tt>
+Option: <tt>-</tt><tt>-eta</tt>
 
 <p>
 It is possible to calculate and show the estimated time of arrival to
@@ -4947,14 +4947,14 @@ counts the number of retrieved query output characters.
 <sect2>Update sqlmap to the latest stable version
 
 <p>
-Option: <tt>--update</tt>
+Option: <tt>-</tt><tt>-update</tt>
 
 <p>
 
 It is possible to update sqlmap to the latest stable version available on
 project's <htmlurl url="http://sourceforge.net/projects/sqlmap/files/"
 name="SourceForge File List page"> by running it with the
-<tt>--update</tt> option.
+<tt>-</tt><tt>-update</tt> option.
 
 <tscreen><verb>
 $ python sqlmap.py --update -v 4
@@ -5122,7 +5122,7 @@ banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real
 <sect2>Save options on a configuration INI file
 
 <p>
-Option: <tt>--save</tt>
+Option: <tt>-</tt><tt>-save</tt>
 
 <p>
 It is possible to save the command line options to a configuration INI
@@ -5255,11 +5255,11 @@ banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real
 <sect2>Act in non-interactive mode
 
 <p>
-Option: <tt>--batch</tt>
+Option: <tt>-</tt><tt>-batch</tt>
 
 <p>
 If you want sqlmap to run as a batch tool, without any users interaction 
-when a choice has to be done, you can force it by using <tt>--batch</tt>
+when a choice has to be done, you can force it by using <tt>-</tt><tt>-batch</tt>
 option, and leave sqlmap to go for a default behaviour.
 
 <p>
@@ -5304,7 +5304,7 @@ to the first vulnerable parameter.
 <sect2>Clean up the DBMS by sqlmap specific UDF and tables
 
 <p>
-Option: <tt>--cleanup</tt>
+Option: <tt>-</tt><tt>-cleanup</tt>
 
 <p>
 It is recommended to clean up the back-end database management system from
