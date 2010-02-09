@@ -232,6 +232,8 @@ def getDocRoot():
 
     if kb.absFilePaths:
         for absFilePath in kb.absFilePaths:
+            if directoryPath(absFilePath) == '/':
+                continue
             absFilePath = normalizePath(absFilePath)
             absFilePathWin = None
 
@@ -271,20 +273,22 @@ def getDirs():
     directories = set()
 
     if kb.os == "Windows":
-        defaultDir = "C:/Inetpub/wwwroot/test/"
+        defaultDir = "C:/Inetpub/wwwroot/"
     else:
-        defaultDir = "/var/www/test/"
+        defaultDir = "/var/www/"
 
     if kb.absFilePaths:
         infoMsg  = "retrieved web server full paths: "
         infoMsg += "'%s'" % ", ".join(path for path in kb.absFilePaths)
         logger.info(infoMsg)
-
+        
         for absFilePath in kb.absFilePaths:
             if absFilePath:
                 directory = directoryPath(absFilePath)
                 if isWindowsPath(directory):
                     directory = directory.replace('\\', '/')
+                if directory == '/':
+                    continue
                 directories.add(directory)
     else:
         warnMsg = "unable to retrieve any web server path"

