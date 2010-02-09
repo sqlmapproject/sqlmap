@@ -80,43 +80,43 @@ class Connect:
         requestHeaders  = ""
         responseHeaders = ""
 
-        if silent:
-            socket.setdefaulttimeout(3)
-
-        if direct:
-            if "?" in url:
-                url, params = url.split("?")
-                params = urlencode(params)
-                url = "%s?%s" % (url, params)
-                requestMsg += "?%s" % params
-
-        elif multipart:
-            multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
-            conn = multipartOpener.open(url, multipart)
-            page = conn.read()            
-            responseHeaders = conn.info()
-
-            encoding = responseHeaders.get("Content-Encoding")
-            page = decodePage(page, encoding)
-
-            return page
-
-        else:
-            if conf.parameters.has_key("GET") and not get:
-                get = conf.parameters["GET"]
-
-            if get:
-                get = urlencode(get)
-                url = "%s?%s" % (url, get)
-                requestMsg += "?%s" % get
-
-            if conf.method == "POST":
-                if conf.parameters.has_key("POST") and not post:
-                    post = conf.parameters["POST"]
-
-        requestMsg += " HTTP/1.1"
-
         try:
+            if silent:
+                socket.setdefaulttimeout(3)
+    
+            if direct:
+                if "?" in url:
+                    url, params = url.split("?")
+                    params = urlencode(params)
+                    url = "%s?%s" % (url, params)
+                    requestMsg += "?%s" % params
+    
+            elif multipart:
+                multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
+                conn = multipartOpener.open(url, multipart)
+                page = conn.read()            
+                responseHeaders = conn.info()
+    
+                encoding = responseHeaders.get("Content-Encoding")
+                page = decodePage(page, encoding)
+    
+                return page
+    
+            else:
+                if conf.parameters.has_key("GET") and not get:
+                    get = conf.parameters["GET"]
+    
+                if get:
+                    get = urlencode(get)
+                    url = "%s?%s" % (url, get)
+                    requestMsg += "?%s" % get
+    
+                if conf.method == "POST":
+                    if conf.parameters.has_key("POST") and not post:
+                        post = conf.parameters["POST"]
+    
+            requestMsg += " HTTP/1.1"
+
             # Perform HTTP request
             headers        = forgeHeaders(cookie, ua)
             req            = urllib2.Request(url, post, headers)
