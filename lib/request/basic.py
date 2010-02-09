@@ -75,7 +75,7 @@ def parseResponse(page, headers):
         # Detect injectable page absolute system path
         # NOTE: this regular expression works if the remote web application
         # is written in PHP and debug/error messages are enabled.
-        absFilePathsRegExp = ( r" in <b>(?P<result>.*?)</b> on line",  r"\b(?P<result>[A-Za-z]:([\\/][\w.\\/]*)?)", r"(\A|[^<])(?P<result>/[/\w.]+)" )
+        absFilePathsRegExp = ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" )
 
         for absFilePathRegExp in absFilePathsRegExp:
             reobj = re.compile(absFilePathRegExp)
