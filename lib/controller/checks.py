@@ -33,7 +33,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import unhandledException
+from lib.core.exception import sqlmapNoneDataException
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.request.connect import Connect as Request
@@ -306,7 +306,7 @@ def checkStability():
             exceptionMsg  += "because of lack of content. please check the "
             exceptionMsg  += "page request results (and probable errors) by "
             exceptionMsg  += "using higher verbosity levels"
-            raise unhandledException, exceptionMsg
+            raise sqlmapNoneDataException, exceptionMsg
 
     elif not condition:
         warnMsg  = "url is not stable, sqlmap will base the page "
