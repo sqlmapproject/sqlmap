@@ -33,6 +33,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import unhandledException
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.request.connect import Connect as Request
@@ -293,13 +294,19 @@ def checkStability():
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True)
 
-    condition = firstPage == secondPage
+    condition = (firstPage == secondPage)
 
     if condition:
-        conf.md5hash = md5hash(firstPage)
-
-        logMsg  = "url is stable"
-        logger.info(logMsg)
+        if firstPage:
+            conf.md5hash = md5hash(firstPage)
+            logMsg  = "url is stable"
+            logger.info(logMsg)
+        else:
+            exceptionMsg   = "there was an error checking the stability of page "
+            exceptionMsg  += "because of lack of content. please check the "
+            exceptionMsg  += "page request results (and probable errors) by "
+            exceptionMsg  += "using higher verbosity levels"
+            raise unhandledException, exceptionMsg
 
     elif not condition:
         warnMsg  = "url is not stable, sqlmap will base the page "
