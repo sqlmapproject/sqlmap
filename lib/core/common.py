@@ -47,6 +47,7 @@ from lib.core.data import temp
 from lib.core.convert import urlencode
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import IS_WIN
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
@@ -595,7 +596,11 @@ def parseTargetUrl():
     conf.hostname  = __hostnamePort[0]
 
     if len(__hostnamePort) == 2:
-        conf.port = int(__hostnamePort[1])
+        try:
+            conf.port = int(__hostnamePort[1])
+        except:
+            errMsg = "invalid target url"
+            raise sqlmapSyntaxException, errMsg
     elif conf.scheme == "https":
         conf.port = 443
     else:

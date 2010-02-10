@@ -609,7 +609,10 @@ def __setHTTPProxy():
     __port         = None
 
     if len(__hostnamePort) == 2:
-        __port = int(__hostnamePort[1])
+        try:
+            __port = int(__hostnamePort[1])
+        except:
+            pass #drops into the next check block
 
     if not __scheme or not __hostname or not __port:
         errMsg = "proxy value must be in format 'http://url:port'"
