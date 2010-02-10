@@ -256,7 +256,7 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "@@VERSION"))
 
         versions = {"2003": ("5.2", (2, 1)),
-                    #"2003": ("6.0", (2,1)),
+                    #"2003": ("6.0", (2, 1)),
                     "2008": ("7.0", (1,)),
                     "2000": ("5.0", (4, 3, 2, 1)),
                     "XP": ("5.1", (2, 1)),
