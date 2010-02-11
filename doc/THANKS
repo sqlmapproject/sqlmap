@@ -1,9 +1,15 @@
 == Individuals ==
 
+David Alvarez <david.alvarez.s@gmail.com>
+    for reporting a bug
+
 Chip Andrews <chip@sqlsecurity.com>
     for his excellent work maintaining the SQL Server versions database
     at SQLSecurity.com and permission to implement the update feature
     taking data from his site
+
+Otavio Augusto <otavioarj@gmail.com>
+    for reporting a minor bug
 
 Simon Baker <simonb@sec-1.com>
     for reporting some bugs
@@ -71,6 +77,9 @@ Giorgio Fedon <giorgio.fedon@gmail.com>
 
 Alan Franzoni <alan.franzoni@gmail.com>
     for helping me out with Python subprocess library
+
+Daniel G. Gamonal <lgrecol@gmail.com>
+    for reporting a minor bug
 
 Ivan Giacomelli <truemilk@insiberia.net>
     for reporting a bug
@@ -263,6 +272,9 @@ Anthony Zboralski <anthony.zboralski@bellua.com>
     for providing me with detailed feedback
     for reporting a few minor bugs
     for donating to sqlmap development
+
+dsu <dsu@dsu.com.ua>
+    for reporting a bug
 
 fufuh <fufuh@users.sourceforge.net>
     for reporting a bug when running on Windows
