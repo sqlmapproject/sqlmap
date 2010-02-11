@@ -141,7 +141,7 @@ class UDF:
         raise sqlmapUnsupportedFeatureException(errMsg)
 
     def udfCreateFromSharedLib(self):
-        errMsg = "udfSetRemotePath() method must be defined within the plugin"
+        errMsg = "udfCreateFromSharedLib() method must be defined within the plugin"
         raise sqlmapUnsupportedFeatureException(errMsg)
 
     def udfInjectCore(self, udfDict):
