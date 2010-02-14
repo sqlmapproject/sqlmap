@@ -58,7 +58,7 @@ extern DLLIMPORT Datum sys_exec(PG_FUNCTION_ARGS) {
 	char *command;
 
 	argv0_size = VARSIZE(argv0) - VARHDRSZ;
-	command = (char *)malloc(argv0_size + 1);
+	command = (char *)palloc(argv0_size + 1);
 
 	memcpy(command, VARDATA(argv0), argv0_size);
 	command[argv0_size] = '\0';
@@ -69,7 +69,7 @@ extern DLLIMPORT Datum sys_exec(PG_FUNCTION_ARGS) {
 	*/
 
 	result = system(command);
-	free(command);
+	pfree(command);
 
 	PG_FREE_IF_COPY(argv0, 0);
 	PG_RETURN_INT32(result);
@@ -91,7 +91,7 @@ extern DLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 	int32 outlen, linelen;
 
 	argv0_size = VARSIZE(argv0) - VARHDRSZ;
-	command = (char *)malloc(argv0_size + 1);
+	command = (char *)palloc(argv0_size + 1);
 
 	memcpy(command, VARDATA(argv0), argv0_size);
 	command[argv0_size] = '\0';
@@ -101,7 +101,7 @@ extern DLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 	elog(NOTICE, "Command evaluated: %s", command);
 	*/
 
-	result = (char *)malloc(1);
+	result = (char *)palloc(1);
 	outlen = 0;
 
 	pipe = popen(command, "r");
@@ -119,7 +119,7 @@ extern DLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 		result[outlen-1] = 0x00;
 	}
 
-	result_text = (text *)malloc(VARHDRSZ + strlen(result));
+	result_text = (text *)palloc(VARHDRSZ + strlen(result));
 #ifdef SET_VARSIZE
 	SET_VARSIZE(result_text, VARHDRSZ + strlen(result));
 #else
@@ -224,7 +224,7 @@ extern DLLIMPORT Datum sys_fileread(PG_FUNCTION_ARGS) {
 	FILE *file;
 
 	argv0_size = VARSIZE(argv0) - VARHDRSZ;
-	filename = (char *)malloc(argv0_size + 1);
+	filename = (char *)palloc(argv0_size + 1);
 
 	memcpy(filename, VARDATA(argv0), argv0_size);
 	filename[argv0_size] = '\0';
@@ -239,7 +239,7 @@ extern DLLIMPORT Datum sys_fileread(PG_FUNCTION_ARGS) {
 	len = ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	buffer=(char *)malloc(len + 1);
+	buffer=(char *)palloc(len + 1);
 	if (!buffer)
 	{
 		fclose(file);
@@ -249,7 +249,7 @@ extern DLLIMPORT Datum sys_fileread(PG_FUNCTION_ARGS) {
 	fread(buffer, len, 1, file);
 	fclose(file);
 
-	result = (char *)malloc(2*len + 1);
+	result = (char *)palloc(2*len + 1);
 	for (i=0, j=0; i<len; i++)
 	{
 		result[j++] = table[(buffer[i] >> 4) & 0x0f];
@@ -257,7 +257,7 @@ extern DLLIMPORT Datum sys_fileread(PG_FUNCTION_ARGS) {
 	}
 	result[j] = '\0';
 	
-	result_text = (text *)malloc(VARHDRSZ + strlen(result));
+	result_text = (text *)palloc(VARHDRSZ + strlen(result));
 #ifdef SET_VARSIZE
 	SET_VARSIZE(result_text, VARHDRSZ + strlen(result));
 #else
@@ -265,9 +265,9 @@ extern DLLIMPORT Datum sys_fileread(PG_FUNCTION_ARGS) {
 #endif
 	memcpy(VARDATA(result_text), result, strlen(result));
 	
-	free(result);
-	free(buffer);
-	free(filename);
+	pfree(result);
+	pfree(buffer);
+	pfree(filename);
 
 	PG_RETURN_POINTER(result_text);
 }
