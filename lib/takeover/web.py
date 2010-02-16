@@ -86,6 +86,8 @@ class Web:
         return retVal
 
     def __webFileStreamUpload(self, stream, destFileName, directory):
+        stream.seek(0) #rewind
+        
         if self.webApi in ("php", "asp"):
             multipartParams = {
                                 "upload":    "1",
@@ -94,9 +96,6 @@ class Web:
                               }
 
             page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams, raise404=False)
-
-            if stream:
-                stream.seek(0)
 
             if "File uploaded" not in page:
                 warnMsg  = "unable to upload the backdoor through "
@@ -118,6 +117,7 @@ class Web:
         query       = agent.postfixQuery(query)
         payload     = agent.payload(newValue=query)
         page        = Request.queryPage(payload)
+        return page
 
     def webInit(self):
         """
@@ -169,7 +169,6 @@ class Web:
         backdoorName = "backdoor.%s" % self.webApi
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_'), backdoorName)
         backdoorContent = backdoorStream.read()
-        backdoorStream.seek(0)
         
         uploaderName = "uploader.%s" % self.webApi
         uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_'))
