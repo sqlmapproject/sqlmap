@@ -265,7 +265,7 @@ Bedirhan Urgun <bedirhanurgun@gmail.com>
     for benchmarking sqlmap in the context of his SQL injection
     benchmark project, OWASP SQLiBench, http://code.google.com/p/sqlibench
 
-Kyprianos Vassilopoulos <kyprianos.vasilopoulos@gmail.com>
+Kyprianos Vasilopoulos <kyprianos.vasilopoulos@gmail.com>
     for reporting an unhandled connection exception
 
 Anthony Zboralski <anthony.zboralski@bellua.com>
