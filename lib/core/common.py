@@ -853,18 +853,18 @@ def urlEncodeCookieValues(cookieStr):
 
 def directoryPath(path):
     retVal = None
-    if path.find('/') != -1:
-        retVal = posixpath.dirname(path)
-    else:
+    if isWindowsPath(path):
         retVal = ntpath.dirname(path)
+    else:
+        retVal = posixpath.dirname(path)
     return retVal
 
 def normalizePath(path):
     retVal = None
-    if path.find('/') != -1:
-        retVal = posixpath.normpath(path)
-    else:
+    if isWindowsPath(path):
         retVal = ntpath.normpath(path)
+    else:
+        retVal = posixpath.normpath(path)
     return retVal
 
 def safeStringFormat(formatStr, params):
