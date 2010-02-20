@@ -622,10 +622,10 @@ class Metasploit:
             payloadSize = payloadSize.group(1)
             exeSize     = os.path.getsize(self.exeFilePathLocal)
 
-            # Only pack the payload stager if the back-end DBMS is not
-            # PostgreSQL because for this DBMS, sqlmap uses the
-            # Metasploit's old exe format
-            if self.__fileFormat != "exe-small":
+            # Only pack the payload stager if the back-end DBMS operating
+            # system is Windows and new portable executable template is
+            # used
+            if self.__fileFormat == "exe":
                 packedSize = upx.pack(self.exeFilePathLocal)
             else:
                 packedSize = None
