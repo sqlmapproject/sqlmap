@@ -20,6 +20,9 @@ sqlmap (0.8-1) stable; urgency=low
     useful when web application does not support stacked queries (Bernardo).
   * Updated active fingerprint and comment injection fingerprint for
     MySQL 5.1, MySQL 5.4 and MySQL 5.5 (Bernardo).
+  * Added support to properly read (--read-file) also binary files via
+    PostgreSQL by injecting sqlmap new sys_fileread() user-defined
+    function (Bernardo and Miroslav).
   * Updated active fingerprint for PostgreSQL 8.4 (Bernardo).
   * Support for NTLM authentication via python-ntlm third party library,
     http://code.google.com/p/python-ntlm/, --auth-type NTLM (Bernardo).
@@ -29,6 +32,7 @@ sqlmap (0.8-1) stable; urgency=low
     (Miroslav).
   * Added support for regular expression based scope when parsing Burp or
     Web Scarab proxy log file (-l), --scope (Miroslav).
+  * Added option (-r) to load the HTTP request from a text file (Miroslav).
   * Added support to ignore Set-Cookie in HTTP responses,
     --drop-set-cookie (Miroslav).
   * Added support to specify which Google dork result page to parse,
