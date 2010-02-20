@@ -117,6 +117,8 @@ class Web:
         query       = agent.postfixQuery(query)
         payload     = agent.payload(newValue=query)
         page        = Request.queryPage(payload)
+        import pdb
+        pdb.set_trace()
         return page
 
     def webInit(self):
@@ -197,17 +199,16 @@ class Web:
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
             
-            if kb.os == "Windows":
-                directory = posixToNtSlashes(directory)
-            
-            if not self.__webFileStreamUpload(backdoorStream, backdoorName, directory):
-                message   = "backdoor hasn't been successfully uploaded "
-                message  += "with uploader probably because of permission "
-                message  += "issues. do you want to try the same method used "
-                message  += "for uploader? [y/N] "
+            if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
+                warnMsg  = "backdoor hasn't been successfully uploaded "
+                warnMsg += "with uploader probably because of permission "
+                warnMsg += "issues."
+                logger.warn(warnMsg)
+                message  = "do you want to try the same method used "
+                message += "for uploader? [y/N] "
                 getOutput = readInput(message, default="N")
                 if getOutput in ("y", "Y"):
-                    self.__webFileInject(self, backdoorContent, backdoorName, directory)
+                    self.__webFileInject(backdoorContent, backdoorName, directory)
                 else:
                     continue
 
