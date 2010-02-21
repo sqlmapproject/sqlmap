@@ -18,7 +18,3 @@ To be able to execute it on Windows you have to rename it to end with
 '.com' or '.exe':
 
 > ren nc_exe nc.exe
-
-
-Happy hacking!
-Bernardo Damele A. G. <bernardo.damele@gmail.com>
