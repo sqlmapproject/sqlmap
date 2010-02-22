@@ -528,7 +528,7 @@ int sys_bineval(
 	return 0;
 }
 
-#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+#if defined(_M_IX86)
 DWORD WINAPI exec_payload(LPVOID lpParameter)
 {
 	__try
