@@ -529,22 +529,15 @@ int sys_bineval(
 }
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
-
-typedef void(*pt2func)();
-
 DWORD WINAPI exec_payload(LPVOID lpParameter)
 {
 	__try
 	{
-#if defined(_M_IX86)
 		__asm
 		{
 			mov eax, [lpParameter]
 			call eax
 		}
-#else
-		((pt2func)lpParameter)();
-#endif
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
