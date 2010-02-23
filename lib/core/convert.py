@@ -22,8 +22,13 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import md5
-import sha
+try:
+    import hashlib
+except:
+    import md5
+    import sha
+    
+import sys
 import struct
 import urllib
 
@@ -45,7 +50,10 @@ def hexencode(string):
     return string.encode("hex")
 
 def md5hash(string):
-    return md5.new(string).hexdigest()
+    if sys.modules.has_key('hashlib'):
+        return hashlib.md5(string).hexdigest()
+    else:
+        return md5.new(string).hexdigest()
 
 def orddecode(string):
     packedString = struct.pack("!"+"I" * len(string), *string)
@@ -55,7 +63,10 @@ def ordencode(string):
     return tuple([ord(char) for char in string])
 
 def sha1hash(string):
-    return sha.new(string).hexdigest()
+    if sys.modules.has_key('hashlib'):
+        return hashlib.sha1(string).hexdigest()
+    else:
+        return sha.new(string).hexdigest()
 
 def urldecode(string):
     result = None
