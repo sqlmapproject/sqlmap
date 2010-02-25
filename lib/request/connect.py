@@ -92,11 +92,10 @@ class Connect:
                     requestMsg += "?%s" % params
     
             elif multipart:
-                proxyHandler = None
-                if not conf.proxy:
-                    if conf.hostname in ('localhost', '127.0.0.1'):
-                        proxyHandler = urllib2.ProxyHandler({})
-                multipartOpener = urllib2.build_opener(*(proxyHandler, multipartpost.MultipartPostHandler) if proxyHandler else multipartpost.MultipartPostHandler)
+                #needed in this form because of potential circle dependency problem (option -> update -> connect -> option)
+                from lib.core.option import proxyHandler
+                
+                multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(url, multipart)
                 page = conn.read()            
                 responseHeaders = conn.info()
