@@ -36,6 +36,7 @@ from lib.core.common import ntToPosixSlashes
 from lib.core.common import isWindowsPath
 from lib.core.common import normalizePath
 from lib.core.common import posixToNtSlashes
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.convert import hexencode
 from lib.core.data import conf
@@ -166,12 +167,12 @@ class Web:
             elif int(choice) < 1 or int(choice) > 3:
                 logger.warn("invalid value, it must be 1 or 3")
 
-        backdoorName = "backdoor.%s" % self.webApi
-        backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, backdoorName + '_'), backdoorName)
+        backdoorName = "tmpb%s.%s" % (randomStr(4), self.webApi)
+        backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
         backdoorContent = backdoorStream.read()
         
-        uploaderName = "uploader.%s" % self.webApi
-        uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, uploaderName + '_'))
+        uploaderName = "tmpu%s.%s" % (randomStr(4), self.webApi)
+        uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "uploader.%s_" % self.webApi))
         
         for directory in directories:
             # Upload the uploader agent
@@ -181,8 +182,9 @@ class Web:
             if isWindowsPath(requestDir):
                 requestDir = requestDir[2:]
             requestDir  = normalizePath(requestDir)
+            
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
-            self.webUploaderUrl = "%s/%s" % (self.webBaseUrl, uploaderName)
+            self.webUploaderUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), uploaderName)
             self.webUploaderUrl = ntToPosixSlashes(self.webUploaderUrl.replace("./", "/"))
             uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True, raise404=False)
             
@@ -194,7 +196,7 @@ class Web:
                 continue
 
             infoMsg  = "the uploader agent has been successfully uploaded "
-            infoMsg += "on '%s'" % directory
+            infoMsg += "on '%s' ('%s')" % (directory, self.webUploaderUrl)
             logger.info(infoMsg)
             
             if self.webApi == "asp":
