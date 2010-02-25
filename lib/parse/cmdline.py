@@ -129,6 +129,10 @@ def cmdLineParser():
         request.add_option("--scope", dest="scope", 
                            help="Regexp to filter targets from provided proxy log")
 
+        request.add_option("--ignore-proxy", dest="ignoreProxy",
+                            action="store_true",
+                           help="Ignore system default HTTP proxy")
+
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
                                 "used to specify which parameters to test "

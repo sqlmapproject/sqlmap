@@ -50,7 +50,8 @@ optDict = {
                                "delay":             "float",
                                "timeout":           "float",
                                "retries":           "integer",
-                               "scope":             "string"
+                               "scope":             "string",
+                               "ignoreProxy":       "boolean"
                              },
 
             "Injection":     {
