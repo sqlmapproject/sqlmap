@@ -274,9 +274,9 @@ def getDirs():
     directories = set()
 
     if kb.os == "Windows":
-        defaultDir = "C:/Inetpub/wwwroot/"
+        defaultDirs = ["C:/Inetpub/wwwroot/", "C:/xampp/htdocs/"]
     else:
-        defaultDir = "/var/www/"
+        defaultDirs = ["/var/www/"]
 
     if kb.absFilePaths:
         infoMsg  = "retrieved web server full paths: "
@@ -296,8 +296,8 @@ def getDirs():
         logger.warn(warnMsg)
 
     message   = "please provide any additional web server full path to try "
-    message  += "to upload the agent [%s]: " % defaultDir
-    inputDirs = readInput(message, default=defaultDir)
+    message  += "to upload the agent [%s]: " % "".join("%s," % directory for directory in defaultDirs).rstrip(',')
+    inputDirs = readInput(message, default="".join("%s," % directory for directory in defaultDirs).rstrip(','))
 
     if inputDirs:
         inputDirs = inputDirs.replace(", ", ",")
@@ -307,7 +307,7 @@ def getDirs():
             if inputDir:
                 directories.add(inputDir)
     else:
-        directories.add(defaultDir)
+        [directories.add(directory) for directory in defaultDirs]
 
     return directories
     
