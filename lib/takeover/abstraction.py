@@ -41,6 +41,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
 
     def __init__(self):
         self.envInitialized = False
+        self.alwaysRetrieveCmdOutput = False
 
         UDF.__init__(self)
         Web.__init__(self)
@@ -77,11 +78,15 @@ class Abstraction(Web, UDF, xp_cmdshell):
     def runCmd(self, cmd):
         getOutput = None
 
-        message   = "do you want to retrieve the command standard "
-        message  += "output? [Y/n] "
-        getOutput = readInput(message, default="Y")
+        if not self.alwaysRetrieveCmdOutput:
+            message   = "do you want to retrieve the command standard "
+            message  += "output? [Y/n/a] "
+            getOutput = readInput(message, default="Y")
+            
+            if getOutput in ("a", "A"):
+                self.alwaysRetrieveCmdOutput = True
 
-        if not getOutput or getOutput in ("y", "Y"):
+        if not getOutput or getOutput in ("y", "Y") or self.alwaysRetrieveCmdOutput:
             output = self.evalCmd(cmd)
 
             if output:

