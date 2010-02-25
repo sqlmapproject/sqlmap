@@ -515,7 +515,6 @@ def banner():
 
     print """
     %s
-    by Bernardo Damele A. G. <bernardo.damele@gmail.com>
     """ % VERSION_STRING
     
 def parsePasswordHash(password):
