@@ -5,7 +5,6 @@
 	Name="lib_postgresqludf_sys"
 	ProjectGUID="{3527D58C-177A-47B3-981B-8104EBB3F943}"
 	RootNamespace="lib_postgresqludf_sys"
-	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -111,13 +110,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="2"
 				AdditionalIncludeDirectories="$(PLATFORM_SDK_DIR)\Include;$(POSTGRESQL_SERVER_DIR)\include\server;$(POSTGRESQL_SERVER_DIR)\include\server\port\win32"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 				CompileAs="1"
 			/>
 			<Tool
@@ -133,10 +133,11 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				AdditionalLibraryDirectories="$(PLATFORM_SDK_DIR)\Lib;$(POSTGRESQL_SERVER_DIR)\lib;$(POSTGRESQL_SERVER_DIR)\bin"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
 				TargetMachine="1"
 			/>
 			<Tool
