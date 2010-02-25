@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Adapt the following settings to your environment
-PORT="3306"
 USER="root"
+PORT="3306"
 
 echo "Compiling the MySQL UDF"
 make
