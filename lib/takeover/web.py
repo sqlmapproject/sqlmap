@@ -200,11 +200,11 @@ class Web:
             logger.info(infoMsg)
             
             if self.webApi == "asp":
-                runcmdName = 'runcmd.exe'
-                runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, runcmdName + '_'), runcmdName)
+                runcmdName = "tmpe%s.exe" % randomStr(4)
+                runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
                 scriptsDirectory = "Scripts"
                 backdoorDirectory = "%s..\%s" % (posixToNtSlashes(directory), scriptsDirectory)
-                backdoorContent = backdoorContent.replace("WRITABLE_DIR", backdoorDirectory)
+                backdoorContent = backdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
                 backdoorStream.file.truncate()
                 backdoorStream.read()
                 backdoorStream.seek(0)
