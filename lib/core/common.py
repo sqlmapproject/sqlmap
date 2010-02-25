@@ -296,8 +296,8 @@ def getDirs():
         logger.warn(warnMsg)
 
     message   = "please provide any additional web server full path to try "
-    message  += "to upload the agent [%s]: " % "".join("%s," % directory for directory in defaultDirs).rstrip(',')
-    inputDirs = readInput(message, default="".join("%s," % directory for directory in defaultDirs).rstrip(','))
+    message  += "to upload the agent [%s]: " % ",".join(directory for directory in defaultDirs)
+    inputDirs = readInput(message, default=",".join(directory for directory in defaultDirs))
 
     if inputDirs:
         inputDirs = inputDirs.replace(", ", ",")
