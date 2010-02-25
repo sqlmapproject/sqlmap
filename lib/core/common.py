@@ -49,6 +49,7 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import IS_WIN
+from lib.core.settings import SITE
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import VERSION_STRING
 
@@ -515,7 +516,8 @@ def banner():
 
     print """
     %s
-    """ % VERSION_STRING
+    %s
+    """ % (VERSION_STRING, SITE)
     
 def parsePasswordHash(password):
     blank = " " * 8
