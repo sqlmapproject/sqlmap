@@ -136,12 +136,12 @@ class Web:
 
         message  = "which web application language does the web server "
         message += "support?\n"
-        message += "[1] ASP\n"
-        message += "[2] PHP (default)\n"
+        message += "[1] ASP%s\n" % " (default)" if kb.os == "Windows" else ""
+        message += "[2] PHP%s\n" % "" if kb.os == "Windows" else " (default)"
         message += "[3] JSP"
 
         while True:
-            choice = readInput(message, default="2")
+            choice = readInput(message, default="1" if kb.os == "Windows" else "2")
 
             if not choice or choice == "2":
                 self.webApi = "php"
