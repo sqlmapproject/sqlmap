@@ -249,6 +249,10 @@ def getDocRoot(webApi=None):
                 index   = absFilePath.index(pagePath)
                 docRoot = absFilePath[:index]
 
+                if len(docRoot) == 0:
+                    docRoot = None
+                    continue
+
                 if absFilePathWin:
                     docRoot = "C:/%s" % ntToPosixSlashes(docRoot)
                     
