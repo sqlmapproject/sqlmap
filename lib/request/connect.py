@@ -92,7 +92,14 @@ class Connect:
                     requestMsg += "?%s" % params
     
             elif multipart:
-                multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
+                proxyHandler = None
+                if not conf.proxy:
+                    if conf.hostname in ('localhost', '127.0.0.1'):
+                        proxyHandler = urllib2.ProxyHandler({})
+                if proxyHandler:
+                    multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
+                else:
+                    multipartOpener = urllib2.build_opener(multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(url, multipart)
                 page = conn.read()            
                 responseHeaders = conn.info()
