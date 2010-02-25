@@ -110,14 +110,15 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="1"
 				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="2"
 				AdditionalIncludeDirectories="$(PLATFORM_SDK_DIR)\include;$(MYSQL_SERVER_DIR)\include"
 				PreprocessorDefinitions="HAVE_DLOPEN"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -131,9 +132,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalLibraryDirectories="$(PLATFORM_SDK_DIR)\Lib"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
 				TargetMachine="1"
 			/>
 			<Tool
