@@ -131,11 +131,6 @@ class Web:
 
         self.checkDbmsOs()
 
-        kb.docRoot  = getDocRoot()
-        directories = getDirs()
-        directories = list(directories)
-        directories.sort()
-
         infoMsg = "trying to upload the uploader agent"
         logger.info(infoMsg)
 
@@ -167,6 +162,11 @@ class Web:
             elif int(choice) < 1 or int(choice) > 3:
                 logger.warn("invalid value, it must be 1 or 3")
 
+        kb.docRoot  = getDocRoot(self.webApi)
+        directories = getDirs(self.webApi)
+        directories = list(directories)
+        directories.sort()
+
         backdoorName = "tmpb%s.%s" % (randomStr(4), self.webApi)
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
         originalBackdoorContent = backdoorContent = backdoorStream.read()
@@ -178,11 +178,10 @@ class Web:
             # Upload the uploader agent
             self.__webFileInject(uploaderContent, uploaderName, directory)
             
-            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixSlashes(kb.docRoot), "/")
+            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixSlashes(kb.docRoot), "/").replace("//", "/")
             if isWindowsPath(requestDir):
                 requestDir = requestDir[2:]
-            while requestDir.find('//') != -1:
-                requestDir = requestDir.replace('//', '/')
+            requestDir  = normalizePath(requestDir)
             
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), uploaderName)

@@ -222,12 +222,15 @@ def getHtmlErrorFp():
 
     return htmlParsed
 
-def getDocRoot():
+def getDocRoot(webApi=None):
     docRoot = None
     pagePath = directoryPath(conf.path)
 
     if kb.os == "Windows":
-        defaultDocRoot = "C:/Inetpub/wwwroot/"
+        if webApi == "php":
+            defaultDocRoot = "C:/xampp/htdocs/"
+        else:
+            defaultDocRoot = "C:/Inetpub/wwwroot/"
     else:
         defaultDocRoot = "/var/www/"
 
@@ -270,11 +273,14 @@ def getDocRoot():
 
     return docRoot
 
-def getDirs():
+def getDirs(webApi=None):
     directories = set()
 
     if kb.os == "Windows":
-        defaultDirs = ["C:/Inetpub/wwwroot/", "C:/xampp/htdocs/"]
+        if webApi == "php":
+            defaultDirs = ["C:/xampp/htdocs/"]
+        else:
+            defaultDirs = ["C:/Inetpub/wwwroot/"]
     else:
         defaultDirs = ["/var/www/"]
 
