@@ -498,7 +498,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
                     # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
                     self.__basedir = inject.getValue("SELECT @@basedir")
-                    self.__basedir = normalizePath(ntToPosixSlashes(self.__basedir))
+                    self.__basedir = ntToPosixSlashes(normalizePath(self.__basedir))
 
                     if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
                         kb.os = "Windows"
