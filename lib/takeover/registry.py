@@ -41,7 +41,7 @@ class Registry:
         self.__regData       = regData
 
         self.__randStr       = randomStr(lowercase=True)
-        self.__batPathRemote = "%s/tmpr%s%s.bat" % (conf.tmpPath, self.__operation, self.__randStr)
+        self.__batPathRemote = "%s/tmpr%s.bat" % (conf.tmpPath, self.__randStr)
         self.__batPathLocal  = os.path.join(conf.outputPath, "tmpr%s%s.bat" % (self.__operation, self.__randStr))
 
         if parse:
