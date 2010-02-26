@@ -65,7 +65,7 @@ class Miscellaneous:
             else:
                 conf.tmpPath = "/tmp"
 
-        if re.search("^[\w]\:[\/\\\\]+", conf.tmpPath, re.I):
+        if re.search("\A[\w]:[\/\\\\]+", conf.tmpPath, re.I):
             kb.os = "Windows"
 
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)

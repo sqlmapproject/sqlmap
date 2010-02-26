@@ -871,11 +871,18 @@ def directoryPath(path):
     return retVal
 
 def normalizePath(path):
+    """
+    This function must be called only after posixToNtSlashes()
+    and ntToPosixSlashes()
+    """
+
     retVal = None
+
     if isWindowsPath(path):
         retVal = ntpath.normpath(path)
     else:
         retVal = posixpath.normpath(path)
+
     return retVal
 
 def safeStringFormat(formatStr, params):
@@ -927,7 +934,7 @@ def decloakToMkstemp(filepath, **kwargs):
     return retVal
 
 def isWindowsPath(filepath):
-    return re.search("\A[A-Za-z]:", filepath) is not None
+    return re.search("\A[\w]\:\\\\", filepath) is not None
 
 def posixToNtSlashes(filepath):
     return filepath.replace('/', '\\')
