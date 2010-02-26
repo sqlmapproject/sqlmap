@@ -178,7 +178,7 @@ class Web:
             # Upload the uploader agent
             self.__webFileInject(uploaderContent, uploaderName, directory)
             
-            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixSlashes(kb.docRoot), "/").replace("//", "/")
+            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixSlashes(kb.docRoot), "/")
             if isWindowsPath(requestDir):
                 requestDir = requestDir[2:]
             requestDir  = normalizePath(requestDir)
