@@ -519,7 +519,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
                 # NOTE: specifying the relative path as './udf.dll'
                 # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
                 self.__datadir = "."
-                self.__datadir = normalizePath(ntToPosixSlashes(self.__datadir))
+                self.__datadir = ntToPosixSlashes(normalizePath(self.__datadir))
 
                 if re.search("[\w]\:\/", self.__datadir, re.I):
                     kb.os = "Windows"
