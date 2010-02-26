@@ -10,19 +10,19 @@ sqlmap (0.8-1) stable; urgency=low
   * Support for takeover features on PostgreSQL 8.4 (Bernardo).
   * Enhanced --priv-esc to rely on new Metasploit Meterpreter's
     'getsystem' command to elevate privileges of the user running the
-    back-end DBMS instance on Windows to SYSTEM (Bernardo).
+    back-end DBMS instance to SYSTEM on Windows (Bernardo).
   * Automatic support in --os-pwn to use the web uploader/backdoor to
     upload and execute the Metasploit payload stager when stacked queries
     SQL injection is not supported, for instance on MySQL/PHP and
-    MySQL/ASP but there is a writable folder within the web server
-    document root (Bernardo).
+    MySQL/ASP, but there is a writable folder within the web server
+    document root (Bernardo and Miroslav).
   * Fixed web backdoor functionality for --os-cmd, --os-shell and --os-pwn
     useful when web application does not support stacked queries (Bernardo).
-  * Updated active fingerprint and comment injection fingerprint for
-    MySQL 5.1, MySQL 5.4 and MySQL 5.5 (Bernardo).
   * Added support to properly read (--read-file) also binary files via
     PostgreSQL by injecting sqlmap new sys_fileread() user-defined
     function (Bernardo and Miroslav).
+  * Updated active fingerprint and comment injection fingerprint for
+    MySQL 5.1, MySQL 5.4 and MySQL 5.5 (Bernardo).
   * Updated active fingerprint for PostgreSQL 8.4 (Bernardo).
   * Support for NTLM authentication via python-ntlm third party library,
     http://code.google.com/p/python-ntlm/, --auth-type NTLM (Bernardo).
@@ -32,7 +32,10 @@ sqlmap (0.8-1) stable; urgency=low
     (Miroslav).
   * Added support for regular expression based scope when parsing Burp or
     Web Scarab proxy log file (-l), --scope (Miroslav).
-  * Added option (-r) to load the HTTP request from a text file (Miroslav).
+  * Added option (-r) to load a single HTTP request from a text file
+    (Miroslav).
+  * Added option (--ignore-proxy) to ignore system default HTTP proxy
+    (Miroslav).
   * Added support to ignore Set-Cookie in HTTP responses,
     --drop-set-cookie (Miroslav).
   * Added support to specify which Google dork result page to parse,
@@ -47,9 +50,9 @@ sqlmap (0.8-1) stable; urgency=low
     https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack (Bernardo
     and Miroslav).
   * Major code cleanup (Miroslav).
-  * Added simple file encryption/compression utility, extra/cloak/cloak.py
-    used by sqlmap to decrypt on the fly Churrasco and UPX executables and
-    web shells consequently reducing drastically the number of anti virus
+  * Added simple file encryption/compression utility, extra/cloak/cloak.py,
+    used by sqlmap to decrypt on the fly Churrasco, UPX executable and web
+    shells consequently reducing drastically the number of anti-virus
     softwares that mistakenly mark sqlmap as a malware (Miroslav).
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon,  1 Mar 2010 10:00:00 +0000

@@ -434,7 +434,7 @@ def cmdLineParser():
         (args, _) = parser.parse_args()
 
         if not args.url and not args.list and not args.googleDork and not args.configFile and not args.requestFile and not args.updateAll:
-            errMsg  = "missing a mandatory parameter ('-u', '-l', '-g', '-c', '-r' or '--update'), "
+            errMsg  = "missing a mandatory parameter ('-u', '-l', '-r', '-g', '-c' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)
 
