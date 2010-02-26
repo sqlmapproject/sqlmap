@@ -531,7 +531,7 @@ class Metasploit:
         logger.info(infoMsg)
 
         self.__randStr           = randomStr(lowercase=True)
-        self.__shellcodeFilePath = os.path.join(conf.outputPath, "sqlmapmsf%s" % self.__randStr)
+        self.__shellcodeFilePath = os.path.join(conf.outputPath, "tmpm%s" % self.__randStr)
 
         self.__initVars()
         self.__prepareIngredients(encode=encode, askChurrasco=False)
@@ -580,7 +580,7 @@ class Metasploit:
         self.__randStr = randomStr(lowercase=True)
 
         if kb.os == "Windows":
-            self.exeFilePathLocal = os.path.join(conf.outputPath, "sqlmapmsf%s.exe" % self.__randStr)
+            self.exeFilePathLocal = os.path.join(conf.outputPath, "tmpm%s.exe" % self.__randStr)
 
             # Metasploit developers added support for the old exe format
             # to msfencode using '-t exe-small' (>= 3.3.3-dev),
@@ -593,7 +593,7 @@ class Metasploit:
             else:
                 self.__fileFormat = "exe"
         else:
-            self.exeFilePathLocal = os.path.join(conf.outputPath, "sqlmapmsf%s" % self.__randStr)
+            self.exeFilePathLocal = os.path.join(conf.outputPath, "tmpm%s" % self.__randStr)
             self.__fileFormat     = "elf"
 
         if initialize:
@@ -684,7 +684,7 @@ class Metasploit:
 
     def smb(self):
         self.__initVars()
-        self.__randFile = "sqlmapunc%s.txt" % randomStr(lowercase=True)
+        self.__randFile = "tmpu%s.txt" % randomStr(lowercase=True)
 
         self.__forgeMsfConsoleResource()
         self.__forgeMsfConsoleCmd()

@@ -198,7 +198,7 @@ class Filesystem:
         back-end DBMS underlying file system
         """
 
-        randScr        = "sqlmapfile%s.scr" % randomStr(lowercase=True)
+        randScr        = "tmpf%s.scr" % randomStr(lowercase=True)
         chunkName      = randomStr(lowercase=True)
         fileScrLines   = self.__binDataToScr(binaryData, chunkName)
         forgedScrLines = []

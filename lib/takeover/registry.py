@@ -41,8 +41,8 @@ class Registry:
         self.__regData       = regData
 
         self.__randStr       = randomStr(lowercase=True)
-        self.__batPathRemote = "%s/sqlmapreg%s%s.bat" % (conf.tmpPath, self.__operation, self.__randStr)
-        self.__batPathLocal  = os.path.join(conf.outputPath, "sqlmapreg%s%s.bat" % (self.__operation, self.__randStr))
+        self.__batPathRemote = "%s/tmpr%s%s.bat" % (conf.tmpPath, self.__operation, self.__randStr)
+        self.__batPathLocal  = os.path.join(conf.outputPath, "tmpr%s%s.bat" % (self.__operation, self.__randStr))
 
         if parse:
             readParse = "FOR /F \"tokens=2* delims==\" %%A IN ('REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"

@@ -126,7 +126,7 @@ class xp_cmdshell:
     def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
         self.getRemoteTempPath()
 
-        tmpFile = "%s/sqlmapevalcmd%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
+        tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
         cmd     = self.xpCmdshellForgeCmd("%s > %s" % (cmd, tmpFile))
 
         self.xpCmdshellExecCmd(cmd)

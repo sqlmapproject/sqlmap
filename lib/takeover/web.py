@@ -167,11 +167,11 @@ class Web:
         directories = list(directories)
         directories.sort()
 
-        backdoorName = "tmpb%s.%s" % (randomStr(4), self.webApi)
+        backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
         originalBackdoorContent = backdoorContent = backdoorStream.read()
         
-        uploaderName = "tmpu%s.%s" % (randomStr(4), self.webApi)
+        uploaderName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
         uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "uploader.%s_" % self.webApi))
         
         for directory in directories:
@@ -200,7 +200,7 @@ class Web:
             logger.info(infoMsg)
             
             if self.webApi == "asp":
-                runcmdName = "tmpe%s.exe" % randomStr(4)
+                runcmdName = "tmpe%s.exe" % randomStr(lowercase=True)
                 runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
                 match = re.search(r'input type=hidden name=scriptsdir value="([^"]+)"', uplPage)
 

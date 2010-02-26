@@ -390,7 +390,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         self.createSupportTbl(self.fileTblName, self.tblField, "longtext")
         self.getRemoteTempPath()
 
-        tmpFile = "%s/sqlmapfilehex%s" % (conf.tmpPath, randomStr(lowercase=True))
+        tmpFile = "%s/tmpf%s" % (conf.tmpPath, randomStr(lowercase=True))
 
         debugMsg  = "saving hexadecimal encoded content of file '%s' " % rFile
         debugMsg += "into temporary file '%s'" % tmpFile
@@ -537,7 +537,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
     def udfSetLocalPaths(self):
         self.udfLocalFile     = paths.SQLMAP_UDF_PATH
-        self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
+        self.udfSharedLibName = "libs%s" % randomStr(lowercase=True)
 
         if kb.os == "Windows":
             self.udfLocalFile   += "/mysql/windows/lib_mysqludf_sys.dll"

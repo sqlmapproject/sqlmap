@@ -395,7 +395,7 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
 
     def udfSetLocalPaths(self):
         self.udfLocalFile     = paths.SQLMAP_UDF_PATH
-        self.udfSharedLibName = "libsqlmapudf%s" % randomStr(lowercase=True)
+        self.udfSharedLibName = "libs%s" % randomStr(lowercase=True)
 
         self.getVersionFromBanner()
 
