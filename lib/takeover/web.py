@@ -136,8 +136,8 @@ class Web:
 
         message  = "which web application language does the web server "
         message += "support?\n"
-        message += "[1] ASP%s\n" % " (default)" if kb.os == "Windows" else ""
-        message += "[2] PHP%s\n" % "" if kb.os == "Windows" else " (default)"
+        message += "[1] ASP%s\n" % (" (default)" if kb.os == "Windows" else "")
+        message += "[2] PHP%s\n" % ("" if kb.os == "Windows" else " (default)")
         message += "[3] JSP"
 
         while True:
