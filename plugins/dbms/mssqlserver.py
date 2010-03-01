@@ -149,9 +149,9 @@ class MSSQLServerMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
-            release = kb.bannerFp["dbmsRelease"]
-            version = kb.bannerFp["dbmsVersion"]
-            servicepack = kb.bannerFp["dbmsServicePack"]
+            release = kb.bannerFp["dbmsRelease"] if 'dbmsRelease' in kb.bannerFp else None
+            version = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
+            servicepack = kb.bannerFp["dbmsServicePack"] if 'dbmsServicePack' in kb.bannerFp else None
 
             if release and version and servicepack:
                 banVer = "Microsoft SQL Server %s " % release
