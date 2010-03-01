@@ -45,6 +45,7 @@ class MSSQLBannerHandler(ContentHandler):
         self.__inServicePack = False
         self.__release       = None
         self.__version       = ""
+        self.__versionAlt    = None
         self.__servicePack   = ""
         self.__info          = info
 
@@ -74,17 +75,23 @@ class MSSQLBannerHandler(ContentHandler):
 
     def endElement(self, name):
         if name == "signature":
-            if re.search(" %s[\.\ ]+" % self.__version, self.__banner):
-                self.__feedInfo("dbmsRelease", self.__release)
-                self.__feedInfo("dbmsVersion", self.__version)
-                self.__feedInfo("dbmsServicePack", self.__servicePack)
+            for version in (self.__version, self.__versionAlt):
+                if version and re.search(" %s[\.\ ]+" % version, self.__banner):
+                    self.__feedInfo("dbmsRelease", self.__release)
+                    self.__feedInfo("dbmsVersion", self.__version)
+                    self.__feedInfo("dbmsServicePack", self.__servicePack)
+                    break
 
             self.__version     = ""
+            self.__versionAlt  = None
             self.__servicePack = ""
 
         elif name == "version":
             self.__inVersion = False
             self.__version = self.__version.replace(" ", "")
+            
+            match = re.search(r"\A(?P<major>\d+)\.00\.(?P<build>\d+)\Z", self.__version)
+            self.__versionAlt = "%s.0.%s.0" % (match.group('major'), match.group('build')) if match else None
 
         elif name == "servicepack":
             self.__inServicePack = False
