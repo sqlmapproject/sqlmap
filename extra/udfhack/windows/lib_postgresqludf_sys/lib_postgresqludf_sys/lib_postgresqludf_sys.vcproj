@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="8,00"
 	Name="lib_postgresqludf_sys"
 	ProjectGUID="{3527D58C-177A-47B3-981B-8104EBB3F943}"
 	RootNamespace="lib_postgresqludf_sys"

@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual C++ Express 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_postgresqludf_sys", "lib_postgresqludf_sys\lib_postgresqludf_sys.vcproj", "{3527D58C-177A-47B3-981B-8104EBB3F943}"
 EndProject
 Global

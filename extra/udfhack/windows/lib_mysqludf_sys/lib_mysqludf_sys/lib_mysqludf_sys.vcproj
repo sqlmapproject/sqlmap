@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="8,00"
 	Name="lib_mysqludf_sys"
 	ProjectGUID="{4D362A3E-CA53-444C-B1C8-C49641823875}"
 	RootNamespace="lib_mysqludf_sys"
