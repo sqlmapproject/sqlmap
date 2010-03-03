@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
-<date>version 0.8, March 01, 2010
+<date>version 0.8, March 14, 2010
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">
@@ -16,20 +16,8 @@ for the latest version.
 
 <sect>Introduction
 <p>
-sqlmap is an open source command-line automatic
-<htmlurl url="http://www.google.com/search?q=SQL+injection" name="SQL injection">
-tool.
-Its goal is to detect and take advantage of SQL injection vulnerabilities
-in web applications. Once it detects one or more SQL injections on the
-target host, the user can choose among a variety of options to perform an
-extensive back-end database management system fingerprint, retrieve DBMS
-session user and database, enumerate users, password hashes, privileges,
-databases, dump entire or user's specified DBMS tables/columns, run his own
-SQL statement, read or write either text or binary files on the file
-system, execute arbitrary commands on the operating system, establish an
-out-of-band stateful connection between the attacker box and the database
-server via Metasploit payload stager, database stored procedure buffer
-overflow exploitation or SMB relay attack and more.
+sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of back-end database servers.
+It comes with a broad range of features lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.
 
 
 <sect1>Requirements
@@ -37,21 +25,29 @@ overflow exploitation or SMB relay attack and more.
 <p>
 sqlmap is developed in <htmlurl url="http://www.python.org" name="Python">,
 a dynamic object-oriented interpreted programming language.
-This makes the tool independent from the operating system since it only
+This makes the tool independent from the operating system. It only
 requires the Python interpreter version equal or above to <bf>2.5</bf>.
 The interpreter is freely downloadable from its
 <htmlurl url="http://python.org/download/" name="official site">.
 To make it even easier, many GNU/Linux distributions come out of the box
-with Python interpreter package installed and other Unices and MacOS X
-too provide it packaged in their formats and ready to be installed.
+with Python interpreter installed and other Unices and MacOS X too provide
+it packaged in their formats and ready to be installed.
 Windows users can download and install the Python setup-ready installer
 for x86, AMD64 and Itanium too.
 
 sqlmap relies on the <htmlurl url="http://metasploit.com/framework/"
 name="Metasploit Framework"> for some of its post-exploitation takeover
-functionalities. You need to grab a copy of it from the
+features. You need to grab a copy of it from the
 <htmlurl url="http://metasploit.com/framework/download/" name="download">
-page. The required version is <bf>3.3.3</bf> or above.
+page. The required version is <bf>3.3.3</bf> or above. However, it is
+recommended to use the Metasploit latest development version from the
+<htmlurl url="https://www.metasploit.com/svn/framework3/trunk/"
+name="Subversion repository">.
+
+If you plan to attack a web application behind NTLM authentication or use
+the sqlmap update functionality you need to install respectively
+<htmlurl url="http://code.google.com/p/python-ntlm/" name="python-ntlm">
+and <htmlurl url="http://pysvn.tigris.org/" name="python-svn"> libraries.
 
 Optionally, if you are running sqlmap on Windows, you may wish to install
 <htmlurl url="http://ipython.scipy.org/moin/PyReadline/Intro" name="PyReadline">
@@ -98,12 +94,11 @@ This is a quite common flaw in dynamic content web applications and it
 does not depend upon the back-end database management system nor on the web
 application programming language: it is a programmer code's security flaw.
 The <htmlurl url="http://www.owasp.org" name="Open Web Application Security Project">
-rated on 2007 in their <htmlurl url="http://www.owasp.org/index.php/Top_10_2007"
+rated on 2010 in their <htmlurl url="http://www.owasp.org/index.php/Category:OWASP_Top_Ten_Project"
 name="OWASP Top Ten"> survey this vulnerability as the <htmlurl
-url="http://www.owasp.org/index.php/Top_10_2007-A2" name="most
-common"> and important web application vulnerability, second only to
-<htmlurl url="http://www.owasp.org/index.php/Top_10_2007-A1"
-name="Cross-Site Scripting">.
+url="http://www.owasp.org/images/0/0f/OWASP_T10_-_2010_rc1.pdf" name="most
+common"> and important web application vulnerability along with other
+injection flaws.
 
 Back to the scenario, probably the SQL <tt>SELECT</tt> statement into
 <tt>get_int.php</tt> has a syntax similar to the following SQL query, in
@@ -141,9 +136,8 @@ to sqlmap, the tool will automatically:
 
 <itemize>
 <item>Identify the vulnerable parameter(s) (<tt>id</tt> in this scenario);
-<item>Depending on the user's options, sqlmap uses the <bf>blind SQL
-injection</bf> or the <bf>inband SQL injection</bf> technique as described
-in the following section to go ahead with the exploiting.
+<item>Depending on the user's options, fingerprint, enumerate, takeover
+the database server.
 </itemize>
 
 
@@ -197,7 +191,7 @@ and the session user privileges.
 <sect>Features
 
 <p>
-Major features implemented in sqlmap include:
+Features implemented in sqlmap include:
 
 
 <sect1>Generic features
@@ -206,7 +200,7 @@ Major features implemented in sqlmap include:
 <itemize>
 <item>Full support for <bf>MySQL</bf>, <bf>Oracle</bf>, <bf>PostgreSQL</bf>
 and <bf>Microsoft SQL Server</bf> back-end database management systems.
-Besides these four database management systems software. sqlmap can also
+Besides these four database management systems software, sqlmap can also
 identify Microsoft Access, DB2, Informix, Sybase and Interbase.
 
 <item>Full support for three SQL injection techniques: <bf> inferential
@@ -216,12 +210,13 @@ blind SQL injection</bf>.
 
 <item>It is possible to provide a single target URL, get the list of
 targets from <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
-requests log file path or
+requests log file or
 <htmlurl url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" name="WebScarab proxy">
-<tt>conversations/</tt> folder path or get the list of targets by providing
-sqlmap with a Google dork which queries
-<htmlurl url="http://www.google.com" name="Google"> search engine and
-parses its results page.
+<tt>conversations/</tt> folder, get the whole HTTP request from a text
+file or get the list of targets by providing sqlmap with a Google dork
+which queries <htmlurl url="http://www.google.com" name="Google"> search engine and
+parses its results page. You can also define a regular-expression based
+scope that is used to identify which of the parsed addresses to test.
 
 <item>Automatically tests all provided <bf>GET</bf> parameters,
 <bf>POST</bf> parameters, HTTP <bf>Cookie</bf> header values and HTTP
@@ -230,29 +225,32 @@ those that vary the HTTP response page content.
 On the dynamic ones sqlmap automatically tests and detects the ones
 affected by SQL injection. Each dynamic parameter is tested for
 <em>numeric</em>, <em>single quoted string</em>, <em>double quoted
-string</em> and all of these three datatypes with zero to two parenthesis
+string</em> and all of these three data-types with zero to two parenthesis
 to correctly detect which is the <tt>SELECT</tt> statement syntax to
-perform further injections with. It is also possible to specify the
+perform further injections with. It is also possible to specify the only
 parameter(s) that you want to perform tests and use for injection on.
 
 <item>Option to specify the <bf>maximum number of concurrent HTTP
-requests</bf> to speed up the blind SQL injection algorithms
-(multithreading). It is also possible to specify the number of seconds to
+requests</bf> to speed up the inferential blind SQL injection algorithms
+(multi-threading). It is also possible to specify the number of seconds to
 wait between each HTTP request.
 
 <item><bf>HTTP <tt>Cookie</tt> header</bf> string support, useful when the
 web application requires authentication based upon cookies and you have
 such data or in case you just want to test for and exploit SQL injection
-on such header.
+on such header. You can also specify to always URL-encode the Cookie
+header.
 
 <item>Automatically handle <bf>HTTP <tt>Set-Cookie</tt> header</bf> from
-target url, re-establishing of the session if it expires. Test and exploit
-on these values is supported too.
+the application, re-establishing of the session if it expires. Test and
+exploit on these values is supported too. You can also force to ignore any
+<tt>Set-Cookie</tt> header.
 
-<item><bf>HTTP Basic and Digest authentications</bf> support.
+<item><bf>HTTP Basic, Digest, NTLM and Certificate authentications</bf>
+support.
 
 <item><bf>Anonymous HTTP proxy</bf> support to pass by the requests to the
-target URL that works also with HTTPS requests.
+target application that works also with HTTPS requests.
 
 <item>Options to fake the <bf>HTTP <tt>Referer</tt> header</bf> value and
 the <bf>HTTP <tt>User-Agent</tt> header</bf> value specified by user or
@@ -260,7 +258,7 @@ randomly selected from a text file.
 
 <item>Support to increase the <bf>verbosity level of output messages</bf>:
 there exist <bf>six levels</bf>. The default level is <bf>1</bf> in which
-information, warnings, errors and tracebacks, if they occur, will be shown.
+information, warnings, errors and tracebacks (if any occur) will be shown.
 
 <item>Granularity in the user's options.
 
@@ -268,83 +266,140 @@ information, warnings, errors and tracebacks, if they occur, will be shown.
 in real time while fetching the information to give to the user an
 overview on how long it will take to retrieve the output.
 
-<item>Support to save the session (queries and their output, even if
-partially retrieved) in real time while fetching the data on a text file
-and <bf>resume the injection from this file in a second time</bf>.
+<item>Automatic support to save the session (queries and their output,
+even if partially retrieved) in real time while fetching the data on a
+text file and <bf>resume the injection from this file in a second
+time</bf>.
 
 <item>Support to read options from a configuration INI file rather than
 specify each time all of the options on the command line. Support also to
 save command line options on a configuration INI file.
 
-<item>Integration with other IT security related open source projects,
+<item>Option to update sqlmap as a whole to the latest development version
+from the Subversion repository.
+
+<item>Integration with other IT security open source projects,
 <htmlurl url="http://metasploit.com/framework/" name="Metasploit"> and <htmlurl
 url="http://w3af.sourceforge.net/" name="w3af">.
-
-<item><bf>PHP setting <tt>magic_quotes_gpc</tt> bypass</bf> by encoding
-every query string, between single quotes, with <tt>CHAR</tt>, or similar,
-database management system function.
 </itemize>
 
 
-<sect1>Enumeration features
+<sect1>Fingerprint and enumeration features
 
 <p>
 <itemize>
-<item><bf>Extensive back-end database management system software and
-underlying operating system fingerprint</bf>
-based upon
+<item><bf>Extensive back-end database software version and underlying
+operating system fingerprint</bf> based upon
 <htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="inband error messages">,
 <htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="banner parsing">,
 <htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="functions output comparison"> and
 <htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="specific features">
 such as MySQL comment injection. It is also possible to force the back-end
-database management system name if you already know it. sqlmap is also able
-to fingerprint the web server operating system, the web application
-technology and, in some circumstances, the back-end DBMS operating system.
+database management system name if you already know it.
 
 <item>Basic web server software and web application technology fingerprint.
 
-<item>Support to retrieve on all four back-end database management system
-<bf>banner</bf>, <bf>current user</bf>, <bf>current database</bf>, check
-if the current user is a database administrator, enumerate <bf>users</bf>,
-<bf>users password hashes</bf>, <bf>users privileges</bf>,
-<bf>databases</bf>, <bf>tables</bf>, <bf>columns</bf>, dump <bf>tables
-entries</bf>, dump <bf>whole database management system</bf> and run user's
-<bf>own SQL statement</bf>.
+<item>Support to retrieve the DBMS <bf>banner</bf>, <bf>session user</bf>
+and <bf>current database</bf> information. The tool can also check if the
+session user is a database administrator (DBA).
+
+<item>Support to enumerate <bf>database users</bf>, <bf>users' password
+hashes</bf>, <bf>users' privileges</bf>, <bf>databases</bf>,
+<bf>tables</bf> and <bf>columns</bf>.
+
+<item>Support to <bf>dump database tables</bf> as a whole or a range of
+entries as per user's choice. The user can also choose to dump only
+specific column(s).
+
+<item>Support to automatically dump <bf>all</bf> databases' schemas and
+entries. It is possibly to exclude from the dump the system databases.
+
+<item>Support to enumerate and dump <bf>all databases' tables containing user
+provided column(s)</bf>. Useful to identify for instance tables containing
+custom application credentials.
+
+<item>Support to <bf>run custom SQL statement(s)</bf> as in an interactive
+SQL client connecting to the back-end database. sqlmap automatically
+dissects the provided statement, determins which technique to use to
+inject it and how to pack the SQL payload accordingly.
 </itemize>
+
 
 <sect1>Takeover features
 
 <p>
-<itemize>
-<item>Support to <bf>read either text or binary files</bf> from the
-database server underlying file system when the database software is MySQL,
-PostgreSQL and Microsoft SQL Server.
+Some of these techniques are detailed in white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf"
+name="Advanced SQL injection to operating system full control"> and
+slides <htmlurl
+url="http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database"
+name="Expanding the control over the operating system from the database">.
 
-<item>Support to <bf>execute arbitrary commands</bf> on the database server
-underlying operating system when the database software is MySQL,
-PostgreSQL via user-defined function injection and Microsoft SQL Server via
-<tt>xp_cmdshell()</tt> stored procedure.
-
-<item>Support to <bf>establish an out-of-band stateful connection between
-the attacker box and the database server</bf> underlying operating system
-via:
 <itemize>
-<item><bf>Stand-alone payload stager</bf> created by Metasploit and
-supporting Meterpreter, shell and VNC payloads for both Windows and Linux;
-<item><bf>Microsoft SQL Server 2000 and 2005 <tt>sp_replwritetovarbin</tt>
-stored procedure heap-based buffer overflow</bf> (MS09-004) exploitation
-with multi-stage Metasploit payload support;
-<item><bf>SMB reflection attack</bf> with UNC path request from the
-database server to the attacker box by using the Metasploit
-<tt>smb_relay</tt> exploit on the attacker box.
+<item>Support to <bf>inject custom user-defined functions</bf>: the user
+can compile shared object then use sqlmap to create within the back-end
+DBMS user-defined functions out of the compiled shared object file. These
+UDFs can then be executed, and optionally removed, via sqlmap too.
+
+<item>Support to <bf>read and upload any file</bf> from the database
+server underlying file system when the database software is MySQL,
+PostgreSQL or Microsoft SQL Server.
+
+<item>Support to <bf>execute arbitrary commands and retrieve their
+standard output</bf> on the database server underlying operating system
+when the database software is MySQL, PostgreSQL or Microsoft SQL Server.
+<itemize>
+<item>On MySQL and PostgreSQL via user-defined function injection and
+execution.
+<item>On Microsoft SQL Server via <tt>xp_cmdshell()</tt> stored procedure.
+Also, the stored procedure is re-enabled if disabled or created from
+scratch if removed.
+</itemize>
+
+<item>Support to <bf>establish an out-of-band stateful TCP connection
+between the user machine and the database server</bf> underlying operating
+system. This channel can be an interactive command prompt, a Meterpreter
+session or a graphical user interface (VNC) session as per user's choice.
+sqlmap relies on Metasploit to create the shellcode and implements four
+different techniques to execute it on the database server. These
+techniques are:
+<itemize>
+<item>Database <bf>in-memory execution of the Metasploit's shellcode</bf>
+via sqlmap own user-defined function <tt>sys_bineval()</tt>. Supported on
+MySQL and PostgreSQL.
+<item>Upload and execution of a Metasploit's <bf>stand-alone payload
+stager</bf> via sqlmap own user-defined function <tt>sys_exec()</tt> on
+MySQL and PostgreSQL or via <tt>xp_cmdshell()</tt> on Microsoft SQL
+Server.
+<item>Execution of Metasploit's shellcode by performing a <bf>SMB
+reflection attack</bf> (<htmlurl
+url="http://www.microsoft.com/technet/security/Bulletin/MS08-068.mspx"
+name="MS08-068">) with a UNC path request from the database server to
+the user's machine where the Metasploit <tt>smb_relay</tt> server exploit
+runs.
+<item>Database in-memory execution of the Metasploit's shellcode by
+exploiting <bf>Microsoft SQL Server 2000 and 2005
+<tt>sp_replwritetovarbin</tt> stored procedure heap-based buffer
+overflow</bf> (<htmlurl
+url="http://www.microsoft.com/technet/security/bulletin/ms09-004.mspx"
+name="MS09-004">) with automatic DEP bypass.
 </itemize>
 
 <item>Support for <bf>database process' user privilege escalation</bf> via
-Windows Access Tokens kidnapping on MySQL and Microsoft SQL Server via
-either Meterpreter's <tt>incognito</tt> extension or <tt>Churrasco</tt>
-stand-alone executable.
+Metasploit's <tt>getsystem</tt> command which include, among others,
+the <htmlurl
+url="http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html"
+name="kitrap0d"> technique (<htmlurl
+url="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx"
+name="MS10-015">) or via <htmlurl
+url="http://www.argeniss.com/research/TokenKidnapping.pdf"
+name="Windows Access Tokens kidnapping"> by using either Meterpreter's
+<tt>incognito</tt> extension or <tt>Churrasco</tt> stand-alone executable
+as per user's choice.
+
+<item>Support to access (read/add/delete) Windows registry hives.
 </itemize>
+
 
 <sect>Download and update
 
@@ -377,12 +432,26 @@ interpreter</bf> to be installed on the operating system.
 </itemize>
 
 <p>
-You can also checkout the source code from the sqlmap
+You can also checkout the latest development version from the sqlmap
 <htmlurl url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/" name="Subversion">
-repository to give a try to the development release:
+repository:
 
 <tscreen><verb>
 $ svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev
+</verb></tscreen>
+
+<p>
+Either way you downloaded sqlmap, you can update it to the latest
+development version anytime by running:
+
+<tscreen><verb>
+$ python sqlmap.py --update
+</verb></tscreen>
+
+Or:
+
+<tscreen><verb>
+$ svn update
 </verb></tscreen>
 
 
@@ -392,9 +461,7 @@ $ svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev
 sqlmap is released under the terms of the
 <htmlurl url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html" name="General Public License v2">.
 sqlmap is copyrighted by
-<htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">
-(2007-2009) and <htmlurl url="mailto:daniele.bellucci@gmail.com" name="Daniele Bellucci">
-(2006).
+<htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">.
 
 
 <sect>Usage
@@ -549,7 +616,7 @@ Options:
     -s SESSIONFILE      Save and resume all data retrieved on a session file
     --eta               Display for each output the estimated time of arrival
     --gpage=GOOGLEPAGE  Use google dork results from specified page number
-    --update            Update Microsoft SQL Server XML signature file
+    --update            Update sqlmap
     --save              Save options on a configuration INI file
     --batch             Never ask for user input, use the default behaviour
     --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
