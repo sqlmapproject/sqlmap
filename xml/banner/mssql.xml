@@ -3,10 +3,18 @@
     <signatures release="2008">
         <signature>
             <version>
+                10.00.2758
+            </version>
+            <servicepack>
+                1+Q978791
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
                 10.00.2734
             </version>
             <servicepack>
-                1 + Cumulative Update 4
+                0+ Cumulative Update 4 for 1
             </servicepack>
         </signature>
         <signature>
@@ -14,7 +22,7 @@
                 10.00.2723
             </version>
             <servicepack>
-                1 + Cumulative Update 3
+                0+ Cumulative Update 3 for 1
             </servicepack>
         </signature>
         <signature>
@@ -22,7 +30,7 @@
                 10.00.2714
             </version>
             <servicepack>
-                1 + Cumulative Update 2
+                0+ Cumulative Update 2 for 1
             </servicepack>
         </signature>
         <signature>
@@ -30,7 +38,7 @@
                 10.00.2712
             </version>
             <servicepack>
-                0+Q970507
+                0+ Q970507
             </servicepack>
         </signature>
         <signature>
@@ -38,7 +46,7 @@
                 10.00.2710
             </version>
             <servicepack>
-                1 + Cumulative Update 1
+                0+ Cumulative Update 1 for 1
             </servicepack>
         </signature>
         <signature>
@@ -46,7 +54,7 @@
                 10.00.2531
             </version>
             <servicepack>
-                1
+                0+  1
             </servicepack>
         </signature>
         <signature>
@@ -54,7 +62,7 @@
                 10.00.1812
             </version>
             <servicepack>
-                0 + Cumulative Update 6
+                0+ Cumulative Update 6
             </servicepack>
         </signature>
         <signature>
@@ -62,7 +70,7 @@
                 9.00.1806
             </version>
             <servicepack>
-                0 + Cumulative Update 5
+                0+ Cumulative Update 5
             </servicepack>
         </signature>
         <signature>
@@ -70,7 +78,7 @@
                 10.00.1798
             </version>
             <servicepack>
-                0 + Cumulative Update 4
+                0+ Cumulative Update 4
             </servicepack>
         </signature>
         <signature>
@@ -139,6 +147,22 @@
         </signature>
     </signatures>
     <signatures release="2005">
+        <signature>
+            <version>
+                9.00.4285
+            </version>
+            <servicepack>
+                3+Q978915
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                9.00.4278
+            </version>
+            <servicepack>
+                3+Q978791
+            </servicepack>
+        </signature>
         <signature>
             <version>
                 9.00.4273
@@ -216,7 +240,7 @@
                 9.00.4035
             </version>
             <servicepack>
-                3
+                0+3
             </servicepack>
         </signature>
         <signature>
