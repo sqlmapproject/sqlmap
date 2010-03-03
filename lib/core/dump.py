@@ -302,9 +302,9 @@ class Dump:
                 self.__write("| %s%s" % (column, blank), n=False)
 
                 if not conf.multipleTargets and field == fields:
-                    dataToDumpFile(dumpFP, "\"%s\"" % column)
+                    dataToDumpFile(dumpFP, "%s" % column)
                 elif not conf.multipleTargets:
-                    dataToDumpFile(dumpFP, "\"%s\"," % column)
+                    dataToDumpFile(dumpFP, "%s," % column)
 
                 field += 1
 
