@@ -241,25 +241,23 @@ def cmdLineParser():
 
         enumeration.add_option("--passwords", dest="getPasswordHashes",
                                action="store_true",
-                               help="Enumerate DBMS users password hashes (opt -U)")
+                               help="Enumerate DBMS users password hashes")
 
         enumeration.add_option("--privileges", dest="getPrivileges",
                                action="store_true",
-                               help="Enumerate DBMS users privileges (opt -U)")
+                               help="Enumerate DBMS users privileges")
 
         enumeration.add_option("--dbs", dest="getDbs", action="store_true",
                                help="Enumerate DBMS databases")
 
         enumeration.add_option("--tables", dest="getTables", action="store_true",
-                               help="Enumerate DBMS database tables (opt -D)")
+                               help="Enumerate DBMS database tables")
 
         enumeration.add_option("--columns", dest="getColumns", action="store_true",
-                               help="Enumerate DBMS database table columns "
-                                    "(req -T opt -D)")
+                               help="Enumerate DBMS database table columns")
 
         enumeration.add_option("--dump", dest="dumpTable", action="store_true",
-                               help="Dump DBMS database table entries "
-                                    "(req -T, opt -D, -C)")
+                               help="Dump DBMS database table entries")
 
         enumeration.add_option("--dump-all", dest="dumpAll", action="store_true",
                                help="Dump all DBMS databases tables entries")
