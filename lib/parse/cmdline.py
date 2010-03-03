@@ -407,7 +407,7 @@ def cmdLineParser():
                                  help="Use google dork results from specified page number")
 
         miscellaneous.add_option("--update", dest="updateAll", action="store_true",
-                                  help="Update Microsoft SQL Server XML signature file")
+                                  help="Update sqlmap")
 
         miscellaneous.add_option("--save", dest="saveCmdline", action="store_true",
                                  help="Save options on a configuration INI file")

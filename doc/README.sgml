@@ -429,7 +429,7 @@ Options:
     --method=METHOD     HTTP method, GET or POST (default GET)
     --data=DATA         Data string to be sent through POST
     --cookie=COOKIE     HTTP Cookie header
-    --cookie-urlencode  URL-encode generated cookie injections
+    --cookie-urlencode  URL Encode generated cookie injections
     --drop-set-cookie   Ignore Set-Cookie header from response
     --user-agent=AGENT  HTTP User-Agent header
     -a USERAGENTSFILE   Load a random HTTP User-Agent header from file
@@ -868,7 +868,52 @@ back-end DBMS: MySQL >= 5.0.0
 
 <p>
 Option: <tt>-r</tt>
-#TODO
+
+<p>
+One of the possibilities of sqlmap is loading of complete HTTP 
+request packet stored in textual file. That way you can skip usage of
+bunch of other options.
+
+<p>
+Sample content of a HTTP request file:
+
+<tscreen><verb>
+POST /sqlmap/mysql/post_int.php HTTP/1.1
+Host: 157.247.180.194
+User-Agent: Mozilla/4.0
+
+id=1
+</verb></tscreen>
+
+<p>
+Example usage:
+
+<tscreen><verb>
+
+$ python sqlmap.py -r request.txt
+
+[...]
+[11:54:27] [INFO] parsing HTTP request from 'request.txt'
+[...]
+[11:52:21] [INFO] testing if POST parameter 'id' is dynamic
+[11:52:22] [INFO] confirming that POST parameter 'id' is dynamic
+[11:52:22] [INFO] POST parameter 'id' is dynamic
+[11:52:22] [INFO] testing sql injection on POST parameter 'id' with 0 parenthesis
+[11:52:22] [INFO] testing unescaped numeric injection on POST parameter 'id'
+[11:52:22] [INFO] confirming unescaped numeric injection on POST parameter 'id'
+[11:52:22] [INFO] POST parameter 'id' is unescaped numeric injectable with 0 parenthesis
+[11:52:22] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
+[11:52:22] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+[11:52:22] [INFO] testing for parenthesis on injectable parameter
+[11:52:22] [INFO] the injectable parameter requires 0 parenthesis
+[11:52:22] [INFO] testing MySQL
+[11:52:22] [INFO] confirming MySQL
+[11:52:22] [INFO] retrieved: 3
+[11:52:22] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu 8.04 (Hardy Heron)
+web application technology: PHP 5.2.4, Apache 2.2.8
+back-end DBMS: MySQL >= 5.0.0
+</verb></tscreen>
 
 
 <sect2>Process Google dork results as target urls
@@ -1108,18 +1153,24 @@ values that you provided? [Y/n]
 </verb></tscreen>
 
 
-<sect2>URL-encode generated cookie injections
+<sect2>URL Encode generated cookie injections
 
 <p>
 Option: <tt>-</tt><tt>-cookie-urlencode</tt>
-#TODO
+
+sqlmap by default doesn't URL Encode generated cookie injections, but you can force it by 
+using this flag. Cookie content encoding is not declared by standard in any way, so it's 
+solely the matter of web application's behaviour.
 
 
 <sect2>Ignore <tt>Set-Cookie</tt> header from response
 
 <p>
 Option: <tt>-</tt><tt>-drop-set-cookie</tt>
-#TODO
+
+Sometimes there is a need for ignoring any session cookie(s) returned by web server and/or
+usage of only the custom supplied value (see option <tt>-</tt><tt>-cookie</tt>). In such cases
+option <tt>-</tt><tt>-drop-set-cookie</tt> should be used.
 
 
 <sect2>HTTP <tt>User-Agent</tt> header
@@ -1317,7 +1368,21 @@ Connection: close
 
 <p>
 Option: <tt>-</tt><tt>-auth-cert</tt>
-#TODO
+
+This option should be used in cases when the web server requires proper user's 
+certificate for authentication. Supplied values should be in the form: <tt>key_file,
+cert_file</tt>, where <tt>key_file</tt> should be the name of a PEM formatted file that 
+contains your private key, while <tt>cert_file</tt> should be the name for a PEM formatted 
+certificate chain file.
+
+<p>
+Example:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://www.example.com/process.php?id=1" \
+  --auth-cert key.pem,cert.pem
+[...]
+</verb></tscreen>
 
 
 <sect2>HTTP proxy
@@ -1451,7 +1516,10 @@ Option: <tt>-</tt><tt>-scope</tt>
 
 <p>
 Option: <tt>-</tt><tt>-ignore-proxy</tt>
-#TODO
+
+This option should be used in cases like when you want to run sqlmap
+against the machine inside a local area network skipping default
+usage of a system wide set HTTP proxy server.
 
 
 <sect1>Injection
@@ -5186,84 +5254,28 @@ Option: <tt>-</tt><tt>-gpage</tt>
 #TODO
 
 
-<sect2>Update Microsoft SQL Server XML signature file
+<sect2>Update <tt>sqlmap</tt>
 
 <p>
 Option: <tt>-</tt><tt>-update</tt>
-#TODO
 
 <p>
-
-It is possible to update sqlmap to the latest stable version available on
-project's <htmlurl url="http://sourceforge.net/projects/sqlmap/files/"
-name="SourceForge File List page"> by running it with the
-<tt>-</tt><tt>-update</tt> option.
-
-<tscreen><verb>
-$ python sqlmap.py --update -v 4
-
-[hh:mm:53] [DEBUG] initializing the configuration
-[hh:mm:53] [DEBUG] initializing the knowledge base
-[hh:mm:53] [DEBUG] cleaning up configuration parameters
-[hh:mm:53] [DEBUG] setting the HTTP method to perform HTTP requests through
-[hh:mm:53] [DEBUG] creating HTTP requests opener object
-[hh:mm:53] [INFO] updating sqlmap
-[hh:mm:53] [DEBUG] checking if a new version is available
-[hh:mm:55] [TRAFFIC OUT] HTTP request:
-GET /doc/VERSION HTTP/1.1
-Host: sqlmap.sourceforge.net
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
-
-[hh:mm:55] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Fri, 01 Aug 2008 14:50:55 GMT
-Server: Apache/1.3.33 (Unix) PHP/4.3.10
-Last-Modified: Thu, 31 Jul 2008 11:10:19 GMT
-ETag: "9fcc53e-4-48919d9b"
-Accept-Ranges: bytes
-Content-Length: 4
-Connection: close
-Content-Type: text/plain
-X-Pad: avoid browser bug
-
-[hh:mm:55] [INFO] you are already running sqlmap latest stable version
-[hh:mm:55] [INFO] updating Microsoft SQL Server XML versions file
-[hh:mm:56] [TRAFFIC OUT] HTTP request:
-GET /FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx HTTP/1.1
-Host: www.sqlsecurity.com
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Cookie: .ASPXANONYMOUS=dvus03cqyQEkAAAANDI0M2QzZmUtOGRkOS00ZDQxLThhMTUtN2ExMWJiNWVjN2My0; 
-language=en-US
-Connection: close
-
-[hh:mm:02] [TRAFFIC IN] HTTP response (OK - 200):
-Cache-Control: private
-Connection: close
-Date: Fri, 01 Aug 2008 14:50:50 GMT
-Content-Length: 167918
-Content-Type: text/html; charset=utf-8
-Server: Microsoft-IIS/6.0
-X-Powered-By: ASP.NET
-X-AspNet-Version: 2.0.50727
-Set-Cookie: .ASPXANONYMOUS=dvus03cqyQEkAAAANDI0M2QzZmUtOGRkOS00ZDQxLThhMTUtN2ExMWJiNWVjN2My0; 
-expires=Fri, 10-Oct-2008 01:30:49 GMT; path=/; HttpOnly
-Set-Cookie: language=en-US; path=/; HttpOnly
-
-[hh:mm:02] [INFO] no new Microsoft SQL Server versions since the last update
-[hh:mm:02] [DEBUG] parsing XML queries file
-</verb></tscreen>
-
-<p>
-As you can see, sqlmap first checks if a new stable version is available,
-and then in case it is, downloads it, unzips it and updates the Microsoft SQL
-Server XML versions file from Chip Andrews'
+Using this option you can update the program to the latest version 
+directly from source repository together with the latest 
+Microsoft SQL Server XML versions file from Chip Andrews'
 <htmlurl url="http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx"
 name="SQLSecurity.com site">.
 
-<p>
-Note that the default configuration file <tt>sqlmap.conf</tt> is backupped
-to <tt>sqlmap.conf.bak</tt> each time a new stable version is available and
-your copy is outdated.
+<tscreen><verb>
+$ python sqlmap.py --update
+
+[...]
+[hh:mm:27] [INFO] updating sqlmap to latest development version from the subversion repository
+[hh:mm:28] [INFO] updated to the latest revision 1356
+[hh:mm:29] [INFO] updating Microsoft SQL Server XML versions file
+[hh:mm:33] [INFO] no new Microsoft SQL Server versions since the last update
+[...]
+</verb></tscreen>
 
 
 <sect2>Save options on a configuration INI file
