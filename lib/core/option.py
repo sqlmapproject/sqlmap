@@ -279,8 +279,8 @@ def __setRequestFromFile():
     
     conf.requestFile = os.path.expanduser(conf.requestFile)
     
-    debugMsg = "parsing HTTP request from '%s'" % conf.requestFile
-    logger.debug(debugMsg)
+    infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
+    logger.info(infoMsg)
 
     if not os.path.isfile(conf.requestFile):
         errMsg  = "the specified HTTP request file "
