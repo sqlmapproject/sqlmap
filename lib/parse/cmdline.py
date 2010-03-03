@@ -77,7 +77,7 @@ def cmdLineParser():
 
         request.add_option("--cookie-urlencode", dest="cookieUrlencode",
                              action="store_true",
-                             help="URL-encode generated cookie injections")
+                             help="URL Encode generated cookie injections")
 
         request.add_option("--drop-set-cookie", dest="dropSetCookie",
                            action="store_true",
