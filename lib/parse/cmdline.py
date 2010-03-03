@@ -111,6 +111,10 @@ def cmdLineParser():
         request.add_option("--proxy", dest="proxy",
                            help="Use a HTTP proxy to connect to the target url")
 
+        request.add_option("--ignore-proxy", dest="ignoreProxy",
+                            action="store_true",
+                           help="Ignore system default HTTP proxy")
+
         request.add_option("--threads", dest="threads", type="int", default=1,
                            help="Maximum number of concurrent HTTP "
                                 "requests (default 1)")
@@ -128,10 +132,6 @@ def cmdLineParser():
 
         request.add_option("--scope", dest="scope", 
                            help="Regexp to filter targets from provided proxy log")
-
-        request.add_option("--ignore-proxy", dest="ignoreProxy",
-                            action="store_true",
-                           help="Ignore system default HTTP proxy")
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "

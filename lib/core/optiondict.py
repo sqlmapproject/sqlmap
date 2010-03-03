@@ -46,12 +46,12 @@ optDict = {
                                "aCred":             "string",
                                "aCert":             "string",
                                "proxy":             "string",
+                               "ignoreProxy":       "boolean",
                                "threads":           "integer",
                                "delay":             "float",
                                "timeout":           "float",
                                "retries":           "integer",
-                               "scope":             "string",
-                               "ignoreProxy":       "boolean"
+                               "scope":             "string"
                              },
 
             "Injection":     {
