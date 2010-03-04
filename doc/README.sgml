@@ -399,7 +399,9 @@ url="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx"
 name="MS10-015">) or via <htmlurl
 url="http://www.argeniss.com/research/TokenKidnapping.pdf"
 name="Windows Access Tokens kidnapping"> by using either Meterpreter's
-<tt>incognito</tt> extension or <tt>Churrasco</tt> stand-alone executable
+<tt>incognito</tt> extension or <tt>Churrasco</tt> (<htmlurl
+url="http://www.microsoft.com/technet/security/bulletin/ms09-012.mspx"
+name="MS09-012">) stand-alone executable
 as per user's choice.
 
 <item>Support to access (read/add/delete) Windows registry hives.
