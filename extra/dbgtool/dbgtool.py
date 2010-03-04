@@ -2,7 +2,7 @@
 
 """
 dbgtool.py - Portable executable to ASCII debug script converter
-Copyright (C) 2009  Bernardo Damele A. G.
+Copyright (C) 2009-2010  Bernardo Damele A. G.
 web: http://bernardodamele.blogspot.com/
 email: bernardo.damele@gmail.com
 

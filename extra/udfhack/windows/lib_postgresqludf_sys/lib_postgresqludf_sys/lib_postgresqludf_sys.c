@@ -1,6 +1,6 @@
 /* 
 	lib_postgresqludf_sys - a library with miscellaneous (operating) system level functions
-	Copyright (C) 2009  Bernardo Damele A. G.
+	Copyright (C) 2009-2010  Bernardo Damele A. G.
 	web: http://bernardodamele.blogspot.com/
 	email: bernardo.damele@gmail.com
 	
