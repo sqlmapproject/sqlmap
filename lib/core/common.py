@@ -130,7 +130,7 @@ def formatDBMSfp(versions=None):
     @rtype: C{str}
     """
 
-    if not versions:
+    if not versions or versions == [None]:
         versions = kb.dbmsVersion
 
     if isinstance(versions, str):

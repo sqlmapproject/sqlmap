@@ -218,7 +218,7 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
             value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
 
         if kb.bannerFp:
-            banVer = kb.bannerFp["dbmsVersion"]
+            banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
 
             if re.search("-log$", kb.data.banner):
                 banVer += ", logging enabled"
