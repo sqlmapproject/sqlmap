@@ -103,7 +103,6 @@ class Enumeration:
 
         infoMsg = "fetching banner"
         logger.info(infoMsg)
-
         if not kb.data.banner:
             if conf.unionUse or conf.unionTest:
                 dumper.string("valid union", unionTest())

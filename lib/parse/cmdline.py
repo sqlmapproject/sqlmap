@@ -397,6 +397,9 @@ def cmdLineParser():
                                  help="Save and resume all data retrieved "
                                       "on a session file")
                                       
+        miscellaneous.add_option("--flush-session", dest="flushSession", action="store_true",
+                                 help="Flush session file for current target")
+                                      
         miscellaneous.add_option("--eta", dest="eta", action="store_true",
                                  help="Display for each output the "
                                       "estimated time of arrival")

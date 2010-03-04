@@ -117,42 +117,50 @@ def __setOutputResume():
     logger.info("using '%s' as session file" % conf.sessionFile)
 
     if os.path.exists(conf.sessionFile):
-        readSessionFP = open(conf.sessionFile, "r")
-        lines = readSessionFP.readlines()
-
-        for line in lines:
-            if line.count("][") == 4:
-                line = line.split("][")
-
-                if len(line) != 5:
-                    continue
-
-                url, _, _, expression, value = line
-
-                if not value:
-                    continue
-
-                if url[0] == "[":
-                    url = url[1:]
-
-                if value[-1] == "\n":
-                    value = value[:-1]
-
-                if url != conf.url:
-                    continue
-
-                if url not in kb.resumedQueries.keys():
-                    kb.resumedQueries[url] = {}
-                    kb.resumedQueries[url][expression] = value
-
-                resumeConfKb(expression, url, value)
-
-                if expression not in kb.resumedQueries[url].keys():
-                    kb.resumedQueries[url][expression] = value
-                elif len(value) >= len(kb.resumedQueries[url][expression]):
-                    kb.resumedQueries[url][expression] = value
-
-        readSessionFP.close()
+        if not conf.flushSession:
+            readSessionFP = open(conf.sessionFile, "r")
+            lines = readSessionFP.readlines()
+    
+            for line in lines:
+                if line.count("][") == 4:
+                    line = line.split("][")
+    
+                    if len(line) != 5:
+                        continue
+    
+                    url, _, _, expression, value = line
+    
+                    if not value:
+                        continue
+    
+                    if url[0] == "[":
+                        url = url[1:]
+    
+                    if value[-1] == "\n":
+                        value = value[:-1]
+    
+                    if url != conf.url:
+                        continue
+    
+                    if url not in kb.resumedQueries.keys():
+                        kb.resumedQueries[url] = {}
+                        kb.resumedQueries[url][expression] = value
+    
+                    resumeConfKb(expression, url, value)
+    
+                    if expression not in kb.resumedQueries[url].keys():
+                        kb.resumedQueries[url][expression] = value
+                    elif len(value) >= len(kb.resumedQueries[url][expression]):
+                        kb.resumedQueries[url][expression] = value
+    
+            readSessionFP.close()
+        else:
+            try:
+                os.remove(conf.sessionFile)
+                logger.info("flushing session file")
+            except OSError, msg:
+                errMsg = "unable to flush the session file (%s)" % msg
+                raise sqlmapFilePathException, errMsg
 
     try:
         conf.sessionFP = open(conf.sessionFile, "a")

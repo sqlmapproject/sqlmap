@@ -139,6 +139,7 @@ optDict = {
 
             "Miscellaneous": {
                                "sessionFile":       "string",
+                               "flushSession":      "boolean",
                                "eta":               "boolean",
                                "googlePage":        "integer",
                                "updateAll":         "boolean",
