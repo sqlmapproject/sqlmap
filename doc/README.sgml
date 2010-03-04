@@ -448,8 +448,9 @@ $ svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev
 </verb></tscreen>
 
 <p>
-Either way you downloaded sqlmap, you can update it to the latest
-development version anytime by running:
+If you download a source package (gzip, bzip2 or zip) or sqlmap from the
+Subversion repository, you can update it to the latest development version
+anytime by running:
 
 <tscreen><verb>
 $ python sqlmap.py --update
@@ -460,6 +461,27 @@ Or:
 <tscreen><verb>
 $ svn update
 </verb></tscreen>
+
+<p>
+Viceversa if you download a binary package (deb, rpm or exe), the
+update feature is disabled.
+
+<p>
+There are some differences between each package:
+
+<itemize>
+<item>The source packages (gzip, bzip2 and zip) have all features. They
+contains the working copy from the Subversion repository updated at the
+time the sqlmap new version has been released.
+<item>The Debian and Red Hat installation packages (deb and rpm) are
+compliant with the Linux distributions' packaging guidelines. This implies
+that they do not support the update features and do not include
+third-party softwares Churrasco (for token kidnapping, see below) and UPX.
+<item>The Windows binary package (exe) can't update itself and does not
+support the takeover out-of-band features because they rely on Metasploit
+and Metasploit's msfconsole and msfcli are not supported on the native
+Windows Ruby interpreter.
+</itemize>
 
 
 <sect>License and copyright
