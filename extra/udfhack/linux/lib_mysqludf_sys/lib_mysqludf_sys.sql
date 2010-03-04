@@ -1,7 +1,7 @@
 /*
         lib_mysqludf_sys - a library with miscellaneous (operating) system level functions
         Copyright (C) 2007  Roland Bouman
-        Copyright (C) 2008-2009  Roland Bouman and Bernardo Damele A. G.
+        Copyright (C) 2008-2010  Roland Bouman and Bernardo Damele A. G.
         web: http://www.mysqludf.org/
         email: roland.bouman@gmail.com, bernardo.damele@gmail.com
 
