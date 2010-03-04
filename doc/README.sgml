@@ -621,6 +621,7 @@ Options:
 
   Miscellaneous:
     -s SESSIONFILE      Save and resume all data retrieved on a session file
+    --flush-session     Flush session file for current target
     --eta               Display for each output the estimated time of arrival
     --gpage=GOOGLEPAGE  Use google dork results from specified page number
     --update            Update sqlmap
@@ -5262,6 +5263,19 @@ back-end DBMS: PostgreSQL
 banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real 
 (Ubuntu 4.3.2-1ubuntu11) 4.3.2'
 </verb></tscreen>
+
+
+<sect2>Flush session file for current target
+    
+<p>
+Option: <tt>-</tt><tt>-flush-session</tt>
+
+<p>
+As you are already familiar with the concept of a session file from description
+of option <tt>-s</tt>, it's good to know that you can flush the content of that 
+same file using option <tt>-</tt><tt>-flush-session</tt>. In that way you can
+avoid caching mechanisms implemented in sqlmap. Other possible way is the 
+manual removing of session file(s) from output directory.
 
 
 <sect2>Estimated time of arrival
