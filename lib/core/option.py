@@ -104,6 +104,9 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
     port   = None
     scheme = None
 
+    if conf.scope:
+        logger.info("using regex: '%s' for filtering targets" % conf.scope)
+
     for request in reqResList:
         if scheme is None:
             schemePort = re.search("\d\d[\:|\.]\d\d[\:|\.]\d\d\s+(http[\w]*)\:\/\/.*?\:([\d]+)", request, re.I)
@@ -163,10 +166,10 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
             elif method is not None and method == "POST" and "=" in line:
                 data   = line
                 params = True
-        
+
         if conf.scope:
             getPostReq &= re.search(conf.scope, host) is not None
-            
+
         if getPostReq and params:
             if not url.startswith("http"):
                 url    = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)

