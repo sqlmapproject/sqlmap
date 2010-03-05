@@ -93,7 +93,7 @@ class Google:
         """
 
         gpage = conf.googlePage if conf.googlePage > 1 else 1
-        logger.info("using search result page #%d" % gpage)
+        logger.info("using Google result page #%d" % gpage)
         
         if not googleDork:
             return None

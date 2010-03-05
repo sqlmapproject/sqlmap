@@ -1588,6 +1588,7 @@ Example usage:
 
 <tscreen><verb>
 $ python sqlmap.py -l /tmp/webscarab.log/conversations/ --scope="(www)?\.target\.(com|net|org)"
+</verb></tscreen>
 
 
 <sect1>Injection

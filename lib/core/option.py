@@ -105,7 +105,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
     scheme = None
 
     if conf.scope:
-        logger.info("using regex: '%s' for filtering targets" % conf.scope)
+        logger.info("using regular expression '%s' for filtering targets" % conf.scope)
 
     for request in reqResList:
         if scheme is None:
