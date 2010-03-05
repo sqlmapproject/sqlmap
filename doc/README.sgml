@@ -2834,12 +2834,12 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/oracle/get_int.php?id=1" --i
 [...]
 back-end DBMS: Oracle
 
-[16:40:57] [INFO] testing if current user is DBA
-[16:40:58] [DEBUG] query: SELECT (CASE WHEN ((SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE 
+[hh:mm:57] [INFO] testing if current user is DBA
+[hh:mm:58] [DEBUG] query: SELECT (CASE WHEN ((SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE 
 GRANTEE=SYS.LOGIN_USER AND GRANTED_ROLE=CHR(68)||CHR(66)||CHR(65))=CHR(68)||CHR(66)||CHR(65)) 
 THEN 1 ELSE 0 END) FROM DUAL
-[16:40:58] [INFO] retrieved: 1
-[16:40:58] [DEBUG] performed 13 queries in 0 seconds
+[hh:mm:58] [INFO] retrieved: 1
+[hh:mm:58] [DEBUG] performed 13 queries in 0 seconds
 current user is DBA:    'True'
 </verb></tscreen>
 
@@ -3233,15 +3233,15 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --co
 [...]
 back-end DBMS: MySQL >= 5.0.0
 
-[16:44:20] [INFO] fetching columns for table 'users' on database 'testdb'
-[16:44:20] [INFO] fetching number of columns for table 'users' on database 'testdb'
-[16:44:20] [INFO] retrieved: 3
-[16:44:20] [INFO] retrieved: id
-[16:44:20] [INFO] retrieved: int(11)
-[16:44:21] [INFO] retrieved: name
-[16:44:21] [INFO] retrieved: varchar(500)
-[16:44:21] [INFO] retrieved: surname
-[16:44:21] [INFO] retrieved: varchar(1000)
+[hh:mm:20] [INFO] fetching columns for table 'users' on database 'testdb'
+[hh:mm:20] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[hh:mm:20] [INFO] retrieved: 3
+[hh:mm:20] [INFO] retrieved: id
+[hh:mm:20] [INFO] retrieved: int(11)
+[hh:mm:21] [INFO] retrieved: name
+[hh:mm:21] [INFO] retrieved: varchar(500)
+[hh:mm:21] [INFO] retrieved: surname
+[hh:mm:21] [INFO] retrieved: varchar(1000)
 Database: testdb
 Table: users
 [3 columns]
@@ -3311,19 +3311,19 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --co
 [...]
 back-end DBMS: MySQL >= 5.0.0
 
-[16:47:45] [WARNING] missing database parameter, sqlmap is going to use the current 
+[hh:mm:45] [WARNING] missing database parameter, sqlmap is going to use the current 
 database to enumerate table 'users' columns
-[16:47:45] [INFO] fetching current database
-[16:47:45] [INFO] retrieved: testdb
-[16:47:45] [INFO] fetching columns for table 'users' on database 'testdb'
-[16:47:45] [INFO] fetching number of columns for table 'users' on database 'testdb'
-[16:47:45] [INFO] retrieved: 3
-[16:47:45] [INFO] retrieved: id
-[16:47:45] [INFO] retrieved: int(11)
-[16:47:46] [INFO] retrieved: name
-[16:47:46] [INFO] retrieved: varchar(500)
-[16:47:46] [INFO] retrieved: surname
-[16:47:46] [INFO] retrieved: varchar(1000)
+[hh:mm:45] [INFO] fetching current database
+[hh:mm:45] [INFO] retrieved: testdb
+[hh:mm:45] [INFO] fetching columns for table 'users' on database 'testdb'
+[hh:mm:45] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[hh:mm:45] [INFO] retrieved: 3
+[hh:mm:45] [INFO] retrieved: id
+[hh:mm:45] [INFO] retrieved: int(11)
+[hh:mm:46] [INFO] retrieved: name
+[hh:mm:46] [INFO] retrieved: varchar(500)
+[hh:mm:46] [INFO] retrieved: surname
+[hh:mm:46] [INFO] retrieved: varchar(1000)
 Database: testdb
 Table: users
 [3 columns]
@@ -3348,17 +3348,17 @@ $ python sqlmap.py -u "http://172.16.213.131/sqlmap/mysql/get_int.php?id=1" --co
   -T users -C name -v 1
 
 [...]
-[16:49:20] [WARNING] missing database parameter, sqlmap is going to use the current 
+[hh:mm:20] [WARNING] missing database parameter, sqlmap is going to use the current 
 database to enumerate table 'users' columns
-[16:49:20] [INFO] fetching current database
-[16:49:20] [INFO] retrieved: testdb
-[16:49:20] [INFO] fetching columns like 'name' for table 'users' on database 'testdb'
-[16:49:20] [INFO] fetching number of columns for table 'users' on database 'testdb'
-[16:49:20] [INFO] retrieved: 2
-[16:49:20] [INFO] retrieved: name
-[16:49:20] [INFO] retrieved: varchar(500)
-[16:49:21] [INFO] retrieved: surname
-[16:49:21] [INFO] retrieved: varchar(1000)
+[hh:mm:20] [INFO] fetching current database
+[hh:mm:20] [INFO] retrieved: testdb
+[hh:mm:20] [INFO] fetching columns like 'name' for table 'users' on database 'testdb'
+[hh:mm:20] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[hh:mm:20] [INFO] retrieved: 2
+[hh:mm:20] [INFO] retrieved: name
+[hh:mm:20] [INFO] retrieved: varchar(500)
+[hh:mm:21] [INFO] retrieved: surname
+[hh:mm:21] [INFO] retrieved: varchar(1000)
 Database: testdb
 Table: users
 [2 columns]
@@ -3481,20 +3481,20 @@ do you want sqlmap to consider provided column(s):
 [1] as LIKE column names (default)
 [2] as exact column names
 > 1
-[19:18:08] [INFO] fetching databases with tables containing columns like 'urna'
-[19:18:08] [INFO] fetching number of databases with tables containing columns like 
+[hh:mm:08] [INFO] fetching databases with tables containing columns like 'urna'
+[hh:mm:08] [INFO] fetching number of databases with tables containing columns like 
 'urna'
-[19:18:08] [INFO] retrieved: 1
-[19:18:08] [INFO] retrieved: testdb
-[19:18:10] [INFO] fetching tables containing columns like 'urna' in database 'testdb'
-[19:18:10] [INFO] fetching number of tables containing columns like 'urna' in 
+[hh:mm:08] [INFO] retrieved: 1
+[hh:mm:08] [INFO] retrieved: testdb
+[hh:mm:10] [INFO] fetching tables containing columns like 'urna' in database 'testdb'
+[hh:mm:10] [INFO] fetching number of tables containing columns like 'urna' in 
 database 'testdb'
-[19:18:10] [INFO] retrieved: 1
-[19:18:10] [INFO] retrieved: users
-[19:18:10] [INFO] fetching columns like 'urna' for table 'users' on database 'testdb'
-[19:18:10] [INFO] fetching number of columns for table 'users' on database 'testdb'
-[19:18:10] [INFO] retrieved: 1
-[19:18:10] [INFO] retrieved: surname
+[hh:mm:10] [INFO] retrieved: 1
+[hh:mm:10] [INFO] retrieved: users
+[hh:mm:10] [INFO] fetching columns like 'urna' for table 'users' on database 'testdb'
+[hh:mm:10] [INFO] fetching number of columns for table 'users' on database 'testdb'
+[hh:mm:10] [INFO] retrieved: 1
+[hh:mm:10] [INFO] retrieved: surname
 Columns like 'urna' were found in the following databases:
 Database: testdb
 Table: users
@@ -4086,21 +4086,21 @@ back-end DBMS: PostgreSQL
 
 [10:hh:mm] [INFO] calling PostgreSQL shell. To quit type 'x' or 'q' and press ENTER
 sql> SELECT COUNT(name) FROM users
-[10:11:57] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
-[10:11:57] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
-[10:11:59] [INFO] retrieved: 4
+[hh:mm:57] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
+[hh:mm:57] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
+[hh:mm:59] [INFO] retrieved: 4
 SELECT COUNT(name) FROM users:    '4'
 
 sql> INSERT INTO users (id, name, surname) VALUES (5, 'from', 'sql shell');
-[10:12:35] [INFO] testing stacked queries support on parameter 'id'
-[10:12:40] [INFO] the web application supports stacked queries on parameter 'id'
-[10:12:40] [INFO] executing SQL data manipulation query: 'INSERT INTO users 
+[hh:mm:35] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:40] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:40] [INFO] executing SQL data manipulation query: 'INSERT INTO users 
 (id, name, surname) VALUES (5, 'from', 'sql shell');'
-[10:12:40] [INFO] done
+[hh:mm:40] [INFO] done
 sql> SELECT COUNT(name) FROM users
-[10:12:51] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
-[10:12:51] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
-[10:12:53] [INFO] retrieved: 5
+[hh:mm:51] [INFO] fetching SQL SELECT statement query output: 'SELECT COUNT(name) FROM users'
+[hh:mm:51] [INPUT] can the SQL query provided return multiple entries? [Y/n] n
+[hh:mm:53] [INFO] retrieved: 5
 SELECT COUNT(name) FROM users:    '5'
 </verb></tscreen>
 
