@@ -27,7 +27,6 @@ import time
 
 from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
-from lib.core.common import parseTargetUrl
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -232,6 +231,5 @@ def initTargetEnv():
         kb.unionCount     = None
         kb.unionPosition  = None
 
-    parseTargetUrl()
     __setRequestParams()
     __setOutputResume()

@@ -30,6 +30,7 @@ from lib.controller.checks import checkString
 from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.core.common import paramToDict
+from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -133,6 +134,7 @@ def start():
             logMsg = "testing url %s" % targetUrl
             logger.info(logMsg)
 
+        parseTargetUrl()
         createTargetDirs()
         initTargetEnv()
 

@@ -5403,25 +5403,23 @@ Example of Google dorking with expression <tt>login ext:php</tt>
 and resulting page set to 3:
 
 <tscreen><verb>
-$ python sqlmap.py -g "login ext:php" --gpage=3 -v 1
+$ python sqlmap.py -g "ext:php login" --gpage 3 -v 1
 
-[hh:mm:12] [INFO] first request to Google to get the session cookie
-[hh:mm:12] [INFO] using search result page #3
-[hh:mm:12] [INFO] sqlmap got 100 results for your Google dork expression, 5 of them are testable targets
-[hh:mm:12] [INFO] sqlmap got a total of 5 targets
+[hh:mm:14] [INFO] first request to Google to get the session cookie
+[hh:mm:14] [INFO] using Google result page #3
+[hh:mm:14] [INFO] sqlmap got 100 results for your Google dork expression, 89 of them are testable targets
+[hh:mm:15] [INFO] sqlmap got a total of 89 targets
 url 1:
-GET http://myjobstreet-beta.jobstreet.com/home/login.php?site=in
+GET http://www.XXX.com/index.php?pageid=login
 do you want to test this url? [Y/n/q]
-> 
-[hh:mm:14] [INFO] testing url http://myjobstreet-beta.jobstreet.com/home/login.php?site=in
-[hh:mm:14] [INFO] using '/home/stamparm/Work/sqlmap/sqlmap/output/None/session' as session file
-[hh:mm:14] [INFO] testing connection to the target url
-[hh:mm:15] [INFO] testing if the url is stable, wait a few seconds
+> y
+[hh:mm:17] [INFO] testing url http://www.XXX.com/index.php?pageid=login
+[hh:mm:17] [INFO] using '/home/inquis/software/sqlmap/subversion/trunk/sqlmap/output/www.XXX.com/session' as session file
+[hh:mm:17] [INFO] testing connection to the target url
+[hh:mm:17] [INFO] testing if the url is stable, wait a few seconds
 [hh:mm:19] [INFO] url is stable
 [hh:mm:19] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
 [hh:mm:21] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:21] [INFO] testing if Cookie parameter 'REFERP' is dynamic
-[hh:mm:22] [WARNING] Cookie parameter 'REFERP' is not dynamic
 [hh:mm:22] [INFO] testing if Cookie parameter 'PHPSESSID' is dynamic
 [hh:mm:24] [INFO] confirming that Cookie parameter 'PHPSESSID' is dynamic
 [hh:mm:27] [INFO] Cookie parameter 'PHPSESSID' is dynamic
