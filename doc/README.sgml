@@ -5484,10 +5484,29 @@ $ cat sqlmap-SAUbs.conf
 [Target]
 url = http://172.16.213.131/sqlmap/pgsql/get_int.php?id=1
 googledork = 
+configfile = 
 list = 
+requestfile = 
+
+[Windows]
+regread = False
+regval = 
+regdata = 
+regadd = False
+regdel = False
+regtype = 
+regkey = 
+
+[User-defined function]
+shlib = 
+udfinject = False
 
 [Request]
+cookieurlencode = False
+ignoreproxy = False
 threads = 1
+acert = 
+retries = 3
 useragentsfile = 
 atype = 
 agent = 
@@ -5496,8 +5515,10 @@ headers =
 cookie = 
 proxy = 
 timeout = 30
+scope = 
 acred = 
 referer = 
+dropsetcookie = False
 data = 
 method = GET
 
@@ -5506,31 +5527,35 @@ updateall = False
 sessionfile = 
 eta = False
 batch = False
+flushsession = False
 cleanup = False
+googlepage = 0
 verbose = 1
 
 [Enumeration]
-dumpall = False
 limitstop = 0
-getusers = False
-isdba = False
 getpasswordhashes = False
 excludesysdbs = False
 getcurrentdb = False
+getcurrentuser = False
+limitstart = 0
+query = 
+getusers = False
+isdba = False
 gettables = False
 dumptable = False
+getdbs = False
 db = 
-limitstart = 0
-getprivileges = False
 sqlshell = False
 tbl = 
+firstchar = 0
 getcolumns = False
-query = 
-getdbs = False
-user = 
-col = 
-getcurrentuser = False
 getbanner = True
+dumpall = False
+getprivileges = False
+lastchar = 0
+col = 
+user = 
 
 [File system]
 dfile = 
@@ -5562,11 +5587,12 @@ eregexp =
 os = 
 
 [Techniques]
-stackedtest = False
 utech = 
 unionuse = False
 timetest = False
 uniontest = False
+stackedtest = False
+timesec = 5
 </verb></tscreen>
 
 <p>
