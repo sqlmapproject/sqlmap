@@ -467,7 +467,7 @@ Viceversa if you download a binary package (deb, rpm or exe), the
 update feature is disabled.
 
 <p>
-There are some differences between each package:
+There are some differences between the packages:
 
 <itemize>
 <item>The source packages (gzip, bzip2 and zip) have all features. They
@@ -476,12 +476,18 @@ time the sqlmap new version has been released.
 <item>The Debian and Red Hat installation packages (deb and rpm) are
 compliant with the Linux distributions' packaging guidelines. This implies
 that they do not support the update features and do not include
-third-party softwares Churrasco (for token kidnapping, see below) and UPX.
+third-party softwares Churrasco (used to perform Windows token kidnapping,
+see below) and UPX (used to pack the Metasploit payload stager in some
+cases, see below).
 <item>The Windows binary package (exe) can't update itself and does not
-support the takeover out-of-band features because they rely on Metasploit
-and Metasploit's msfconsole and msfcli are not supported on the native
-Windows Ruby interpreter.
+support the takeover out-of-band features because they rely on
+Metasploit's <tt>msfcli</tt> which is not available for Windows.
 </itemize>
+
+<p>
+It is therefore recommended to download any of the source packages and run
+it either from a shell like Bash on Unix and Mac OSX or from Cygwin on
+Windows.
 
 
 <sect>License and copyright
