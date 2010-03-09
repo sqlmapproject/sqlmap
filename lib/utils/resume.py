@@ -26,6 +26,7 @@ import re
 
 from lib.core.common import dataToSessionFile
 from lib.core.common import safeStringFormat
+from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -62,7 +63,9 @@ def queryOutputLength(expression, payload):
     if ( select and re.search("\A(COUNT|LTRIM)\(", regExpr, re.I) ) or len(regExpr) <= 1:
         return None, None, None
 
-    if select:
+    if selectDistinctExpr:
+        lengthExpr = "SELECT %s FROM (%s) AS T%s" % (lengthQuery % regExpr, expression, randomStr(4))
+    elif select:
         lengthExpr = expression.replace(regExpr, lengthQuery % regExpr, 1)
     else:
         lengthExpr = lengthQuery % expression
@@ -82,7 +85,7 @@ def queryOutputLength(expression, payload):
 
     if length == " ":
         length = 0
-
+    
     return count, length, regExpr
 
 def resume(expression, payload):
