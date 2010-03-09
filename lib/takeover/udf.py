@@ -83,8 +83,7 @@ class UDF:
             self.udfToCreate.add(udf)
 
     def udfCreateSupportTbl(self, dataType):
-        debugMsg  = "creating a support table to write commands standard "
-        debugMsg += "output to"
+        debugMsg = "creating a support table for user-defined functions"
         logger.debug(debugMsg)
 
         self.createSupportTbl(self.cmdTblName, self.tblField, dataType)

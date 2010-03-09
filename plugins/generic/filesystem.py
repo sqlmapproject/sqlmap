@@ -270,7 +270,7 @@ class Filesystem:
 
             fileContent = self.stackedReadFile(rFile)
 
-        if fileContent in ( None, "" ):
+        if fileContent in ( None, "" ) and kb.dbms != "PostgreSQL":
             self.cleanup(onlyFileTbl=True)
 
             return
@@ -288,7 +288,8 @@ class Filesystem:
         fileContent = self.__unhexString(fileContent)
         rFilePath = dataToOutFile(fileContent)
 
-        self.cleanup(onlyFileTbl=True)
+        if kb.dbms != "PostgreSQL":
+            self.cleanup(onlyFileTbl=True)
 
         return rFilePath
 
