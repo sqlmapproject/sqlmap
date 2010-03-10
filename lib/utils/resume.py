@@ -64,7 +64,10 @@ def queryOutputLength(expression, payload):
         return None, None, None
 
     if selectDistinctExpr:
-        lengthExpr = "SELECT %s FROM (%s) AS T%s" % (lengthQuery % regExpr, expression, randomStr(4))
+        lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % regExpr, expression)
+
+        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            lengthExpr += " AS %s" % randomStr(lowercase=True)
     elif select:
         lengthExpr = expression.replace(regExpr, lengthQuery % regExpr, 1)
     else:

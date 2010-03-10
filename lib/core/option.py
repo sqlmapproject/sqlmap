@@ -1072,9 +1072,9 @@ def __setVerbosity():
 
     if conf.verbose == 1:
         logger.setLevel(logging.INFO)
-    elif conf.verbose > 1 and conf.eta:
-        conf.verbose = 1
-        logger.setLevel(logging.INFO)
+    elif conf.verbose > 2 and conf.eta:
+        conf.verbose = 2
+        logger.setLevel(logging.DEBUG)
     elif conf.verbose == 2:
         logger.setLevel(logging.DEBUG)
     elif conf.verbose == 3:
