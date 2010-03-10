@@ -18,6 +18,9 @@ Daniele Bellucci <daniele.bellucci@gmail.com>
     for starting sqlmap project and developing it between July and August
     2006
 
+Velky Brat <velkybrat@gmail.com>
+    for suggesting a minor enhancement to the bisection algorithm
+
 Jack Butler <fattredd@hotmail.com>
     for providing me with the sqlmap site favicon
 
@@ -75,6 +78,9 @@ Giorgio Fedon <giorgio.fedon@gmail.com>
     for suggesting a speed improvement for bisection algorithm
     for reporting a bug when running against Microsoft SQL Server 2005
 
+Kasper Fons <thefeds@mail.dk>
+    for reporting a bug
+
 Alan Franzoni <alan.franzoni@gmail.com>
     for helping me out with Python subprocess library
 
@@ -104,7 +110,7 @@ Will Holcomb <wholcomb@gmail.com>
     for his MultipartPostHandler class to handle multipart POST forms and
     permission to include it within sqlmap source code
 
-Daniel Hückmann <sanitybit@gmail.com>
+Daniel Huckmann <sanitybit@gmail.com>
     for reporting a couple of bugs
 
 Mounir Idrassi <mounir.idrassi@idrix.net>
