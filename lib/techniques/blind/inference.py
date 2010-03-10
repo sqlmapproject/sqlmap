@@ -153,6 +153,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         index   = [ firstChar ]    # As list for python nested function scoping
         idxlock = threading.Lock()
         iolock  = threading.Lock()
+        conf.seqLock = threading.Lock()
 
         def downloadThread():
             try:
@@ -237,6 +238,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if conf.verbose >= 1 and not showEta and infoMsg:
             dataToStdout(infoMsg)
 
+        conf.seqLock = None
     else:
         index = firstChar
 

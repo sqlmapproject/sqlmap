@@ -65,8 +65,14 @@ def comparison(page, headers=None, getSeqMatcher=False):
         else:
             return False
 
+    if conf.seqLock:
+        conf.seqLock.acquire()
+
     conf.seqMatcher.set_seq2(page)
     ratio = round(conf.seqMatcher.ratio(), 3)
+
+    if conf.seqLock:
+        conf.seqLock.release()
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content

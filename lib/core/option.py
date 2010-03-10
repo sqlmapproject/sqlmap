@@ -957,6 +957,7 @@ def __setConfAttributes():
     conf.scheme          = None
     #conf.seqMatcher      = difflib.SequenceMatcher(lambda x: x in " \t")
     conf.seqMatcher      = difflib.SequenceMatcher(None)
+    conf.seqLock         = None
     conf.sessionFP       = None
     conf.start           = True
     conf.threadException = False
