@@ -219,9 +219,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             threads.append(thread)
 
         # And wait for them to all finish
-        #for thread in threads:
-        #    thread.join()
-        
         try:
             alive = True
             while alive:
@@ -233,7 +230,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         except KeyboardInterrupt:
             conf.threadContinue = False
             raise
-            
+
         # If we have got one single character not correctly fetched it
         # can mean that the connection to the target url was lost
         if None in value:
