@@ -327,8 +327,8 @@ def cmdLineParser():
                                    "write to")
 
         # Takeover options
-        takeover = OptionGroup(parser, "Operating system access", "This "
-                               "option can be used to access the back-end "
+        takeover = OptionGroup(parser, "Operating system access", "These "
+                               "options can be used to access the back-end "
                                "database management system underlying "
                                "operating system.")
 
@@ -364,8 +364,8 @@ def cmdLineParser():
                                  "directory")
 
         # Windows registry options
-        windows = OptionGroup(parser, "Windows registry access", "This "
-                               "option can be used to access the back-end "
+        windows = OptionGroup(parser, "Windows registry access", "These "
+                               "options can be used to access the back-end "
                                "database management system Windows "
                                "registry.")
 

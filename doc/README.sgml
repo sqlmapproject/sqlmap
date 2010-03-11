@@ -623,7 +623,7 @@ Options:
     --dest-file=DFILE   Back-end DBMS absolute filepath to write to
 
   Operating system access:
-    This option can be used to access the back-end database management
+    These options can be used to access the back-end database management
     system underlying operating system.
 
     --os-cmd=OSCMD      Execute an operating system command
@@ -636,7 +636,7 @@ Options:
     --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
   Windows registry access:
-    This option can be used to access the back-end database management
+    These options can be used to access the back-end database management
     system Windows registry.
 
     --reg-read          Read a Windows registry key value
