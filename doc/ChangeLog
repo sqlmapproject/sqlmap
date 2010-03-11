@@ -55,7 +55,7 @@ sqlmap (0.8-1) stable; urgency=low
     shells consequently reducing drastically the number of anti-virus
     softwares that mistakenly mark sqlmap as a malware (Miroslav).
   * Updated user's manual (Bernardo and Miroslav).
-  * Created seven demo videos, http://sqlmap.sf.net/demo.html (Bernardo).
+  * Created several demo videos, http://sqlmap.sf.net/demo.html (Bernardo).
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun, 14 Mar 2010 10:00:00 +0000
 
