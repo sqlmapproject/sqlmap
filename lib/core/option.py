@@ -960,6 +960,7 @@ def __setConfAttributes():
     conf.seqLock         = None
     conf.sessionFP       = None
     conf.start           = True
+    conf.threadContinue  = True
     conf.threadException = False
     conf.wFileType       = None
 

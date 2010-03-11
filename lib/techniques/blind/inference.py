@@ -154,10 +154,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         idxlock = threading.Lock()
         iolock  = threading.Lock()
         conf.seqLock = threading.Lock()
+        conf.threadContinue = True
 
         def downloadThread():
             try:
-                while True:
+                while conf.threadContinue:
                     idxlock.acquire()
 
                     if index[0] >= length:
@@ -169,21 +170,24 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     curidx = index[0]
                     idxlock.release()
 
-                    charStart = time.time()
-                    val       = getChar(curidx)
-
-                    if val is None:
-                        raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
+                    if conf.threadContinue:
+                        charStart = time.time()
+                        val       = getChar(curidx)
+                        if val is None:
+                            raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
+                    else:
+                        break
 
                     value[curidx-1] = val
 
-                    if showEta:
-                        etaProgressUpdate(time.time() - charStart, index[0])
-                    elif conf.verbose >= 1:
-                        s = "".join([c or "_" for c in value])
-                        iolock.acquire()
-                        dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), s))
-                        iolock.release()
+                    if conf.threadContinue:
+                        if showEta:
+                            etaProgressUpdate(time.time() - charStart, index[0])
+                        elif conf.verbose >= 1:
+                            s = "".join([c or "_" for c in value])
+                            iolock.acquire()
+                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), s))
+                            iolock.release()
 
             except (sqlmapConnectionException, sqlmapValueException), errMsg:
                 conf.threadException = True
@@ -215,9 +219,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             threads.append(thread)
 
         # And wait for them to all finish
-        for thread in threads:
-            thread.join()
-
+        #for thread in threads:
+        #    thread.join()
+        
+        try:
+            alive = True
+            while alive:
+                alive = False
+                for thread in threads:
+                    if thread.isAlive():
+                        alive = True
+                        thread.join(5)
+        except KeyboardInterrupt:
+            conf.threadContinue = False
+            raise
+            
         # If we have got one single character not correctly fetched it
         # can mean that the connection to the target url was lost
         if None in value:
