@@ -100,11 +100,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progress = ProgressBar(maxValue=length)
         progressTime = []
 
+    if numThreads is not None:
+        debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
+        logger.debug(debugMsg)
+
     if conf.verbose >= 1 and not showEta:
         if isinstance(length, int) and conf.threads > 1:
-            infoMsg = "starting %d threads" % numThreads
-            logger.info(infoMsg)
-
             dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
             dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
         else:
