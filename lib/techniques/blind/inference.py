@@ -198,9 +198,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             for i in xrange(length):
                                 count += 1 if value[i] is not None else 0
                             if startCharIndex > 0:
-                                output = '...' + output[3:]
+                                output = '..' + output[2:]
                             if endCharIndex - startCharIndex == conf.progressWidth:
-                                output = output[:-3] + '...'
+                                output = output[:-2] + '..'
                             output += '_' * (min(length, conf.progressWidth) - len(output))
                             status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
                             output += status if count != length else " "*len(status)
