@@ -23,19 +23,20 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 from lib.core.common import dataToStdout
+from lib.core.data import conf
 
 class ProgressBar:
     """
     This class defines methods to update and draw a progress bar
     """
 
-    def __init__(self, minValue=0, maxValue=10, totalWidth=54):
+    def __init__(self, minValue=0, maxValue=10, totalWidth=None):
         self.__progBar = "[]"
         self.__oldProgBar = ""
         self.__min = int(minValue)
         self.__max = int(maxValue)
         self.__span = self.__max - self.__min
-        self.__width = totalWidth
+        self.__width = totalWidth if totalWidth else conf.progressWidth
         self.__amount = 0
         self.update()
 

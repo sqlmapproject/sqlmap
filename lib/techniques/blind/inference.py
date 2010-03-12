@@ -95,7 +95,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     showEta    = conf.eta and isinstance(length, int)
     numThreads = min(conf.threads, length)
     threads    = []
-    totalWidth = 54
 
     if showEta:
         progress = ProgressBar(maxValue=length)
@@ -106,7 +105,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             infoMsg = "starting %d threads" % numThreads
             logger.info(infoMsg)
 
-            dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, totalWidth)))
+            dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
             dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
         else:
             dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
@@ -191,8 +190,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 if value[i] is not None:
                                     endCharIndex = max(endCharIndex, i)
                             output = ''
-                            if endCharIndex > totalWidth:
-                                startCharIndex = endCharIndex - totalWidth
+                            if endCharIndex > conf.progressWidth:
+                                startCharIndex = endCharIndex - conf.progressWidth
                             count = 0
                             for i in xrange(startCharIndex, endCharIndex):
                                 output += '_' if value[i] is None else value[i]
@@ -200,7 +199,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 count += 1 if value[i] is not None else 0
                             if startCharIndex > 0:
                                 output = '...' + output[3:]
-                            if endCharIndex - startCharIndex == totalWidth:
+                            if endCharIndex - startCharIndex == conf.progressWidth:
                                 output = output[:-3] + '...'
                             status = ' %d/%d' % (count, length)
                             output += status if count != length else " "*len(status)
