@@ -97,6 +97,9 @@ def resume(expression, payload):
     SQL injection query output.
     """
 
+    if "sqlmapfile" in expression or "sqlmapoutput" in expression:
+        return None
+
     condition = (
                   kb.resumedQueries and conf.url in kb.resumedQueries.keys()
                   and expression in kb.resumedQueries[conf.url].keys()
