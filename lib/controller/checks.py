@@ -317,6 +317,7 @@ def checkStability():
         logger.warn(warnMsg)
 
     return condition
+
 def checkString():
     if not conf.string:
         return True
