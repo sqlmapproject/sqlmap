@@ -407,11 +407,8 @@ name="kitrap0d"> technique (<htmlurl
 url="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx"
 name="MS10-015">) or via <htmlurl
 url="http://www.argeniss.com/research/TokenKidnapping.pdf"
-name="Windows Access Tokens kidnapping"> by using either Meterpreter's
-<tt>incognito</tt> extension or <tt>Churrasco</tt> (<htmlurl
-url="http://www.microsoft.com/technet/security/bulletin/ms09-012.mspx"
-name="MS09-012">) stand-alone executable
-as per user's choice.
+name="Windows Access Tokens kidnapping"> by using Meterpreter's
+<tt>incognito</tt> extension.
 
 <item>Support to access (read/add/delete) Windows registry hives.
 </itemize>
@@ -484,10 +481,8 @@ contains the working copy from the Subversion repository updated at the
 time the sqlmap new version has been released.
 <item>The Debian and Red Hat installation packages (deb and rpm) are
 compliant with the Linux distributions' packaging guidelines. This implies
-that they do not support the update features and do not include
-third-party softwares Churrasco (used to perform Windows token kidnapping,
-see below) and UPX (used to pack the Metasploit payload stager in some
-cases, see below).
+that they do not support the update features and do not include UPX (used
+to pack the Metasploit payload stager in some cases, see below).
 <item>The Windows binary package (exe) can't update itself and does not
 support the takeover out-of-band features because they rely on
 Metasploit's <tt>msfcli</tt> which is not available for Windows.
@@ -4872,12 +4867,9 @@ name="kitrap0d"> technique (<htmlurl
 url="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx"
 name="MS10-015">) or via <htmlurl
 url="http://www.argeniss.com/research/TokenKidnapping.pdf"
-name="Windows Access Tokens kidnapping"> by using either Meterpreter's
+name="Windows Access Tokens kidnapping"> by using Meterpreter's
 <htmlurl url="http://sourceforge.net/projects/incognito/"
-name="incognito"> extension or <htmlurl
-url="http://www.argeniss.com/research/Churrasco.zip" name="Churrasco">
-(<htmlurl url="http://www.microsoft.com/technet/security/bulletin/ms09-012.mspx"
-name="MS09-012">) stand-alone executable as per user's choice.
+name="incognito"> extension.
 
 <p>
 Example on a <bf>Microsoft SQL Server 2005 Service Pack 0</bf> running as
@@ -4928,9 +4920,7 @@ which payload encoding do you want to use?
 [hh:mm:53] [INFO] creation in progress ..... done
 [hh:mm:58] [INFO] compression in progress . done
 [hh:mm:59] [INFO] uploading payload stager to 'C:/WINDOWS/Temp/tmpmqyws.exe'
-do you want sqlmap to upload Churrasco and call the Metasploit payload stager as its 
-argument so that it will be started as SYSTEM? [y/N] 
-[hh:mm:22] [INFO] running Metasploit Framework 3 command line interface locally, wait..
+[hh:mm:05] [INFO] running Metasploit Framework 3 command line interface locally, wait..
 [*] Please wait while we load the module tree...
 [*] Started reverse handler on 172.16.213.1:44780 
 [*] Starting the payload handler...

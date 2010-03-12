@@ -247,7 +247,7 @@ and the session user privileges.</LI>
 </H2>
 
 <P>You can watch several demo videos, they are hosted on 
-<A HREF="http://www.youtube.com/user/inquisb#p/u">YouTube</A> and linked
+<A HREF="http://www.youtube.com/user/inquisb#g/u">YouTube</A> and linked
 from 
 <A HREF="http://sqlmap.sourceforge.net/demo.html">here</A>.</P>
 
@@ -276,13 +276,12 @@ blind SQL injection</B>.
 targets from 
 <A HREF="http://portswigger.net/suite/">Burp proxy</A>
 requests log file or
-<A HREF="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project">WebScarab proxy</A>
-<CODE>conversations/</CODE> folder, get the whole HTTP request from a text
-file or get the list of targets by providing sqlmap with a Google dork
-which queries 
-<A HREF="http://www.google.com">Google</A> search engine and
-parses its results page. You can also define a regular-expression based
-scope that is used to identify which of the parsed addresses to test.
+<A HREF="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project">WebScarab proxy</A> <CODE>conversations/</CODE> folder, get the whole HTTP
+request from a text file or get the list of targets by providing sqlmap
+with a Google dork which queries 
+<A HREF="http://www.google.com">Google</A> search engine and parses its results page. You can also
+define a regular-expression based scope that is used to identify which of
+the parsed addresses to test.
 </LI>
 <LI>Automatically tests all provided <B>GET</B> parameters,
 <B>POST</B> parameters, HTTP <B>Cookie</B> header values and HTTP
@@ -457,10 +456,8 @@ Metasploit's <CODE>getsystem</CODE> command which include, among others,
 the 
 <A HREF="http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html">kitrap0d</A> technique (
 <A HREF="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx">MS10-015</A>) or via 
-<A HREF="http://www.argeniss.com/research/TokenKidnapping.pdf">Windows Access Tokens kidnapping</A> by using either Meterpreter's
-<CODE>incognito</CODE> extension or <CODE>Churrasco</CODE> (
-<A HREF="http://www.microsoft.com/technet/security/bulletin/ms09-012.mspx">MS09-012</A>) stand-alone executable
-as per user's choice.
+<A HREF="http://www.argeniss.com/research/TokenKidnapping.pdf">Windows Access Tokens kidnapping</A> by using Meterpreter's
+<CODE>incognito</CODE> extension.
 </LI>
 <LI>Support to access (read/add/delete) Windows registry hives.</LI>
 </UL>
@@ -538,10 +535,8 @@ contains the working copy from the Subversion repository updated at the
 time the sqlmap new version has been released.</LI>
 <LI>The Debian and Red Hat installation packages (deb and rpm) are
 compliant with the Linux distributions' packaging guidelines. This implies
-that they do not support the update features and do not include
-third-party softwares Churrasco (used to perform Windows token kidnapping,
-see below) and UPX (used to pack the Metasploit payload stager in some
-cases, see below).</LI>
+that they do not support the update features and do not include UPX (used
+to pack the Metasploit payload stager in some cases, see below).</LI>
 <LI>The Windows binary package (exe) can't update itself and does not
 support the takeover out-of-band features because they rely on
 Metasploit's <CODE>msfcli</CODE> which is not available for Windows.</LI>
@@ -694,7 +689,7 @@ Options:
     --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
     --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
     --os-bof            Stored procedure buffer overflow exploitation
-    --priv-esc          User priv escalation by abusing Windows access tokens
+    --priv-esc          Database process' user privilege escalation
     --msf-path=MSFPATH  Local path where Metasploit Framework 3 is installed
     --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
@@ -4968,11 +4963,8 @@ via Metasploit's <CODE>getsystem</CODE> command which include, among others,
 the 
 <A HREF="http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html">kitrap0d</A> technique (
 <A HREF="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx">MS10-015</A>) or via 
-<A HREF="http://www.argeniss.com/research/TokenKidnapping.pdf">Windows Access Tokens kidnapping</A> by using either Meterpreter's
-<A HREF="http://sourceforge.net/projects/incognito/">incognito</A> extension or 
-<A HREF="http://www.argeniss.com/research/Churrasco.zip">Churrasco</A>
-(
-<A HREF="http://www.microsoft.com/technet/security/bulletin/ms09-012.mspx">MS09-012</A>) stand-alone executable as per user's choice.</P>
+<A HREF="http://www.argeniss.com/research/TokenKidnapping.pdf">Windows Access Tokens kidnapping</A> by using Meterpreter's
+<A HREF="http://sourceforge.net/projects/incognito/">incognito</A> extension.</P>
 
 <P>Example on a <B>Microsoft SQL Server 2005 Service Pack 0</B> running as
 <CODE>NETWORK SERVICE</CODE> on the target:</P>
@@ -5023,9 +5015,7 @@ which payload encoding do you want to use?
 [hh:mm:53] [INFO] creation in progress ..... done
 [hh:mm:58] [INFO] compression in progress . done
 [hh:mm:59] [INFO] uploading payload stager to 'C:/WINDOWS/Temp/tmpmqyws.exe'
-do you want sqlmap to upload Churrasco and call the Metasploit payload stager as its 
-argument so that it will be started as SYSTEM? [y/N] 
-[hh:mm:22] [INFO] running Metasploit Framework 3 command line interface locally, wait..
+[hh:mm:05] [INFO] running Metasploit Framework 3 command line interface locally, wait..
 [*] Please wait while we load the module tree...
 [*] Started reverse handler on 172.16.213.1:44780 
 [*] Starting the payload handler...
@@ -5144,11 +5134,9 @@ send the NTLM session hash when connecting to a SMB service
 [hh:mm:16] [INFO] which is the back-end DBMS address? [172.16.213.131] 172.16.213.131
 [hh:mm:16] [INFO] which remote port numer do you want to use? [4907] 4907
 [hh:mm:16] [INFO] which payload do you want to use?
-[1] Reflective Meterpreter (default)
-[2] PatchUp Meterpreter (only from Metasploit development revision 6742)
-[3] Shell
-[4] Reflective VNC
-[5] PatchUp VNC (only from Metasploit development revision 6742)
+[1] Meterpreter (default)
+[2] Shell
+[3] VNC
 > 1
 [hh:mm:16] [INFO] which SMB port do you want to use?
 [1] 139/TCP (default)
