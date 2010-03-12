@@ -40,6 +40,8 @@ sqlmap (0.8-1) stable; urgency=low
     --drop-set-cookie (Miroslav).
   * Added support to specify which Google dork result page to parse,
     --gpage to be used together with -g (Miroslav).
+  * Major bug fix and enhancements to the multi-threading (--threads)
+    functionality (Miroslav).
   * Fixed URL encoding/decoding of GET/POST parameters and Cookie header
     (Miroslav).
   * Refactored --update to use python-svn third party library if available
@@ -55,7 +57,9 @@ sqlmap (0.8-1) stable; urgency=low
     shells consequently reducing drastically the number of anti-virus
     softwares that mistakenly mark sqlmap as a malware (Miroslav).
   * Updated user's manual (Bernardo and Miroslav).
-  * Created several demo videos, http://sqlmap.sf.net/demo.html (Bernardo).
+  * Created several demo videos, hosted on YouTube
+    (http://www.youtube.com/user/inquisb) and linked from
+    http://sqlmap.sourceforge.net/demo.html (Bernardo).
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun, 14 Mar 2010 10:00:00 +0000
 
