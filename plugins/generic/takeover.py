@@ -191,7 +191,7 @@ class Takeover(Abstraction, Metasploit, Registry):
                         debugMsg  = "beware that the privilege escalation "
                         debugMsg += "might not work via Churrasco if "
                         debugMsg += "MS09-012 patch is installed"
-                        logger.warn(warnMsg)
+                        logger.debug(debugMsg)
 
             elif kb.os != "Windows" and conf.privEsc:
                 # Unset --priv-esc if the back-end DBMS underlying operating
