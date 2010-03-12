@@ -352,8 +352,7 @@ def cmdLineParser():
                                  "exploitation")
 
         takeover.add_option("--priv-esc", dest="privEsc", action="store_true",
-                            help="User priv escalation by abusing Windows "
-                                 "access tokens")
+                            help="Database process' user privilege escalation")
 
         takeover.add_option("--msf-path", dest="msfPath",
                             help="Local path where Metasploit Framework 3 "

