@@ -348,7 +348,7 @@ class Takeover(Abstraction, Metasploit, Registry):
         infoMsg = "reading Windows registry path '%s\%s' " % (regKey, regVal)
         logger.info(infoMsg)
 
-        return self.readRegKey(regKey, regVal, False)
+        return self.readRegKey(regKey, regVal, True)
 
     def regAdd(self):
         self.__regInit()

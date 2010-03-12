@@ -45,7 +45,7 @@ class Registry:
         self.__batPathLocal  = os.path.join(conf.outputPath, "tmpr%s.bat" % self.__randStr)
 
         if parse:
-            readParse = "FOR /F \"tokens=2* delims==\" %%A IN ('REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"
+            readParse = "FOR /F \"tokens=1* delims= \" %%A IN ('REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"
         else:
             readParse = "REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\""
 
