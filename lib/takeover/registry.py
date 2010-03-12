@@ -95,12 +95,13 @@ class Registry:
 
         logger.debug("reading registry key '%s' value '%s'" % (regKey, regValue))
 
-        if not parse:
-            first = len(regKey) + 6
-        else:
-            first = None
-
-        data = self.evalCmd(self.__batPathRemote, first)
+        data = self.evalCmd(self.__batPathRemote)
+        
+        if data:
+            pattern = '    '
+            index = data.find(pattern)
+            if index != -1:
+                data = data[index + len(pattern):]
 
         self.delRemoteFile(self.__batPathRemote, doubleslash=True)
 
