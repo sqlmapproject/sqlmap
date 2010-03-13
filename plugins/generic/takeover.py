@@ -384,7 +384,7 @@ class Takeover(Abstraction, Metasploit, Registry):
         if output and output[0] not in ( "Y", "y" ):
             return
 
-        infoMsg  = "deleting Windows registry path '%s\%s'" % (regKey, regVal)
+        infoMsg  = "deleting Windows registry path '%s\%s'. " % (regKey, regVal)
         infoMsg += "This will work only if the user running the database "
         infoMsg += "process has privileges to modify the Windows registry."
         logger.info(infoMsg)
