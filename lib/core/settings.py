@@ -27,7 +27,7 @@ import subprocess
 import sys
 
 # sqlmap version and site
-VERSION            = "0.8"
+VERSION            = "0.9-dev"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 DESCRIPTION        = "automatic SQL injection and database takeover tool"
 SITE               = "http://sqlmap.sourceforge.net"
