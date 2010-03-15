@@ -27,7 +27,7 @@ import subprocess
 import sys
 
 # sqlmap version and site
-VERSION            = "0.8-rc7"
+VERSION            = "0.8"
 VERSION_STRING     = "sqlmap/%s" % VERSION
 DESCRIPTION        = "automatic SQL injection and database takeover tool"
 SITE               = "http://sqlmap.sourceforge.net"
@@ -51,10 +51,6 @@ PYVERSION          = sys.version.split()[0]
 
 # Url to update Microsoft SQL Server XML versions file from
 MSSQL_VERSIONS_URL = "http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx"
-
-# Urls to update sqlmap from
-SQLMAP_VERSION_URL = "%s/doc/VERSION" % SITE
-SQLMAP_SOURCE_URL  = "http://downloads.sourceforge.net/sqlmap/sqlmap-%s.zip"
 
 # Database managemen system specific variables
 MSSQL_SYSTEM_DBS   = ( "Northwind", "model", "msdb", "pubs", "tempdb" )

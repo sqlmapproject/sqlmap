@@ -47,8 +47,6 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.settings import MSSQL_VERSIONS_URL
-from lib.core.settings import SQLMAP_VERSION_URL
-from lib.core.settings import SQLMAP_SOURCE_URL
 from lib.core.settings import VERSION
 from lib.request.connect import Connect as Request
 
