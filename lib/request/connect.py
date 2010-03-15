@@ -125,6 +125,15 @@ class Connect:
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 
+            if hasattr(conn, "redurl"):
+                infoMsg  = "connection redirected, going to use "
+                infoMsg += "%s as target address" % conn.redurl
+                logger.info(infoMsg)
+
+                conf.url = conn.redurl
+
+                return Connect.__getPageProxy(**kwargs)
+
             # Reset the number of connection retries
             conf.retriesCount = 0
 
@@ -163,7 +172,7 @@ class Connect:
             code            = conn.code
             status          = conn.msg
             responseHeaders = conn.info()
-            
+
             encoding = responseHeaders.get("Content-Encoding")
             page = decodePage(page, encoding)
 

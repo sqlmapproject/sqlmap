@@ -22,24 +22,25 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import httplib
 import urllib2
-import sys
 
-from lib.core.data import conf
+class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
+    def http_error_301(self, req, fp, code, msg, headers):
+        result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
 
-class HTTPSCertAuthHandler(urllib2.HTTPSHandler):
-    def __init__(self, key_file, cert_file):
-        urllib2.HTTPSHandler.__init__(self)
-        self.key_file = key_file
-        self.cert_file = cert_file
+        if "location" in headers:
+            result.redurl = headers.getheaders("location")[0].split("?")[0]
+        elif "uri" in headers:
+            result.redurl = headers.getheaders("uri")[0].split("?")[0]
 
-    def https_open(self, req):
-        return self.do_open(self.getConnection, req)
+        return result
 
-    def getConnection(self, host):
-        if sys.version_info >= (2,6):
-            retVal = httplib.HTTPSConnection(host, key_file=self.key_file, cert_file=self.cert_file, timeout=conf.timeout)
-        else:
-            retVal = httplib.HTTPSConnection(host, key_file=self.key_file, cert_file=self.cert_file)
-        return retVal
+    def http_error_302(self, req, fp, code, msg, headers):
+        result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+
+        if "location" in headers:
+            result.redurl = headers.getheaders("location")[0].split("?")[0]
+        elif "uri" in headers:
+            result.redurl = headers.getheaders("uri")[0].split("?")[0]
+
+        return result

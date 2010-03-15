@@ -69,10 +69,12 @@ from lib.parse.configfile import configFileParser
 from lib.parse.queriesfile import queriesParser
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
+from lib.request.redirecthandler import SmartRedirectHandler
 from lib.utils.google import Google
 
 authHandler  = urllib2.BaseHandler()
 proxyHandler = urllib2.BaseHandler()
+redirectHandler = SmartRedirectHandler()
 
 def __urllib2Opener():
     """
@@ -81,6 +83,7 @@ def __urllib2Opener():
 
     global authHandler
     global proxyHandler
+    global redirectHandler
 
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
@@ -89,7 +92,7 @@ def __urllib2Opener():
         opener  = urllib2.build_opener(proxyHandler, authHandler)
     else:
         conf.cj = cookielib.LWPCookieJar()
-        opener  = urllib2.build_opener(proxyHandler, authHandler, urllib2.HTTPCookieProcessor(conf.cj))
+        opener  = urllib2.build_opener(proxyHandler, authHandler, urllib2.HTTPCookieProcessor(conf.cj), redirectHandler)
 
     urllib2.install_opener(opener)
 
