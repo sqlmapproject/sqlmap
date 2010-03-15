@@ -107,9 +107,6 @@ def paramToDict(place, parameters=None):
             warnMsg  = "the testable parameter '%s' " % paramStr
             warnMsg += "you provided is not into the %s" % place
 
-        if conf.multipleTargets:
-            warnMsg += ", skipping to next url"
-
         logger.warn(warnMsg)
 
     elif len(conf.testParameter) != len(testableParameters.keys()):

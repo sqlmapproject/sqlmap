@@ -218,8 +218,6 @@ def initTargetEnv():
     """
 
     if conf.multipleTargets:
-        conf.paramDict    = {}
-        conf.parameters   = {}
         kb.dbms           = None
         kb.dbmsDetected   = False
         kb.dbmsVersion    = None
