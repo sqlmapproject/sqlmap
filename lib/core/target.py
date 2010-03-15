@@ -220,6 +220,7 @@ def initTargetEnv():
     if conf.multipleTargets:
         conf.paramDict    = {}
         conf.parameters   = {}
+        conf.sessionFile  = None
         kb.dbms           = None
         kb.dbmsDetected   = False
         kb.dbmsVersion    = None
