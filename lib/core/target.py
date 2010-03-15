@@ -218,6 +218,8 @@ def initTargetEnv():
     """
 
     if conf.multipleTargets:
+        conf.paramDict    = {}
+        conf.parameters   = {}
         kb.dbms           = None
         kb.dbmsDetected   = False
         kb.dbmsVersion    = None
@@ -229,5 +231,6 @@ def initTargetEnv():
         kb.unionCount     = None
         kb.unionPosition  = None
 
+def setupTargetEnv():
     __setRequestParams()
     __setOutputResume()
