@@ -194,7 +194,7 @@ def __createDumpDir():
     if not os.path.isdir(conf.dumpPath):
         os.makedirs(conf.dumpPath, 0755)
 
-def createTargetDirs():
+def __createTargetDirs():
     """
     Create the output directory.
     """
@@ -232,5 +232,6 @@ def initTargetEnv():
         kb.unionPosition  = None
 
 def setupTargetEnv():
+    __createTargetDirs()
     __setRequestParams()
     __setOutputResume()

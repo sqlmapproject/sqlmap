@@ -37,8 +37,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.session import setInjection
-from lib.core.target import createTargetDirs
-from lib.core.target import initTargetEnv, setupTargetEnv
+from lib.core.target import initTargetEnv
+from lib.core.target import setupTargetEnv
 from lib.utils.parenthesis import checkForParenthesis
 
 def __selectInjection(injData):
@@ -136,7 +136,6 @@ def start():
         
         initTargetEnv()
         parseTargetUrl()
-        createTargetDirs()
         setupTargetEnv()
 
         if not checkConnection() or not checkString() or not checkRegexp():
