@@ -31,6 +31,8 @@ from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
+from lib.core.common import pop
+from lib.core.common import push
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -103,6 +105,10 @@ def start():
     if kb.targetUrls and len(kb.targetUrls) > 1:
         infoMsg = "sqlmap got a total of %d targets" % len(kb.targetUrls)
         logger.info(infoMsg)
+        
+    if conf.multipleTargets:
+        push(conf.raise404)
+        conf.raise404 = False
 
     hostCount               = 0
     cookieStr               = ""
@@ -267,7 +273,12 @@ def start():
                 logger.error(e)
             else:
                 logger.error(e)
+                if conf.multipleTargets:
+                    conf.raise404 = pop()
                 return
+
+    if conf.multipleTargets:
+        conf.raise404 = pop()
 
     if conf.loggedToOut:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)

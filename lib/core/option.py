@@ -957,12 +957,14 @@ def __setConfAttributes():
     conf.path            = None
     conf.port            = None
     conf.progressWidth   = 54
+    conf.raise404        = True
     conf.retriesCount    = 0
     conf.scheme          = None
     #conf.seqMatcher      = difflib.SequenceMatcher(lambda x: x in " \t")
     conf.seqMatcher      = difflib.SequenceMatcher(None)
     conf.seqLock         = None
     conf.sessionFP       = None
+    conf.stack           = []
     conf.start           = True
     conf.threadContinue  = True
     conf.threadException = False
