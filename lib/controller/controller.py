@@ -138,7 +138,7 @@ def start():
 
                 logMsg = "testing url %s" % targetUrl
                 logger.info(logMsg)
-            
+
             initTargetEnv()
             parseTargetUrl()
             setupTargetEnv()
@@ -150,12 +150,12 @@ def start():
                 for _, cookie in enumerate(conf.cj):
                     cookie = str(cookie)
                     index  = cookie.index(" for ")
-        
+
                     cookieStr += "%s;" % cookie[8:index]
 
                 if cookieStr:
                     cookieStr = cookieStr[:-1]
-        
+
                     if "Cookie" in conf.parameters:
                         message  = "you provided an HTTP Cookie header value. "
                         message += "The target url provided its own Cookie within "
@@ -163,15 +163,15 @@ def start():
                         message += "continue using the HTTP Cookie values that "
                         message += "you provided? [Y/n] "
                         test = readInput(message, default="Y")
-        
+
                         if not test or test[0] in ("y", "Y"):
                             setCookieAsInjectable = False
-        
+
                     if setCookieAsInjectable:
                         conf.httpHeaders.append(("Cookie", cookieStr))
                         conf.parameters["Cookie"] = cookieStr
                         __paramDict = paramToDict("Cookie", cookieStr)
-        
+
                         if __paramDict:
                             conf.paramDict["Cookie"] = __paramDict
                             __testableParameters = True
