@@ -72,11 +72,10 @@ def main():
 
     try:
         init(cmdLineOptions)
-
-        if conf.start:
-            start()
+        start()
 
     except exceptionsTuple, e:
+        e = str(e)
         logger.error(e)
 
     except KeyboardInterrupt:
@@ -90,6 +89,7 @@ def main():
         logger.error(errMsg)
 
     except:
+        print
         errMsg = unhandledException()
         logger.error(errMsg)
         traceback.print_exc()

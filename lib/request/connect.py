@@ -178,12 +178,12 @@ class Connect:
 
         except urllib2.HTTPError, e:
             if e.code == 401:
-                exceptionMsg  = "not authorized, try to provide right HTTP "
-                exceptionMsg += "authentication type and valid credentials"
-                raise sqlmapConnectionException, exceptionMsg
+                errMsg  = "not authorized, try to provide right HTTP "
+                errMsg += "authentication type and valid credentials"
+                raise sqlmapConnectionException, errMsg
             elif e.code == 404 and raise404:
-                exceptionMsg = "page not found"
-                raise sqlmapConnectionException, exceptionMsg
+                errMsg = "page not found"
+                raise sqlmapConnectionException, errMsg
             else:
                 page = e.read()
                 code = e.code
@@ -209,12 +209,6 @@ class Connect:
 
             if "BadStatusLine" not in tbMsg:
                 warnMsg += " or proxy"
-
-            if conf.multipleTargets:
-                warnMsg += ", skipping to next url"
-                logger.warn(warnMsg)
-
-                return None, None
 
             if silent:
                 return None, None

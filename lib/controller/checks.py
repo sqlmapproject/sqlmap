@@ -302,11 +302,11 @@ def checkStability():
             logMsg  = "url is stable"
             logger.info(logMsg)
         else:
-            exceptionMsg   = "there was an error checking the stability of page "
-            exceptionMsg  += "because of lack of content. please check the "
-            exceptionMsg  += "page request results (and probable errors) by "
-            exceptionMsg  += "using higher verbosity levels"
-            raise sqlmapNoneDataException, exceptionMsg
+            errMsg  = "there was an error checking the stability of page "
+            errMsg += "because of lack of content. please check the "
+            errMsg += "page request results (and probable errors) by "
+            errMsg += "using higher verbosity levels"
+            raise sqlmapNoneDataException, errMsg
 
     elif not condition:
         warnMsg  = "url is not stable, sqlmap will base the page "
@@ -387,15 +387,8 @@ def checkConnection():
         page, _ = Request.getPage()
         conf.seqMatcher.set_seq1(page)
 
-    except sqlmapConnectionException, exceptionMsg:
-        exceptionMsg = str(exceptionMsg)
-
-        if conf.multipleTargets:
-            exceptionMsg += ", skipping to next url"
-            logger.warn(exceptionMsg)
-
-            return False
-        else:
-            raise sqlmapConnectionException, exceptionMsg
+    except sqlmapConnectionException, errMsg:
+        errMsg = str(errMsg)
+        raise sqlmapConnectionException, errMsg
 
     return True

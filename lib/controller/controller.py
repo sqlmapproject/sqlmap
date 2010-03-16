@@ -35,6 +35,7 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.session import setInjection
 from lib.core.target import initTargetEnv
@@ -88,6 +89,9 @@ def start():
     check if they are dynamic and SQL injection affected
     """
 
+    if not conf.start:
+        return
+
     if conf.url:
         kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
@@ -105,158 +109,165 @@ def start():
     setCookieAsInjectable   = True
 
     for targetUrl, targetMethod, targetData, targetCookie in kb.targetUrls:
-        conf.url    = targetUrl
-        conf.method = targetMethod
-        conf.data   = targetData
-        conf.cookie = targetCookie
-        injData     = []
+        try:
+            conf.url    = targetUrl
+            conf.method = targetMethod
+            conf.data   = targetData
+            conf.cookie = targetCookie
+            injData     = []
 
-        if conf.multipleTargets:
-            hostCount += 1
-            message = "url %d:\n%s %s" % (hostCount, conf.method or "GET", targetUrl)
+            if conf.multipleTargets:
+                hostCount += 1
+                message = "url %d:\n%s %s" % (hostCount, conf.method or "GET", targetUrl)
 
-            if conf.cookie:
-                message += "\nCookie: %s" % conf.cookie
+                if conf.cookie:
+                    message += "\nCookie: %s" % conf.cookie
 
-            if conf.data:
-                message += "\nPOST data: %s" % conf.data
+                if conf.data:
+                    message += "\nPOST data: %s" % conf.data
 
-            message += "\ndo you want to test this url? [Y/n/q]"
-            test = readInput(message, default="Y")
+                message += "\ndo you want to test this url? [Y/n/q]"
+                test = readInput(message, default="Y")
 
-            if not test:
-                pass
-            elif test[0] in ("n", "N"):
-                continue
-            elif test[0] in ("q", "Q"):
-                break
-
-            logMsg = "testing url %s" % targetUrl
-            logger.info(logMsg)
-        
-        initTargetEnv()
-        parseTargetUrl()
-        setupTargetEnv()
-
-        if not checkConnection() or not checkString() or not checkRegexp():
-            continue
-
-        if not conf.dropSetCookie:
-            for _, cookie in enumerate(conf.cj):
-                cookie = str(cookie)
-                index  = cookie.index(" for ")
-    
-                cookieStr += "%s;" % cookie[8:index]
-
-            if cookieStr:
-                cookieStr = cookieStr[:-1]
-    
-                if "Cookie" in conf.parameters:
-                    message  = "you provided an HTTP Cookie header value. "
-                    message += "The target url provided its own Cookie within "
-                    message += "the HTTP Set-Cookie header. Do you want to "
-                    message += "continue using the HTTP Cookie values that "
-                    message += "you provided? [Y/n] "
-                    test = readInput(message, default="Y")
-    
-                    if not test or test[0] in ("y", "Y"):
-                        setCookieAsInjectable = False
-    
-                if setCookieAsInjectable:
-                    conf.httpHeaders.append(("Cookie", cookieStr))
-                    conf.parameters["Cookie"] = cookieStr
-                    __paramDict = paramToDict("Cookie", cookieStr)
-    
-                    if __paramDict:
-                        conf.paramDict["Cookie"] = __paramDict
-                        __testableParameters = True
-
-        if not kb.injPlace or not kb.injParameter or not kb.injType:
-            if not conf.string and not conf.regexp and not conf.eRegexp:
-                # NOTE: this is not needed anymore, leaving only to display
-                # a warning message to the user in case the page is not stable
-                checkStability()
-
-            for place in conf.parameters.keys():
-                if not conf.paramDict.has_key(place):
+                if not test:
+                    pass
+                elif test[0] in ("n", "N"):
                     continue
+                elif test[0] in ("q", "Q"):
+                    break
 
-                paramDict = conf.paramDict[place]
+                logMsg = "testing url %s" % targetUrl
+                logger.info(logMsg)
+            
+            initTargetEnv()
+            parseTargetUrl()
+            setupTargetEnv()
 
-                for parameter, value in paramDict.items():
-                    testSqlInj = True
+            if not checkConnection() or not checkString() or not checkRegexp():
+                continue
 
-                    # Avoid dinamicity test if the user provided the
-                    # parameter manually
-                    if parameter in conf.testParameter:
-                        pass
+            if not conf.dropSetCookie:
+                for _, cookie in enumerate(conf.cj):
+                    cookie = str(cookie)
+                    index  = cookie.index(" for ")
+        
+                    cookieStr += "%s;" % cookie[8:index]
 
-                    elif not checkDynParam(place, parameter, value):
-                        warnMsg = "%s parameter '%s' is not dynamic" % (place, parameter)
-                        logger.warn(warnMsg)
-                        testSqlInj = False
+                if cookieStr:
+                    cookieStr = cookieStr[:-1]
+        
+                    if "Cookie" in conf.parameters:
+                        message  = "you provided an HTTP Cookie header value. "
+                        message += "The target url provided its own Cookie within "
+                        message += "the HTTP Set-Cookie header. Do you want to "
+                        message += "continue using the HTTP Cookie values that "
+                        message += "you provided? [Y/n] "
+                        test = readInput(message, default="Y")
+        
+                        if not test or test[0] in ("y", "Y"):
+                            setCookieAsInjectable = False
+        
+                    if setCookieAsInjectable:
+                        conf.httpHeaders.append(("Cookie", cookieStr))
+                        conf.parameters["Cookie"] = cookieStr
+                        __paramDict = paramToDict("Cookie", cookieStr)
+        
+                        if __paramDict:
+                            conf.paramDict["Cookie"] = __paramDict
+                            __testableParameters = True
 
-                    else:
-                        logMsg = "%s parameter '%s' is dynamic" % (place, parameter)
-                        logger.info(logMsg)
+            if not kb.injPlace or not kb.injParameter or not kb.injType:
+                if not conf.string and not conf.regexp and not conf.eRegexp:
+                    # NOTE: this is not needed anymore, leaving only to display
+                    # a warning message to the user in case the page is not stable
+                    checkStability()
 
-                    if testSqlInj:
-                        for parenthesis in range(0, 4):
-                            logMsg  = "testing sql injection on %s " % place
-                            logMsg += "parameter '%s' with " % parameter
-                            logMsg += "%d parenthesis" % parenthesis
+                for place in conf.parameters.keys():
+                    if not conf.paramDict.has_key(place):
+                        continue
+
+                    paramDict = conf.paramDict[place]
+
+                    for parameter, value in paramDict.items():
+                        testSqlInj = True
+
+                        # Avoid dinamicity test if the user provided the
+                        # parameter manually
+                        if parameter in conf.testParameter:
+                            pass
+
+                        elif not checkDynParam(place, parameter, value):
+                            warnMsg = "%s parameter '%s' is not dynamic" % (place, parameter)
+                            logger.warn(warnMsg)
+                            testSqlInj = False
+
+                        else:
+                            logMsg = "%s parameter '%s' is dynamic" % (place, parameter)
                             logger.info(logMsg)
 
-                            injType = checkSqlInjection(place, parameter, value, parenthesis)
+                        if testSqlInj:
+                            for parenthesis in range(0, 4):
+                                logMsg  = "testing sql injection on %s " % place
+                                logMsg += "parameter '%s' with " % parameter
+                                logMsg += "%d parenthesis" % parenthesis
+                                logger.info(logMsg)
 
-                            if injType:
-                                injData.append((place, parameter, injType))
+                                injType = checkSqlInjection(place, parameter, value, parenthesis)
 
-                                break
-                            else:
-                                infoMsg  = "%s parameter '%s' is not " % (place, parameter)
-                                infoMsg += "injectable with %d parenthesis" % parenthesis
-                                logger.info(infoMsg)
+                                if injType:
+                                    injData.append((place, parameter, injType))
 
-                        if not injData:
-                            warnMsg  = "%s parameter '%s' is not " % (place, parameter)
-                            warnMsg += "injectable"
-                            logger.warn(warnMsg)
+                                    break
+                                else:
+                                    infoMsg  = "%s parameter '%s' is not " % (place, parameter)
+                                    infoMsg += "injectable with %d parenthesis" % parenthesis
+                                    logger.info(infoMsg)
 
-        if not kb.injPlace or not kb.injParameter or not kb.injType:
-            if len(injData) == 1:
-                injDataSelected = injData[0]
+                            if not injData:
+                                warnMsg  = "%s parameter '%s' is not " % (place, parameter)
+                                warnMsg += "injectable"
+                                logger.warn(warnMsg)
 
-            elif len(injData) > 1:
-                injDataSelected = __selectInjection(injData)
+            if not kb.injPlace or not kb.injParameter or not kb.injType:
+                if len(injData) == 1:
+                    injDataSelected = injData[0]
 
-            elif conf.multipleTargets:
-                continue
+                elif len(injData) > 1:
+                    injDataSelected = __selectInjection(injData)
 
-            else:
-                return
+                else:
+                    raise sqlmapNotVulnerableException, "all parameters are not injectable"
+                    return
 
-            if injDataSelected == "Quit":
-                return
+                if injDataSelected == "Quit":
+                    return
 
-            else:
-                kb.injPlace, kb.injParameter, kb.injType = injDataSelected
-                setInjection()
+                else:
+                    kb.injPlace, kb.injParameter, kb.injType = injDataSelected
+                    setInjection()
 
-        if not conf.multipleTargets and ( not kb.injPlace or not kb.injParameter or not kb.injType ):
-            raise sqlmapNotVulnerableException, "all parameters are not injectable"
-        elif kb.injPlace and kb.injParameter and kb.injType:
+            elif kb.injPlace and kb.injParameter and kb.injType:
+                if conf.multipleTargets:
+                    message = "do you want to exploit this SQL injection? [Y/n] "
+                    exploit = readInput(message, default="Y")
+
+                    condition = not exploit or exploit[0] in ("y", "Y")
+                else:
+                    condition = True
+
+                if condition:
+                    checkForParenthesis()
+                    action()
+
+        except exceptionsTuple, e:
+            e = str(e)
+
             if conf.multipleTargets:
-                message = "do you want to exploit this SQL injection? [Y/n] "
-                exploit = readInput(message, default="Y")
-
-                condition = not exploit or exploit[0] in ("y", "Y")
+                e += ", skipping to next url"
+                logger.error(e)
             else:
-                condition = True
-
-            if condition:
-                checkForParenthesis()
-                action()
+                logger.error(e)
+                return
 
     if conf.loggedToOut:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
