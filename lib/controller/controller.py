@@ -237,7 +237,6 @@ def start():
 
                 else:
                     raise sqlmapNotVulnerableException, "all parameters are not injectable"
-                    return
 
                 if injDataSelected == "Quit":
                     return
@@ -246,7 +245,7 @@ def start():
                     kb.injPlace, kb.injParameter, kb.injType = injDataSelected
                     setInjection()
 
-            elif kb.injPlace and kb.injParameter and kb.injType:
+            if kb.injPlace and kb.injParameter and kb.injType:
                 if conf.multipleTargets:
                     message = "do you want to exploit this SQL injection? [Y/n] "
                     exploit = readInput(message, default="Y")

@@ -31,6 +31,7 @@ import urlparse
 import traceback
 
 from lib.contrib import multipartpost
+from lib.core.common import readInput
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -125,12 +126,24 @@ class Connect:
             req            = urllib2.Request(url, post, headers)
             conn           = urllib2.urlopen(req)
 
-            if hasattr(conn, "redurl"):
-                infoMsg  = "connection redirected, going to use "
-                infoMsg += "%s as target address" % conn.redurl
-                logger.info(infoMsg)
+            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled:
+                msg  = "sqlmap got a %d redirect to " % conn.redcode
+                msg += "%s - What target address do you " % conn.redurl
+                msg += "want to use from now on? %s " % conf.url
+                msg += "(default) or provide another target address based "
+                msg += "also on the redirection got from the application\n"
 
-                conf.url = conn.redurl
+                while True:
+                    choice = readInput(msg, default="1")
+
+                    if not choice or choice == "1":
+                        pass
+                    else:
+                        conf.url = choice
+
+                    break
+
+                conf.redirectHandled = True
 
                 return Connect.__getPageProxy(**kwargs)
 

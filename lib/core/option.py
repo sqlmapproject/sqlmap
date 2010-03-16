@@ -957,6 +957,7 @@ def __setConfAttributes():
     conf.path            = None
     conf.port            = None
     conf.progressWidth   = 54
+    conf.redirectHandled = False
     conf.retriesCount    = 0
     conf.scheme          = None
     #conf.seqMatcher      = difflib.SequenceMatcher(lambda x: x in " \t")

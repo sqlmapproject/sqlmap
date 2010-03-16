@@ -25,22 +25,20 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import urllib2
 
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
-    def http_error_301(self, req, fp, code, msg, headers):
-        result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
-
+    def common_http_redirect(self, result, headers, code):
         if "location" in headers:
             result.redurl = headers.getheaders("location")[0].split("?")[0]
         elif "uri" in headers:
             result.redurl = headers.getheaders("uri")[0].split("?")[0]
 
+        result.redcode = code
+
         return result
+
+    def http_error_301(self, req, fp, code, msg, headers):
+        result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
+        return self.common_http_redirect(result, headers, code)
 
     def http_error_302(self, req, fp, code, msg, headers):
         result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
-
-        if "location" in headers:
-            result.redurl = headers.getheaders("location")[0].split("?")[0]
-        elif "uri" in headers:
-            result.redurl = headers.getheaders("uri")[0].split("?")[0]
-
-        return result
+        return self.common_http_redirect(result, headers, code)
