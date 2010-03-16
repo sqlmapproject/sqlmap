@@ -939,9 +939,3 @@ def posixToNtSlashes(filepath):
 
 def ntToPosixSlashes(filepath):
     return filepath.replace('\\', '/')
-
-def push(value):
-    conf.stack.append(value)
-
-def pop():
-    return conf.stack.pop()

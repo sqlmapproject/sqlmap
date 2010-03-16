@@ -70,7 +70,7 @@ class Connect:
         direct    = kwargs.get('direct',    False)
         multipart = kwargs.get('multipart', False)
         silent    = kwargs.get('silent',    False)
-        raise404  = kwargs.get('raise404',  None)
+        raise404  = kwargs.get('raise404',  True)
 
         page            = ""
         cookieStr       = ""
@@ -181,7 +181,7 @@ class Connect:
                 errMsg  = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials"
                 raise sqlmapConnectionException, errMsg
-            elif e.code == 404 and (raise404 or (raise404 is None and conf.raise404)):
+            elif e.code == 404 and raise404:
                 errMsg = "page not found"
                 raise sqlmapConnectionException, errMsg
             else:
