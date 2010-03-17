@@ -1,0 +1,50 @@
+<!doctype linuxdoc system>
+
+<article>
+
+<title>sqlmap FAQ
+<author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
+<date>version 0.8, March 15, 2010
+<abstract>
+This document contains frequently asked questions for <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
+Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">
+for the latest version.
+</abstract>
+
+<toc>
+
+<sect>Frequently Asked Questions
+
+<sect1>General information
+
+<sect2>What is sqlmap?
+
+<p>
+sqlmap is an open source penetration testing tool that automates the
+process of detecting and exploiting SQL injection flaws and taking over of
+back-end database servers.
+It comes with a broad range of features lasting from database
+fingerprinting, over data fetching from the database, to accessing the
+underlying file system and executing commands on the operating system via
+out-of-band connections.
+</p>
+
+<sect1>Usage
+
+<sect2>How to run sqlmap?
+
+<p>
+<tscreen><verb>
+python sqlmap.py
+</verb></tscreen>
+</p>
+
+<sect1>Design
+    
+<sect2>How sqlmap decides this and that?
+
+<p>
+That's how.
+</p>
+
+</article>
