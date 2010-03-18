@@ -379,9 +379,9 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     conf.paramFalseCond = oldParamFalseCond
     conf.paramNegative  = oldParamNegative
 
-    if value:
+    if value and isinstance(value, str):
         value = value.strip()
-        
+
     return value
 
 def goStacked(expression, silent=False):
