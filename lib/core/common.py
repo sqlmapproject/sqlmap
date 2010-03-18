@@ -127,7 +127,7 @@ def formatDBMSfp(versions=None):
     @rtype: C{str}
     """
 
-    if not versions or versions == [None]:
+    if ( not versions or versions == [None] ) and kb.dbmsVersion[0] != "Unknown":
         versions = kb.dbmsVersion
 
     if isinstance(versions, str):
@@ -734,13 +734,18 @@ def getDelayQuery(andCond=False):
         if (kb.dbms == "MySQL" and banVer >= "5.0.12") or (kb.dbms == "PostgreSQL" and banVer >= "8.2"):
             query = queries[kb.dbms].timedelay % conf.timeSec
 
-            if kb.dbms == "MySQL" and andCond:
-                query = query.replace("SELECT ", "")
-
         else:
             query = queries[kb.dbms].timedelay2 % conf.timeSec
+    elif kb.dbms is "Firebird":
+        query = queries[kb.dbms].timedelay
     else:
         query = queries[kb.dbms].timedelay % conf.timeSec
+
+    if andCond:
+        if kb.dbms in ( "MySQL", "SQLite" ):
+            query = query.replace("SELECT ", "")
+        elif kb.dbms is "Firebird":
+            query = "(%s)>0" % query
 
     return query
     

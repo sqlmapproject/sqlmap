@@ -182,6 +182,11 @@ class Agent:
         @rtype: C{str}
         """
 
+        # SQLite version 2 does not support neither CAST() nor IFNULL(),
+        # introduced only in SQLite version 3
+        if kb.dbms == "SQLite":
+            return field
+
         if field.startswith("(CASE"):
             nulledCastedField = field
         else:
@@ -252,12 +257,12 @@ class Agent:
         @return: query fields (columns) and more details
         @rtype: C{str}
         """
-
+        prefixRegex          = "(?:\s+(?:FIRST|SKIP)\s+\d+)*"
         fieldsSelectTop      = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
-        fieldsSelectDistinct = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", query, re.I)
-        fieldsSelectCase     = re.search("\ASELECT\s+(\(CASE WHEN\s+.+\s+END\))", query, re.I)
-        fieldsSelectFrom     = re.search("\ASELECT\s+(.+?)\s+FROM\s+", query, re.I)
-        fieldsSelect         = re.search("\ASELECT\s+(.*)", query, re.I)
+        fieldsSelectDistinct = re.search("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
+        fieldsSelectCase     = re.search("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
+        fieldsSelectFrom     = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
+        fieldsSelect         = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
         fieldsNoSelect       = query
 
         if fieldsSelectTop:
@@ -284,7 +289,7 @@ class Agent:
         if kb.dbms == "MySQL":
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
-        elif kb.dbms in ( "PostgreSQL", "Oracle" ):
+        elif kb.dbms in ( "PostgreSQL", "Oracle", "SQLite" ):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
         elif kb.dbms == "Microsoft SQL Server":
@@ -342,7 +347,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (temp.start, concatenatedQuery, temp.stop)
 
-        elif kb.dbms in ( "PostgreSQL", "Oracle" ):
+        elif kb.dbms in ( "PostgreSQL", "Oracle", "SQLite" ):
             if fieldsSelectCase:
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
                 concatenatedQuery += "||'%s'" % temp.stop
@@ -483,8 +488,12 @@ class Agent:
         untilFrom     = limitedQuery[:fromIndex]
         fromFrom      = limitedQuery[fromIndex+1:]
 
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+        if kb.dbms in ( "MySQL", "PostgreSQL", "SQLite" ):
             limitStr = queries[kb.dbms].limit % (num, 1)
+            limitedQuery += " %s" % limitStr
+            
+        elif kb.dbms == "Firebird":
+            limitStr = queries[kb.dbms].limit % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
         elif kb.dbms == "Oracle":

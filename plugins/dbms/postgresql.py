@@ -412,10 +412,10 @@ class PostgreSQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeove
             raise sqlmapUnsupportedFeatureException, errMsg
 
         if kb.os == "Windows":
-            self.udfLocalFile += "/postgresql/windows/%s/lib_postgresqludf_sys.dll" % majorVer
+            self.udfLocalFile += "/postgresql/windows/32/%s/lib_postgresqludf_sys.dll" % majorVer
             self.udfSharedLibExt = "dll"
         else:
-            self.udfLocalFile += "/postgresql/linux/%s/lib_postgresqludf_sys.so" % majorVer
+            self.udfLocalFile += "/postgresql/linux/32/%s/lib_postgresqludf_sys.so" % majorVer
             self.udfSharedLibExt = "so"
 
     def udfCreateFromSharedLib(self, udf, inpRet):

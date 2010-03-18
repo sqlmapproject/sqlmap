@@ -121,8 +121,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             queriesCount[0] += 1
             position      = (len(asciiTbl) / 2)
             posValue      = asciiTbl[position]
+
+            if kb.dbms == "SQLite":
+                posValueOld = posValue
+                posValue = chr(posValue)
+
             forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
             result        = Request.queryPage(forgedPayload)
+
+            if kb.dbms == "SQLite":
+                posValue = posValueOld
 
             if result:
                 minValue = posValue

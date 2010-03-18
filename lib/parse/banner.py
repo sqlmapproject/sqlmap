@@ -103,6 +103,8 @@ def bannerParser(banner):
     DBMS banner based upon the data in XML file
     """
 
+    xmlfile = None
+    
     if kb.dbms == "Microsoft SQL Server":
         xmlfile = paths.MSSQL_XML
     elif kb.dbms == "MySQL":
@@ -112,6 +114,9 @@ def bannerParser(banner):
     elif kb.dbms == "PostgreSQL":
         xmlfile = paths.PGSQL_XML
 
+    if not xmlfile:
+        return
+        
     checkFile(xmlfile)
 
     if kb.dbms == "Microsoft SQL Server":

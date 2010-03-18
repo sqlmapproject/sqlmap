@@ -236,4 +236,115 @@
         </dump_table>
     </dbms>
 
+    <!-- SQLite -->
+    <dbms value="SQLite">
+        <!-- Not supported on SQLite 2 -->
+        <cast query="CAST(%s AS VARCHAR(8000))"/>
+        <length query="LENGTH(%s)"/>
+        <!-- Not supported on SQLite 2 -->
+        <isnull query="IFNULL(%s, ' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d, %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="/*"/>
+        <!-- Not supported on SQLite 2 -->
+        <timedelay query="SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(1000000%d))))"/>
+        <substring query="SUBSTR((%s), %d, %d)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <inference query="AND SUBSTR((%s), %d, 1) > '%s'"/>
+        <banner query="SQLITE_VERSION()"/>
+        <current_user/>
+        <current_db/>
+        <is_dba/>
+        <check_udf/>
+        <users/>
+        <passwords/>
+        <privileges/>
+        <dbs/>
+        <tables>
+            <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table'"/>
+            <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' LIMIT %d, 1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
+        </tables>
+        <columns/>
+        <dump_column/>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT %s FROM %s LIMIT %d, 1" count="SELECT COUNT(*) FROM %s"/>
+        </dump_table>
+    </dbms>
+
+    <!-- Microsoft Access -->
+    <dbms value="Microsoft Access">
+        <cast query="CVAR(%s)"/>
+        <length query="LEN(%s)"/>
+        <isnull query="ISNULL(%s)"/>
+        <delimiter query=","/>
+        <limit query="TOP %d"/>
+        <limitregexp query="\s+TOP\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="1"/>
+        <limitstring query=" TOP "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="%00"/>
+        <timedelay/>
+        <substring query="MID((%s), %d, %d)"/>
+        <case query="IIF(%s,1,0)"/>
+        <banner/>
+        <current_user query="CURRENTUSER()"/>
+        <current_db/>
+        <inference query="AND ASC(MID((%s), %d, 1)) > %d"/>
+        <is_dba query="IIF(CURRENTUSER()='Admin',1,0)"/>
+   </dbms>
+
+   <!-- Firebird -->
+   <dbms value="Firebird">
+        <cast query="CAST(%s AS VARCHAR(10000))"/>
+        <length query="CHAR_LENGTH(%s)"/>
+        <limit query="ROWS %d TO %d"/>
+        <limitregexp query="\s+ROWS\s+([\d]+)(\s+\TO\s+([\d]+))?"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" ROWS "/>
+        <isnull query="%s"/>
+        <order query="ORDER BY %s ASC"/>
+        <comment query="--"/>
+        <count query="COUNT(%s)"/>
+        <timedelay query="SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6"/>
+        <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
+        <case query="SELECT IIF(%s,1,0) FROM RDB$DATABASE"/>
+        <banner query="SELECT RDB$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB$DATABASE"/>
+        <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
+        <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM', 'DB_NAME') FROM RDB$DATABASE"/>
+        <users>
+            <inband query="SELECT DISTINCT RDB$USER FROM RDB$USER_PRIVILEGES"/>
+            <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
+        </users>
+        <inference query="AND ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d"/>
+        <is_dba query="CURRENT_USER='SYSDBA'"/>
+        <tables>
+            <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
+            <blind query="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" count="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
+        </tables>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT FIRST 1 SKIP %d %s FROM %s" count="SELECT COUNT(*) FROM %s"/>
+        </dump_table>    
+        <privileges>
+            <inband query="SELECT RDB$USER, RDB$PRIVILEGE FROM RDB$USER_PRIVILEGES" condition="RDB$USER"/>
+            <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$PRIVILEGE) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'" count="SELECT COUNT(DISTINCT(RDB$PRIVILEGE)) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'"/>
+        </privileges>
+        <dbs/>
+        <columns>
+            <!--<inband query="SELECT r.RDB$FIELD_NAME, CASE f.RDB$FIELD_TYPE WHEN 261 THEN 'BLOB' WHEN 14 THEN 'CHAR' WHEN 40 THEN 'CSTRING' WHEN 11 THEN 'D_FLOAT' WHEN 27 THEN 'DOUBLE' WHEN 10 THEN 'FLOAT' WHEN 16 THEN 'INT64' WHEN 8 THEN 'INTEGER' WHEN 9 THEN 'QUAD' WHEN 7 THEN 'SMALLINT' WHEN 12 THEN 'DATE' WHEN 13 THEN 'TIME' WHEN 35 THEN 'TIMESTAMP' WHEN 37 THEN 'VARCHAR' ELSE 'UNKNOWN' END AS field_type FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>-->
+            <inband query="SELECT r.RDB$FIELD_NAME, f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>
+            <blind query="SELECT r.RDB$FIELD_NAME FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'" query2="SELECT f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s' AND r.RDB$FIELD_NAME='%s'" count="SELECT COUNT(r.RDB$FIELD_NAME) FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>
+        </columns>        
+   </dbms>
+
 </root>

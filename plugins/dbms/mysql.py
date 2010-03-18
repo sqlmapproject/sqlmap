@@ -540,10 +540,10 @@ class MySQLMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
         self.udfSharedLibName = "libs%s" % randomStr(lowercase=True)
 
         if kb.os == "Windows":
-            self.udfLocalFile   += "/mysql/windows/lib_mysqludf_sys.dll"
+            self.udfLocalFile   += "/mysql/windows/32/lib_mysqludf_sys.dll"
             self.udfSharedLibExt = "dll"
         else:
-            self.udfLocalFile   += "/mysql/linux/lib_mysqludf_sys.so"
+            self.udfLocalFile   += "/mysql/linux/32/lib_mysqludf_sys.so"
             self.udfSharedLibExt = "so"
 
     def udfCreateFromSharedLib(self, udf, inpRet):

@@ -50,3 +50,6 @@ class Fingerprint:
         errMsg  = "'checkDbms' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
+
+    def forceDbmsEnum(self):
+        pass

@@ -68,9 +68,6 @@ class Enumeration:
 
         temp.inference                 = queries[dbms].inference
 
-    def forceDbmsEnum(self):
-        pass
-
     def getVersionFromBanner(self):
         if "dbmsVersion" in kb.bannerFp:
             return
@@ -405,6 +402,15 @@ class Enumeration:
                         ( 2, "super" ),
                         ( 3, "catupd" ),
                      )
+                     
+        firebirdPrivs = {
+                         "S": "SELECT",
+                         "I": "INSERT",
+                         "U": "UPDATE",
+                         "D": "DELETE",
+                         "R": "REFERENCES",
+                         "E": "EXECUTE"
+                     }
 
         if kb.unionPosition:
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
@@ -564,6 +570,8 @@ class Enumeration:
                         query = rootQuery["blind"]["query2"] % (queryUser, index)
                     elif kb.dbms == "MySQL" and kb.data.has_information_schema:
                         query = rootQuery["blind"]["query"] % (conditionChar, queryUser, index)
+                    elif kb.dbms == "Firebird":
+                        query = rootQuery["blind"]["query"] % (index, queryUser)
                     else:
                         query = rootQuery["blind"]["query"] % (queryUser, index)
                     privilege = inject.getValue(query, inband=False)
@@ -602,6 +610,8 @@ class Enumeration:
                                         privileges.add(mysqlPriv)
 
                             i += 1
+                    elif kb.dbms == "Firebird":
+                        privileges.add(firebirdPrivs[privilege.strip()])
 
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
@@ -701,7 +711,7 @@ class Enumeration:
             query = rootQuery["inband"]["query"]
             condition = rootQuery["inband"]["condition"]
 
-            if conf.db:
+            if conf.db and kb.dbms != "SQLite":
                 if "," in conf.db:
                     dbs = conf.db.split(",")
                     query += " WHERE "
@@ -717,6 +727,17 @@ class Enumeration:
             value = inject.getValue(query, blind=False)
 
             if value:
+                if kb.dbms == "SQLite":
+                    if isinstance(value, str):
+                        value = [[ "SQLite", value ]]
+                    elif isinstance(value, (list, tuple, set)):
+                        newValue = []
+
+                        for v in value:
+                            newValue.append([ "SQLite", v])
+
+                        value = newValue
+
                 for db, table in value:
                     if not kb.data.cachedTables.has_key(db):
                         kb.data.cachedTables[db] = [table]
@@ -746,7 +767,10 @@ class Enumeration:
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
-                query = rootQuery["blind"]["count"] % db
+                if kb.dbms in ("SQLite", "Firebird"):
+                    query = rootQuery["blind"]["count"]
+                else:
+                    query = rootQuery["blind"]["count"] % db
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
@@ -755,7 +779,7 @@ class Enumeration:
                     logger.warn(warnMsg)
                     continue
 
-                tables     = []
+                tables = []
 
                 if kb.dbms in ( "Microsoft SQL Server", "Oracle" ):
                     plusOne = True
@@ -764,7 +788,10 @@ class Enumeration:
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    query = rootQuery["blind"]["query"] % (db, index)
+                    if kb.dbms in ("SQLite", "Firebird"):
+                        query = rootQuery["blind"]["query"] % index
+                    else:
+                        query = rootQuery["blind"]["query"] % (db, index)
                     table = inject.getValue(query, inband=False)
                     tables.append(table)
 
@@ -803,6 +830,23 @@ class Enumeration:
             logger.warn(warnMsg)
 
             conf.db = self.getCurrentDb()
+        
+        firebirdTypes = {
+                            "261":"BLOB",
+                            "14":"CHAR",
+                            "40":"CSTRING",
+                            "11":"D_FLOAT",
+                            "27":"DOUBLE",
+                            "10":"FLOAT",
+                            "16":"INT64",
+                            "8":"INTEGER",
+                            "9":"QUAD",
+                            "7":"SMALLINT",
+                            "12":"DATE",
+                            "13":"TIME",
+                            "35":"TIMESTAMP",
+                            "37":"VARCHAR"
+                        }
 
         rootQuery = queries[kb.dbms].columns
         condition = rootQuery["blind"]["condition"]
@@ -863,6 +907,9 @@ class Enumeration:
             elif kb.dbms == "Microsoft SQL Server":
                 query = rootQuery["blind"]["count"] % (conf.db, conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
+            elif kb.dbms == "Firebird":
+                query = rootQuery["blind"]["count"] % (conf.tbl)
+                query += condQuery
 
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
@@ -893,6 +940,10 @@ class Enumeration:
                                                            conf.tbl)
                     query += condQuery.replace("[DB]", conf.db)
                     field = condition.replace("[DB]", conf.db)
+                elif kb.dbms == "Firebird":
+                    query = rootQuery["blind"]["query"] % (conf.tbl)
+                    query += condQuery
+                    field = None
 
                 query = agent.limitQuery(index, query, field)
                 column = inject.getValue(query, inband=False)
@@ -906,8 +957,14 @@ class Enumeration:
                         query = rootQuery["blind"]["query2"] % (conf.db, conf.db, conf.db,
                                                                 conf.db, column, conf.db,
                                                                 conf.db, conf.db, conf.tbl)
+                    elif kb.dbms == "Firebird":
+                        query = rootQuery["blind"]["query2"] % (conf.tbl, column)
 
                     colType = inject.getValue(query, inband=False)
+
+                    if kb.dbms == "Firebird":
+                        colType = firebirdTypes[colType] if colType in firebirdTypes else colType
+
                     columns[column] = colType
                 else:
                     columns[column] = None
@@ -1278,6 +1335,8 @@ class Enumeration:
         if kb.unionPosition:
             if kb.dbms == "Oracle":
                 query = rootQuery["inband"]["query"] % (colString, conf.tbl.upper())
+            elif kb.dbms == "SQLite":
+                query = rootQuery["inband"]["query"] % (colString, conf.tbl)
             else:
                 query = rootQuery["inband"]["query"] % (colString, conf.db, conf.tbl)
             entries = inject.getValue(query, blind=False)
@@ -1321,6 +1380,8 @@ class Enumeration:
 
             if kb.dbms == "Oracle":
                 query = rootQuery["blind"]["count"] % conf.tbl.upper()
+            elif kb.dbms == "SQLite":
+                query = rootQuery["blind"]["count"] % conf.tbl
             else:
                 query = rootQuery["blind"]["count"] % (conf.db, conf.tbl)
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -1336,8 +1397,8 @@ class Enumeration:
 
                 return None
 
-            lengths    = {}
-            entries    = {}
+            lengths = {}
+            entries = {}
 
             if kb.dbms == "Oracle":
                 plusOne = True
@@ -1365,6 +1426,8 @@ class Enumeration:
                                                                conf.tbl, column,
                                                                index, column,
                                                                conf.db, conf.tbl)
+                    elif kb.dbms == "SQLite":
+                        query = rootQuery["blind"]["query"] % (column, conf.tbl, index)
 
                     value = inject.getValue(query, inband=False)
 

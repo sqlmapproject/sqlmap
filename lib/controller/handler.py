@@ -29,11 +29,17 @@ from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import SQLITE_ALIASES
+from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import FIREBIRD_ALIASES
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
 from plugins.dbms.mysql import MySQLMap
 from plugins.dbms.oracle import OracleMap
 from plugins.dbms.postgresql import PostgreSQLMap
+from plugins.dbms.sqlite import SQLiteMap
+from plugins.dbms.access import AccessMap
+from plugins.dbms.firebird import FirebirdMap
 
 def setHandler():
     """
@@ -42,12 +48,15 @@ def setHandler():
     """
 
     count     = 0
-    dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server" )
+    dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird" )
     dbmsMap   = (
                   ( MYSQL_ALIASES, MySQLMap ),
                   ( ORACLE_ALIASES, OracleMap ),
                   ( PGSQL_ALIASES, PostgreSQLMap ),
                   ( MSSQL_ALIASES, MSSQLServerMap ),
+                  ( SQLITE_ALIASES, SQLiteMap ),
+                  ( ACCESS_ALIASES, AccessMap ),
+                  ( FIREBIRD_ALIASES, FirebirdMap ),
                 )
 
     for dbmsAliases, dbmsEntry in dbmsMap:

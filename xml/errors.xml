@@ -30,6 +30,7 @@
         <error regexp="Access.*Driver"/>
         <error regexp="Driver.*Access"/>
         <error regexp="JET Database Engine"/>
+        <error regexp="Access Database Engine"/>
     </dbms>
 
     <!-- Oracle -->
@@ -57,9 +58,17 @@
         <error regexp="Sybase message"/>
     </dbms>
 
-    <!-- Interbase -->
-    <dbms value="Interbase">
+    <!-- Interbase/Firebird -->
+    <dbms value="Firebird">
         <error regexp="Dynamic SQL Error"/>
+    </dbms>
+    
+    <!-- SQLite -->
+    <dbms value="SQLite">
+        <error regexp="Warning.*sqlite_.*"/>
+        <error regexp="SQLite/JDBCDriver"/>
+        <error regexp="SQLite.Exception"/>
+        <error regexp="System.Data.SQLite.SQLiteException"/>
     </dbms>
 
 </root>
