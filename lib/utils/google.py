@@ -39,11 +39,10 @@ class Google:
     line option '-g <google dork>'
     """
 
-    def __init__(self, proxyHandler):
-        self.__googleCookie = None
+    def __init__(self, proxy):
         self.__matches = []
         self.__cj = cookielib.LWPCookieJar()
-        self.opener = urllib2.build_opener(proxyHandler, urllib2.HTTPCookieProcessor(self.__cj))
+        self.opener = urllib2.build_opener(proxy, urllib2.HTTPCookieProcessor(self.__cj))
         self.opener.addheaders = conf.httpHeaders
 
     def __parsePage(self, page):

@@ -139,7 +139,7 @@ class UDF:
         errMsg = "udfSetLocalPaths() method must be defined within the plugin"
         raise sqlmapUnsupportedFeatureException(errMsg)
 
-    def udfCreateFromSharedLib(self):
+    def udfCreateFromSharedLib(self, udf=None, inpRet=None):
         errMsg = "udfCreateFromSharedLib() method must be defined within the plugin"
         raise sqlmapUnsupportedFeatureException(errMsg)
 
@@ -182,7 +182,7 @@ class UDF:
 
         self.checkDbmsOs()
 
-        if self.isDba() == False:
+        if not self.isDba():
             warnMsg  = "the functionality requested might not work because "
             warnMsg += "the session user is not a database administrator"
             logger.warn(warnMsg)
@@ -317,7 +317,7 @@ class UDF:
             udfList = []
             msg     = "which UDF do you want to call?"
 
-            for udf, inpRet in self.udfs.items():
+            for udf in self.udfs.keys():
                 udfList.append(udf)
                 msg += "\n[%d] %s" % (len(udfList), udf)
 

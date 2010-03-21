@@ -26,7 +26,6 @@ import os
 
 from lib.core.common import randomStr
 from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.data import logger
 
 class Registry:

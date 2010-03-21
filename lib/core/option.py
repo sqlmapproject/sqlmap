@@ -632,9 +632,9 @@ def __setHTTPAuthentication():
         key_file = os.path.expanduser(aCertRegExp.group(1))
         cert_file = os.path.expanduser(aCertRegExp.group(2))
         
-        for file in (key_file, cert_file):
-            if not os.path.exists(file):
-                errMsg  = "File '%s' doesn't exist" % file
+        for ifile in (key_file, cert_file):
+            if not os.path.exists(ifile):
+                errMsg  = "File '%s' does not exist" % ifile
                 raise sqlmapSyntaxException, errMsg
         
         authHandler = HTTPSCertAuthHandler(key_file, cert_file)

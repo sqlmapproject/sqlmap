@@ -32,7 +32,6 @@ from select import select
 from subprocess import PIPE
 from subprocess import Popen as execute
 
-from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import getLocalIP
 from lib.core.common import getRemoteIP

@@ -174,6 +174,7 @@ def start():
 
                         if __paramDict:
                             conf.paramDict["Cookie"] = __paramDict
+                            # TODO: consider the following line in __setRequestParams()
                             __testableParameters = True
 
             if not kb.injPlace or not kb.injParameter or not kb.injType:

@@ -68,12 +68,12 @@ def setHandler():
 
             continue
 
-        dbmsHandler = dbmsEntry()
+        handler = dbmsEntry()
 
-        if dbmsHandler.checkDbms():
+        if handler.checkDbms():
             if not conf.dbms or conf.dbms in dbmsAliases:
                 kb.dbmsDetected = True
 
-                return dbmsHandler
+                return handler
 
     return None

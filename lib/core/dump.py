@@ -125,7 +125,7 @@ class Dump:
         print
 
     def dbColumns(self, dbColumns, colConsider, dbs):
-        for column, dbTables in dbColumns.items():
+        for column in dbColumns.keys():
             if colConsider == "1":
                 colConsiderStr = "s like '" + column + "' were"
             else:

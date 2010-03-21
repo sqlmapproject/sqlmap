@@ -736,7 +736,7 @@ def getDelayQuery(andCond=False):
 
         else:
             query = queries[kb.dbms].timedelay2 % conf.timeSec
-    elif kb.dbms is "Firebird":
+    elif kb.dbms == "Firebird":
         query = queries[kb.dbms].timedelay
     else:
         query = queries[kb.dbms].timedelay % conf.timeSec
@@ -744,7 +744,7 @@ def getDelayQuery(andCond=False):
     if andCond:
         if kb.dbms in ( "MySQL", "SQLite" ):
             query = query.replace("SELECT ", "")
-        elif kb.dbms is "Firebird":
+        elif kb.dbms == "Firebird":
             query = "(%s)>0" % query
 
     return query
@@ -914,6 +914,7 @@ def sanitizeAsciiString(string):
 
 def decloakToNamedTemporaryFile(filepath, name=None):
     retVal = NamedTemporaryFile()
+
     def __del__():
         try:
             if hasattr(retVal, 'old_name'):
@@ -921,12 +922,15 @@ def decloakToNamedTemporaryFile(filepath, name=None):
             retVal.close()
         except OSError:
             pass
+
     retVal.__del__ = __del__
     retVal.write(decloak(filepath))
     retVal.seek(0)
+
     if name:
         retVal.old_name = retVal.name
         retVal.name = name
+
     return retVal
 
 def decloakToMkstemp(filepath, **kwargs):
