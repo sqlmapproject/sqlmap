@@ -22,7 +22,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import os
 import re
 
 from lib.core.common import normalizePath
@@ -32,6 +31,8 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import queries
+from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setRemoteTempPath
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
@@ -41,6 +42,9 @@ class Miscellaneous:
     """
     This class defines miscellaneous functionalities for plugins.
     """
+
+    def __init__(self):
+        pass
 
     def getRemoteTempPath(self):
         if not conf.tmpPath:
@@ -72,6 +76,30 @@ class Miscellaneous:
         conf.tmpPath = normalizePath(conf.tmpPath)
 
         setRemoteTempPath()
+
+    def getVersionFromBanner(self):
+        if "dbmsVersion" in kb.bannerFp:
+            return
+
+        infoMsg = "detecting back-end DBMS version from its banner"
+        logger.info(infoMsg)
+
+        if kb.dbms == "MySQL":
+            first, last = 1, 6
+
+        elif kb.dbms == "PostgreSQL":
+            first, last = 12, 6
+
+        elif kb.dbms == "Microsoft SQL Server":
+            first, last = 29, 9
+
+        else:
+            raise sqlmapUnsupportedFeatureException, "unsupported DBMS"
+
+        query = queries[kb.dbms].substring % (queries[kb.dbms].banner, first, last)
+
+        kb.bannerFp["dbmsVersion"] = inject.getValue(query, unpack=False)
+        kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
 
     def delRemoteFile(self, tempFile, doubleslash=False):
         self.checkDbmsOs()

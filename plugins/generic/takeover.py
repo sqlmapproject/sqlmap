@@ -22,38 +22,29 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import os
-import re
-
-from lib.core.agent import agent
-from lib.core.common import decloakToNamedTemporaryFile
-from lib.core.common import fileToStr
-from lib.core.common import getDirs
-from lib.core.common import getDocRoot
-from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import paths
+from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNotVulnerableException
+from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedDBMSException
-from lib.core.shell import autoCompletion
-from lib.request.connect import Connect as Request
 from lib.takeover.abstraction import Abstraction
 from lib.takeover.metasploit import Metasploit
 from lib.takeover.registry import Registry
 from lib.techniques.outband.stacked import stackedTest
 
-class Takeover(Abstraction, Metasploit, Registry):
+from plugins.generic.misc import Miscellaneous
+
+class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
     """
     This class defines generic OS takeover functionalities for plugins.
     """
 
     def __init__(self):
-        self.cmdTblName       = "sqlmapoutput"
-        self.tblField         = "data"
+        self.cmdTblName = "sqlmapoutput"
+        self.tblField = "data"
 
         Abstraction.__init__(self)
 
@@ -267,6 +258,11 @@ class Takeover(Abstraction, Metasploit, Registry):
         self.getRemoteTempPath()
         self.createMsfShellcode(exitfunc="seh", format="raw", extra="-b 27", encode=True)
         self.bof()
+
+    def uncPathRequest(self):
+        errMsg  = "'uncPathRequest' method must be defined "
+        errMsg += "into the specific DBMS plugin"
+        raise sqlmapUndefinedMethod, errMsg
 
     def __regInit(self):
         stackedTest()

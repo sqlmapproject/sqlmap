@@ -22,30 +22,20 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.exception import sqlmapUnsupportedFeatureException
 
-class Fingerprint:
-    """
-    This class defines generic fingerprint functionalities for plugins.
-    """
+from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
+class Filesystem(GenericFilesystem):
     def __init__(self):
-        pass
+        GenericFilesystem.__init__(self)
 
-    def getFingerprint(self):
-        errMsg  = "'getFingerprint' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+    def readFile(self, rFile):
+        errMsg  = "File system read access not yet implemented for "
+        errMsg += "Oracle"
+        raise sqlmapUnsupportedFeatureException, errMsg
 
-    def checkDbms(self):
-        errMsg  = "'checkDbms' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def checkDbmsOs(self, detailed=False):
-        errMsg  = "'checkDbmsOs' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def forceDbmsEnum(self):
-        pass
+    def writeFile(self, wFile, dFile, fileType=None, confirm=True):
+        errMsg  = "File system write access not yet implemented for "
+        errMsg += "Oracle"
+        raise sqlmapUnsupportedFeatureException, errMsg

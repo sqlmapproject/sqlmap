@@ -22,30 +22,29 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.settings import ORACLE_SYSTEM_DBS
+from lib.core.unescaper import unescaper
 
-class Fingerprint:
+from plugins.dbms.oracle.enumeration import Enumeration
+from plugins.dbms.oracle.filesystem import Filesystem
+from plugins.dbms.oracle.fingerprint import Fingerprint
+from plugins.dbms.oracle.syntax import Syntax
+from plugins.dbms.oracle.takeover import Takeover
+from plugins.generic.misc import Miscellaneous
+
+class OracleMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
-    This class defines generic fingerprint functionalities for plugins.
+    This class defines Oracle methods
     """
 
     def __init__(self):
-        pass
+        self.excludeDbsList = ORACLE_SYSTEM_DBS
 
-    def getFingerprint(self):
-        errMsg  = "'getFingerprint' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        Syntax.__init__(self)
+        Fingerprint.__init__(self)
+        Enumeration.__init__(self)
+        Filesystem.__init__(self)
+        Miscellaneous.__init__(self)
+        Takeover.__init__(self)
 
-    def checkDbms(self):
-        errMsg  = "'checkDbms' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def checkDbmsOs(self, detailed=False):
-        errMsg  = "'checkDbmsOs' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def forceDbmsEnum(self):
-        pass
+        unescaper.setUnescape(OracleMap.unescape)

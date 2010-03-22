@@ -50,7 +50,6 @@ from lib.techniques.outband.stacked import stackedTest
 class Enumeration:
     """
     This class defines generic enumeration functionalities for plugins.
-
     """
 
     def __init__(self, dbms):
@@ -67,30 +66,6 @@ class Enumeration:
         kb.data.dumpedTable            = {}
 
         temp.inference                 = queries[dbms].inference
-
-    def getVersionFromBanner(self):
-        if "dbmsVersion" in kb.bannerFp:
-            return
-
-        infoMsg = "detecting back-end DBMS version from its banner"
-        logger.info(infoMsg)
-
-        if kb.dbms == "MySQL":
-            first, last = 1, 6
-
-        elif kb.dbms == "PostgreSQL":
-            first, last = 12, 6
-
-        elif kb.dbms == "Microsoft SQL Server":
-            first, last = 29, 9
-
-        else:
-            raise sqlmapUnsupportedFeatureException, "unsupported DBMS"
-
-        query = queries[kb.dbms].substring % (queries[kb.dbms].banner, first, last)
-
-        kb.bannerFp["dbmsVersion"] = inject.getValue(query, unpack=False)
-        kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
 
     def getBanner(self):
         if not conf.getBanner:

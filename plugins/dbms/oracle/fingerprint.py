@@ -31,89 +31,16 @@ from lib.core.common import getHtmlErrorFp
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setDbms
 from lib.core.settings import ORACLE_ALIASES
-from lib.core.settings import ORACLE_SYSTEM_DBS
-from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
-from plugins.generic.enumeration import Enumeration
-from plugins.generic.filesystem import Filesystem
-from plugins.generic.fingerprint import Fingerprint
-from plugins.generic.misc import Miscellaneous
-from plugins.generic.takeover import Takeover
+from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
-class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
-    """
-    This class defines Oracle methods
-    """
-
+class Fingerprint(GenericFingerprint):
     def __init__(self):
-        self.excludeDbsList = ORACLE_SYSTEM_DBS
-
-        Enumeration.__init__(self, "Oracle")
-        Filesystem.__init__(self)
-        Takeover.__init__(self)
-
-        unescaper.setUnescape(OracleMap.unescape)
-
-    @staticmethod
-    def unescape(expression, quote=True):
-        if quote:
-            while True:
-                index = expression.find("'")
-                if index == -1:
-                    break
-
-                firstIndex = index + 1
-                index = expression[firstIndex:].find("'")
-
-                if index == -1:
-                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
-
-                lastIndex = firstIndex + index
-                old = "'%s'" % expression[firstIndex:lastIndex]
-                #unescaped = "("
-                unescaped = ""
-
-                for i in range(firstIndex, lastIndex):
-                    unescaped += "CHR(%d)" % (ord(expression[i]))
-                    if i < lastIndex - 1:
-                        unescaped += "||"
-
-                #unescaped += ")"
-                expression = expression.replace(old, unescaped)
-        else:
-            expression = "||".join("CHR(%d)" % ord(c) for c in expression)
-
-        return expression
-
-    @staticmethod
-    def escape(expression):
-        while True:
-            index = expression.find("CHR(")
-            if index == -1:
-                break
-
-            firstIndex = index
-            index = expression[firstIndex:].find("))")
-
-            if index == -1:
-                raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
-
-            lastIndex = firstIndex + index + 1
-            old = expression[firstIndex:lastIndex]
-            oldUpper = old.upper()
-            oldUpper = oldUpper.replace("CHR(", "").replace(")", "")
-            oldUpper = oldUpper.split("||")
-
-            escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
-            expression = expression.replace(old, escaped)
-
-        return expression
+        GenericFingerprint.__init__(self)
 
     def getFingerprint(self):
         value  = ""
@@ -218,39 +145,3 @@ class OracleMap(Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
 
         if conf.tbl:
             conf.tbl = conf.tbl.upper()
-
-    def getDbs(self):
-        warnMsg = "on Oracle it is not possible to enumerate databases"
-        logger.warn(warnMsg)
-
-        return []
-
-    def readFile(self, rFile):
-        errMsg  = "File system read access not yet implemented for "
-        errMsg += "Oracle"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
-    def writeFile(self, wFile, dFile, fileType=None, confirm=True):
-        errMsg  = "File system write access not yet implemented for "
-        errMsg += "Oracle"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
-    def osCmd(self):
-        errMsg  = "Operating system command execution functionality not "
-        errMsg += "yet implemented for Oracle"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
-    def osShell(self):
-        errMsg  = "Operating system shell functionality not yet "
-        errMsg += "implemented for Oracle"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
-    def osPwn(self):
-        errMsg  = "Operating system out-of-band control functionality "
-        errMsg += "not yet implemented for Oracle"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
-    def osSmb(self):
-        errMsg  = "One click operating system out-of-band control "
-        errMsg += "functionality not yet implemented for Oracle"
-        raise sqlmapUnsupportedFeatureException, errMsg

@@ -19,33 +19,27 @@ details.
 
 You should have received a copy of the GNU General Public License along
 with sqlmap; if not, write to the Free Software Foundation, Inc., 51
-Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+Franklin St, Fifth Floor, Boston, MA  021101301  USA
 """
 
 from lib.core.exception import sqlmapUndefinedMethod
 
-class Fingerprint:
+class Syntax:
     """
-    This class defines generic fingerprint functionalities for plugins.
+    This class defines generic syntax functionalities for plugins.
     """
 
     def __init__(self):
         pass
 
-    def getFingerprint(self):
-        errMsg  = "'getFingerprint' method must be defined "
+    @staticmethod
+    def unescape(expression, quote=True):
+        errMsg  = "'unescape' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
-    def checkDbms(self):
-        errMsg  = "'checkDbms' method must be defined "
+    @staticmethod
+    def escape(expression):
+        errMsg  = "'escape' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
-
-    def checkDbmsOs(self, detailed=False):
-        errMsg  = "'checkDbmsOs' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def forceDbmsEnum(self):
-        pass

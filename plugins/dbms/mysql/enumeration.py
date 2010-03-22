@@ -22,30 +22,8 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from lib.core.exception import sqlmapUndefinedMethod
+from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
-class Fingerprint:
-    """
-    This class defines generic fingerprint functionalities for plugins.
-    """
-
+class Enumeration(GenericEnumeration):
     def __init__(self):
-        pass
-
-    def getFingerprint(self):
-        errMsg  = "'getFingerprint' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def checkDbms(self):
-        errMsg  = "'checkDbms' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def checkDbmsOs(self, detailed=False):
-        errMsg  = "'checkDbmsOs' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def forceDbmsEnum(self):
-        pass
+        GenericEnumeration.__init__(self, "MySQL")

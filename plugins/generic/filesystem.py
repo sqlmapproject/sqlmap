@@ -31,6 +31,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.exception import sqlmapUndefinedMethod
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
 
@@ -249,6 +250,26 @@ class Filesystem:
 
         if not output or output in ("y", "Y"):
             self.__checkWrittenFile(wFile, dFile, fileType)
+
+    def unionReadFile(self, rFile):
+        errMsg  = "'unionReadFile' method must be defined "
+        errMsg += "into the specific DBMS plugin"
+        raise sqlmapUndefinedMethod, errMsg
+
+    def stackedReadFile(self, rFile):
+        errMsg  = "'stackedReadFile' method must be defined "
+        errMsg += "into the specific DBMS plugin"
+        raise sqlmapUndefinedMethod, errMsg
+
+    def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
+        errMsg  = "'unionWriteFile' method must be defined "
+        errMsg += "into the specific DBMS plugin"
+        raise sqlmapUndefinedMethod, errMsg
+
+    def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
+        errMsg  = "'stackedWriteFile' method must be defined "
+        errMsg += "into the specific DBMS plugin"
+        raise sqlmapUndefinedMethod, errMsg
 
     def readFile(self, rFile):
         fileContent = None
