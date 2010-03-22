@@ -500,9 +500,13 @@ def checkFile(filename):
 
     if not os.path.exists(filename):
         raise sqlmapFilePathException, "unable to read file '%s'" % filename
-    
-def replaceNewlineTabs(inpStr):
-    replacedString = inpStr.replace("\n", "__NEWLINE__").replace("\t", "__TAB__")
+
+def replaceNewlineTabs(inpStr, stdout=False):
+    if stdout:
+        replacedString = inpStr.replace("\n", " ").replace("\t", " ")
+    else:
+        replacedString = inpStr.replace("\n", "__NEWLINE__").replace("\t", "__TAB__")
+
     replacedString = replacedString.replace(temp.delimiter, "__DEL__")
 
     return replacedString

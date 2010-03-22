@@ -204,17 +204,22 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             count = 0
                             for i in xrange(startCharIndex, endCharIndex):
                                 output += '_' if value[i] is None else value[i]
+
                             for i in xrange(length):
                                 count += 1 if value[i] is not None else 0
+
                             if startCharIndex > 0:
                                 output = '..' + output[2:]
+
                             if endCharIndex - startCharIndex == conf.progressWidth:
                                 output = output[:-2] + '..'
+
                             output += '_' * (min(length, conf.progressWidth) - len(output))
                             status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
                             output += status if count != length else " "*len(status)
+
                             iolock.acquire()
-                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), output))
+                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
                             iolock.release()
 
             except (sqlmapConnectionException, sqlmapValueException), errMsg:

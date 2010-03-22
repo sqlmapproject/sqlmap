@@ -27,6 +27,7 @@ import re
 from lib.core.common import dataToSessionFile
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
+from lib.core.common import replaceNewlineTabs
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -113,6 +114,8 @@ def resume(expression, payload):
     if not resumedValue:
         return None
 
+    resumedValue = resumedValue.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
+
     if resumedValue[-1] == "]":
         resumedValue = resumedValue[:-1]
 
@@ -154,7 +157,7 @@ def resume(expression, payload):
         infoMsg += "%s" % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, replaceNewlineTabs(resumedValue)))
 
         return resumedValue
     elif len(resumedValue) < int(length):
@@ -162,7 +165,7 @@ def resume(expression, payload):
         infoMsg += "%s..." % resumedValue.split("\n")[0]
         logger.info(infoMsg)
 
-        dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, resumedValue))
+        dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, replaceNewlineTabs(resumedValue)))
 
         if select:
             newExpr = expression.replace(regExpr, safeStringFormat(substringQuery, (regExpr, len(resumedValue) + 1, int(length))), 1)

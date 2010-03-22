@@ -70,7 +70,7 @@ class Dump:
             data = data.replace("__DEL__", ", ")
 
             if "\n" in data:
-                self.__write("%s:\n---\n%s---\n" % (header, data))
+                self.__write("%s:\n---\n%s\n---\n" % (header, data))
             else:
                 self.__write("%s:    '%s'\n" % (header, data))
         else:
