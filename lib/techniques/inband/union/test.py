@@ -33,7 +33,26 @@ from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
 
+def __forgeUserFriendlyValue(payload):
+    value = ""
+
+    if kb.injPlace == "GET":
+        value = "%s?%s" % (conf.url, payload)
+    elif kb.injPlace == "POST":
+        value  = "URL:\t'%s'" % conf.url
+        value += "\nPOST:\t'%s'\n" % payload
+    elif kb.injPlace == "Cookie":
+        value  = "URL:\t'%s'" % conf.url
+        value += "\nCookie:\t'%s'\n" % payload
+    elif kb.injPlace == "User-Agent":
+        value  = "URL:\t\t'%s'" % conf.url
+        value += "\nUser-Agent:\t'%s'\n" % payload
+
+    return value
+
 def __unionPosition(negative=False, falseCond=False):
+    value = None
+
     if negative or falseCond:
         negLogMsg = "partial (single entry)"
     else:
@@ -73,6 +92,7 @@ def __unionPosition(negative=False, falseCond=False):
 
         if randQuery in resultPage and not htmlParsed:
             setUnion(position=exprPosition)
+            value = __forgeUserFriendlyValue(payload)
 
             break
 
@@ -90,22 +110,26 @@ def __unionPosition(negative=False, falseCond=False):
 
         logger.warn(warnMsg)
 
+    return value
+
 def __unionConfirm():
+    value = None
+
     # Confirm the inband SQL injection and get the exact column
     # position
     if not isinstance(kb.unionPosition, int):
-        __unionPosition()
+        value = __unionPosition()
 
         # Assure that the above function found the exploitable full inband
         # SQL injection position
         if not isinstance(kb.unionPosition, int):
-            __unionPosition(falseCond=True)
+            value = __unionPosition(falseCond=True)
 
             # Assure that the above function found the exploitable partial
             # (single entry) inband SQL injection position by appending
             # a false condition after the parameter value
             if not isinstance(kb.unionPosition, int):
-                __unionPosition(negative=True)
+                value = __unionPosition(negative=True)
 
                 # Assure that the above function found the exploitable partial
                 # (single entry) inband SQL injection position with negative
@@ -113,24 +137,9 @@ def __unionConfirm():
                 if not isinstance(kb.unionPosition, int):
                     return
                 else:
-                    conf.paramNegative = True
+                    setUnion(negative=True)
             else:
-                conf.paramFalseCond = True
-
-def __forgeUserFriendlyValue(payload):
-    value = ""
-
-    if kb.injPlace == "GET":
-        value = "%s?%s" % (conf.url, payload)
-    elif kb.injPlace == "POST":
-        value  = "URL:\t'%s'" % conf.url
-        value += "\nPOST:\t'%s'\n" % payload
-    elif kb.injPlace == "Cookie":
-        value  = "URL:\t'%s'" % conf.url
-        value += "\nCookie:\t'%s'\n" % payload
-    elif kb.injPlace == "User-Agent":
-        value  = "URL:\t\t'%s'" % conf.url
-        value += "\nUser-Agent:\t'%s'\n" % payload
+                setUnion(falseCond=True)
 
     return value
 
@@ -142,7 +151,6 @@ def __unionTestByNULLBruteforce(comment):
     """
 
     columns = None
-    value   = None
     query   = agent.prefixQuery(" UNION ALL SELECT NULL")
 
     for count in range(0, 50):
@@ -161,15 +169,13 @@ def __unionTestByNULLBruteforce(comment):
 
         if seqMatcher >= 0.6:
             columns = count + 1
-            value   = __forgeUserFriendlyValue(payload)
 
             break
 
-    return value, columns
+    return columns
 
 def __unionTestByOrderBy(comment):
     columns     = None
-    value       = None
     prevPayload = ""
 
     for count in range(1, 51):
@@ -182,13 +188,11 @@ def __unionTestByOrderBy(comment):
             columns = count
 
         elif columns:
-            value = __forgeUserFriendlyValue(prevPayload)
-
             break
 
         prevPayload = payload
 
-    return value, columns
+    return columns
 
 def unionTest():
     """
@@ -205,25 +209,28 @@ def unionTest():
     infoMsg += "'%s' with %s technique" % (kb.injParameter, technique)
     logger.info(infoMsg)
 
-    value   = ""
+    value   = None
     columns = None
 
     for comment in (queries[kb.dbms].comment, ""):
         if conf.uTech == "orderby":
-            value, columns = __unionTestByOrderBy(comment)
+            columns = __unionTestByOrderBy(comment)
         else:
-            value, columns = __unionTestByNULLBruteforce(comment)
+            columns = __unionTestByNULLBruteforce(comment)
 
         if columns:
-            setUnion(comment, columns)
+            setUnion(comment=comment, count=columns)
 
             break
 
     if kb.unionCount:
-        __unionConfirm()
+        value = __unionConfirm()
     else:
         warnMsg  = "the target url is not affected by an "
         warnMsg += "inband sql injection vulnerability"
         logger.warn(warnMsg)
+
+    if value is None:
+        value = ""
 
     return value

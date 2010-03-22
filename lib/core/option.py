@@ -872,8 +872,6 @@ def __setConfAttributes():
     conf.outputPath      = None
     conf.paramDict       = {}
     conf.parameters      = {}
-    conf.paramFalseCond  = False
-    conf.paramNegative   = False
     conf.path            = None
     conf.port            = None
     conf.progressWidth   = 54
@@ -932,6 +930,9 @@ def __setKnowledgeBaseAttributes():
     kb.unionComment   = ""
     kb.unionCount     = None
     kb.unionPosition  = None
+    kb.unionNegative  = False
+    kb.unionFalseCond = False
+
 
 def __saveCmdline():
     """

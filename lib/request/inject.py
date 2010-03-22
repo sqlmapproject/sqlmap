@@ -368,16 +368,16 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
             warnMsg += "technique, sqlmap is going blind"
             logger.warn(warnMsg)
 
-    oldParamFalseCond   = conf.paramFalseCond
-    oldParamNegative    = conf.paramNegative
-    conf.paramFalseCond = False
-    conf.paramNegative  = False
+    oldParamFalseCond   = kb.unionFalseCond
+    oldParamNegative    = kb.unionNegative
+    kb.unionFalseCond   = False
+    kb.unionNegative    = False
 
     if blind and not value:
         value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
-    conf.paramFalseCond = oldParamFalseCond
-    conf.paramNegative  = oldParamNegative
+    kb.unionFalseCond = oldParamFalseCond
+    kb.unionNegative  = oldParamNegative
 
     if value and isinstance(value, str):
         value = value.strip()

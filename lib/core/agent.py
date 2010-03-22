@@ -55,11 +55,11 @@ class Agent:
         retValue   = ""
         newValue   = urlencode(newValue)
 
-        if negative or conf.paramNegative:
+        if negative or kb.unionNegative:
             negValue = "-"
-        elif falseCond or conf.paramFalseCond:
+        elif falseCond or kb.unionFalseCond:
             randInt = randomInt()
-            falseValue = " AND %d=%d" % (randInt, randInt + 1)
+            falseValue = urlencode(" AND %d=%d" % (randInt, randInt + 1))
 
         # After identifing the injectable parameter
         if kb.injPlace == "User-Agent":

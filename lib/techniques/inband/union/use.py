@@ -70,7 +70,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         expression = agent.concatQuery(expression, unpack)
         expression = unescaper.unescape(expression)
 
-    if ( conf.paramNegative or conf.paramFalseCond ) and not direct:
+    if ( kb.unionNegative or kb.unionFalseCond ) and not direct:
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
 
         if len(expressionFieldsList) > 1:

@@ -199,7 +199,7 @@ def setStacked():
     if condition:
         dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.stackedTest))
 
-def setUnion(comment=None, count=None, position=None):
+def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False):
     """
     @param comment: union comment to save in session file
     @type comment: C{str}
@@ -226,7 +226,7 @@ def setUnion(comment=None, count=None, position=None):
         kb.unionComment = comment
         kb.unionCount = count
 
-    elif position:
+    if position:
         condition = (
                       not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
                       ( not kb.resumedQueries[conf.url].has_key("Union position")
@@ -237,6 +237,30 @@ def setUnion(comment=None, count=None, position=None):
             dataToSessionFile("[%s][%s][%s][Union position][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], position))
 
         kb.unionPosition = position
+
+    if negative:
+        condition = (
+                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                      ( not kb.resumedQueries[conf.url].has_key("Union negative")
+                      ) )
+                    )
+
+        if condition:
+            dataToSessionFile("[%s][%s][%s][Union negative][Yes]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace]))
+
+        kb.unionNegative = True
+
+    if falseCond:
+        condition = (
+                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                      ( not kb.resumedQueries[conf.url].has_key("Union false condition")
+                      ) )
+                    )
+
+        if condition:
+            dataToSessionFile("[%s][%s][%s][Union false condition][Yes]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace]))
+
+        kb.unionFalseCond = True
 
 def setRemoteTempPath():
     condition = (
@@ -427,6 +451,20 @@ def resumeConfKb(expression, url, value):
         kb.unionPosition = int(value[:-1])
 
         logMsg  = "resuming union position "
+        logMsg += "%s from session file" % kb.unionPosition
+        logger.info(logMsg)
+
+    elif expression == "Union negative" and url == conf.url:
+        kb.unionNegative = True if value[:-1] == "Yes" else False
+
+        logMsg  = "resuming union negative "
+        logMsg += "%s from session file" % kb.unionPosition
+        logger.info(logMsg)
+
+    elif expression == "Union false condition" and url == conf.url:
+        kb.unionFalseCond = True if value[:-1] == "Yes" else False
+
+        logMsg  = "resuming union false condition "
         logMsg += "%s from session file" % kb.unionPosition
         logger.info(logMsg)
 
