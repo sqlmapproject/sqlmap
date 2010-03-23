@@ -233,6 +233,9 @@ Sven Schluter <sschlueter@netzwerk.cc>
 Uemit Seren <uemit.seren@gmail.com>
     for reporting a minor adjustment when running with python 2.6
 
+Brian Shura <bshura@appsecconsulting.com>
+    for reporting a bug
+
 Sumit Siddharth <sid@notsosecure.com>
     for providing me with ideas on the implementation of a couple of
     features
@@ -312,8 +315,8 @@ Black Hat team <info@blackhat.com>
 
 Metasploit LLC <msfdev@metasploit.com>
     for their powerful tool Metasploit Framework 3, used by sqlmap, among
-    others things, to create the payload stager and establish an
-    out-of-band connection between sqlmap and the database server,
+    others things, to create the shellcode and establish an out-of-band
+    connection between sqlmap and the database server,
     http://www.metasploit.com/framework
 
 OWASP Board <http://www.owasp.org>
