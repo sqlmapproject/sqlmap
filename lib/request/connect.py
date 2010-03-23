@@ -118,7 +118,7 @@ class Connect:
                 if conf.method == "POST":
                     if conf.parameters.has_key("POST") and not post:
                         post = conf.parameters["POST"]
-    
+
             requestMsg += " HTTP/1.1"
 
             # Perform HTTP request
