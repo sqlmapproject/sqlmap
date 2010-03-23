@@ -42,45 +42,47 @@ class Syntax(GenericSyntax):
                 index = expression[firstIndex:].find("'")
 
                 if index == -1:
-                    raise sqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
+                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
 
                 lastIndex = firstIndex + index
                 old = "'%s'" % expression[firstIndex:lastIndex]
-                #unescaped = "("
                 unescaped = ""
 
                 for i in range(firstIndex, lastIndex):
-                    unescaped += "CHAR(%d)" % (ord(expression[i]))
+                    unescaped += "CHR(%d)" % (ord(expression[i]))
                     if i < lastIndex - 1:
-                        unescaped += "+"
+                        unescaped += "&"
 
-                #unescaped += ")"
                 expression = expression.replace(old, unescaped)
         else:
-            expression = "+".join("CHAR(%d)" % ord(c) for c in expression)
+            unescaped = "".join("CHR(%d)&" % ord(c) for c in expression)
+            if unescaped[-1] == "&":
+                unescaped = unescaped[:-1]
+
+            expression = unescaped
 
         return expression
 
     @staticmethod
     def escape(expression):
         while True:
-            index = expression.find("CHAR(")
+            index = expression.find("CHR(")
             if index == -1:
                 break
 
             firstIndex = index
-            index = expression[firstIndex:].find("))")
+            index = expression[firstIndex:].find(")")
 
             if index == -1:
-                raise sqlmapSyntaxException("Unenclosed ) in '%s'" % expression)
+                raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
 
             lastIndex = firstIndex + index + 1
             old = expression[firstIndex:lastIndex]
             oldUpper = old.upper()
-            oldUpper = oldUpper.replace("CHAR(", "").replace(")", "")
-            oldUpper = oldUpper.split("+")
+            oldUpper = oldUpper.lstrip("CHR(").rstrip(")")
+            oldUpper = oldUpper.split("&")
 
             escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
-            expression = expression.replace(old, escaped)
+            expression = expression.replace(old, escaped).replace("'&'", "")
 
         return expression

@@ -23,6 +23,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 from lib.core.exception import sqlmapSyntaxException
+
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):

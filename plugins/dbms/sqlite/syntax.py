@@ -32,55 +32,62 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
+        # The following is not supported on SQLite 2
+        return expression
+
         if quote:
+            expression = expression.replace("'", "''")
             while True:
-                index = expression.find("'")
+                index = expression.find("''")
                 if index == -1:
                     break
 
-                firstIndex = index + 1
-                index = expression[firstIndex:].find("'")
+                firstIndex = index + 2
+                index = expression[firstIndex:].find("''")
 
                 if index == -1:
-                    raise sqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
+                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression.replace("''", "'")
 
                 lastIndex = firstIndex + index
-                old = "'%s'" % expression[firstIndex:lastIndex]
-                #unescaped = "("
+                old = "''%s''" % expression[firstIndex:lastIndex]
                 unescaped = ""
 
                 for i in range(firstIndex, lastIndex):
-                    unescaped += "CHAR(%d)" % (ord(expression[i]))
+                    unescaped += "X'%x'" % ord(expression[i])
                     if i < lastIndex - 1:
-                        unescaped += "+"
+                        unescaped += "||"
 
                 #unescaped += ")"
                 expression = expression.replace(old, unescaped)
+            expression = expression.replace("''", "'")
         else:
-            expression = "+".join("CHAR(%d)" % ord(c) for c in expression)
+            expression = "||".join("X'%x" % ord(c) for c in expression)
 
         return expression
 
     @staticmethod
     def escape(expression):
+        # Example on SQLite 3, not supported on SQLite 2:
+        # select X'48'||X'656c6c6f20576f726c6400'; -- Hello World
         while True:
-            index = expression.find("CHAR(")
+            index = expression.find("X'")
             if index == -1:
                 break
 
             firstIndex = index
-            index = expression[firstIndex:].find("))")
+            index = expression[firstIndex+2:].find("'")
 
             if index == -1:
-                raise sqlmapSyntaxException("Unenclosed ) in '%s'" % expression)
+                raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
 
-            lastIndex = firstIndex + index + 1
+            lastIndex = firstIndex + index + 3
             old = expression[firstIndex:lastIndex]
             oldUpper = old.upper()
-            oldUpper = oldUpper.replace("CHAR(", "").replace(")", "")
-            oldUpper = oldUpper.split("+")
+            oldUpper = oldUpper.replace("X'", "").replace("'", "")
 
-            escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
+            for i in xrange(len(oldUpper)/2):
+                char = oldUpper[i*2:i*2+2]
+                escaped = "'%s'" % chr(int(char, 16))
             expression = expression.replace(old, escaped)
 
         return expression
