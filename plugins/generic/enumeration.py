@@ -60,6 +60,7 @@ class Enumeration:
         kb.data.cachedUsers            = []
         kb.data.cachedUsersPasswords   = {}
         kb.data.cachedUsersPrivileges  = {}
+        kb.data.cachedUsersRoles       = {}
         kb.data.cachedDbs              = []
         kb.data.cachedTables           = {}
         kb.data.cachedColumns          = {}
@@ -327,9 +328,14 @@ class Enumeration:
         # that the user is DBA
         dbaCondition |= ( kb.dbms == "MySQL" and not kb.data.has_information_schema and "super_priv" in privileges )
 
+        # In Firebird there is no specific privilege that means
+        # that the user is DBA
+        # TODO: confirm
+        dbaCondition |= ( kb.dbms == "Firebird" and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges )
+
         return dbaCondition
 
-    def getPrivileges(self):
+    def getPrivileges(self, query2=False):
         infoMsg = "fetching database users privileges"
 
         rootQuery = queries[kb.dbms].privileges
@@ -377,7 +383,7 @@ class Enumeration:
                         ( 2, "super" ),
                         ( 3, "catupd" ),
                      )
-                     
+
         firebirdPrivs = {
                          "S": "SELECT",
                          "I": "INSERT",
@@ -391,37 +397,31 @@ class Enumeration:
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 query     = rootQuery["inband"]["query2"]
                 condition = rootQuery["inband"]["condition2"]
+            elif kb.dbms == "Oracle" and query2:
+                query     = rootQuery["inband"]["query2"]
+                condition = rootQuery["inband"]["condition2"]
             else:
                 query     = rootQuery["inband"]["query"]
                 condition = rootQuery["inband"]["condition"]
 
             if conf.user:
-                if "," in conf.user:
-                    users = conf.user.split(",")
-                    query += " WHERE "
-                    # NOTE: I assume that the user provided is not in
-                    # MySQL >= 5.0 syntax 'user'@'host'
-                    if kb.dbms == "MySQL" and kb.data.has_information_schema:
-                        queryUser = "%" + conf.user + "%"
-                        query += " OR ".join("%s LIKE '%s'" % (condition, "%" + user + "%") for user in users)
-                    else:
-                        query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
+                users = conf.user.split(",")
+                query += " WHERE "
+                # NOTE: I assume that the user provided is not in
+                # MySQL >= 5.0 syntax 'user'@'host'
+                if kb.dbms == "MySQL" and kb.data.has_information_schema:
+                    queryUser = "%" + conf.user + "%"
+                    query += " OR ".join("%s LIKE '%s'" % (condition, "%" + user + "%") for user in users)
                 else:
-                    if kb.dbms == "MySQL":
-                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", conf.user)
-
-                        if parsedUser:
-                            conf.user = parsedUser.groups()[0]
-
-                    # NOTE: I assume that the user provided is not in
-                    # MySQL >= 5.0 syntax 'user'@'host'
-                    if kb.dbms == "MySQL" and kb.data.has_information_schema:
-                        queryUser = "%" + conf.user + "%"
-                        query += " WHERE %s LIKE '%s'" % (condition, queryUser)
-                    else:
-                        query += " WHERE %s = '%s'" % (condition, conf.user)
+                    query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
             values = inject.getValue(query, blind=False)
+
+            if not values and kb.dbms == "Oracle" and not query2:
+                infoMsg = "trying with table USER_SYS_PRIVS"
+                logger.info(infoMsg)
+
+                return self.getPrivileges(query2=True)
 
             if values:
                 for value in values:
@@ -482,13 +482,8 @@ class Enumeration:
                             conf.user = parsedUser.groups()[0]
 
                         users = [ "%" + conf.user + "%" ]
-
-                elif "," in conf.user:
-                    users = conf.user.split(",")
-
                 else:
-                    users = [ conf.user ]
-
+                    users = conf.user.split(",")
             else:
                 if not len(kb.data.cachedUsers):
                     users = self.getUsers()
@@ -519,11 +514,19 @@ class Enumeration:
                     query = rootQuery["blind"]["count2"] % queryUser
                 elif kb.dbms == "MySQL" and kb.data.has_information_schema:
                     query = rootQuery["blind"]["count"] % (conditionChar, queryUser)
+                elif kb.dbms == "Oracle" and query2:
+                    query = rootQuery["blind"]["count2"] % queryUser
                 else:
                     query = rootQuery["blind"]["count"] % queryUser
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
+                    if not count.isdigit() and kb.dbms == "Oracle" and not query2:
+                        infoMsg = "trying with table USER_SYS_PRIVS"
+                        logger.info(infoMsg)
+
+                        return self.getPrivileges(query2=True)
+
                     warnMsg  = "unable to retrieve the number of "
                     warnMsg += "privileges for user '%s'" % user
                     logger.warn(warnMsg)
@@ -545,6 +548,8 @@ class Enumeration:
                         query = rootQuery["blind"]["query2"] % (queryUser, index)
                     elif kb.dbms == "MySQL" and kb.data.has_information_schema:
                         query = rootQuery["blind"]["query"] % (conditionChar, queryUser, index)
+                    elif kb.dbms == "Oracle" and query2:
+                        query = rootQuery["blind"]["query2"] % (queryUser, index)
                     elif kb.dbms == "Firebird":
                         query = rootQuery["blind"]["query"] % (index, queryUser)
                     else:
@@ -585,6 +590,8 @@ class Enumeration:
                                         privileges.add(mysqlPriv)
 
                             i += 1
+
+                    # In Firebird we get one letter for each privilege
                     elif kb.dbms == "Firebird":
                         privileges.add(firebirdPrivs[privilege.strip()])
 
@@ -612,6 +619,11 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return ( kb.data.cachedUsersPrivileges, areAdmins )
+
+    def getRoles(self, query2=False):
+        warnMsg  = "on %s the concept of roles does not " % kb.dbms
+        warnMsg += "exist. sqlmap will enumerate privileges instead"
+        self.getPrivileges(query2)
 
     def getDbs(self):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:

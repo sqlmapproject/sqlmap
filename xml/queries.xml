@@ -42,6 +42,7 @@
             <inband query="SELECT grantee, privilege_type FROM information_schema.USER_PRIVILEGES" condition="grantee" query2="SELECT user, select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user" condition2="user"/>
             <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s LIMIT %d, 1" query2="SELECT select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
         </privileges>
+        <roles/>
         <dbs>
             <inband query="SELECT schema_name FROM information_schema.SCHEMATA" query2="SELECT db FROM mysql.db"/>
             <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA LIMIT %d, 1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d, 1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
@@ -83,9 +84,13 @@
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END) FROM DUAL"/>
         <inference query="AND ASCII(SUBSTR((%s), %d, 1)) > %d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
-        <current_user query="SELECT SYS.LOGIN_USER FROM DUAL"/>
+        <current_user query="SELECT USER FROM DUAL"/>
         <current_db query="SELECT SYS.DATABASE_NAME FROM DUAL"/>
-        <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=SYS.LOGIN_USER AND GRANTED_ROLE='DBA')='DBA'"/>
+        <!--
+             NOTE: in Oracle to check if the session user is DBA you can use:
+             SELECT USERENV('ISDBA') FROM DUAL
+        -->
+        <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
             <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
@@ -94,10 +99,22 @@
             <inband query="SELECT NAME, PASSWORD FROM SYS.USER$" condition="NAME"/>
             <blind query="SELECT DISTINCT(PASSWORD) FROM (SELECT DISTINCT(PASSWORD), ROWNUM AS LIMIT FROM SYS.USER$ WHERE NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PASSWORD)) FROM SYS.USER$ WHERE NAME='%s'"/>
         </passwords>
+        <!--
+             NOTE: in Oracle to enumerate the privileges for the session user you can use:
+             SELECT * FROM SESSION_PRIVS
+        -->
         <privileges>
-            <inband query="SELECT GRANTEE, GRANTED_ROLE FROM DBA_ROLE_PRIVS" condition="GRANTEE"/>
-            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'"/>
+            <inband query="SELECT GRANTEE, PRIVILEGE FROM DBA_SYS_PRIVS" query2="SELECT USERNAME, PRIVILEGE FROM USER_SYS_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
+            <blind query="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM DBA_SYS_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM USER_SYS_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM DBA_SYS_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM USER_SYS_PRIVS WHERE USERNAME='%s'"/>
         </privileges>
+        <!--
+             NOTE: in Oracle to enumerate the roles for the session user you can use:
+             SELECT * FROM SESSION_ROLES
+        -->
+        <roles>
+            <inband query="SELECT GRANTEE, GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME, GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
+            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
+        </roles>
         <!-- NOTE: in Oracle there is no query to enumerate DBMS databases. It is possible only through a STATUS request to the Oracle TNS Listener negotiating its protocol -->
         <dbs/>
         <tables>
@@ -160,6 +177,7 @@
             <inband query="SELECT usename, (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user" condition="usename"/>
             <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
         </privileges>
+        <roles/>
         <dbs>
             <inband query="SELECT datname FROM pg_database"/>
             <blind query="SELECT DISTINCT(datname) FROM pg_database OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database"/>
@@ -214,6 +232,7 @@
         </passwords>
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
         <privileges/>
+        <roles/>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases"/>
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
@@ -265,6 +284,7 @@
         <users/>
         <passwords/>
         <privileges/>
+        <roles/>
         <dbs/>
         <tables>
             <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table'"/>
@@ -339,6 +359,7 @@
             <inband query="SELECT RDB$USER, RDB$PRIVILEGE FROM RDB$USER_PRIVILEGES" condition="RDB$USER"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$PRIVILEGE) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'" count="SELECT COUNT(DISTINCT(RDB$PRIVILEGE)) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'"/>
         </privileges>
+        <roles/>
         <dbs/>
         <columns>
             <!--<inband query="SELECT r.RDB$FIELD_NAME, CASE f.RDB$FIELD_TYPE WHEN 261 THEN 'BLOB' WHEN 14 THEN 'CHAR' WHEN 40 THEN 'CSTRING' WHEN 11 THEN 'D_FLOAT' WHEN 27 THEN 'DOUBLE' WHEN 10 THEN 'FLOAT' WHEN 16 THEN 'INT64' WHEN 8 THEN 'INTEGER' WHEN 9 THEN 'QUAD' WHEN 7 THEN 'SMALLINT' WHEN 12 THEN 'DATE' WHEN 13 THEN 'TIME' WHEN 35 THEN 'TIMESTAMP' WHEN 37 THEN 'VARCHAR' ELSE 'UNKNOWN' END AS field_type FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>-->

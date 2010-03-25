@@ -87,6 +87,7 @@ optDict = {
                                "getUsers":          "boolean",
                                "getPasswordHashes": "boolean",
                                "getPrivileges":     "boolean",
+                               "getRoles":          "boolean",
                                "getDbs":            "boolean",
                                "getTables":         "boolean",
                                "getColumns":        "boolean",

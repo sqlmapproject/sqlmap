@@ -101,6 +101,10 @@ def action():
         dumper.userSettings("database management system users privileges",
                             conf.dbmsHandler.getPrivileges(), "privilege")
 
+    if conf.getRoles:
+        dumper.userSettings("database management system users roles",
+                            conf.dbmsHandler.getRoles(), "role")
+
     if conf.getDbs:
         dumper.lister("available databases", conf.dbmsHandler.getDbs())
 

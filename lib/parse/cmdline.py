@@ -247,6 +247,10 @@ def cmdLineParser():
                                action="store_true",
                                help="Enumerate DBMS users privileges")
 
+        enumeration.add_option("--roles", dest="getRoles",
+                               action="store_true",
+                               help="Enumerate DBMS users roles")
+
         enumeration.add_option("--dbs", dest="getDbs", action="store_true",
                                help="Enumerate DBMS databases")
 

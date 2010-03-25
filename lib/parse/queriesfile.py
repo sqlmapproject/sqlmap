@@ -177,6 +177,14 @@ class queriesHandler(ContentHandler):
 
             self.__queries.privileges = self.__privileges
 
+        elif name == "roles":
+            self.__roles = {}
+            self.__roles["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband, "condition2": self.__conditionInband2 }
+            self.__roles["blind"]  = { "query": self.__blind, "query2": self.__blind2,
+                                       "count": self.__count, "count2": self.__count2 }
+
+            self.__queries.roles = self.__roles
+
         elif name == "dbs":
             self.__dbs = {}
             self.__dbs["inband"] = { "query": self.__inband, "query2": self.__inband2 }
