@@ -874,7 +874,6 @@ def __setConfAttributes():
     conf.parameters      = {}
     conf.path            = None
     conf.port            = None
-    conf.progressWidth   = 54
     conf.redirectHandled = False
     conf.retriesCount    = 0
     conf.scheme          = None
@@ -886,6 +885,11 @@ def __setConfAttributes():
     conf.threadContinue  = True
     conf.threadException = False
     conf.wFileType       = None
+
+    if conf.eta:
+        conf.progressWidth = 54
+    else:
+        conf.progressWidth = 34
 
 def __setKnowledgeBaseAttributes():
     """
