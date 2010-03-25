@@ -183,6 +183,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if conf.threadContinue:
                         charStart = time.time()
                         val       = getChar(curidx)
+
                         if val is None:
                             raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
                     else:
@@ -196,13 +197,18 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         elif conf.verbose >= 1:
                             startCharIndex = 0
                             endCharIndex = 0
+
                             for i in xrange(length):
                                 if value[i] is not None:
                                     endCharIndex = max(endCharIndex, i)
+
                             output = ''
+
                             if endCharIndex > conf.progressWidth:
                                 startCharIndex = endCharIndex - conf.progressWidth
+
                             count = 0
+
                             for i in xrange(startCharIndex, endCharIndex):
                                 output += '_' if value[i] is None else value[i]
 
@@ -224,6 +230,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             iolock.release()
 
             except (sqlmapConnectionException, sqlmapValueException), errMsg:
+                print
                 conf.threadException = True
                 logger.error("thread %d: %s" % (numThread + 1, errMsg))
 
@@ -241,6 +248,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     raise sqlmapThreadException, "user aborted"
 
             except:
+                print
                 conf.threadException = True
                 errMsg = unhandledException()
                 logger.error("thread %d: %s" % (numThread + 1, errMsg))
