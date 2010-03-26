@@ -44,11 +44,24 @@ class Agent:
         temp.start     = randomStr(6)
         temp.stop      = randomStr(6)
 
+    def payloadDirect(self, query):
+        if query.startswith(" AND "):
+            query = query.replace(" AND ", "SELECT ")
+        elif query.startswith(" UNION ALL "):
+            query = query.replace(" UNION ALL ", "")
+        elif query.startswith("; "):
+            query = query.replace("; ", "")
+
+        return query
+
     def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False, falseCond=False):
         """
         This method replaces the affected parameter with the SQL
         injection statement to request
         """
+
+        if conf.direct:
+            return self.payloadDirect(newValue)
 
         falseValue = ""
         negValue   = ""
@@ -83,6 +96,9 @@ class Agent:
         return retValue
 
     def fullPayload(self, query):
+        if conf.direct:
+            return self.payloadDirect(query)
+
         query   = self.prefixQuery(query)
         query   = self.postfixQuery(query)
         payload = self.payload(newValue=query)
@@ -95,6 +111,9 @@ class Agent:
         to perform the injection depending on the injection type
         identified as valid
         """
+
+        if conf.direct:
+            return self.payloadDirect(string)
 
         query = ""
 
@@ -122,6 +141,9 @@ class Agent:
         This method appends the DBMS comment to the
         SQL injection request
         """
+
+        if conf.direct:
+            return self.payloadDirect(string)
 
         randInt = randomInt()
         randStr = randomStr()

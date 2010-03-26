@@ -51,7 +51,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
     def osCmd(self):
         stackedTest()
 
-        if kb.stackedTest:
+        if kb.stackedTest or conf.direct:
             web = False
         elif not kb.stackedTest and kb.dbms == "MySQL":
             infoMsg = "going to use a web backdoor for command execution"
@@ -74,7 +74,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
     def osShell(self):
         stackedTest()
 
-        if kb.stackedTest:
+        if kb.stackedTest or conf.direct:
             web = False
         elif not kb.stackedTest and kb.dbms == "MySQL":
             infoMsg = "going to use a web backdoor for command prompt"
@@ -99,7 +99,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
 
         stackedTest()
 
-        if kb.stackedTest:
+        if kb.stackedTest or conf.direct:
             web = False
 
             self.initEnv(web=web)
@@ -195,7 +195,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
             errMsg += "relay attack"
             raise sqlmapUnsupportedDBMSException(errMsg)
 
-        if not kb.stackedTest:
+        if not kb.stackedTest and not conf.direct:
             if kb.dbms in ( "PostgreSQL", "Microsoft SQL Server" ):
                 errMsg  = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
@@ -239,7 +239,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
     def osBof(self):
         stackedTest()
 
-        if not kb.stackedTest:
+        if not kb.stackedTest and not conf.direct:
             return
 
         if not kb.dbms == "Microsoft SQL Server" or kb.dbmsVersion[0] not in ( "2000", "2005" ):
@@ -267,7 +267,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
     def __regInit(self):
         stackedTest()
 
-        if not kb.stackedTest:
+        if not kb.stackedTest and not conf.direct:
             return
 
         self.checkDbmsOs()

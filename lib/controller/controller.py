@@ -76,7 +76,7 @@ def __selectInjection(injData):
         return "Quit"
 
     else:
-        warnMsg = "Invalid choice, retry"
+        warnMsg = "invalid choice, retry"
         logger.warn(warnMsg)
         __selectInjection(injData)
 
@@ -92,6 +92,13 @@ def start():
     if not conf.start:
         return
 
+    if conf.direct:
+        initTargetEnv()
+        setupTargetEnv()
+        action()
+
+        return
+
     if conf.url:
         kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
@@ -104,9 +111,9 @@ def start():
         infoMsg = "sqlmap got a total of %d targets" % len(kb.targetUrls)
         logger.info(infoMsg)
 
-    hostCount               = 0
-    cookieStr               = ""
-    setCookieAsInjectable   = True
+    hostCount             = 0
+    cookieStr             = ""
+    setCookieAsInjectable = True
 
     for targetUrl, targetMethod, targetData, targetCookie in kb.targetUrls:
         try:

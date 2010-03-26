@@ -25,6 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 optDict = {
             # Family:        { "parameter_name":    "parameter_datatype" },
             "Target":        {
+                               "direct":            "string",
                                "url":               "string",
                                "list":              "string",
                                "requestFile":       "string",

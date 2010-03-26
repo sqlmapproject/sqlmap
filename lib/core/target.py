@@ -43,6 +43,10 @@ def __setRequestParams():
     HTTP method POST.
     """
 
+    if conf.direct:
+        conf.parameters[None] = "direct connection"
+        return
+
     __testableParameters = False
 
     # Perform checks on GET parameters

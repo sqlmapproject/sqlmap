@@ -37,6 +37,7 @@ from ConfigParser import ConfigParser
 from lib.core.common import getFileType
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
+from lib.core.common import parseTargetDirect
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
@@ -58,6 +59,9 @@ from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
+from lib.core.settings import SQLITE_ALIASES
+from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import SITE
@@ -493,7 +497,10 @@ def __setDBMS():
     firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
                                      "|".join([alias for alias in MYSQL_ALIASES]),
                                      "|".join([alias for alias in PGSQL_ALIASES]),
-                                     "|".join([alias for alias in ORACLE_ALIASES]))
+                                     "|".join([alias for alias in ORACLE_ALIASES]),
+                                     "|".join([alias for alias in SQLITE_ALIASES]),
+                                     "|".join([alias for alias in ACCESS_ALIASES]),
+                                     "|".join([alias for alias in FIREBIRD_ALIASES]))
     dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms)
 
     if dbmsRegExp:
@@ -606,7 +613,7 @@ def __setHTTPAuthentication():
     
         elif aTypeLower == "digest":
             authHandler = urllib2.HTTPDigestAuthHandler(passwordMgr)
-    
+
         elif aTypeLower == "ntlm":
             try:
                 from ntlm import HTTPNtlmAuthHandler
@@ -861,6 +868,7 @@ def __setConfAttributes():
     logger.debug(debugMsg)
 
     conf.cj              = None
+    conf.dbmsConnector   = None
     conf.dbmsHandler     = None
     conf.dumpPath        = None
     conf.httpHeaders     = []
@@ -1045,28 +1053,30 @@ def init(inputOptions=advancedDict()):
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
     __cleanupOptions()
-
     __setRequestFromFile()
-    
-    parseTargetUrl()
 
-    __setHTTPTimeout()
-    __setHTTPCookies()
-    __setHTTPReferer()
-    __setHTTPUserAgent()
-    __setHTTPExtraHeaders()
-    __setHTTPMethod()
-    __setHTTPAuthentication()
-    __setHTTPProxy()
+    parseTargetUrl()
+    parseTargetDirect()
+
+    if conf.url or conf.list or conf.requestFile or conf.googleDork:
+        __setHTTPTimeout()
+        __setHTTPCookies()
+        __setHTTPReferer()
+        __setHTTPUserAgent()
+        __setHTTPExtraHeaders()
+        __setHTTPMethod()
+        __setHTTPAuthentication()
+        __setHTTPProxy()
+        __setUnionTech()
+        __setGoogleDorking()
+        __setMultipleTargets()
+        __urllib2Opener()
+        __setDBMS()
+
     __setThreads()
-    __setDBMS()
     __setOS()
-    __setUnionTech()
     __setWriteFile()
     __setMetasploit()
-    __setGoogleDorking()
-    __setMultipleTargets()
-    __urllib2Opener()
 
     update()
     queriesParser()

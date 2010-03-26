@@ -29,12 +29,12 @@ from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
-
 
 class Filesystem:
     """
@@ -278,18 +278,19 @@ class Filesystem:
 
         self.checkDbmsOs()
 
-        if not kb.stackedTest:
+        if conf.direct or kb.stackedTest:
+            if kb.stackedTest:
+                debugMsg  = "going to read the file with stacked query SQL "
+                debugMsg += "injection technique"
+                logger.debug(debugMsg)
+
+            fileContent = self.stackedReadFile(rFile)
+        else:
             debugMsg  = "going to read the file with UNION query SQL "
             debugMsg += "injection technique"
             logger.debug(debugMsg)
 
             fileContent = self.unionReadFile(rFile)
-        else:
-            debugMsg  = "going to read the file with stacked query SQL "
-            debugMsg += "injection technique"
-            logger.debug(debugMsg)
-
-            fileContent = self.stackedReadFile(rFile)
 
         if fileContent in ( None, "" ) and kb.dbms != "PostgreSQL":
             self.cleanup(onlyFileTbl=True)
@@ -319,16 +320,17 @@ class Filesystem:
 
         self.checkDbmsOs()
 
-        if not kb.stackedTest:
+        if conf.direct or kb.stackedTest:
+            if kb.stackedTest:
+                debugMsg  = "going to upload the %s file with " % fileType
+                debugMsg += "stacked query SQL injection technique"
+                logger.debug(debugMsg)
+
+            self.stackedWriteFile(wFile, dFile, fileType, confirm)
+            self.cleanup(onlyFileTbl=True)
+        else:
             debugMsg  = "going to upload the %s file with " % fileType
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)
 
             self.unionWriteFile(wFile, dFile, fileType, confirm)
-        else:
-            debugMsg  = "going to upload the %s file with " % fileType
-            debugMsg += "stacked query SQL injection technique"
-            logger.debug(debugMsg)
-
-            self.stackedWriteFile(wFile, dFile, fileType, confirm)
-            self.cleanup(onlyFileTbl=True)

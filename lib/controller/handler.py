@@ -34,12 +34,19 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
+from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn
 from plugins.dbms.mysql import MySQLMap
+from plugins.dbms.mysql.connector import Connector as MySQLConn
 from plugins.dbms.oracle import OracleMap
+from plugins.dbms.oracle.connector import Connector as OracleConn
 from plugins.dbms.postgresql import PostgreSQLMap
+from plugins.dbms.postgresql.connector import Connector as PostgreSQLConn
 from plugins.dbms.sqlite import SQLiteMap
+from plugins.dbms.sqlite.connector import Connector as SQLiteConn
 from plugins.dbms.access import AccessMap
+from plugins.dbms.access.connector import Connector as AccessConn
 from plugins.dbms.firebird import FirebirdMap
+from plugins.dbms.firebird.connector import Connector as FirebirdConn
 
 def setHandler():
     """
@@ -50,16 +57,16 @@ def setHandler():
     count     = 0
     dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird" )
     dbmsMap   = (
-                  ( MYSQL_ALIASES, MySQLMap ),
-                  ( ORACLE_ALIASES, OracleMap ),
-                  ( PGSQL_ALIASES, PostgreSQLMap ),
-                  ( MSSQL_ALIASES, MSSQLServerMap ),
-                  ( SQLITE_ALIASES, SQLiteMap ),
-                  ( ACCESS_ALIASES, AccessMap ),
-                  ( FIREBIRD_ALIASES, FirebirdMap ),
+                  ( MYSQL_ALIASES, MySQLMap, MySQLConn ),
+                  ( ORACLE_ALIASES, OracleMap, OracleConn ),
+                  ( PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn ),
+                  ( MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn ),
+                  ( SQLITE_ALIASES, SQLiteMap, SQLiteConn ),
+                  ( ACCESS_ALIASES, AccessMap, AccessConn ),
+                  ( FIREBIRD_ALIASES, FirebirdMap, FirebirdConn ),
                 )
 
-    for dbmsAliases, dbmsEntry in dbmsMap:
+    for dbmsAliases, dbmsMap, dbmsConn in dbmsMap:
         if conf.dbms and conf.dbms not in dbmsAliases:
             debugMsg  = "skipping test for %s" % dbmsNames[count]
             logger.debug(debugMsg)
@@ -68,12 +75,15 @@ def setHandler():
 
             continue
 
-        handler = dbmsEntry()
+        handler = dbmsMap()
+        conf.dbmsConnector = dbmsConn()
 
         if handler.checkDbms():
             if not conf.dbms or conf.dbms in dbmsAliases:
                 kb.dbmsDetected = True
 
-                return handler
+                conf.dbmsHandler = handler
 
-    return None
+                return
+        else:
+            conf.dbmsConnector = None

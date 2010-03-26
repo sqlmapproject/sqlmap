@@ -154,6 +154,12 @@ class Fingerprint(GenericFingerprint):
         * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
+        infoMsg = "testing MySQL"
+        logger.info(infoMsg)
+
+        if conf.direct:
+            conf.dbmsConnector.connect()
+
         if conf.dbms in MYSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
             setDbms("MySQL %s" % kb.dbmsVersion[0])
 
@@ -165,11 +171,7 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-        infoMsg = "testing MySQL"
-        logger.info(infoMsg)
-
         randInt = str(randomInt(1))
-
         payload = agent.fullPayload(" AND CONNECTION_ID()=CONNECTION_ID()")
         result  = Request.queryPage(payload)
 
@@ -203,7 +205,7 @@ class Fingerprint(GenericFingerprint):
                     kb.dbmsVersion = [">= 5.5.0"]
 
                 # Check if it is MySQL >= 5.1.2 and < 5.5.0
-                elif inject.getValue("MID(@@table_open_cache, 1, 1)", unpack=False):
+                elif inject.getValue("SELECT MID(@@table_open_cache, 1, 1)", unpack=False):
                     if inject.getValue("SELECT %s FROM information_schema.GLOBAL_STATUS LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
                         kb.dbmsVersion = [">= 5.1.12", "< 5.5.0"]
                     elif inject.getValue("SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1" % randInt, unpack=False, charsetType=2) == randInt:
@@ -216,11 +218,11 @@ class Fingerprint(GenericFingerprint):
                         kb.dbmsVersion = [">= 5.1.2", "< 5.1.5"]
 
                 # Check if it is MySQL >= 5.0.0 and < 5.1.2
-                elif inject.getValue("MID(@@hostname, 1, 1)", unpack=False):
+                elif inject.getValue("SELECT MID(@@hostname, 1, 1)", unpack=False):
                     kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
                 elif inject.getValue("SELECT 1 FROM DUAL", charsetType=1) == "1":
                     kb.dbmsVersion = [">= 5.0.11", "< 5.0.38"]
-                elif inject.getValue("DATABASE() LIKE SCHEMA()"):
+                elif inject.getValue("SELECT DATABASE() LIKE SCHEMA()"):
                     kb.dbmsVersion = [">= 5.0.2", "< 5.0.11"]
                 else:
                     kb.dbmsVersion = [">= 5.0.0", "<= 5.0.1"]
@@ -237,24 +239,24 @@ class Fingerprint(GenericFingerprint):
                     return True
 
                 # Check which version of MySQL < 5.0.0 it is
-                coercibility = inject.getValue("COERCIBILITY(USER())")
+                coercibility = inject.getValue("SELECT COERCIBILITY(USER())")
 
                 if coercibility == "3":
                     kb.dbmsVersion = [">= 4.1.11", "< 5.0.0"]
                 elif coercibility == "2":
                     kb.dbmsVersion = [">= 4.1.1", "< 4.1.11"]
-                elif inject.getValue("CURRENT_USER()"):
+                elif inject.getValue("SELECT CURRENT_USER()"):
                     kb.dbmsVersion = [">= 4.0.6", "< 4.1.1"]
 
-                    if inject.getValue("CHARSET(CURRENT_USER())") == "utf8":
+                    if inject.getValue("SELECT CHARSET(CURRENT_USER())") == "utf8":
                         kb.dbmsVersion = ["= 4.1.0"]
                     else:
                         kb.dbmsVersion = [">= 4.0.6", "< 4.1.0"]
-                elif inject.getValue("FOUND_ROWS()", charsetType=1) == "0":
+                elif inject.getValue("SELECT FOUND_ROWS()", charsetType=1) == "0":
                     kb.dbmsVersion = [">= 4.0.0", "< 4.0.6"]
-                elif inject.getValue("CONNECTION_ID()"):
+                elif inject.getValue("SELECT CONNECTION_ID()"):
                     kb.dbmsVersion = [">= 3.23.14", "< 4.0.0"]
-                elif re.search("@[\w\.\-\_]+", inject.getValue("USER()")):
+                elif re.search("@[\w\.\-\_]+", inject.getValue("SELECT USER()")):
                     kb.dbmsVersion = [">= 3.22.11", "< 3.23.14"]
                 else:
                     kb.dbmsVersion = ["< 3.22.11"]

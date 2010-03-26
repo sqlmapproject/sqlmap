@@ -37,6 +37,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.data import temp
 from lib.request.connect import Connect as Request
+from lib.core.settings import SQL_STATEMENTS
 from lib.techniques.inband.union.use import unionUse
 from lib.techniques.blind.inference import bisection
 from lib.utils.resume import queryOutputLength
@@ -350,6 +351,32 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     (if selected).
     """
 
+    if conf.direct:
+        expression = agent.payloadDirect(expression)
+        values = None
+        select = False
+
+        for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
+            for sqlStatement in sqlStatements:
+                if expression.lower().startswith(sqlStatement) and sqlTitle == "SQL SELECT statement":
+                    select = True
+                    break
+
+        if select:
+            values = conf.dbmsConnector.select(expression)
+        else:
+            values = conf.dbmsConnector.execute(expression)
+
+        if values is None or len(values) == 0:
+            return None
+        elif len(values) == 1:
+            if len(values[0]) == 1:
+                return str(list(values)[0][0])
+            else:
+                return list(values)
+        else:
+            return values
+
     expression = cleanQuery(expression)
     expression = expandAsteriskForColumns(expression)
     value      = None
@@ -386,6 +413,24 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
 
 def goStacked(expression, silent=False):
     expression = cleanQuery(expression)
+
+    if conf.direct:
+        expression = agent.payloadDirect(expression)
+        values = None
+        select = False
+
+        for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
+            for sqlStatement in sqlStatements:
+                if expression.lower().startswith(sqlStatement) and sqlTitle == "SQL SELECT statement":
+                    select = True
+                    break
+
+        if select:
+            values = conf.dbmsConnector.select(expression)
+        else:
+            values = conf.dbmsConnector.execute(expression)
+
+        return None, None
 
     debugMsg = "query: %s" % expression
     logger.debug(debugMsg)

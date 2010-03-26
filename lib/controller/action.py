@@ -43,7 +43,7 @@ def action():
 
     # First of all we have to identify the back-end database management
     # system to be able to go ahead with the injection
-    conf.dbmsHandler = setHandler()
+    setHandler()
 
     if not conf.dbmsHandler:
         htmlParsed = getHtmlErrorFp()
@@ -166,3 +166,6 @@ def action():
     # Miscellaneous options
     if conf.cleanup:
         conf.dbmsHandler.cleanup()
+
+    if conf.direct:
+        conf.dbmsConnector.close()

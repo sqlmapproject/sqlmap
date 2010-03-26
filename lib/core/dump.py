@@ -92,7 +92,7 @@ class Dump:
             if isinstance(element, str):
                 self.__write("[*] %s" % element)
             elif isinstance(element, (list, tuple, set)):
-                self.__write("[*] " + ", ".join(e for e in element))
+                self.__write("[*] " + ", ".join(str(e) for e in element))
 
         if elements:
             self.__write("")
@@ -321,11 +321,11 @@ class Dump:
                     info = tableValues[column]
                     value = info["values"][i]
 
-                    if re.search("^[\ *]*$", value):
+                    if re.search("^[\ *]*$", str(value)):
                         value = "NULL"
 
                     maxlength = int(info["length"])
-                    blank = " " * (maxlength - len(value))
+                    blank = " " * (maxlength - len(str(value)))
                     self.__write("| %s%s" % (value, blank), n=False)
 
                     if not conf.multipleTargets and field == fields:

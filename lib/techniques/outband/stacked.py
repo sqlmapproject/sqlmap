@@ -32,6 +32,9 @@ from lib.core.session import setStacked
 from lib.request import inject
 
 def stackedTest():
+    if conf.direct:
+        return
+
     if kb.stackedTest is not None:
         return kb.stackedTest
 

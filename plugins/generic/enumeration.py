@@ -139,7 +139,7 @@ class Enumeration:
         condition  = ( kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ) )
         condition |= ( kb.dbms == "MySQL" and not kb.data.has_information_schema )
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             if condition:
                 query = rootQuery["inband"]["query2"]
             else:
@@ -196,7 +196,7 @@ class Enumeration:
 
         logger.info(infoMsg)
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
                 query = rootQuery["inband"]["query2"]
             else:
@@ -393,7 +393,7 @@ class Enumeration:
                          "E": "EXECUTE"
                      }
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 query     = rootQuery["inband"]["query2"]
                 condition = rootQuery["inband"]["condition2"]
@@ -439,7 +439,7 @@ class Enumeration:
 
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
-                            if kb.dbms == "PostgreSQL" and privilege.isdigit():
+                            if kb.dbms == "PostgreSQL" and str(privilege).isdigit():
                                 for position, pgsqlPriv in pgsqlPrivs:
                                     if count == position and int(privilege) == 1:
                                         privileges.add(pgsqlPriv)
@@ -639,7 +639,7 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].dbs
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 query = rootQuery["inband"]["query2"]
             else:
@@ -696,7 +696,7 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].tables
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             query = rootQuery["inband"]["query"]
             condition = rootQuery["inband"]["condition"]
 
@@ -855,7 +855,7 @@ class Enumeration:
         infoMsg += "on database '%s'" % conf.db
         logger.info(infoMsg)
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
                 query = rootQuery["inband"]["query"] % (conf.tbl, conf.db)
                 query += condQuery
@@ -1039,7 +1039,7 @@ class Enumeration:
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % column
 
-            if kb.unionPosition:
+            if kb.unionPosition or conf.direct:
                 query = rootQuery["inband"]["query"]
                 query += colQuery
                 query += dbsQuery
@@ -1095,7 +1095,7 @@ class Enumeration:
                 infoMsg += " '%s' in database '%s'" % (column, db)
                 logger.info(infoMsg)
 
-                if kb.unionPosition:
+                if kb.unionPosition or conf.direct:
                     query = rootQuery["inband"]["query2"]
 
                     if kb.dbms in ( "MySQL", "PostgreSQL" ):
@@ -1321,7 +1321,7 @@ class Enumeration:
 
         entriesCount = 0
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             if kb.dbms == "Oracle":
                 query = rootQuery["inband"]["query"] % (colString, conf.tbl.upper())
             elif kb.dbms == "SQLite":
@@ -1349,7 +1349,7 @@ class Enumeration:
                         else:
                             colEntry = entry[index]
 
-                        colEntryLen = len(colEntry)
+                        colEntryLen = len(str(colEntry))
                         maxLen = max(colLen, colEntryLen)
 
                         if maxLen > kb.data.dumpedTable[column]["length"]:

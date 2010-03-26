@@ -38,6 +38,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import sanitizeAsciiString
 from lib.core.exception import sqlmapConnectionException
+from lib.core.settings import SQL_STATEMENTS
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
@@ -262,6 +263,38 @@ class Connect:
         and returns its page MD5 hash or a boolean value in case of
         string match check ('--string' command line parameter)
         """
+
+        if conf.direct:
+            values = None
+            select = False
+
+            for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
+                for sqlStatement in sqlStatements:
+                    if value.lower().startswith(sqlStatement) and sqlTitle == "SQL SELECT statement":
+                        select = True
+                        break
+
+            if select:
+                values = conf.dbmsConnector.select(value)
+            else:
+                values = conf.dbmsConnector.execute(value)
+
+            if values is None or len(values) == 0:
+                return None
+            elif content:
+                if len(values) == 1:
+                    if len(values[0]) == 1:
+                        return str(list(values)[0][0]), None
+                    else:
+                        return list(values), None
+                else:
+                    return values, None
+            else:
+                for value in values:
+                    if value[0] == 1:
+                        return True
+                    else:
+                        return False
 
         get    = None
         post   = None

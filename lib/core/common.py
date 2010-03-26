@@ -47,12 +47,21 @@ from lib.core.data import temp
 from lib.core.convert import urlencode
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import SITE
 from lib.core.settings import SQL_STATEMENTS
+from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import VERSION_STRING
+from lib.core.settings import MSSQL_ALIASES
+from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import ORACLE_ALIASES
+from lib.core.settings import SQLITE_ALIASES
+from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import FIREBIRD_ALIASES
 
 def paramToDict(place, parameters=None):
     """
@@ -319,7 +328,7 @@ def getDirs(webApi=None):
         [directories.add(directory) for directory in defaultDirs]
 
     return directories
-    
+
 def filePathToString(filePath):
     strRepl = filePath.replace("/", "_").replace("\\", "_")
     strRepl = strRepl.replace(" ", "_").replace(":", "_")
@@ -329,18 +338,18 @@ def filePathToString(filePath):
 def dataToStdout(data):
     sys.stdout.write(data)
     sys.stdout.flush()
-    
+
 def dataToSessionFile(data):
     if not conf.sessionFile:
         return
 
     conf.sessionFP.write(data)
     conf.sessionFP.flush()
-    
+
 def dataToDumpFile(dumpFile, data):
     dumpFile.write(data)
     dumpFile.flush()
-    
+
 def dataToOutFile(data):
     if not data:
         return "No data retrieved"
@@ -586,10 +595,62 @@ def weAreFrozen():
 
     return hasattr(sys, "frozen")
 
+def parseTargetDirect():
+    """
+    Parse target dbms and set some attributes into the configuration singleton.
+    """
+
+    if not conf.direct:
+        return
+
+    details = None
+
+    for dbms in SUPPORTED_DBMS:
+        details = re.search("^(%s)://(.+?)\:(.+?)\@(.+?)\:([\d]+)\/(.+?)$" % dbms, conf.direct, re.I)
+
+        if details:
+            conf.dbms     = details.group(1)
+            conf.dbmsUser = details.group(2)
+            conf.dbmsPass = details.group(3)
+            conf.hostname = details.group(4)
+            conf.port     = int(details.group(5))
+            conf.dbmsDb   = details.group(6)
+
+            conf.parameters[None] = "direct connection"
+
+            break
+
+    if not details:
+        errMsg = "invalid target details, valid syntax is for instance: mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME"
+        raise sqlmapSyntaxException, errMsg
+
+    # TODO: add details for others python DBMS libraries
+    dbmsDict = { "Microsoft SQL Server": [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
+                 "MySQL": [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
+                 "PostgreSQL": [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
+                 "Oracle": [ORACLE_ALIASES, "", ""],
+                 "SQLite": [SQLITE_ALIASES, "", ""],
+                 "Access": [ACCESS_ALIASES, "", ""],
+                 "Firebird": [FIREBIRD_ALIASES, "", ""] }
+
+    for dbmsName, data in dbmsDict.items():
+        if conf.dbms in data[0]:
+            try:
+                if dbmsName == "Microsoft SQL Server":
+                    import pymssql
+                elif dbmsName == "MySQL":
+                    import MySQLdb
+                elif dbmsName == "PostgreSQL":
+                    import psycopg2
+            except ImportError, _:
+                errMsg  = "sqlmap requires %s third-party library " % data[1]
+                errMsg += "in order to directly connect to the database "
+                errMsg += "%s. Download from %s" % (dbmsName, data[2])
+                raise sqlmapMissingDependence, errMsg
+
 def parseTargetUrl():
     """
-    Parse target url and set some attributes into the configuration
-    singleton.
+    Parse target url and set some attributes into the configuration singleton.
     """
 
     if not conf.url:

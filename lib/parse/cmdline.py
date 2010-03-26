@@ -48,6 +48,9 @@ def cmdLineParser():
                              "options has to be specified to set the source "
                              "to get target urls from.")
 
+        target.add_option("-d", dest="direct", help="Direct "
+                          "connection to the database")
+
         target.add_option("-u", "--url", dest="url", help="Target url")
 
         target.add_option("-l", dest="list", help="Parse targets from Burp "
@@ -437,8 +440,8 @@ def cmdLineParser():
 
         (args, _) = parser.parse_args()
 
-        if not args.url and not args.list and not args.googleDork and not args.configFile and not args.requestFile and not args.updateAll:
-            errMsg  = "missing a mandatory parameter ('-u', '-l', '-r', '-g', '-c' or '--update'), "
+        if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile and not args.requestFile and not args.updateAll:
+            errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)
 

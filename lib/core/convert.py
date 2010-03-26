@@ -32,6 +32,8 @@ import sys
 import struct
 import urllib
 
+from lib.core.data import conf
+
 def base64decode(string):
     return string.decode("base64")
 
@@ -77,6 +79,9 @@ def urldecode(string):
     return result
 
 def urlencode(string, safe=":/?%&=", convall=False):
+    if conf.direct:
+        return string
+
     result = None
 
     if string is None:

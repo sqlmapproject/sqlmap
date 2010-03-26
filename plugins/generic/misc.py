@@ -98,6 +98,9 @@ class Miscellaneous:
 
         query = queries[kb.dbms].substring % (queries[kb.dbms].banner, first, last)
 
+        if conf.direct:
+            query = "SELECT %s" % query
+
         kb.bannerFp["dbmsVersion"] = inject.getValue(query, unpack=False)
         kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
 
@@ -127,7 +130,7 @@ class Miscellaneous:
 
         stackedTest()
 
-        if not kb.stackedTest:
+        if not kb.stackedTest and not conf.direct:
             return
 
         if kb.os == "Windows":

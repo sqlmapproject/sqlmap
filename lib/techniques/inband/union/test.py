@@ -200,6 +200,9 @@ def unionTest():
     SQL injection vulnerability. The test is done up to 3*50 times
     """
 
+    if conf.direct:
+        return
+
     if conf.uTech == "orderby":
         technique = "ORDER BY clause bruteforcing"
     else:
