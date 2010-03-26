@@ -623,7 +623,9 @@ class Enumeration:
     def getRoles(self, query2=False):
         warnMsg  = "on %s the concept of roles does not " % kb.dbms
         warnMsg += "exist. sqlmap will enumerate privileges instead"
-        self.getPrivileges(query2)
+        logger.warn(warnMsg)
+
+        return self.getPrivileges(query2)
 
     def getDbs(self):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
