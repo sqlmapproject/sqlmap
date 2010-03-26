@@ -43,14 +43,16 @@ class Replication:
             return "<DataType: %s>" % self
        
     class Table:
-        def __init__(self, parent, name, columns, typeless=False):
+        def __init__(self, parent, name, columns=None, create=True, typeless=False):
             self.parent = parent
             self.name = name
             self.columns = columns
-            if not typeless:
-                self.parent.cursor.execute('CREATE TABLE %s (%s)' % (name, ','.join('%s %s' % (colname, coltype) for colname, coltype in columns)))
-            else:
-                self.parent.cursor.execute('CREATE TABLE %s (%s)' % (name, ','.join(colname for colname in columns)))
+            if create:
+                self.parent.cursor.execute('DROP TABLE IF EXISTS %s' % self.name)
+                if not typeless:
+                    self.parent.cursor.execute('CREATE TABLE %s (%s)' % (self.name, ','.join('%s %s' % (colname, coltype) for colname, coltype in self.columns)))
+                else:
+                    self.parent.cursor.execute('CREATE TABLE %s (%s)' % (self.name, ','.join(colname for colname in self.columns)))
             
         def insert(self, rows):
             self.parent.cursor.executemany('INSERT INTO %s VALUES (?,?,?,?,?)' % self.name, rows)
