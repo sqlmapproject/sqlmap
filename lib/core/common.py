@@ -913,8 +913,8 @@ def safeStringFormat(formatStr, params):
 
     return retVal
 
-def sanitizeAsciiString(string):
-    return "".join(char if ord(char) < 128 else '?' for char in string)
+def sanitizeAsciiString(subject):
+    return "".join(char if ord(char) < 128 else '?' for char in subject)
 
 def decloakToNamedTemporaryFile(filepath, name=None):
     retVal = NamedTemporaryFile()
@@ -952,3 +952,9 @@ def posixToNtSlashes(filepath):
 
 def ntToPosixSlashes(filepath):
     return filepath.replace('\\', '/')
+
+def isBase64EncodedString(subject):
+    return re.match(r"\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z", subject) is not None
+    
+def isHexEncodedString(subject):
+    return re.match(r"\A[0-9a-fA-F]+\Z", subject) is not None
