@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import cookielib
 import re
+import socket
 import urllib2
 
 from lib.core.convert import urlencode
@@ -129,7 +130,7 @@ class Google:
             logger.log(8, responseMsg)
         except urllib2.HTTPError, e:
             page = e.read()
-        except urllib2.URLError, e:
+        except (urllib2.URLError, socket.error, socket.timeout), e:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
