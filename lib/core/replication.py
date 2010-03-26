@@ -26,6 +26,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import sqlite3
 
 class Replication:
+    """
+    This class holds all methods/classes used for database
+    replication purposes.
+    """
+    
     def __init__(self, dbpath):
         self.dbpath = dbpath
         self.connection = sqlite3.connect(dbpath)
@@ -33,6 +38,11 @@ class Replication:
         self.cursor = self.connection.cursor()
         
     class DataType:
+        """
+        Using this class we define auxiliary objects
+        used for representing sqlite data types.
+        """
+        
         def __init__(self, name):
             self.name = name
 
@@ -43,6 +53,10 @@ class Replication:
             return "<DataType: %s>" % self
        
     class Table:
+        """
+        This class defines methods used to manipulate table objects.
+        """
+        
         def __init__(self, parent, name, columns=None, create=True, typeless=False):
             self.parent = parent
             self.name = name
@@ -55,18 +69,39 @@ class Replication:
                     self.parent.cursor.execute('CREATE TABLE %s (%s)' % (self.name, ','.join(colname for colname in self.columns)))
             
         def insert(self, rows):
+            """
+            This function is used for inserting row(s) into current table.
+            """
             self.parent.cursor.executemany('INSERT INTO %s VALUES (?,?,?,?,?)' % self.name, rows)
 
+        def select(self, condition=None):
+            """
+            This function is used for selecting row(s) from current table.
+            """        
+            stmt = 'SELECT * FROM %s' % self.name
+            if condition:
+                stmt += 'WHERE %s' % condition
+            return self.parent.cursor.execute(stmt)
 
-    NULL = DataType('NULL')
+    # sqlite data types
+    NULL    = DataType('NULL')
     INTEGER = DataType('INTEGER')
-    REAL = DataType('REAL')
-    TEXT = DataType('TEXT')
-    BLOB = DataType('BLOB')
+    REAL    = DataType('REAL')
+    TEXT    = DataType('TEXT')
+    BLOB    = DataType('BLOB')
     
-    def createTable(self, name, columns):
-        return Table(self, name, columns)
+    def createTable(self, tblname, columns=None):
+        """
+        This function creates Table instance with current connection settings.
+        """
+        return Table(self, tblname, columns)
     
+    def dropTable(self, tblname):
+        """
+        This function drops table with given name using current connection.
+        """
+        self.cursor.execute('DROP TABLE IF EXISTS %s' % tblname)
+            
     def __del__(self):
         self.cursor.close()
         self.connection.close()
