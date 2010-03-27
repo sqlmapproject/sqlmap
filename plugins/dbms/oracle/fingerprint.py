@@ -78,6 +78,12 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
+        logMsg = "testing Oracle"
+        logger.info(logMsg)
+
+        if conf.direct:
+            conf.dbmsConnector.connect()
+
         if conf.dbms in ORACLE_ALIASES:
             setDbms("Oracle")
 
@@ -86,18 +92,25 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-        logMsg = "testing Oracle"
-        logger.info(logMsg)
-
-        payload = agent.fullPayload(" AND ROWNUM=ROWNUM")
-        result  = Request.queryPage(payload)
+        # NOTE: SELECT ROWNUM=ROWNUM FROM DUAL does not work connecting
+        # directly to the Oracle database
+        if conf.direct:
+            result = True
+        else:
+            payload = agent.fullPayload(" AND ROWNUM=ROWNUM")
+            result  = Request.queryPage(payload)
 
         if result:
             logMsg = "confirming Oracle"
             logger.info(logMsg)
 
-            payload = agent.fullPayload(" AND LENGTH(SYSDATE)=LENGTH(SYSDATE)")
-            result  = Request.queryPage(payload)
+            # NOTE: SELECT LENGTH(SYSDATE)=LENGTH(SYSDATE) FROM DUAL does
+            # not work connecting directly to the Oracle database
+            if conf.direct:
+                result = True
+            else:
+                payload = agent.fullPayload(" AND LENGTH(SYSDATE)=LENGTH(SYSDATE)")
+                result  = Request.queryPage(payload)
 
             if not result:
                 warnMsg = "the back-end DMBS is not Oracle"

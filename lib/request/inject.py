@@ -356,6 +356,9 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
         values = None
         select = False
 
+        if kb.dbms == "Oracle" and expression.startswith("SELECT ") and " FROM " not in expression:
+            expression = "%s FROM DUAL" % expression
+
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:
                 if expression.lower().startswith(sqlStatement) and sqlTitle == "SQL SELECT statement":
@@ -418,6 +421,9 @@ def goStacked(expression, silent=False):
         expression = agent.payloadDirect(expression)
         values = None
         select = False
+
+        if kb.dbms == "Oracle" and expression.startswith("SELECT ") and " FROM " not in expression:
+            expression = "%s FROM DUAL" % expression
 
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:

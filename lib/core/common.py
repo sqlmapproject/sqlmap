@@ -628,7 +628,7 @@ def parseTargetDirect():
     dbmsDict = { "Microsoft SQL Server": [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
                  "MySQL": [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
                  "PostgreSQL": [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
-                 "Oracle": [ORACLE_ALIASES, "", ""],
+                 "Oracle": [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
                  "SQLite": [SQLITE_ALIASES, "", ""],
                  "Access": [ACCESS_ALIASES, "", ""],
                  "Firebird": [FIREBIRD_ALIASES, "", ""] }
@@ -642,6 +642,8 @@ def parseTargetDirect():
                     import MySQLdb
                 elif dbmsName == "PostgreSQL":
                     import psycopg2
+                elif dbmsName == "Oracle":
+                    import cx_Oracle
             except ImportError, _:
                 errMsg  = "sqlmap requires %s third-party library " % data[1]
                 errMsg += "in order to directly connect to the database "

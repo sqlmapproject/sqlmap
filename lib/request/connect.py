@@ -268,6 +268,9 @@ class Connect:
             values = None
             select = False
 
+            if kb.dbms == "Oracle" and value.startswith("SELECT ") and " FROM " not in value:
+                value = "%s FROM DUAL" % value
+
             for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
                 for sqlStatement in sqlStatements:
                     if value.lower().startswith(sqlStatement) and sqlTitle == "SQL SELECT statement":

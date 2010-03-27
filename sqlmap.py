@@ -26,6 +26,9 @@ import os
 import sys
 import time
 import traceback
+import warnings
+
+warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 
 try:
     import psyco
