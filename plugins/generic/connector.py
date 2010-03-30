@@ -46,6 +46,13 @@ class Connector:
         infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
         infoMsg += ":%d established" % self.port
         logger.info(infoMsg)
+        
+    def closed(self):
+        self.connector = None
+        self.cursor = None
+        infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
+        infoMsg += ":%d closed" % self.port
+        logger.info(infoMsg)
 
     def connect(self):
         errMsg  = "'connect' method must be defined "

@@ -45,7 +45,10 @@ class Connector(GenericConnector):
     def __init__(self):
         GenericConnector.__init__(self)
 
-    def connect(self):
+    def connect(self, reuse=True):
+        if reuse and self.connector:
+            return
+
         self.initConnection()
 
         try:
@@ -89,4 +92,5 @@ class Connector(GenericConnector):
     def close(self):
         self.cursor.close()
         self.connector.close()
+        self.closed()
 
