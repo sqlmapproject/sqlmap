@@ -77,6 +77,9 @@ def setHandler():
 
         handler = dbmsMap()
         conf.dbmsConnector = dbmsConn()
+        
+        if conf.direct:
+            conf.dbmsConnector.connect()
 
         if handler.checkDbms():
             if not conf.dbms or conf.dbms in dbmsAliases:
