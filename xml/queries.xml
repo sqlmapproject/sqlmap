@@ -320,6 +320,10 @@
         <current_db/>
         <inference query="AND ASC(MID((%s), %d, 1)) > %d"/>
         <is_dba query="IIF(CURRENTUSER()='Admin',1,0)"/>
+        <dbs/> 
+        <tables>
+            <inband query="SELECT Name FROM MSysObjects WHERE (Left([Name],1) &lt;&gt; '~') AND (Left([Name],4) &lt;&gt; 'MSys') AND ([Type] In (1, 4, 6))"/>
+        </tables>       
    </dbms>
 
    <!-- Firebird -->

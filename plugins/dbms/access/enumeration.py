@@ -29,7 +29,13 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 class Enumeration(GenericEnumeration):
     def __init__(self):
         GenericEnumeration.__init__(self, "Microsoft Access")
+        
+    def getDbs(self):
+        warnMsg = "on Microsoft Access it is not possible to enumerate databases"
+        logger.warn(warnMsg)
 
+        return []
+        
     def getBanner(self):
         warnMsg = "on Microsoft Access it is not possible to get a banner"
         logger.warn(warnMsg)

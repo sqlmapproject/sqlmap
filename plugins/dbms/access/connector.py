@@ -52,7 +52,8 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = pyodbc.connect(driver='{Microsoft Access Driver (*.mdb)}', dbq=self.db)
+            #self.connector = pyodbc.connect(driver='{Microsoft Access Driver (*.mdb)}', dbq=self.db, uid='Admin')
+            self.connector = pyodbc.connect('Driver={Microsoft Access Driver (*.mdb)};Dbq=%s;Uid=Admin;Pwd=;' % self.db)
         except pyodbc.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
 
