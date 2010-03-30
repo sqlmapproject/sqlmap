@@ -50,7 +50,7 @@ class Agent:
         elif query.startswith(" UNION ALL "):
             query = query.replace(" UNION ALL ", "", 1)
         elif query.startswith("; "):
-            query = query.replace("; ", "")
+            query = query.replace("; ", "", 1)
 
         return query
 
