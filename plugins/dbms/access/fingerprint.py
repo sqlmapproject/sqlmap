@@ -145,9 +145,6 @@ class Fingerprint(GenericFingerprint):
 
         logMsg = "testing Microsoft Access"
         logger.info(logMsg)
-        
-        if conf.direct:
-            conf.dbmsConnector.connect()
 
         payload = agent.fullPayload(" AND VAL(CVAR(1))=1")
         result  = Request.queryPage(payload)

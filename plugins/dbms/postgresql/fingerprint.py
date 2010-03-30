@@ -89,9 +89,6 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing PostgreSQL"
         logger.info(infoMsg)
 
-        if conf.direct:
-            conf.dbmsConnector.connect()
-
         if conf.dbms in PGSQL_ALIASES:
             setDbms("PostgreSQL")
 

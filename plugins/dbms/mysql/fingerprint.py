@@ -157,9 +157,6 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing MySQL"
         logger.info(infoMsg)
 
-        if conf.direct:
-            conf.dbmsConnector.connect()
-
         if conf.dbms in MYSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
             setDbms("MySQL %s" % kb.dbmsVersion[0])
 

@@ -81,9 +81,6 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing Oracle"
         logger.info(logMsg)
 
-        if conf.direct:
-            conf.dbmsConnector.connect()
-
         if conf.dbms in ORACLE_ALIASES:
             setDbms("Oracle")
 
