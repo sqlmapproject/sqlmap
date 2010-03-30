@@ -46,9 +46,9 @@ class Agent:
 
     def payloadDirect(self, query):
         if query.startswith(" AND "):
-            query = query.replace(" AND ", "SELECT ")
+            query = query.replace(" AND ", "SELECT ", 1)
         elif query.startswith(" UNION ALL "):
-            query = query.replace(" UNION ALL ", "")
+            query = query.replace(" UNION ALL ", "", 1)
         elif query.startswith("; "):
             query = query.replace("; ", "")
 
