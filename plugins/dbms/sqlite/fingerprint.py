@@ -93,6 +93,9 @@ class Fingerprint(GenericFingerprint):
 
         logMsg = "testing SQLite"
         logger.info(logMsg)
+        
+        if conf.direct:
+            conf.dbmsConnector.connect()
 
         payload = agent.fullPayload(" AND LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
         result  = Request.queryPage(payload)

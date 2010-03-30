@@ -127,6 +127,9 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing Firebird"
         logger.info(logMsg)
         
+        if conf.direct:
+            conf.dbmsConnector.connect()
+        
         randInt = randomInt()
 
         payload = agent.fullPayload(" AND EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))

@@ -78,8 +78,8 @@ class Connector(GenericConnector):
         self.connector.commit()
 
     def select(self, query):
-        self.execute(query)
-        return self.fetchall()
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
 
     def setCursor(self):
         self.cursor = self.connector.cursor()

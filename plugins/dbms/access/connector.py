@@ -22,14 +22,67 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+try:
+    import pyodbc
+except ImportError, _:
+    pass
+
+from lib.core.data import conf
+from lib.core.data import logger
+from lib.core.exception import sqlmapConnectionException
+
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     """
-    Homepage: 
-    User guide: 
-    API: 
+    Homepage: http://pyodbc.googlecode.com/
+    User guide: http://code.google.com/p/pyodbc/wiki/GettingStarted
+    API: http://code.google.com/p/pyodbc/w/list
+    Debian package: python-pyodbc
+    License: MIT
     """
 
     def __init__(self):
         GenericConnector.__init__(self)
+
+    def connect(self):
+        self.initConnection()
+
+        try:
+            self.connector = pyodbc.connect(driver='{Microsoft Access Driver (*.mdb)}', dbq=self.db)
+        except pyodbc.OperationalError, msg:
+            raise sqlmapConnectionException, msg[1]
+
+        self.setCursor()
+        self.connected()
+
+    def fetchall(self):
+        try:
+            return self.cursor.fetchall()
+        except pyodbc.OperationalError, msg:
+            logger.log(8, msg[1])
+            return None
+
+    def execute(self, query):
+        logger.debug(query)
+
+        try:
+            self.cursor.execute(query)
+        except pyodbc.OperationalError, msg:
+            logger.log(8, msg[1])
+        except pyodbc.Error, msg:
+            raise sqlmapConnectionException, msg[1]
+
+        self.connector.commit()
+
+    def select(self, query):
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+    def setCursor(self):
+        self.cursor = self.connector.cursor()
+
+    def close(self):
+        self.cursor.close()
+        self.connector.close()
+
