@@ -606,7 +606,7 @@ def parseTargetDirect():
     details = None
 
     for dbms in SUPPORTED_DBMS:
-        details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<dbmsUser>.+?)\:(?P<dbmsPass>.+?)\@)(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<dbmsDb>.+?)$" % dbms, conf.direct, re.I)
+        details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<dbmsUser>.+?)\:(?P<dbmsPass>.+?)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<dbmsDb>.+?)$" % dbms, conf.direct, re.I)
 
         if details:
             conf.dbms     = details.group('dbms')
@@ -632,7 +632,8 @@ def parseTargetDirect():
             break
 
     if not details:
-        errMsg = "invalid target details, valid syntax is for instance: mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME"
+        errMsg = "invalid target details, valid syntax is for instance: 'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME'"
+        errMsg += " and/or: 'access://DATABASE_FILEPATH'"
         raise sqlmapSyntaxException, errMsg
 
     # TODO: add details for others python DBMS libraries
