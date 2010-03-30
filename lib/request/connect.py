@@ -294,7 +294,7 @@ class Connect:
                     return values, None
             else:
                 for value in values:
-                    if value[0] == 1:
+                    if value[0] in (1, -1):
                         return True
                     else:
                         return False
