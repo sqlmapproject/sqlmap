@@ -82,10 +82,12 @@ class Fingerprint(GenericFingerprint):
                     negate = True
                     table = table[1:]
                 randInt = randomInt()
-                query   = agent.prefixQuery(" AND EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
+                query   = agent.prefixQuery(" AND EXISTS(SELECT * FROM %s WHERE %d=%d) FROM %s" % (table, randInt, randInt, table))
                 query   = agent.postfixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
+                if result is None:
+                    result = False
                 if negate:
                     result = not result
                 exist &= result

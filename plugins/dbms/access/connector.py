@@ -68,7 +68,7 @@ class Connector(GenericConnector):
 
         try:
             self.cursor.execute(query)
-        except pyodbc.OperationalError, msg:
+        except (pyodbc.OperationalError, pyodbc.ProgrammingError), msg:
             logger.log(8, msg[1])
         except pyodbc.Error, msg:
             raise sqlmapConnectionException, msg[1]
@@ -76,9 +76,13 @@ class Connector(GenericConnector):
         self.connector.commit()
 
     def select(self, query):
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
-
+        try:
+            self.cursor.execute(query)
+            return self.cursor.fetchall()
+        except pyodbc.ProgrammingError, msg:
+            logger.log(8, msg[1])
+            return None
+        
     def setCursor(self):
         self.cursor = self.connector.cursor()
 
