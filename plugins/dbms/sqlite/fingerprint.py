@@ -117,7 +117,7 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            version = inject.getValue("SUBSTR((SQLITE_VERSION()), 1, 1)", unpack=False, charsetType=2)
+            version = inject.getValue("SELECT SUBSTR((SQLITE_VERSION()), 1, 1)", unpack=False, charsetType=2)
             kb.dbmsVersion = [ version ]
 
             return True

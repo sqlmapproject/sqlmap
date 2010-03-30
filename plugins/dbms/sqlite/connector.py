@@ -53,7 +53,7 @@ class Connector(GenericConnector):
         try:
             self.connector = sqlite3.connect(database=self.db, timeout=conf.timeout)
         except sqlite3.OperationalError, msg:
-            raise sqlmapConnectionException, msg[1]
+            raise sqlmapConnectionException, msg[0]
 
         self.setCursor()
         self.connected()
@@ -62,7 +62,7 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except sqlite3.OperationalError, msg:
-            logger.log(8, msg[1])
+            logger.log(8, msg[0])
             return None
 
     def execute(self, query):
@@ -71,9 +71,9 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(query)
         except sqlite3.OperationalError, msg:
-            logger.log(8, msg[1])
+            logger.log(8, msg[0])
         except sqlite3.Error, msg:
-            raise sqlmapConnectionException, msg[1]
+            raise sqlmapConnectionException, msg[0]
 
         self.connector.commit()
 
