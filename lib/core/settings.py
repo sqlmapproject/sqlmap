@@ -113,6 +113,7 @@ SQL_STATEMENTS     = {
                              "grant ",         ),
 
                        "SQL data execution":    (
+                             "exec ",
                              "execute ",       ),
 
                        "SQL transaction":       (

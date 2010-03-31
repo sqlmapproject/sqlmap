@@ -232,7 +232,7 @@ class Filesystem:
         commands = (
                      "cd %s" % tmpPath,
                      "debug < %s" % randScr,
-                     "del /F %s" % randScr
+                     "del /F /Q %s" % randScr
                    )
 
         complComm = " & ".join(command for command in commands)

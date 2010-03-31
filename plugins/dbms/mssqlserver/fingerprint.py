@@ -112,6 +112,10 @@ class Fingerprint(GenericFingerprint):
             for version in (0, 5, 8):
                 randInt = randomInt()
                 query   = " AND %d=(SELECT (CASE WHEN (( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d )) THEN %d ELSE %d END))" % (randInt, version, version, randInt, (randInt + 1))
+
+                if conf.direct:
+                    query = query.replace(" AND ", "SELECT 1 WHERE ", 1)
+
                 payload = agent.fullPayload(query)
                 result  = Request.queryPage(payload)
 

@@ -1498,7 +1498,7 @@ class Enumeration:
         getOutput = readInput(message, default="Y")
 
         if not getOutput or getOutput in ("y", "Y"):
-            infoMsg = "fetching %s query output: '%s'" % (sqlType, query)
+            infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             logger.info(infoMsg)
 
             output = inject.getValue(query, fromUser=True)
@@ -1510,11 +1510,11 @@ class Enumeration:
             if kb.stackedTest is None:
                 stackedTest()
 
-            if not kb.stackedTest:
+            if not kb.stackedTest and not conf.direct:
                 return None
             else:
                 if sqlType:
-                    infoMsg = "executing %s query: '%s'" % (sqlType, query)
+                    infoMsg = "executing %s query: '%s'" % (sqlType if sqlType is not None else "SQL", query)
                 else:
                     infoMsg = "executing unknown SQL type query: '%s'" % query
                 logger.info(infoMsg)

