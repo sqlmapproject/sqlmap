@@ -37,20 +37,21 @@ class Connector(GenericConnector):
     """
     Homepage: http://kinterbasdb.sourceforge.net/
     User guide: http://kinterbasdb.sourceforge.net/dist_docs/usage.html
+    Debian package: python-kinterbasdb
     License: BSD
     """
 
     def __init__(self):
         GenericConnector.__init__(self)
 
-    def connect(self, reuse=True):
-        if reuse and self.connector:
-            return
-
+    def connect(self):
         self.initConnection()
 
+        if not self.hostname:
+            self.checkFileDb()
+
         try:
-            self.connector = kinterbasdb.connect(database=self.db, user=self.user, password=self.password, timeout={'period': conf.timeout})
+            self.connector = kinterbasdb.connect(host=self.hostname, database=self.db, user=self.user, password=self.password, timeout={'period': conf.timeout})
         except kinterbasdb.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
 
@@ -77,13 +78,5 @@ class Connector(GenericConnector):
         self.connector.commit()
 
     def select(self, query):
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
-
-    def setCursor(self):
-        self.cursor = self.connector.cursor()
-
-    def close(self):
-        self.cursor.close()
-        self.connector.close()
-        self.closed()
+        self.execute(query)
+        return self.fetchall()

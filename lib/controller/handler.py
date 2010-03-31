@@ -79,6 +79,9 @@ def setHandler():
         conf.dbmsConnector = dbmsConn()
         
         if conf.direct:
+            logger.debug("forcing timeout to 10 seconds")
+            conf.timeout = 10
+
             conf.dbmsConnector.connect()
 
         if handler.checkDbms():

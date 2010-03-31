@@ -140,6 +140,7 @@ class Fingerprint(GenericFingerprint):
     def checkDbms(self):
         if conf.dbms in ACCESS_ALIASES:
             setDbms("Microsoft Access")
+
             if not conf.extensiveFp:
                 return True
 

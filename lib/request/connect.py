@@ -42,6 +42,7 @@ from lib.core.settings import SQL_STATEMENTS
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
+from lib.request.direct import direct
 from lib.request.comparison import comparison
 
 
@@ -265,39 +266,7 @@ class Connect:
         """
 
         if conf.direct:
-            values = None
-            select = False
-
-            if kb.dbms == "Oracle" and value.startswith("SELECT ") and " FROM " not in value:
-                value = "%s FROM DUAL" % value
-
-            for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
-                for sqlStatement in sqlStatements:
-                    if value.lower().startswith(sqlStatement) and sqlTitle == "SQL SELECT statement":
-                        select = True
-                        break
-
-            if select:
-                values = conf.dbmsConnector.select(value)
-            else:
-                values = conf.dbmsConnector.execute(value)
-
-            if values is None or len(values) == 0:
-                return None
-            elif content:
-                if len(values) == 1:
-                    if len(values[0]) == 1:
-                        return str(list(values)[0][0]), None
-                    else:
-                        return list(values), None
-                else:
-                    return values, None
-            else:
-                for value in values:
-                    if value[0] in (1, -1):
-                        return True
-                    else:
-                        return False
+            return direct(value, content)
 
         get    = None
         post   = None

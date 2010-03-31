@@ -86,9 +86,6 @@ class Fingerprint(GenericFingerprint):
         * http://www.postgresql.org/docs/8.4/interactive/release.html (up to 8.4.2)
         """
 
-        infoMsg = "testing PostgreSQL"
-        logger.info(infoMsg)
-
         if conf.dbms in PGSQL_ALIASES:
             setDbms("PostgreSQL")
 
@@ -96,6 +93,9 @@ class Fingerprint(GenericFingerprint):
 
             if not conf.extensiveFp:
                 return True
+
+        infoMsg = "testing PostgreSQL"
+        logger.info(infoMsg)
 
         randInt = str(randomInt(1))
 

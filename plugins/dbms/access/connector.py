@@ -45,15 +45,14 @@ class Connector(GenericConnector):
     def __init__(self):
         GenericConnector.__init__(self)
 
-    def connect(self, reuse=True):
-        if reuse and self.connector:
-            return
-
+    def connect(self):
         self.initConnection()
+        self.checkFileDb()
 
         try:
             #self.connector = pyodbc.connect(driver='{Microsoft Access Driver (*.mdb)}', dbq=self.db, uid='Admin')
             self.connector = pyodbc.connect('Driver={Microsoft Access Driver (*.mdb)};Dbq=%s;Uid=Admin;Pwd=;' % self.db)
+            self.connector.timeout = conf.timeout
         except pyodbc.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
 
@@ -63,7 +62,7 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except pyodbc.OperationalError, msg:
+        except pyodbc.ProgrammingError, msg:
             logger.log(8, msg[1])
             return None
 
@@ -80,18 +79,5 @@ class Connector(GenericConnector):
         self.connector.commit()
 
     def select(self, query):
-        try:
-            self.cursor.execute(query)
-            return self.cursor.fetchall()
-        except pyodbc.ProgrammingError, msg:
-            logger.log(8, msg[1])
-            return None
-        
-    def setCursor(self):
-        self.cursor = self.connector.cursor()
-
-    def close(self):
-        self.cursor.close()
-        self.connector.close()
-        self.closed()
-
+        self.execute(query)
+        return self.fetchall()

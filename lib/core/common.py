@@ -606,49 +606,50 @@ def parseTargetDirect():
     details = None
 
     for dbms in SUPPORTED_DBMS:
-        details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<dbmsUser>.+?)\:(?P<dbmsPass>.+?)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<dbmsDb>.+?)$" % dbms, conf.direct, re.I)
+        details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<user>.+?)\:(?P<pass>.+?)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\.\_\-\/]+?)$" % dbms, conf.direct, re.I)
 
         if details:
-            conf.dbms     = details.group('dbms')
-            
+            conf.dbms = details.group('dbms')
+
             if details.group('credentials'):
-                conf.dbmsUser = details.group('dbmsUser')
-                conf.dbmsPass = details.group('dbmsPass')
+                conf.dbmsUser = details.group('user')
+                conf.dbmsPass = details.group('pass')
             else:
                 conf.dbmsUser = str()
                 conf.dbmsPass = str()
-                
+
             if details.group('remote'):
                 conf.hostname = details.group('hostname')
                 conf.port     = int(details.group('port'))   
             else:
                 conf.hostname = "localhost"
-                conf.port     = 0  
-                              
-            conf.dbmsDb   = details.group('dbmsDb')
+                conf.port     = 0
+
+            conf.dbmsDb = details.group('db')
 
             conf.parameters[None] = "direct connection"
 
             break
 
     if not details:
-        errMsg = "invalid target details, valid syntax is for instance: 'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME'"
-        errMsg += " and/or: 'access://DATABASE_FILEPATH'"
+        errMsg = "invalid target details, valid syntax is for instance "
+        errMsg += "'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME' "
+        errMsg += "or 'access://DATABASE_FILEPATH'"
         raise sqlmapSyntaxException, errMsg
 
-    # TODO: add details for others python DBMS libraries
     dbmsDict = { "Microsoft SQL Server": [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
                  "MySQL": [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
                  "PostgreSQL": [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
                  "Oracle": [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
-                 "SQLite": [SQLITE_ALIASES, "", ""],
-                 "Access": [ACCESS_ALIASES, "", ""],
-                 "Firebird": [FIREBIRD_ALIASES, "", ""] }
+                 "SQLite": [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
+                 "Access": [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
+                 "Firebird": [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"] }
 
     for dbmsName, data in dbmsDict.items():
         if conf.dbms in data[0]:
             try:
                 if dbmsName == "Microsoft SQL Server":
+                    import _mssql
                     import pymssql
                 elif dbmsName == "MySQL":
                     import MySQLdb
@@ -656,6 +657,12 @@ def parseTargetDirect():
                     import psycopg2
                 elif dbmsName == "Oracle":
                     import cx_Oracle
+                elif dbmsName == "SQLite":
+                    import sqlite3
+                elif dbmsName == "Access":
+                    import pyodbc
+                elif dbmsName == "Firebird":
+                    import kinterbasdb
             except ImportError, _:
                 errMsg  = "sqlmap requires %s third-party library " % data[1]
                 errMsg += "in order to directly connect to the database "

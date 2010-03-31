@@ -96,7 +96,7 @@ class Enumeration(GenericEnumeration):
                     else:
                         kb.data.cachedUsersRoles[user] = list(roles)
 
-        if not kb.data.cachedUsersRoles:
+        if not kb.data.cachedUsersRoles and not conf.direct:
             conditionChar = "="
 
             if conf.user:

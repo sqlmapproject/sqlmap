@@ -149,7 +149,7 @@ class Enumeration:
             if value:
                 kb.data.cachedUsers = value
 
-        if not kb.data.cachedUsers:
+        if not kb.data.cachedUsers and not conf.direct:
             infoMsg = "fetching number of database users"
             logger.info(infoMsg)
 
@@ -232,7 +232,7 @@ class Enumeration:
                     else:
                         kb.data.cachedUsersPasswords[user].append(password)
 
-        if not kb.data.cachedUsersPasswords:
+        if not kb.data.cachedUsersPasswords and not conf.direct:
             if conf.user:
                 if "," in conf.user:
                     users = conf.user.split(",")
@@ -464,7 +464,7 @@ class Enumeration:
                     else:
                         kb.data.cachedUsersPrivileges[user] = list(privileges)
 
-        if not kb.data.cachedUsersPrivileges:
+        if not kb.data.cachedUsersPrivileges and not conf.direct:
             conditionChar = "="
 
             if conf.user:
@@ -649,7 +649,7 @@ class Enumeration:
             if value:
                 kb.data.cachedDbs = value
 
-        if not kb.data.cachedDbs:
+        if not kb.data.cachedDbs and not conf.direct:
             infoMsg = "fetching number of databases"
             logger.info(infoMsg)
 
@@ -733,7 +733,7 @@ class Enumeration:
                     else:
                         kb.data.cachedTables[db].append(table)
 
-        if not kb.data.cachedTables:
+        if not kb.data.cachedTables and not conf.direct:
             if conf.db:
                 if "," in conf.db:
                     dbs = conf.db.split(",")
@@ -881,7 +881,7 @@ class Enumeration:
                 table[conf.tbl] = columns
                 kb.data.cachedColumns[conf.db] = table
 
-        if not kb.data.cachedColumns:
+        if not kb.data.cachedColumns and not conf.direct:
             infoMsg  = "fetching number of columns "
             infoMsg += "for table '%s'" % conf.tbl
             infoMsg += " on database '%s'" % conf.db
@@ -1298,8 +1298,10 @@ class Enumeration:
             colList = conf.col.split(",")
             kb.data.cachedColumns[conf.db] = {}
             kb.data.cachedColumns[conf.db][conf.tbl] = {}
+
             for column in colList:
                 kb.data.cachedColumns[conf.db][conf.tbl][column] = None
+
         elif not kb.data.cachedColumns:
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
                 errMsg  = "information_schema not available, "
@@ -1359,7 +1361,7 @@ class Enumeration:
 
                     index += 1
 
-        if not kb.data.dumpedTable:
+        if not kb.data.dumpedTable and not conf.direct:
             infoMsg = "fetching number of "
             if conf.col:
                 infoMsg += "columns '%s' " % colString

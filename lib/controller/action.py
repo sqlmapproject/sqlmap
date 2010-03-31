@@ -65,9 +65,6 @@ def action():
 
         raise sqlmapUnsupportedDBMSException, errMsg
 
-    if conf.direct:
-        conf.dbmsConnector.connect()
-
     print "%s\n" % conf.dbmsHandler.getFingerprint()
 
     # Techniques options

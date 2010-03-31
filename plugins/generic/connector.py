@@ -22,8 +22,11 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  021101301  USA
 """
 
+import os
+
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapUndefinedMethod
 
 class Connector:
@@ -48,11 +51,28 @@ class Connector:
         logger.info(infoMsg)
         
     def closed(self):
-        self.connector = None
-        self.cursor = None
         infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
         infoMsg += ":%d closed" % self.port
         logger.info(infoMsg)
+
+        self.connector = None
+        self.cursor = None
+
+    def setCursor(self):
+        self.cursor = self.connector.cursor()
+
+    def getCursor(self):
+        return self.cursor
+
+    def close(self):
+        self.cursor.close()
+        self.connector.close()
+        self.closed()
+
+    def checkFileDb(self):
+        if not os.path.exists(self.db):
+            errMsg = "the provided database file '%s' does not exist" % self.db
+            raise sqlmapFilePathException, errMsg
 
     def connect(self):
         errMsg  = "'connect' method must be defined "
@@ -71,18 +91,5 @@ class Connector:
 
     def select(self, query):
         errMsg  = "'select' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def setCursor(self):
-        errMsg  = "'setCursor' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
-
-    def getCursor(self):
-        return self.cursor
-
-    def close(self):
-        errMsg  = "'close' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg

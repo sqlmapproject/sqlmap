@@ -78,9 +78,6 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        logMsg = "testing Oracle"
-        logger.info(logMsg)
-
         if conf.dbms in ORACLE_ALIASES:
             setDbms("Oracle")
 
@@ -88,6 +85,9 @@ class Fingerprint(GenericFingerprint):
 
             if not conf.extensiveFp:
                 return True
+
+        logMsg = "testing Oracle"
+        logger.info(logMsg)
 
         # NOTE: SELECT ROWNUM=ROWNUM FROM DUAL does not work connecting
         # directly to the Oracle database

@@ -154,9 +154,6 @@ class Fingerprint(GenericFingerprint):
         * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
-        infoMsg = "testing MySQL"
-        logger.info(infoMsg)
-
         if conf.dbms in MYSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
             setDbms("MySQL %s" % kb.dbmsVersion[0])
 
@@ -167,6 +164,9 @@ class Fingerprint(GenericFingerprint):
 
             if not conf.extensiveFp:
                 return True
+
+        infoMsg = "testing MySQL"
+        logger.info(infoMsg)
 
         randInt = str(randomInt(1))
         payload = agent.fullPayload(" AND CONNECTION_ID()=CONNECTION_ID()")

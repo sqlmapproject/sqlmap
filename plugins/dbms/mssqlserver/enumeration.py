@@ -61,7 +61,7 @@ class Enumeration(GenericEnumeration):
             else:
                 dbs = [conf.db]
 
-        if kb.unionPosition:
+        if kb.unionPosition or conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -75,7 +75,7 @@ class Enumeration(GenericEnumeration):
                 if value:
                     kb.data.cachedTables[db] = value
 
-        if not kb.data.cachedTables:
+        if not kb.data.cachedTables and not conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db

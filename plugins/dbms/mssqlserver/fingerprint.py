@@ -97,8 +97,13 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing Microsoft SQL Server"
         logger.info(infoMsg)
 
-        payload = agent.fullPayload(" AND LEN(@@VERSION)=LEN(@@VERSION)")
-        result  = Request.queryPage(payload)
+        # NOTE: SELECT LEN(@@VERSION)=LEN(@@VERSION) FROM DUAL does not work connecting
+        # directly to the Microsoft SQL Server database
+        if conf.direct:
+            result = True
+        else:
+            payload = agent.fullPayload(" AND LEN(@@VERSION)=LEN(@@VERSION)")
+            result  = Request.queryPage(payload)
 
         if result:
             infoMsg = "confirming Microsoft SQL Server"

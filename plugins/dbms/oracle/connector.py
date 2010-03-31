@@ -37,19 +37,13 @@ class Connector(GenericConnector):
     Homepage: http://cx-oracle.sourceforge.net/
     User guide: http://cx-oracle.sourceforge.net/README.txt
     API: http://cx-oracle.sourceforge.net/html/index.html
-    Debian package: -
     License: http://cx-oracle.sourceforge.net/LICENSE.txt
-
-    Possible connectors: -
     """
 
     def __init__(self):
         GenericConnector.__init__(self)
 
-    def connect(self, reuse=True):
-        if reuse and self.connector:
-            return
-
+    def connect(self):
         self.initConnection()
         self.__dsn = cx_Oracle.makedsn(self.hostname, self.port, self.db)
 
@@ -87,11 +81,3 @@ class Connector(GenericConnector):
     def select(self, query):
         self.execute(query)
         return self.fetchall()
-
-    def setCursor(self):
-        self.cursor = self.connector.cursor()
-
-    def close(self):
-        self.cursor.close()
-        self.connector.close()
-        self.closed()

@@ -39,7 +39,7 @@ class Connector(GenericConnector):
     User guide: http://docs.python.org/release/2.5/lib/module-sqlite3.html
     API: http://docs.python.org/library/sqlite3.html
     Debian package: python-pysqlite2
-    License: zlib/libpng
+    License: MIT
 
     Possible connectors: http://wiki.python.org/moin/SQLite
     """
@@ -47,11 +47,9 @@ class Connector(GenericConnector):
     def __init__(self):
         GenericConnector.__init__(self)
 
-    def connect(self, reuse=True):
-        if reuse and self.connector:
-            return
-
+    def connect(self):
         self.initConnection()
+        self.checkFileDb()
 
         try:
             self.connector = sqlite3.connect(database=self.db, timeout=conf.timeout)
@@ -75,19 +73,11 @@ class Connector(GenericConnector):
             self.cursor.execute(query)
         except sqlite3.OperationalError, msg:
             logger.log(8, msg[0])
-        except sqlite3.Error, msg:
+        except sqlite3.DatabaseError, msg:
             raise sqlmapConnectionException, msg[0]
 
         self.connector.commit()
 
     def select(self, query):
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
-
-    def setCursor(self):
-        self.cursor = self.connector.cursor()
-
-    def close(self):
-        self.cursor.close()
-        self.connector.close()
-        self.closed()
+        self.execute(query)
+        return self.fetchall()
