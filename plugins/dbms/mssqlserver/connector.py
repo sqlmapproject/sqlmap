@@ -43,6 +43,9 @@ class Connector(GenericConnector):
     License: LGPL
 
     Possible connectors: http://wiki.python.org/moin/SQL%20Server
+
+    Important note: pymssql library on your system MUST be version 1.0.2
+    to work, get it from http://sourceforge.net/projects/pymssql/files/pymssql/1.0.2/
     """
 
     def __init__(self):
@@ -79,6 +82,10 @@ class Connector(GenericConnector):
     def select(self, query):
         self.execute(query)
         value = self.fetchall()
-        self.connector.commit()
+
+        try:
+            self.connector.commit()
+        except pymssql.OperationalError:
+            pass
 
         return value

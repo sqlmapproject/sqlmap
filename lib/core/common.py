@@ -651,6 +651,13 @@ def parseTargetDirect():
                 if dbmsName == "Microsoft SQL Server":
                     import _mssql
                     import pymssql
+
+                    if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
+                        errMsg = "pymssql library on your system must be "
+                        errMsg += "version 1.0.2 to work, get it from "
+                        errMsg += "http://sourceforge.net/projects/pymssql/files/pymssql/1.0.2/"
+                        raise sqlmapMissingDependence, errMsg
+
                 elif dbmsName == "MySQL":
                     import MySQLdb
                 elif dbmsName == "PostgreSQL":
