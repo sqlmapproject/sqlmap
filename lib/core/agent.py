@@ -299,9 +299,12 @@ class Agent:
             fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsNoSelect:
             fieldsToCastStr = fieldsNoSelect
-
-        fieldsToCastList = fieldsToCastStr.replace(", ", ",")
-        fieldsToCastList = fieldsToCastList.split(",")
+        
+        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I): #function
+            fieldsToCastList = [fieldsToCastStr]
+        else:
+            fieldsToCastList = fieldsToCastStr.replace(", ", ",")
+            fieldsToCastList = fieldsToCastList.split(",")
 
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr
 
