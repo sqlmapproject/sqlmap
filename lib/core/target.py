@@ -235,6 +235,8 @@ def initTargetEnv():
         kb.unionComment   = ""
         kb.unionCount     = None
         kb.unionPosition  = None
+        if conf.cj:
+            conf.cj.clear()        
 
 def setupTargetEnv():
     __createTargetDirs()
