@@ -494,13 +494,8 @@ def __setDBMS():
     logger.debug(debugMsg)
 
     conf.dbms = conf.dbms.lower()
-    firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
-                                     "|".join([alias for alias in MYSQL_ALIASES]),
-                                     "|".join([alias for alias in PGSQL_ALIASES]),
-                                     "|".join([alias for alias in ORACLE_ALIASES]),
-                                     "|".join([alias for alias in SQLITE_ALIASES]),
-                                     "|".join([alias for alias in ACCESS_ALIASES]),
-                                     "|".join([alias for alias in FIREBIRD_ALIASES]))
+    aliases = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES
+    firstRegExp = "(%s)" % "|".join([alias for alias in aliases])
     dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms)
 
     if dbmsRegExp:
