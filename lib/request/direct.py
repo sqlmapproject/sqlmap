@@ -43,9 +43,9 @@ def direct(query, content=True):
                 break
 
     if select:
-        output = timeout(func=conf.dbmsConnector.select, args=(query), duration=conf.timeout, default=None)
+        output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
     else:
-        output = timeout(func=conf.dbmsConnector.execute, args=(query), duration=conf.timeout, default=None)
+        output = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
 
     if output is None or len(output) == 0:
         return None
