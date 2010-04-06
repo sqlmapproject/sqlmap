@@ -26,6 +26,7 @@ from lib.core.agent import agent
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.settings import SQL_STATEMENTS
+from lib.utils.timeout import timeout
 
 def direct(query, content=True):
     output = None
@@ -42,9 +43,9 @@ def direct(query, content=True):
                 break
 
     if select:
-        output = conf.dbmsConnector.select(query)
+        output = timeout(func=conf.dbmsConnector.select, args = query, duration=conf.timeout, default=None)
     else:
-        output = conf.dbmsConnector.execute(query)
+        output = timeout(func=conf.dbmsConnector.execute, args = query, duration=conf.timeout, default=None)
 
     if output is None or len(output) == 0:
         return None
