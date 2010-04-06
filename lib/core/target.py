@@ -222,9 +222,13 @@ def initTargetEnv():
     """
 
     if conf.multipleTargets:
+        if conf.cj:
+            conf.cj.clear()        
+
         conf.paramDict    = {}
         conf.parameters   = {}
         conf.sessionFile  = None
+
         kb.dbms           = None
         kb.dbmsDetected   = False
         kb.dbmsVersion    = None
@@ -235,8 +239,6 @@ def initTargetEnv():
         kb.unionComment   = ""
         kb.unionCount     = None
         kb.unionPosition  = None
-        if conf.cj:
-            conf.cj.clear()        
 
 def setupTargetEnv():
     __createTargetDirs()
