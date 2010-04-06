@@ -27,7 +27,6 @@ try:
 except ImportError, _:
     pass
 
-from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 
