@@ -27,8 +27,10 @@ try:
 except ImportError, _:
     pass
 
+from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
+from lib.utils.timeout import timeout
 
 from plugins.generic.connector import Connector as GenericConnector
 
@@ -58,11 +60,10 @@ class Connector(GenericConnector):
         self.connected()
 
     def fetchall(self):
-        try:
-            return self.cursor.fetchall()
-        except psycopg2.ProgrammingError, msg:
-            logger.log(8, msg)
-            return None
+        retVal = timeout(func=self.cursor.fetchall, duration=conf.timeout, default=None)
+        if self.exceptionMsg:
+            logger.log(8, self.exceptionMsg)
+        return retVal
 
     def execute(self, query):
         logger.debug(query)
