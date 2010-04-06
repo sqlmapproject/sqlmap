@@ -52,7 +52,7 @@ class Connector(GenericConnector):
         self.checkFileDb()
 
         try:
-            self.connector = sqlite3.connect(database=self.db, timeout=conf.timeout)
+            self.connector = sqlite3.connect(database=self.db, check_same_thread=False, timeout=conf.timeout)
         except sqlite3.OperationalError, msg:
             raise sqlmapConnectionException, msg[0]
 
