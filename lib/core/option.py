@@ -574,21 +574,27 @@ def __setHTTPAuthentication():
     if not conf.aCert:
         debugMsg = "setting the HTTP authentication type and credentials"
         logger.debug(debugMsg)
-    
+
         aTypeLower = conf.aType.lower()
-    
+
         if aTypeLower not in ( "basic", "digest", "ntlm" ):
             errMsg  = "HTTP authentication type value must be "
             errMsg += "Basic, Digest or NTLM"
             raise sqlmapSyntaxException, errMsg
-    
-        aCredRegExp = re.search("^(.*?)\:(.*?)$", conf.aCred)
-    
+        elif aTypeLower in ( "basic", "digest" ):
+            regExp = "^(.*?):(.*?)$"
+            errMsg  = "HTTP %s authentication credentials " % aTypeLower
+            errMsg += "value must be in format username:password"
+        elif aTypeLower == "ntlm":
+            regExp = "^(.*?)\\\(.*?):(.*?)$"
+            errMsg  = "HTTP NTLM authentication credentials value must "
+            errMsg += "be in format DOMAIN\username:password"
+
+        aCredRegExp = re.search(regExp, conf.aCred)
+
         if not aCredRegExp:
-            errMsg  = "HTTP authentication credentials value must be "
-            errMsg += "in format username:password"
             raise sqlmapSyntaxException, errMsg
-    
+
         authUsername = aCredRegExp.group(1)
         authPassword = aCredRegExp.group(2)
     
