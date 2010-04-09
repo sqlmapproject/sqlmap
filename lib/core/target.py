@@ -223,7 +223,7 @@ def initTargetEnv():
 
     if conf.multipleTargets:
         if conf.cj:
-            conf.cj.clear()        
+            conf.cj.clear()
 
         conf.paramDict    = {}
         conf.parameters   = {}

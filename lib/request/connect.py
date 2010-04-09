@@ -157,7 +157,7 @@ class Connect:
 
             requestHeaders = "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
 
-            if not conf.dropSetCookie:
+            if not conf.dropSetCookie and conf.cj:
                 for _, cookie in enumerate(conf.cj):
                     if not cookieStr:
                         cookieStr = "Cookie: "
