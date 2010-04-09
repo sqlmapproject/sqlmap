@@ -187,16 +187,9 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                     for num in xrange(startLimit, stopLimit):
                         if kb.dbms == "Microsoft SQL Server":
-                            orderBy = re.search(" ORDER BY ([\w\_]+)", expression, re.I)
-
-                            if orderBy:
-                                field = orderBy.group(1)
-                            else:
-                                field = expressionFieldsList[0]
-
+                            field = expressionFieldsList[0]
                         elif kb.dbms == "Oracle":
                             field = expressionFieldsList
-
                         else:
                             field = None
 

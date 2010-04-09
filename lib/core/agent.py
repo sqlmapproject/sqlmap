@@ -507,11 +507,12 @@ class Agent:
         @rtype: C{str}
         """
 
-        limitedQuery  = query
-        limitStr      = queries[kb.dbms].limit
-        fromIndex     = limitedQuery.index(" FROM ")
-        untilFrom     = limitedQuery[:fromIndex]
-        fromFrom      = limitedQuery[fromIndex+1:]
+        limitedQuery = query
+        limitStr = queries[kb.dbms].limit
+        fromIndex = limitedQuery.index(" FROM ")
+        untilFrom = limitedQuery[:fromIndex]
+        fromFrom = limitedQuery[fromIndex+1:]
+        orderBy = False
 
         if kb.dbms in ( "MySQL", "PostgreSQL", "SQLite" ):
             limitStr = queries[kb.dbms].limit % (num, 1)
@@ -523,6 +524,7 @@ class Agent:
 
         elif kb.dbms == "Oracle":
             if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
+                orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
             if query.startswith("SELECT "):
@@ -536,6 +538,7 @@ class Agent:
             forgeNotIn = True
 
             if " ORDER BY " in limitedQuery:
+                orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
             notDistincts = re.findall("DISTINCT[\(\s+](.+?)\)*\s+", limitedQuery, re.I)
@@ -568,6 +571,9 @@ class Agent:
 
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
                 limitedQuery += "%s %s)" % (field, fromFrom)
+
+        if orderBy:
+            limitedQuery += orderBy
 
         return limitedQuery
 

@@ -31,25 +31,25 @@
         <is_dba query="(SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0, 1)='%s'"/>
         <users>
-            <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES" query2="SELECT user FROM mysql.user"/>
-            <blind query="SELECT DISTINCT(grantee) FROM information_schema.USER_PRIVILEGES LIMIT %d, 1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d, 1" count="SELECT COUNT(DISTINCT(grantee)) FROM information_schema.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
+            <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES ORDER BY 1" query2="SELECT user FROM mysql.user ORDER BY 1"/>
+            <blind query="SELECT DISTINCT(grantee) FROM information_schema.USER_PRIVILEGES ORDER BY 1 LIMIT %d, 1" query2="SELECT DISTINCT(user) FROM mysql.user ORDER BY 1 LIMIT %d, 1" count="SELECT COUNT(DISTINCT(grantee)) FROM information_schema.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
         </users>
         <passwords>
             <inband query="SELECT user, password FROM mysql.user" condition="user"/>
-            <blind query="SELECT DISTINCT(password) FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(password)) FROM mysql.user WHERE user='%s'"/>
+            <blind query="SELECT DISTINCT(password) FROM mysql.user WHERE user='%s' ORDER BY 1 LIMIT %d, 1" count="SELECT COUNT(DISTINCT(password)) FROM mysql.user WHERE user='%s'"/>
         </passwords>
         <privileges>
             <inband query="SELECT grantee, privilege_type FROM information_schema.USER_PRIVILEGES" condition="grantee" query2="SELECT user, select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user" condition2="user"/>
-            <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s LIMIT %d, 1" query2="SELECT select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
+            <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s ORDER BY 1 LIMIT %d, 1" query2="SELECT select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s' ORDER BY 1"/>
         </privileges>
         <roles/>
         <dbs>
-            <inband query="SELECT schema_name FROM information_schema.SCHEMATA" query2="SELECT db FROM mysql.db"/>
-            <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA LIMIT %d, 1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d, 1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
+            <inband query="SELECT schema_name FROM information_schema.SCHEMATA ORDER BY 1" query2="SELECT db FROM mysql.db ORDER BY 1"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA ORDER BY 1 LIMIT %d, 1" query2="SELECT DISTINCT(db) FROM mysql.db ORDER BY 1 LIMIT %d, 1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
         </dbs>
         <tables>
             <inband query="SELECT table_schema, table_name FROM information_schema.TABLES" condition="table_schema"/>
-            <blind query="SELECT table_name FROM information_schema.TABLES WHERE table_schema='%s' LIMIT %d, 1" count="SELECT COUNT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'"/>
+            <blind query="SELECT table_name FROM information_schema.TABLES WHERE table_schema='%s' ORDER BY 1 LIMIT %d, 1" count="SELECT COUNT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
@@ -92,7 +92,7 @@
         -->
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
-            <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
+            <inband query="SELECT USERNAME FROM SYS.ALL_USERS ORDER BY 1"/>
             <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
         </users>
         <passwords>
@@ -166,25 +166,25 @@
         <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <check_udf query="(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)"/>
         <users>
-            <inband query="SELECT usename FROM pg_user"/>
-            <blind query="SELECT DISTINCT(usename) FROM pg_user OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
+            <inband query="SELECT usename FROM pg_user ORDER BY 1"/>
+            <blind query="SELECT DISTINCT(usename) FROM pg_user ORDER BY 1 OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
         </users>
         <passwords>
             <inband query="SELECT usename, passwd FROM pg_shadow" condition="usename"/>
-            <blind query="SELECT DISTINCT(passwd) FROM pg_shadow WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(passwd)) FROM pg_shadow WHERE usename='%s'"/>
+            <blind query="SELECT DISTINCT(passwd) FROM pg_shadow WHERE usename='%s' ORDER BY 1 OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(passwd)) FROM pg_shadow WHERE usename='%s'"/>
         </passwords>
         <privileges>
             <inband query="SELECT usename, (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user" condition="usename"/>
-            <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
+            <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' ORDER BY 1 OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
         </privileges>
         <roles/>
         <dbs>
-            <inband query="SELECT datname FROM pg_database"/>
-            <blind query="SELECT DISTINCT(datname) FROM pg_database OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database"/>
+            <inband query="SELECT datname FROM pg_database ORDER BY 1"/>
+            <blind query="SELECT DISTINCT(datname) FROM pg_database ORDER BY 1 OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database"/>
         </dbs>
         <tables>
             <inband query="SELECT schemaname, tablename FROM pg_tables" condition="schemaname"/>
-            <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
+            <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' ORDER BY 1 OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT attname, typname FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
@@ -223,23 +223,23 @@
         <current_db query="SELECT DB_NAME()"/>
         <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1"/>
         <users>
-            <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
-            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
+            <inband query="SELECT name FROM master..syslogins ORDER BY 1" query2="SELECT name FROM sys.sql_logins ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins ORDER BY 1) ORDER BY 1" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins ORDER BY 1) ORDER BY 1" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
         </users>
         <passwords>
             <inband query="SELECT name, master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins" query2="SELECT name, master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins" condition="name"/>
-            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..sysxlogins WHERE name='%s')"  query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
+            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..sysxlogins WHERE name='%s' ORDER BY 1) ORDER BY 1" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM sys.sql_logins WHERE name='%s' ORDER BY 1) ORDER BY 1" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
         </passwords>
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
         <privileges/>
         <roles/>
         <dbs>
-            <inband query="SELECT name FROM master..sysdatabases"/>
-            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
+            <inband query="SELECT name FROM master..sysdatabases ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY 1) ORDER BY 1" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
-            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u', 'v') ORDER BY name ASC) ORDER BY name ASC" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v') ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u', 'v') ORDER BY 1) ORDER BY 1" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
@@ -287,8 +287,8 @@
         <roles/>
         <dbs/>
         <tables>
-            <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table'"/>
-            <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' LIMIT %d, 1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
+            <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY 1"/>
+            <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY 1 LIMIT %d, 1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
         </tables>
         <columns/>
         <dump_column/>
