@@ -125,6 +125,9 @@ Dirk Jagdmann <doj@cubic.org>
 Luke Jahnke <luke.jahnke@gmail.com>
     for reporting a bug when running against MySQL < 5.0
 
+David Klein <david.klein@ipfocus.com.au>
+    for reporting a minor code improvement
+
 Sven Klemm <sven@c3d2.de>
     for reporting two minor bugs with PostgreSQL
 
@@ -299,6 +302,9 @@ mariano <marianoso@gmail.com>
 
 pacman730 <pacman730@users.sourceforge.net>
     for reporting a bug
+
+shiftzwei <shiftzwei@gmail.com>
+    for reporting a couple of bugs
 
 Stuffe <stuffe.dk@gmail.com>
     for reporting a minor bug and a feature request
