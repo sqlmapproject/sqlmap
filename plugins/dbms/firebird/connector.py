@@ -66,8 +66,6 @@ class Connector(GenericConnector):
             return None
 
     def execute(self, query):
-        logger.debug(query)
-
         try:
             self.cursor.execute(query)
         except kinterbasdb.OperationalError, msg:

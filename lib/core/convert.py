@@ -27,7 +27,8 @@ try:
 except:
     import md5
     import sha
-    
+
+import pickle
 import sys
 import struct
 import urllib
@@ -38,7 +39,13 @@ def base64decode(string):
     return string.decode("base64")
 
 def base64encode(string):
-    return string.encode("base64")[:-1]
+    return string.encode("base64")[:-1].replace("\n", "")
+
+def base64pickle(string):
+    return base64encode(pickle.dumps(string))
+
+def base64unpickle(string):
+    return pickle.loads(base64decode(string))
 
 def hexdecode(string):
     string = string.lower()

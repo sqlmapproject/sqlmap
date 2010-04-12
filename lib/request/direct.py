@@ -23,8 +23,12 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 from lib.core.agent import agent
+from lib.core.common import dataToSessionFile
+from lib.core.convert import base64pickle
+from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.data import logger
 from lib.core.settings import SQL_STATEMENTS
 from lib.utils.timeout import timeout
 
@@ -42,14 +46,25 @@ def direct(query, content=True):
                 select = True
                 break
 
-    if select:
-        output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
-    else:
+    logger.log(9, query)
+
+    if not select:
         output = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
+    elif conf.hostname in kb.resumedQueries and query in kb.resumedQueries[conf.hostname]:
+        output = base64unpickle(kb.resumedQueries[conf.hostname][query][:-1])
+
+        infoMsg  = "resumed from file '%s': " % conf.sessionFile
+        infoMsg += "%s..." % str(output)[:20]
+        logger.info(infoMsg)
+    elif select:
+        output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
 
     if output is None or len(output) == 0:
         return None
     elif content:
+        if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.hostname, kb.injPlace, conf.parameters[kb.injPlace], query, base64pickle(output)))
+
         if len(output) == 1:
             if len(output[0]) == 1:
                 return str(list(output)[0][0])

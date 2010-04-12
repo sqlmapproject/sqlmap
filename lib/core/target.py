@@ -123,14 +123,14 @@ def __setOutputResume():
         if not conf.flushSession:
             readSessionFP = open(conf.sessionFile, "r")
             lines = readSessionFP.readlines()
-    
+
             for line in lines:
                 if line.count("][") == 4:
                     line = line.split("][")
-    
+
                     if len(line) != 5:
                         continue
-    
+
                     url, _, _, expression, value = line
     
                     if not value:
@@ -141,10 +141,10 @@ def __setOutputResume():
     
                     if value[-1] == "\n":
                         value = value[:-1]
-    
-                    if url != conf.url:
+
+                    if url not in ( conf.url, conf.hostname ):
                         continue
-    
+
                     if url not in kb.resumedQueries.keys():
                         kb.resumedQueries[url] = {}
                         kb.resumedQueries[url][expression] = value
