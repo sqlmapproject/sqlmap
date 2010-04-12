@@ -47,13 +47,10 @@ class Connector(GenericConnector):
 
     def connect(self):
         self.initConnection()
-        self.checkFileDb()
 
         try:
-            #self.connector = pyodbc.connect(driver='{Microsoft Access Driver (*.mdb)}', dbq=self.db, uid='Admin')
-            self.connector = pyodbc.connect('Driver={Microsoft Access Driver (*.mdb)};Dbq=%s;Uid=Admin;Pwd=;' % self.db)
-            self.connector.timeout = conf.timeout
-        except pyodbc.OperationalError, msg:
+            self.connector = pyodbc.connect('DSN=%s' % self.db)
+        except (pyodbc.Error, pyodbc.OperationalError), msg:
             raise sqlmapConnectionException, msg[1]
 
         self.setCursor()
