@@ -49,7 +49,6 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import SITE
@@ -653,10 +652,13 @@ def parseTargetDirect():
             try:
                 if dbmsName in ('Access', 'SQLite'):
                     if remote:
-                        errMsg = "direct connection over the network for %s DBMS is not supported" % dbmsName
-                        raise sqlmapUnsupportedFeatureException, errMsg
-                else:
-                    if not remote:
+                        warnMsg = "direct connection over the network for "
+                        warnMsg += "%s DBMS is not supported" % dbmsName
+                        logger.warn(warnMsg)
+
+                        conf.hostname = "localhost"
+                        conf.port     = 0
+                elif not remote:
                         errMsg = "missing remote connection details"
                         raise sqlmapSyntaxException, errMsg
 
