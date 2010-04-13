@@ -51,7 +51,7 @@ class Connector(GenericConnector):
             self.checkFileDb()
 
         try:
-            self.connector = kinterbasdb.connect(host=self.hostname, database=self.db, user=self.user, password=self.password, timeout={'period': conf.timeout})
+            self.connector = kinterbasdb.connect(host=self.hostname, database=self.db, user=self.user, password=self.password)
         except kinterbasdb.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
 
