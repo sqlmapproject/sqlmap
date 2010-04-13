@@ -48,17 +48,30 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
 
-        try:
-            self.connector = pyodbc.connect('DSN=%s' % self.db)
-        except (pyodbc.Error, pyodbc.OperationalError), msg:
-            raise sqlmapConnectionException, msg[1]
+        lastMsg = None
+        for connString in ('Driver={Microsoft Access Driver (*.mdb)};Dbq=%s;Uid=Admin;Pwd=;' % self.db, 'DSN=%s' % self.db):
+            try:
+                self.connector = pyodbc.connect(connString)
+                break
+            except pyodbc.Error, msg:
+                lastMsg = msg
+            except pyodbc.OperationalError, msg:
+                raise sqlmapConnectionException, msg[1]
+        if not self.connector:
+            raise sqlmapConnectionException, lastMsg[1]
 
         self.setCursor()
         self.connected()
 
     def fetchall(self):
         try:
-            return self.cursor.fetchall()
+            output = self.cursor.fetchall()
+            for i in xrange(len(output)):
+                for j in xrange(len(output[i])):
+                    if type(output[i][j]) == str and output[i][j].find('\0') != -1:
+                        output[i][j] = output[i][j][:output[i][j].find('\0')].rstrip()
+            return output
+
         except pyodbc.ProgrammingError, msg:
             logger.log(8, msg[1])
             return None
