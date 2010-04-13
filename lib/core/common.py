@@ -49,6 +49,7 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import SITE
@@ -604,6 +605,7 @@ def parseTargetDirect():
         return
 
     details = None
+    remote = False
 
     for dbms in SUPPORTED_DBMS:
         details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<user>.+?)\:(?P<pass>.+?)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\.\_\-\/]+?)$" % dbms, conf.direct, re.I)
@@ -619,6 +621,7 @@ def parseTargetDirect():
                 conf.dbmsPass = str()
 
             if details.group('remote'):
+                remote = True
                 conf.hostname = details.group('hostname')
                 conf.port     = int(details.group('port'))   
             else:
@@ -648,6 +651,15 @@ def parseTargetDirect():
     for dbmsName, data in dbmsDict.items():
         if conf.dbms in data[0]:
             try:
+                if dbmsName in ('Access', 'SQLite'):
+                    if remote:
+                        errMsg = "direct connection over the network for %s DBMS is not supported" % dbmsName
+                        raise sqlmapUnsupportedFeatureException, errMsg
+                else:
+                    if not remote:
+                        errMsg = "missing remote connection details"
+                        raise sqlmapSyntaxException, errMsg
+
                 if dbmsName == "Microsoft SQL Server":
                     import _mssql
                     import pymssql
