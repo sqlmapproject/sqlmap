@@ -643,7 +643,7 @@ def parseTargetDirect():
                  "MySQL": [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
                  "PostgreSQL": [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
                  "Oracle": [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
-                 "SQLite": [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
+                 "SQLite": [SQLITE_ALIASES, "python-pysqlite2 and python-sqlite", "http://pysqlite.googlecode.com/"],
                  "Access": [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
                  "Firebird": [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"] }
 
@@ -679,6 +679,7 @@ def parseTargetDirect():
                 elif dbmsName == "Oracle":
                     import cx_Oracle
                 elif dbmsName == "SQLite":
+                    import sqlite
                     import sqlite3
                 elif dbmsName == "Access":
                     import pyodbc

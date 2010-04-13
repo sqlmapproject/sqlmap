@@ -23,6 +23,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 try:
+    import sqlite
     import sqlite3
 except ImportError, _:
     pass
@@ -52,9 +53,15 @@ class Connector(GenericConnector):
         self.checkFileDb()
 
         try:
-            self.connector = sqlite3.connect(database=self.db, check_same_thread=False, timeout=conf.timeout)
-        except sqlite3.OperationalError, msg:
-            raise sqlmapConnectionException, msg[0]
+            self.connector = sqlite.connect(database=self.db, check_same_thread=False, timeout=conf.timeout)
+        except (sqlite.DatabaseError, sqlite.OperationalError), _:
+            errMsg = "unable to connect using SQLite 2 library, trying with SQLite 3"
+            logger.error(errMsg)
+
+            try:
+                self.connector = sqlite3.connect(database=self.db, check_same_thread=False, timeout=conf.timeout)
+            except (sqlite.DatabaseError, sqlite.OperationalError), msg:
+                raise sqlmapConnectionException, msg[0]
 
         self.setCursor()
         self.connected()
