@@ -783,6 +783,7 @@ class Enumeration:
                         query = rootQuery["blind"]["query"] % (db, index)
                     table = inject.getValue(query, inband=False)
                     tables.append(table)
+                    kb.hintValue = table
 
                 if tables:
                     kb.data.cachedTables[db] = tables
