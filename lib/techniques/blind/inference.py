@@ -115,27 +115,34 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     queriesCount = [0]    # As list to deal with nested scoping rules
 
     hintlock  = threading.Lock()
+
     def tryHint(idx):
         hintlock.acquire()
         hintValue = kb.hintValue
         hintlock.release()
-        if hintValue and len(hintValue) >= idx:
+
+        if hintValue is not None and len(hintValue) >= idx:
             if kb.dbms == "SQLite":
                 posValue = hintValue[idx-1]
             else:
                 posValue = ord(hintValue[idx-1])
 
+            queriesCount[0] += 1
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, posValue))
             result        = Request.queryPage(urlencode(forgedPayload))
+
             if result:
                 return hintValue[idx-1]
+
         hintlock.acquire()
         kb.hintValue = None
         hintlock.release()
+
         return None
 
     def getChar(idx, asciiTbl=asciiTbl):
         result = tryHint(idx)
+
         if result:
             return result
 
