@@ -50,7 +50,7 @@ def direct(query, content=True):
 
     if not select:
         output = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
-    elif conf.hostname in kb.resumedQueries and query in kb.resumedQueries[conf.hostname]:
+    elif conf.hostname in kb.resumedQueries and query in kb.resumedQueries[conf.hostname] and "sqlmapoutput" not in query and "sqlmapfile" not in query:
         output = base64unpickle(kb.resumedQueries[conf.hostname][query][:-1])
 
         infoMsg  = "resumed from file '%s': " % conf.sessionFile
