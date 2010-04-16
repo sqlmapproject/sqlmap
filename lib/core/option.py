@@ -549,6 +549,23 @@ def __setHTTPProxy():
     else:
         proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
 
+def __setSafeUrl():
+    """
+    Check and set the safe URL options.
+    """
+    if not conf.safUrl:
+        return
+
+    if not re.search("^http[s]*://", conf.safUrl):
+        if ":443/" in conf.safUrl:
+            conf.safUrl = "https://" + conf.safUrl
+        else:
+            conf.safUrl = "http://" + conf.safUrl
+
+    if conf.saFreq <= 0:
+        errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe url feature"
+        raise sqlmapSyntaxException, errMsg
+
 def __setHTTPAuthentication():
     """
     Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or Certificate),
@@ -929,6 +946,7 @@ def __setKnowledgeBaseAttributes():
     kb.osSP           = None
 
     kb.parenthesis    = None
+    kb.queryCounter   = 0
     kb.resumedQueries = {}
     kb.stackedTest    = None
     kb.targetUrls     = set()
@@ -1061,6 +1079,7 @@ def init(inputOptions=advancedDict()):
         __setHTTPMethod()
         __setHTTPAuthentication()
         __setHTTPProxy()
+        __setSafeUrl()
         __setUnionTech()
         __setGoogleDorking()
         __setMultipleTargets()

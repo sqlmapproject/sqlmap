@@ -52,7 +52,9 @@ optDict = {
                                "delay":             "float",
                                "timeout":           "float",
                                "retries":           "integer",
-                               "scope":             "string"
+                               "scope":             "string",
+                               "safUrl":            "string",
+                               "saFreq":            "integer"
                              },
 
             "Injection":     {

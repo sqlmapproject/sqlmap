@@ -299,7 +299,12 @@ class Connect:
                 ua = value
             else:
                 ua = conf.parameters["User-Agent"]
-
+        
+        if conf.safUrl and conf.saFreq > 0:
+            kb.queryCounter += 1
+            if kb.queryCounter % conf.saFreq == 0:
+                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
+        
         page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent)
 
         if content:

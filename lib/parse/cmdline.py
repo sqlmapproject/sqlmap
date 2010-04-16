@@ -136,6 +136,12 @@ def cmdLineParser():
         request.add_option("--scope", dest="scope", 
                            help="Regexp to filter targets from provided proxy log")
 
+        request.add_option("--safe-url", dest="safUrl", 
+                           help="Url address to visit frequently during testing")
+
+        request.add_option("--safe-freq", dest="saFreq", type="int", default=0,
+                           help="Test requests between two visits to a given safe url")
+
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
                                 "used to specify which parameters to test "
