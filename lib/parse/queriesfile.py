@@ -234,4 +234,4 @@ def queriesParser():
 
     checkFile(xmlfile)
     handler = queriesHandler()
-    parse(xmlfile, handler)
+    parse(open(xmlfile), handler)
