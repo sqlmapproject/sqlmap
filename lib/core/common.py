@@ -34,8 +34,10 @@ import ntpath
 import posixpath
 import subprocess
 
+from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
+from xml.sax import parse
 
 from extra.cloak.cloak import decloak
 from lib.contrib import magic
@@ -1085,3 +1087,11 @@ def getConsoleWidth(default=80):
             pass
 
     return width if width else default
+
+def parseXmlFile(xmlFile, handler):
+    file = open(paths.GENERIC_XML)
+    content = file.read()
+    stream = StringIO(content)
+    parse(stream, handler)
+    stream.close()
+    file.close()

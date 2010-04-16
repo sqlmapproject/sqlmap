@@ -24,11 +24,10 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
-from StringIO import StringIO
-from xml.sax import parse
 from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
+from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
@@ -69,7 +68,7 @@ def htmlParser(page):
     checkFile(xmlfile)
     page = sanitizeStr(page)
     handler = htmlHandler(page)
-    parse(StringIO(open(xmlfile).read()), handler)
+    parseXmlFile(xmlfile, handler)
 
     if handler.dbms and handler.dbms not in kb.htmlFp:
         kb.htmlFp.append(handler.dbms)
