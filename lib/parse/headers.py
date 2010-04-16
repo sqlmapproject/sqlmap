@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 
+from StringIO import StringIO
 from xml.sax import parse
 
 from lib.core.common import checkFile
@@ -63,5 +64,5 @@ def headersParser(headers):
 
             handler = FingerprintHandler(value, kb.headersFp)
 
-            parse(xmlfile, handler)
-            parse(paths.GENERIC_XML, handler)
+            parse(StringIO(open(xmlfile).read()), handler)
+            parse(StringIO(open(paths.GENERIC_XML).read()), handler)

@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from StringIO import StringIO
 from xml.sax import parse
 from xml.sax.handler import ContentHandler
 
@@ -121,11 +122,11 @@ def bannerParser(banner):
 
     if kb.dbms == "Microsoft SQL Server":
         handler = MSSQLBannerHandler(banner, kb.bannerFp)
-        parse(xmlfile, handler)
+        parse(StringIO(open(xmlfile).read()), handler)
 
         handler = FingerprintHandler(banner, kb.bannerFp)
-        parse(paths.GENERIC_XML, handler)
+        parse(StringIO(open(paths.GENERIC_XML).read()), handler)
     else:
         handler = FingerprintHandler(banner, kb.bannerFp)
-        parse(xmlfile, handler)
-        parse(paths.GENERIC_XML, handler)
+        parse(StringIO(open(xmlfile).read()), handler)
+        parse(StringIO(open(paths.GENERIC_XML).read()), handler)

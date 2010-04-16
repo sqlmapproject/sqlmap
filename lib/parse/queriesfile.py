@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+from StringIO import StringIO
 from xml.sax import parse
 from xml.sax.handler import ContentHandler
 
@@ -234,4 +235,4 @@ def queriesParser():
 
     checkFile(xmlfile)
     handler = queriesHandler()
-    parse(open(xmlfile), handler)
+    parse(StringIO(open(xmlfile).read()), handler)
