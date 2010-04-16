@@ -34,6 +34,7 @@ import urlparse
 
 from ConfigParser import ConfigParser
 
+from lib.core.common import getConsoleWidth
 from lib.core.common import getFileType
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -904,10 +905,12 @@ def __setConfAttributes():
     conf.threadException = False
     conf.wFileType       = None
 
+    width = getConsoleWidth()
+
     if conf.eta:
-        conf.progressWidth = 54
+        conf.progressWidth = width-26
     else:
-        conf.progressWidth = 34
+        conf.progressWidth = width-46
 
 def __setKnowledgeBaseAttributes():
     """

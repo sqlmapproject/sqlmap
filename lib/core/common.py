@@ -32,6 +32,7 @@ import time
 import urlparse
 import ntpath
 import posixpath
+import subprocess
 
 from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
@@ -1062,3 +1063,25 @@ def isBase64EncodedString(subject):
     
 def isHexEncodedString(subject):
     return re.match(r"\A[0-9a-fA-F]+\Z", subject) is not None
+
+def getConsoleWidth(default=80):
+    width = None
+
+    if 'COLUMNS' in os.environ and os.environ['COLUMNS'].isdigit():
+        width = int(os.environ['COLUMNS'])
+    else:
+        output=subprocess.Popen('stty size', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.read()
+        items = output.split()
+        if len(items) == 2 and items[1].isdigit():
+            width = int(items[1])
+
+    if width is None:
+        try:
+            import curses
+            stdscr = curses.initscr()
+            _, width = stdscr.getmaxyx()
+            curses.endwin()
+        except:
+            pass
+
+    return width if width else default
