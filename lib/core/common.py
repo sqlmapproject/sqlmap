@@ -1089,9 +1089,9 @@ def getConsoleWidth(default=80):
     return width if width else default
 
 def parseXmlFile(xmlFile, handler):
-    file = open(paths.GENERIC_XML)
-    content = file.read()
+    xfile = open(xmlFile)
+    content = xfile.read()
     stream = StringIO(content)
     parse(stream, handler)
     stream.close()
-    file.close()
+    xfile.close()
