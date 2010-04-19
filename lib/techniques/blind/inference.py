@@ -249,7 +249,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             if startCharIndex > 0:
                                 output = '..' + output[2:]
 
-                            if endCharIndex - startCharIndex == conf.progressWidth:
+                            if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length-1):
                                 output = output[:-2] + '..'
 
                             output += '_' * (min(length, conf.progressWidth) - len(output))
