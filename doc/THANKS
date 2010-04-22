@@ -227,6 +227,9 @@ Andres Riancho <andres.riancho@gmail.com>
 Antonio Riva <antonio.riva@gmail.com>
     for reporting a bug when running with python 2.5
 
+Ethan Robish <ethan.robish@gmail.com>
+    for reporting a bug
+
 Richard Safran <allapplyhere@yahoo.com>
     for donating the sqlmap.org domain control
 
@@ -281,6 +284,9 @@ Efrain Torres <et@metasploit.com>
 Sandro Tosi <matrixhasu@gmail.com>
     for helping to create sqlmap Debian package correctly
 
+Vitaly Turenko <dsu@dsu.com.ua>
+    for reporting a bug
+
 Bedirhan Urgun <bedirhanurgun@gmail.com>
     for reporting a few bugs
     for suggesting some features and improvements
@@ -294,9 +300,6 @@ Anthony Zboralski <anthony.zboralski@bellua.com>
     for providing me with detailed feedback
     for reporting a few minor bugs
     for donating to sqlmap development
-
-dsu <dsu@dsu.com.ua>
-    for reporting a bug
 
 fufuh <fufuh@users.sourceforge.net>
     for reporting a bug when running on Windows
