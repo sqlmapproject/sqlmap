@@ -34,8 +34,10 @@ import ntpath
 import posixpath
 import subprocess
 
+from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
+from xml.sax import parse
 
 from extra.cloak.cloak import decloak
 from lib.contrib import magic
