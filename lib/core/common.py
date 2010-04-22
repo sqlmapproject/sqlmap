@@ -310,7 +310,7 @@ def getDirs(webApi=None):
             if absFilePath:
                 directory = directoryPath(absFilePath)
                 if isWindowsPath(directory):
-                    ntToPosixSlashes(directory)
+                    directory = ntToPosixSlashes(directory)
                 if directory == '/':
                     continue
                 directories.add(directory)
@@ -980,10 +980,12 @@ def urlEncodeCookieValues(cookieStr):
 
 def directoryPath(path):
     retVal = None
-    if isWindowsDriveLetterPath(path):
+
+    if isWindowsPath(path):
         retVal = ntpath.dirname(path)
     else:
         retVal = posixpath.dirname(path)
+
     return retVal
 
 def normalizePath(path):
@@ -992,7 +994,8 @@ def normalizePath(path):
     and ntToPosixSlashes()
     """
     retVal = None
-    if isWindowsDriveLetterPath(path):
+
+    if isWindowsPath(path):
         retVal = ntpath.normpath(path)
     else:
         retVal = posixpath.normpath(path)
