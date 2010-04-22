@@ -34,10 +34,8 @@ import ntpath
 import posixpath
 import subprocess
 
-from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
-from xml.sax import parse
 
 from extra.cloak.cloak import decloak
 from lib.contrib import magic
@@ -255,7 +253,9 @@ def getDocRoot(webApi=None):
             if isWindowsPath(absFilePath):
                 absFilePathWin = posixToNtSlashes(absFilePath)
                 absFilePath    = ntToPosixSlashes(absFilePath[2:])
-            
+            elif isWindowsDriveLetterPath(absFilePath): #e.g. C:/xampp/htdocs
+                absFilePath    = absFilePath[2:]
+
             if pagePath in absFilePath:
                 index   = absFilePath.index(pagePath)
                 docRoot = absFilePath[:index]
@@ -266,7 +266,7 @@ def getDocRoot(webApi=None):
 
                 if absFilePathWin:
                     docRoot = "C:/%s" % ntToPosixSlashes(docRoot)
-                    
+
                 docRoot = normalizePath(docRoot)
                 break
 
@@ -308,7 +308,7 @@ def getDirs(webApi=None):
             if absFilePath:
                 directory = directoryPath(absFilePath)
                 if isWindowsPath(directory):
-                    directory = directory.replace('\\', '/')
+                    ntToPosixSlashes(directory)
                 if directory == '/':
                     continue
                 directories.add(directory)
@@ -978,7 +978,7 @@ def urlEncodeCookieValues(cookieStr):
 
 def directoryPath(path):
     retVal = None
-    if isWindowsPath(path):
+    if isWindowsDriveLetterPath(path):
         retVal = ntpath.dirname(path)
     else:
         retVal = posixpath.dirname(path)
@@ -989,10 +989,8 @@ def normalizePath(path):
     This function must be called only after posixToNtSlashes()
     and ntToPosixSlashes()
     """
-
     retVal = None
-
-    if isWindowsPath(path):
+    if isWindowsDriveLetterPath(path):
         retVal = ntpath.normpath(path)
     else:
         retVal = posixpath.normpath(path)
@@ -1053,6 +1051,9 @@ def decloakToMkstemp(filepath, **kwargs):
 
 def isWindowsPath(filepath):
     return re.search("\A[\w]\:\\\\", filepath) is not None
+
+def isWindowsDriveLetterPath(filepath):
+    return re.search("\A[\w]\:", filepath) is not None
 
 def posixToNtSlashes(filepath):
     return filepath.replace('/', '\\')
