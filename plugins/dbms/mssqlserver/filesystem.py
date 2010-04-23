@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import ntpath
 import os
 
 from lib.core.common import getRange
@@ -146,8 +147,8 @@ class Filesystem(GenericFilesystem):
 
         debugSize    = 0xFF00
         tmpPath      = posixToNtSlashes(conf.tmpPath)
-        dFileName    = os.path.split(dFile)[1]
         dFile        = posixToNtSlashes(dFile)
+        dFileName    = ntpath.basename(dFile)
         wFileSize    = os.path.getsize(wFile)
         wFilePointer = open(wFile, "rb")
         wFileContent = wFilePointer.read()

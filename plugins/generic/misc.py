@@ -72,8 +72,8 @@ class Miscellaneous:
         if re.search("\A[\w]:[\/\\\\]+", conf.tmpPath, re.I):
             kb.os = "Windows"
 
-        conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
         conf.tmpPath = normalizePath(conf.tmpPath)
+        conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
 
         setRemoteTempPath()
 

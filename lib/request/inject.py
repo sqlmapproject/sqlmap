@@ -38,7 +38,6 @@ from lib.core.data import queries
 from lib.core.data import temp
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
-from lib.core.settings import SQL_STATEMENTS
 from lib.techniques.inband.union.use import unionUse
 from lib.techniques.blind.inference import bisection
 from lib.utils.resume import queryOutputLength

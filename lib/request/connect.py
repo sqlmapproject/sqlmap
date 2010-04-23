@@ -38,7 +38,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import sanitizeAsciiString
 from lib.core.exception import sqlmapConnectionException
-from lib.core.settings import SQL_STATEMENTS
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse

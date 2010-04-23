@@ -249,13 +249,14 @@ def getDocRoot(webApi=None):
         for absFilePath in kb.absFilePaths:
             if directoryPath(absFilePath) == '/':
                 continue
+
             absFilePath = normalizePath(absFilePath)
             absFilePathWin = None
 
             if isWindowsPath(absFilePath):
                 absFilePathWin = posixToNtSlashes(absFilePath)
                 absFilePath    = ntToPosixSlashes(absFilePath[2:])
-            elif isWindowsDriveLetterPath(absFilePath): #e.g. C:/xampp/htdocs
+            elif isWindowsDriveLetterPath(absFilePath): # E.g. C:/xampp/htdocs
                 absFilePath    = absFilePath[2:]
 
             if pagePath in absFilePath:
@@ -309,10 +310,13 @@ def getDirs(webApi=None):
         for absFilePath in kb.absFilePaths:
             if absFilePath:
                 directory = directoryPath(absFilePath)
+
                 if isWindowsPath(directory):
                     directory = ntToPosixSlashes(directory)
+
                 if directory == '/':
                     continue
+
                 directories.add(directory)
     else:
         warnMsg = "unable to retrieve any web server path"
@@ -981,7 +985,7 @@ def urlEncodeCookieValues(cookieStr):
 def directoryPath(path):
     retVal = None
 
-    if isWindowsPath(path):
+    if isWindowsDriveLetterPath(path):
         retVal = ntpath.dirname(path)
     else:
         retVal = posixpath.dirname(path)
@@ -989,13 +993,9 @@ def directoryPath(path):
     return retVal
 
 def normalizePath(path):
-    """
-    This function must be called only after posixToNtSlashes()
-    and ntToPosixSlashes()
-    """
     retVal = None
 
-    if isWindowsPath(path):
+    if isWindowsDriveLetterPath(path):
         retVal = ntpath.normpath(path)
     else:
         retVal = posixpath.normpath(path)

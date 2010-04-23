@@ -852,19 +852,19 @@ def __cleanupOptions():
         conf.delay = float(conf.delay)
 
     if conf.rFile:
-        conf.rFile = normalizePath(ntToPosixSlashes(conf.rFile))
+        conf.rFile = ntToPosixSlashes(normalizePath(conf.rFile))
 
     if conf.wFile:
-        conf.wFile = normalizePath(ntToPosixSlashes(conf.wFile))
+        conf.wFile = ntToPosixSlashes(normalizePath(conf.wFile))
 
     if conf.dFile:
-        conf.dFile = normalizePath(ntToPosixSlashes(conf.dFile))
+        conf.dFile = ntToPosixSlashes(normalizePath(conf.dFile))
 
     if conf.msfPath:
-        conf.msfPath = normalizePath(ntToPosixSlashes(conf.msfPath))
+        conf.msfPath = ntToPosixSlashes(normalizePath(conf.msfPath))
 
     if conf.tmpPath:
-        conf.tmpPath = normalizePath(ntToPosixSlashes(conf.tmpPath))
+        conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
     if conf.googleDork or conf.list:
         conf.multipleTargets = True

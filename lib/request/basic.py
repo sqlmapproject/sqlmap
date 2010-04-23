@@ -28,8 +28,7 @@ import re
 import StringIO
 import zlib
 
-from lib.core.common import directoryPath
-from lib.core.common import isWindowsPath
+from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
@@ -83,8 +82,10 @@ def parseResponse(page, headers):
             for match in reobj.finditer(page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
-                if isWindowsPath(absFilePath):
+
+                if isWindowsDriveLetterPath(absFilePath):
                     absFilePath = posixToNtSlashes(absFilePath)
+
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)
                     

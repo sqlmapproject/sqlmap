@@ -178,12 +178,16 @@ class Web:
             # Upload the uploader agent
             self.__webFileInject(uploaderContent, uploaderName, directory)
             requestDir  = ntToPosixSlashes(directory)
+
             if requestDir[-1] != '/':
                 requestDir += '/'
-            requestDir  = requestDir.replace(ntToPosixSlashes(kb.docRoot), "/")
+
+            requestDir = requestDir.replace(ntToPosixSlashes(kb.docRoot), "/")
+
             if isWindowsDriveLetterPath(requestDir):
                 requestDir = requestDir[2:]
-            requestDir  = normalizePath(requestDir)
+
+            requestDir = normalizePath(requestDir)
 
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), uploaderName)
