@@ -1058,16 +1058,16 @@ def __mergeOptions(inputOptions):
 
 def __basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
-        errMsg = "value for LIMITSTART provided with --start option must be an integer value greater than zero (>0)"
+        errMsg = "value for --start (limitStart) option must be an integer value greater than zero (>0)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.limitStop is not None and not (isinstance(conf.limitStop, int) and conf.limitStop > 0):
-        errMsg = "value for LIMITSTOP provided with --stop option must be an integer value greater than zero (>0)"
+        errMsg = "value for --stop (limitStop) option must be an integer value greater than zero (>0)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and\
       conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop <= conf.limitStart:
-        errMsg = "value for LIMITSTART provided with --start option must be smaller than value for LIMITSTOP provided with --stop option"
+        errMsg = "value for --start (limitStart) option must be smaller than value for --stop (limitStop) option"
         raise sqlmapSyntaxException, errMsg
 
 def init(inputOptions=advancedDict()):
