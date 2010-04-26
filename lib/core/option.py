@@ -1056,6 +1056,20 @@ def __mergeOptions(inputOptions):
         if not conf.has_key(key) or conf[key] is None or value is not None:
             conf[key] = value
 
+def __basicOptionValidation():
+    if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
+        errMsg = "value for LIMITSTART provided with --start option must be an integer value greater than zero (>0)"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.limitStop is not None and not (isinstance(conf.limitStop, int) and conf.limitStop > 0):
+        errMsg = "value for LIMITSTOP provided with --stop option must be an integer value greater than zero (>0)"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and\
+      conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop <= conf.limitStart:
+        errMsg = "value for LIMITSTART provided with --start option must be smaller than value for LIMITSTOP provided with --stop option"
+        raise sqlmapSyntaxException, errMsg
+
 def init(inputOptions=advancedDict()):
     """
     Set attributes into both configuration and knowledge base singletons
@@ -1068,6 +1082,7 @@ def init(inputOptions=advancedDict()):
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
     __cleanupOptions()
+    __basicOptionValidation()
     __setRequestFromFile()
 
     parseTargetUrl()
