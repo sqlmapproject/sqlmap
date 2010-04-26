@@ -1,3 +1,16 @@
+sqlmap (0.9-1) stable; urgency=low
+
+  * Added support to directly connect to the database without passing via
+    a SQL injection (Bernardo and Miroslav).
+  * Added support for --roles for Oracle (Bernardo).
+  * Added safe URL feature, --safe-url and --safe-freq (Miroslav).
+  * Support for customizable HTTP redirections (Bernardo).
+  * Implemented feature to speedup the enumeration of table names (Miroslav).
+  * Major code refactoring (Bernardo).
+  * Several bugs fixed (Bernardo and Miroslav).
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day, DD MMM 2010 10:00:00 +0000
+
 sqlmap (0.8-1) stable; urgency=low
 
   * Support to enumerate and dump all databases' tables containing user
