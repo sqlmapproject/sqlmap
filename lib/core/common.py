@@ -616,7 +616,7 @@ def parseTargetDirect():
     remote = False
 
     for dbms in SUPPORTED_DBMS:
-        details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<user>.+?)\:(?P<pass>.+?)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\.\_\-\/]+?)$" % dbms, conf.direct, re.I)
+        details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<user>.+?)\:(?P<pass>.*?)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\.\_\-\/]+?)$" % dbms, conf.direct, re.I)
 
         if details:
             conf.dbms = details.group('dbms')
@@ -627,6 +627,9 @@ def parseTargetDirect():
             else:
                 conf.dbmsUser = str()
                 conf.dbmsPass = str()
+
+            if not conf.dbmsPass:
+                conf.dbmsPass = None
 
             if details.group('remote'):
                 remote = True
