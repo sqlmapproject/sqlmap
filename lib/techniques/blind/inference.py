@@ -304,6 +304,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             conf.threadContinue = False
             raise
 
+        infoMsg = None
         # If we have got one single character not correctly fetched it
         # can mean that the connection to the target url was lost
         if None in value:
