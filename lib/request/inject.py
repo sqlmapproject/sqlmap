@@ -314,7 +314,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
     return returnValue
 
-def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=True):
+def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
     injection vulnerability on the affected parameter.
@@ -336,14 +336,14 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
             partial = True
 
     if not output:
-        output = unionUse(expression, resetCounter=True, unpack=unpack)
+        output = unionUse(expression, resetCounter=True, unpack=unpack, dump=dump)
 
     if output:
         data = parseUnionPage(output, expression, partial, condition, sort)
 
     return data
 
-def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None):
+def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -361,7 +361,7 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     expression = expression.replace("DISTINCT ", "")
 
     if inband and kb.unionPosition:
-        value = __goInband(expression, expected, sort, resumeValue, unpack)
+        value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
         if not value:
             warnMsg  = "for some reasons it was not possible to retrieve "

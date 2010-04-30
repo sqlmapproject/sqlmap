@@ -39,7 +39,7 @@ from lib.utils.resume import resume
 
 reqCount = 0
 
-def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullChar="NULL", unpack=True):
+def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullChar="NULL", unpack=True, dump=False):
     """
     This function tests for an inband SQL injection on the target
     url then call its subsidiary function to effectively perform an
@@ -72,13 +72,6 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
     if ( kb.unionNegative or kb.unionFalseCond ) and not direct:
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
-
-        if len(expressionFieldsList) > 1:
-            infoMsg  = "the SQL query provided has more than a field. "
-            infoMsg += "sqlmap will now unpack it into distinct queries "
-            infoMsg += "to be able to retrieve the output even if we "
-            infoMsg += "are in front of a partial inband sql injection"
-            logger.info(infoMsg)
 
         # We have to check if the SQL query might return multiple entries
         # and in such case forge the SQL limiting the query output one
@@ -130,6 +123,11 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                     elif kb.dbms == "Microsoft SQL Server":
                         stopLimit += startLimit
+                elif dump:
+                    if conf.limitStart:
+                        startLimit = conf.limitStart
+                    if conf.limitStop:
+                        stopLimit = conf.limitStop
 
                 if not stopLimit or stopLimit <= 1:
                     if kb.dbms == "Oracle" and expression.endswith("FROM DUAL"):
@@ -194,10 +192,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                             field = None
 
                         limitedExpr = agent.limitQuery(num, expression, field)
-                        output      = unionUse(limitedExpr, direct=True, unescape=False)
+                        output = resume(limitedExpr, None)
+
+                        if not output:
+                            output = unionUse(limitedExpr, direct=True, unescape=False)
 
                         if output:
                             value += output
+                            parseUnionPage(output, limitedExpr)
 
                     return value
 

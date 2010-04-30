@@ -1331,7 +1331,7 @@ class Enumeration:
                 query = rootQuery["inband"]["query"] % (colString, conf.tbl)
             else:
                 query = rootQuery["inband"]["query"] % (colString, conf.db, conf.tbl)
-            entries = inject.getValue(query, blind=False)
+            entries = inject.getValue(query, blind=False, dump=True)
 
             if entries:
                 if isinstance(entries, str):
@@ -1432,19 +1432,15 @@ class Enumeration:
                 else:
                     length = lengths[column]
 
-                kb.data.dumpedTable[column] = {
-                                             "length": length,
-                                             "values": columnEntries,
-                                           }
+                kb.data.dumpedTable[column] = { "length": length,
+                                                "values": columnEntries }
 
                 entriesCount = len(columnEntries)
 
         if kb.data.dumpedTable:
-            kb.data.dumpedTable["__infos__"] = {
-                                              "count": entriesCount,
-                                              "table": conf.tbl,
-                                              "db":    conf.db
-                                            }
+            kb.data.dumpedTable["__infos__"] = { "count": entriesCount,
+                                                 "table": conf.tbl,
+                                                 "db":    conf.db }
         else:
             warnMsg = "unable to retrieve the entries of "
             if conf.col:
