@@ -54,6 +54,9 @@ Alessandro Curio <alessandro.curio@gmail.com>
 Stefano Di Paola <stefano.dipaola@wisec.it>
     for suggesting good features
 
+Mosk Dmitri <ya@darkbyte.ru>
+    for reporting a minor bug
+
 Dan Guido <dguido@gmail.com>
     for promoting sqlmap in the context of the Penetration Testing and
     Vulnerability Analysis class at the Polytechnic University of New York,
@@ -181,6 +184,9 @@ Ferruh Mavituna <ferruh@mavituna.com>
 Enrico Milanese <enricomilanese@gmail.com>
     for reporting a bugs when using (-a) a single line User-Agent file
     for providing me with some ideas for the PHP backdoor
+
+Alejo Murillo <alex@65535.com>
+    for suggesting a feature
 
 Roberto Nemirovsky <roberto.paes@gmail.com>
     for pointing me out some enhancements
@@ -318,9 +324,6 @@ Stuffe <stuffe.dk@gmail.com>
 
 Sylphid <sylphid.su@sti.com.tw>
     for suggesting some features
-
-Mosk Dmitri <ya@darkbyte.ru>
-    for reporting a minor bug
 
 
 == Organizations ==
