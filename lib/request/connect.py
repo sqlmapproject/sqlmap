@@ -203,10 +203,11 @@ class Connect:
                     page = e.read()
                     responseHeaders = e.info()
                 except socket.timeout:
+                    page, responseHeaders = None, None
                     warnMsg  = "connection timed out while trying "
                     warnMsg += "to get error page information"
                     logger.warn(warnMsg)
-                    page, responseHeaders = None, None
+                    return None, None
                 code = e.code
                 status = e.msg
 
@@ -249,15 +250,15 @@ class Connect:
         socket.setdefaulttimeout(conf.timeout)
 
         page = sanitizeAsciiString(page)
-        
         parseResponse(page, responseHeaders)
+
         responseMsg += "(%s - %d):\n" % (status, code)
-        
+
         if conf.verbose <= 4:
             responseMsg += str(responseHeaders)
         elif conf.verbose > 4:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
-        
+
         logger.log(8, responseMsg)
 
         return page, responseHeaders
