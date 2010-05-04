@@ -201,12 +201,14 @@ class Connect:
             else:
                 try:
                     page = e.read()
+                    responseHeaders = e.info()
                 except socket.timeout:
-                    warnMsg = "connection timed out to the target url"
-                    raise sqlmapConnectionException, warnMsg
+                    warnMsg  = "connection timed out while trying "
+                    warnMsg += "to get error page information"
+                    logger.warn(warnMsg)
+                    page, responseHeaders = None, None
                 code = e.code
                 status = e.msg
-                responseHeaders = e.info()
 
                 debugMsg = "got HTTP error code: %d" % code
                 logger.debug(debugMsg)
