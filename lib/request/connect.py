@@ -199,7 +199,11 @@ class Connect:
                 errMsg = "page not found"
                 raise sqlmapConnectionException, errMsg
             else:
-                page = e.read()
+                try:
+                    page = e.read()
+                except socket.timeout:
+                    warnMsg = "connection timed out to the target url"
+                    raise sqlmapConnectionException, warnMsg
                 code = e.code
                 status = e.msg
                 responseHeaders = e.info()
