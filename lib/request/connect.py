@@ -205,7 +205,7 @@ class Connect:
                 except socket.timeout:
                     page, responseHeaders = None, None
                     warnMsg  = "connection timed out while trying "
-                    warnMsg += "to get error page information"
+                    warnMsg += "to get error page information (%d)" % e.code
                     logger.warn(warnMsg)
                     return None, None
                 code = e.code
