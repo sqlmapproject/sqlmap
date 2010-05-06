@@ -146,8 +146,6 @@ class Connect:
 
                 conf.redirectHandled = True
 
-                return Connect.__getPageProxy(**kwargs)
-
             # Reset the number of connection retries
             conf.retriesCount = 0
 
@@ -207,7 +205,9 @@ class Connect:
                     warnMsg  = "connection timed out while trying "
                     warnMsg += "to get error page information (%d)" % e.code
                     logger.warn(warnMsg)
+
                     return None, None
+
                 code = e.code
                 status = e.msg
 

@@ -307,6 +307,9 @@ Anthony Zboralski <anthony.zboralski@bellua.com>
     for reporting a few minor bugs
     for donating to sqlmap development
 
+Thierry Zoller <thierry@zoller.lu>
+    for reporting a couple of major bugs
+
 fufuh <fufuh@users.sourceforge.net>
     for reporting a bug when running on Windows
 
