@@ -214,6 +214,8 @@ enumerate and dump all databases' tables containing user provided
 column(s), stabilization and enhancements to the takeover functionalities,
 updated integration with Metasploit 3.3.3 and a lot of minor features and
 bug fixes.
+<item><bf>March</bf>, sqlmap demo videos have been <htmlurl
+name="published" url="http://sqlmap.sourceforge.net/demo.html">.
 <item><bf>January</bf>, Bernardo is <htmlurl name="invited"
 url="http://www.athcon.org/speakers/"> to present at <htmlurl
 name="AthCon" url="http://www.athcon.org"> conference in Greece on June
