@@ -141,6 +141,7 @@ class Connect:
                         pass
                     else:
                         conf.url = choice
+                        return Connect.__getPageProxy(**kwargs)
 
                     break
 
