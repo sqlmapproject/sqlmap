@@ -265,6 +265,13 @@ system from the database</em>.
 
 <item><bf>July 25</bf>, stable version of sqlmap <bf>0.7</bf> is out!
 
+<item><bf>June 27</bf>, Bernardo <htmlurl name="presents"
+url="http://www.slideshare.net/inquis/sql-injection-not-only-and-11-updated">
+an updated version of his
+<em>SQL injection: Not only AND 1=1</em> slides at <htmlurl name="2nd
+Digital Security Forum" url="http://www.digitalsecurityforum.eu/"> in
+Lisbon, Portugal.
+
 <item><bf>June 2</bf>, sqlmap version <bf>0.6.4</bf> has made it way to
 the official Ubuntu repository too.
 
