@@ -96,6 +96,7 @@ optDict = {
                                "getColumns":        "boolean",
                                "dumpTable":         "boolean",
                                "dumpAll":           "boolean",
+                               "search":            "boolean",
                                "user":              "string",
                                "db":                "string",
                                "tbl":               "string",

@@ -207,19 +207,33 @@ class queriesHandler(ContentHandler):
 
             self.__queries.columns = self.__columns
 
-        elif name == "dump_column":
-            self.__dumpColumn = {}
-            self.__dumpColumn["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband, "condition2": self.__conditionInband2 }
-            self.__dumpColumn["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "count2": self.__count2, "condition": self.__conditionBlind, "condition2": self.__conditionBlind2 }
-
-            self.__queries.dumpColumn = self.__dumpColumn
-
         elif name == "dump_table":
             self.__dumpTable = {}
             self.__dumpTable["inband"] = { "query": self.__inband }
             self.__dumpTable["blind"]  = { "query": self.__blind, "count": self.__count }
 
             self.__queries.dumpTable = self.__dumpTable
+
+        elif name == "search_db":
+            self.__searchDb = {}
+            self.__searchDb["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband, "condition2": self.__conditionInband2 }
+            self.__searchDb["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "count2": self.__count2, "condition": self.__conditionBlind, "condition2": self.__conditionBlind2 }
+
+            self.__queries.searchDb = self.__searchDb
+
+        elif name == "search_table":
+            self.__searchTable = {}
+            self.__searchTable["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband, "condition2": self.__conditionInband2 }
+            self.__searchTable["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "count2": self.__count2, "condition": self.__conditionBlind, "condition2": self.__conditionBlind2 }
+
+            self.__queries.searchTable = self.__searchTable
+
+        elif name == "search_column":
+            self.__searchColumn = {}
+            self.__searchColumn["inband"] = { "query": self.__inband, "query2": self.__inband2, "condition": self.__conditionInband, "condition2": self.__conditionInband2 }
+            self.__searchColumn["blind"]  = { "query": self.__blind, "query2": self.__blind2, "count": self.__count, "count2": self.__count2, "condition": self.__conditionBlind, "condition2": self.__conditionBlind2 }
+
+            self.__queries.searchColumn = self.__searchColumn
 
 def queriesParser():
     """

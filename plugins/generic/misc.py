@@ -184,3 +184,21 @@ class Miscellaneous:
             warnMsg += "saved on the file system can only be deleted "
             warnMsg += "manually"
             logger.warn(warnMsg)
+
+    def likeOrExact(self, what):
+        message = "do you want sqlmap to consider provided %s(s):\n" % what
+        message += "[1] as LIKE column names (default)\n"
+        message += "[2] as exact column names"
+
+        choice = readInput(message, default="1")
+
+        if not choice or choice == "1":
+            choice = "1"
+            condParam = " LIKE '%%%s%%'"
+        elif choice.isdigit() and choice == "2":
+            condParam = "='%s'"
+        else:
+            errMsg = "invalid value"
+            raise sqlmapNoneDataException, errMsg
+
+        return choice, condParam

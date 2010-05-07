@@ -41,3 +41,9 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return {}
+
+    def searchDb(self):
+        warnMsg = "on Firebird it is not possible to search databases"
+        logger.warn(warnMsg)
+
+        return []

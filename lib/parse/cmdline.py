@@ -275,6 +275,9 @@ def cmdLineParser():
         enumeration.add_option("--dump-all", dest="dumpAll", action="store_true",
                                help="Dump all DBMS databases tables entries")
 
+        enumeration.add_option("--search", dest="search", action="store_true",
+                               help="Search column(s), table(s) and/or database name(s)")
+
         enumeration.add_option("-D", dest="db",
                                help="DBMS database to enumerate")
 

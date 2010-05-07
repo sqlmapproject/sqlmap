@@ -78,10 +78,16 @@ class Enumeration(GenericEnumeration):
 
         logger.warn(errMsg)
 
-    def dumpColumn(self):
+    def dumpAll(self):
         errMsg = "on SQLite you must specify the table and columns to dump"
         raise sqlmapUnsupportedFeatureException, errMsg
 
-    def dumpAll(self):
+    def searchDb(self):
+        warnMsg = "on SQLite it is not possible to search databases"
+        logger.warn(warnMsg)
+
+        return []
+
+    def searchColumn(self):
         errMsg = "on SQLite you must specify the table and columns to dump"
         raise sqlmapUnsupportedFeatureException, errMsg

@@ -28,6 +28,7 @@ from lib.core.agent import agent
 from lib.core.common import getRange
 from lib.core.common import parsePasswordHash
 from lib.core.common import readInput
+from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -971,313 +972,18 @@ class Enumeration:
 
         return kb.data.cachedColumns
 
-    def dumpColumn(self):
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-            errMsg  = "information_schema not available, "
-            errMsg += "back-end DBMS is MySQL < 5.0"
-            raise sqlmapUnsupportedFeatureException, errMsg
-
-        if not conf.col:
-            errMsg = "missing column parameter"
-            raise sqlmapMissingMandatoryOptionException, errMsg
-
-        rootQuery = queries[kb.dbms].dumpColumn
-        foundCols = {}
-        dbs = {}
-        colList = conf.col.split(",")
-        colCond = rootQuery["inband"]["condition"]
-        dbCond = rootQuery["inband"]["condition2"]
-
-        message = "do you want sqlmap to consider provided column(s):\n"
-        message += "[1] as LIKE column names (default)\n"
-        message += "[2] as exact column names"
-        colConsider = readInput(message, default="1")
-
-        if not colConsider or colConsider.isdigit() and colConsider == "1":
-            colConsider = "1"
-            colCondParam = " LIKE '%%%s%%'"
-        elif colConsider.isdigit() and colConsider == "2":
-            colCondParam = "='%s'"
-        else:
-            errMsg = "invalid value"
-            raise sqlmapNoneDataException, errMsg
-
-        for column in colList:
-            if kb.dbms == "Oracle":
-                column = column.upper()
-                conf.db = "USERS"
-            elif kb.dbms == "Microsoft SQL Server":
-                if not conf.db:
-                    if not len(kb.data.cachedDbs):
-                        enumDbs = self.getDbs()
-                    else:
-                        enumDbs = kb.data.cachedDbs
-
-                    conf.db = ",".join(db for db in enumDbs)
-
-            foundCols[column] = {}
-
-            if conf.db:
-                for db in conf.db.split(","):
-                    dbs[db] = {}
-                    foundCols[column][db] = []
-
-                continue
-
-            infoMsg = "fetching databases with tables containing column"
-            if colConsider == "1":
-                infoMsg += "s like"
-            infoMsg += " '%s'" % column
-            logger.info(infoMsg)
-
-            if conf.excludeSysDbs and kb.dbms != "Oracle":
-                dbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
-                logger.info(infoMsg)
-            else:
-                dbsQuery = ""
-
-            colQuery = "%s%s" % (colCond, colCondParam)
-            colQuery = colQuery % column
-
-            if kb.unionPosition or conf.direct:
-                query = rootQuery["inband"]["query"]
-                query += colQuery
-                query += dbsQuery
-                values = inject.getValue(query, blind=False)
-
-                if values:
-                    if isinstance(values, str):
-                        values = [ values ]
-
-                    for value in values:
-                        dbs[value] = {}
-                        foundCols[column][value] = []
-            else:
-                infoMsg = "fetching number of databases with tables containing column"
-                if colConsider == "1":
-                    infoMsg += "s like"
-                infoMsg += " '%s'" % column
-                logger.info(infoMsg)
-
-                query = rootQuery["blind"]["count"]
-                query += colQuery
-                query += dbsQuery
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
-
-                if not count.isdigit() or not len(count) or count == "0":
-                    warnMsg  = "no databases have tables containing column"
-                    if colConsider == "1":
-                        warnMsg += "s like"
-                    warnMsg += " '%s'" % column
-                    logger.warn(warnMsg)
-
-                    continue
-
-                indexRange = getRange(count)
-
-                for index in indexRange:
-                    query = rootQuery["blind"]["query"]
-                    query += colQuery
-                    query += dbsQuery
-                    query = agent.limitQuery(index, query)
-                    db = inject.getValue(query, inband=False)
-                    dbs[db] = {}
-                    foundCols[column][db] = []
-
-        for column, dbData in foundCols.items():
-            colQuery = "%s%s" % (colCond, colCondParam)
-            colQuery = colQuery % column
-
-            for db in dbData:
-                infoMsg = "fetching tables containing column"
-                if colConsider == "1":
-                    infoMsg += "s like"
-                infoMsg += " '%s' in database '%s'" % (column, db)
-                logger.info(infoMsg)
-
-                if kb.unionPosition or conf.direct:
-                    query = rootQuery["inband"]["query2"]
-
-                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                        query = query % db
-                        query += " AND %s" % colQuery
-                    elif kb.dbms == "Oracle":
-                        query += " WHERE %s" % colQuery
-                    elif kb.dbms == "Microsoft SQL Server":
-                        query = query % (db, db, db, db, db)
-                        query += " AND %s" % colQuery.replace("[DB]", db)
-
-                    values = inject.getValue(query, blind=False)
-
-                    if values:
-                        if isinstance(values, str):
-                            values = [ values ]
-
-                        for value in values:
-                            if value not in dbs[db]:
-                                dbs[db][value] = {}
-
-                            dbs[db][value][column] = None
-                            foundCols[column][db].append(value)
-                else:
-                    infoMsg = "fetching number of tables containing column"
-                    if colConsider == "1":
-                        infoMsg += "s like"
-                    infoMsg += " '%s' in database '%s'" % (column, db)
-                    logger.info(infoMsg)
-
-                    query = rootQuery["blind"]["count2"]
-
-                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                        query = query % db
-                        query += " AND %s" % colQuery
-                    elif kb.dbms == "Oracle":
-                        query += " WHERE %s" % colQuery
-                    elif kb.dbms == "Microsoft SQL Server":
-                        query = query % (db, db, db, db, db)
-                        query += " AND %s" % colQuery.replace("[DB]", db)
-
-                    count = inject.getValue(query, inband=False, expected="int", charsetType=2)
-
-                    if not count.isdigit() or not len(count) or count == "0":
-                        warnMsg = "no tables contain column"
-                        if colConsider == "1":
-                            warnMsg += "s like"
-                        warnMsg += " '%s' " % column
-                        warnMsg += "in database '%s'" % db
-                        logger.warn(warnMsg)
-
-                        continue
-
-                    indexRange = getRange(count)
-
-                    for index in indexRange:
-                        query = rootQuery["blind"]["query2"]
-
-                        if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                            query = query % db
-                            query += " AND %s" % colQuery
-                            field = None
-                        elif kb.dbms == "Oracle":
-                            query += " WHERE %s" % colQuery
-                            field = None
-                        elif kb.dbms == "Microsoft SQL Server":
-                            query = query % (db, db, db, db, db)
-                            query += " AND %s" % colQuery.replace("[DB]", db)
-                            field = colCond.replace("[DB]", db)
-
-                        query = agent.limitQuery(index, query, field)
-                        tbl = inject.getValue(query, inband=False)
-
-                        if tbl not in dbs[db]:
-                            dbs[db][tbl] = {}
-
-                        dbs[db][tbl][column] = None
-                        foundCols[column][db].append(tbl)
-
-        if colConsider == "1":
-            okDbs = {}
-
-            for db, tableData in dbs.items():
-                conf.db = db
-                okDbs[db] = {}
-
-                for tbl, columns in tableData.items():
-                    conf.tbl = tbl
-
-                    for column in columns:
-                        conf.col = column
-
-                        self.getColumns(onlyColNames=True)
-
-                        if tbl in okDbs[db]:
-                            okDbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
-                        else:
-                            okDbs[db][tbl] = kb.data.cachedColumns[db][tbl]
-
-                        kb.data.cachedColumns = {}
-
-            dbs = okDbs
-
-        if not dbs:
-            warnMsg = "no databases have tables containing any of the "
-            warnMsg += "provided columns"
-            logger.warn(warnMsg)
-            return
-
-        dumper.dbColumns(foundCols, colConsider, dbs)
-
-        message = "do you want to dump entries? [Y/n] "
-        output = readInput(message, default="Y")
-
-        if output and output[0] not in ("y", "Y"):
-            return
-
-        dumpFromDbs = []
-        message = "which database(s)?\n[a]ll (default)\n"
-
-        for db, tblData in dbs.items():
-            if tblData:
-                message += "[%s]\n" % db
-
-        message += "[q]uit"
-        test = readInput(message, default="a")
-
-        if not test or test in ("a", "A"):
-            dumpFromDbs = dbs.keys()
-        elif test in ("q", "Q"):
-            return
-        else:
-            dumpFromDbs = test.replace(" ", "").split(",")
-
-        for db, tblData in dbs.items():
-            if db not in dumpFromDbs or not tblData:
-                continue
-
-            conf.db = db
-            dumpFromTbls = []
-            message = "which table(s) of database '%s'?\n" % db
-            message += "[a]ll (default)\n"
-
-            for tbl in tblData:
-                message += "[%s]\n" % tbl
-
-            message += "[s]kip\n"
-            message += "[q]uit"
-            test = readInput(message, default="a")
-
-            if not test or test in ("a", "A"):
-                dumpFromTbls = tblData
-            elif test in ("s", "S"):
-                continue
-            elif test in ("q", "Q"):
-                return
-            else:
-                dumpFromTbls = test.replace(" ", "").split(",")
-
-            for table, columns in tblData.items():
-                if table not in dumpFromTbls:
-                    continue
-
-                conf.tbl = table
-                conf.col = ",".join(column for column in columns)
-                kb.data.cachedColumns = {}
-                kb.data.dumpedTable = {}
-
-                data = self.dumpTable()
-
-                if data:
-                    dumper.dbTableValues(data)
-
     def dumpTable(self):
         if not conf.tbl and not conf.col:
-            errMsg = "missing both table and column parameters, please "
-            errMsg += "provide at least one of them"
+            errMsg = "missing table parameter"
             raise sqlmapMissingMandatoryOptionException, errMsg
 
         if conf.col and not conf.tbl:
-            self.dumpColumn()
+            warnMsg = "missing table parameter. You only provided "
+            warnMsg += "column(s). sqlmap will search for all databases' "
+            warnMsg += "tables containing the provided column(s)"
+            logger.warn(warnMsg)
+
+            self.searchColumn()
             return
 
         if "." in conf.tbl:
@@ -1478,6 +1184,391 @@ class Enumeration:
 
                 if data:
                     dumper.dbTableValues(data)
+
+    def searchDb(self):
+        foundDbs = []
+        rootQuery = queries[kb.dbms].searchDb
+        dbList = conf.db.split(",")
+
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            dbCond = rootQuery["inband"]["condition2"]
+        else:
+            dbCond = rootQuery["inband"]["condition"]
+
+        dbConsider, dbCondParam = self.likeOrExact("database")
+
+        for db in dbList:
+            infoMsg = "searching database"
+            if dbConsider == "1":
+                infoMsg += "s like"
+            infoMsg += " '%s'" % db
+            logger.info(infoMsg)
+
+            if conf.excludeSysDbs:
+                exclDbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
+                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                logger.info(infoMsg)
+            else:
+                exclDbsQuery = ""
+
+            dbQuery = "%s%s" % (dbCond, dbCondParam)
+            dbQuery = dbQuery % db
+
+            if kb.unionPosition or conf.direct:
+                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                    query = rootQuery["inband"]["query2"]
+                else:
+                    query = rootQuery["inband"]["query"]
+                query += dbQuery
+                query += exclDbsQuery
+                values = inject.getValue(query, blind=False)
+
+                if values:
+                    if isinstance(values, str):
+                        values = [ values ]
+
+                    for value in values:
+                        foundDbs.append(value)
+            else:
+                infoMsg = "fetching number of databases"
+                if dbConsider == "1":
+                    infoMsg += "s like"
+                infoMsg += " '%s'" % db
+                logger.info(infoMsg)
+
+                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                    query = rootQuery["blind"]["count2"]
+                else:
+                    query = rootQuery["blind"]["count"]
+                query += dbQuery
+                query += exclDbsQuery
+                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                if not count.isdigit() or not len(count) or count == "0":
+                    warnMsg  = "no database"
+                    if dbConsider == "1":
+                        warnMsg += "s like"
+                    warnMsg += " '%s' found" % db
+                    logger.warn(warnMsg)
+
+                    continue
+
+                indexRange = getRange(count)
+
+                for index in indexRange:
+                    if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                        query = rootQuery["blind"]["query2"]
+                    else:
+                        query = rootQuery["blind"]["query"]
+                    query += dbQuery
+                    query += exclDbsQuery
+                    query = agent.limitQuery(index, query, dbCond)
+
+                    foundDbs.append(inject.getValue(query, inband=False))
+
+        return foundDbs
+
+    def searchTable(self):
+        errMsg = "search for table names is not supported yet"
+        raise sqlmapUnsupportedFeatureException, errMsg
+
+    def searchColumn(self):
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            errMsg  = "information_schema not available, "
+            errMsg += "back-end DBMS is MySQL < 5.0"
+            raise sqlmapUnsupportedFeatureException, errMsg
+
+        rootQuery = queries[kb.dbms].searchColumn
+        foundCols = {}
+        dbs = {}
+        colList = conf.col.split(",")
+        colCond = rootQuery["inband"]["condition"]
+        dbCond = rootQuery["inband"]["condition2"]
+
+        colConsider, colCondParam = self.likeOrExact("column")
+
+        for column in colList:
+            if kb.dbms == "Oracle":
+                column = column.upper()
+                conf.db = "USERS"
+            elif kb.dbms == "Microsoft SQL Server":
+                if not conf.db:
+                    if not len(kb.data.cachedDbs):
+                        enumDbs = self.getDbs()
+                    else:
+                        enumDbs = kb.data.cachedDbs
+
+                    conf.db = ",".join(db for db in enumDbs)
+
+            foundCols[column] = {}
+
+            if conf.db:
+                for db in conf.db.split(","):
+                    dbs[db] = {}
+                    foundCols[column][db] = []
+
+                continue
+
+            infoMsg = "fetching databases with tables containing column"
+            if colConsider == "1":
+                infoMsg += "s like"
+            infoMsg += " '%s'" % column
+            logger.info(infoMsg)
+
+            if conf.excludeSysDbs and kb.dbms != "Oracle":
+                exclDbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
+                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                logger.info(infoMsg)
+            else:
+                exclDbsQuery = ""
+
+            colQuery = "%s%s" % (colCond, colCondParam)
+            colQuery = colQuery % column
+
+            if kb.unionPosition or conf.direct:
+                query = rootQuery["inband"]["query"]
+                query += colQuery
+                query += exclDbsQuery
+                values = inject.getValue(query, blind=False)
+
+                if values:
+                    if isinstance(values, str):
+                        values = [ values ]
+
+                    for value in values:
+                        dbs[value] = {}
+                        foundCols[column][value] = []
+            else:
+                infoMsg = "fetching number of databases with tables containing column"
+                if colConsider == "1":
+                    infoMsg += "s like"
+                infoMsg += " '%s'" % column
+                logger.info(infoMsg)
+
+                query = rootQuery["blind"]["count"]
+                query += colQuery
+                query += exclDbsQuery
+                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                if not count.isdigit() or not len(count) or count == "0":
+                    warnMsg  = "no databases have tables containing column"
+                    if colConsider == "1":
+                        warnMsg += "s like"
+                    warnMsg += " '%s'" % column
+                    logger.warn(warnMsg)
+
+                    continue
+
+                indexRange = getRange(count)
+
+                for index in indexRange:
+                    query = rootQuery["blind"]["query"]
+                    query += colQuery
+                    query += exclDbsQuery
+                    query = agent.limitQuery(index, query)
+                    db = inject.getValue(query, inband=False)
+                    dbs[db] = {}
+                    foundCols[column][db] = []
+
+        for column, dbData in foundCols.items():
+            colQuery = "%s%s" % (colCond, colCondParam)
+            colQuery = colQuery % column
+
+            for db in dbData:
+                infoMsg = "fetching tables containing column"
+                if colConsider == "1":
+                    infoMsg += "s like"
+                infoMsg += " '%s' in database '%s'" % (column, db)
+                logger.info(infoMsg)
+
+                if kb.unionPosition or conf.direct:
+                    query = rootQuery["inband"]["query2"]
+
+                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                        query = query % db
+                        query += " AND %s" % colQuery
+                    elif kb.dbms == "Oracle":
+                        query += " WHERE %s" % colQuery
+                    elif kb.dbms == "Microsoft SQL Server":
+                        query = query % (db, db, db, db, db)
+                        query += " AND %s" % colQuery.replace("[DB]", db)
+
+                    values = inject.getValue(query, blind=False)
+
+                    if values:
+                        if isinstance(values, str):
+                            values = [ values ]
+
+                        for value in values:
+                            if value not in dbs[db]:
+                                dbs[db][value] = {}
+
+                            dbs[db][value][column] = None
+                            foundCols[column][db].append(value)
+                else:
+                    infoMsg = "fetching number of tables containing column"
+                    if colConsider == "1":
+                        infoMsg += "s like"
+                    infoMsg += " '%s' in database '%s'" % (column, db)
+                    logger.info(infoMsg)
+
+                    query = rootQuery["blind"]["count2"]
+
+                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                        query = query % db
+                        query += " AND %s" % colQuery
+                    elif kb.dbms == "Oracle":
+                        query += " WHERE %s" % colQuery
+                    elif kb.dbms == "Microsoft SQL Server":
+                        query = query % (db, db, db, db, db)
+                        query += " AND %s" % colQuery.replace("[DB]", db)
+
+                    count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                    if not count.isdigit() or not len(count) or count == "0":
+                        warnMsg = "no tables contain column"
+                        if colConsider == "1":
+                            warnMsg += "s like"
+                        warnMsg += " '%s' " % column
+                        warnMsg += "in database '%s'" % db
+                        logger.warn(warnMsg)
+
+                        continue
+
+                    indexRange = getRange(count)
+
+                    for index in indexRange:
+                        query = rootQuery["blind"]["query2"]
+
+                        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                            query = query % db
+                            query += " AND %s" % colQuery
+                            field = None
+                        elif kb.dbms == "Oracle":
+                            query += " WHERE %s" % colQuery
+                            field = None
+                        elif kb.dbms == "Microsoft SQL Server":
+                            query = query % (db, db, db, db, db)
+                            query += " AND %s" % colQuery.replace("[DB]", db)
+                            field = colCond.replace("[DB]", db)
+
+                        query = agent.limitQuery(index, query, field)
+                        tbl = inject.getValue(query, inband=False)
+
+                        if tbl not in dbs[db]:
+                            dbs[db][tbl] = {}
+
+                        dbs[db][tbl][column] = None
+                        foundCols[column][db].append(tbl)
+
+        if colConsider == "1":
+            okDbs = {}
+
+            for db, tableData in dbs.items():
+                conf.db = db
+                okDbs[db] = {}
+
+                for tbl, columns in tableData.items():
+                    conf.tbl = tbl
+
+                    for column in columns:
+                        conf.col = column
+
+                        self.getColumns(onlyColNames=True)
+
+                        if tbl in okDbs[db]:
+                            okDbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
+                        else:
+                            okDbs[db][tbl] = kb.data.cachedColumns[db][tbl]
+
+                        kb.data.cachedColumns = {}
+
+            dbs = okDbs
+
+        if not dbs:
+            warnMsg = "no databases have tables containing any of the "
+            warnMsg += "provided columns"
+            logger.warn(warnMsg)
+            return
+
+        dumper.dbColumns(foundCols, colConsider, dbs)
+
+        message = "do you want to dump entries? [Y/n] "
+        output = readInput(message, default="Y")
+
+        if output and output[0] not in ("y", "Y"):
+            return
+
+        dumpFromDbs = []
+        message = "which database(s)?\n[a]ll (default)\n"
+
+        for db, tblData in dbs.items():
+            if tblData:
+                message += "[%s]\n" % db
+
+        message += "[q]uit"
+        test = readInput(message, default="a")
+
+        if not test or test in ("a", "A"):
+            dumpFromDbs = dbs.keys()
+        elif test in ("q", "Q"):
+            return
+        else:
+            dumpFromDbs = test.replace(" ", "").split(",")
+
+        for db, tblData in dbs.items():
+            if db not in dumpFromDbs or not tblData:
+                continue
+
+            conf.db = db
+            dumpFromTbls = []
+            message = "which table(s) of database '%s'?\n" % db
+            message += "[a]ll (default)\n"
+
+            for tbl in tblData:
+                message += "[%s]\n" % tbl
+
+            message += "[s]kip\n"
+            message += "[q]uit"
+            test = readInput(message, default="a")
+
+            if not test or test in ("a", "A"):
+                dumpFromTbls = tblData
+            elif test in ("s", "S"):
+                continue
+            elif test in ("q", "Q"):
+                return
+            else:
+                dumpFromTbls = test.replace(" ", "").split(",")
+
+            for table, columns in tblData.items():
+                if table not in dumpFromTbls:
+                    continue
+
+                conf.tbl = table
+                conf.col = ",".join(column for column in columns)
+                kb.data.cachedColumns = {}
+                kb.data.dumpedTable = {}
+
+                data = self.dumpTable()
+
+                if data:
+                    dumper.dbTableValues(data)
+
+    def search(self):
+        if conf.db:
+            dumper.lister("found databases", self.searchDb())
+
+        if conf.tbl:
+            dumper.dbTables(self.searchTable())
+
+        if conf.col:
+            self.searchColumn()
+
+        if not conf.db and not conf.tbl and not conf.col:
+            errMsg = "missing parameter, provide -D, -T or -C together "
+            errMsg += "with --search"
+            raise sqlmapMissingMandatoryOptionException, errMsg
 
     def sqlQuery(self, query):
         output  = None

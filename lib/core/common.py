@@ -1006,7 +1006,7 @@ def normalizePath(path):
     return retVal
 
 def safeStringFormat(formatStr, params):
-    retVal = formatStr.replace('%d', '%s')
+    retVal = formatStr.replace("%d", "%s")
 
     if isinstance(params, str):
         retVal = retVal.replace("%s", params)
@@ -1015,7 +1015,7 @@ def safeStringFormat(formatStr, params):
         index = 0
 
         while index != -1:
-            index = retVal.find('%s')
+            index = retVal.find("%s")
 
             if index != -1:
                 if count < len(params):

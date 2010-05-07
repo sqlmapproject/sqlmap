@@ -120,6 +120,9 @@ def action():
     if conf.dumpAll:
         conf.dbmsHandler.dumpAll()
 
+    if conf.search:
+        conf.dbmsHandler.search()
+
     if conf.query:
         dumper.string(conf.query, conf.dbmsHandler.sqlQuery(conf.query))
 
