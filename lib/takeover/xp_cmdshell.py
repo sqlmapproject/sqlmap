@@ -90,7 +90,7 @@ class xp_cmdshell:
             cmd  = "EXEC master..sp_addextendedproc 'xp_cmdshell', "
             cmd += "@dllname='xplog70.dll'"
         else:
-            cmd = "EXEC master..sp_dropextendedproc xp_cmdshell"
+            cmd = "EXEC master..sp_dropextendedproc 'xp_cmdshell'"
 
         return cmd
 
