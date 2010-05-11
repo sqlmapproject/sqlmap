@@ -122,9 +122,10 @@ def __setOutputResume():
     if os.path.exists(conf.sessionFile):
         if not conf.flushSession:
             readSessionFP = open(conf.sessionFile, "r")
-            lines = readSessionFP.readlines()
+            __url_cache = set()
+            __expression_cache = {}
 
-            for line in lines:
+            for line in readSessionFP.xreadlines():
                 if line.count("][") == 4:
                     line = line.split("][")
 
@@ -145,17 +146,20 @@ def __setOutputResume():
                     if url not in ( conf.url, conf.hostname ):
                         continue
 
-                    if url not in kb.resumedQueries.keys():
+                    if url not in __url_cache:
                         kb.resumedQueries[url] = {}
                         kb.resumedQueries[url][expression] = value
+                        __url_cache.add(url)
+                        __expression_cache[url] = set()
     
                     resumeConfKb(expression, url, value)
     
-                    if expression not in kb.resumedQueries[url].keys():
+                    if expression not in __expression_cache[url]:
                         kb.resumedQueries[url][expression] = value
+                        __expression_cache[url].add(value)
                     elif len(value) >= len(kb.resumedQueries[url][expression]):
                         kb.resumedQueries[url][expression] = value
-    
+
             readSessionFP.close()
         else:
             try:
