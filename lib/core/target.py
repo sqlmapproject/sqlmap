@@ -150,7 +150,7 @@ def __setOutputResume():
                         kb.resumedQueries[url] = {}
                         kb.resumedQueries[url][expression] = value
                         __url_cache.add(url)
-                        __expression_cache[url] = set()
+                        __expression_cache[url] = set(expression)
     
                     resumeConfKb(expression, url, value)
     
