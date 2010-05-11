@@ -194,6 +194,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         index   = [ firstChar ]    # As list for python nested function scoping
         idxlock = threading.Lock()
         iolock  = threading.Lock()
+        valuelock  = threading.Lock()
         conf.seqLock = threading.Lock()
         conf.threadContinue = True
 
@@ -220,7 +221,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         break
 
+                    valuelock.acquire()
                     value[curidx-1] = val
+                    currentValue = list(value)
+                    valuelock.release()
 
                     if conf.threadContinue:
                         if showEta:
@@ -230,7 +234,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             endCharIndex = 0
 
                             for i in xrange(length):
-                                if value[i] is not None:
+                                if currentValue[i] is not None:
                                     endCharIndex = max(endCharIndex, i)
 
                             output = ''
@@ -240,11 +244,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                             count = 0
 
-                            for i in xrange(startCharIndex, endCharIndex):
-                                output += '_' if value[i] is None else value[i]
+                            for i in xrange(startCharIndex, endCharIndex + 1):
+                                output += '_' if currentValue[i] is None else currentValue[i]
 
                             for i in xrange(length):
-                                count += 1 if value[i] is not None else 0
+                                count += 1 if currentValue[i] is not None else 0
 
                             if startCharIndex > 0:
                                 output = '..' + output[2:]
