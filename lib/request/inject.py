@@ -55,10 +55,6 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar)
 
-    if conf.eta and length:
-        infoMsg = "retrieved: %s" % value
-        logger.info(infoMsg)
-
     debugMsg = "performed %d queries in %d seconds" % (count, int(time.time() - start))
     logger.debug(debugMsg)
 

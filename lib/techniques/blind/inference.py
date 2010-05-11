@@ -353,7 +353,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     if conf.verbose >= 1 or showEta:
         dataToStdout("\n")
 
-    if ( conf.verbose in ( 1, 2 ) and showEta and len(str(progress)) >= 64 ) or conf.verbose >= 3:
+    if ( conf.verbose in ( 1, 2 ) and showEta ) or conf.verbose >= 3:
         infoMsg = "retrieved: %s" % finalValue
         logger.info(infoMsg)
 
