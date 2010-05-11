@@ -23,6 +23,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import re
+import time
 
 from lib.core.common import dataToSessionFile
 from lib.core.common import safeStringFormat
@@ -84,8 +85,12 @@ def queryOutputLength(expression, payload):
 
     dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr))
 
+    start = time.time()
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
-    count, length       = bisection(payload, lengthExprUnescaped, charsetType=2)
+    count, length = bisection(payload, lengthExprUnescaped, charsetType=2)
+
+    debugMsg = "performed %d queries in %d seconds" % (count, int(time.time() - start))
+    logger.debug(debugMsg)
 
     if length == " ":
         length = 0
@@ -178,7 +183,11 @@ def resume(expression, payload):
         infoMsg += "output characters"
         logger.info(infoMsg)
 
-        _, finalValue = bisection(payload, newExpr, length=missingCharsLength)
+        start = time.time()
+        count, finalValue = bisection(payload, newExpr, length=missingCharsLength)
+
+        debugMsg = "performed %d queries in %d seconds" % (count, int(time.time() - start))
+        logger.debug(debugMsg)
 
         if len(finalValue) != ( int(length) - len(resumedValue) ):
             warnMsg  = "the total length of the query is not "

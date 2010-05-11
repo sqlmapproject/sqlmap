@@ -54,13 +54,12 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
     dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression))
 
     count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar)
-    duration = int(time.time() - start)
 
     if conf.eta and length:
         infoMsg = "retrieved: %s" % value
         logger.info(infoMsg)
 
-    debugMsg = "performed %d queries in %d seconds" % (count, duration)
+    debugMsg = "performed %d queries in %d seconds" % (count, int(time.time() - start))
     logger.debug(debugMsg)
 
     return value
