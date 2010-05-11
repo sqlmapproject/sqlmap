@@ -85,7 +85,7 @@ def queryOutputLength(expression, payload):
     dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr))
 
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
-    count, length       = bisection(payload, lengthExprUnescaped)
+    count, length       = bisection(payload, lengthExprUnescaped, charsetType=2)
 
     if length == " ":
         length = 0
