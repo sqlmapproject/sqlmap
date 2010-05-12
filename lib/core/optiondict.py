@@ -67,6 +67,7 @@ optDict = {
                                "regexp":            "string",
                                "eString":           "string",
                                "eRegexp":           "string",
+                               "useBetween":        "boolean",
                              },
 
             "Techniques":    {

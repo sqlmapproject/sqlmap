@@ -182,6 +182,10 @@ def cmdLineParser():
                              help="Matches to be excluded before "
                                   "comparing page contents")
 
+        injection.add_option("--use-between", dest="useBetween",
+                             action="store_true",
+                             help="Use operator BETWEEN instead of default '>'")
+
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
                                  "be used to test for specific SQL injection "
