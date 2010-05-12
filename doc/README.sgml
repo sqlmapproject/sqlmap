@@ -226,9 +226,9 @@ name="AthCon" url="http://www.athcon.org"> conference in Greece on June
 
 <p>
 <itemize>
-<item><bf>December 18</bf>, Miroslav Stampar replies to my public call
-for developers. He contributes actively in the development of sqlmap from
-version <bf>0.8 release candidate 2</bf>.
+<item><bf>December 18</bf>, Miroslav Stampar replies to the call for
+developers. Along with Bernardo, he actively develops sqlmap from version
+<bf>0.8 release candidate 2</bf>.
 
 <item><bf>December 12</bf>, Bernardo writes to the mailing list a post
 titled <htmlurl url="http://bernardodamele.blogspot.com/2009/12/sqlmap-state-of-art-3-years-later.html"
@@ -236,7 +236,7 @@ name="sqlmap state of art - 3 years later"> highlighting the goals
 achieved during these first three years of the project and launches a call
 for developers.
 
-<item><bf>December 4</bf>, sqlmap-devel mailing list has been merged
+<item><bf>December 4</bf>, sqlmap-devel mailing list has been merged into
 sqlmap-users <htmlurl name="mailing list" url="http://sqlmap.sourceforge.net/#ml">.
 
 <item><bf>November 20</bf>, Bernardo and Guido present again their
@@ -259,7 +259,7 @@ url="http://www.pornosecurity.org"> <htmlurl name="present"
 url="http://www.sourceconference.com/index.php/pastevents/source-barcelona-2009/schedule"> their research (<htmlurl name="slides"
 url="http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database">) at SOURCE Conference 2009 in Barcelona, Spain.
 
-<item><bf>August</bf>, Bernardo is accepted as a speaker to two others IT
+<item><bf>August</bf>, Bernardo is accepted as a speaker at two others IT
 security conferences, <htmlurl url="http://www.sourceconference.com/index.php/pastevents/source-barcelona-2009" name="SOURCE Barcelona 2009"> and <htmlurl url="http://200902.confidence.org.pl/"
 name="CONfidence 2009 Warsaw">.
 This new research is titled <em>Expanding the control over the operating
@@ -274,7 +274,7 @@ an updated version of his
 Digital Security Forum" url="http://www.digitalsecurityforum.eu/"> in
 Lisbon, Portugal.
 
-<item><bf>June 2</bf>, sqlmap version <bf>0.6.4</bf> has made it way to
+<item><bf>June 2</bf>, sqlmap version <bf>0.6.4</bf> has made its way to
 the official Ubuntu repository too.
 
 <item><bf>May</bf>, Bernardo presents again his research on operating
@@ -372,9 +372,10 @@ away from SourceForge and goes private for a while.
 <item><bf>November 4</bf>, release <bf>0.5</bf> marks the end of the OWASP
 Spring of Code 2007 contest participation. Bernardo has <htmlurl
 url="http://www.owasp.org/index.php/SpoC_007_-_SQLMap_-_Progress_Page"
-name="accomplished"> all the propsed objects which include initial support
-for Oracle, enhanced support for UNION query SQL injection and support to
-test and exploit injections on HTTP Cookie and User-Agent headers.
+name="accomplished"> all the propsed objects which include also initial
+support for Oracle, enhanced support for UNION query SQL injection and
+support to test and exploit SQL injections in HTTP Cookie and User-Agent
+headers.
 
 <item><bf>June 15</bf>, Bernardo releases version <bf>0.4</bf> as a
 result of the first OWASP Spring of Code 2007 milestone. This release
@@ -624,8 +625,8 @@ url="http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html"
 name="kitrap0d"> technique (<htmlurl
 url="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx"
 name="MS10-015">) or via <htmlurl
-url="http://www.argeniss.com/research/TokenKidnapping.pdf"
-name="Windows Access Tokens kidnapping"> by using Meterpreter's
+url="http://labs.mwrinfosecurity.com/files/Publications/mwri_security-implications-of-windows-access-tokens_2008-04-14.pdf"
+name="Windows Access Tokens insecure design"> by using Meterpreter's
 <tt>incognito</tt> extension.
 
 <item>Support to access (read/add/delete) Windows registry hives.
