@@ -45,7 +45,7 @@ def stackedTest():
     query      = getDelayQuery()
     start      = time.time()
     payload, _ = inject.goStacked(query)
-    duration   = time.time() - start
+    duration   = int(time.time() - start)
 
     if duration >= conf.timeSec:
         infoMsg  = "the web application supports stacked queries "
