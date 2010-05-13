@@ -262,6 +262,8 @@ class Connect:
 
         logger.log(8, responseMsg)
 
+        time.sleep(conf.cpuThrottleDelay)
+
         return page, responseHeaders
 
     @staticmethod
