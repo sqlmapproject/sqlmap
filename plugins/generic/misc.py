@@ -65,7 +65,7 @@ class Miscellaneous:
                 #logger.info(infoMsg)
                 #
                 #conf.tmpPath = self.evalCmd("echo %TEMP%")
-                conf.tmpPath = "C:/WINDOWS/Temp"
+                conf.tmpPath = "%TEMP%"
             else:
                 conf.tmpPath = "/tmp"
 

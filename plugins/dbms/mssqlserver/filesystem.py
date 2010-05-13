@@ -160,7 +160,7 @@ class Filesystem(GenericFilesystem):
 
             logger.debug("moving binary file %s to %s" % (sFile, dFile))
 
-            commands   = ("cd %s" % tmpPath,
+            commands   = ("cd \"%s\"" % tmpPath,
                           "ren %s %s" % (chunkName, dFileName),
                           "move /Y %s %s" % (dFileName, dFile))
             complComm  = " & ".join(command for command in commands)

@@ -211,7 +211,7 @@ class Filesystem:
 
         for scrLine in fileScrLines:
             forgedScrLine  = "echo %s " % scrLine
-            forgedScrLine += ">> %s\%s" % (tmpPath, randScr)
+            forgedScrLine += ">> \"%s\%s\"" % (tmpPath, randScr)
             forgedScrLines.append(forgedScrLine)
 
         for forgedScrLine in forgedScrLines:
