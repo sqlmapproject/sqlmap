@@ -25,6 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import time
 
 from lib.core.agent import agent
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getDelayQuery
 from lib.core.data import conf
 from lib.core.data import kb
@@ -43,7 +44,7 @@ def timeTest():
     payload   = agent.payload(newValue=query)
     start     = time.time()
     _         = Request.queryPage(payload)
-    duration  = int(time.time() - start)
+    duration  = calculateDeltaSeconds(start)
 
     if duration >= conf.timeSec:
         infoMsg  = "the parameter '%s' is affected by a time " % kb.injParameter
@@ -64,7 +65,7 @@ def timeTest():
         timeQuery  = getDelayQuery(andCond=True)
         start      = time.time()
         payload, _ = inject.goStacked(timeQuery)
-        duration   = int(time.time() - start)
+        duration   = calculateDeltaSeconds(start)
 
         if duration >= conf.timeSec:
             infoMsg  = "the parameter '%s' is affected by a time " % kb.injParameter
@@ -84,6 +85,6 @@ def timeTest():
 def timeUse(query):
     start      = time.time()
     _, _       = inject.goStacked(query)
-    duration   = int(time.time() - start)
+    duration   = calculateDeltaSeconds(start)
 
     return duration

@@ -25,6 +25,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 import time
 
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
@@ -89,7 +90,7 @@ def queryOutputLength(expression, payload):
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
     count, length = bisection(payload, lengthExprUnescaped, charsetType=2)
 
-    debugMsg = "performed %d queries in %d seconds" % (count, int(time.time() - start))
+    debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
     logger.debug(debugMsg)
 
     if length == " ":
@@ -186,7 +187,7 @@ def resume(expression, payload):
         start = time.time()
         count, finalValue = bisection(payload, newExpr, length=missingCharsLength)
 
-        debugMsg = "performed %d queries in %d seconds" % (count, int(time.time() - start))
+        debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
         logger.debug(debugMsg)
 
         if len(finalValue) != ( int(length) - len(resumedValue) ):

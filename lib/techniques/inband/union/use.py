@@ -26,6 +26,7 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import parseUnionPage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -228,7 +229,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         endPosition = resultPage.rindex(temp.stop) + len(temp.stop)
         value = str(resultPage[startPosition:endPosition])
 
-        duration = int(time.time() - start)
+        duration = calculateDeltaSeconds(start)
 
         debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
         logger.debug(debugMsg)

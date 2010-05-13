@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import time
 
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getDelayQuery
 from lib.core.data import conf
 from lib.core.data import kb
@@ -45,7 +46,7 @@ def stackedTest():
     query      = getDelayQuery()
     start      = time.time()
     payload, _ = inject.goStacked(query)
-    duration   = int(time.time() - start)
+    duration   = calculateDeltaSeconds(start)
 
     if duration >= conf.timeSec:
         infoMsg  = "the web application supports stacked queries "

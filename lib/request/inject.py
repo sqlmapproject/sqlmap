@@ -26,6 +26,7 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
@@ -55,7 +56,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar)
 
-    debugMsg = "performed %d queries in %d seconds" % (count, int(time.time() - start))
+    debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
     logger.debug(debugMsg)
 
     return value

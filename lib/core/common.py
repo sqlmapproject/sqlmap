@@ -1107,3 +1107,6 @@ def parseXmlFile(xmlFile, handler):
     parse(stream, handler)
     stream.close()
     xfile.close()
+
+def calculateDeltaSeconds(start, epsilon=0.05):
+    return int(time.time() - start + epsilon)
