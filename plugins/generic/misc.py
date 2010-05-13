@@ -49,23 +49,10 @@ class Miscellaneous:
     def getRemoteTempPath(self):
         if not conf.tmpPath:
             if kb.os == "Windows":
-                # NOTES:
-                #
-                # * The system-wide temporary files directory is
-                # C:\WINDOWS\Temp
-                #
-                # * MySQL runs by default as SYSTEM
-                #
-                # * PostgreSQL runs by default as postgres user and the
-                #   temporary files directory is C:\Documents and Settings\postgres\Local Settings\Temp,
-                #   however the system-wide folder is writable too
-                #
-                #infoMsg  = "retrieving remote absolute path of temporary files "
-                #infoMsg += "directory"
-                #logger.info(infoMsg)
-                #
-                #conf.tmpPath = self.evalCmd("echo %TEMP%")
-                conf.tmpPath = "%TEMP%"
+                if kb.dbms == "Microsoft SQL Server":
+                    conf.tmpPath = "%TEMP%"
+                else:
+                    conf.tmpPath = "C:/WINDOWS/Temp"
             else:
                 conf.tmpPath = "/tmp"
 
