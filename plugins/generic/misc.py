@@ -187,8 +187,8 @@ class Miscellaneous:
 
     def likeOrExact(self, what):
         message = "do you want sqlmap to consider provided %s(s):\n" % what
-        message += "[1] as LIKE column names (default)\n"
-        message += "[2] as exact column names"
+        message += "[1] as LIKE %s names (default)\n" % what
+        message += "[2] as exact %s names" % what
 
         choice = readInput(message, default="1")
 
