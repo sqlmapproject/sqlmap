@@ -161,27 +161,19 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if not conf.useBetween or kb.dbms == "SQLite":
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
             else:
-                forgedPayload = safeStringFormat(payload.replace('%3E', 'BETWEEN 0 AND'), (expressionUnescaped, idx, posValue))
+                forgedPayload = safeStringFormat(payload.replace('%3E', 'NOT BETWEEN 0 AND'), (expressionUnescaped, idx, posValue))
 
             result        = Request.queryPage(urlencode(forgedPayload))
 
             if kb.dbms == "SQLite":
                 posValue = posValueOld
 
-            if not conf.useBetween or kb.dbms == "SQLite":     #normal
-                if result:
-                    minValue = posValue
-                    asciiTbl = asciiTbl[position:]
-                else:
-                    maxValue = posValue
-                    asciiTbl = asciiTbl[:position]
-            else:                       #reversed
-                if result:
-                    maxValue = posValue
-                    asciiTbl = asciiTbl[:position]
-                else:
-                    minValue = posValue
-                    asciiTbl = asciiTbl[position:]
+            if result:
+                minValue = posValue
+                asciiTbl = asciiTbl[position:]
+            else:
+                maxValue = posValue
+                asciiTbl = asciiTbl[:position]
 
             if len(asciiTbl) == 1:
                 if maxValue == 1:
