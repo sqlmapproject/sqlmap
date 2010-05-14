@@ -1036,8 +1036,7 @@ def sanitizeAsciiString(subject):
         if not index:
             return subject
         else:
-            retVal = subject[:index] + "".join(subject[i] if ord(subject[i]) < 128 else '?' for i in xrange(index, len(subject)))
-            return retVal
+            return subject[:index] + "".join(subject[i] if ord(subject[i]) < 128 else '?' for i in xrange(index, len(subject)))
     else:
         return None
 
