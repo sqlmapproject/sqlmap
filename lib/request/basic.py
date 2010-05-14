@@ -36,6 +36,9 @@ from lib.core.data import kb
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
+__absFilePathsRegExp = ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" )
+__absFilePathsRegObj = [re.compile(absFilePathRegExp) for absFilePathRegExp in __absFilePathsRegExp]
+
 def forgeHeaders(cookie, ua):
     """
     Prepare HTTP Cookie and HTTP User-Agent headers to use when performing
@@ -74,10 +77,9 @@ def parseResponse(page, headers):
         # Detect injectable page absolute system path
         # NOTE: this regular expression works if the remote web application
         # is written in PHP and debug/error messages are enabled.
-        absFilePathsRegExp = ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" )
 
-        for absFilePathRegExp in absFilePathsRegExp:
-            for match in re.finditer(absFilePathRegExp, page):
+        for reobj in __absFilePathsRegObj:
+            for match in reobj.finditer(page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
 
