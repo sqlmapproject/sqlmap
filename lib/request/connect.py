@@ -285,35 +285,23 @@ class Connect:
         if not place:
             place = kb.injPlace
 
-        if conf.parameters.has_key("GET"):
-            if place == "GET" and value:
-                get = value
-            else:
-                get = conf.parameters["GET"]
+        if "GET" in conf.parameters:
+            get = conf.parameters["GET"] if place != "GET" or not value else value
 
-        if conf.parameters.has_key("POST"):
-            if place == "POST" and value:
-                post = value
-            else:
-                post = conf.parameters["POST"]
+        if "POST" in conf.parameters:
+            post = conf.parameters["POST"] if place != "POST" or not value else value
 
-        if conf.parameters.has_key("Cookie"):
-            if place == "Cookie" and value:
-                cookie = value
-            else:
-                cookie = conf.parameters["Cookie"]
+        if "Cookie" in conf.parameters:
+            cookie = conf.parameters["Cookie"] if place != "Cookie" or not value else value
 
-        if conf.parameters.has_key("User-Agent"):
-            if place == "User-Agent" and value:
-                ua = value
-            else:
-                ua = conf.parameters["User-Agent"]
-        
+        if "User-Agent" in conf.parameters:
+            ua = conf.parameters["User-Agent"] if place != "User-Agent" or not value else value
+
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
             if kb.queryCounter % conf.saFreq == 0:
                 Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
-        
+
         page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent)
 
         if content:
