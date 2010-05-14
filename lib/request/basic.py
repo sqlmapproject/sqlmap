@@ -77,9 +77,7 @@ def parseResponse(page, headers):
         absFilePathsRegExp = ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" )
 
         for absFilePathRegExp in absFilePathsRegExp:
-            reobj = re.compile(absFilePathRegExp)
-
-            for match in reobj.finditer(page):
+            for match in re.finditer(absFilePathRegExp, page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
 
