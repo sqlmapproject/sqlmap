@@ -53,17 +53,11 @@ def comparison(page, headers=None, getSeqMatcher=False):
 
     # String to match in page when the query is valid
     if conf.string:
-        if conf.string in page:
-            return True
-        else:
-            return False
+        return conf.string in page
 
     # Regular expression to match in page when the query is valid
     if conf.regexp:
-        if re.search(conf.regexp, page, re.I | re.M):
-            return True
-        else:
-            return False
+        return re.search(conf.regexp, page, re.I | re.M) is not None
 
     if conf.seqLock:
         conf.seqLock.acquire()
@@ -102,7 +96,5 @@ def comparison(page, headers=None, getSeqMatcher=False):
 
     # If the url is not stable it returns sequence matcher between the
     # first untouched HTTP response page content and this content
-    elif ratio > conf.matchRatio:
-        return True
     else:
-        return False
+        return ratio > conf.matchRatio
