@@ -1027,10 +1027,19 @@ def safeStringFormat(formatStr, params):
     return retVal
 
 def sanitizeAsciiString(subject):
-    retVal = None
     if subject:
-        retVal = "".join(char if ord(char) < 128 else '?' for char in subject)
-    return retVal
+        index = None
+        for i in xrange(len(subject)):
+            if ord(subject[i]) >= 128:
+                index = i
+                break
+        if not index:
+            return subject
+        else:
+            retVal = subject[:index] + "".join(subject[i] if ord(subject[i]) < 128 else '?' for i in xrange(index, len(subject)))
+            return retVal
+    else:
+        return None
 
 def decloakToNamedTemporaryFile(filepath, name=None):
     retVal = NamedTemporaryFile()
