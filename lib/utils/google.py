@@ -129,7 +129,13 @@ class Google:
     
             logger.log(8, responseMsg)
         except urllib2.HTTPError, e:
-            page = e.read()
+            try:
+                page = e.read()
+            except socket.timeout:
+                warnMsg  = "connection timed out while trying "
+                warnMsg += "to get error page information (%d)" % e.code
+                logger.warn(warnMsg)
+                return None
         except (urllib2.URLError, socket.error, socket.timeout), e:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
