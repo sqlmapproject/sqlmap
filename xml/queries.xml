@@ -63,7 +63,10 @@
             <inband query="SELECT schema_name FROM information_schema.SCHEMATA WHERE " query2="SELECT db FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
             <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA WHERE " query2="SELECT DISTINCT(db) FROM mysql.db WHERE " count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA WHERE " count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
         </search_db>
-        <search_table/>
+        <search_table>
+            <inband query="SELECT table_schema, table_name FROM information_schema.TABLES WHERE " condition="table_name" condition2="table_schema"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM information_schema.TABLES WHERE " query2="SELECT DISTINCT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM information_schema.TABLES WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM information_schema.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
+        </search_table>
         <search_column>
             <inband query="SELECT table_schema FROM information_schema.COLUMNS WHERE " query2="SELECT table_name FROM information_schema.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema"/>
             <blind query="SELECT DISTINCT(table_schema) FROM information_schema.COLUMNS WHERE " query2="SELECT DISTINCT(table_name) FROM information_schema.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM information_schema.COLUMNS WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM information_schema.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema"/>
@@ -136,7 +139,11 @@
             <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS LIMIT FROM %s) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db/>
-        <search_table/>
+        <search_table>
+            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
+            <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
+            <blind query="SELECT DISTINCT(TABLESPACE_NAME) FROM SYS.ALL_TABLES WHERE " query2="SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" count="SELECT COUNT(DISTINCT(TABLESPACE_NAME)) FROM SYS.ALL_TABLES WHERE " count2="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
+        </search_table>
         <search_column>
             <inband query="" query2="SELECT TABLE_NAME FROM SYS.ALL_TAB_COLUMNS" condition="COLUMN_NAME" condition2="TABLESPACE_NAME"/>
             <blind query="" query2="SELECT DISTINCT(TABLE_NAME) FROM SYS.ALL_TAB_COLUMNS" count="" count2="SELECT COUNT(DISTINCT(TABLE_NAME)) FROM SYS.ALL_TAB_COLUMNS" condition="COLUMN_NAME" condition2="TABLESPACE_NAME"/>
@@ -205,7 +212,10 @@
             <inband query="SELECT datname FROM pg_database WHERE " query2="" condition="datname" condition2=""/>
             <blind query="SELECT DISTINCT(datname) FROM pg_database WHERE " query2="" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database WHERE " count2="" condition="datname" condition2=""/>
         </search_db>
-        <search_table/>
+        <search_table>
+            <inband query="SELECT schemaname, tablename FROM pg_tables WHERE " condition="tablename" condition2="schemaname"/>
+            <blind query="SELECT DISTINCT(schemaname) FROM pg_tables WHERE " query2="SELECT tablename FROM pg_tables WHERE schemaname='%s'" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables WHERE " count2="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'" condition="tablename" condition2="schemaname"/>
+        </search_table>
         <search_column>
             <inband query="SELECT nspname FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " query2="SELECT relname FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" condition="attname" condition2="nspname"/>
             <blind query="SELECT DISTINCT(nspname) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " query2="SELECT DISTINCT(relname) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" count="SELECT COUNT(DISTINCT(nspname)) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " count2="SELECT COUNT(DISTINCT(relname)) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" condition="attname" condition2="nspname"/>
@@ -265,7 +275,10 @@
             <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
             <blind query="SELECT name FROM master..sysdatabases WHERE " count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE " condition="name"/>
         </search_db>
-        <search_table/>
+        <search_table>
+            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND " condition="name" condition2="name"/>
+            <blind query="" query2="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v') " count="" count2="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')" condition="name" condition2="name"/>
+        </search_table>
         <search_column>
             <inband query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
             <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>

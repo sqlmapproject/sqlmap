@@ -1269,8 +1269,125 @@ class Enumeration:
         return foundDbs
 
     def searchTable(self):
-        errMsg = "search for table names is not supported yet"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            errMsg  = "information_schema not available, "
+            errMsg += "back-end DBMS is MySQL < 5.0"
+            raise sqlmapUnsupportedFeatureException, errMsg
+
+        rootQuery = queries[kb.dbms].searchTable
+        foundTbls = {}
+        tblList = conf.tbl.split(",")
+        tblCond = rootQuery["inband"]["condition"]
+        dbCond = rootQuery["inband"]["condition2"]
+
+        tblConsider, tblCondParam = self.likeOrExact("table")
+
+        for tbl in tblList:
+            if kb.dbms == "Oracle":
+                tbl = tbl.upper()
+
+            infoMsg = "searching table"
+            if tblConsider == "1":
+                infoMsg += "s like"
+            infoMsg += " '%s'" % tbl
+            logger.info(infoMsg)
+
+            if conf.excludeSysDbs:
+                exclDbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
+                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                logger.info(infoMsg)
+            else:
+                exclDbsQuery = ""
+
+            tblQuery = "%s%s" % (tblCond, tblCondParam)
+            tblQuery = tblQuery % tbl
+
+            if kb.unionPosition or conf.direct:
+                query = rootQuery["inband"]["query"]
+                query += tblQuery
+                query += exclDbsQuery
+                values = inject.getValue(query, blind=False)
+
+                if values:
+                    if isinstance(values, str):
+                        values = [ values ]
+
+                    for foundDb, foundTbl in values:
+                        if foundDb in foundTbls:
+                            foundTbls[foundDb].append(foundTbl)
+                        else:
+                            foundTbls[foundDb] = [ foundTbl ]
+            else:
+                infoMsg = "fetching number of databases with table"
+                if tblConsider == "1":
+                    infoMsg += "s like"
+                infoMsg += " '%s'" % tbl
+                logger.info(infoMsg)
+
+                query = rootQuery["blind"]["count"]
+                query += tblQuery
+                query += exclDbsQuery
+                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                if not count.isdigit() or not len(count) or count == "0":
+                    warnMsg  = "no databases have table"
+                    if tblConsider == "1":
+                        warnMsg += "s like"
+                    warnMsg += " '%s'" % tbl
+                    logger.warn(warnMsg)
+
+                    continue
+
+                indexRange = getRange(count)
+
+                for index in indexRange:
+                    query = rootQuery["blind"]["query"]
+                    query += tblQuery
+                    query += exclDbsQuery
+                    query = agent.limitQuery(index, query)
+                    foundDb = inject.getValue(query, inband=False)
+                    foundTbls[foundDb] = []
+
+                    if tblConsider == "2":
+                        foundTbls[foundDb].append(tbl)
+
+                if tblConsider == "2":
+                    continue
+
+                for db in foundTbls.keys():
+                    infoMsg = "fetching number of table"
+                    if tblConsider == "1":
+                        infoMsg += "s like"
+                    infoMsg += " '%s' in database '%s'" % (tbl, db)
+                    logger.info(infoMsg)
+
+                    query = rootQuery["blind"]["count2"]
+                    query = query % db
+                    query += " AND %s" % tblQuery
+                    count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                    if not count.isdigit() or not len(count) or count == "0":
+                        warnMsg = "no table"
+                        if tblConsider == "1":
+                            warnMsg += "s like"
+                        warnMsg += " '%s' " % tbl
+                        warnMsg += "in database '%s'" % db
+                        logger.warn(warnMsg)
+
+                        continue
+
+                    indexRange = getRange(count)
+
+                    for index in indexRange:
+                        query = rootQuery["blind"]["query2"]
+                        query = query % db
+                        query += " AND %s" % tblQuery
+                        query = agent.limitQuery(index, query)
+                        foundTbl = inject.getValue(query, inband=False)
+                        kb.hintValue = foundTbl
+                        foundTbls[db].append(foundTbl)
+
+        return foundTbls
 
     def searchColumn(self):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
@@ -1291,7 +1408,16 @@ class Enumeration:
             if kb.dbms == "Oracle":
                 column = column.upper()
                 conf.db = "USERS"
-            elif kb.dbms == "Microsoft SQL Server":
+
+            infoMsg = "searching column"
+            if colConsider == "1":
+                infoMsg += "s like"
+            infoMsg += " '%s'" % column
+            logger.info(infoMsg)
+
+            foundCols[column] = {}
+
+            if kb.dbms == "Microsoft SQL Server":
                 if not conf.db:
                     if not len(kb.data.cachedDbs):
                         enumDbs = self.getDbs()
@@ -1299,8 +1425,6 @@ class Enumeration:
                         enumDbs = kb.data.cachedDbs
 
                     conf.db = ",".join(db for db in enumDbs)
-
-            foundCols[column] = {}
 
             if conf.db:
                 for db in conf.db.split(","):
