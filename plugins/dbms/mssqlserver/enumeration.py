@@ -28,7 +28,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.dump import dumper
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
 
