@@ -140,7 +140,7 @@ class Dump:
             for db, tblData in dbs.items():
                 for tbl, colData in tblData.items():
                     for col, dataType in colData.items():
-                        if column in col:
+                        if column.lower() in col.lower():
                             if db in printDbs:
                                 if tbl in printDbs[db]:
                                     printDbs[db][tbl][col] = dataType

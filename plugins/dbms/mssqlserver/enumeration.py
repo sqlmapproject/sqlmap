@@ -28,6 +28,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.dump import dumper
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
 
@@ -143,21 +144,19 @@ class Enumeration(GenericEnumeration):
             infoMsg += " '%s'" % tbl
             logger.info(infoMsg)
 
-            if conf.excludeSysDbs:
-                exclDbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
-                logger.info(infoMsg)
-            else:
-                exclDbsQuery = ""
-
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % tbl
 
             for db in foundTbls.keys():
+                if conf.excludeSysDbs and db in self.excludeDbsList:
+                    infoMsg = "skipping system database '%s'" % db
+                    logger.info(infoMsg)
+
+                    continue
+
                 if kb.unionPosition or conf.direct:
                     query = rootQuery["inband"]["query"] % db
                     query += tblQuery
-                    query += exclDbsQuery
                     values = inject.getValue(query, blind=False)
 
                     if values:
@@ -204,3 +203,120 @@ class Enumeration(GenericEnumeration):
                 foundTbls.pop(db)
 
         return foundTbls
+
+    def searchColumn(self):
+        rootQuery = queries[kb.dbms].searchColumn
+        foundCols = {}
+        dbs = {}
+        colList = conf.col.split(",")
+        colCond = rootQuery["inband"]["condition"]
+        colConsider, colCondParam = self.likeOrExact("column")
+
+        if not len(kb.data.cachedDbs):
+            enumDbs = self.getDbs()
+        else:
+            enumDbs = kb.data.cachedDbs
+
+        for db in enumDbs:
+            dbs[db] = {}
+
+        for column in colList:
+            infoMsg = "searching column"
+            if colConsider == "1":
+                infoMsg += "s like"
+            infoMsg += " '%s'" % column
+            logger.info(infoMsg)
+
+            foundCols[column] = {}
+
+            colQuery = "%s%s" % (colCond, colCondParam)
+            colQuery = colQuery % column
+
+            for db in dbs.keys():
+                if conf.excludeSysDbs and db in self.excludeDbsList:
+                    infoMsg = "skipping system database '%s'" % db
+                    logger.info(infoMsg)
+
+                    continue
+
+                if kb.unionPosition or conf.direct:
+                    query = rootQuery["inband"]["query"] % (db, db, db, db, db)
+                    query += " AND %s" % colQuery.replace("[DB]", db)
+                    values = inject.getValue(query, blind=False)
+
+                    if values:
+                        if isinstance(values, str):
+                            values = [ values ]
+
+                        for foundTbl in values:
+                            if foundTbl not in dbs[db]:
+                                dbs[db][foundTbl] = {}
+
+                            if colConsider == "1":
+                                conf.db = db
+                                conf.tbl = foundTbl
+                                conf.col = column
+
+                                self.getColumns(onlyColNames=True)
+
+                                dbs[db][foundTbl].update(kb.data.cachedColumns[db][foundTbl])
+                                kb.data.cachedColumns = {}
+                            else:
+                                dbs[db][foundTbl][column] = None
+
+                            if db in foundCols[column]:
+                                foundCols[column][db].append(foundTbl)
+                            else:
+                                foundCols[column][db] = [ foundTbl ]
+                else:
+                    foundCols[column][db] = []
+
+                    infoMsg = "fetching number of tables containing column"
+                    if colConsider == "1":
+                        infoMsg += "s like"
+                    infoMsg += " '%s' in database '%s'" % (column, db)
+                    logger.info(infoMsg)
+
+                    query = rootQuery["blind"]["count2"]
+                    query = query % (db, db, db, db, db)
+                    query += " AND %s" % colQuery.replace("[DB]", db)
+                    count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+
+                    if not count.isdigit() or not len(count) or count == "0":
+                        warnMsg = "no tables contain column"
+                        if colConsider == "1":
+                            warnMsg += "s like"
+                        warnMsg += " '%s' " % column
+                        warnMsg += "in database '%s'" % db
+                        logger.warn(warnMsg)
+
+                        continue
+
+                    indexRange = getRange(count)
+
+                    for index in indexRange:
+                        query = rootQuery["blind"]["query2"]
+                        query = query % (db, db, db, db, db)
+                        query += " AND %s" % colQuery.replace("[DB]", db)
+                        query = agent.limitQuery(index, query, colCond.replace("[DB]", db))
+                        tbl = inject.getValue(query, inband=False)
+                        kb.hintValue = tbl
+
+                        if tbl not in dbs[db]:
+                            dbs[db][tbl] = {}
+
+                        if colConsider == "1":
+                            conf.db = db
+                            conf.tbl = tbl
+                            conf.col = column
+
+                            self.getColumns(onlyColNames=True)
+
+                            dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
+                            kb.data.cachedColumns = {}
+                        else:
+                            dbs[db][tbl][column] = None
+
+                        foundCols[column][db].append(tbl)
+
+        self.dumpFoundColumn(dbs, foundCols, colConsider)
