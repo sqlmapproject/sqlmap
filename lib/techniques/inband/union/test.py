@@ -203,6 +203,9 @@ def unionTest():
     if conf.direct:
         return
 
+    if kb.unionCount is not None and kb.unionPosition is not None:
+        return
+
     if conf.uTech == "orderby":
         technique = "ORDER BY clause bruteforcing"
     else:
