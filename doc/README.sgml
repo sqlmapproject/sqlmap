@@ -44,10 +44,7 @@ sqlmap relies on the <htmlurl url="http://metasploit.com/framework/"
 name="Metasploit Framework"> for some of its post-exploitation takeover
 features. You need to grab a copy of it from the
 <htmlurl url="http://metasploit.com/framework/download/" name="download">
-page. The required version is <bf>3.3.3</bf> or above. However, it is
-recommended to use the Metasploit latest development version from the
-<htmlurl url="https://www.metasploit.com/svn/framework3/trunk/"
-name="Subversion repository">.
+page. The required version is <bf>3.4</bf> or above.
 
 If you plan to attack a web application behind NTLM authentication or use
 the sqlmap update functionality you need to install respectively
