@@ -58,6 +58,7 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.optiondict import optDict
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
+from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
@@ -546,7 +547,10 @@ def __setHTTPProxy():
     # can't be tunneled over an HTTP proxy natively by Python (<= 2.5)
     # urllib2 standard library
     if conf.scheme == "https":
-        proxyHandler = ProxyHTTPSHandler(__proxyString)
+        if PYVERSION >= "2.6":
+            proxyHandler = urllib2.ProxyHandler({"https": __proxyString})
+        else:
+            proxyHandler = ProxyHTTPSHandler(__proxyString)
     else:
         proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
 
