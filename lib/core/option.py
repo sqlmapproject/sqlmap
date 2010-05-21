@@ -928,7 +928,7 @@ def __setKnowledgeBaseAttributes():
     kb.absFilePaths   = set()
     kb.bannerFp       = advancedDict()
     kb.data           = advancedDict()
-    kb.commonTables   = None
+    kb.commonOutputs  = None
 
     # Basic back-end DBMS fingerprint
     kb.dbms           = None

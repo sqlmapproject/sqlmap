@@ -1111,7 +1111,7 @@ def profile(profileOutputFile=None, imageOutputFile=None):
     logger.info(infoMsg)
 
     graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
-    stderr = subprocess.Popen('python %s -f pstats %s | dot -Tpng -o %s' % (graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=subprocess.PIPE).stderr.read()
+    stderr = subprocess.Popen('%s %s -f pstats %s | dot -Tpng -o %s' % (sys.executable, graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=subprocess.PIPE).stderr.read()
 
     if stderr or not os.path.exists(imageOutputFile):
         errMsg = "there was an error while converting ('%s')" % stderr.strip()
@@ -1164,26 +1164,27 @@ def parseXmlFile(xmlFile, handler):
 def calculateDeltaSeconds(start, epsilon=0.05):
     return int(time.time() - start + epsilon)
 
-def getCommonPredictionTables(value, originalTable):
-    if not kb.commonTables:
-        kb.commonTables = {}
-        fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-tables.txt')
-        file = open(fileName, 'r')
-        key = None
-        for line in file.xreadlines():
-            line = line.strip()
-            if len(line) > 1:
-                if line[0] == '[' and line[-1] == ']':
-                    key = line[1:-1]
-                elif key:
-                    if key not in kb.commonTables:
-                        kb.commonTables[key] = []
-                    kb.commonTables[key].append(line.strip())
+def initCommonOutputs():
+    kb.commonOutputs = {}
+    fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
+    file = open(fileName, 'r')
+    key = None
+    for line in file.xreadlines():
+        line = line.strip()
+        if len(line) > 1:
+            if line[0] == '[' and line[-1] == ']':
+                key = line[1:-1]
+            elif key:
+                if key not in kb.commonTables:
+                    kb.commonTables[key] = []
+                kb.commonTables[key].append(line.strip())
+
+def getGoodSamaritanCharsets(part, originalCharset):
+    if not kb.commonOutputs:
+        initCommonOutputs()
 
     predictionSet = set()
     wildIndexes = []
-
-    kb.dbms = 'MySQL'
 
     if value[-1] != '.':
         value += '.'
