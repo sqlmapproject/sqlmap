@@ -1093,7 +1093,7 @@ def profile(profileOutputFile='sqlmap.profile', imageOutputFile='profile.png'):
 
     graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
 
-    infoMsg  = "converting profile data to an image."
+    infoMsg  = "converting profile data to a graph image."
     logger.info(infoMsg)
 
     if os.path.exists(imageOutputFile):
@@ -1102,15 +1102,29 @@ def profile(profileOutputFile='sqlmap.profile', imageOutputFile='profile.png'):
     msg = subprocess.Popen('python %s -f pstats %s | dot -Tpng -o %s' % (graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=subprocess.PIPE).stderr.read()
 
     if msg:
-        errMsg  = "there was an error while converting ('%s')." % msg.strip()
+        errMsg  = "there was an error while converting ('%s'), " % msg.strip()
+        errMsg += "but you can still find raw profile data "
+        errMsg += "inside file '%s'" % profileOutputFile
         logger.error(errMsg)
     else:
-        if os.name == 'mac':
-            subprocess.call(('open', imageOutputFile))
-        elif os.name == 'posix':
-            subprocess.call(('xdg-open', imageOutputFile))
-        elif os.name == 'nt':
-            subprocess.call(('start', imageOutputFile))
+        try:
+            if os.name == 'mac':
+                subprocess.call(('open', imageOutputFile))
+            elif os.name == 'posix':
+                subprocess.call(('xdg-open', imageOutputFile))
+            elif os.name == 'nt':
+                subprocess.call(('start', imageOutputFile))
+        except:
+            pass
+
+    if os.path.exists(imageOutputFile):
+        infoMsg  = "done. you can find a graph image inside file '%s'." % imageOutputFile
+        logger.info(infoMsg)
+    else:
+        errMsg  = "there was an error while converting, "
+        errMsg += "but you can still find raw profile data "
+        errMsg += "inside file '%s'" % profileOutputFile
+        logger.error(errMsg)
 
 def getConsoleWidth(default=80):
     width = None
