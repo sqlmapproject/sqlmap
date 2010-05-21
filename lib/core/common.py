@@ -573,6 +573,7 @@ def cleanQuery(query):
 def setPaths():
     # sqlmap paths
     paths.SQLMAP_CONTRIB_PATH    = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "contrib")
+    paths.SQLMAP_EXTRAS_PATH     = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
     paths.SQLMAP_SHELL_PATH      = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
     paths.SQLMAP_TXT_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
     paths.SQLMAP_UDF_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "udf")
@@ -1090,16 +1091,7 @@ def profile(profileOutputFile='sqlmap.profile', imageOutputFile='profile.png'):
     import cProfile
     cProfile.run("start()", profileOutputFile)
 
-    graphScript = 'gprof2dot.py'
-    graphScriptRepositoryUrl = 'http://gprof2dot.jrfonseca.googlecode.com/hg/'
-    graphScriptPath = os.path.join(paths.SQLMAP_ROOT_PATH, graphScript)
-    if not os.path.exists(graphScriptPath):
-        errMsg = "unable to find Jose Fonseca's '%s' graph " % graphScript
-        errMsg += "conversion script. please download it from "
-        errMsg += "official repository at '%s' " % graphScriptRepositoryUrl
-        errMsg += "and put it inside sqlmap's root directory ('%s')." % paths.SQLMAP_ROOT_PATH
-        logger.error(errMsg)
-        return
+    graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
 
     infoMsg  = "converting profile data to an image."
     logger.info(infoMsg)
