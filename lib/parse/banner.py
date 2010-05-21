@@ -27,6 +27,7 @@ import re
 from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
+from lib.core.common import getCompiledRegex
 from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
@@ -76,7 +77,8 @@ class MSSQLBannerHandler(ContentHandler):
     def endElement(self, name):
         if name == "signature":
             for version in (self.__version, self.__versionAlt):
-                if version and re.search(" %s[\.\ ]+" % version, self.__banner):
+                regObj = getCompiledRegex(" %s[\.\ ]+" % version)
+                if version and regObj.search(self.__banner):
                     self.__feedInfo("dbmsRelease", self.__release)
                     self.__feedInfo("dbmsVersion", self.__version)
                     self.__feedInfo("dbmsServicePack", self.__servicePack)
@@ -89,8 +91,9 @@ class MSSQLBannerHandler(ContentHandler):
         elif name == "version":
             self.__inVersion = False
             self.__version = self.__version.replace(" ", "")
-            
-            match = re.search(r"\A(?P<major>\d+)\.00\.(?P<build>\d+)\Z", self.__version)
+
+            regObj = getCompiledRegex(r"\A(?P<major>\d+)\.00\.(?P<build>\d+)\Z")
+            match = regObj.search(self.__version)
             self.__versionAlt = "%s.0.%s.0" % (match.group('major'), match.group('build')) if match else None
 
         elif name == "servicepack":

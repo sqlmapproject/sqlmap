@@ -70,6 +70,8 @@ from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 
+__compiledRegularExpressions = {}
+
 def paramToDict(place, parameters=None):
     """
     Split the parameters into names and values, check if these parameters
@@ -1222,3 +1224,11 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
         return predictedCharset, otherCharset
     else:
         return None, originalTable
+
+def getCompiledRegex(regex):
+    if regex in __compiledRegularExpressions:
+        return __compiledRegularExpressions[regex]
+    else:
+        retVal = re.compile(regex)
+        __compiledRegularExpressions[regex] = retVal
+        return retVal

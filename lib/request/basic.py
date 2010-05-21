@@ -28,6 +28,7 @@ import re
 import StringIO
 import zlib
 
+from lib.core.common import getCompiledRegex
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
 from lib.core.common import urlEncodeCookieValues
@@ -35,9 +36,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
-
-__absFilePathsRegExp = ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" )
-__absFilePathsRegObj = [re.compile(absFilePathRegExp) for absFilePathRegExp in __absFilePathsRegExp]
 
 def forgeHeaders(cookie, ua):
     """
@@ -78,8 +76,9 @@ def parseResponse(page, headers):
         # NOTE: this regular expression works if the remote web application
         # is written in PHP and debug/error messages are enabled.
 
-        for reobj in __absFilePathsRegObj:
-            for match in reobj.finditer(page):
+        for regex in ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" ):
+            regObj = getCompiledRegex(regex)
+            for match in regObj.finditer(page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
 

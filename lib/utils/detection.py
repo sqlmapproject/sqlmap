@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import re, sre_constants
 from xml.dom import minidom
 
+from lib.core.common import getCompiledRegex
 from lib.core.data import paths
 from lib.core.data import logger
 
@@ -50,12 +51,13 @@ def checkPayload(string):
         rules = []
         for xmlrule in xmlrules.getElementsByTagName("filter"):
             try:
-                rule = re.compile(xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue)
+                rule = xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue
                 desc = __adjustGrammar(xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue)
                 rules.append((rule, desc))
             except sre_constants.error: #some issues with some regex expressions in Python 2.5
                 pass
     
     for rule, desc in rules:
-        if rule.search(string, re.IGNORECASE):
+        regObj = getCompiledRegex(rule)
+        if regObj.search(string, re.IGNORECASE):
             logger.warn("highly probable IDS/IPS detection: '%s'" % desc)
