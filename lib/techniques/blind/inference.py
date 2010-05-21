@@ -30,6 +30,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import getCharset
+from lib.core.common import getGoodSamaritanCharsets
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
@@ -342,10 +343,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             charStart = time.time()
 
             if conf.useCommonPrediction:
-                commonTbl, otherTbl = getCommonPredictionTables(finalValue, asciiTbl)
-                val = getChar(index, commonTbl) if commonTbl else None
+                predictedCharset, otherCharset = getGoodSamaritanCharsets(finalValue, asciiTbl)
+                val = getChar(index, predictedCharset) if predictedCharset else None
                 if not val:
-                    val = getChar(index, otherTbl)
+                    val = getChar(index, otherCharset)
             else:
                 val = getChar(index, asciiTbl)
 
