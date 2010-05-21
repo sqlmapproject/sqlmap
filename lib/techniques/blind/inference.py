@@ -343,7 +343,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             charStart = time.time()
 
             if conf.useCommonPrediction:
-                predictedCharset, otherCharset = getGoodSamaritanCharsets(finalValue, asciiTbl)
+                predictedCharset, otherCharset = getGoodSamaritanCharsets(kb.partRun, finalValue, asciiTbl)
                 val = getChar(index, predictedCharset) if predictedCharset else None
                 if not val:
                     val = getChar(index, otherCharset)

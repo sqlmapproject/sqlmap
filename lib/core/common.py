@@ -1166,49 +1166,54 @@ def calculateDeltaSeconds(start, epsilon=0.05):
 
 def initCommonOutputs():
     kb.commonOutputs = {}
+    key = None
+
     fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     file = open(fileName, 'r')
-    key = None
+
     for line in file.xreadlines():
         line = line.strip()
         if len(line) > 1:
             if line[0] == '[' and line[-1] == ']':
                 key = line[1:-1]
             elif key:
-                if key not in kb.commonTables:
-                    kb.commonTables[key] = []
-                kb.commonTables[key].append(line.strip())
+                if key not in kb.commonOutputs:
+                    kb.commonOutputs[key] = []
+                kb.commonOutputs[key].append(line.strip())
+    file.close()
 
-def getGoodSamaritanCharsets(part, originalCharset):
+def getGoodSamaritanCharsets(part, prevValue, originalCharset):
+    ###wild card . (dot) is supported for compatibility with threading
     if not kb.commonOutputs:
         initCommonOutputs()
 
     predictionSet = set()
     wildIndexes = []
 
-    if value[-1] != '.':
-        value += '.'
+    if prevValue[-1] != '.':
+        prevValue += '.'
     charIndex = 0
-    findIndex = value.find('.', charIndex)
+    findIndex = prevValue.find('.', charIndex)
     while findIndex != -1:
         wildIndexes.append(findIndex)
         charIndex += 1
-        findIndex = value.find('.', charIndex)
-    if kb.dbms in kb.commonTables:
-        for item in kb.commonTables[kb.dbms]:
-            if re.search('\A%s' % value, item):
+        findIndex = prevValue.find('.', charIndex)
+
+    if part in kb.commonOutputs:
+        for item in kb.commonOutputs[kb.dbms]:
+            if re.search('\A%s' % prevValue, item):
                 for index in wildIndexes:
                     char = item[index]
                     if char not in predictionSet:
                         predictionSet.add(char)
-        predictionTable = []
-        otherTable = []
+        predictedCharset = []
+        otherCharset = []
         for ordChar in originalTable:
             if chr(ordChar) not in predictionSet:
-                otherTable.append(ordChar)
+                otherCharset.append(ordChar)
             else:
-                predictionTable.append(ordChar)
-        predictionTable.sort()
-        return predictionTable, otherTable
+                predictedCharset.append(ordChar)
+        predictedCharset.sort()
+        return predictedCharset, otherCharset
     else:
         return None, originalTable

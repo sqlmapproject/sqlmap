@@ -954,6 +954,7 @@ def __setKnowledgeBaseAttributes():
     kb.osSP           = None
 
     kb.parenthesis    = None
+    kb.partRun        = None
     kb.queryCounter   = 0
     kb.resumedQueries = {}
     kb.stackedTest    = None
