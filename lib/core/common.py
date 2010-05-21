@@ -1113,6 +1113,8 @@ def profile(profileOutputFile=None, imageOutputFile=None):
     logger.info(infoMsg)
 
     graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
+
+    # TODO: find the Windows version of Unix command 'dot'
     process = execute('%s %s -f pstats %s | dot -Tpng -o %s' % (sys.executable, graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stdout=None, stderr=PIPE)
     processStderr = process.communicate()[1]
 
