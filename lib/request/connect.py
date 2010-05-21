@@ -261,7 +261,7 @@ class Connect:
         logger.log(8, responseMsg)
 
         if conf.cpuThrottle:
-            delay = 0.00001 * conf.cpuThrottle
+            delay = 0.00001 * (conf.cpuThrottle ** 2)
             time.sleep(delay)
 
         return page, responseHeaders
