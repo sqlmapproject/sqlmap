@@ -882,7 +882,6 @@ def __setConfAttributes():
     debugMsg = "initializing the configuration"
     logger.debug(debugMsg)
 
-    conf.cpuThrottleDelay = 0.001
     conf.cj               = None
     conf.dbmsConnector    = None
     conf.dbmsHandler      = None
@@ -929,6 +928,7 @@ def __setKnowledgeBaseAttributes():
     kb.absFilePaths   = set()
     kb.bannerFp       = advancedDict()
     kb.data           = advancedDict()
+    kb.commonTables   = None
 
     # Basic back-end DBMS fingerprint
     kb.dbms           = None

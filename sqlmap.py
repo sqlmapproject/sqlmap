@@ -39,6 +39,7 @@ except ImportError, _:
 
 from lib.controller.controller import start
 from lib.core.common import banner
+from lib.core.common import profile
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
 from lib.core.data import conf
@@ -75,8 +76,10 @@ def main():
 
     try:
         init(cmdLineOptions)
-        start()
-
+        if not conf.profile:
+            start()
+        else:
+            profile()
     except exceptionsTuple, e:
         e = str(e)
         logger.error(e)

@@ -1086,6 +1086,40 @@ def isBase64EncodedString(subject):
 def isHexEncodedString(subject):
     return re.match(r"\A[0-9a-fA-F]+\Z", subject) is not None
 
+def profile(profileOutputFile='sqlmap.profile', imageOutputFile='profile.png'):
+    import cProfile
+    cProfile.run("start()", profileOutputFile)
+
+    graphScript = 'gprof2dot.py'
+    graphScriptRepositoryUrl = 'http://gprof2dot.jrfonseca.googlecode.com/hg/'
+    graphScriptPath = os.path.join(paths.SQLMAP_ROOT_PATH, graphScript)
+    if not os.path.exists(graphScriptPath):
+        errMsg = "unable to find Jose Fonseca's '%s' graph " % graphScript
+        errMsg += "conversion script. please download it from "
+        errMsg += "official repository at '%s' " % graphScriptRepositoryUrl
+        errMsg += "and put it inside sqlmap's root directory ('%s')." % paths.SQLMAP_ROOT_PATH
+        logger.error(errMsg)
+        return
+
+    infoMsg  = "converting profile data to an image."
+    logger.info(infoMsg)
+
+    if os.path.exists(imageOutputFile):
+        os.remove(imageOutputFile)
+
+    msg = subprocess.Popen('python %s -f pstats %s | dot -Tpng -o %s' % (graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=subprocess.PIPE).stderr.read()
+
+    if msg:
+        errMsg  = "there was an error while converting ('%s')." % msg.strip()
+        logger.error(errMsg)
+    else:
+        if os.name == 'mac':
+            subprocess.call(('open', imageOutputFile))
+        elif os.name == 'posix':
+            subprocess.call(('xdg-open', imageOutputFile))
+        elif os.name == 'nt':
+            subprocess.call(('start', imageOutputFile))
+
 def getConsoleWidth(default=80):
     width = None
 
@@ -1118,3 +1152,51 @@ def parseXmlFile(xmlFile, handler):
 
 def calculateDeltaSeconds(start, epsilon=0.05):
     return int(time.time() - start + epsilon)
+
+def getCommonPredictionTables(value, originalTable):
+    if not kb.commonTables:
+        kb.commonTables = {}
+        fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-tables.txt')
+        file = open(fileName, 'r')
+        key = None
+        for line in file.xreadlines():
+            line = line.strip()
+            if len(line) > 1:
+                if line[0] == '[' and line[-1] == ']':
+                    key = line[1:-1]
+                elif key:
+                    if key not in kb.commonTables:
+                        kb.commonTables[key] = []
+                    kb.commonTables[key].append(line.strip())
+
+    predictionSet = set()
+    wildIndexes = []
+
+    kb.dbms = 'MySQL'
+
+    if value[-1] != '.':
+        value += '.'
+    charIndex = 0
+    findIndex = value.find('.', charIndex)
+    while findIndex != -1:
+        wildIndexes.append(findIndex)
+        charIndex += 1
+        findIndex = value.find('.', charIndex)
+    if kb.dbms in kb.commonTables:
+        for item in kb.commonTables[kb.dbms]:
+            if re.search('\A%s' % value, item):
+                for index in wildIndexes:
+                    char = item[index]
+                    if char not in predictionSet:
+                        predictionSet.add(char)
+        predictionTable = []
+        otherTable = []
+        for ordChar in originalTable:
+            if chr(ordChar) not in predictionSet:
+                otherTable.append(ordChar)
+            else:
+                predictionTable.append(ordChar)
+        predictionTable.sort()
+        return predictionTable, otherTable
+    else:
+        return None, originalTable

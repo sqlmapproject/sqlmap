@@ -340,7 +340,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         while True:
             index    += 1
             charStart = time.time()
-            val       = getChar(index, asciiTbl)
+
+            if conf.useCommonPrediction:
+                commonTbl, otherTbl = getCommonPredictionTables(finalValue, asciiTbl)
+                val = getChar(index, commonTbl) if commonTbl else None
+                if not val:
+                    val = getChar(index, otherTbl)
+            else:
+                val = getChar(index, asciiTbl)
 
             if val is None or ( lastChar > 0 and index > lastChar ):
                 break

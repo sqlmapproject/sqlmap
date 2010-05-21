@@ -260,7 +260,10 @@ class Connect:
 
         logger.log(8, responseMsg)
 
-        time.sleep(conf.cpuThrottleDelay)
+        if conf.cpuThrottle:
+            minThrottleDelay, maxThrottleDelay = 0.0001, 0.1
+            delay = minThrottleDelay + (maxThrottleDelay-minThrottleDelay) * conf.cpuThrottle
+            time.sleep(delay)
 
         return page, responseHeaders
 

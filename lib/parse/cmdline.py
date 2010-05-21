@@ -27,6 +27,7 @@ import sys
 from optparse import OptionError
 from optparse import OptionGroup
 from optparse import OptionParser
+from optparse import SUPPRESS_HELP
 
 from lib.core.data import logger
 from lib.core.settings import VERSION_STRING
@@ -415,10 +416,10 @@ def cmdLineParser():
         miscellaneous.add_option("-s", dest="sessionFile",
                                  help="Save and resume all data retrieved "
                                       "on a session file")
-                                      
+
         miscellaneous.add_option("--flush-session", dest="flushSession", action="store_true",
                                  help="Flush session file for current target")
-                                      
+
         miscellaneous.add_option("--eta", dest="eta", action="store_true",
                                  help="Display for each output the "
                                       "estimated time of arrival")
@@ -438,6 +439,16 @@ def cmdLineParser():
         miscellaneous.add_option("--cleanup", dest="cleanup", action="store_true",
                                  help="Clean up the DBMS by sqlmap specific "
                                       "UDF and tables")
+
+        # Hidden and/or experimental options
+        parser.add_option("--profile", dest="profile", action="store_true",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int", default=10,
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--common-prediction", dest="useCommonPrediction", action="store_true",
+                          help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)
