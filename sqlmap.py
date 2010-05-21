@@ -76,10 +76,10 @@ def main():
 
     try:
         init(cmdLineOptions)
-        if not conf.profile:
-            start()
-        else:
+        if conf.profile:
             profile()
+        else:
+            start()
     except exceptionsTuple, e:
         e = str(e)
         logger.error(e)
