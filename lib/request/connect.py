@@ -63,6 +63,9 @@ class Connect:
 
         if conf.delay is not None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
+        elif conf.cpuThrottle:
+            delay = 0.00001 * (conf.cpuThrottle ** 2)
+            time.sleep(delay)
 
         url       = kwargs.get('url',       conf.url).replace(" ", "%20")
         get       = kwargs.get('get',       None)
@@ -259,10 +262,6 @@ class Connect:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
         logger.log(8, responseMsg)
-
-        if conf.cpuThrottle:
-            delay = 0.00001 * (conf.cpuThrottle ** 2)
-            time.sleep(delay)
 
         return page, responseHeaders
 
