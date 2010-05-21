@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from lib.core.common import getCompiledRegex
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import posixToNtSlashes
@@ -57,7 +58,7 @@ class Miscellaneous:
             else:
                 conf.tmpPath = "/tmp"
 
-        if re.search("\A[\w]:[\/\\\\]+", conf.tmpPath, re.I):
+        if getCompiledRegex("(?i)\A[\w]:[\/\\\\]+").search(conf.tmpPath):
             kb.os = "Windows"
 
         conf.tmpPath = normalizePath(conf.tmpPath)

@@ -51,7 +51,7 @@ def checkPayload(string):
         rules = []
         for xmlrule in xmlrules.getElementsByTagName("filter"):
             try:
-                rule = xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue
+                rule = "(?i)%s" % xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue
                 desc = __adjustGrammar(xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue)
                 rules.append((rule, desc))
             except sre_constants.error: #some issues with some regex expressions in Python 2.5
@@ -59,5 +59,5 @@ def checkPayload(string):
     
     for rule, desc in rules:
         regObj = getCompiledRegex(rule)
-        if regObj.search(string, re.IGNORECASE):
+        if regObj.search(string):
             logger.warn("highly probable IDS/IPS detection: '%s'" % desc)
