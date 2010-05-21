@@ -1114,11 +1114,10 @@ def profile(profileOutputFile=None, imageOutputFile=None):
 
     graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
     process = execute('%s %s -f pstats %s | dot -Tpng -o %s' % (sys.executable, graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stdout=None, stderr=PIPE)
-    pollProcess(process)
-    payloadStderr = process.communicate()[1]
+    processStderr = process.communicate()[1]
 
-    if payloadStderr or not os.path.exists(imageOutputFile):
-        errMsg = "there was an error while converting ('%s'), " % payloadStderr.strip()
+    if processStderr or not os.path.exists(imageOutputFile):
+        errMsg = "there was an error while converting ('%s'), " % processStderr.strip()
         errMsg += "but you can still find raw profile data "
         errMsg += "inside file '%s'" % profileOutputFile
         logger.error(errMsg)
