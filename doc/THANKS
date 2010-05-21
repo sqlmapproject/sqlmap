@@ -84,6 +84,11 @@ Giorgio Fedon <giorgio.fedon@gmail.com>
 Kasper Fons <thefeds@mail.dk>
     for reporting a few bugs
 
+Jose Fonseca <jose.r.fonseca@gmail.com>
+    for his Gprof2Dot utility for converting profiler output
+    to dot graph(s) included in sqlmap tree inside extras,
+    http://gprof2dot.jrfonseca.googlecode.com/hg/gprof2dot.py
+
 Alan Franzoni <alan.franzoni@gmail.com>
     for helping me out with Python subprocess library
 
