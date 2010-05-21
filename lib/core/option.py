@@ -323,7 +323,7 @@ def __setMetasploit():
     if conf.osSmb:
         isAdmin = False
 
-        if "linux" in PLATFORM or "darwin" in PLATFORM:
+        if PLATFORM in ( "posix", "mac" ):
             isAdmin = os.geteuid()
 
             if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:

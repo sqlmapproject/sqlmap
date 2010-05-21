@@ -46,15 +46,15 @@ class UPX:
     """
 
     def __initialize(self, srcFile, dstFile=None):
-        if "darwin" in PLATFORM:
+        if PLATFORM == "mac":
             self.__upxPath = "%s/upx/macosx/upx" % paths.SQLMAP_CONTRIB_PATH
 
-        elif "win" in PLATFORM:
+        elif PLATFORM in ( "ce", "nt" ):
             self.__upxTempExe = decloakToMkstemp("%s\upx\windows\upx.exe_" % paths.SQLMAP_CONTRIB_PATH, suffix=".exe")
             self.__upxPath = self.__upxTempExe.name
             self.__upxTempExe.close() #needed for execution rights
 
-        elif "linux" in PLATFORM:
+        elif PLATFORM == "posix":
             self.__upxPath = "%s/upx/linux/upx" % paths.SQLMAP_CONTRIB_PATH
 
         else:

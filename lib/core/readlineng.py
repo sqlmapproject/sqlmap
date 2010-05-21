@@ -61,7 +61,7 @@ if IS_WIN and haveReadline:
 # Thanks to Boyd Waters for this patch.
 uses_libedit = False
 
-if PLATFORM == 'darwin' and haveReadline:
+if PLATFORM == 'mac' and haveReadline:
     import commands
 
     (status, result) = commands.getstatusoutput( "otool -L %s | grep libedit" % _rl.__file__ )

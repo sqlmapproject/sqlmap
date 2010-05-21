@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import cProfile
 import os
 import random
 import re
@@ -54,6 +55,7 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
+from lib.core.settings import PLATFORM
 from lib.core.settings import SITE
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
@@ -1087,44 +1089,47 @@ def isBase64EncodedString(subject):
 def isHexEncodedString(subject):
     return re.match(r"\A[0-9a-fA-F]+\Z", subject) is not None
 
-def profile(profileOutputFile='sqlmap.profile', imageOutputFile='profile.png'):
-    import cProfile
-    cProfile.run("start()", profileOutputFile)
+def profile(profileOutputFile=None, imageOutputFile=None):
+    if profileOutputFile is None:
+        profileOutputFile = os.path.join(paths.SQLMAP_OUTPUT_PATH, "sqlmap_profile.raw")
 
-    graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
+    if imageOutputFile is None:
+        imageOutputFile = os.path.join(paths.SQLMAP_OUTPUT_PATH, "sqlmap_profile.png")
 
-    infoMsg  = "converting profile data to a graph image."
-    logger.info(infoMsg)
+    if os.path.exists(profileOutputFile):
+        os.remove(profileOutputFile)
 
     if os.path.exists(imageOutputFile):
         os.remove(imageOutputFile)
 
-    msg = subprocess.Popen('python %s -f pstats %s | dot -Tpng -o %s' % (graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=subprocess.PIPE).stderr.read()
+    infoMsg  = "profiling the execution into file %s" % profileOutputFile
+    logger.info(infoMsg)
 
-    if msg:
-        errMsg  = "there was an error while converting ('%s'), " % msg.strip()
+    cProfile.run("start()", profileOutputFile)
+
+    infoMsg  = "converting profile data into a graph image, %s" % imageOutputFile
+    logger.info(infoMsg)
+
+    graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
+    stderr = subprocess.Popen('python %s -f pstats %s | dot -Tpng -o %s' % (graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=subprocess.PIPE).stderr.read()
+
+    if stderr or not os.path.exists(imageOutputFile):
+        errMsg = "there was an error while converting ('%s')" % stderr.strip()
         errMsg += "but you can still find raw profile data "
         errMsg += "inside file '%s'" % profileOutputFile
         logger.error(errMsg)
-    else:
-        try:
-            if os.name == 'mac':
-                subprocess.call(('open', imageOutputFile))
-            elif os.name == 'posix':
-                subprocess.call(('xdg-open', imageOutputFile))
-            elif os.name == 'nt':
-                subprocess.call(('start', imageOutputFile))
-        except:
-            pass
 
-    if os.path.exists(imageOutputFile):
-        infoMsg  = "done. you can find a graph image inside file '%s'." % imageOutputFile
-        logger.info(infoMsg)
-    else:
-        errMsg  = "there was an error while converting, "
-        errMsg += "but you can still find raw profile data "
-        errMsg += "inside file '%s'" % profileOutputFile
-        logger.error(errMsg)
+        return
+
+    try:
+        if PLATFORM == 'mac':
+            subprocess.call(('open', imageOutputFile))
+        elif PLATFORM == 'posix':
+            subprocess.call(('xdg-open', imageOutputFile))
+        elif PLATFORM == 'nt':
+            subprocess.call(('start', imageOutputFile))
+    except:
+        pass
 
 def getConsoleWidth(default=80):
     width = None

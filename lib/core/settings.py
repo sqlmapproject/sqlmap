@@ -23,6 +23,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import logging
+import os
 import subprocess
 import sys
 
@@ -46,7 +47,10 @@ LOGGER.setLevel(logging.WARN)
 
 # System variables
 IS_WIN             = subprocess.mswindows
-PLATFORM           = sys.platform.lower()
+# The name of the operating system dependent module imported. The following
+# names have currently been registered: 'posix', 'nt', 'mac', 'os2', 'ce',
+# 'java', 'riscos'
+PLATFORM           = os.name
 PYVERSION          = sys.version.split()[0]
 
 # Url to update Microsoft SQL Server XML versions file from
