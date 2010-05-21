@@ -36,6 +36,8 @@ import posixpath
 import subprocess
 
 from StringIO import StringIO
+from subprocess import PIPE
+from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
 from xml.sax import parse
@@ -1111,7 +1113,7 @@ def profile(profileOutputFile=None, imageOutputFile=None):
     logger.info(infoMsg)
 
     graphScriptPath = os.path.join(paths.SQLMAP_EXTRAS_PATH, 'gprof2dot', 'gprof2dot.py')
-    stderr = subprocess.Popen('%s %s -f pstats %s | dot -Tpng -o %s' % (sys.executable, graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=subprocess.PIPE).stderr.read()
+    stderr = execute('%s %s -f pstats %s | dot -Tpng -o %s' % (sys.executable, graphScriptPath, profileOutputFile, imageOutputFile), shell=True, stderr=PIPE).stderr.read()
 
     if stderr or not os.path.exists(imageOutputFile):
         errMsg = "there was an error while converting ('%s')" % stderr.strip()
