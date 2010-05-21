@@ -381,12 +381,10 @@ def checkRegexp():
         return False
 
 def checkConnection():
-    infoMsg = "testing if site exists"
-    logger.info(infoMsg)
     try:
         socket.gethostbyname(conf.hostname)
     except socket.gaierror:
-        errMsg = "site '%s' does not exist" % conf.hostname
+        errMsg = "host '%s' does not exist" % conf.hostname
         raise sqlmapConnectionException, errMsg
 
     infoMsg = "testing connection to the target url"
