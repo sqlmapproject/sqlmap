@@ -180,7 +180,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if maxValue == 1:
                     return None
                 elif minValue == maxChar:
-                    asciiTbl = range( maxChar + 1, (maxChar + 1) * 8 )
+                    asciiTbl = range( maxChar + 1, (maxChar + 1) << 8 )
                     maxChar = maxValue = asciiTbl[-1]
                     minValue = asciiTbl[0]
                 else:
