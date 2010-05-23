@@ -141,23 +141,26 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return None
 
-    def getChar(idx, asciiTbl=asciiTbl):
+    def getChar(idx, charTbl=asciiTbl):
         result = tryHint(idx)
 
         if result:
             return result
 
-        maxChar = maxValue = asciiTbl[-1]
-        minValue = asciiTbl[0]
+        maxChar = maxValue = charTbl[-1]
+        minValue = charTbl[0]
 
-        while len(asciiTbl) != 1:
+        while len(charTbl) != 1:
             queriesCount[0] += 1
-            position      = (len(asciiTbl) / 2)
-            posValue      = asciiTbl[position]
+            position      = (len(charTbl) >> 1)
+            posValue      = charTbl[position]
 
             if kb.dbms == "SQLite":
                 posValueOld = posValue
-                posValue = chr(posValue)
+                if posValue < 256:
+                    posValue = chr(posValue)
+                else:
+                    posValue = unichr(posValue)
 
             if not conf.useBetween or kb.dbms == "SQLite":
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
@@ -171,18 +174,24 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if result:
                 minValue = posValue
-                asciiTbl = asciiTbl[position:]
+                if type(charTbl) != xrange:
+                    charTbl = charTbl[position:]
+                else:
+                    charTbl = xrange(charTbl[position], charTbl[-1] + 1)
             else:
                 maxValue = posValue
-                asciiTbl = asciiTbl[:position]
+                if type(charTbl) != xrange:
+                    charTbl = charTbl[:position]
+                else:
+                    charTbl = xrange(charTbl[0], charTbl[position] + 1)
 
-            if len(asciiTbl) == 1:
+            if len(charTbl) == 1:
                 if maxValue == 1:
                     return None
                 elif minValue == maxChar:
-                    asciiTbl = range( maxChar + 1, (maxChar + 1) << 8 )
-                    maxChar = maxValue = asciiTbl[-1]
-                    minValue = asciiTbl[0]
+                    charTbl = xrange( maxChar + 1, (maxChar + 1) << 8 )
+                    maxChar = maxValue = charTbl[-1]
+                    minValue = charTbl[0]
                 else:
                     retVal = minValue + 1
                     if retVal < 256:
