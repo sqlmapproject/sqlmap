@@ -147,8 +147,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if result:
             return result
 
-        maxValue = asciiTbl[len(asciiTbl)-1]
-        minValue = 0
+        maxChar = maxValue = asciiTbl[-1]
+        minValue = asciiTbl[0]
 
         while len(asciiTbl) != 1:
             queriesCount[0] += 1
@@ -179,8 +179,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if len(asciiTbl) == 1:
                 if maxValue == 1:
                     return None
+                elif minValue == maxChar:
+                    asciiTbl = range( maxChar + 1, (maxChar + 1) * 8 )
+                    maxChar = maxValue = asciiTbl[-1]
+                    minValue = asciiTbl[0]
                 else:
-                    return chr(minValue + 1)
+                    retVal = minValue + 1
+                    if retVal < 256:
+                        return chr(retVal)
+                    else:
+                        return unichr(retVal)
 
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):
