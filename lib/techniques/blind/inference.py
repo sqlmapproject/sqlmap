@@ -157,7 +157,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if kb.dbms == "SQLite":
                 posValueOld = posValue
-                if posValue < 256:
+                if posValue < 128:
                     posValue = chr(posValue)
                 else:
                     posValue = unichr(posValue)
@@ -197,7 +197,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if retVal < 128:
                         return chr(retVal)
                     else:
-                        return unichr(retVal) #test value 50089
+                        return unichr(retVal)
 
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):
