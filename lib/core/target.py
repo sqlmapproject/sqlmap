@@ -141,8 +141,7 @@ def __setOutputResume():
                     if url[0] == "[":
                         url = url[1:]
     
-                    if value[-1] == "\n":
-                        value = value[:-1]
+                    value = value.rstrip('\r\n') #strips both chars independently
 
                     if url not in ( conf.url, conf.hostname ):
                         continue
