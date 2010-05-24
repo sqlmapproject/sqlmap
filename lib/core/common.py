@@ -1165,7 +1165,6 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     gobject.timeout_add(1000, win.update, dotOutputFile)
     gtk.main()
 
-
 def getConsoleWidth(default=80):
     width = None
 
@@ -1204,22 +1203,25 @@ def initCommonOutputs():
     key = None
 
     fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
-    file = open(fileName, 'r')
+    cfile = open(fileName, 'r')
 
-    for line in file.xreadlines():
+    for line in cfile.xreadlines():
         line = line.strip()
+
         if len(line) > 1:
             if line[0] == '[' and line[-1] == ']':
                 key = line[1:-1]
             elif key:
                 if key not in kb.commonOutputs:
                     kb.commonOutputs[key] = []
+
                 kb.commonOutputs[key].append(line.strip())
-    file.close()
+
+    cfile.close()
 
 def getGoodSamaritanCharsets(part, prevValue, originalCharset):
     ###wild card . (dot) is supported for compatibility with threading
-    if not kb.commonOutputs:
+    if kb.commonOutputs is None:
         initCommonOutputs()
 
     predictionSet = set()
@@ -1227,8 +1229,10 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
 
     if prevValue[-1] != '.':
         prevValue += '.'
+
     charIndex = 0
     findIndex = prevValue.find('.', charIndex)
+
     while findIndex != -1:
         wildIndexes.append(findIndex)
         charIndex += 1
@@ -1239,16 +1243,21 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
             if re.search('\A%s' % prevValue, item):
                 for index in wildIndexes:
                     char = item[index]
+
                     if char not in predictionSet:
                         predictionSet.add(char)
+
         predictedCharset = []
         otherCharset = []
+
         for ordChar in originalTable:
             if chr(ordChar) not in predictionSet:
                 otherCharset.append(ordChar)
             else:
                 predictedCharset.append(ordChar)
+
         predictedCharset.sort()
+
         return predictedCharset, otherCharset
     else:
         return None, originalTable
