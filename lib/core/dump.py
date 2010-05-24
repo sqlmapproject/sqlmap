@@ -55,7 +55,7 @@ class Dump:
         
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
-        self.__outputFP = codecs.open(self.__outputFile, "a", "utf-8")
+        self.__outputFP = codecs.open(self.__outputFile, "a", conf.dataEncoding)
         
     def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
@@ -268,7 +268,7 @@ class Dump:
                 os.makedirs(dumpDbPath, 0755)
 
             dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, table)
-            dumpFP = codecs.open(dumpFileName, "w", "utf-8")
+            dumpFP = codecs.open(dumpFileName, "w", conf.dataEncoding)
 
         count     = int(tableValues["__infos__"]["count"])
         separator = ""

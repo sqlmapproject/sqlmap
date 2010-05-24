@@ -97,7 +97,7 @@ def __urllib2Opener():
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
-    fp = codecs.open(reqFile, "r", "utf-8")
+    fp = codecs.open(reqFile, "r", conf.dataEncoding)
 
     fread = fp.read()
     fread = fread.replace("\r", "")
@@ -884,6 +884,7 @@ def __setConfAttributes():
     logger.debug(debugMsg)
 
     conf.cj               = None
+    conf.dataEncoding     = "utf-8"
     conf.dbmsConnector    = None
     conf.dbmsHandler      = None
     conf.dumpPath         = None

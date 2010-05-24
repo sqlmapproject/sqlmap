@@ -122,7 +122,7 @@ def __setOutputResume():
 
     if os.path.exists(conf.sessionFile):
         if not conf.flushSession:
-            readSessionFP = codecs.open(conf.sessionFile, "r", "utf-8")
+            readSessionFP = codecs.open(conf.sessionFile, "r", conf.dataEncoding)
             __url_cache = set()
             __expression_cache = {}
 
@@ -171,7 +171,7 @@ def __setOutputResume():
                 raise sqlmapFilePathException, errMsg
 
     try:
-        conf.sessionFP = codecs.open(conf.sessionFile, "a", "utf-8")
+        conf.sessionFP = codecs.open(conf.sessionFile, "a", conf.dataEncoding)
         dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
     except IOError:
         errMsg = "unable to write on the session file specified"

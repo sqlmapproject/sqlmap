@@ -356,7 +356,7 @@ def dataToStdout(data):
         sys.stdout.write(data)
         sys.stdout.flush()
     except UnicodeEncodeError:
-        print data.encode("utf8")
+        print data.encode(conf.dataEncoding)
 
 def dataToSessionFile(data):
     if not conf.sessionFile:
@@ -375,7 +375,7 @@ def dataToOutFile(data):
 
     rFile     = filePathToString(conf.rFile)
     rFilePath = "%s%s%s" % (conf.filePath, os.sep, rFile)
-    rFileFP   = codecs.open(rFilePath, "wb", "utf-8")
+    rFileFP   = codecs.open(rFilePath, "wb", conf.dataEncoding)
 
     rFileFP.write(data)
     rFileFP.flush()
@@ -416,7 +416,7 @@ def fileToStr(fileName):
     @rtype: C{str}
     """
 
-    filePointer = codecs.open(fileName, "r", "utf-8")
+    filePointer = codecs.open(fileName, "r", conf.dataEncoding)
     fileText = filePointer.read()
 
     return fileText.replace("    ", "").replace("\t", "").replace("\r", "").replace("\n", " ")
