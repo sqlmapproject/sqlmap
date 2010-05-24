@@ -22,8 +22,9 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import os
+import codecs
 import re
+import os
 
 from lib.core.common import dataToDumpFile
 from lib.core.data import conf
@@ -54,7 +55,7 @@ class Dump:
         
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
-        self.__outputFP = open(self.__outputFile, "a")
+        self.__outputFP = codecs.open(self.__outputFile, "a", "utf-8")
         
     def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
@@ -267,7 +268,7 @@ class Dump:
                 os.makedirs(dumpDbPath, 0755)
 
             dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, table)
-            dumpFP = open(dumpFileName, "w")
+            dumpFP = codecs.open(dumpFileName, "w", "utf-8")
 
         count     = int(tableValues["__infos__"]["count"])
         separator = ""
@@ -319,13 +320,14 @@ class Dump:
             for column in columns:
                 if column != "__infos__":
                     info = tableValues[column]
-                    value = info["values"][i]
 
-                    if re.search("^[\ *]*$", str(value)):
+                    value = unicode(info["values"][i]) if type(info["values"][i]) != unicode else info["values"][i]
+
+                    if re.search("^[\ *]*$", value):
                         value = "NULL"
 
                     maxlength = int(info["length"])
-                    blank = " " * (maxlength - len(str(value)))
+                    blank = " " * (maxlength - len(value))
                     self.__write("| %s%s" % (value, blank), n=False)
 
                     if not conf.multipleTargets and field == fields:

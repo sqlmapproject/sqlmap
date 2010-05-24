@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import os
 import time
 
@@ -121,11 +122,11 @@ def __setOutputResume():
 
     if os.path.exists(conf.sessionFile):
         if not conf.flushSession:
-            readSessionFP = open(conf.sessionFile, "r")
+            readSessionFP = codecs.open(conf.sessionFile, "r", "utf-8")
             __url_cache = set()
             __expression_cache = {}
 
-            for line in readSessionFP.xreadlines():
+            for line in readSessionFP.readlines(): #xreadlines doesn't return unicode strings when codec.open used
                 if line.count("][") == 4:
                     line = line.split("][")
 
@@ -170,7 +171,7 @@ def __setOutputResume():
                 raise sqlmapFilePathException, errMsg
 
     try:
-        conf.sessionFP = open(conf.sessionFile, "a")
+        conf.sessionFP = codecs.open(conf.sessionFile, "a", "utf-8")
         dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
     except IOError:
         errMsg = "unable to write on the session file specified"

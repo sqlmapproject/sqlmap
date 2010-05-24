@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import cookielib
 import ctypes
 import difflib
@@ -96,7 +97,7 @@ def __urllib2Opener():
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
-    fp = open(reqFile, "r")
+    fp = codecs.open(reqFile, "r", "utf-8")
 
     fread = fp.read()
     fread = fread.replace("\r", "")

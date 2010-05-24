@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import cProfile
 import os
 import random
@@ -351,8 +352,11 @@ def filePathToString(filePath):
     return strRepl
 
 def dataToStdout(data):
-    sys.stdout.write(data)
-    sys.stdout.flush()
+    try:
+        sys.stdout.write(data)
+        sys.stdout.flush()
+    except UnicodeEncodeError:
+        print data.encode("utf8")
 
 def dataToSessionFile(data):
     if not conf.sessionFile:
@@ -371,7 +375,7 @@ def dataToOutFile(data):
 
     rFile     = filePathToString(conf.rFile)
     rFilePath = "%s%s%s" % (conf.filePath, os.sep, rFile)
-    rFileFP   = open(rFilePath, "wb")
+    rFileFP   = codecs.open(rFilePath, "wb", "utf-8")
 
     rFileFP.write(data)
     rFileFP.flush()
@@ -412,7 +416,7 @@ def fileToStr(fileName):
     @rtype: C{str}
     """
 
-    filePointer = open(fileName, "r")
+    filePointer = codecs.open(fileName, "r", "utf-8")
     fileText = filePointer.read()
 
     return fileText.replace("    ", "").replace("\t", "").replace("\r", "").replace("\n", " ")

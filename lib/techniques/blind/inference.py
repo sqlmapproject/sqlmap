@@ -194,10 +194,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     minValue = charTbl[0]
                 else:
                     retVal = minValue + 1
-                    if retVal < 256:
+                    if retVal < 128:
                         return chr(retVal)
                     else:
-                        return unichr(retVal)
+                        return unichr(retVal) #test value 50089
 
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):
