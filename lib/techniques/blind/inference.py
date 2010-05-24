@@ -183,12 +183,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if type(charTbl) != xrange:
                     charTbl = charTbl[:position]
                 else:
-                    charTbl = xrange(charTbl[0], charTbl[position] + 1)
+                    charTbl = xrange(charTbl[0], charTbl[position])
 
             if len(charTbl) == 1:
                 if maxValue == 1:
                     return None
                 elif minValue == maxChar:
+                    import pdb
+                    pdb.set_trace()
                     charTbl = xrange( maxChar + 1, (maxChar + 1) << 8 )
                     maxChar = maxValue = charTbl[-1]
                     minValue = charTbl[0]
