@@ -211,6 +211,10 @@ Simone Onofri <simone.onofri@gmail.com>
     for patching the PHP web backdoor to make it work properly also on
     Windows
 
+Shaohua Pan <pan@knownsec.com>
+    for reporting a minor bug
+    for suggesting a feature
+
 Antonio Parata <s4tan@ictsc.it>
     for providing me with some ideas for the PHP backdoor
 
