@@ -1219,16 +1219,17 @@ def initCommonOutputs():
 
     cfile.close()
 
-def getGoodSamaritanCharsets(part, prevValue, originalCharset):
+def getGoodSamaritanParameters(part, prevValue, originalCharset):
     ###wild card . (dot) is supported for compatibility with threading
     if kb.commonOutputs is None:
         initCommonOutputs()
 
     if not part or not prevValue: #is not None and != ""
-        return None, originalCharset
+        return None, None, originalCharset
 
     predictionSet = set()
     wildIndexes = []
+    singleValue = None
 
     if prevValue[-1] != '.':
         prevValue += '.'
@@ -1244,6 +1245,7 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
     if part in kb.commonOutputs:
         for item in kb.commonOutputs[part]:
             if re.search('\A%s' % prevValue, item):
+                singleValue = item
                 for index in wildIndexes:
                     char = item[index]
 
@@ -1260,10 +1262,13 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
                 predictedCharset.append(ordChar)
 
         predictedCharset.sort()
+        
+        if len(predictedCharset) > 1:
+            singleValue = None
 
-        return predictedCharset, otherCharset
+        return singleValue, predictedCharset, otherCharset
     else:
-        return None, originalCharset
+        return None, None, originalCharset
 
 def getCompiledRegex(regex):
     if regex in __compiledRegularExpressions:

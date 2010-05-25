@@ -30,7 +30,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import getCharset
-from lib.core.common import getGoodSamaritanCharsets
+from lib.core.common import getGoodSamaritanParameters
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
@@ -370,8 +370,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             charStart = time.time()
 
             if conf.useCommonPrediction:
-                predictedCharset, otherCharset = getGoodSamaritanCharsets(kb.partRun, finalValue, asciiTbl)
-                val = getChar(index, predictedCharset, False) if predictedCharset else None
+                singleValue, predictedCharset, otherCharset = getGoodSamaritanParameters(kb.partRun, finalValue, asciiTbl)
+                if singleValue is None:
+                    val = getChar(index, predictedCharset, False) if predictedCharset else None
+                else:
+                    ##check if that's the value
+                    #finalValue = singleValue
+                    #break
+                    pass
                 if not val:
                     val = getChar(index, otherCharset)
             else:
