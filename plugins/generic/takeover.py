@@ -114,7 +114,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
                 while True:
                     choice = readInput(msg, default=1)
 
-                    if isinstance(choice, str) and choice.isdigit() and int(choice) in ( 1, 2 ):
+                    if isinstance(choice, basestring) and choice.isdigit() and int(choice) in ( 1, 2 ):
                         choice = int(choice)
                         break
 

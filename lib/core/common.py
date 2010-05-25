@@ -149,7 +149,7 @@ def formatDBMSfp(versions=None):
     if ( not versions or versions == [None] ) and kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown":
         versions = kb.dbmsVersion
 
-    if isinstance(versions, str):
+    if isinstance(versions, basestring):
         return "%s %s" % (kb.dbms, versions)
     elif isinstance(versions, (list, set, tuple)):
         return "%s %s" % (kb.dbms, " and ".join([version for version in versions]))
@@ -848,7 +848,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
     else:
         data = output
 
-    if len(data) == 1 and isinstance(data[0], str):
+    if len(data) == 1 and isinstance(data[0], basestring):
         data = data[0]
 
     return data
@@ -1019,7 +1019,7 @@ def normalizePath(path):
 def safeStringFormat(formatStr, params):
     retVal = formatStr.replace("%d", "%s")
 
-    if isinstance(params, str):
+    if isinstance(params, basestring):
         retVal = retVal.replace("%s", params)
     else:
         count = 0

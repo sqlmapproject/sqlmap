@@ -90,7 +90,7 @@ class Dump:
                 pass
 
         for element in elements:
-            if isinstance(element, str):
+            if isinstance(element, basestring):
                 self.__write("[*] %s" % element)
             elif isinstance(element, (list, tuple, set)):
                 self.__write("[*] " + ", ".join(str(e) for e in element))

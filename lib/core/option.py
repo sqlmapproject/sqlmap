@@ -1011,7 +1011,7 @@ def __saveCmdline():
                 elif datatype == "string":
                     value = ""
 
-            if isinstance(value, str):
+            if isinstance(value, basestring):
                 value = value.replace("\n", "\n ")
 
             config.set(family, option, value)

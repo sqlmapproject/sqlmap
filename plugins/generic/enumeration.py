@@ -718,7 +718,7 @@ class Enumeration:
 
             if value:
                 if kb.dbms == "SQLite":
-                    if isinstance(value, str):
+                    if isinstance(value, basestring):
                         value = [[ "SQLite", value ]]
                     elif isinstance(value, (list, tuple, set)):
                         newValue = []
@@ -1040,7 +1040,7 @@ class Enumeration:
             entries = inject.getValue(query, blind=False, dump=True)
 
             if entries:
-                if isinstance(entries, str):
+                if isinstance(entries, basestring):
                     entries = [ entries ]
 
                 entriesCount = len(entries)
@@ -1053,7 +1053,7 @@ class Enumeration:
                         kb.data.dumpedTable[column] = { "length": 0, "values": [] }
 
                     for entry in entries:
-                        if isinstance(entry, str):
+                        if isinstance(entry, basestring):
                             colEntry = entry
                         else:
                             colEntry = entry[index]
@@ -1295,7 +1295,7 @@ class Enumeration:
                 values = inject.getValue(query, blind=False)
 
                 if values:
-                    if isinstance(values, str):
+                    if isinstance(values, basestring):
                         values = [ values ]
 
                     for value in values:
@@ -1380,7 +1380,7 @@ class Enumeration:
                 values = inject.getValue(query, blind=False)
 
                 if values:
-                    if isinstance(values, str):
+                    if isinstance(values, basestring):
                         values = [ values ]
 
                     for foundDb, foundTbl in values:
@@ -1501,7 +1501,7 @@ class Enumeration:
                 values = inject.getValue(query, blind=False)
 
                 if values:
-                    if isinstance(values, str):
+                    if isinstance(values, basestring):
                         values = [ values ]
 
                     for foundDb, foundTbl in values:

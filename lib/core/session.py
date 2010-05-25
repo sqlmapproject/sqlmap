@@ -193,7 +193,7 @@ def setStacked():
                   not kb.resumedQueries[conf.url].has_key("Stacked queries") )
                 )
 
-    if not isinstance(kb.stackedTest, str):
+    if not isinstance(kb.stackedTest, basestring):
         return
 
     if condition:

@@ -45,7 +45,7 @@ def queriesForAutoCompletion():
     autoComplQueries = {}
 
     for _, query in queries[kb.dbms].items():
-        if isinstance(query, str) and len(query) > 1:
+        if isinstance(query, basestring) and len(query) > 1:
             autoComplQuery = query
         elif isinstance(query, dict) and "inband" in query:
             autoComplQuery = query["inband"]["query"]

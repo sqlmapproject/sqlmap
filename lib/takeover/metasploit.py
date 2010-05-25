@@ -179,7 +179,7 @@ class Metasploit:
         return self.__skeletonSelection("SMB port", self.__msfSMBPortsList)
 
     def __selectEncoder(self, encode=True):
-        if isinstance(encode, str):
+        if isinstance(encode, basestring):
             return encode
 
         elif kb.os == "Windows" and encode:

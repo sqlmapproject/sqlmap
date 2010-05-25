@@ -58,20 +58,20 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     if "LENGTH(" in expression or "LEN(" in expression:
         firstChar = 0
-    elif conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, str) and conf.firstChar.isdigit() ) ):
+    elif conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit() ) ):
         firstChar = int(conf.firstChar) - 1
     elif firstChar is None:
         firstChar = 0
-    elif ( isinstance(firstChar, str) and firstChar.isdigit() ) or isinstance(firstChar, int):
+    elif ( isinstance(firstChar, basestring) and firstChar.isdigit() ) or isinstance(firstChar, int):
         firstChar = int(firstChar) - 1
 
     if "LENGTH(" in expression or "LEN(" in expression:
         lastChar = 0
-    elif conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, str) and conf.lastChar.isdigit() ) ):
+    elif conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit() ) ):
         lastChar = int(conf.lastChar)
     elif lastChar in ( None, "0" ):
         lastChar = 0
-    elif ( isinstance(lastChar, str) and lastChar.isdigit() ) or isinstance(lastChar, int):
+    elif ( isinstance(lastChar, basestring) and lastChar.isdigit() ) or isinstance(lastChar, int):
         lastChar = int(lastChar)
 
     if kb.dbmsDetected:
@@ -335,7 +335,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         # can mean that the connection to the target url was lost
         if None in value:
             for v in value:
-                if isinstance(v, str) and v is not None:
+                if isinstance(v, basestring) and v is not None:
                     partialValue += v
 
             if partialValue:
@@ -345,7 +345,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             finalValue = "".join(value)
             infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), finalValue)
 
-        if isinstance(finalValue, str) and len(finalValue) > 0:
+        if isinstance(finalValue, basestring) and len(finalValue) > 0:
             dataToSessionFile(replaceNewlineTabs(finalValue))
 
         if conf.verbose >= 1 and not showEta and infoMsg:

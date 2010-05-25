@@ -376,7 +376,7 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     kb.unionFalseCond = oldParamFalseCond
     kb.unionNegative  = oldParamNegative
 
-    if value and isinstance(value, str):
+    if value and isinstance(value, basestring):
         value = value.strip()
 
     return value

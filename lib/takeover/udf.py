@@ -227,7 +227,7 @@ class UDF:
         while True:
             udfCount = readInput(msg, default=1)
 
-            if isinstance(udfCount, str) and udfCount.isdigit():
+            if isinstance(udfCount, basestring) and udfCount.isdigit():
                 udfCount = int(udfCount)
 
                 if udfCount <= 0:
@@ -267,7 +267,7 @@ class UDF:
             while True:
                 parCount = readInput(msg, default=default)
 
-                if isinstance(parCount, str) and parCount.isdigit() and int(parCount) >= 0:
+                if isinstance(parCount, basestring) and parCount.isdigit() and int(parCount) >= 0:
                     parCount = int(parCount)
                     break
 
@@ -284,7 +284,7 @@ class UDF:
                 while True:
                     parType = readInput(msg, default=defaultType)
 
-                    if isinstance(parType, str) and parType.isdigit():
+                    if isinstance(parType, basestring) and parType.isdigit():
                         logger.warn("you need to specify the data-type of the parameter")
 
                     else:
@@ -297,7 +297,7 @@ class UDF:
             while True:
                 retType = readInput(msg, default=defaultType)
 
-                if isinstance(retType, str) and retType.isdigit():
+                if isinstance(retType, basestring) and retType.isdigit():
                     logger.warn("you need to specify the data-type of the return value")
                 else:
                     self.udfs[udfName]["return"] = retType
@@ -328,7 +328,7 @@ class UDF:
 
                 if choice and choice[0] in ( "q", "Q" ):
                     break
-                elif isinstance(choice, str) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
+                elif isinstance(choice, basestring) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
                     choice = int(choice)
                     break
                 elif isinstance(choice, int) and choice > 0 and choice <= len(udfList):

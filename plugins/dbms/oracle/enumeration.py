@@ -217,7 +217,7 @@ class Enumeration(GenericEnumeration):
                     values = inject.getValue(query, blind=False)
 
                     if values:
-                        if isinstance(values, str):
+                        if isinstance(values, basestring):
                             values = [ values ]
 
                         for foundTbl in values:
