@@ -1224,6 +1224,9 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
     if kb.commonOutputs is None:
         initCommonOutputs()
 
+    if not part or not prevValue: #is not None and != ""
+        return None, originalCharset
+
     predictionSet = set()
     wildIndexes = []
 
@@ -1239,7 +1242,7 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
         findIndex = prevValue.find('.', charIndex)
 
     if part in kb.commonOutputs:
-        for item in kb.commonOutputs[kb.dbms]:
+        for item in kb.commonOutputs[part]:
             if re.search('\A%s' % prevValue, item):
                 for index in wildIndexes:
                     char = item[index]
@@ -1250,7 +1253,7 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
         predictedCharset = []
         otherCharset = []
 
-        for ordChar in originalTable:
+        for ordChar in originalCharset:
             if chr(ordChar) not in predictionSet:
                 otherCharset.append(ordChar)
             else:
@@ -1260,7 +1263,7 @@ def getGoodSamaritanCharsets(part, prevValue, originalCharset):
 
         return predictedCharset, otherCharset
     else:
-        return None, originalTable
+        return None, originalCharset
 
 def getCompiledRegex(regex):
     if regex in __compiledRegularExpressions:

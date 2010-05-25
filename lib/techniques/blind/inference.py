@@ -141,11 +141,22 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return None
 
-    def getChar(idx, charTbl=asciiTbl):
+    def getChar(idx, charTbl=asciiTbl, sequentialOrder=True):
         result = tryHint(idx)
 
         if result:
             return result
+
+        if not sequentialOrder:
+            originalTbl = list(charTbl)
+
+        if len(charTbl) == 1:
+            forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
+            result = Request.queryPage(urlencode(forgedPayload))
+            if result:
+                return chr(charTbl[0]) if charTbl[0] < 128 else unichr(charTbl[0])
+            else: 
+                return None
 
         maxChar = maxValue = charTbl[-1]
         minValue = charTbl[0]
@@ -189,15 +200,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if maxValue == 1:
                     return None
                 elif minValue == maxChar:
-                    charTbl = xrange( maxChar + 1, (maxChar + 1) << 8 )
+                    charTbl = xrange(maxChar + 1, (maxChar + 1) << 8)
                     maxChar = maxValue = charTbl[-1]
                     minValue = charTbl[0]
-                else:
+                elif sequentialOrder:
                     retVal = minValue + 1
-                    if retVal < 128:
-                        return chr(retVal)
-                    else:
-                        return unichr(retVal)
+                    return chr(retVal) if retVal < 128 else unichr(retVal)
+                else:
+                    retVal = originalTbl[originalTbl.index(minValue) + 1]
 
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):
@@ -361,7 +371,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if conf.useCommonPrediction:
                 predictedCharset, otherCharset = getGoodSamaritanCharsets(kb.partRun, finalValue, asciiTbl)
-                val = getChar(index, predictedCharset) if predictedCharset else None
+                val = getChar(index, predictedCharset, False) if predictedCharset else None
                 if not val:
                     val = getChar(index, otherCharset)
             else:
