@@ -371,13 +371,18 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if conf.useCommonPrediction:
                 singleValue, predictedCharset, otherCharset = getGoodSamaritanParameters(kb.partRun, finalValue, asciiTbl)
+                val = None
+
                 if singleValue is None:
                     val = getChar(index, predictedCharset, False) if predictedCharset else None
                 else:
-                    ##check if that's the value
-                    #finalValue = singleValue
-                    #break
+                    #forgedPayload = safeStringFormat('AND (%s) = \'%s\'', (expressionUnescaped, singleValue))
+                    #result = Request.queryPage(urlencode(forgedPayload))
+                    #if result:
+                    #    finalValue = singleValue
+                    #    break
                     pass
+
                 if not val:
                     val = getChar(index, otherCharset)
             else:

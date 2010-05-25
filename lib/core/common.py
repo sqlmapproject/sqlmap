@@ -1262,11 +1262,11 @@ def getGoodSamaritanParameters(part, prevValue, originalCharset):
                 predictedCharset.append(ordChar)
 
         predictedCharset.sort()
-        
-        if len(predictedCharset) > 1:
-            singleValue = None
 
-        return singleValue, predictedCharset, otherCharset
+        if len(predictedCharset) > 1:
+            return None, predictedCharset, otherCharset
+        else:
+            return singleValue, None, originalCharset
     else:
         return None, None, originalCharset
 
