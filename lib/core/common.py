@@ -1221,7 +1221,13 @@ def initCommonOutputs():
     cfile.close()
 
 def getGoodSamaritanParameters(part, prevValue, originalCharset):
-    ###wild card . (dot) is supported for compatibility with threading
+    """
+    Function for retrieving parameters needed for good samaritan (common outputs) feature.
+    Returns singleValue if there is a complete single match (in part of common-outputs.txt set by parameter 'part') 
+       regarding parameter prevValue. If there is no single value match, but multiple, predictedCharset is returned
+       containing more probable characters (retrieved from matched items in common-outputs.txt) together with the
+       rest of charset as otherCharset
+    """
     if kb.commonOutputs is None:
         initCommonOutputs()
 
@@ -1272,6 +1278,9 @@ def getGoodSamaritanParameters(part, prevValue, originalCharset):
         return None, None, originalCharset
 
 def getCompiledRegex(regex, args=()):
+    """
+    Returns compiled regular expression and stores it in cache for further usage
+    """
     if regex in __compiledRegularExpressions:
         return __compiledRegularExpressions[regex]
     else:
@@ -1279,8 +1288,10 @@ def getCompiledRegex(regex, args=()):
         __compiledRegularExpressions[regex] = retVal
         return retVal
 
-#dumper.dbTableValues(conf.dbmsHandler.dumpTable()) -> dumpTable
 def getPartRun():
+    """
+    Goes through call stack and finds constructs matching conf.dmbsHandler.*. Returns it or it's alias used in common-outputs.txt
+    """
     commonPartsDict = { "getTables":"Tables", "getColumns":"Columns", "getUsers":"Users", "getBanner":"Banners", "getDbs":"Databases" }
     retVal = None
     stack = [item[4][0] if isinstance(item[4], list) else '' for item in inspect.stack()]

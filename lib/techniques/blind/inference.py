@@ -57,7 +57,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     asciiTbl = getCharset(charsetType)
 
-    kb.partRun = getPartRun() if conf.useCommonPrediction else None
+    kb.partRun = getPartRun() if conf.useCommonPrediction else None #set kb.partRun in case common-prediction used
 
     if "LENGTH(" in expression or "LEN(" in expression:
         firstChar = 0
@@ -372,16 +372,20 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             index    += 1
             charStart = time.time()
 
+            #common prediction (a.k.a. good samaritan)
             if conf.useCommonPrediction:
                 singleValue, predictedCharset, otherCharset = getGoodSamaritanParameters(kb.partRun, finalValue, asciiTbl)
                 val = None
 
+                #if there is no singleValue (single match from common-outputs.txt) use the returned predictedCharset
                 if singleValue is None:
                     val = getChar(index, predictedCharset, False) if predictedCharset else None
                 else:
+                    #one shot query containing equals singleValue
                     query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = %s', (expressionUnescaped, unescaper.unescape('\'%s\'' % singleValue))))
                     query = agent.postfixQuery(query)
                     result = Request.queryPage(urlencode(agent.payload(newValue=query)))
+                    #did we have luck?
                     if result:
                         dataToSessionFile(replaceNewlineTabs(singleValue[index-1:]))
                         if showEta:
@@ -390,6 +394,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             dataToStdout(singleValue[index-1:])
                         finalValue = singleValue
                         break
+                #if we had no luck with singleValue and predictedCharset use the returned otherCharset
                 if not val:
                     val = getChar(index, otherCharset)
             else:
