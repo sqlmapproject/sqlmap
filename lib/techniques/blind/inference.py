@@ -31,6 +31,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import getCharset
 from lib.core.common import getGoodSamaritanParameters
+from lib.core.common import getPartRun
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
@@ -55,6 +56,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     finalValue   = ""
 
     asciiTbl = getCharset(charsetType)
+
+    kb.partRun = getPartRun() if conf.useCommonPrediction else None
 
     if "LENGTH(" in expression or "LEN(" in expression:
         firstChar = 0
@@ -376,13 +379,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if singleValue is None:
                     val = getChar(index, predictedCharset, False) if predictedCharset else None
                 else:
-                    #forgedPayload = safeStringFormat('AND (%s) = \'%s\'', (expressionUnescaped, singleValue))
-                    #result = Request.queryPage(urlencode(forgedPayload))
-                    #if result:
-                    #    finalValue = singleValue
-                    #    break
-                    pass
-
+                    query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = \'%s\'', (expressionUnescaped, singleValue)))
+                    query = agent.postfixQuery(query)
+                    payload = agent.payload(newValue=query)
+                    result = Request.queryPage(urlencode(payload))
+                    if result:
+                        finalValue = singleValue
+                        break
                 if not val:
                     val = getChar(index, otherCharset)
             else:

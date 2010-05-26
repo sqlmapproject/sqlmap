@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import codecs
 import cProfile
+import inspect
 import os
 import random
 import re
@@ -1270,10 +1271,23 @@ def getGoodSamaritanParameters(part, prevValue, originalCharset):
     else:
         return None, None, originalCharset
 
-def getCompiledRegex(regex):
+def getCompiledRegex(regex, args=()):
     if regex in __compiledRegularExpressions:
         return __compiledRegularExpressions[regex]
     else:
-        retVal = re.compile(regex)
+        retVal = re.compile(regex, *args)
         __compiledRegularExpressions[regex] = retVal
         return retVal
+
+#dumper.dbTableValues(conf.dbmsHandler.dumpTable()) -> dumpTable
+def getPartRun():
+    commonPartsDict = { "dumpTable":"Tables", "getColumns":"Columns", "getUsers":"Users", "getBanner":"Banners" }
+    retVal = None
+    stack = [item[4][0] if isinstance(item[4], list) else '' for item in inspect.stack()]
+    reobj = getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')
+    for i in xrange(len(stack) - 1, 0, -1):
+        match = reobj.search(stack[i])
+        if match:
+            retVal = match.groups()[0]
+            break
+    return commonPartsDict[retVal] if retVal in commonPartsDict else retVal
