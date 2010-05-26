@@ -16,3 +16,7 @@ TABLES
 TRIGGERS
 USER_PRIVILEGES
 VIEWS
+
+[Databases]
+information_schema
+mysql

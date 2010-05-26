@@ -1281,7 +1281,7 @@ def getCompiledRegex(regex, args=()):
 
 #dumper.dbTableValues(conf.dbmsHandler.dumpTable()) -> dumpTable
 def getPartRun():
-    commonPartsDict = { "getTables":"Tables", "getColumns":"Columns", "getUsers":"Users", "getBanner":"Banners" }
+    commonPartsDict = { "getTables":"Tables", "getColumns":"Columns", "getUsers":"Users", "getBanner":"Banners", "getDbs":"Databases" }
     retVal = None
     stack = [item[4][0] if isinstance(item[4], list) else '' for item in inspect.stack()]
     reobj = getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')
