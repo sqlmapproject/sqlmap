@@ -379,11 +379,15 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if singleValue is None:
                     val = getChar(index, predictedCharset, False) if predictedCharset else None
                 else:
-                    query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = \'%s\'', (expressionUnescaped, singleValue)))
+                    query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = %s', (expressionUnescaped, unescaper.unescape('\'%s\'' % singleValue))))
                     query = agent.postfixQuery(query)
-                    payload = agent.payload(newValue=query)
-                    result = Request.queryPage(urlencode(payload))
+                    result = Request.queryPage(urlencode(agent.payload(newValue=query)))
                     if result:
+                        dataToSessionFile(replaceNewlineTabs(singleValue[index-1:]))
+                        if showEta:
+                            etaProgressUpdate(time.time() - charStart, lastChar + 1)
+                        elif conf.verbose >= 1:
+                            dataToStdout(singleValue[index-1:])
                         finalValue = singleValue
                         break
                 if not val:
