@@ -42,12 +42,18 @@ def configFileProxy(section, option, boolean=False, integer=False):
     global config
 
     if config.has_option(section, option):
-        if boolean:
-            value = config.getboolean(section, option)
-        elif integer:
-            value = config.getint(section, option)
-        else:
-            value = config.get(section, option)
+        value = config.get(section, option)
+
+        if not value:
+            value = None
+        elif value.isdigit():
+            value = int(value)
+        elif value == "False":
+            value = False
+        elif value == "True":
+            value = True
+
+        print option, value, type(value)
 
         if value:
             conf[option] = value
@@ -90,6 +96,9 @@ def configFileParser(configFile):
         for option, data in optionData.items():
             boolean = False
             integer = False
+
+            if isinstance(data, (tuple, dict, set)):
+                data = data[0]
 
             if data == "boolean":
                 boolean = True
