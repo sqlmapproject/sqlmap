@@ -23,7 +23,10 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 optDict = {
-            # Family:        { "parameter_name":    "parameter_datatype" },
+            # Format:
+            # Family:        { "parameter name":    "parameter datatype" },
+            # Or:
+            # Family:        { "parameter name":    ("parameter datatype", "category name used for common outputs feature") },
             "Target":        {
                                "direct":            "string",
                                "url":               "string",
@@ -84,17 +87,17 @@ optDict = {
                              },
 
             "Enumeration":   {
-                               "getBanner":         "boolean",
-                               "getCurrentUser":    "boolean",
-                               "getCurrentDb":      "boolean",
+                               "getBanner":         ("boolean", "Banners"),
+                               "getCurrentUser":    ("boolean", "Users"),
+                               "getCurrentDb":      ("boolean", "Databases"),
                                "isDba":             "boolean",
-                               "getUsers":          "boolean",
-                               "getPasswordHashes": "boolean",
-                               "getPrivileges":     "boolean",
-                               "getRoles":          "boolean",
-                               "getDbs":            "boolean",
-                               "getTables":         "boolean",
-                               "getColumns":        "boolean",
+                               "getUsers":          ("boolean", "Users"),
+                               "getPasswordHashes": ("boolean", "Hashes"),
+                               "getPrivileges":     ("boolean", "Privileges"),
+                               "getRoles":          ("boolean", "Roles"),
+                               "getDbs":            ("boolean", "Databases"),
+                               "getTables":         ("boolean", "Tables"),
+                               "getColumns":        ("boolean", "Columns"),
                                "dumpTable":         "boolean",
                                "dumpAll":           "boolean",
                                "search":            "boolean",
@@ -107,6 +110,8 @@ optDict = {
                                "limitStop":         "integer",
                                "firstChar":         "integer",
                                "lastChar":          "integer",
+                               "getNumOfTables":    "integer",
+                               "getNumOfDBs":       "integer",
                                "query":             "string",
                                "sqlShell":          "boolean"
                              },
@@ -144,6 +149,7 @@ optDict = {
                              },
 
             "Miscellaneous": {
+                               "xmlFile":           "string",
                                "sessionFile":       "string",
                                "flushSession":      "boolean",
                                "eta":               "boolean",

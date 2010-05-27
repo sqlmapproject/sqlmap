@@ -57,6 +57,7 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.optiondict import optDict
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -417,7 +418,7 @@ def fileToStr(fileName):
     @rtype: C{str}
     """
 
-    filePointer = codecs.open(fileName, "r", conf.dataEncoding)
+    filePointer = codecs.open(fileName, "rb", conf.dataEncoding)
     fileText = filePointer.read()
 
     return fileText.replace("    ", "").replace("\t", "").replace("\r", "").replace("\n", " ")
@@ -1106,7 +1107,8 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        logger.error(e)
+        errMsg = "profiling requires third-party libraries (%s)" % str(e)
+        logger.error(errMsg)
         return
 
     if profileOutputFile is None:
@@ -1209,6 +1211,9 @@ def initCommonOutputs():
     for line in cfile.xreadlines():
         line = line.strip()
 
+        if line.startswith('#'):
+            continue
+
         if len(line) > 1:
             if line[0] == '[' and line[-1] == ']':
                 key = line[1:-1]
@@ -1220,19 +1225,26 @@ def initCommonOutputs():
 
     cfile.close()
 
-def getGoodSamaritanParameters(part, prevValue, originalCharset):
+def goGoodSamaritan(part, prevValue, originalCharset):
     """
-    Function for retrieving parameters needed for good samaritan (common outputs) feature.
-    Returns singleValue if there is a complete single match (in part of common-outputs.txt set by parameter 'part') 
-       regarding parameter prevValue. If there is no single value match, but multiple, predictedCharset is returned
-       containing more probable characters (retrieved from matched items in common-outputs.txt) together with the
-       rest of charset as otherCharset
+    Function for retrieving parameters needed for common prediction (good
+    samaritan) feature.
+
+    part is for instance Users, Databases, Tables and corresponds to the
+    header (e.g. [Users]) in txt/common-outputs.txt.
+
+    prevValue: retrieved query output so far (e.g. 'i').
+
+    Returns singleValue if there is a complete single match (in part of
+    txt/common-outputs.txt under 'part') regarding parameter prevValue. If
+    there is no single value match, but multiple, commonCharset is
+    returned containing more probable characters (retrieved from matched
+    values in txt/common-outputs.txt) together with the rest of charset as
+    otherCharset.
     """
+
     if kb.commonOutputs is None:
         initCommonOutputs()
-
-    if not part or not prevValue: #is not None and != ""
-        return None, None, originalCharset
 
     predictionSet = set()
     wildIndexes = []
@@ -1249,29 +1261,34 @@ def getGoodSamaritanParameters(part, prevValue, originalCharset):
         charIndex += 1
         findIndex = prevValue.find('.', charIndex)
 
+    # If the header we are looking for has common outputs defined
     if part in kb.commonOutputs:
         for item in kb.commonOutputs[part]:
+            # Check if the common output (item) starts with prevValue
             if re.search('\A%s' % prevValue, item):
                 singleValue = item
+
                 for index in wildIndexes:
                     char = item[index]
 
                     if char not in predictionSet:
                         predictionSet.add(char)
 
-        predictedCharset = []
+        commonCharset = []
         otherCharset = []
 
+        # Split the original charset into common chars (commonCharset)
+        # and other chars (otherCharset)
         for ordChar in originalCharset:
             if chr(ordChar) not in predictionSet:
                 otherCharset.append(ordChar)
             else:
-                predictedCharset.append(ordChar)
+                commonCharset.append(ordChar)
 
-        predictedCharset.sort()
+        commonCharset.sort()
 
-        if len(predictedCharset) > 1:
-            return None, predictedCharset, otherCharset
+        if len(commonCharset) > 1:
+            return None, commonCharset, otherCharset
         else:
             return singleValue, None, originalCharset
     else:
@@ -1279,8 +1296,12 @@ def getGoodSamaritanParameters(part, prevValue, originalCharset):
 
 def getCompiledRegex(regex, *args):
     """
-    Returns compiled regular expression and stores it in cache for further usage
+    Returns compiled regular expression and stores it in cache for further
+    usage
     """
+
+    global __compiledRegularExpressions
+
     if (regex, args) in __compiledRegularExpressions:
         return __compiledRegularExpressions[(regex, args)]
     else:
@@ -1290,15 +1311,23 @@ def getCompiledRegex(regex, *args):
 
 def getPartRun():
     """
-    Goes through call stack and finds constructs matching conf.dmbsHandler.*. Returns it or it's alias used in common-outputs.txt
+    Goes through call stack and finds constructs matching conf.dmbsHandler.*.
+    Returns it or its alias used in txt/common-outputs.txt
     """
-    commonPartsDict = { "getTables":"Tables", "getColumns":"Columns", "getUsers":"Users", "getBanner":"Banners", "getDbs":"Databases" }
+
     retVal = None
+    commonPartsDict = optDict["Enumeration"]
     stack = [item[4][0] if isinstance(item[4], list) else '' for item in inspect.stack()]
     reobj = getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')
+
+    # Goes backwards through the stack to find the conf.dbmsHandler method
+    # calling this function
     for i in xrange(len(stack) - 1, 0, -1):
         match = reobj.search(stack[i])
+
         if match:
+            # This is the calling conf.dbmsHandler method (e.g. 'getDbms')
             retVal = match.groups()[0]
             break
-    return commonPartsDict[retVal] if retVal in commonPartsDict else retVal
+
+    return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal

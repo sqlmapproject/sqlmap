@@ -30,7 +30,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import getCharset
-from lib.core.common import getGoodSamaritanParameters
+from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
@@ -53,11 +53,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     """
 
     partialValue = ""
-    finalValue   = ""
-
+    finalValue = ""
     asciiTbl = getCharset(charsetType)
 
-    kb.partRun = getPartRun() if conf.useCommonPrediction else None #set kb.partRun in case common-prediction used
+    # Set kb.partRun in case "common prediction" feature (a.k.a. "good
+    # samaritan") is used
+    kb.partRun = getPartRun() if conf.useCommonPrediction else None
 
     if "LENGTH(" in expression or "LEN(" in expression:
         firstChar = 0
@@ -116,9 +117,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
 
-    queriesCount = [0]    # As list to deal with nested scoping rules
-
-    hintlock  = threading.Lock()
+    queriesCount = [0] # As list to deal with nested scoping rules
+    hintlock = threading.Lock()
 
     def tryHint(idx):
         hintlock.acquire()
@@ -131,9 +131,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 posValue = ord(hintValue[idx-1])
 
-            queriesCount[0] += 1
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, posValue))
-            result        = Request.queryPage(urlencode(forgedPayload))
+            queriesCount[0] += 1
+            result = Request.queryPage(urlencode(forgedPayload))
 
             if result:
                 return hintValue[idx-1]
@@ -155,6 +155,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if len(charTbl) == 1:
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
+            queriesCount[0] += 1
             result = Request.queryPage(urlencode(forgedPayload))
             if result:
                 return chr(charTbl[0]) if charTbl[0] < 128 else unichr(charTbl[0])
@@ -165,9 +166,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         minValue = charTbl[0]
 
         while len(charTbl) != 1:
-            queriesCount[0] += 1
-            position      = (len(charTbl) >> 1)
-            posValue      = charTbl[position]
+            position = (len(charTbl) >> 1)
+            posValue = charTbl[position]
 
             if kb.dbms == "SQLite":
                 posValueOld = posValue
@@ -181,7 +181,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 forgedPayload = safeStringFormat(payload.replace('%3E', 'NOT BETWEEN 0 AND'), (expressionUnescaped, idx, posValue))
 
-            result        = Request.queryPage(urlencode(forgedPayload))
+            queriesCount[0] += 1
+            result = Request.queryPage(urlencode(forgedPayload))
 
             if kb.dbms == "SQLite":
                 posValue = posValueOld
@@ -249,7 +250,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                     if conf.threadContinue:
                         charStart = time.time()
-                        val       = getChar(curidx)
+                        val = getChar(curidx)
 
                         if val is None:
                             raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
@@ -344,6 +345,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             raise
 
         infoMsg = None
+
         # If we have got one single character not correctly fetched it
         # can mean that the connection to the target url was lost
         if None in value:
@@ -369,32 +371,44 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         index = firstChar
 
         while True:
-            index    += 1
+            index += 1
             charStart = time.time()
 
-            #common prediction (a.k.a. good samaritan)
-            if conf.useCommonPrediction:
-                singleValue, predictedCharset, otherCharset = getGoodSamaritanParameters(kb.partRun, finalValue, asciiTbl)
+            # Common prediction feature (a.k.a. "good samaritan")
+            # NOTE: to be used only when multi-threading is not set for
+            # the moment
+            if conf.useCommonPrediction and len(finalValue) > 0 and kb.partRun is not None:
                 val = None
+                singleValue, commonCharset, otherCharset = goGoodSamaritan(kb.partRun, finalValue, asciiTbl)
 
-                #if there is no singleValue (single match from common-outputs.txt) use the returned predictedCharset
-                if singleValue is None:
-                    val = getChar(index, predictedCharset, False) if predictedCharset else None
-                else:
-                    #one shot query containing equals singleValue
+                # If there is no singleValue (single match from
+                # txt/common-outputs.txt) use the returned common
+                # charset only to retrieve the query output
+                if singleValue is not None:
+                    # One-shot query containing equals singleValue
                     query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = %s', (expressionUnescaped, unescaper.unescape('\'%s\'' % singleValue))))
                     query = agent.postfixQuery(query)
+                    queriesCount[0] += 1
                     result = Request.queryPage(urlencode(agent.payload(newValue=query)))
-                    #did we have luck?
+
+                    # Did we have luck?
                     if result:
                         dataToSessionFile(replaceNewlineTabs(singleValue[index-1:]))
+
                         if showEta:
-                            etaProgressUpdate(time.time() - charStart, lastChar + 1)
+                            etaProgressUpdate(time.time() - charStart, len(singleValue))
                         elif conf.verbose >= 1:
                             dataToStdout(singleValue[index-1:])
+
                         finalValue = singleValue
+
                         break
-                #if we had no luck with singleValue and predictedCharset use the returned otherCharset
+                elif commonCharset:
+                    # TODO: this part does not seem to work yet
+                    val = getChar(index, commonCharset, False)
+
+                # If we had no luck with singleValue and common charset,
+                # use the returned other charset
                 if not val:
                     val = getChar(index, otherCharset)
             else:
