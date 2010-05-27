@@ -1277,15 +1277,15 @@ def getGoodSamaritanParameters(part, prevValue, originalCharset):
     else:
         return None, None, originalCharset
 
-def getCompiledRegex(regex, args=()):
+def getCompiledRegex(regex, *args):
     """
     Returns compiled regular expression and stores it in cache for further usage
     """
-    if regex in __compiledRegularExpressions:
-        return __compiledRegularExpressions[regex]
+    if (regex, args) in __compiledRegularExpressions:
+        return __compiledRegularExpressions[(regex, args)]
     else:
         retVal = re.compile(regex, *args)
-        __compiledRegularExpressions[regex] = retVal
+        __compiledRegularExpressions[(regex, args)] = retVal
         return retVal
 
 def getPartRun():
