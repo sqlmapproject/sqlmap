@@ -23,9 +23,10 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 from ConfigParser import NoSectionError
-from ConfigParser import ConfigParser
+from ConfigParser import RawConfigParser
 
 from lib.core.common import checkFile
+from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
@@ -48,12 +49,12 @@ def configFileProxy(section, option, boolean=False, integer=False):
             value = None
         elif value.isdigit():
             value = int(value)
-        elif value == "False":
+        elif value in ("false", "False"):
             value = False
-        elif value == "True":
+        elif value in ("true", "True"):
             value = True
-
-        print option, value, type(value)
+        else:
+            value = utf8decode(value)
 
         if value:
             conf[option] = value
@@ -77,7 +78,7 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    config = ConfigParser()
+    config = RawConfigParser()
     config.read(configFile)
 
     if not config.has_section("Target"):
