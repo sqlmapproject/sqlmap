@@ -21,12 +21,12 @@ You should have received a copy of the GNU General Public License along
 with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
+import codecs
 
 from ConfigParser import NoSectionError
 from ConfigParser import RawConfigParser
 
 from lib.core.common import checkFile
-from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
@@ -53,8 +53,6 @@ def configFileProxy(section, option, boolean=False, integer=False):
             value = False
         elif value in ("true", "True"):
             value = True
-        else:
-            value = utf8decode(value)
 
         if value:
             conf[option] = value
@@ -79,7 +77,7 @@ def configFileParser(configFile):
 
     checkFile(configFile)
     config = RawConfigParser()
-    config.read(configFile)
+    config.readfp(codecs.open(configFile, "r", "UTF8"))
 
     if not config.has_section("Target"):
         raise NoSectionError, "Target in the configuration file is mandatory"
