@@ -420,7 +420,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # If we had no luck with singleValue and common charset,
                 # use the returned other charset
                 if not val:
-                    val = getChar(index, otherCharset)
+                    val = getChar(index, otherCharset, otherCharset == asciiTbl)
             else:
                 val = getChar(index, asciiTbl)
 
