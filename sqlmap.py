@@ -22,6 +22,8 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
+import locale
 import os
 import sys
 import time
@@ -29,6 +31,8 @@ import traceback
 import warnings
 
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
+
+sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
 try:
     import psyco
