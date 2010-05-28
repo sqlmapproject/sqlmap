@@ -33,7 +33,7 @@ import socket
 import urllib2
 import urlparse
 
-from ConfigParser import ConfigParser
+from ConfigParser import RawConfigParser
 
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileType
@@ -75,6 +75,26 @@ from lib.utils.google import Google
 authHandler  = urllib2.BaseHandler()
 proxyHandler = urllib2.BaseHandler()
 redirectHandler = SmartRedirectHandler()
+
+
+class UnicodeRawConfigParser(RawConfigParser):
+    def write(self, fp):
+        """Write an .ini-format representation of the configuration state."""
+        if self._defaults:
+            fp.write("[%s]\n" % DEFAULTSECT)
+            for (key, value) in self._defaults.items():
+                fp.write("%s = %s\n" % (key, unicode(value).replace('\n', '\n\t')))
+            fp.write("\n")
+        for section in self._sections:
+            fp.write("[%s]\n" % section)
+            for (key, value) in self._sections[section].items():
+                if key != "__name__":
+                    if value is None:
+                        fp.write("%s\n" % (key))
+                    else:
+                        fp.write("%s = %s\n" %
+                                 (key, unicode(value).replace('\n', '\n\t')))
+            fp.write("\n")
 
 def __urllib2Opener():
     """
@@ -981,7 +1001,7 @@ def __saveCmdline():
     debugMsg = "saving command line options on a sqlmap configuration INI file"
     logger.debug(debugMsg)
 
-    config   = ConfigParser()
+    config   = UnicodeRawConfigParser()
     userOpts = {}
 
     for family in optDict.keys():
@@ -1016,8 +1036,10 @@ def __saveCmdline():
 
             config.set(family, option, value)
 
-    confFP = open(paths.SQLMAP_CONFIG, "wb")
+    print 11111
+    confFP = codecs.open(paths.SQLMAP_CONFIG, "wb", "UTF8")
     config.write(confFP)
+    print 22222
 
     infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
     logger.info(infoMsg)
