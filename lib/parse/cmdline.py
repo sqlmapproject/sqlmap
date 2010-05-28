@@ -29,6 +29,7 @@ from optparse import OptionGroup
 from optparse import OptionParser
 from optparse import SUPPRESS_HELP
 
+from lib.core.convert import utf8decode
 from lib.core.data import logger
 from lib.core.settings import VERSION_STRING
 
@@ -462,7 +463,7 @@ def cmdLineParser():
         parser.add_option_group(windows)
         parser.add_option_group(miscellaneous)
 
-        (args, _) = parser.parse_args()
+        (args, _) = parser.parse_args([utf8decode(arg) for arg in sys.argv])
 
         if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile and not args.requestFile and not args.updateAll:
             errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c' or '--update'), "
