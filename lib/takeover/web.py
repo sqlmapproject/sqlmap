@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import os
 import posixpath
 import re
@@ -82,13 +83,15 @@ class Web:
         return output
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
-        inputFile = open(fileToUpload, "r")
-        retVal = self.__webFileStreamUpload(inputFile, destFileName, directory)
-        inputFile.close()
+        inputFP = codecs.open(fileToUpload, "rb")
+        retVal = self.__webFileStreamUpload(inputFP, destFileName, directory)
+        inputFP.close()
+
         return retVal
 
     def __webFileStreamUpload(self, stream, destFileName, directory):
-        stream.seek(0) #rewind        
+        stream.seek(0) # Rewind
+
         if self.webApi in ("php", "asp"):
             multipartParams = {
                                 "upload":    "1",

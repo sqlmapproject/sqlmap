@@ -74,32 +74,34 @@ class MultipartPostHandler(urllib2.BaseHandler):
             request.add_data(data)
         return request
 
-    def multipart_encode(vars, files, boundary = None, buffer = None):
+    def multipart_encode(vars, files, boundary = None, buf = None):
         if boundary is None:
             boundary = mimetools.choose_boundary()
 
-        if buffer is None:
-            buffer = ''
+        if buf is None:
+            buf = ''
 
-        for(key, value) in vars:
-            buffer += '--%s\r\n' % boundary
-            buffer += 'Content-Disposition: form-data; name="%s"' % key
-            buffer += '\r\n\r\n' + value + '\r\n'
+        for (key, value) in vars:
+            buf += '--%s\r\n' % boundary
+            buf += 'Content-Disposition: form-data; name="%s"' % key
+            buf += '\r\n\r\n' + value + '\r\n'
 
-        for(key, fd) in files:
+        for (key, fd) in files:
             file_size = os.fstat(fd.fileno())[stat.ST_SIZE]
             filename = fd.name.split('/')[-1]
             contenttype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
-            buffer += '--%s\r\n' % boundary
-            buffer += 'Content-Disposition: form-data; name="%s"; filename="%s"\r\n' % (key, filename)
-            buffer += 'Content-Type: %s\r\n' % contenttype
-            # buffer += 'Content-Length: %s\r\n' % file_size
+            buf += '--%s\r\n' % boundary
+            buf += 'Content-Disposition: form-data; name="%s"; filename="%s"\r\n' % (key, filename)
+            buf += 'Content-Type: %s\r\n' % contenttype
+            # buf += 'Content-Length: %s\r\n' % file_size
             fd.seek(0)
-            buffer += '\r\n' + fd.read() + '\r\n'
 
-        buffer += '--%s--\r\n\r\n' % boundary
+            buf = str(buf)
+            buf += '\r\n%s\r\n' % fd.read()
 
-        return boundary, buffer
+        buf += '--%s--\r\n\r\n' % boundary
+
+        return boundary, buf
 
     multipart_encode = Callable(multipart_encode)
 

@@ -377,9 +377,9 @@ def dataToOutFile(data):
     if not data:
         return "No data retrieved"
 
-    rFile     = filePathToString(conf.rFile)
+    rFile = filePathToString(conf.rFile)
     rFilePath = "%s%s%s" % (conf.filePath, os.sep, rFile)
-    rFileFP   = codecs.open(rFilePath, "wb", conf.dataEncoding)
+    rFileFP = codecs.open(rFilePath, "wb", conf.dataEncoding)
 
     rFileFP.write(data)
     rFileFP.flush()

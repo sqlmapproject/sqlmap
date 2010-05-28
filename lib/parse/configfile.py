@@ -72,8 +72,9 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
+    configFP = codecs.open(configFile, "rb", conf.dataEncoding)
     config = UnicodeRawConfigParser()
-    config.readfp(codecs.open(configFile, "rb", conf.dataEncoding))
+    config.readfp(configFP)
 
     if not config.has_section("Target"):
         raise NoSectionError, "Target in the configuration file is mandatory"

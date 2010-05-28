@@ -32,7 +32,8 @@ import warnings
 
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 
-sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
+# NOTE: This breaks SQL shell and OS shell history and TAB functionalities
+#sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
 try:
     import psyco
