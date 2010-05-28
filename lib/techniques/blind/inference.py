@@ -144,13 +144,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return None
 
-    def getChar(idx, charTbl=asciiTbl, sequentialOrder=True):
+    def getChar(idx, charTbl=asciiTbl, continuousOrder=True):
         result = tryHint(idx)
 
         if result:
             return result
 
-        if not sequentialOrder:
+        if not continuousOrder:
             originalTbl = list(charTbl)
 
         if len(charTbl) == 1:
@@ -201,7 +201,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     charTbl = xrange(charTbl[0], charTbl[position])
 
             if len(charTbl) == 1:
-                if sequentialOrder:
+                if continuousOrder:
                     if maxValue == 1:
                         return None
                     elif minValue == maxChar:
