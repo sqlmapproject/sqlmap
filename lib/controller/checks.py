@@ -257,7 +257,7 @@ def checkDynParam(place, parameter, value):
     logger.info(infoMsg)
 
     randInt = randomInt()
-    payload = agent.payload(place, parameter, value, str(randInt))
+    payload = agent.payload(place, parameter, value, unicode(randInt))
     dynResult1 = Request.queryPage(payload, place)
 
     if True == dynResult1:
@@ -395,7 +395,7 @@ def checkConnection():
         conf.seqMatcher.set_seq1(page)
 
     except sqlmapConnectionException, errMsg:
-        errMsg = str(errMsg)
+        errMsg = unicode(errMsg)
         raise sqlmapConnectionException, errMsg
 
     return True

@@ -214,7 +214,7 @@ def __updateSqlmap():
         logger.debug(debugMsg)
 
         def notify(event_dict):
-            action = str(event_dict['action'])
+            action = unicode(event_dict['action'])
             index = action.find('_')
             prefix = action[index + 1].upper() if index != -1 else action.capitalize()
 
@@ -224,7 +224,7 @@ def __updateSqlmap():
             if action.find('_completed') == -1:
                 print "%s\t%s" % (prefix, event_dict['path'])
             else:
-                revision = str(event_dict['revision'])
+                revision = unicode(event_dict['revision'])
                 index = revision.find('number ')
 
                 if index != -1:

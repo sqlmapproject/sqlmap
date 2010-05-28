@@ -97,7 +97,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing PostgreSQL"
         logger.info(infoMsg)
 
-        randInt = str(randomInt(1))
+        randInt = unicode(randomInt(1))
 
         payload = agent.fullPayload(" AND %s::int=%s" % (randInt, randInt))
         result  = Request.queryPage(payload)

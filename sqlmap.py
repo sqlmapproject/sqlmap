@@ -81,7 +81,7 @@ def main():
         else:
             start()
     except exceptionsTuple, e:
-        e = str(e)
+        e = unicode(e)
         logger.error(e)
 
     except KeyboardInterrupt:

@@ -94,7 +94,7 @@ class Fingerprint(GenericFingerprint):
         for i in xrange(len(table)):
             version, checks = table[i]
             failed = False
-            check = checks[randomRange(0,len(checks)-1)].replace("%d", str(randomRange(1,100)))
+            check = checks[randomRange(0,len(checks)-1)].replace("%d", unicode(randomRange(1,100)))
             payload = agent.fullPayload(check)
             result  = Request.queryPage(payload)
             if result:

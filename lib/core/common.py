@@ -451,7 +451,7 @@ def readInput(message, default=None):
         message += "\n> "
 
     if conf.batch and default:
-        infoMsg = "%s%s" % (message, str(default))
+        infoMsg = "%s%s" % (message, unicode(default))
         logger.info(infoMsg)
 
         debugMsg = "used the default behaviour, running in batch mode"
@@ -517,7 +517,7 @@ def sanitizeStr(inpStr):
     @rtype: C{str}
     """
 
-    cleanString = str(inpStr)
+    cleanString = unicode(inpStr)
     cleanString = cleanString.replace("\n", " ").replace("\r", "")
 
     return cleanString
@@ -638,8 +638,8 @@ def parseTargetDirect():
                 conf.dbmsUser = details.group('user')
                 conf.dbmsPass = details.group('pass')
             else:
-                conf.dbmsUser = str()
-                conf.dbmsPass = str()
+                conf.dbmsUser = unicode()
+                conf.dbmsPass = unicode()
 
             if not conf.dbmsPass:
                 conf.dbmsPass = None
@@ -1032,7 +1032,7 @@ def safeStringFormat(formatStr, params):
 
             if index != -1:
                 if count < len(params):
-                    retVal = retVal[:index] + str(params[count]) + retVal[index+2:]
+                    retVal = retVal[:index] + unicode(params[count]) + retVal[index+2:]
                 else:
                     raise sqlmapNoneDataException, "wrong number of parameters during string formatting"
                 count += 1
@@ -1107,7 +1107,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        errMsg = "profiling requires third-party libraries (%s)" % str(e)
+        errMsg = "profiling requires third-party libraries (%s)" % unicode(e)
         logger.error(errMsg)
         return
 
@@ -1343,7 +1343,7 @@ def getCommonStart(strings=[]):
     if len(strings) == 1:
         return strings[0]
 
-    retVal = str()
+    retVal = unicode()
     maxCount = min(len(string) for string in strings)
 
     count = 0

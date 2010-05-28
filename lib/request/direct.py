@@ -54,7 +54,7 @@ def direct(query, content=True):
         output = base64unpickle(kb.resumedQueries[conf.hostname][query][:-1])
 
         infoMsg  = "resumed from file '%s': " % conf.sessionFile
-        infoMsg += "%s..." % str(output)[:20]
+        infoMsg += "%s..." % unicode(output)[:20]
         logger.info(infoMsg)
     elif select:
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
@@ -67,7 +67,7 @@ def direct(query, content=True):
 
         if len(output) == 1:
             if len(output[0]) == 1:
-                return str(list(output)[0][0])
+                return unicode(list(output)[0][0])
             else:
                 return list(output)
         else:

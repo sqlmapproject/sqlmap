@@ -217,7 +217,7 @@ class Fingerprint(GenericFingerprint):
 
         for sp in sps:
             query  =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
-            query += "LIKE '%Service Pack " + str(sp) + "%')>0"
+            query += "LIKE '%Service Pack " + unicode(sp) + "%')>0"
             query  = agent.forgeCaseStatement(query)
 
             if inject.getValue(query, charsetType=1) == "1":

@@ -155,7 +155,7 @@ def start():
 
             if not conf.dropSetCookie:
                 for _, cookie in enumerate(conf.cj):
-                    cookie = str(cookie)
+                    cookie = unicode(cookie)
                     index  = cookie.index(" for ")
 
                     cookieStr += "%s;" % cookie[8:index]
@@ -267,7 +267,7 @@ def start():
                     action()
 
         except exceptionsTuple, e:
-            e = str(e)
+            e = unicode(e)
 
             if conf.multipleTargets:
                 e += ", skipping to next url"

@@ -63,7 +63,7 @@ class Dump:
 
             return
 
-        data = str(data)
+        data = unicode(data)
 
         if data:
             data = data.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
@@ -93,7 +93,7 @@ class Dump:
             if isinstance(element, basestring):
                 self.__write("[*] %s" % element)
             elif isinstance(element, (list, tuple, set)):
-                self.__write("[*] " + ", ".join(str(e) for e in element))
+                self.__write("[*] " + ", ".join(unicode(e) for e in element))
 
         if elements:
             self.__write("")

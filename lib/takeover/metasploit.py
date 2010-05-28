@@ -156,7 +156,7 @@ class Metasploit:
 
         if not choice:
             if lst:
-                choice = str(default)
+                choice = unicode(default)
             else:
                 return default
 

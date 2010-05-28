@@ -163,7 +163,7 @@ class Connect:
                     if not cookieStr:
                         cookieStr = "Cookie: "
     
-                    cookie = str(cookie)
+                    cookie = unicode(cookie)
                     index  = cookie.index(" for ")
     
                     cookieStr += "%s; " % cookie[8:index]
@@ -257,7 +257,7 @@ class Connect:
         responseMsg += "(%s - %d):\n" % (status, code)
 
         if conf.verbose <= 4:
-            responseMsg += str(responseHeaders)
+            responseMsg += unicode(responseHeaders)
         elif conf.verbose > 4:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 

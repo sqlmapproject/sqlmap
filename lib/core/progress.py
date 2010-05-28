@@ -80,7 +80,7 @@ class ProgressBar:
                                           " " * (allFull - numHashes))
 
         # Add the percentage at the beginning of the progress bar
-        percentString = str(percentDone) + "%"
+        percentString = unicode(percentDone) + "%"
         self.__progBar = "%s %s" % (percentString, self.__progBar)
 
     def draw(self, eta=0):
@@ -102,4 +102,4 @@ class ProgressBar:
         This method returns the progress bar string
         """
 
-        return str(self.__progBar)
+        return unicode(self.__progBar)

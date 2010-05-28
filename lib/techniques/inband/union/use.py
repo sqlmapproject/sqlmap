@@ -227,7 +227,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         # sql injection output
         startPosition = resultPage.index(temp.start)
         endPosition = resultPage.rindex(temp.stop) + len(temp.stop)
-        value = str(resultPage[startPosition:endPosition])
+        value = unicode(resultPage[startPosition:endPosition])
 
         duration = calculateDeltaSeconds(start)
 

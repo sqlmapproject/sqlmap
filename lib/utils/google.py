@@ -123,7 +123,7 @@ class Google:
             responseMsg = "HTTP response (%s - %d):\n" % (status, code)
     
             if conf.verbose <= 4:
-                responseMsg += str(responseHeaders)
+                responseMsg += unicode(responseHeaders)
             elif conf.verbose > 4:
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
     

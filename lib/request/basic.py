@@ -94,7 +94,7 @@ def decodePage(page, encoding):
     Decode gzip/deflate HTTP response
     """
 
-    if str(encoding).lower() in ('gzip', 'x-gzip', 'deflate'):
+    if unicode(encoding).lower() in (u'gzip', u'x-gzip', u'deflate'):
         if encoding == 'deflate':
             # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
             data = StringIO.StringIO(zlib.decompress(page, -15))
