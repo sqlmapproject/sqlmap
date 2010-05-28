@@ -163,7 +163,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 return None
 
         maxChar = maxValue = charTbl[-1]
-        minValue = charTbl[0]
+        minChar = minValue = charTbl[0]
 
         while len(charTbl) != 1:
             position = (len(charTbl) >> 1)
@@ -201,17 +201,27 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     charTbl = xrange(charTbl[0], charTbl[position])
 
             if len(charTbl) == 1:
-                if maxValue == 1:
-                    return None
-                elif minValue == maxChar:
-                    charTbl = xrange(maxChar + 1, (maxChar + 1) << 8)
-                    maxChar = maxValue = charTbl[-1]
-                    minValue = charTbl[0]
-                elif sequentialOrder:
-                    retVal = minValue + 1
-                    return chr(retVal) if retVal < 128 else unichr(retVal)
+                if sequentialOrder:
+                    if maxValue == 1:
+                        return None
+                    elif minValue == maxChar:
+                        charTbl = xrange(maxChar + 1, (maxChar + 1) << 8)
+                        maxChar = maxValue = charTbl[-1]
+                        minChar = minValue = charTbl[0]
+                    else:
+                        retVal = minValue + 1
+                        return chr(retVal) if retVal < 128 else unichr(retVal)
                 else:
+                    if minValue == maxChar or maxValue == minChar:
+                        return None
                     retVal = originalTbl[originalTbl.index(minValue) + 1]
+                    forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
+                    queriesCount[0] += 1
+                    result = Request.queryPage(urlencode(forgedPayload))
+                    if result:
+                        return chr(retVal) if retVal < 128 else unichr(retVal)
+                    else: 
+                        return None
 
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):
