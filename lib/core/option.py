@@ -33,6 +33,7 @@ import socket
 import urllib2
 import urlparse
 
+from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
 
 from lib.core.common import getConsoleWidth
