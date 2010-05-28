@@ -1359,3 +1359,9 @@ def getCommonStart(strings=[]):
         count += 1
 
     return retVal
+
+def getBruteUnicode(string):
+    retVal = unicode()
+    for char in string:
+        retVal += unichr(ord(char))
+    return retVal

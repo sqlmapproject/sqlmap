@@ -51,7 +51,7 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = MySQLdb.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout)
+            self.connector = MySQLdb.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
         except MySQLdb.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
 
