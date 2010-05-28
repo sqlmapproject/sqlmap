@@ -100,3 +100,9 @@ def urlencode(string, safe=":/?%&=", convall=False):
         result = urllib.quote(string, safe)
 
     return result
+
+def utf8encode(string):
+    return string.encode("utf-8")
+
+def utf8decode(string):
+    return string.decode("utf-8")

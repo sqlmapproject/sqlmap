@@ -26,6 +26,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
+from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -35,6 +36,7 @@ from lib.utils.timeout import timeout
 def direct(query, content=True):
     output = None
     select = False
+    query = utf8decode(query)
     query = agent.payloadDirect(query)
 
     if kb.dbms == "Oracle" and query.startswith("SELECT ") and " FROM " not in query:
