@@ -26,7 +26,6 @@ from lib.controller.handler import setHandler
 from lib.core.common import getHtmlErrorFp
 from lib.core.data import conf
 from lib.core.data import kb
-from lib.core.dump import dumper
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.blind.timebased import timeTest
@@ -69,53 +68,53 @@ def action():
 
     # Techniques options
     if conf.stackedTest:
-        dumper.string("stacked queries support", stackedTest())
+        conf.dumper.technic("stacked queries support", stackedTest())
 
     if conf.timeTest:
-        dumper.string("time based blind sql injection payload", timeTest())
+        conf.dumper.technic("time based blind sql injection payload", timeTest())
 
     if ( conf.unionUse or conf.unionTest ) and not kb.unionPosition:
-        dumper.string("valid union", unionTest())
+        conf.dumper.technic("valid union", unionTest())
 
     # Enumeration options
     if conf.getBanner:
-        dumper.string("banner", conf.dbmsHandler.getBanner())
+        conf.dumper.banner(conf.dbmsHandler.getBanner())
 
     if conf.getCurrentUser:
-        dumper.string("current user", conf.dbmsHandler.getCurrentUser())
+        conf.dumper.currentUser(conf.dbmsHandler.getCurrentUser())
 
     if conf.getCurrentDb:
-        dumper.string("current database", conf.dbmsHandler.getCurrentDb())
+        conf.dumper.currentDb(conf.dbmsHandler.getCurrentDb())
 
     if conf.isDba:
-        dumper.string("current user is DBA", conf.dbmsHandler.isDba())
+        conf.dumper.dba(conf.dbmsHandler.isDba())
 
     if conf.getUsers:
-        dumper.lister("database management system users", conf.dbmsHandler.getUsers())
+        conf.dumper.users(conf.dbmsHandler.getUsers())
 
     if conf.getPasswordHashes:
-        dumper.userSettings("database management system users password hashes",
-                            conf.dbmsHandler.getPasswordHashes(), "password hash")
+        conf.dumper.userSettings("database management system users password hashes",
+                                 conf.dbmsHandler.getPasswordHashes(), "password hash")
 
     if conf.getPrivileges:
-        dumper.userSettings("database management system users privileges",
-                            conf.dbmsHandler.getPrivileges(), "privilege")
+        conf.dumper.userSettings("database management system users privileges",
+                                 conf.dbmsHandler.getPrivileges(), "privilege")
 
     if conf.getRoles:
-        dumper.userSettings("database management system users roles",
-                            conf.dbmsHandler.getRoles(), "role")
+        conf.dumper.userSettings("database management system users roles",
+                                 conf.dbmsHandler.getRoles(), "role")
 
     if conf.getDbs:
-        dumper.lister("available databases", conf.dbmsHandler.getDbs())
+        conf.dumper.dbs(conf.dbmsHandler.getDbs())
 
     if conf.getTables:
-        dumper.dbTables(conf.dbmsHandler.getTables())
+        conf.dumper.dbTables(conf.dbmsHandler.getTables())
 
     if conf.getColumns:
-        dumper.dbTableColumns(conf.dbmsHandler.getColumns())
+        conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns())
 
     if conf.dumpTable:
-        dumper.dbTableValues(conf.dbmsHandler.dumpTable())
+        conf.dumper.dbTableValues(conf.dbmsHandler.dumpTable())
 
     if conf.dumpAll:
         conf.dbmsHandler.dumpAll()
@@ -124,7 +123,7 @@ def action():
         conf.dbmsHandler.search()
 
     if conf.query:
-        dumper.string(conf.query, conf.dbmsHandler.sqlQuery(conf.query))
+        conf.dumper.query(conf.query, conf.dbmsHandler.sqlQuery(conf.query))
 
     if conf.sqlShell:
         conf.dbmsHandler.sqlShell()
@@ -135,7 +134,7 @@ def action():
 
     # File system options
     if conf.rFile:
-        dumper.string("%s file saved to" % conf.rFile, conf.dbmsHandler.readFile(conf.rFile), sort=False)
+        conf.dumper.rFile(conf.rFile, conf.dbmsHandler.readFile(conf.rFile))
 
     if conf.wFile:
         conf.dbmsHandler.writeFile(conf.wFile, conf.dFile, conf.wFileType)
@@ -158,7 +157,7 @@ def action():
 
     # Windows registry options
     if conf.regRead:
-        dumper.string("Registry key value data", conf.dbmsHandler.regRead())
+        conf.dumper.registerValue(conf.dbmsHandler.regRead())
 
     if conf.regAdd:
         conf.dbmsHandler.regAdd()

@@ -52,6 +52,7 @@ from lib.core.data import paths
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import unhandledException
 from lib.core.option import init
+from lib.core.xmldump import closeDumper
 from lib.parse.cmdline import cmdLineParser
 
 def modulePath():
@@ -87,22 +88,29 @@ def main():
     except exceptionsTuple, e:
         e = unicode(e)
         logger.error(e)
+        closeDumper(False, e)
 
-    except KeyboardInterrupt:
+    except KeyboardInterrupt, e:
         print
         errMsg = "user aborted"
         logger.error(errMsg)
+        closeDumper(False, e)
 
-    except EOFError:
+    except EOFError, e:
         print
         errMsg = "exit"
         logger.error(errMsg)
+        closeDumper(False, e)
 
     except:
         print
         errMsg = unhandledException()
         logger.error(errMsg)
         traceback.print_exc()
+        closeDumper(False, errMsg)
+
+    else:
+        closeDumper(True)
 
     print "\n[*] shutting down at: %s\n" % time.strftime("%X")
 

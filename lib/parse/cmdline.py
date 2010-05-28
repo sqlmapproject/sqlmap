@@ -414,6 +414,9 @@ def cmdLineParser():
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
+        miscellaneous.add_option("-x", dest="xmlFile",
+                                 help="Dump the data into an XML file")
+
         miscellaneous.add_option("-s", dest="sessionFile",
                                  help="Save and resume all data retrieved "
                                       "on a session file")

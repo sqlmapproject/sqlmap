@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="Results">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="Messages" minOccurs="0" />
+                <xs:element ref="Banner" minOccurs="0"/>
+                <xs:element ref="CurrentUser" minOccurs="0"/>
+                <xs:element ref="CurrentDB" minOccurs="0"/>
+                <xs:element ref="isDBA" minOccurs="0"/>
+                <xs:element ref="Users" minOccurs="0"/>
+                <xs:element ref="UserSettings" minOccurs="0"/>
+                <xs:element ref="DBs" minOccurs="0"/>
+                <xs:element ref="DBTables" minOccurs="0"/>
+                <xs:element ref="Technics" minOccurs="0" />
+                <xs:element ref="Lists" minOccurs="0" />
+                <xs:element ref="DatabaseColumns" minOccurs="0" />
+                <xs:element ref="DBValues" minOccurs="0"/>
+                <xs:element ref="Queries" minOccurs="0"/>
+                <xs:element ref="RegistryEntries" minOccurs="0"/>
+                <xs:element ref="FileContent" minOccurs="0"/>
+                <xs:element ref="Status"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    
+    
+    
+    <!-- Simple Types -->
+    <xs:element name="Banner" type="xs:string"/>
+    <xs:element name="CurrentUser" type="xs:string"/>
+    <xs:element name="CurrentDB" type="xs:string"/>
+    
+    <!-- File Content -->
+    <xs:element name="FileContent">
+        <xs:complexType mixed="true">
+            <xs:attribute name="name" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- RegistryEntries -->
+    <xs:element name="RegistryEntries">
+        <xs:complexType>
+            <xs:sequence>
+        		<xs:element ref="RegisterData" maxOccurs="unbounded"/>
+        	</xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="RegisterData" type="xs:string"/>
+    
+    <!-- Queries -->
+    <xs:element name="Queries">
+        <xs:complexType>
+            <xs:sequence>
+        		<xs:element ref="Query" maxOccurs="unbounded"/>
+        	</xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Query">
+        <xs:complexType mixed="true">
+            <xs:attribute name="value" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Columns -->
+    <xs:element name="DatabaseColumns">
+        <xs:complexType>
+        	<xs:sequence>
+        		<xs:element ref="DB" minOccurs="0" maxOccurs="unbounded"/>
+        	</xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="DB">
+        <xs:complexType mixed="true">
+        	<xs:sequence>
+        		<xs:element ref="Table" minOccurs="0" maxOccurs="unbounded"/>
+        	</xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Table">
+        <xs:complexType mixed="true">
+        	<xs:sequence>
+        		<xs:element ref="Column" minOccurs="0" maxOccurs="unbounded"/>
+        	</xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Column">
+        <xs:complexType mixed="true">     
+            <xs:attribute name="type" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- List -->
+    <xs:element name="Member">
+        <xs:complexType mixed="true">
+        	<xs:sequence>
+        		<xs:element ref="Member" minOccurs="0" maxOccurs="unbounded"/>
+        	</xs:sequence>
+            <xs:attribute name="type" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="List">
+        <xs:complexType mixed="true">
+        	<xs:sequence>
+        		<xs:element ref="Member" minOccurs="0" maxOccurs="unbounded"/>
+        	</xs:sequence>
+            <xs:attribute name="type" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Lists">
+        <xs:complexType>
+        	<xs:sequence>
+        		<xs:element ref="List" minOccurs="0" maxOccurs="unbounded"/>
+        	</xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    
+    <!-- Technics -->
+    <xs:element name="Technics">
+        <xs:complexType>
+        	<xs:sequence>
+        		<xs:element ref="Technic" minOccurs="0" maxOccurs="unbounded"/>
+        	</xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Technic">
+        <xs:complexType mixed="true">
+            <xs:attribute name="type" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Messages -->
+    <xs:element name="Messages">
+        <xs:complexType>
+        	<xs:sequence>
+        		<xs:element ref="Message" maxOccurs="unbounded"/>
+        	</xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Message">
+        <xs:complexType mixed="true">
+            <xs:attribute name="type" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- is DBA -->
+    <xs:element name="isDBA">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Users -->
+    <xs:element name="Users">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="DBUser"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="DBUser" type="xs:string"/>
+    
+    <!-- User Settings -->
+    <xs:element name="UserSettings">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserSetting"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="UserSetting">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="User"/>
+            </xs:sequence>
+            <xs:attribute name="type" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="User">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Settings" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Settings">
+        <xs:complexType mixed="true">
+            <xs:attribute name="type" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Databases -->
+    <xs:element name="DBs">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="DBName"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DBName" type="xs:NCName"/>
+    
+    <!-- DB Tables  -->
+    <xs:element name="DBTables">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="Database"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Database">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="DBTable"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DBTable" type="xs:NCName"/>
+    
+    <!-- Table Values -->
+    <xs:element name="DBValues">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="DBTableValues"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="DBTableValues">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Row" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="db" type="xs:string"/>
+            <xs:attribute name="name" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Row">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="Cell"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="Cell">
+        <xs:complexType mixed="true">
+            <xs:attribute name="column" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Status Elements  -->
+    <xs:element name="Status">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Error" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="success" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Error">
+        <xs:complexType mixed="true">
+            <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

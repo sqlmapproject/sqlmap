@@ -157,6 +157,9 @@ Krzysztof Kotowicz <kkotowicz@gmail.com>
 Nicolas Krassas <krasn@ans.gr>
     for reporting a bug
 
+Alex Landa <landa.alex86@gmail.com>
+    for providing a patch adding support for XML output
+
 Guido Landi <lists@keamera.org>
     for reporting a couple of bugs
     for the great technical discussions
@@ -193,7 +196,7 @@ Enrico Milanese <enricomilanese@gmail.com>
     for reporting a bugs when using (-a) a single line User-Agent file
     for providing me with some ideas for the PHP backdoor
 
-Alejo Murillo <alex@65535.com>
+Alejo Murillo Moya <alex@65535.com>
     for suggesting a feature
 
 Roberto Nemirovsky <roberto.paes@gmail.com>

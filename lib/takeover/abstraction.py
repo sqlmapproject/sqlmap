@@ -26,7 +26,6 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.dump import dumper
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.takeover.udf import UDF
@@ -90,7 +89,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             output = self.evalCmd(cmd)
 
             if output:
-                dumper.string("command standard output", output)
+                conf.dumper.string("command standard output", output)
             else:
                 print "No output"
         else:

@@ -40,7 +40,7 @@ class Dump:
     def __init__(self):
         self.__outputFile = None
         self.__outputFP   = None
-        
+
     def __write(self, data, n=True):
         if n:
             print data
@@ -52,11 +52,19 @@ class Dump:
         self.__outputFP.flush()
 
         conf.loggedToOut = True
-        
+
+    def __formatString(self, string):
+        string = unicode(string)
+        string = string.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
+        string = string.replace("__START__", "").replace("__STOP__", "")
+        string = string.replace("__DEL__", ", ")
+
+        return string
+
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
-        self.__outputFP = codecs.open(self.__outputFile, "a", conf.dataEncoding)
-        
+        self.__outputFP = codecs.open(self.__outputFile, "ab", conf.dataEncoding)
+
     def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
             self.lister(header, data, sort)
@@ -66,9 +74,7 @@ class Dump:
         data = unicode(data)
 
         if data:
-            data = data.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
-            data = data.replace("__START__", "").replace("__STOP__", "")
-            data = data.replace("__DEL__", ", ")
+            data = self.__formatString(data)
 
             if "\n" in data:
                 self.__write("%s:\n---\n%s\n---\n" % (header, data))
@@ -97,7 +103,25 @@ class Dump:
 
         if elements:
             self.__write("")
-            
+
+    def technic(self,header,data):
+        self.string(header, data)
+
+    def banner(self,data):
+        self.string("banner", data)
+
+    def currentUser(self,data):
+        self.string("current user", data)
+
+    def currentDb(self,data):
+        self.string("current database", data)
+
+    def dba(self,data):
+        self.string("current user is DBA", data)
+
+    def users(self,users):
+        self.lister("database management system users", users)
+
     def userSettings(self, header, userSettings, subHeader):
         self.__areAdmins = set()
 
@@ -125,35 +149,8 @@ class Dump:
                 self.__write("    %s: %s" % (subHeader, setting))
         print
 
-    def dbColumns(self, dbColumns, colConsider, dbs):
-        for column in dbColumns.keys():
-            if colConsider == "1":
-                colConsiderStr = "s like '" + column + "' were"
-            else:
-                colConsiderStr = " '%s' was" % column
-
-            msg  = "Column%s found in the " % colConsiderStr
-            msg += "following databases:"
-            self.__write(msg)
-
-            printDbs = {}
-
-            for db, tblData in dbs.items():
-                for tbl, colData in tblData.items():
-                    for col, dataType in colData.items():
-                        if column.lower() in col.lower():
-                            if db in printDbs:
-                                if tbl in printDbs[db]:
-                                    printDbs[db][tbl][col] = dataType
-                                else:
-                                    printDbs[db][tbl] = { col: dataType }
-                            else:
-                                printDbs[db] = {}
-                                printDbs[db][tbl] = { col: dataType }
-
-                            continue
-
-            self.dbTableColumns(printDbs)
+    def dbs(self,dbs):
+        self.lister("available databases", dbs)
 
     def dbTables(self, dbTables):
         if not isinstance(dbTables, dict):
@@ -268,7 +265,7 @@ class Dump:
                 os.makedirs(dumpDbPath, 0755)
 
             dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, table)
-            dumpFP = codecs.open(dumpFileName, "w", conf.dataEncoding)
+            dumpFP = codecs.open(dumpFileName, "wb", conf.dataEncoding)
 
         count     = int(tableValues["__infos__"]["count"])
         separator = ""
@@ -349,6 +346,45 @@ class Dump:
             dumpFP.close()
 
             logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
+
+    def dbColumns(self, dbColumns, colConsider, dbs):
+        for column in dbColumns.keys():
+            if colConsider == "1":
+                colConsiderStr = "s like '" + column + "' were"
+            else:
+                colConsiderStr = " '%s' was" % column
+
+            msg  = "Column%s found in the " % colConsiderStr
+            msg += "following databases:"
+            self.__write(msg)
+
+            printDbs = {}
+
+            for db, tblData in dbs.items():
+                for tbl, colData in tblData.items():
+                    for col, dataType in colData.items():
+                        if column.lower() in col.lower():
+                            if db in printDbs:
+                                if tbl in printDbs[db]:
+                                    printDbs[db][tbl][col] = dataType
+                                else:
+                                    printDbs[db][tbl] = { col: dataType }
+                            else:
+                                printDbs[db] = {}
+                                printDbs[db][tbl] = { col: dataType }
+
+                            continue
+
+            self.dbTableColumns(printDbs)
+
+    def query(self, query, queryRes):
+        self.string(query, queryRes)    
+
+    def rFile(self,filePath,fileData):
+        self.string("%s file saved to" % filePath,fileData,sort=False) 
+
+    def registerValue(self,registerData):
+        self.string("Registry key value data", registerData,sort=False)
 
 # object to manage how to print the retrieved queries output to
 # standard output and sessions file

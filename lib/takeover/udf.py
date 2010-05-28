@@ -31,7 +31,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.dump import dumper
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -370,7 +369,7 @@ class UDF:
                 output = self.udfEvalCmd(cmd, udfName=udfToCall)
 
                 if output:
-                    dumper.string("return value", output)
+                    conf.dumper.string("return value", output)
                 else:
                     print "No return value"
             else:

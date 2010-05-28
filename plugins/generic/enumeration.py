@@ -30,12 +30,12 @@ from lib.core.common import parsePasswordHash
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
+from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.data import temp
-from lib.core.dump import dumper
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -80,7 +80,7 @@ class Enumeration:
 
         if not kb.data.banner:
             if conf.unionUse or conf.unionTest:
-                dumper.string("valid union", unionTest())
+                conf.dumper.technic("valid union", unionTest())
 
             query          = queries[kb.dbms].banner
             kb.data.banner = inject.getValue(query)
@@ -775,7 +775,7 @@ class Enumeration:
                     plusOne = True
                 else:
                     plusOne = False
-                indexRange = getRange(count, plusOne=plusOne)
+                indexRange = getRange(count)
 
                 for index in indexRange:
                     if kb.dbms in ("SQLite", "Firebird"):
@@ -1183,7 +1183,7 @@ class Enumeration:
                 data = self.dumpTable()
 
                 if data:
-                    dumper.dbTableValues(data)
+                    conf.dumper.dbTableValues(data)
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
         if not dbs:
@@ -1192,7 +1192,7 @@ class Enumeration:
             logger.warn(warnMsg)
             return
 
-        dumper.dbColumns(foundCols, colConsider, dbs)
+        conf.dumper.dbColumns(foundCols, colConsider, dbs)
 
         message = "do you want to dump entries? [Y/n] "
         output = readInput(message, default="Y")
@@ -1254,7 +1254,7 @@ class Enumeration:
                 data = self.dumpTable()
 
                 if data:
-                    dumper.dbTableValues(data)
+                    conf.dumper.dbTableValues(data)
 
     def searchDb(self):
         foundDbs = []
@@ -1620,10 +1620,10 @@ class Enumeration:
 
     def search(self):
         if conf.db:
-            dumper.lister("found databases", self.searchDb())
+            conf.dumper.lister("found databases", self.searchDb())
 
         if conf.tbl:
-            dumper.dbTables(self.searchTable())
+            conf.dumper.dbTables(self.searchTable())
 
         if conf.col:
             self.searchColumn()
@@ -1691,6 +1691,7 @@ class Enumeration:
 
             try:
                 query = raw_input("sql-shell> ")
+                query = utf8decode(query)
             except KeyboardInterrupt:
                 print
                 errMsg = "user aborted"
@@ -1710,7 +1711,7 @@ class Enumeration:
             output = self.sqlQuery(query)
 
             if output and output != "Quit":
-                dumper.string(query, output)
+                conf.dumper.query(query, output)
 
             elif not output:
                 pass

@@ -37,6 +37,7 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.session import resumeConfKb
+from lib.core.xmldump import dumper as xmldumper
 
 def __setRequestParams():
     """
@@ -202,6 +203,14 @@ def __createDumpDir():
     if not os.path.isdir(conf.dumpPath):
         os.makedirs(conf.dumpPath, 0755)
 
+def __configureDumper():
+    if conf.xmlFile:
+        conf.dumper = xmldumper
+    else:
+        conf.dumper = dumper
+
+    conf.dumper.setOutputFile()
+
 def __createTargetDirs():
     """
     Create the output directory.
@@ -215,10 +224,9 @@ def __createTargetDirs():
     if not os.path.isdir(conf.outputPath):
         os.makedirs(conf.outputPath, 0755)
 
-    dumper.setOutputFile()
-
     __createDumpDir()
     __createFilesDir()
+    __configureDumper()
 
 def initTargetEnv():
     """

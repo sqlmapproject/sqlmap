@@ -110,8 +110,6 @@ optDict = {
                                "limitStop":         "integer",
                                "firstChar":         "integer",
                                "lastChar":          "integer",
-                               "getNumOfTables":    "integer",
-                               "getNumOfDBs":       "integer",
                                "query":             "string",
                                "sqlShell":          "boolean"
                              },
