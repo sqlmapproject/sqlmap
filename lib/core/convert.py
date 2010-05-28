@@ -95,9 +95,9 @@ def urlencode(string, safe=":/?%&=", convall=False):
         return result
 
     if convall:
-        result = urllib.quote(string.encode("utf-8")) #Reference: http://old.nabble.com/Re:-Problem:-neither-urllib2.quote-nor-urllib.quote-encode-the--unicode-strings-arguments-p19823144.html
+        result = urllib.quote(utf8encode(string)) #Reference: http://old.nabble.com/Re:-Problem:-neither-urllib2.quote-nor-urllib.quote-encode-the--unicode-strings-arguments-p19823144.html
     else:
-        result = urllib.quote(string.encode("utf-8"), safe)
+        result = urllib.quote(utf8encode(string), safe)
 
     return result
 
