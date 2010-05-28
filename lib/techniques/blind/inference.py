@@ -401,9 +401,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     queriesCount[0] += 1
                     result = Request.queryPage(urlencode(agent.payload(newValue=query)))
 
-                    # We've used the singleValue and for sure we won't need it again
-                    kb.commonOutputs[kb.partRun].remove(singleValue)
-
                     # Did we have luck?
                     if result:
                         dataToSessionFile(replaceNewlineTabs(singleValue[index-1:]))
