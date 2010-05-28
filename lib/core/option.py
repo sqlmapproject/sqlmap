@@ -33,9 +33,6 @@ import socket
 import urllib2
 import urlparse
 
-from ConfigParser import DEFAULTSECT
-from ConfigParser import RawConfigParser
-
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileType
 from lib.core.common import normalizePath
@@ -45,6 +42,7 @@ from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
 from lib.core.common import sanitizeStr
+from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -77,26 +75,6 @@ authHandler  = urllib2.BaseHandler()
 proxyHandler = urllib2.BaseHandler()
 redirectHandler = SmartRedirectHandler()
 
-
-class UnicodeRawConfigParser(RawConfigParser):
-    def write(self, fp):
-        """Write an .ini-format representation of the configuration state."""
-        if self._defaults:
-            fp.write("[%s]\n" % DEFAULTSECT)
-            for (key, value) in self._defaults.items():
-                fp.write("%s = %s\n" % (key, unicode(value).replace('\n', '\n\t')))
-            fp.write("\n")
-        for section in self._sections:
-            fp.write("[%s]\n" % section)
-            for (key, value) in self._sections[section].items():
-                if key != "__name__":
-                    if value is None:
-                        fp.write("%s\n" % (key))
-                    else:
-                        fp.write("%s = %s\n" %
-                                 (key, unicode(value).replace('\n', '\n\t')))
-            fp.write("\n")
-
 def __urllib2Opener():
     """
     This function creates the urllib2 OpenerDirector.
@@ -118,7 +96,7 @@ def __urllib2Opener():
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
-    fp = codecs.open(reqFile, "r", conf.dataEncoding)
+    fp = codecs.open(reqFile, "rb", conf.dataEncoding)
 
     fread = fp.read()
     fread = fread.replace("\r", "")
@@ -856,6 +834,13 @@ def __cleanupOptions():
     debugMsg = "cleaning up configuration parameters"
     logger.debug(debugMsg)
 
+    width = getConsoleWidth()
+
+    if conf.eta:
+        conf.progressWidth = width-26
+    else:
+        conf.progressWidth = width-46
+
     if conf.testParameter:
         conf.testParameter = conf.testParameter.replace(" ", "")
         conf.testParameter = conf.testParameter.split(",")
@@ -932,13 +917,6 @@ def __setConfAttributes():
     conf.threadException  = False
     conf.wFileType        = None
 
-    width = getConsoleWidth()
-
-    if conf.eta:
-        conf.progressWidth = width-26
-    else:
-        conf.progressWidth = width-46
-
 def __setKnowledgeBaseAttributes():
     """
     This function set some needed attributes into the knowledge base
@@ -989,7 +967,6 @@ def __setKnowledgeBaseAttributes():
     kb.unionNegative  = False
     kb.unionFalseCond = False
 
-
 def __saveCmdline():
     """
     Saves the command line options on a sqlmap configuration INI file
@@ -1002,7 +979,7 @@ def __saveCmdline():
     debugMsg = "saving command line options on a sqlmap configuration INI file"
     logger.debug(debugMsg)
 
-    config   = UnicodeRawConfigParser()
+    config = UnicodeRawConfigParser()
     userOpts = {}
 
     for family in optDict.keys():
@@ -1019,6 +996,9 @@ def __saveCmdline():
         optionData.sort()
 
         for option, value, datatype in optionData:
+            if isinstance(datatype, (list, tuple, set)):
+                datatype = datatype[0]
+
             if value is None:
                 if datatype == "boolean":
                     value = "False"
@@ -1037,10 +1017,8 @@ def __saveCmdline():
 
             config.set(family, option, value)
 
-    print 11111
-    confFP = codecs.open(paths.SQLMAP_CONFIG, "wb", "UTF8")
+    confFP = codecs.open(paths.SQLMAP_CONFIG, "wb", conf.dataEncoding)
     config.write(confFP)
-    print 22222
 
     infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
     logger.info(infoMsg)
@@ -1112,11 +1090,11 @@ def init(inputOptions=advancedDict()):
     based upon command line and configuration file options.
     """
 
+    __setConfAttributes()
+    __setKnowledgeBaseAttributes()
     __mergeOptions(inputOptions)
     __setVerbosity()
     __saveCmdline()
-    __setConfAttributes()
-    __setKnowledgeBaseAttributes()
     __cleanupOptions()
     __basicOptionValidation()
     __setRequestFromFile()

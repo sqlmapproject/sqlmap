@@ -24,9 +24,9 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 import codecs
 
 from ConfigParser import NoSectionError
-from ConfigParser import RawConfigParser
 
 from lib.core.common import checkFile
+from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
@@ -43,16 +43,12 @@ def configFileProxy(section, option, boolean=False, integer=False):
     global config
 
     if config.has_option(section, option):
-        value = config.get(section, option)
-
-        if not value:
-            value = None
-        elif value.isdigit():
-            value = int(value)
-        elif value in ("false", "False"):
-            value = False
-        elif value in ("true", "True"):
-            value = True
+        if boolean:
+            value = config.getboolean(section, option)
+        elif integer:
+            value = config.getint(section, option)
+        else:
+            value = config.get(section, option)
 
         if value:
             conf[option] = value
@@ -76,8 +72,8 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    config = RawConfigParser()
-    config.readfp(codecs.open(configFile, "r", "UTF8"))
+    config = UnicodeRawConfigParser()
+    config.readfp(codecs.open(configFile, "rb", conf.dataEncoding))
 
     if not config.has_section("Target"):
         raise NoSectionError, "Target in the configuration file is mandatory"
@@ -92,16 +88,16 @@ def configFileParser(configFile):
         raise sqlmapMissingMandatoryOptionException, errMsg
 
     for family, optionData in optDict.items():
-        for option, data in optionData.items():
+        for option, datatype in optionData.items():
             boolean = False
             integer = False
 
-            if isinstance(data, (tuple, dict, set)):
-                data = data[0]
+            if isinstance(datatype, (list, tuple, set)):
+                datatype = datatype[0]
 
-            if data == "boolean":
+            if datatype == "boolean":
                 boolean = True
-            elif data == "integer":
+            elif datatype == "integer":
                 integer = True
 
             configFileProxy(family, option, boolean, integer)

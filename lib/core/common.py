@@ -37,6 +37,8 @@ import ntpath
 import posixpath
 import subprocess
 
+from ConfigParser import DEFAULTSECT
+from ConfigParser import RawConfigParser
 from StringIO import StringIO
 from subprocess import PIPE
 from subprocess import Popen as execute
@@ -1365,3 +1367,22 @@ def getBruteUnicode(string):
     for char in string:
         retVal += unichr(ord(char))
     return retVal
+
+class UnicodeRawConfigParser(RawConfigParser):
+    def write(self, fp):
+        """Write an .ini-format representation of the configuration state."""
+        if self._defaults:
+            fp.write("[%s]\n" % DEFAULTSECT)
+            for (key, value) in self._defaults.items():
+                fp.write("%s = %s\n" % (key, unicode(value).replace('\n', '\n\t')))
+            fp.write("\n")
+        for section in self._sections:
+            fp.write("[%s]\n" % section)
+            for (key, value) in self._sections[section].items():
+                if key != "__name__":
+                    if value is None:
+                        fp.write("%s\n" % (key))
+                    else:
+                        fp.write("%s = %s\n" %
+                                 (key, unicode(value).replace('\n', '\n\t')))
+            fp.write("\n")
