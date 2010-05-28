@@ -97,7 +97,8 @@ class Connect:
                     requestMsg += "?%s" % params
     
             elif multipart:
-                #needed in this form because of potential circle dependency problem (option -> update -> connect -> option)
+                # Needed in this form because of potential circle dependency 
+                # problem (option -> update -> connect -> option)
                 from lib.core.option import proxyHandler
                 
                 multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)

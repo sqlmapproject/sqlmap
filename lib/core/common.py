@@ -55,6 +55,7 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.convert import urlencode
+from lib.core.convert import utf8decode
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
@@ -381,7 +382,7 @@ def dataToOutFile(data):
     rFilePath = "%s%s%s" % (conf.filePath, os.sep, rFile)
     rFileFP = codecs.open(rFilePath, "wb", conf.dataEncoding)
 
-    rFileFP.write(data)
+    rFileFP.write(utf8decode(data))
     rFileFP.flush()
     rFileFP.close()
 
