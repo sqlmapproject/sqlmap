@@ -1077,6 +1077,11 @@ def __basicOptionValidation():
       conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop <= conf.limitStart:
         errMsg = "value for --start (limitStart) option must be smaller than value for --stop (limitStop) option"
         raise sqlmapSyntaxException, errMsg
+    
+    if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or\
+      conf.cpuThrottle < 0):
+        errMsg = "value for --cpu-throttle (cpuThrottle) option must be in range [0,100]"
+        raise sqlmapSyntaxException, errMsg
 
 def init(inputOptions=advancedDict()):
     """

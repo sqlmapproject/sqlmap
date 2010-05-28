@@ -1249,6 +1249,7 @@ def goGoodSamaritan(part, prevValue, originalCharset):
     predictionSet = set()
     wildIndexes = []
     singleValue = None
+    reObj = getCompiledRegex('\A%s' % prevValue)
 
     if prevValue[-1] != '.':
         prevValue += '.'
@@ -1265,7 +1266,7 @@ def goGoodSamaritan(part, prevValue, originalCharset):
     if part in kb.commonOutputs:
         for item in kb.commonOutputs[part]:
             # Check if the common output (item) starts with prevValue
-            if re.search('\A%s' % prevValue, item):
+            if reObj.search(item):
                 singleValue = item
 
                 for index in wildIndexes:
@@ -1331,3 +1332,30 @@ def getPartRun():
             break
 
     return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal
+
+def getCommonStart(strings=[]):
+    """
+    Returns common start of given strings
+    """
+    if not strings or not isinstance(strings, list):
+        return None
+
+    if len(strings) == 1:
+        return strings[0]
+
+    retVal = str()
+    maxCount = min(len(string) for string in strings)
+
+    count = 0
+    while count < maxCount:
+        char = strings[0][count]
+        for i in xrange(1, len(strings)):
+            if char != strings[i][count]:
+                char = None
+                break
+        if char is None:
+            break
+        retVal += char
+        count += 1
+
+    return retVal
