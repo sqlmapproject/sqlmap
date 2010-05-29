@@ -83,7 +83,7 @@ class Web:
         return output
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
-        inputFP = codecs.open(fileToUpload, "rb", conf.dataEncoding)
+        inputFP = codecs.open(fileToUpload, "rb")
         retVal = self.__webFileStreamUpload(inputFP, destFileName, directory)
         inputFP.close()
 
