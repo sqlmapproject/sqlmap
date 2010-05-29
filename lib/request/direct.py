@@ -26,6 +26,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
+from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -67,7 +68,10 @@ def direct(query, content=True):
 
         if len(output) == 1:
             if len(output[0]) == 1:
-                return unicode(list(output)[0][0])
+                out = list(output)[0][0]
+                if isinstance(out, str):
+                    out = utf8decode(out)
+                return out
             else:
                 return list(output)
         else:
