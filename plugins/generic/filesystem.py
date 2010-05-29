@@ -23,6 +23,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import binascii
+import codecs
 import os
 
 from lib.core.agent import agent
@@ -163,8 +164,8 @@ class Filesystem:
         """
 
         fcEncodedList = []
-        fp            = open(fileName, "rb")
-        fcEncodedStr  = fp.read().encode(encoding).replace("\n", "")
+        fp = codecs.open(fileName, "rb")
+        fcEncodedStr = fp.read().encode(encoding).replace("\n", "")
 
         if not single:
             fcLength = len(fcEncodedStr)

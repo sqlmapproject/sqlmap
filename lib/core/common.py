@@ -1080,8 +1080,10 @@ def decloakToNamedTemporaryFile(filepath, name=None):
 def decloakToMkstemp(filepath, **kwargs):
     name = mkstemp(**kwargs)[1]
     retVal = open(name, 'w+b')
+
     retVal.write(decloak(filepath))
     retVal.seek(0)
+
     return retVal
 
 def isWindowsPath(filepath):
@@ -1143,7 +1145,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
 
     # Create dot file by using extra/gprof2dot/gprof2dot.py
     # http://code.google.com/p/jrfonseca/wiki/Gprof2Dot
-    dotFilePointer = open(dotOutputFile, 'wt')
+    dotFilePointer = codecs.open(dotOutputFile, 'wt', conf.dataEncoding)
     parser = gprof2dot.PstatsParser(profileOutputFile)
     profile = parser.parse()
     profile.prune(0.5/100.0, 0.1/100.0)
@@ -1194,7 +1196,7 @@ def getConsoleWidth(default=80):
     return width if width else default
 
 def parseXmlFile(xmlFile, handler):
-    xfile = open(xmlFile)
+    xfile = codecs.open(xmlFile, 'rb', conf.dataEncoding)
     content = xfile.read()
     stream = StringIO(content)
     parse(stream, handler)
@@ -1209,7 +1211,7 @@ def initCommonOutputs():
     key = None
 
     fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
-    cfile = open(fileName, 'r')
+    cfile = codecs.open(fileName, 'r', conf.dataEncoding)
 
     for line in cfile.xreadlines():
         line = line.strip()

@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import os
 import re
 import stat
@@ -357,7 +358,7 @@ class Metasploit:
 
         self.__resource += "exploit\n"
 
-        self.resourceFp = open(self.resourceFile, "w")
+        self.resourceFp = codecs.open(self.resourceFile, "w", conf.dataEncoding)
         self.resourceFp.write(self.__resource)
         self.resourceFp.close()
 
@@ -546,7 +547,7 @@ class Metasploit:
             errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", "")
             raise sqlmapFilePathException, errMsg
 
-        self.__shellcodeFP   = open(self.__shellcodeFilePath, "rb")
+        self.__shellcodeFP = codecs.open(self.__shellcodeFilePath, "rb", conf.dataEncoding)
         self.shellcodeString = self.__shellcodeFP.read()
         self.__shellcodeFP.close()
 

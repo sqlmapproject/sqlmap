@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import difflib
 import os
 import re
@@ -145,7 +146,7 @@ def __updateMSSQLXML():
                 servicepackElement.appendChild(servicepackText)
 
     # Get the XML old file content to a local variable
-    mssqlXml = open(paths.MSSQL_XML, "r")
+    mssqlXml = codecs.open(paths.MSSQL_XML, "r", conf.dataEncoding)
     oldMssqlXml = mssqlXml.read()
     oldMssqlXmlSignatures = oldMssqlXml.count("<signature>")
     oldMssqlXmlList = oldMssqlXml.splitlines(1)
@@ -155,12 +156,12 @@ def __updateMSSQLXML():
     shutil.copy(paths.MSSQL_XML, "%s.bak" % paths.MSSQL_XML)
 
     # Save our newly created XML to the signatures file
-    mssqlXml = open(paths.MSSQL_XML, "w")
+    mssqlXml = codecs.open(paths.MSSQL_XML, "w", conf.dataEncoding)
     doc.writexml(writer=mssqlXml, addindent="    ", newl="\n")
     mssqlXml.close()
 
     # Get the XML new file content to a local variable
-    mssqlXml = open(paths.MSSQL_XML, "r")
+    mssqlXml = codecs.open(paths.MSSQL_XML, "r", conf.dataEncoding)
     newMssqlXml = mssqlXml.read()
     newMssqlXmlSignatures = newMssqlXml.count("<signature>")
     newMssqlXmlList = newMssqlXml.splitlines(1)

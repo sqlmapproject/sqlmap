@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import ntpath
 import os
 
@@ -150,7 +151,7 @@ class Filesystem(GenericFilesystem):
         dFile        = posixToNtSlashes(dFile)
         dFileName    = ntpath.basename(dFile)
         wFileSize    = os.path.getsize(wFile)
-        wFilePointer = open(wFile, "rb")
+        wFilePointer = codecs.open(wFile, "rb")
         wFileContent = wFilePointer.read()
         wFilePointer.close()
 

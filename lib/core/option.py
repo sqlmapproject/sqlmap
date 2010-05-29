@@ -96,7 +96,7 @@ def __urllib2Opener():
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
-    fp = codecs.open(reqFile, "rb", conf.dataEncoding)
+    fp = codecs.open(reqFile, "rb")
 
     fread = fp.read()
     fread = fread.replace("\r", "")
@@ -745,7 +745,7 @@ def __setHTTPUserAgent():
     logger.debug(debugMsg)
 
     try:
-        fd = open(conf.userAgentsFile, "r")
+        fd = codecs.open(conf.userAgentsFile, "r", conf.dataEncoding)
     except IOError:
         warnMsg  = "unable to read HTTP User-Agent header "
         warnMsg += "file '%s'" % conf.userAgentsFile
