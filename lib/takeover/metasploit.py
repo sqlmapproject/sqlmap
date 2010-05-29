@@ -121,8 +121,8 @@ class Metasploit:
 
         self.__msfSMBPortsList    = {
                                       "windows": {
-                                                   1: ( "139/TCP (default)", "139" ),
-                                                   2: ( "445/TCP", "445" ),
+                                                   1: ( "139/TCP", "139" ),
+                                                   2: ( "445/TCP (default)", "445" ),
                                                  }
                                     }
 
@@ -547,7 +547,7 @@ class Metasploit:
             errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", "")
             raise sqlmapFilePathException, errMsg
 
-        self.__shellcodeFP = codecs.open(self.__shellcodeFilePath, "rb", conf.dataEncoding)
+        self.__shellcodeFP = codecs.open(self.__shellcodeFilePath, "rb")
         self.shellcodeString = self.__shellcodeFP.read()
         self.__shellcodeFP.close()
 
