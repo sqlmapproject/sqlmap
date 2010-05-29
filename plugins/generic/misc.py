@@ -51,10 +51,7 @@ class Miscellaneous:
     def getRemoteTempPath(self):
         if not conf.tmpPath:
             if kb.os == "Windows":
-                if kb.dbms == "Microsoft SQL Server":
-                    conf.tmpPath = "%TEMP%"
-                else:
-                    conf.tmpPath = "C:/WINDOWS/Temp"
+                conf.tmpPath = "C:/WINDOWS/Temp"
             else:
                 conf.tmpPath = "/tmp"
 
