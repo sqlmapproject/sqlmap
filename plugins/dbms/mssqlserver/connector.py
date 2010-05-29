@@ -28,6 +28,7 @@ try:
 except ImportError, _:
     pass
 
+from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
@@ -71,7 +72,7 @@ class Connector(GenericConnector):
 
     def execute(self, query):
         try:
-            self.cursor.execute(query)
+            self.cursor.execute(utf8encode(query))
         except (pymssql.OperationalError, pymssql.ProgrammingError), msg:
             logger.log(8, msg)
         except pymssql.InternalError, msg:
