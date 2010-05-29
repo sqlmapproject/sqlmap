@@ -28,6 +28,7 @@ try:
 except ImportError, _:
     pass
 
+from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
@@ -75,7 +76,7 @@ class Connector(GenericConnector):
 
     def execute(self, query):
         try:
-            self.cursor.execute(query)
+            self.cursor.execute(utf8encode(query))
         except sqlite3.OperationalError, msg:
             logger.log(8, msg[0])
         except sqlite3.DatabaseError, msg:
