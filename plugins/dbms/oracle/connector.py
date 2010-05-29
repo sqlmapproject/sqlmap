@@ -27,10 +27,15 @@ try:
 except ImportError, _:
     pass
 
+import os 
+
+from lib.core.convert import utf8encode
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 
 from plugins.generic.connector import Connector as GenericConnector
+
+os.environ["NLS_LANG"] = ".AL32UTF8" 
 
 class Connector(GenericConnector):
     """
@@ -46,6 +51,9 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
         self.__dsn = cx_Oracle.makedsn(self.hostname, self.port, self.db)
+        self.__dsn = utf8encode(self.__dsn)
+        self.user = utf8encode(self.user)
+        self.password = utf8encode(self.password)
 
         try:
             self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
@@ -68,7 +76,7 @@ class Connector(GenericConnector):
 
     def execute(self, query):
         try:
-            self.cursor.execute(query)
+            self.cursor.execute(utf8encode(query))
         except (cx_Oracle.DatabaseError), msg:
             logger.log(8, msg)
         except cx_Oracle.InternalError, msg:
