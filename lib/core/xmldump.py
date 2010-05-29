@@ -131,8 +131,7 @@ class XMLDump:
         if attrValue is None :
             attr.nodeValue = unicode("","utf-8")
         else :
-            escaped_data = unicode(attrValue)
-            attr.nodeValue = unicode(escaped_data,"utf-8")
+            attr.nodeValue = attrValue if isinstance(attrValue, unicode) else unicode(attrValue,"utf-8")
         return attr
 
     def __formatString(self, string):
