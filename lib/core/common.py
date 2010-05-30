@@ -380,9 +380,9 @@ def dataToOutFile(data):
 
     rFile = filePathToString(conf.rFile)
     rFilePath = "%s%s%s" % (conf.filePath, os.sep, rFile)
-    rFileFP = codecs.open(rFilePath, "wb", conf.dataEncoding)
+    rFileFP = codecs.open(rFilePath, "wb")
 
-    rFileFP.write(utf8decode(data))
+    rFileFP.write(data)
     rFileFP.flush()
     rFileFP.close()
 
@@ -421,7 +421,7 @@ def fileToStr(fileName):
     @rtype: C{str}
     """
 
-    filePointer = codecs.open(fileName, "rb", conf.dataEncoding)
+    filePointer = codecs.open(fileName, "rb")
     fileText = filePointer.read()
 
     return fileText.replace("    ", "").replace("\t", "").replace("\r", "").replace("\n", " ")

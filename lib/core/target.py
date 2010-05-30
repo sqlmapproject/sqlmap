@@ -127,7 +127,7 @@ def __setOutputResume():
             __url_cache = set()
             __expression_cache = {}
 
-            for line in readSessionFP.readlines(): #xreadlines doesn't return unicode strings when codec.open used
+            for line in readSessionFP.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
                 if line.count("][") == 4:
                     line = line.split("][")
 
@@ -142,7 +142,7 @@ def __setOutputResume():
                     if url[0] == "[":
                         url = url[1:]
     
-                    value = value.rstrip('\r\n') #strips both chars independently
+                    value = value.rstrip('\r\n') # Strips both chars independently
 
                     if url not in ( conf.url, conf.hostname ):
                         continue

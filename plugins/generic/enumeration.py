@@ -775,7 +775,7 @@ class Enumeration:
                     plusOne = True
                 else:
                     plusOne = False
-                indexRange = getRange(count)
+                indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
                     if kb.dbms in ("SQLite", "Firebird"):

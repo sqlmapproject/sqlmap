@@ -414,7 +414,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         break
                 elif commonCharset:
-                    # TODO: this part does not seem to work yet
                     val = getChar(index, commonCharset, False)
 
                 # If we had no luck with singleValue and common charset,

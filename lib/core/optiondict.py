@@ -92,7 +92,7 @@ optDict = {
                                "getCurrentDb":      ("boolean", "Databases"),
                                "isDba":             "boolean",
                                "getUsers":          ("boolean", "Users"),
-                               "getPasswordHashes": ("boolean", "Hashes"),
+                               "getPasswordHashes": ("boolean", "Passwords"),
                                "getPrivileges":     ("boolean", "Privileges"),
                                "getRoles":          ("boolean", "Roles"),
                                "getDbs":            ("boolean", "Databases"),
