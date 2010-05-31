@@ -214,14 +214,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 else:
                     if minValue == maxChar or maxValue == minChar:
                         return None
-                    retVal = originalTbl[originalTbl.index(minValue) + 1]
-                    forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
-                    queriesCount[0] += 1
-                    result = Request.queryPage(urlencode(forgedPayload))
-                    if result:
-                        return chr(retVal) if retVal < 128 else unichr(retVal)
-                    else: 
-                        return None
+                    for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
+                        forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
+                        queriesCount[0] += 1
+                        result = Request.queryPage(urlencode(forgedPayload))
+                        if result:
+                            return chr(retVal) if retVal < 128 else unichr(retVal)
+                    return None
 
     def etaProgressUpdate(charTime, index):
         if len(progressTime) <= ( (length * 3) / 100 ):

@@ -54,6 +54,8 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.data import temp
+from lib.core.convert import md5hash
+from lib.core.convert import sha1hash
 from lib.core.convert import urlencode
 from lib.core.convert import utf8decode
 from lib.core.exception import sqlmapFilePathException
@@ -1224,7 +1226,9 @@ def initCommonOutputs():
                 if key not in kb.commonOutputs:
                     kb.commonOutputs[key] = []
 
-                kb.commonOutputs[key].append(line.strip())
+                item = line.strip()
+                if item not in kb.commonOutputs[key]:
+                    kb.commonOutputs[key].append(item)
 
     cfile.close()
 
@@ -1252,29 +1256,23 @@ def goGoodSamaritan(part, prevValue, originalCharset):
     predictionSet = set()
     wildIndexes = []
     singleValue = None
-    reObj = getCompiledRegex('\A%s' % prevValue)
-
-    if prevValue[-1] != '.':
-        prevValue += '.'
-
-    charIndex = 0
-    findIndex = prevValue.find('.', charIndex)
-
-    while findIndex != -1:
-        wildIndexes.append(findIndex)
-        charIndex += 1
-        findIndex = prevValue.find('.', charIndex)
 
     # If the header we are looking for has common outputs defined
     if part in kb.commonOutputs:
         for item in kb.commonOutputs[part]:
+            #if part == 'Passwords':
+                #if prevValue.startswith('*'): #MySQL_160bit
+                    #return None, None, originalCharset
+                #if item not in kb.cache.md5:
+                    #kb.cache.md5[item] = md5hash(item).upper()
+                #item = kb.cache.md5[item]
+
             # Check if the common output (item) starts with prevValue
-            if reObj.search(item):
+            if item.startswith(prevValue):
                 singleValue = item
 
-                for index in wildIndexes:
-                    char = item[index]
-
+                if len(item) > len(prevValue):
+                    char = item[len(prevValue)]
                     if char not in predictionSet:
                         predictionSet.add(char)
 
