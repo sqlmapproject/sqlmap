@@ -1213,11 +1213,11 @@ def initCommonOutputs():
     fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     cfile = codecs.open(fileName, 'r', conf.dataEncoding)
 
-    for line in cfile.xreadlines():
-        line = line.strip()
+    for line in cfile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
+        if line.find('#') != -1:
+            line = line[:line.find('#')]
 
-        if line.startswith('#'):
-            continue
+        line = line.strip()
 
         if len(line) > 1:
             if line[0] == '[' and line[-1] == ']':
@@ -1260,13 +1260,6 @@ def goGoodSamaritan(part, prevValue, originalCharset):
     # If the header we are looking for has common outputs defined
     if part in kb.commonOutputs:
         for item in kb.commonOutputs[part]:
-            #if part == 'Passwords':
-                #if prevValue.startswith('*'): #MySQL_160bit
-                    #return None, None, originalCharset
-                #if item not in kb.cache.md5:
-                    #kb.cache.md5[item] = md5hash(item).upper()
-                #item = kb.cache.md5[item]
-
             # Check if the common output (item) starts with prevValue
             if item.startswith(prevValue):
                 singleValue = item

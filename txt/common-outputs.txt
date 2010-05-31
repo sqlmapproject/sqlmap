@@ -47,14 +47,9 @@ USERS
 
 [Passwords]
 
-root
-test
-testpass
-password
-abc123
-qwertz
-12345
-123456
+#MySQL
+*00E247AC5F9AF26AE0194B41E1E769DEE1429A29 #testpass
+
 
 [Users]
 
