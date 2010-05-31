@@ -144,7 +144,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return None
 
-    def getChar(idx, charTbl=asciiTbl, continuousOrder=True):
+    def getChar(idx, charTbl=asciiTbl, continuousOrder=True): # continuousOrder means that distance between each two neighbour's numerical values is exactly 1
         result = tryHint(idx)
 
         if result:
@@ -190,21 +190,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                 if type(charTbl) != xrange:
                     charTbl = charTbl[position:]
-                else:
+                else: # xrange - extended virtual charset used for memory/space optimization
                     charTbl = xrange(charTbl[position], charTbl[-1] + 1)
             else:
                 maxValue = posValue
 
                 if type(charTbl) != xrange:
                     charTbl = charTbl[:position]
-                else:
+                else: # xrange - extended set (e.g. Unicode)
                     charTbl = xrange(charTbl[0], charTbl[position])
 
             if len(charTbl) == 1:
                 if continuousOrder:
                     if maxValue == 1:
                         return None
-                    elif minValue == maxChar:
+                    elif minValue == maxChar: # if we hit the maxChar then extend the working set with xrange (virtual charset used because of memory/space optimization) and continue tests with new set
                         charTbl = xrange(maxChar + 1, (maxChar + 1) << 8)
                         maxChar = maxValue = charTbl[-1]
                         minChar = minValue = charTbl[0]
@@ -215,7 +215,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if minValue == maxChar or maxValue == minChar:
                         return None
 
-                    for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
+                    for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]): # if we are working with non-continuous set both minValue and character afterwards are possible candidates
                         forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
                         queriesCount[0] += 1
                         result = Request.queryPage(urlencode(forgedPayload))
