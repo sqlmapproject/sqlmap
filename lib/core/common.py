@@ -76,8 +76,6 @@ from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 
-__compiledRegularExpressions = {}
-
 def paramToDict(place, parameters=None):
     """
     Split the parameters into names and values, check if these parameters
@@ -1305,14 +1303,11 @@ def getCompiledRegex(regex, *args):
     Returns compiled regular expression and stores it in cache for further
     usage
     """
-
-    global __compiledRegularExpressions
-
-    if (regex, args) in __compiledRegularExpressions:
-        return __compiledRegularExpressions[(regex, args)]
+    if (regex, args) in kb.cache.regex:
+        return kb.cache.regex[(regex, args)]
     else:
         retVal = re.compile(regex, *args)
-        __compiledRegularExpressions[(regex, args)] = retVal
+        kb.cache.regex[(regex, args)] = retVal
         return retVal
 
 def getPartRun():

@@ -928,6 +928,11 @@ def __setKnowledgeBaseAttributes():
 
     kb.absFilePaths   = set()
     kb.bannerFp       = advancedDict()
+
+    kb.cache          = advancedDict()
+    kb.cache.regex    = {}
+    kb.cache.md5      = {}
+
     kb.commonOutputs  = None
     kb.data           = advancedDict()
 
