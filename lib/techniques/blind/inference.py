@@ -157,6 +157,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
             queriesCount[0] += 1
             result = Request.queryPage(urlencode(forgedPayload))
+
             if result:
                 return chr(charTbl[0]) if charTbl[0] < 128 else unichr(charTbl[0])
             else: 
@@ -171,10 +172,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if kb.dbms == "SQLite":
                 posValueOld = posValue
-                if posValue < 128:
-                    posValue = chr(posValue)
-                else:
-                    posValue = unichr(posValue)
+                posValue = chr(posValue) if posValue < 128 else unichr(posValue)
 
             if not conf.useBetween or kb.dbms == "SQLite":
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
@@ -189,12 +187,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if result:
                 minValue = posValue
+
                 if type(charTbl) != xrange:
                     charTbl = charTbl[position:]
                 else:
                     charTbl = xrange(charTbl[position], charTbl[-1] + 1)
             else:
                 maxValue = posValue
+
                 if type(charTbl) != xrange:
                     charTbl = charTbl[:position]
                 else:
@@ -214,12 +214,15 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 else:
                     if minValue == maxChar or maxValue == minChar:
                         return None
+
                     for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
                         forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
                         queriesCount[0] += 1
                         result = Request.queryPage(urlencode(forgedPayload))
+
                         if result:
                             return chr(retVal) if retVal < 128 else unichr(retVal)
+
                     return None
 
     def etaProgressUpdate(charTime, index):
@@ -390,9 +393,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 val = None
                 singleValue, commonCharset, otherCharset = goGoodSamaritan(kb.partRun, finalValue, asciiTbl)
 
-                # If there is no singleValue (single match from
-                # txt/common-outputs.txt) use the returned common
-                # charset only to retrieve the query output
+                # If there is one single output in common-outputs, check
+                # it via equal against the query output
                 if singleValue is not None:
                     # One-shot query containing equals singleValue
                     query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = %s', (expressionUnescaped, unescaper.unescape('\'%s\'' % singleValue))))
@@ -412,7 +414,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         finalValue = singleValue
 
                         break
-                elif commonCharset:
+
+                # Otherwise if there is no singleValue (single match from
+                # txt/common-outputs.txt) use the returned common
+                # charset only to retrieve the query output
+                if commonCharset:
                     val = getChar(index, commonCharset, False)
 
                 # If we had no luck with singleValue and common charset,

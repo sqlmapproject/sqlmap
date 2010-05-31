@@ -1,21 +1,19 @@
 [Databases]
 
-#MySQL
+# MySQL
 information_schema
 mysql
-public
-master
 phpmyadmin
 
-#Microsoft SQL Server
+# Microsoft SQL Server
 tempdb
 model
 master
 msdb
 
-[Tables]
 
-#MySQL
+[Tables]
+# MySQL
 CHARACTER_SETS
 COLLATION_CHARACTER_SET_APPLICABILITY
 COLLATIONS
@@ -68,7 +66,7 @@ time_zone_transition
 time_zone_transition_type
 user
 
-#PHPMyAdmin
+# PHPMyAdmin
 pma_bookmark
 pma_column_info
 pma_designer_coords
@@ -78,14 +76,14 @@ pma_relation
 pma_table_coords
 pma_table_info
 
-#Oracle
+# Oracle
 BONUS
 DEPT
 EMP
 SALGRADE
 USERS
 
-#Microsoft SQL Server
+# Microsoft SQL Server
 all_columns
 all_objects
 all_parameters
@@ -472,13 +470,13 @@ systaskids
 
 [Passwords]
 
-#MySQL
-*00E247AC5F9AF26AE0194B41E1E769DEE1429A29 #testpass
+# MySQL
+*00E247AC5F9AF26AE0194B41E1E769DEE1429A29 # testpass
 
 
 [Users]
 
-#Oracle
+# Oracle
 SCOTT
 MGMT_VIEW
 MDDATA

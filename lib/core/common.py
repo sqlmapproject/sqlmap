@@ -54,10 +54,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.data import temp
-from lib.core.convert import md5hash
-from lib.core.convert import sha1hash
 from lib.core.convert import urlencode
-from lib.core.convert import utf8decode
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
@@ -1220,15 +1217,14 @@ def initCommonOutputs():
         line = line.strip()
 
         if len(line) > 1:
-            if line[0] == '[' and line[-1] == ']':
+            if line.startswith('[') and line.endswith(']'):
                 key = line[1:-1]
             elif key:
                 if key not in kb.commonOutputs:
                     kb.commonOutputs[key] = []
 
-                item = line.strip()
-                if item not in kb.commonOutputs[key]:
-                    kb.commonOutputs[key].append(item)
+                if line not in kb.commonOutputs[key]:
+                    kb.commonOutputs[key].append(line)
 
     cfile.close()
 
@@ -1257,15 +1253,19 @@ def goGoodSamaritan(part, prevValue, originalCharset):
     wildIndexes = []
     singleValue = None
 
-    # If the header we are looking for has common outputs defined
+    # If the header (e.g. Databases) we are looking for has common
+    # outputs defined
     if part in kb.commonOutputs:
+        # For each common output
         for item in kb.commonOutputs[part]:
             # Check if the common output (item) starts with prevValue
+            # where prevValue is the enumerated character(s) so far
             if item.startswith(prevValue):
                 singleValue = item
 
                 if len(item) > len(prevValue):
                     char = item[len(prevValue)]
+
                     if char not in predictionSet:
                         predictionSet.add(char)
 
@@ -1285,7 +1285,7 @@ def goGoodSamaritan(part, prevValue, originalCharset):
         if len(commonCharset) > 1:
             return None, commonCharset, otherCharset
         else:
-            return singleValue, None, originalCharset
+            return singleValue, commonCharset, originalCharset
     else:
         return None, None, originalCharset
 
@@ -1294,6 +1294,7 @@ def getCompiledRegex(regex, *args):
     Returns compiled regular expression and stores it in cache for further
     usage
     """
+
     if (regex, args) in kb.cache.regex:
         return kb.cache.regex[(regex, args)]
     else:
