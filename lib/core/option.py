@@ -33,6 +33,7 @@ import socket
 import urllib2
 import urlparse
 
+from extra.keepalive import keepalive
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileType
 from lib.core.common import normalizePath
@@ -71,7 +72,8 @@ from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.utils.google import Google
 
-authHandler  = urllib2.BaseHandler()
+authHandler = urllib2.BaseHandler()
+keepAliveHandler = keepalive.HTTPHandler()
 proxyHandler = urllib2.BaseHandler()
 redirectHandler = SmartRedirectHandler()
 
@@ -81,18 +83,21 @@ def __urllib2Opener():
     """
 
     global authHandler
+    global keepAliveHandler
     global proxyHandler
     global redirectHandler
 
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
     
-    if conf.dropSetCookie:
-        opener  = urllib2.build_opener(proxyHandler, authHandler)
-    else:
+    handlers = [proxyHandler, authHandler, redirectHandler]
+    if not conf.dropSetCookie:
         conf.cj = cookielib.LWPCookieJar()
-        opener  = urllib2.build_opener(proxyHandler, authHandler, urllib2.HTTPCookieProcessor(conf.cj), redirectHandler)
+        handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
+    if conf.keepAlive:
+        handlers.append(keepAliveHandler)
 
+    opener  = urllib2.build_opener(*handlers)
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):

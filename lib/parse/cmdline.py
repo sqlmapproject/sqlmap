@@ -454,6 +454,9 @@ def cmdLineParser():
         parser.add_option("--common-prediction", dest="useCommonPrediction", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--keep-alive", dest="keepAlive", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(injection)
