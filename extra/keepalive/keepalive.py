@@ -68,6 +68,7 @@ EXTRA ATTRIBUTES AND METHODS
 
 """
 
+import threading
 import urllib2
 import httplib
 import socket
@@ -89,19 +90,28 @@ class HTTPHandler(urllib2.HTTPHandler):
 
     def open_connections(self):
         """return a list of connected hosts"""
-        return self._connections.keys()
+        retVal = []
+        currentThread = threading.currentThread()
+        for thread, host in self._connections.keys():
+            if thread == currentThread:
+                retVal.append(host)
+        return retVal
 
     def close_all(self):
         """close all open connections"""
-        for host, conn in self._connections.items():
+        for _, conn in self._connections.items():
             conn.close()
         self._connections = {}
         
     def _remove_connection(self, host, close=0):
-        if self._connections.has_key(host):
-            if close: self._connections[host].close()
-            del self._connections[host]
-        
+        key = self._get_connection_key(host)
+        if self._connections.has_key(key):
+            if close: self._connections[key].close()
+            del self._connections[key]
+    
+    def _get_connection_key(self, host):
+        return (threading.currentThread(), host)
+    
     def _start_connection(self, h, req):
         try:
             if req.has_data():
@@ -132,7 +142,8 @@ class HTTPHandler(urllib2.HTTPHandler):
 
         try:
             need_new_connection = 1
-            h = self._connections.get(host)
+            key = self._get_connection_key(host)
+            h = self._connections.get(key)
             if not h is None:
                 try:
                     self._start_connection(h, req)
@@ -155,7 +166,7 @@ class HTTPHandler(urllib2.HTTPHandler):
             if need_new_connection:
                 if DEBUG: print "creating new connection to %s" % host
                 h = http_class(host)
-                self._connections[host] = h
+                self._connections[key] = h
                 self._start_connection(h, req)
                 r = h.getresponse()
         except socket.error, err:
