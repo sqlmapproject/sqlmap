@@ -116,7 +116,7 @@ class XMLDump:
         The text is escaped to an fit the xml text format.
         '''
         if data is None :
-            return self.__doc.createTextNode('')
+            return self.__doc.createTextNode(u'')
         else :
             escaped_data = saxutils.escape(self.__formatString(data), ENTITIES)
             return self.__doc.createTextNode(escaped_data)
@@ -128,7 +128,7 @@ class XMLDump:
         '''
         attr = self.__doc.createAttribute(attrName)
         if attrValue is None :
-            attr.nodeValue = ''
+            attr.nodeValue = u''
         else :
             attr.nodeValue = self.__getUnicode(attrValue)
         return attr
