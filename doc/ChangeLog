@@ -1,13 +1,22 @@
 sqlmap (0.9-1) stable; urgency=low
 
   * Added support to directly connect to the database without passing via
-    a SQL injection (Bernardo and Miroslav).
-  * Added support for --roles for Oracle (Bernardo).
+    a SQL injection, -d switch (Bernardo and Miroslav).
+  * Added support to enumerate roles on Oracle, --roles switch (Bernardo).
+  * Implemented feature to speedup the enumeration of table names
+    (Miroslav).
+  * Extended old '--dump -C' functionality to be able to search for
+    specific database(s), table(s) and column(s), --search switch
+    (Bernardo).
+  * Added support to fetch unicode data (Miroslav).
   * Added safe URL feature, --safe-url and --safe-freq (Miroslav).
+  * Added --use-between switch to use BETWEEN syntax in inferencial
+    statement and bypass firewalls filtering '>' character (Bernardo and
+    Miroslav).
   * Support for customizable HTTP redirections (Bernardo).
-  * Implemented feature to speedup the enumeration of table names (Miroslav).
-  * Major code refactoring (Bernardo).
   * Several bugs fixed (Bernardo and Miroslav).
+  * Major code refactoring (Bernardo).
+  * User's manual updated (Bernardo).
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day, DD MMM 2010 10:00:00 +0000
 
