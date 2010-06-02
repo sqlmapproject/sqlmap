@@ -195,7 +195,7 @@ def __createDumpDir():
     Create the dump directory.
     """
 
-    if not conf.dumpTable and not conf.dumpAll:
+    if not conf.dumpTable and not conf.dumpAll and not conf.search:
         return
 
     conf.dumpPath = paths.SQLMAP_DUMP_PATH % conf.hostname
