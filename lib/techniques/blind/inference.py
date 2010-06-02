@@ -197,14 +197,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                 if type(charTbl) != xrange:
                     charTbl = charTbl[:position]
-                else: # xrange - extended set (e.g. Unicode)
+                else:
                     charTbl = xrange(charTbl[0], charTbl[position])
 
             if len(charTbl) == 1:
                 if continuousOrder:
                     if maxValue == 1:
                         return None
-                    elif minValue == maxChar: # if we hit the maxChar then extend the working set with xrange (virtual charset used because of memory/space optimization) and continue tests with new set
+                    elif minValue == maxChar: # going beyond the original charset
+                        # if the original charTbl was [0,..,127] new one will be [128,..,128*256-1] or from 128 to 32767
+                        # and instead of making a HUGE list with all elements we use here xrange, which is a virtual list
                         charTbl = xrange(maxChar + 1, (maxChar + 1) << 8)
                         maxChar = maxValue = charTbl[-1]
                         minChar = minValue = charTbl[0]
