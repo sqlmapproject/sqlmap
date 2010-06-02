@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import codecs
 import re
 
@@ -62,7 +61,6 @@ NAME_ATTR = "name"
 TYPE_ATTR = "type"
 VALUE_ATTR = "value"
 SUCESS_ATTR = "success"
-ENCODING = "utf-8"
 NAME_SPACE_ATTR = 'http://www.w3.org/2001/XMLSchema-instance'
 XMLNS_ATTR = "xmlns:xsi"
 SCHEME_NAME = "sqlmap.xsd"
@@ -480,7 +478,7 @@ class XMLDump:
         if (conf.xmlFile) :
             try :
                 self.__outputFile = conf.xmlFile 
-                self.__outputFP = codecs.open(self.__outputFile, "ab", conf.dataEncoding)
+                self.__outputFP = codecs.open(self.__outputFile, "a", conf.dataEncoding)
                 self.__root = self.__doc.createElementNS(NAME_SPACE_ATTR, RESULTS_ELEM_NAME)
                 self.__root.setAttributeNode(self.__createAttribute(XMLNS_ATTR,NAME_SPACE_ATTR))
                 self.__root.setAttributeNode(self.__createAttribute(SCHEME_NAME_ATTR,SCHEME_NAME))
@@ -511,7 +509,7 @@ class XMLDump:
                 statusElem.appendChild(errorElem)
 
             self.__addToRoot(statusElem)
-            self.__write(self.__doc.toprettyxml(encoding=ENCODING))
+            self.__write(self.__doc.toprettyxml(encoding=conf.dataEncoding))
             self.__outputFP.close()
 
 def closeDumper(status, msg=""):
