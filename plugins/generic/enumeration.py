@@ -26,6 +26,7 @@ import re
 
 from lib.core.agent import agent
 from lib.core.common import getRange
+from lib.core.common import getUnicode
 from lib.core.common import parsePasswordHash
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
@@ -440,7 +441,7 @@ class Enumeration:
 
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
-                            if kb.dbms == "PostgreSQL" and unicode(privilege).isdigit():
+                            if kb.dbms == "PostgreSQL" and getUnicode(privilege).isdigit():
                                 for position, pgsqlPriv in pgsqlPrivs:
                                     if count == position and int(privilege) == 1:
                                         privileges.add(pgsqlPriv)
@@ -1058,7 +1059,7 @@ class Enumeration:
                         else:
                             colEntry = entry[index]
 
-                        colEntryLen = len(unicode(colEntry))
+                        colEntryLen = len(getUnicode(colEntry))
                         maxLen = max(colLen, colEntryLen)
 
                         if maxLen > kb.data.dumpedTable[column]["length"]:

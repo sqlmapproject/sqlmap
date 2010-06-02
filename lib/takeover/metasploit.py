@@ -36,6 +36,7 @@ from subprocess import Popen as execute
 from lib.core.common import dataToStdout
 from lib.core.common import getLocalIP
 from lib.core.common import getRemoteIP
+from lib.core.common import getUnicode
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import pollProcess
@@ -157,7 +158,7 @@ class Metasploit:
 
         if not choice:
             if lst:
-                choice = unicode(default)
+                choice = getUnicode(default)
             else:
                 return default
 

@@ -27,6 +27,7 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -227,7 +228,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         # sql injection output
         startPosition = resultPage.index(temp.start)
         endPosition = resultPage.rindex(temp.stop) + len(temp.stop)
-        value = unicode(resultPage[startPosition:endPosition])
+        value = getUnicode(resultPage[startPosition:endPosition])
 
         duration = calculateDeltaSeconds(start)
 

@@ -1354,7 +1354,7 @@ def getCommonStart(strings=[]):
 
 def getUnicode(value):
     if isinstance(value, basestring):
-        return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding)
+        return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding if 'dataEncoding' in conf else "utf-8")
     else:
         return unicode(value)
 

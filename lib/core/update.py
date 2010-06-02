@@ -39,6 +39,7 @@ from xml.dom.minidom import Document
 from subprocess import PIPE
 from subprocess import Popen as execute
 
+from lib.core.common import getUnicode
 from lib.core.common import dataToStdout
 from lib.core.common import pollProcess
 from lib.core.common import readInput
@@ -215,7 +216,7 @@ def __updateSqlmap():
         logger.debug(debugMsg)
 
         def notify(event_dict):
-            action = unicode(event_dict['action'])
+            action = getUnicode(event_dict['action'])
             index = action.find('_')
             prefix = action[index + 1].upper() if index != -1 else action.capitalize()
 
@@ -225,7 +226,7 @@ def __updateSqlmap():
             if action.find('_completed') == -1:
                 print "%s\t%s" % (prefix, event_dict['path'])
             else:
-                revision = unicode(event_dict['revision'])
+                revision = getUnicode(event_dict['revision'])
                 index = revision.find('number ')
 
                 if index != -1:

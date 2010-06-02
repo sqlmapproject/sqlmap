@@ -26,6 +26,7 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
+from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
@@ -217,7 +218,7 @@ class Fingerprint(GenericFingerprint):
 
         for sp in sps:
             query  =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
-            query += "LIKE '%Service Pack " + unicode(sp) + "%')>0"
+            query += "LIKE '%Service Pack " + getUnicode(sp) + "%')>0"
             query  = agent.forgeCaseStatement(query)
 
             if inject.getValue(query, charsetType=1) == "1":

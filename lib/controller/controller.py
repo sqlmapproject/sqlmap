@@ -29,6 +29,7 @@ from lib.controller.checks import checkStability
 from lib.controller.checks import checkString
 from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
+from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
@@ -155,7 +156,7 @@ def start():
 
             if not conf.dropSetCookie:
                 for _, cookie in enumerate(conf.cj):
-                    cookie = unicode(cookie)
+                    cookie = getUnicode(cookie)
                     index  = cookie.index(" for ")
 
                     cookieStr += "%s;" % cookie[8:index]
@@ -267,7 +268,7 @@ def start():
                     action()
 
         except exceptionsTuple, e:
-            e = unicode(e)
+            e = getUnicode(e)
 
             if conf.multipleTargets:
                 e += ", skipping to next url"

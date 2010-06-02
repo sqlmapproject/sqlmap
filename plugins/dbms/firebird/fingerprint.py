@@ -28,6 +28,7 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
+from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomRange
 from lib.core.data import conf
@@ -94,7 +95,7 @@ class Fingerprint(GenericFingerprint):
         for i in xrange(len(table)):
             version, checks = table[i]
             failed = False
-            check = checks[randomRange(0,len(checks)-1)].replace("%d", unicode(randomRange(1,100)))
+            check = checks[randomRange(0,len(checks)-1)].replace("%d", getUnicode(randomRange(1,100)))
             payload = agent.fullPayload(check)
             result  = Request.queryPage(payload)
             if result:

@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
+from lib.core.common import getUnicode
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
 from lib.core.convert import utf8decode
@@ -55,7 +56,7 @@ def direct(query, content=True):
         output = base64unpickle(kb.resumedQueries[conf.hostname][query][:-1])
 
         infoMsg  = "resumed from file '%s': " % conf.sessionFile
-        infoMsg += "%s..." % unicode(output)[:20]
+        infoMsg += "%s..." % getUnicode(output)[:20]
         logger.info(infoMsg)
     elif select:
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)

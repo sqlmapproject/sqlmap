@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+from lib.core.common import getUnicode
 from lib.core.common import dataToStdout
 from lib.core.data import conf
 
@@ -80,7 +81,7 @@ class ProgressBar:
                                           " " * (allFull - numHashes))
 
         # Add the percentage at the beginning of the progress bar
-        percentString = unicode(percentDone) + "%"
+        percentString = getUnicode(percentDone) + "%"
         self.__progBar = "%s %s" % (percentString, self.__progBar)
 
     def draw(self, eta=0):
@@ -102,4 +103,4 @@ class ProgressBar:
         This method returns the progress bar string
         """
 
-        return unicode(self.__progBar)
+        return getUnicode(self.__progBar)

@@ -28,6 +28,7 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
+from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
@@ -76,7 +77,7 @@ class Fingerprint(GenericFingerprint):
 
             for version in range(element[0], element[1] + 1):
                 randInt = randomInt()
-                version = unicode(version)
+                version = getUnicode(version)
                 query   = agent.prefixQuery(" /*!%s AND %d=%d*/" % (version, randInt, randInt + 1))
                 query   = agent.postfixQuery(query)
                 payload = agent.payload(newValue=query)
@@ -168,7 +169,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing MySQL"
         logger.info(infoMsg)
 
-        randInt = unicode(randomInt(1))
+        randInt = getUnicode(randomInt(1))
         payload = agent.fullPayload(" AND CONNECTION_ID()=CONNECTION_ID()")
         result  = Request.queryPage(payload)
 

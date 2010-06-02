@@ -28,6 +28,7 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
+from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
@@ -97,7 +98,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing PostgreSQL"
         logger.info(infoMsg)
 
-        randInt = unicode(randomInt(1))
+        randInt = getUnicode(randomInt(1))
 
         payload = agent.fullPayload(" AND %s::int=%s" % (randInt, randInt))
         result  = Request.queryPage(payload)

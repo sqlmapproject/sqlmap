@@ -44,6 +44,7 @@ except ImportError, _:
 
 from lib.controller.controller import start
 from lib.core.common import banner
+from lib.core.common import getUnicode
 from lib.core.common import profile
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
@@ -63,7 +64,7 @@ def modulePath():
     """
 
     if weAreFrozen():
-        return os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding()))
+        return os.path.dirname(getUnicode(sys.executable, sys.getfilesystemencoding()))
     else:
         return os.path.dirname(os.path.realpath(__file__))
 
@@ -87,7 +88,7 @@ def main():
         else:
             start()
     except exceptionsTuple, e:
-        e = unicode(e)
+        e = getUnicode(e)
         logger.error(e)
         closeDumper(False, e)
 

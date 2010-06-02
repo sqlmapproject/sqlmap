@@ -27,6 +27,7 @@ import socket
 import time
 
 from lib.core.agent import agent
+from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import md5hash
@@ -257,7 +258,7 @@ def checkDynParam(place, parameter, value):
     logger.info(infoMsg)
 
     randInt = randomInt()
-    payload = agent.payload(place, parameter, value, unicode(randInt))
+    payload = agent.payload(place, parameter, value, getUnicode(randInt))
     dynResult1 = Request.queryPage(payload, place)
 
     if True == dynResult1:
@@ -395,7 +396,7 @@ def checkConnection():
         conf.seqMatcher.set_seq1(page)
 
     except sqlmapConnectionException, errMsg:
-        errMsg = unicode(errMsg)
+        errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg
 
     return True
