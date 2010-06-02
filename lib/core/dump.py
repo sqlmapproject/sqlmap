@@ -27,6 +27,7 @@ import re
 import os
 
 from lib.core.common import dataToDumpFile
+from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 
@@ -54,7 +55,7 @@ class Dump:
         conf.loggedToOut = True
 
     def __formatString(self, string):
-        string = unicode(string)
+        string = getUnicode(string)
         string = string.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
         string = string.replace("__START__", "").replace("__STOP__", "")
         string = string.replace("__DEL__", ", ")
@@ -71,7 +72,7 @@ class Dump:
 
             return
 
-        data = unicode(data)
+        data = getUnicode(data)
 
         if data:
             data = self.__formatString(data)
@@ -99,7 +100,7 @@ class Dump:
             if isinstance(element, basestring):
                 self.__write("[*] %s" % element)
             elif isinstance(element, (list, tuple, set)):
-                self.__write("[*] " + ", ".join(unicode(e) for e in element))
+                self.__write("[*] " + ", ".join(getUnicode(e) for e in element))
 
         if elements:
             self.__write("")
@@ -318,7 +319,7 @@ class Dump:
                 if column != "__infos__":
                     info = tableValues[column]
 
-                    value = unicode(info["values"][i]) if type(info["values"][i]) != unicode else info["values"][i]
+                    value = getUnicode(info["values"][i])
 
                     if re.search("^[\ *]*$", value):
                         value = "NULL"

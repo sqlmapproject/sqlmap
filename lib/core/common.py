@@ -1352,6 +1352,12 @@ def getCommonStart(strings=[]):
 
     return retVal
 
+def getUnicode(value):
+    if isinstance(value, basestring):
+        return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding)
+    else:
+        return unicode(value)
+
 def getBruteUnicode(string):
     retVal = unicode()
     for char in string:

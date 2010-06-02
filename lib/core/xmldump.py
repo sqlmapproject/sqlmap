@@ -7,6 +7,7 @@ import re
 import xml.sax.saxutils as saxutils
 from xml.dom.minidom import Document
 
+from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapFilePathException
@@ -130,21 +131,15 @@ class XMLDump:
         if attrValue is None :
             attr.nodeValue = u''
         else :
-            attr.nodeValue = self.__getUnicode(attrValue)
+            attr.nodeValue = getUnicode(attrValue)
         return attr
 
     def __formatString(self, string):
-        string = self.__getUnicode(string)
+        string = getUnicode(string)
         string = string.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
         string = string.replace("__START__", "").replace("__STOP__", "")
         string = string.replace("__DEL__", ", ")
         return string
-
-    def __getUnicode(self, value):
-        if isinstance(value, basestring):
-            return value if isinstance(value, unicode) else unicode(value, "utf-8")
-        else:
-            return unicode(value)
 
     def string(self, header, data, sort=True):
         '''
@@ -196,7 +191,7 @@ class XMLDump:
                     for e in element :
                         memberElemStr = self.__doc.createElement(MEMBER_ELEM)
                         memberElemStr.setAttributeNode(self.__createAttribute(TYPE_ATTR, "string"))
-                        memberElemStr.appendChild(self.__createTextNode(self.__getUnicode(e)))
+                        memberElemStr.appendChild(self.__createTextNode(getUnicode(e)))
                         memberElem.appendChild(memberElemStr)
         listsElem = self.__getRootChild(LSTS_ELEM_NAME)
         if not(listsElem):
@@ -250,7 +245,7 @@ class XMLDump:
         Adds information to the xml that indicates whether the user has DBA privileges
         '''
         isDBAElem = self.__doc.createElement(IS_DBA_ELEM_NAME)
-        isDBAElem.setAttributeNode(self.__createAttribute(VALUE_ATTR, self.__getUnicode(isDBA)))
+        isDBAElem.setAttributeNode(self.__createAttribute(VALUE_ATTR, getUnicode(isDBA)))
         self.__addToRoot(isDBAElem)
 
     def users(self,users):
@@ -502,7 +497,7 @@ class XMLDump:
         '''
         if ((self.__outputFP is not None) and not(self.__outputFP.closed)):
             statusElem = self.__doc.createElement(STATUS_ELEM_NAME)
-            statusElem.setAttributeNode(self.__createAttribute(SUCESS_ATTR,self.__getUnicode(resultStatus)))
+            statusElem.setAttributeNode(self.__createAttribute(SUCESS_ATTR,getUnicode(resultStatus)))
 
             if not(resultStatus) :
                 errorElem = self.__doc.createElement(ERROR_ELEM_NAME)
@@ -510,13 +505,13 @@ class XMLDump:
                 if (isinstance(resultMsg, Exception)):
                     errorElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, type(resultMsg).__name__))
                 else :
-                    errorElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, UNHANDLED_PROBLEM_TYPE))                    
+                    errorElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, UNHANDLED_PROBLEM_TYPE))
 
-                errorElem.appendChild(self.__createTextNode(self.__getUnicode(resultMsg)))
+                errorElem.appendChild(self.__createTextNode(getUnicode(resultMsg)))
                 statusElem.appendChild(errorElem)
 
             self.__addToRoot(statusElem)
-            self.__write(self.__doc.toprettyxml(encoding=ENCODING))              
+            self.__write(self.__doc.toprettyxml(encoding=ENCODING))
             self.__outputFP.close()
 
 def closeDumper(status, msg=""):
