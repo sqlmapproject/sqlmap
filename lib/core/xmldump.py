@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
 import codecs
+import os
 import re
+import xml
 
 import xml.sax.saxutils as saxutils
+
 from xml.dom.minidom import Document
+from xml.parsers.expat import ExpatError
 
 from lib.core.common import getUnicode
 from lib.core.data import conf
@@ -477,12 +481,23 @@ class XMLDump:
         '''
         if (conf.xmlFile) :
             try :
-                self.__outputFile = conf.xmlFile 
-                self.__outputFP = codecs.open(self.__outputFile, "a", conf.dataEncoding)
-                self.__root = self.__doc.createElementNS(NAME_SPACE_ATTR, RESULTS_ELEM_NAME)
-                self.__root.setAttributeNode(self.__createAttribute(XMLNS_ATTR,NAME_SPACE_ATTR))
-                self.__root.setAttributeNode(self.__createAttribute(SCHEME_NAME_ATTR,SCHEME_NAME))
-                self.__doc.appendChild(self.__root)
+                self.__outputFile = conf.xmlFile
+                self.__root = None
+
+                if os.path.exists(self.__outputFile):
+                    try:
+                        self.__doc = xml.dom.minidom.parse(self.__outputFile)
+                        self.__root = self.__doc.childNodes[0]
+                    except ExpatError:
+                        pass
+
+                self.__outputFP = codecs.open(self.__outputFile, "w+", conf.dataEncoding)
+
+                if self.__root is None:                    
+                    self.__root = self.__doc.createElementNS(NAME_SPACE_ATTR, RESULTS_ELEM_NAME)
+                    self.__root.setAttributeNode(self.__createAttribute(XMLNS_ATTR,NAME_SPACE_ATTR))
+                    self.__root.setAttributeNode(self.__createAttribute(SCHEME_NAME_ATTR,SCHEME_NAME))
+                    self.__doc.appendChild(self.__root)
             except IOError, e:
                 raise sqlmapFilePathException("Wrong filename provided for saving the xml file: %s" % conf.xmlFile)
 
@@ -509,7 +524,8 @@ class XMLDump:
                 statusElem.appendChild(errorElem)
 
             self.__addToRoot(statusElem)
-            self.__write(self.__doc.toprettyxml(encoding=conf.dataEncoding))
+            #self.__write(self.__doc.toprettyxml(encoding=conf.dataEncoding))    ##don't use toprettyxml, lots of bugs with it
+            self.__write(self.__doc.toxml(encoding=conf.dataEncoding))          ##not human readable, but at least without bugs
             self.__outputFP.close()
 
 def closeDumper(status, msg=""):
