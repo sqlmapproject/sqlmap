@@ -453,6 +453,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         dataToSessionFile("]\n")
 
     if conf.threadException:
-        raise sqlmapThreadException, "something unexpected happen into the threads"
+        raise sqlmapThreadException, "something unexpected happened inside the threads"
 
     return queriesCount[0], finalValue
