@@ -451,7 +451,7 @@ def readInput(message, default=None):
         message += "\n> "
 
     if conf.batch and default:
-        infoMsg = "%s%s" % (message, unicode(default))
+        infoMsg = "%s%s" % (message, getUnicode(default))
         logger.info(infoMsg)
 
         debugMsg = "used the default behaviour, running in batch mode"
@@ -517,7 +517,7 @@ def sanitizeStr(inpStr):
     @rtype: C{str}
     """
 
-    cleanString = unicode(inpStr)
+    cleanString = getUnicode(inpStr)
     cleanString = cleanString.replace("\n", " ").replace("\r", "")
 
     return cleanString
@@ -1032,7 +1032,7 @@ def safeStringFormat(formatStr, params):
 
             if index != -1:
                 if count < len(params):
-                    retVal = retVal[:index] + unicode(params[count]) + retVal[index+2:]
+                    retVal = retVal[:index] + getUnicode(params[count]) + retVal[index+2:]
                 else:
                     raise sqlmapNoneDataException, "wrong number of parameters during string formatting"
                 count += 1
@@ -1109,7 +1109,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        errMsg = "profiling requires third-party libraries (%s)" % unicode(e)
+        errMsg = "profiling requires third-party libraries (%s)" % getUnicode(e)
         logger.error(errMsg)
         return
 
@@ -1370,7 +1370,7 @@ class UnicodeRawConfigParser(RawConfigParser):
         if self._defaults:
             fp.write("[%s]\n" % DEFAULTSECT)
             for (key, value) in self._defaults.items():
-                fp.write("%s = %s\n" % (key, unicode(value).replace('\n', '\n\t')))
+                fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
             fp.write("\n")
         for section in self._sections:
             fp.write("[%s]\n" % section)
@@ -1380,5 +1380,5 @@ class UnicodeRawConfigParser(RawConfigParser):
                         fp.write("%s\n" % (key))
                     else:
                         fp.write("%s = %s\n" %
-                                 (key, unicode(value).replace('\n', '\n\t')))
+                                 (key, getUnicode(value).replace('\n', '\n\t')))
             fp.write("\n")
