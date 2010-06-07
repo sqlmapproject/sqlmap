@@ -10,6 +10,7 @@ import xml.sax.saxutils as saxutils
 from xml.dom.minidom import Document
 from xml.parsers.expat import ExpatError
 
+from extra.prettyprint import prettyprint
 from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -524,8 +525,7 @@ class XMLDump:
                 statusElem.appendChild(errorElem)
 
             self.__addToRoot(statusElem)
-            #self.__write(self.__doc.toprettyxml(encoding=conf.dataEncoding))    ##don't use toprettyxml, lots of bugs with it
-            self.__write(self.__doc.toxml(encoding=conf.dataEncoding))          ##not human readable, but at least without bugs
+            self.__write(prettyprint.formatXML(self.__doc, encoding=conf.dataEncoding))
             self.__outputFP.close()
 
 def closeDumper(status, msg=""):
