@@ -1,5 +1,15 @@
-require 'msf/core'
+##
+# $Id$
+##
 
+##
+# This file is part of the Metasploit Framework and may be subject to
+# redistribution and commercial restrictions. Please see the Metasploit
+# Framework web site for more information on licensing and terms of use.
+# http://metasploit.com/framework/
+##
+
+require 'msf/core'
 
 class Metasploit3 < Msf::Auxiliary
 
@@ -7,12 +17,11 @@ class Metasploit3 < Msf::Auxiliary
 	include Msf::Auxiliary::WMAPScanUniqueQuery
 	include Msf::Auxiliary::Scanner
 
-
 	def initialize(info = {})
-		super(update_info(info,	
+		super(update_info(info,
 			'Name'			=> 'SQLMAP SQL Injection External Module',
 			'Description'	=> %q{
-				This module launch a sqlmap session.
+					This module launch a sqlmap session.
 				sqlmap is an automatic SQL injection tool developed in Python.
 				Its goal is to detect and take advantage of SQL injection
 				vulnerabilities on web applications. Once it detects one
@@ -25,27 +34,27 @@ class Metasploit3 < Msf::Auxiliary
 				statement, read specific files on the file system and much
 				more.
 			},
-			'Author'		=> [ 'bernardo.damele [at] gmail.com', 'daniele.bellucci [at] gmail.com' ],
+			'Author'	    => [ 'Bernardo Damele A. G. <bernardo.damele[at]gmail.com>' ],
 			'License'		=> BSD_LICENSE,
-			'Version'		=> '$Revision$',
+			'Version'		=> '$Revision: 9212 $',
 			'References'	=>
 				[
 					['URL', 'http://sqlmap.sourceforge.net'],
 				]
 			))
-		
+
 		register_options(
 			[
 				OptString.new('METHOD', [ true,  "HTTP Method", 'GET' ]),
 				OptString.new('PATH', [ true,  "The path/file to test for SQL injection", 'index.php' ]),
 				OptString.new('QUERY', [ false, "HTTP GET query", 'id=1' ]),
-				OptString.new('BODY', [ false, "The data string to be sent through POST", '' ]),
+				OptString.new('DATA', [ false, "The data string to be sent through POST", '' ]),
 				OptString.new('OPTS', [ false,  "The sqlmap options to use", ' ' ]),
-				OptPath.new('SQLMAP_PATH', [ true,  "The sqlmap >= 0.6.1 full path ", '/sqlmap/sqlmap.py' ]), 
+				OptPath.new('SQLMAP_PATH', [ true,  "The sqlmap >= 0.6.1 full path ", '/sqlmap/sqlmap.py' ]),
 				OptBool.new('BATCH', [ true,  "Never ask for user input, use the default behaviour", true ])
 			], self.class)
 	end
-	
+
 	# Modify to true if you have sqlmap installed.
 	def wmap_enabled
 		false
@@ -53,20 +62,20 @@ class Metasploit3 < Msf::Auxiliary
 
 	# Test a single host
 	def run_host(ip)
-			
-		sqlmap = datastore['SQLMAP_PATH'] 
-			
+
+		sqlmap = datastore['SQLMAP_PATH']
+
 		if not sqlmap
 			print_error("The sqlmap script could not be found")
 			return
 		end
 
-		data = datastore['BODY']
+		data = datastore['DATA']
 		method = datastore['METHOD'].upcase
 
 		sqlmap_url  = (datastore['SSL'] ? "https" : "http")
-		sqlmap_url += "://" + self.target_host + ":" + datastore['RPORT']
-		sqlmap_url += "/" + datastore['PATH'] 
+		sqlmap_url += "://" + wmap_target_host + ":" + wmap_target_port
+		sqlmap_url += "/" + datastore['PATH']
 
 		if method == "GET"
 			sqlmap_url += '?' + datastore['QUERY']
@@ -93,3 +102,4 @@ class Metasploit3 < Msf::Auxiliary
 	end
 
 end
+
