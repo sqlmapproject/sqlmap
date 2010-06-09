@@ -89,18 +89,22 @@ def parseResponse(page, headers):
                     kb.absFilePaths.add(absFilePath)
                     
 
-def decodePage(page, encoding):
+def decodePage(page, contentEncoding, contentType):
     """
-    Decode gzip/deflate HTTP response
+    Decode compressed/charset HTTP response
     """
 
-    if isinstance(encoding, basestring) and encoding.lower() in ('gzip', 'x-gzip', 'deflate'):
-        if encoding == 'deflate':
+    if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ('gzip', 'x-gzip', 'deflate'):
+        if contentEncoding == 'deflate':
             # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
             data = StringIO.StringIO(zlib.decompress(page, -15))
         else:
             data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(page))
 
         page = data.read()
+
+    #http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
+    if contentType and (contentType.find('charset=') != -1):
+        page = unicode(page, contentType.split('charset=')[-1])
 
     return page

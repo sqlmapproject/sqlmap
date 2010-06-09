@@ -88,33 +88,32 @@ class Connect:
         try:
             if silent:
                 socket.setdefaulttimeout(3)
-    
+
             if direct:
                 if "?" in url:
                     url, params = url.split("?")
                     params = urlencode(params)
                     url = "%s?%s" % (url, params)
                     requestMsg += "?%s" % params
-    
+
             elif multipart:
                 # Needed in this form because of potential circle dependency 
                 # problem (option -> update -> connect -> option)
                 from lib.core.option import proxyHandler
-                
+
                 multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(url, multipart)
-                page = conn.read()            
+                page = conn.read()
                 responseHeaders = conn.info()
-    
-                encoding = responseHeaders.get("Content-Encoding")
-                page = decodePage(page, encoding)
-    
+
+                page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+
                 return page
-    
+
             else:
                 if conf.parameters.has_key("GET") and not get:
                     get = conf.parameters["GET"]
-    
+
                 if get:
                     get = urlencode(get)
                     url = "%s?%s" % (url, get)
@@ -190,8 +189,7 @@ class Connect:
             status          = conn.msg
             responseHeaders = conn.info()
 
-            encoding = responseHeaders.get("Content-Encoding")
-            page = decodePage(page, encoding)
+            page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
         except urllib2.HTTPError, e:
             if e.code == 401:
