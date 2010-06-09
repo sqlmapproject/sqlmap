@@ -123,7 +123,7 @@ def __setOutputResume():
 
     if os.path.exists(conf.sessionFile):
         if not conf.flushSession:
-            readSessionFP = codecs.open(conf.sessionFile, "r", conf.dataEncoding)
+            readSessionFP = codecs.open(conf.sessionFile, "r", conf.dataEncoding, 'replace')
             __url_cache = set()
             __expression_cache = {}
 
