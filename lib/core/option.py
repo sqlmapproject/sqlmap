@@ -96,7 +96,9 @@ def __urllib2Opener():
         conf.cj = cookielib.LWPCookieJar()
         handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
 
-    if conf.keepAlive:
+    # Use Keep-Alive (persistent HTTP connection) only if a proxy is not set
+    # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
+    if conf.keepAlive and not conf.proxy:
         handlers.append(keepAliveHandler)
 
     opener = urllib2.build_opener(*handlers)
