@@ -44,6 +44,9 @@ class Connector(GenericConnector):
     def __init__(self):
         GenericConnector.__init__(self)
 
+    # sample usage:
+    # ./sqlmap.py -d "firebird://sysdba:testpass@/opt/firebird/testdb.fdb"
+    # ./sqlmap.py -d "firebird://sysdba:testpass@127.0.0.1:3050//opt/firebird/testdb.fdb"
     def connect(self):
         self.initConnection()
 
@@ -51,7 +54,7 @@ class Connector(GenericConnector):
             self.checkFileDb()
 
         try:
-            self.connector = kinterbasdb.connect(host=self.hostname, database=self.db, user=self.user, password=self.password)
+            self.connector = kinterbasdb.connect(host=str(self.hostname), database=str(self.db), user=str(self.user), password=str(self.password)) #, charset="UTF8")
         except kinterbasdb.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
 

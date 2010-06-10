@@ -647,7 +647,7 @@ def parseTargetDirect():
             if details.group('remote'):
                 remote = True
                 conf.hostname = details.group('hostname')
-                conf.port     = int(details.group('port'))   
+                conf.port     = int(details.group('port'))
             else:
                 conf.hostname = "localhost"
                 conf.port     = 0
@@ -675,7 +675,7 @@ def parseTargetDirect():
     for dbmsName, data in dbmsDict.items():
         if conf.dbms in data[0]:
             try:
-                if dbmsName in ('Access', 'SQLite'):
+                if dbmsName in ('Access', 'SQLite', 'Firebird'):
                     if remote:
                         warnMsg = "direct connection over the network for "
                         warnMsg += "%s DBMS is not supported" % dbmsName
