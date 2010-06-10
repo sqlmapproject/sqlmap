@@ -32,6 +32,7 @@ import traceback
 
 from lib.contrib import multipartpost
 from lib.core.common import readInput
+from lib.core.common import getUnicode
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -163,7 +164,7 @@ class Connect:
                     if not cookieStr:
                         cookieStr = "Cookie: "
     
-                    cookie = unicode(cookie)
+                    cookie = getUnicode(cookie)
                     index  = cookie.index(" for ")
     
                     cookieStr += "%s; " % cookie[8:index]
@@ -256,7 +257,7 @@ class Connect:
         responseMsg += "(%s - %d):\n" % (status, code)
 
         if conf.verbose <= 4:
-            responseMsg += unicode(responseHeaders)
+            responseMsg += getUnicode(responseHeaders)
         elif conf.verbose > 4:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 

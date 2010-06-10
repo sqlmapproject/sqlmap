@@ -87,7 +87,7 @@ def parseResponse(page, headers):
 
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)
-                    
+
 
 def decodePage(page, contentEncoding, contentType):
     """
@@ -105,6 +105,6 @@ def decodePage(page, contentEncoding, contentType):
 
     #http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
     if contentType and (contentType.find('charset=') != -1):
-        page = unicode(page, contentType.split('charset=')[-1])
+        page = unicode(page, contentType.split('charset=')[-1])     #don't use getUnicode here. it needs to stay as is.
 
     return page
