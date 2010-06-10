@@ -120,8 +120,7 @@ class HTTPHandler(urllib2.HTTPHandler):
                 data = req.get_data()
                 h.putrequest('POST', req.get_selector())
                 if not req.headers.has_key('Content-type'):
-                    h.putheader('Content-type',
-                                'application/x-www-form-urlencoded')
+                    h.putheader('Content-type', 'application/x-www-form-urlencoded')
                 if not req.headers.has_key('Content-length'):
                     h.putheader('Content-length', '%d' % len(data))
             else:
@@ -134,9 +133,9 @@ class HTTPHandler(urllib2.HTTPHandler):
             h.endheaders()
             if req.has_data():
                 h.send(data)
-        except:
+        except socket.error, err:
             h.close()
-            raise
+            raise urllib2.URLError(err)
 
     def do_open(self, http_class, req):
         host = req.get_host()
