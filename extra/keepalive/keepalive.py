@@ -67,7 +67,7 @@ EXTRA ATTRIBUTES AND METHODS
   prefer to see your error codes, then do.
 
 """
-from httplib import _CS_REQ_STARTED, _CS_REQ_SENT, CannotSendHeader
+from httplib import _CS_REQ_STARTED, _CS_REQ_SENT, _CS_IDLE, CannotSendHeader
 
 import threading
 import urllib2
@@ -126,16 +126,17 @@ class HTTPHandler(urllib2.HTTPHandler):
                     h.putheader('Content-length', '%d' % len(data))
             else:
                 h.putrequest('GET', req.get_selector())
-        except socket.error, err:
-            raise urllib2.URLError(err)
 
-        for args in self.parent.addheaders:
-            h.putheader(*args)
-        for k, v in req.headers.items():
-            h.putheader(k, v)
-        h.endheaders()
-        if req.has_data():
-            h.send(data)
+            for args in self.parent.addheaders:
+                h.putheader(*args)
+            for k, v in req.headers.items():
+                h.putheader(k, v)
+            h.endheaders()
+            if req.has_data():
+                h.send(data)
+        except:
+            h.close()
+            raise
 
     def do_open(self, http_class, req):
         host = req.get_host()
