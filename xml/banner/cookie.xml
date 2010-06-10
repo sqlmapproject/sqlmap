@@ -8,7 +8,7 @@
 
 <root>
     <regexp value="ASPSESSIONID">
-        <info technology="ASP" type="Windows" distrib="2000"/>
+        <info technology="ASP" type="Windows" distrib="2000|2003"/>
     </regexp>
 
     <regexp value="ASP\.NET_SessionId">

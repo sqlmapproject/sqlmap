@@ -213,7 +213,7 @@ class Connect:
                 code = e.code
                 status = e.msg
 
-                debugMsg = "got HTTP error code: %d" % code
+                debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine), e:
