@@ -106,7 +106,6 @@ class Connect:
                 conn = multipartOpener.open(url, multipart)
                 page = conn.read()
                 responseHeaders = conn.info()
-
                 page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
                 return page
@@ -119,7 +118,7 @@ class Connect:
                     get = urlencode(get)
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
-    
+
                 if conf.method == "POST":
                     if conf.parameters.has_key("POST") and not post:
                         post = conf.parameters["POST"]
@@ -127,9 +126,40 @@ class Connect:
             requestMsg += " HTTP/1.1"
 
             # Perform HTTP request
-            headers        = forgeHeaders(cookie, ua)
-            req            = urllib2.Request(url, post, headers)
-            conn           = urllib2.urlopen(req)
+            headers = forgeHeaders(cookie, ua)
+            req = urllib2.Request(url, post, headers)
+
+            if not req.has_header("Accept-Encoding"):
+                requestHeaders += "Accept-Encoding: identity\n"
+
+            requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
+
+            if not conf.dropSetCookie and conf.cj:
+                for _, cookie in enumerate(conf.cj):
+                    if not cookieStr:
+                        cookieStr = "Cookie: "
+    
+                    cookie = getUnicode(cookie)
+                    index  = cookie.index(" for ")
+    
+                    cookieStr += "%s; " % cookie[8:index]
+
+            if not req.has_header("Cookie") and cookieStr:
+                requestHeaders += "\n%s" % cookieStr[:-2]
+
+            if not req.has_header("Connection"):
+                requestHeaders += "\nConnection: close"
+
+            requestMsg += "\n%s" % requestHeaders
+
+            if post:
+                requestMsg += "\n%s" % post
+
+            requestMsg += "\n"
+
+            logger.log(9, requestMsg)
+
+            conn = urllib2.urlopen(req)
 
             if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled:
                 msg  = "sqlmap got a %d redirect to " % conn.redcode
@@ -154,42 +184,11 @@ class Connect:
             # Reset the number of connection retries
             conf.retriesCount = 0
 
-            if not req.has_header("Accept-Encoding"):
-                requestHeaders += "\nAccept-Encoding: identity"
-
-            requestHeaders = "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
-
-            if not conf.dropSetCookie and conf.cj:
-                for _, cookie in enumerate(conf.cj):
-                    if not cookieStr:
-                        cookieStr = "Cookie: "
-    
-                    cookie = getUnicode(cookie)
-                    index  = cookie.index(" for ")
-    
-                    cookieStr += "%s; " % cookie[8:index]
-
-            if not req.has_header("Cookie") and cookieStr:
-                requestHeaders += "\n%s" % cookieStr[:-2]
-     
-            if not req.has_header("Connection"):
-                requestHeaders += "\nConnection: close"
-
-            requestMsg += "\n%s" % requestHeaders
-
-            if post:
-                requestMsg += "\n%s" % post
-
-            requestMsg += "\n"
-
-            logger.log(9, requestMsg)
-
             # Get HTTP response
-            page            = conn.read()
-            code            = conn.code
-            status          = conn.msg
+            page = conn.read()
+            code = conn.code
+            status = conn.msg
             responseHeaders = conn.info()
-
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
         except urllib2.HTTPError, e:
