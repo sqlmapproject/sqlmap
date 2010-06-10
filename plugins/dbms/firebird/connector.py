@@ -54,10 +54,10 @@ class Connector(GenericConnector):
             self.checkFileDb()
 
         try:
-            self.connector = kinterbasdb.connect(host=str(self.hostname), database=str(self.db), user=str(self.user), password=str(self.password)) #, charset="UTF8")
+            self.connector = kinterbasdb.connect(host=self.hostname.encode(conf.dataEncoding), database=self.db.encode(conf.dataEncoding), \
+                user=self.user.encode(conf.dataEncoding), password=self.password.encode(conf.dataEncoding), charset="UTF8") #http://www.daniweb.com/forums/thread248499.html
         except kinterbasdb.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
-
         self.setCursor()
         self.connected()
 
