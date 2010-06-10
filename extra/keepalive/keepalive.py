@@ -315,8 +315,13 @@ class HTTPConnection(httplib.HTTPConnection):
         else:
             raise CannotSendHeader()
 
+        for header in ['Host', 'Accept-Encoding']:
+            if header in self._headers:
+                str = '%s: %s' % (header, self._headers[header])
+                self._output(str)
+                del self._headers[header]
+
         for header, value in self._headers.items():
-            print header, value
             str = '%s: %s' % (header, value)
             self._output(str)
 
