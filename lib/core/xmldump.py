@@ -513,12 +513,12 @@ class XMLDump:
             statusElem = self.__doc.createElement(STATUS_ELEM_NAME)
             statusElem.setAttributeNode(self.__createAttribute(SUCESS_ATTR,getUnicode(resultStatus)))
 
-            if not(resultStatus) :
+            if not resultStatus:
                 errorElem = self.__doc.createElement(ERROR_ELEM_NAME)
 
-                if (isinstance(resultMsg, Exception)):
+                if isinstance(resultMsg, Exception):
                     errorElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, type(resultMsg).__name__))
-                else :
+                else:
                     errorElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, UNHANDLED_PROBLEM_TYPE))
 
                 errorElem.appendChild(self.__createTextNode(getUnicode(resultMsg)))

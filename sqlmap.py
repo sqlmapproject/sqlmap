@@ -92,17 +92,17 @@ def main():
         logger.error(e)
         closeDumper(False, e)
 
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt, _:
         print
         errMsg = "user aborted"
         logger.error(errMsg)
-        closeDumper(False, e)
+        closeDumper(False, errMsg)
 
-    except EOFError, e:
+    except EOFError, _:
         print
         errMsg = "exit"
         logger.error(errMsg)
-        closeDumper(False, e)
+        closeDumper(False, errMsg)
 
     except:
         print
