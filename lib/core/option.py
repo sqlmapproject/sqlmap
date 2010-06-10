@@ -91,13 +91,15 @@ def __urllib2Opener():
     logger.debug(debugMsg)
     
     handlers = [proxyHandler, authHandler, redirectHandler]
+
     if not conf.dropSetCookie:
         conf.cj = cookielib.LWPCookieJar()
         handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
+
     if conf.keepAlive:
         handlers.append(keepAliveHandler)
 
-    opener  = urllib2.build_opener(*handlers)
+    opener = urllib2.build_opener(*handlers)
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
@@ -702,7 +704,6 @@ def __setHTTPExtraHeaders():
 
             if header and value:
                 conf.httpHeaders.append((header, value))
-
     else:
         conf.httpHeaders.append(("Accept", "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5"))
         conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))

@@ -1366,19 +1366,26 @@ def getBruteUnicode(string):
 
 class UnicodeRawConfigParser(RawConfigParser):
     def write(self, fp):
-        """Write an .ini-format representation of the configuration state."""
+        """
+        Write an .ini-format representation of the configuration state.
+        """
+
         if self._defaults:
             fp.write("[%s]\n" % DEFAULTSECT)
+
             for (key, value) in self._defaults.items():
                 fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+
             fp.write("\n")
+
         for section in self._sections:
             fp.write("[%s]\n" % section)
+
             for (key, value) in self._sections[section].items():
                 if key != "__name__":
                     if value is None:
                         fp.write("%s\n" % (key))
                     else:
-                        fp.write("%s = %s\n" %
-                                 (key, getUnicode(value).replace('\n', '\n\t')))
+                        fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+
             fp.write("\n")
