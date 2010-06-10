@@ -152,6 +152,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if not continuousOrder:
             originalTbl = list(charTbl)
+        else:
+            shiftTable = [5, 4] # used for gradual expanding into unicode charspace
 
         if len(charTbl) == 1:
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
@@ -205,11 +207,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if maxValue == 1:
                         return None
                     elif minValue == maxChar: # going beyond the original charset
-                        # if the original charTbl was [0,..,127] new one will be [128,..,128*256-1] or from 128 to 32767
+                        # if the original charTbl was [0,..,127] new one will be [128,..,128*16-1] or from 128 to 2047
                         # and instead of making a HUGE list with all elements we use here xrange, which is a virtual list
-                        charTbl = xrange(maxChar + 1, (maxChar + 1) << 8)
-                        maxChar = maxValue = charTbl[-1]
-                        minChar = minValue = charTbl[0]
+                        if shiftTable:
+                            charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
+                            maxChar = maxValue = charTbl[-1]
+                            minChar = minValue = charTbl[0]
+                        else:
+                            return None
                     else:
                         retVal = minValue + 1
                         return chr(retVal) if retVal < 128 else unichr(retVal)
