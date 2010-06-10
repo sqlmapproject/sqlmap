@@ -144,7 +144,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return None
 
-    def getChar(idx, charTbl=asciiTbl, continuousOrder=True): # continuousOrder means that distance between each two neighbour's numerical values is exactly 1
+    def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None): # continuousOrder means that distance between each two neighbour's numerical values is exactly 1
         result = tryHint(idx)
 
         if result:
@@ -209,7 +209,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     elif minValue == maxChar: # going beyond the original charset
                         # if the original charTbl was [0,..,127] new one will be [128,..,128*16-1] or from 128 to 2047
                         # and instead of making a HUGE list with all elements we use here xrange, which is a virtual list
-                        if shiftTable:
+                        if expand and shiftTable:
                             charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
                             maxChar = maxValue = charTbl[-1]
                             minChar = minValue = charTbl[0]
