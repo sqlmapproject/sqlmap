@@ -67,6 +67,7 @@ EXTRA ATTRIBUTES AND METHODS
   prefer to see your error codes, then do.
 
 """
+from httplib import _CS_REQ_STARTED, _CS_REQ_SENT, CannotSendHeader
 
 import threading
 import urllib2
@@ -113,6 +114,7 @@ class HTTPHandler(urllib2.HTTPHandler):
         return (threading.currentThread(), host)
     
     def _start_connection(self, h, req):
+        h.clearheaders()
         try:
             if req.has_data():
                 data = req.get_data()
@@ -289,7 +291,37 @@ class HTTPResponse(httplib.HTTPResponse):
 class HTTPConnection(httplib.HTTPConnection):
     # use the modified response class
     response_class = HTTPResponse
-    
+    _headers = {}
+
+    def clearheaders(self):
+        self._headers.clear()
+
+    def putheader(self, header, value):
+        """Send a request header line to the server.
+
+        For example: h.putheader('Accept', 'text/html')
+        """
+        if self.__state != _CS_REQ_STARTED:
+            raise CannotSendHeader()
+
+        self._headers[header] = value
+
+
+    def endheaders(self):
+        """Indicate that the last header line has been sent to the server."""
+
+        if self.__state == _CS_REQ_STARTED:
+            self.__state = _CS_REQ_SENT
+        else:
+            raise CannotSendHeader()
+
+        for header, value in self._headers.items():
+            print header, value
+            str = '%s: %s' % (header, value)
+            self._output(str)
+
+        self._send_output()
+
 #########################################################################
 #####   TEST FUNCTIONS
 #########################################################################
