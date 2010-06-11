@@ -138,6 +138,7 @@ class HTTPHandler(urllib2.HTTPHandler):
             raise urllib2.URLError(err)
 
     def do_open(self, http_class, req):
+        h = None
         host = req.get_host()
         if not host:
             raise urllib2.URLError('no host given')
@@ -172,6 +173,7 @@ class HTTPHandler(urllib2.HTTPHandler):
                 self._start_connection(h, req)
                 r = h.getresponse()
         except socket.error, err:
+            if h: h.close()
             raise urllib2.URLError(err)
             
         # if not a persistent connection, don't try to reuse it
