@@ -265,10 +265,11 @@ def __setGoogleDorking():
     the results and save the testable hosts into the knowledge base.
     """
 
-    global proxyHandler
-
     if not conf.googleDork:
         return
+
+    global keepAliveHandler
+    global proxyHandler
 
     debugMsg = "initializing Google dorking requests"
     logger.debug(debugMsg)
@@ -276,7 +277,14 @@ def __setGoogleDorking():
     logMsg = "first request to Google to get the session cookie"
     logger.info(logMsg)
 
-    googleObj = Google(proxyHandler)
+    handlers = [ proxyHandler ]
+
+    # Use Keep-Alive (persistent HTTP connection) only if a proxy is not set
+    # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
+    if conf.keepAlive and not conf.proxy:
+        handlers.append(keepAliveHandler)
+
+    googleObj = Google(handlers)
     googleObj.getCookie()
 
     matches = googleObj.search(conf.googleDork)

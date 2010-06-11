@@ -88,7 +88,6 @@ def parseResponse(page, headers):
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)
 
-
 def decodePage(page, contentEncoding, contentType):
     """
     Decode compressed/charset HTTP response

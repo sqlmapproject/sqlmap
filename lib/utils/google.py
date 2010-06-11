@@ -41,10 +41,13 @@ class Google:
     line option '-g <google dork>'
     """
 
-    def __init__(self, proxy):
+    def __init__(self, handlers):
         self.__matches = []
         self.__cj = cookielib.LWPCookieJar()
-        self.opener = urllib2.build_opener(proxy, urllib2.HTTPCookieProcessor(self.__cj))
+
+        handlers.append(urllib2.HTTPCookieProcessor(self.__cj))
+
+        self.opener = urllib2.build_opener(*handlers)
         self.opener.addheaders = conf.httpHeaders
 
     def __parsePage(self, page):
@@ -83,7 +86,7 @@ class Google:
             _ = conn.info()
         except urllib2.HTTPError, e:
             _ = e.info()
-        except urllib2.URLError, e:
+        except urllib2.URLError, _:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
@@ -107,19 +110,16 @@ class Google:
         try:
             conn = self.opener.open(url)
 
-            requestMsg = "HTTP request:\nGET %s HTTP/1.1" % url
-            #requestHeaders = "\n".join(["%s: %s" % (header, value) for header, value in conn.headers.items()])
-            #requestMsg += "\n%s" % requestHeaders
+            requestMsg = "HTTP request:\nGET %s HTTP/1.1\n" % url
+            requestMsg += "\n".join(["%s: %s" % (header, value) for header, value in conn.headers.items()])
             requestMsg += "\n"
             logger.log(9, requestMsg)
 
-            page            = conn.read()
-            code            = conn.code
-            status          = conn.msg
+            page = conn.read()
+            code = conn.code
+            status = conn.msg
             responseHeaders = conn.info()
-
-            encoding = responseHeaders.get("Content-Encoding")
-            page = decodePage(page, encoding)
+            page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
             responseMsg = "HTTP response (%s - %d):\n" % (status, code)
     
@@ -137,7 +137,7 @@ class Google:
                 warnMsg += "to get error page information (%d)" % e.code
                 logger.warn(warnMsg)
                 return None
-        except (urllib2.URLError, socket.error, socket.timeout), e:
+        except (urllib2.URLError, socket.error, socket.timeout), _:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
