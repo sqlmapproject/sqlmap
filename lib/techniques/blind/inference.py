@@ -38,6 +38,7 @@ from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import queries
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapThreadException
@@ -144,7 +145,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return None
 
-    def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None): # continuousOrder means that distance between each two neighbour's numerical values is exactly 1
+    def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None):
+        """
+        continuousOrder means that distance between each two neighbour's
+        numerical values is exactly 1
+        """
+
         result = tryHint(idx)
 
         if result:
@@ -153,7 +159,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if not continuousOrder:
             originalTbl = list(charTbl)
         else:
-            shiftTable = [5, 4] # used for gradual expanding into unicode charspace
+            # Used for gradual expanding into unicode charspace
+            shiftTable = [5, 4]
 
         if len(charTbl) == 1:
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
@@ -192,7 +199,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                 if type(charTbl) != xrange:
                     charTbl = charTbl[position:]
-                else: # xrange - extended virtual charset used for memory/space optimization
+                else:
+                    # xrange() - extended virtual charset used for memory/space optimization
                     charTbl = xrange(charTbl[position], charTbl[-1] + 1)
             else:
                 maxValue = posValue
@@ -206,9 +214,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if continuousOrder:
                     if maxValue == 1:
                         return None
-                    elif minValue == maxChar: # going beyond the original charset
-                        # if the original charTbl was [0,..,127] new one will be [128,..,128*16-1] or from 128 to 2047
-                        # and instead of making a HUGE list with all elements we use here xrange, which is a virtual list
+
+                    # Going beyond the original charset
+                    elif minValue == maxChar:
+                        # If the original charTbl was [0,..,127] new one
+                        # will be [128,..,128*16-1] or from 128 to 2047
+                        # and instead of making a HUGE list with all
+                        # elements we use here xrange, which is a virtual
+                        # list
                         if expand and shiftTable:
                             charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
                             maxChar = maxValue = charTbl[-1]
@@ -222,7 +235,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if minValue == maxChar or maxValue == minChar:
                         return None
 
-                    for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]): # if we are working with non-continuous set both minValue and character afterwards are possible candidates
+                    # If we are working with non-continuous elements, set
+                    # both minValue and character afterwards are possible
+                    # candidates
+                    for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
                         forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
                         queriesCount[0] += 1
                         result = Request.queryPage(urlencode(forgedPayload))
@@ -244,6 +260,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progress.update(index)
         progress.draw(eta)
 
+    # Go multi-threading (--threads > 1)
     if conf.threads > 1 and isinstance(length, int) and length > 1:
         value   = [ None ] * length
         index   = [ firstChar ]    # As list for python nested function scoping
@@ -386,6 +403,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             dataToStdout(infoMsg)
 
         conf.seqLock = None
+
+    # No multi-threading (--threads = 1)
     else:
         index = firstChar
 
@@ -398,7 +417,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             # the moment
             if conf.useCommonPrediction and len(finalValue) > 0 and kb.partRun is not None:
                 val = None
-                singleValue, commonCharset, otherCharset = goGoodSamaritan(kb.partRun, finalValue, asciiTbl)
+                singleValue, commonPatternValue, commonCharset, otherCharset = goGoodSamaritan(kb.partRun, finalValue, asciiTbl)
 
                 # If there is one single output in common-outputs, check
                 # it via equal against the query output
@@ -422,10 +441,26 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         break
 
+                # If there is a common pattern starting with finalValue,
+                # check it via equal against the substring-query output
+                if commonPatternValue is not None:
+                    # Substring-query containing equals commonPatternValue
+                    subquery = queries[kb.dbms].substring % (expressionUnescaped, 1, len(commonPatternValue))
+                    query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = %s', (subquery, unescaper.unescape('\'%s\'' % commonPatternValue))))
+                    query = agent.postfixQuery(query)
+                    queriesCount[0] += 1
+                    result = Request.queryPage(urlencode(agent.payload(newValue=query)))
+
+                    # Did we have luck?
+                    if result:
+                        val = commonPatternValue[index-1:]
+                        index += len(val)-1
+
                 # Otherwise if there is no singleValue (single match from
-                # txt/common-outputs.txt) use the returned common
-                # charset only to retrieve the query output
-                if commonCharset:
+                # txt/common-outputs.txt) and no commonPatternValue
+                # (common pattern) use the returned common charset only
+                # to retrieve the query output
+                if not val and commonCharset:
                     val = getChar(index, commonCharset, False)
 
                 # If we had no luck with singleValue and common charset,

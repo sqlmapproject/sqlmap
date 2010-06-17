@@ -1252,22 +1252,36 @@ def goGoodSamaritan(part, prevValue, originalCharset):
     predictionSet = set()
     wildIndexes = []
     singleValue = None
+    commonPatternValue = None
+    countSingleValues = 0
 
     # If the header (e.g. Databases) we are looking for has common
     # outputs defined
     if part in kb.commonOutputs:
+        commonPartOutputs = kb.commonOutputs[part]
+        commonPatternValue = common_finder_only(prevValue, commonPartOutputs)
+
+        # If the longest common prefix is the same as previous value then
+        # do not consider it
+        if commonPatternValue and commonPatternValue == prevValue:
+            commonPatternValue = None
+
         # For each common output
-        for item in kb.commonOutputs[part]:
+        for item in commonPartOutputs:
             # Check if the common output (item) starts with prevValue
             # where prevValue is the enumerated character(s) so far
             if item.startswith(prevValue):
                 singleValue = item
+                countSingleValues += 1
 
                 if len(item) > len(prevValue):
                     char = item[len(prevValue)]
+                    predictionSet.add(char)
 
-                    if char not in predictionSet:
-                        predictionSet.add(char)
+        # Reset single value if there is more than one possible common
+        # output
+        if countSingleValues > 1:
+            singleValue = None
 
         commonCharset = []
         otherCharset = []
@@ -1282,12 +1296,9 @@ def goGoodSamaritan(part, prevValue, originalCharset):
 
         commonCharset.sort()
 
-        if len(commonCharset) > 1:
-            return None, commonCharset, otherCharset
-        else:
-            return singleValue, commonCharset, originalCharset
+        return singleValue, commonPatternValue, commonCharset, originalCharset
     else:
-        return None, None, originalCharset
+        return None, None, None, originalCharset
 
 def getCompiledRegex(regex, *args):
     """
@@ -1389,3 +1400,25 @@ class UnicodeRawConfigParser(RawConfigParser):
                         fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
 
             fp.write("\n")
+
+# http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
+def longest_common_prefix(*sequences):
+    if len(sequences) == 1:
+        return sequences[0]
+
+    sequences = [pair[1] for pair in sorted((len(fi), fi) for fi in sequences)]
+
+    if not sequences:
+        return None
+
+    for i, comparison_ch in enumerate(sequences[0]):
+        for fi in sequences[1:]:
+            ch = fi[i]
+
+            if ch != comparison_ch:
+                return fi[:i]
+
+    return sequences[0]
+
+def common_finder_only(initial, sequence):
+    return longest_common_prefix(*filter(lambda x: x.startswith(initial), sequence))
