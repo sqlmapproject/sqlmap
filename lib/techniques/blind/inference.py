@@ -219,8 +219,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     elif minValue == maxChar:
                         # If the original charTbl was [0,..,127] new one
                         # will be [128,..,128*16-1] or from 128 to 2047
-                        # and instead of making a HUGE list with all
-                        # elements we use here xrange, which is a virtual
+                        # and instead of making a HUGE list with all the
+                        # elements we use a xrange, which is a virtual
                         # list
                         if expand and shiftTable:
                             charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
