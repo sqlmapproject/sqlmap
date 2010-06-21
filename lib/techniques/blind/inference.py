@@ -417,53 +417,58 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             # the moment
             if conf.useCommonPrediction and len(finalValue) > 0 and kb.partRun is not None:
                 val = None
-                singleValue, commonPatternValue, commonCharset, otherCharset = goGoodSamaritan(kb.partRun, finalValue, asciiTbl)
+                commonValue, commonPattern, commonCharset, otherCharset = goGoodSamaritan(finalValue, asciiTbl)
+
+                # Debug print
+                #print "\ncommonValue, commonPattern, commonCharset:", commonValue, commonPattern, commonCharset
 
                 # If there is one single output in common-outputs, check
                 # it via equal against the query output
-                if singleValue is not None:
-                    # One-shot query containing equals singleValue
-                    query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = %s', (expressionUnescaped, unescaper.unescape('\'%s\'' % singleValue))))
+                if commonValue is not None:
+                    # One-shot query containing equals commonValue
+                    testValue = unescaper.unescape("'%s'" % commonValue) if "'" not in commonValue else unescaper.unescape("%s" % commonValue, quote=False)
+                    query = agent.prefixQuery(" %s" % safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
                     query = agent.postfixQuery(query)
                     queriesCount[0] += 1
                     result = Request.queryPage(urlencode(agent.payload(newValue=query)))
 
                     # Did we have luck?
                     if result:
-                        dataToSessionFile(replaceNewlineTabs(singleValue[index-1:]))
+                        dataToSessionFile(replaceNewlineTabs(commonValue[index-1:]))
 
                         if showEta:
-                            etaProgressUpdate(time.time() - charStart, len(singleValue))
+                            etaProgressUpdate(time.time() - charStart, len(commonValue))
                         elif conf.verbose >= 1:
-                            dataToStdout(singleValue[index-1:])
+                            dataToStdout(commonValue[index-1:])
 
-                        finalValue = singleValue
+                        finalValue = commonValue
 
                         break
 
                 # If there is a common pattern starting with finalValue,
                 # check it via equal against the substring-query output
-                if commonPatternValue is not None:
-                    # Substring-query containing equals commonPatternValue
-                    subquery = queries[kb.dbms].substring % (expressionUnescaped, 1, len(commonPatternValue))
-                    query = agent.prefixQuery(" %s" % safeStringFormat('AND (%s) = %s', (subquery, unescaper.unescape('\'%s\'' % commonPatternValue))))
+                if commonPattern is not None:
+                    # Substring-query containing equals commonPattern
+                    subquery = queries[kb.dbms].substring % (expressionUnescaped, 1, len(commonPattern))
+                    testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
+                    query = agent.prefixQuery(" %s" % safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                     query = agent.postfixQuery(query)
                     queriesCount[0] += 1
                     result = Request.queryPage(urlencode(agent.payload(newValue=query)))
 
                     # Did we have luck?
                     if result:
-                        val = commonPatternValue[index-1:]
+                        val = commonPattern[index-1:]
                         index += len(val)-1
 
-                # Otherwise if there is no singleValue (single match from
-                # txt/common-outputs.txt) and no commonPatternValue
+                # Otherwise if there is no commonValue (single match from
+                # txt/common-outputs.txt) and no commonPattern
                 # (common pattern) use the returned common charset only
                 # to retrieve the query output
                 if not val and commonCharset:
                     val = getChar(index, commonCharset, False)
 
-                # If we had no luck with singleValue and common charset,
+                # If we had no luck with commonValue and common charset,
                 # use the returned other charset
                 if not val:
                     val = getChar(index, otherCharset, otherCharset == asciiTbl)

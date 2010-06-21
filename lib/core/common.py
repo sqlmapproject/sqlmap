@@ -1228,19 +1228,16 @@ def initCommonOutputs():
 
     cfile.close()
 
-def goGoodSamaritan(part, prevValue, originalCharset):
+def goGoodSamaritan(prevValue, originalCharset):
     """
     Function for retrieving parameters needed for common prediction (good
     samaritan) feature.
 
-    part is for instance Users, Databases, Tables and corresponds to the
-    header (e.g. [Users]) in txt/common-outputs.txt.
-
     prevValue: retrieved query output so far (e.g. 'i').
 
-    Returns singleValue if there is a complete single match (in part of
-    txt/common-outputs.txt under 'part') regarding parameter prevValue. If
-    there is no single value match, but multiple, commonCharset is
+    Returns commonValue if there is a complete single match (in kb.partRun
+    of txt/common-outputs.txt under kb.partRun) regarding parameter
+    prevValue. If there is no single value match, but multiple, commonCharset is
     returned containing more probable characters (retrieved from matched
     values in txt/common-outputs.txt) together with the rest of charset as
     otherCharset.
@@ -1250,29 +1247,28 @@ def goGoodSamaritan(part, prevValue, originalCharset):
         initCommonOutputs()
 
     predictionSet = set()
-    wildIndexes = []
-    singleValue = None
-    commonPatternValue = None
-    countSingleValues = 0
+    commonValue = None
+    commonPattern = None
+    countCommonValue = 0
 
     # If the header (e.g. Databases) we are looking for has common
     # outputs defined
-    if part in kb.commonOutputs:
-        commonPartOutputs = kb.commonOutputs[part]
-        commonPatternValue = common_finder_only(prevValue, commonPartOutputs)
+    if kb.partRun in kb.commonOutputs:
+        commonPartOutputs = kb.commonOutputs[kb.partRun]
+        commonPattern = common_finder_only(prevValue, commonPartOutputs)
 
         # If the longest common prefix is the same as previous value then
         # do not consider it
-        if commonPatternValue and commonPatternValue == prevValue:
-            commonPatternValue = None
+        if commonPattern and commonPattern == prevValue:
+            commonPattern = None
 
         # For each common output
         for item in commonPartOutputs:
             # Check if the common output (item) starts with prevValue
             # where prevValue is the enumerated character(s) so far
             if item.startswith(prevValue):
-                singleValue = item
-                countSingleValues += 1
+                commonValue = item
+                countCommonValue += 1
 
                 if len(item) > len(prevValue):
                     char = item[len(prevValue)]
@@ -1280,8 +1276,8 @@ def goGoodSamaritan(part, prevValue, originalCharset):
 
         # Reset single value if there is more than one possible common
         # output
-        if countSingleValues > 1:
-            singleValue = None
+        if countCommonValue > 1:
+            commonValue = None
 
         commonCharset = []
         otherCharset = []
@@ -1296,7 +1292,7 @@ def goGoodSamaritan(part, prevValue, originalCharset):
 
         commonCharset.sort()
 
-        return singleValue, commonPatternValue, commonCharset, originalCharset
+        return commonValue, commonPattern, commonCharset, originalCharset
     else:
         return None, None, None, originalCharset
 
@@ -1322,18 +1318,25 @@ def getPartRun():
     retVal = None
     commonPartsDict = optDict["Enumeration"]
     stack = [item[4][0] if isinstance(item[4], list) else '' for item in inspect.stack()]
-    reobj = getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')
+    reobj1 = getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')
+    reobj2 = getCompiledRegex('self\.(get[^(]+)\(\)')
 
     # Goes backwards through the stack to find the conf.dbmsHandler method
     # calling this function
-    for i in xrange(len(stack) - 1, 0, -1):
-        match = reobj.search(stack[i])
+    for i in xrange(0, len(stack)-1):
+        for reobj in (reobj2, reobj1):
+            match = reobj.search(stack[i])
 
-        if match:
-            # This is the calling conf.dbmsHandler method (e.g. 'getDbms')
-            retVal = match.groups()[0]
+            if match:
+                # This is the calling conf.dbmsHandler or self method
+                # (e.g. 'getDbms')
+                retVal = match.groups()[0]
+                break
+
+        if retVal is not None:
             break
 
+    # Return the INI tag to consider for common outputs (e.g. 'Databases')
     return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal
 
 def getCommonStart(strings=[]):
