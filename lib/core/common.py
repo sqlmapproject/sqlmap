@@ -459,7 +459,7 @@ def readInput(message, default=None):
 
         data = default
     else:
-        data = raw_input(message)
+        data = raw_input(message.encode(conf.dataEncoding))
 
         if not data:
             data = default
