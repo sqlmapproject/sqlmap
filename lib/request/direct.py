@@ -72,7 +72,7 @@ def direct(query, content=True):
                 out = list(output)[0][0]
                 if isinstance(out, str):
                     out = utf8decode(out)
-                return out
+                return getUnicode(out)
             else:
                 return list(output)
         else:

@@ -66,7 +66,7 @@ class Filesystem(GenericFilesystem):
 
         length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=2)
 
-        if not length.isdigit() or not len(length) or length in ( "0", "1" ):
+        if length is None or not length.isdigit() or not len(length) or length in ( "0", "1" ):
             errMsg  = "unable to retrieve the content of the "
             errMsg += "file '%s'" % rFile
             raise sqlmapNoneDataException, errMsg
