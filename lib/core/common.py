@@ -1221,10 +1221,10 @@ def initCommonOutputs():
                 key = line[1:-1]
             elif key:
                 if key not in kb.commonOutputs:
-                    kb.commonOutputs[key] = []
+                    kb.commonOutputs[key] = set()
 
                 if line not in kb.commonOutputs[key]:
-                    kb.commonOutputs[key].append(line)
+                    kb.commonOutputs[key].add(line)
 
     cfile.close()
 

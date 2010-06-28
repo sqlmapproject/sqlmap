@@ -8,14 +8,14 @@ sqlmap (0.9-1) stable; urgency=low
   * Extended old '--dump -C' functionality to be able to search for
     specific database(s), table(s) and column(s), --search switch
     (Bernardo).
-  * Added support to fetch unicode data (Miroslav).
+  * Added support to fetch unicode data (Bernardo and Miroslav).
   * Added safe URL feature, --safe-url and --safe-freq (Miroslav).
   * Added --use-between switch to use BETWEEN syntax in inferencial
     statement and bypass firewalls filtering '>' character (Bernardo and
     Miroslav).
   * Support for customizable HTTP redirections (Bernardo).
   * Several bugs fixed (Bernardo and Miroslav).
-  * Major code refactoring (Bernardo).
+  * Major code refactoring (Bernardo and Miroslav).
   * User's manual updated (Bernardo).
 
  -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Day, DD MMM 2010 10:00:00 +0000
