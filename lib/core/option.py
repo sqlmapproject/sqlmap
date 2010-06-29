@@ -724,7 +724,7 @@ def __setHTTPExtraHeaders():
 
             if header and value:
                 conf.httpHeaders.append((header, value))
-    elif not conf.httpHeaders:
+    elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
         conf.httpHeaders.append(("Accept", "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5"))
         conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
         conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
@@ -763,7 +763,16 @@ def __setHTTPUserAgent():
         return
 
     if not conf.userAgentsFile:
-        conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
+        addDefaultUserAgent = True
+
+        for header, _ in conf.httpHeaders:
+            if header == "User-Agent":
+                addDefaultUserAgent = False
+                break
+
+        if addDefaultUserAgent:
+            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
+
         return
 
     debugMsg  = "fetching random HTTP User-Agent header from "
@@ -826,7 +835,7 @@ def __setHTTPCookies():
     if conf.cookie:
         debugMsg = "setting the HTTP Cookie header"
         logger.debug(debugMsg)
-        
+
         conf.httpHeaders.append(("Connection", "Keep-Alive"))
         conf.httpHeaders.append(("Cookie", conf.cookie))
 
@@ -1128,23 +1137,23 @@ def init(inputOptions=advancedDict()):
     __cleanupOptions()
     __basicOptionValidation()
     __setRequestFromFile()
+    __setMultipleTargets()
 
     parseTargetUrl()
     parseTargetDirect()
 
     if conf.url or conf.list or conf.requestFile or conf.googleDork:
         __setHTTPTimeout()
+        __setHTTPExtraHeaders()
         __setHTTPCookies()
         __setHTTPReferer()
         __setHTTPUserAgent()
-        __setHTTPExtraHeaders()
         __setHTTPMethod()
         __setHTTPAuthentication()
         __setHTTPProxy()
         __setSafeUrl()
         __setUnionTech()
         __setGoogleDorking()
-        __setMultipleTargets()
         __urllib2Opener()
         __setDBMS()
 
