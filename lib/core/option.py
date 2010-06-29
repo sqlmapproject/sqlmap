@@ -167,19 +167,24 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
             elif "?" in line and "=" in line and ": " not in line:
                 params = True
 
-            # Cookie and Host headers
+            # Headers
             elif ": " in line:
                 key, value = line.split(": ", 1)
 
+                # Cookie and Host headers
                 if key.lower() == "cookie":
                     cookie = value
                 elif key.lower() == "host":
                     host = value
 
+                # Avoid to add a static content length header to
+                # conf.httpHeaders and consider the following lines as
+                # POSTed data
                 if key == "Content-Length":
                     data = ""
                     params = True
 
+                # Avoid proxy and connection type related headers
                 elif key not in ( "Proxy-Connection", "Connection" ):
                     conf.httpHeaders.append((str(key), str(value)))
 
