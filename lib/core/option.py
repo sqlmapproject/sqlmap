@@ -151,7 +151,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 else:
                     index = 5
 
-                url    = line[index:line.index(" HTTP/")]
+                url = line[index:line.index(" HTTP/")]
                 method = line[:index-1]
 
                 if "?" in line and "=" in line:
@@ -159,9 +159,12 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
                 getPostReq = True
 
+            # POST parameters
+            elif data is not None and params:
+                data += line
+
             # GET parameters
             elif "?" in line and "=" in line and ": " not in line:
-                data   = line
                 params = True
 
             # Cookie and Host headers
@@ -173,10 +176,12 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 elif key.lower() == "host":
                     host = value
 
-            # POST parameters
-            elif method is not None and method == "POST" and "=" in line:
-                data   = line
-                params = True
+                if key == "Content-Length":
+                    data = ""
+                    params = True
+
+                elif key not in ( "Proxy-Connection", "Connection" ):
+                    conf.httpHeaders.append((str(key), str(value)))
 
         if conf.scope:
             getPostReq &= re.search(conf.scope, host) is not None
@@ -188,7 +193,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 port   = None
 
             if not kb.targetUrls or url not in addedTargetUrls:
-                kb.targetUrls.add(( url, method, data, cookie ))
+                kb.targetUrls.add((url, method, data, cookie))
                 addedTargetUrls.add(url)
 
 def __setMultipleTargets():
@@ -714,7 +719,7 @@ def __setHTTPExtraHeaders():
 
             if header and value:
                 conf.httpHeaders.append((header, value))
-    else:
+    elif not conf.httpHeaders:
         conf.httpHeaders.append(("Accept", "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5"))
         conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
         conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
