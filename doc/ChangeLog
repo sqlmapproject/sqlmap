@@ -9,6 +9,7 @@ sqlmap (0.9-1) stable; urgency=low
     specific database(s), table(s) and column(s), --search switch
     (Bernardo).
   * Added support to fetch unicode data (Bernardo and Miroslav).
+  * Added support for SOAP requests (Bernardo).
   * Added safe URL feature, --safe-url and --safe-freq (Miroslav).
   * Added --use-between switch to use BETWEEN syntax in inferencial
     statement and bypass firewalls filtering '>' character (Bernardo and
