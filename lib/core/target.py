@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import codecs
 import os
+import re
 import time
 
 from lib.core.common import dataToSessionFile
@@ -66,8 +67,15 @@ def __setRequestParams():
         raise sqlmapSyntaxException, errMsg
 
     if conf.data:
+        conf.data = conf.data.replace("\n", " ")
         conf.parameters["POST"] = conf.data
-        __paramDict = paramToDict("POST", conf.data)
+
+        # Check if POST data is in xml syntax
+        if re.match("[\n]*<(\?xml |soap\:|ns).*>", conf.data):
+            conf.paramDict["POSTxml"] = True
+            __paramDict = paramToDict("POSTxml", conf.data)
+        else:
+            __paramDict = paramToDict("POST", conf.data)
 
         if __paramDict:
             conf.paramDict["POST"] = __paramDict

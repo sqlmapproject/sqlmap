@@ -24,6 +24,8 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from xml.etree import ElementTree as ET
+
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import urlencode
@@ -32,7 +34,6 @@ from lib.core.data import kb
 from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.exception import sqlmapNoneDataException
-
 
 class Agent:
     """
@@ -82,16 +83,36 @@ class Agent:
             paramString = conf.parameters[kb.injPlace]
             paramDict = conf.paramDict[kb.injPlace]
             value = paramDict[kb.injParameter]
-            retValue = paramString.replace("%s=%s" % (kb.injParameter, value),
-                                           "%s=%s%s" % (kb.injParameter, negValue, value + falseValue + newValue))
+
+            if "POSTxml" in conf.paramDict and kb.injPlace == "POST":
+                root = ET.XML(paramString)
+                iterator = root.getiterator(kb.injParameter)
+
+                for child in iterator:
+                    child.text = "%s%s" % (negValue, value + falseValue + newValue)
+
+                retValue = ET.tostring(root)
+            else:
+                retValue = paramString.replace("%s=%s" % (kb.injParameter, value),
+                                               "%s=%s%s" % (kb.injParameter, negValue, value + falseValue + newValue))
 
         # Before identifing the injectable parameter
         elif parameter == "User-Agent":
             retValue = value.replace(value, newValue)
         else:
             paramString = conf.parameters[place]
-            retValue = paramString.replace("%s=%s" % (parameter, value),
-                                           "%s=%s" % (parameter, newValue))
+
+            if "POSTxml" in conf.paramDict and place == "POST":
+                root = ET.XML(paramString)
+                iterator = root.getiterator(parameter)
+
+                for child in iterator:
+                    child.text = newValue
+
+                retValue = ET.tostring(root)
+            else:
+                retValue = paramString.replace("%s=%s" % (parameter, value),
+                                               "%s=%s" % (parameter, newValue))
 
         return retValue
 

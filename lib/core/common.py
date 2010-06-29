@@ -44,6 +44,7 @@ from subprocess import PIPE
 from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
+from xml.etree import ElementTree as ET
 from xml.sax import parse
 
 from extra.cloak.cloak import decloak
@@ -96,25 +97,36 @@ def paramToDict(place, parameters=None):
     if conf.parameters.has_key(place) and not parameters:
         parameters = conf.parameters[place]
 
-    parameters = parameters.replace(", ", ",")
+    if place is not "POSTxml":
+        parameters = parameters.replace(", ", ",")
 
-    if place == "Cookie":
-        splitParams = parameters.split(";")
+        if place == "Cookie":
+            splitParams = parameters.split(";")
+        else:
+            splitParams = parameters.split("&")
+
+        for element in splitParams:
+            elem = element.split("=")
+
+            if len(elem) == 2:
+                parameter = elem[0].replace(" ", "")
+
+                condition  = not conf.testParameter
+                condition |= parameter in conf.testParameter
+
+                if condition:
+                    testableParameters[parameter] = elem[1]
     else:
-        splitParams = parameters.split("&")
+        root = ET.XML(parameters)
+        iterator = root.getiterator()
 
-    for element in splitParams:
-        elem = element.split("=")
-
-        if len(elem) == 2:
-            parameter = elem[0].replace(" ", "")
-
-            condition  = not conf.testParameter
-            condition |= parameter in conf.testParameter
+        for child in iterator:
+            parameter = child.tag
+            condition = not conf.testParameter
+            condition |= parameter.split("}")[1] in conf.testParameter
 
             if condition:
-                value = elem[1]
-                testableParameters[parameter] = value
+                testableParameters[parameter] = child.text
 
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
