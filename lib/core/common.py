@@ -1267,7 +1267,7 @@ def goGoodSamaritan(prevValue, originalCharset):
     # outputs defined
     if kb.partRun in kb.commonOutputs:
         commonPartOutputs = kb.commonOutputs[kb.partRun]
-        commonPattern = common_finder_only(prevValue, commonPartOutputs)
+        commonPattern = commonFinderOnly(prevValue, commonPartOutputs)
 
         # If the longest common prefix is the same as previous value then
         # do not consider it
@@ -1351,33 +1351,6 @@ def getPartRun():
     # Return the INI tag to consider for common outputs (e.g. 'Databases')
     return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal
 
-def getCommonStart(strings=[]):
-    """
-    Returns common start of given strings
-    """
-    if not strings or not isinstance(strings, list):
-        return None
-
-    if len(strings) == 1:
-        return strings[0]
-
-    retVal = unicode()
-    maxCount = min(len(string) for string in strings)
-
-    count = 0
-    while count < maxCount:
-        char = strings[0][count]
-        for i in xrange(1, len(strings)):
-            if char != strings[i][count]:
-                char = None
-                break
-        if char is None:
-            break
-        retVal += char
-        count += 1
-
-    return retVal
-
 def getUnicode(value):
     if isinstance(value, basestring):
         return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding if 'dataEncoding' in conf else "utf-8")
@@ -1417,7 +1390,7 @@ class UnicodeRawConfigParser(RawConfigParser):
             fp.write("\n")
 
 # http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
-def longest_common_prefix(*sequences):
+def longestCommonPrefix(*sequences):
     if len(sequences) == 1:
         return sequences[0]
 
@@ -1435,5 +1408,5 @@ def longest_common_prefix(*sequences):
 
     return sequences[0]
 
-def common_finder_only(initial, sequence):
-    return longest_common_prefix(*filter(lambda x: x.startswith(initial), sequence))
+def commonFinderOnly(initial, sequence):
+    return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
