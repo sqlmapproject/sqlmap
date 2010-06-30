@@ -40,7 +40,7 @@ class Connector:
 
     def initConnection(self):
         self.user = conf.dbmsUser
-        self.password = conf.dbmsPass
+        self.password = conf.dbmsPass if conf.dbmsPass is not None else ""
         self.hostname = conf.hostname
         self.port = conf.port
         self.db = conf.dbmsDb
