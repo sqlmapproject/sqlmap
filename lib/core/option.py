@@ -96,10 +96,15 @@ def __urllib2Opener():
         conf.cj = cookielib.LWPCookieJar()
         handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
 
-    # Use Keep-Alive (persistent HTTP connection) only if a proxy is not set
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-    if conf.keepAlive and not conf.proxy:
-        handlers.append(keepAliveHandler)
+    if conf.keepAlive:
+        if conf.proxy:
+            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
+            warnMsg += "been disabled because of it's incompatibility "
+            warnMsg += "with HTTP(s) proxy"
+            logger.warn(warnMsg)
+        else:
+            handlers.append(keepAliveHandler)
 
     opener = urllib2.build_opener(*handlers)
     urllib2.install_opener(opener)
@@ -289,10 +294,15 @@ def __setGoogleDorking():
 
     handlers = [ proxyHandler ]
 
-    # Use Keep-Alive (persistent HTTP connection) only if a proxy is not set
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-    if conf.keepAlive and not conf.proxy:
-        handlers.append(keepAliveHandler)
+    if conf.keepAlive:
+        if conf.proxy:
+            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
+            warnMsg += "been disabled because of it's incompatibility "
+            warnMsg += "with HTTP(s) proxy"
+            logger.warn(warnMsg)
+        else:
+            handlers.append(keepAliveHandler)
 
     googleObj = Google(handlers)
     googleObj.getCookie()
@@ -542,9 +552,10 @@ def __setHTTPProxy():
 
     global proxyHandler
 
-    if not conf.proxy: 
+    if not conf.proxy:
         if conf.hostname in ('localhost', '127.0.0.1') or conf.ignoreProxy:
             proxyHandler = urllib2.ProxyHandler({})
+
         return
 
     debugMsg = "setting the HTTP proxy to pass by all HTTP requests"
