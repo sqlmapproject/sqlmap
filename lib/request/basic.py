@@ -22,6 +22,7 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import gzip
 import os
 import re
@@ -34,6 +35,7 @@ from lib.core.common import posixToNtSlashes
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.data import logger
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -88,6 +90,20 @@ def parseResponse(page, headers):
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)
 
+def checkCharEncoding(encoding):
+    #http://philip.html5.org/data/charsets-2.html
+    if encoding and encoding.startswith('cp-'):
+        encoding = 'cp%s' % encoding[3:]
+    try:
+        codecs.lookup(encoding)
+    except LookupError:
+        warnMsg  = "unknown charset '%s'. " % encoding
+        warnMsg += "please report by e-mail to sqlmap-users@lists.sourceforge.net."
+
+        logger.warn(warnMsg)
+        encoding = conf.dataEncoding
+    return encoding
+
 def decodePage(page, contentEncoding, contentType):
     """
     Decode compressed/charset HTTP response
@@ -101,9 +117,11 @@ def decodePage(page, contentEncoding, contentType):
             data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(page))
 
         page = data.read()
-
+    
     #http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
     if contentType and (contentType.find('charset=') != -1):
-        page = unicode(page, contentType.split('charset=')[-1])     #don't use getUnicode here. it needs to stay as is.
+        charset = checkCharEncoding(contentType.split('charset=')[-1])
+        if charset:
+            page = unicode(page, charset)     #don't use getUnicode here. it needs to stay as is.
 
     return page
