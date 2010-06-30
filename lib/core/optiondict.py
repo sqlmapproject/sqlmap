@@ -49,6 +49,7 @@ optDict = {
                                "aType":             "string",
                                "aCred":             "string",
                                "aCert":             "string",
+                               "keepAlive":         "boolean",
                                "proxy":             "string",
                                "ignoreProxy":       "boolean",
                                "threads":           "integer",

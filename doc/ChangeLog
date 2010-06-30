@@ -10,6 +10,8 @@ sqlmap (0.9-1) stable; urgency=low
     (Bernardo).
   * Added support to fetch unicode data (Bernardo and Miroslav).
   * Added support for SOAP based web services requests (Bernardo).
+  * Added support to use persistent HTTP(s) connection for speed
+    improvement, --keep-alive switch (Miroslav).
   * Added safe URL feature, --safe-url and --safe-freq (Miroslav).
   * Added --use-between switch to use BETWEEN syntax in inferencial
     statement and bypass firewalls filtering '>' character (Bernardo and

@@ -113,6 +113,9 @@ def cmdLineParser():
                            help="HTTP authentication certificate ("
                                 "key_file,cert_file)")
 
+        request.add_option("--keep-alive", dest="keepAlive", action="store_true",
+                           help="Use persistent HTTP(s) connections")
+
         request.add_option("--proxy", dest="proxy",
                            help="Use a HTTP proxy to connect to the target url")
 
@@ -452,9 +455,6 @@ def cmdLineParser():
                           help=SUPPRESS_HELP)
 
         parser.add_option("--common-prediction", dest="useCommonPrediction", action="store_true",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("--keep-alive", dest="keepAlive", action="store_true",
                           help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
