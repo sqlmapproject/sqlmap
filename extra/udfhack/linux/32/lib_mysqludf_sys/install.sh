@@ -37,7 +37,7 @@ fi
 
 echo -e "\nPlease provide your MySQL root password"
 
-mysql -u ${USER} -P ${PORT} -p mysql < lib_mysqludf_sys.sql
+mysql -h 127.0.0.1 -P ${PORT} -u ${USER} -p mysql < lib_mysqludf_sys.sql
 
 if test $? -ne 0; then
 	echo "ERROR: unable to install the UDF"

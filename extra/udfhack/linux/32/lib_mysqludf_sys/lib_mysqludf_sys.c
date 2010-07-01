@@ -19,6 +19,7 @@
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
 #define DLLEXP __declspec(dllexport) 
 #else
@@ -55,7 +56,7 @@ typedef long long longlong;
 extern "C" {
 #endif
 
-#define LIBVERSION "lib_mysqludf_sys version 0.0.3"
+#define LIBVERSION "lib_mysqludf_sys version 0.0.4"
 
 #ifdef __WIN__
 #define SETENV(name,value)		SetEnvironmentVariable(name,value);
@@ -446,7 +447,7 @@ char* sys_eval(
 
 	while (fgets(line, sizeof(line), pipe) != NULL) {
 		linelen = strlen(line);
-		result = realloc(result, outlen + linelen);
+		result = (char *)realloc(result, outlen + linelen);
 		strncpy(result + outlen, line, linelen);
 		outlen = outlen + linelen;
 	}
@@ -480,7 +481,6 @@ int sys_bineval(
 	UDF_INIT *initid
 ,	UDF_ARGS *args
 ){
-	int32 argv0_size;
 	size_t len;
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
@@ -492,8 +492,7 @@ int sys_bineval(
 	pid_t pID;
 #endif
 
-	argv0_size = strlen(args->args[0]);
-	len = (size_t)argv0_size;
+	len = (size_t)strlen(args->args[0]);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
 	// allocate a +rwx memory page
@@ -529,7 +528,22 @@ int sys_bineval(
 	return 0;
 }
 
-#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(WIN32)
+#if defined(_WIN64)
+void __exec_payload(LPVOID);
+
+DWORD WINAPI exec_payload(LPVOID lpParameter)
+{
+	__try
+	{
+		__exec_payload(lpParameter);
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
+
+	return 0;
+}
+#elif defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 DWORD WINAPI exec_payload(LPVOID lpParameter)
 {
 	__try
@@ -542,7 +556,6 @@ DWORD WINAPI exec_payload(LPVOID lpParameter)
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-
 	}
 
 	return 0;

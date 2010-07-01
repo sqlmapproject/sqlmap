@@ -56,7 +56,7 @@ typedef long long longlong;
 extern "C" {
 #endif
 
-#define LIBVERSION "lib_mysqludf_sys version 0.0.3"
+#define LIBVERSION "lib_mysqludf_sys version 0.0.4"
 
 #ifdef __WIN__
 #define SETENV(name,value)		SetEnvironmentVariable(name,value);
@@ -436,17 +436,18 @@ char* sys_eval(
 ,	char *error
 ){
 	FILE *pipe;
-	char line[1024];
+	char *line;
 	unsigned long outlen, linelen;
 
-	result = malloc(1);
+	line = (char *)malloc(1024);
+	result = (char *)malloc(1);
 	outlen = 0;
 
 	pipe = popen(args->args[0], "r");
 
 	while (fgets(line, sizeof(line), pipe) != NULL) {
 		linelen = strlen(line);
-		result = realloc(result, outlen + linelen);
+		result = (char *)realloc(result, outlen + linelen);
 		strncpy(result + outlen, line, linelen);
 		outlen = outlen + linelen;
 	}

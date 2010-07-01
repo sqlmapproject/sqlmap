@@ -48,29 +48,29 @@ PG_MODULE_MAGIC;
 
 char *text_ptr_to_char_ptr(text *arg)
 {
-    char *retVal;
-    int arg_size = VARSIZE(arg) - VARHDRSZ;
-    retVal = (char *)malloc(arg_size + 1);
+	char *retVal;
+	int arg_size = VARSIZE(arg) - VARHDRSZ;
+	retVal = (char *)malloc(arg_size + 1);
 
-    memcpy(retVal, VARDATA(arg), arg_size);
-    retVal[arg_size] = '\0';
-    
-    return retVal;
+	memcpy(retVal, VARDATA(arg), arg_size);
+	retVal[arg_size] = '\0';
+	
+	return retVal;
 }
 
 text *chr_ptr_to_text_ptr(char *arg)
 {
-    text *retVal;
-    
-    retVal = (text *)malloc(VARHDRSZ + strlen(arg));
+	text *retVal;
+	
+	retVal = (text *)malloc(VARHDRSZ + strlen(arg));
 #ifdef SET_VARSIZE
-    SET_VARSIZE(retVal, VARHDRSZ + strlen(arg));
+	SET_VARSIZE(retVal, VARHDRSZ + strlen(arg));
 #else
-    VARATT_SIZEP(retVal) = strlen(arg) + VARHDRSZ;
+	VARATT_SIZEP(retVal) = strlen(arg) + VARHDRSZ;
 #endif
-    memcpy(VARDATA(retVal), arg, strlen(arg));
-    
-    return retVal;
+	memcpy(VARDATA(retVal), arg, strlen(arg));
+	
+	return retVal;
 }
 
 PG_FUNCTION_INFO_V1(sys_exec);
@@ -108,7 +108,7 @@ extern DLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 	char *command;
 	char *result;
 	FILE *pipe;
-	char line[1024];
+	char *line;
 	int32 outlen, linelen;
 
 	command = text_ptr_to_char_ptr(argv0);
@@ -118,6 +118,7 @@ extern DLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 	elog(NOTICE, "Command evaluated: %s", command);
 	*/
 
+	line = (char *)malloc(1024);
 	result = (char *)malloc(1);
 	outlen = 0;
 
