@@ -85,7 +85,7 @@ Giorgio Fedon <giorgio.fedon@gmail.com>
     for reporting a bug when running against Microsoft SQL Server 2005
 
 Kasper Fons <thefeds@mail.dk>
-    for reporting a few bugs
+    for reporting several bugs
 
 Jose Fonseca <jose.r.fonseca@gmail.com>
     for his Gprof2Dot utility for converting profiler output to dot
@@ -114,7 +114,7 @@ Davide Guerri <d.guerri@caspur.it>
     for suggesting an enhancement
 
 David Guimaraes <skysbsb@gmail.com>
-    for reporting a few bugs
+    for reporting several bugs
 
 Chris Hall <chris.hall@mod10.net>
     for coding the prettyprint.py library
