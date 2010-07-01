@@ -176,7 +176,7 @@ class UDF:
 
         stackedTest()
 
-        if not kb.stackedTest:
+        if not kb.stackedTest and not conf.direct:
             return
 
         self.checkDbmsOs()
