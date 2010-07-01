@@ -973,6 +973,7 @@ def __setKnowledgeBaseAttributes():
     logger.debug(debugMsg)
 
     kb.absFilePaths   = set()
+    kb.assumeBlank    = False
     kb.bannerFp       = advancedDict()
 
     kb.cache          = advancedDict()

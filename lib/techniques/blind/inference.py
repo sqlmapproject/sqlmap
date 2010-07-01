@@ -32,6 +32,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getCharset
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
+from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
@@ -289,7 +290,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         val = getChar(curidx)
 
                         if val is None:
-                            raise sqlmapValueException, "failed to get character at index %d (expected %d total)" % (curidx, length)
+                            if not kb.assumeBlank:
+                                iolock.acquire()
+                                warnMsg = "failed to get character at index %d (expected %d total)." % (curidx, length)
+                                logger.warn(warnMsg)
+                                message   = "assume blank character? [Y/n/a]"
+                                getOutput = readInput(message, default="Y")
+                                iolock.release()
+                                if getOutput in ("a", "A"):
+                                    kb.assumeBlank = True
+                                elif not getOutput or getOutput in ("y", "Y"):
+                                    pass # do nothing
+                                else:
+                                    raise sqlmapValueException
+
+                            val = ' '
                     else:
                         break
 
