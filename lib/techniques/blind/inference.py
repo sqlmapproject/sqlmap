@@ -304,7 +304,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 else:
                                     raise sqlmapValueException
 
-                            val = ' '
+                            val = ''
                     else:
                         break
 
