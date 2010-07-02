@@ -1,14 +1,18 @@
 [Banners]
 
 # MySQL
+3.22.
+3.23.
 4.0.
 4.1.
 5.0.
 5.1.
 5.5.
+6.0.
 
 # PostgreSQL
-PostgreSQL 7.
+PostgreSQL 7.3
+PostgreSQL 7.4
 PostgreSQL 8.1
 PostgreSQL 8.2
 PostgreSQL 8.3
@@ -24,6 +28,12 @@ Oracle Database 10g Enterprise Edition Release
 Oracle Database 11g Standard Edition Release
 Oracle Database 11g Express Edition Release
 Oracle Database 11g Enterprise Edition Release
+
+# Microsoft SQL Server
+Microsoft SQL Server 7.0
+Microsoft SQL Server 2000
+Microsoft SQL Server 2005
+Microsoft SQL Server 2008
 
 
 [Users]
@@ -63,6 +73,9 @@ TSMSYS
 WMSYS
 XDB
 
+# Microsoft SQL Server
+sa
+
 
 [Passwords]
 
@@ -70,10 +83,13 @@ XDB
 *00E247AC5F9AF26AE0194B41E1E769DEE1429A29 # testpass
 
 # PostgreSQL
-md599e5ea7a6f7c3269995cba3927fd0093
+md599e5ea7a6f7c3269995cba3927fd0093 # testpass
 
 # Oracle
 2D5A0C491B634F1B # testpass
+
+# Microsoft SQL Server
+0x0100098a6200f657f7d012dfa7dc1fd1b154d4dfb8cd20596d22 # testpass
 
 
 [Privileges]
@@ -351,20 +367,26 @@ mysql
 phpmyadmin
 
 # PostgreSQL
+pg_catalog
 postgres
+public
 template0
 template1
 
 # Microsoft SQL Server
-tempdb
-model
+AdventureWorks
+AdventureWorksDW
 master
+model
 msdb
+ReportServer
+ReportServerTempDB
+tempdb
 
 
 [Tables]
 
-# MySQL
+# MySQL >= 5.0
 CHARACTER_SETS
 COLLATION_CHARACTER_SET_APPLICABILITY
 COLLATIONS
@@ -393,6 +415,8 @@ TABLES
 TRIGGERS
 USER_PRIVILEGES
 VIEWS
+
+# MySQL
 columns_priv
 db
 event
@@ -427,6 +451,57 @@ pma_relation
 pma_table_coords
 pma_table_info
 
+# PostgreSQL
+pg_aggregate
+pg_am
+pg_amop
+pg_amproc
+pg_attrdef
+pg_attribute
+pg_authid
+pg_auth_members
+pg_cast
+pg_class
+pg_constraint
+pg_conversion
+pg_database
+pg_depend
+pg_description
+pg_enum
+pg_foreign_data_wrapper
+pg_foreign_server
+pg_index
+pg_inherits
+pg_language
+pg_largeobject
+pg_listener
+pg_namespace
+pg_opclass
+pg_operator
+pg_opfamily
+pg_pltemplate
+pg_proc
+pg_rewrite
+pg_shdepend
+pg_shdescription
+pg_statistic
+pg_tablespace
+pg_trigger
+pg_ts_config
+pg_ts_config_map
+pg_ts_dict
+pg_ts_parser
+pg_ts_template
+pg_type
+pg_user_mapping
+sql_features
+sql_implementation_info
+sql_languages
+sql_packages
+sql_parts
+sql_sizing
+sql_sizing_profiles
+
 # Oracle
 BONUS
 DEPT
@@ -435,6 +510,39 @@ SALGRADE
 USERS
 
 # Microsoft SQL Server
+## Database: AdventureWorksDW
+AdventureWorksDWBuildVersion
+DatabaseLog
+DimAccount
+DimCurrency
+DimCustomer
+DimDepartmentGroup
+DimEmployee
+DimGeography
+DimOrganization
+DimProduct
+DimProductCategory
+DimProductSubcategory
+DimPromotion
+DimReseller
+DimSalesReason
+DimSalesTerritory
+DimScenario
+DimTime
+FactCurrencyRate
+FactFinance
+FactInternetSales
+FactInternetSalesReason
+FactResellerSales
+FactSalesQuota
+ProspectiveBuyer
+vAssocSeqLineItems
+vAssocSeqOrders
+vDMPrep
+vTargetMail
+vTimeSeries
+
+## Database: master
 all_columns
 all_objects
 all_parameters
@@ -450,10 +558,12 @@ asymmetric_keys
 backup_devices
 certificates
 CHECK_CONSTRAINTS
+check_constraints
 COLUMN_DOMAIN_USAGE
 COLUMN_PRIVILEGES
 column_type_usages
 column_xml_schema_collection_usages
+columns
 COLUMNS
 computed_columns
 configurations
@@ -577,7 +687,6 @@ indexes
 internal_tables
 KEY_COLUMN_USAGE
 key_constraints
-key_constraints
 key_encryptions
 linked_logins
 login_token
@@ -590,11 +699,10 @@ MSreplication_options
 numbered_procedure_parameters
 numbered_procedures
 objects
-objects
-objects
 openkeys
 parameter_type_usages
 parameter_xml_schema_collection_usages
+parameters
 PARAMETERS
 partition_functions
 partition_parameters
@@ -632,6 +740,7 @@ service_queues
 services
 soap_endpoints
 spt_fallback_db
+spt_fallback_dev
 spt_fallback_usg
 spt_monitor
 spt_values
@@ -680,7 +789,6 @@ sysremotelogins
 syssegments
 sysservers
 system_columns
-system_columns
 system_components_surface_area_configuration
 system_internals_allocation_units
 system_internals_partition_columns
@@ -689,13 +797,12 @@ system_objects
 system_parameters
 system_sql_modules
 system_views
-system_views
 systypes
 sysusers
 TABLE_CONSTRAINTS
 TABLE_PRIVILEGES
-TABLE_PRIVILEGES
 TABLES
+tables
 tcp_endpoints
 trace_categories
 trace_columns
@@ -712,6 +819,7 @@ user_token
 via_endpoints
 VIEW_COLUMN_USAGE
 VIEW_TABLE_USAGE
+views
 VIEWS
 xml_indexes
 xml_schema_attributes
@@ -725,6 +833,9 @@ xml_schema_namespaces
 xml_schema_types
 xml_schema_wildcard_namespaces
 xml_schema_wildcards
+
+Database:msdb
+[92tables]
 backupfile
 backupfilegroup
 backupmediafamily
@@ -818,11 +929,100 @@ systargetservers
 systargetservers_view
 systaskids
 
+## Database: AdventureWorks
+Address
+AddressType
+AWBuildVersion
+BillOfMaterials
+Contact
+ContactCreditCard
+ContactType
+CountryRegion
+CountryRegionCurrency
+CreditCard
+Culture
+Currency
+CurrencyRate
+Customer
+CustomerAddress
+DatabaseLog
+Department
+Document
+Employee
+EmployeeAddress
+EmployeeDepartmentHistory
+EmployeePayHistory
+ErrorLog
+Illustration
+Individual
+JobCandidate
+Location
+Product
+ProductCategory
+ProductCostHistory
+ProductDescription
+ProductDocument
+ProductInventory
+ProductListPriceHistory
+ProductModel
+ProductModelIllustration
+ProductModelProductDescriptionCulture
+ProductPhoto
+ProductProductPhoto
+ProductReview
+ProductSubcategory
+ProductVendor
+PurchaseOrderDetail
+PurchaseOrderHeader
+SalesOrderDetail
+SalesOrderHeader
+SalesOrderHeaderSalesReason
+SalesPerson
+SalesPersonQuotaHistory
+SalesReason
+SalesTaxRate
+SalesTerritory
+SalesTerritoryHistory
+ScrapReason
+Shift
+ShipMethod
+ShoppingCartItem
+SpecialOffer
+SpecialOfferProduct
+StateProvince
+Store
+StoreContact
+TransactionHistory
+TransactionHistoryArchive
+UnitMeasure
+vAdditionalContactInfo
+vEmployee
+vEmployeeDepartment
+vEmployeeDepartmentHistory
+Vendor
+VendorAddress
+VendorContact
+vIndividualCustomer
+vIndividualDemographics
+vJobCandidate
+vJobCandidateEducation
+vJobCandidateEmployment
+vProductAndDescription
+vProductModelCatalogDescription
+vProductModelInstructions
+vSalesPerson
+vSalesPersonSalesByFiscalYears
+vStateProvinceCountryRegion
+vStoreWithDemographics
+vVendor
+WorkOrder
+WorkOrderRouting
+
 
 [Columns]
 
 # MySQL
-## 'mysql.user' table
+## Table: mysql.user
 Alter_priv
 Alter_routine_priv
 Create_priv
