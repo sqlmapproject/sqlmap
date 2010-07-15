@@ -91,9 +91,19 @@ def parseResponse(page, headers):
                     kb.absFilePaths.add(absFilePath)
 
 def checkCharEncoding(encoding):
+    if encoding:
+        encoding = encoding.lower()
+    else:
+        return encoding
+
+    #http://www.destructor.de/charsets/index.htm
+    translate = { 'windows-874':'iso-8859-11' }
+
     #http://philip.html5.org/data/charsets-2.html
     if encoding and encoding.startswith('cp-'):
         encoding = 'cp%s' % encoding[3:]
+    elif encoding in translate:
+        encoding = translate[encoding]
     try:
         codecs.lookup(encoding)
     except LookupError:
