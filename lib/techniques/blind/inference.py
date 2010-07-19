@@ -354,6 +354,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
                             iolock.release()
 
+                #TODO: more
+                if not conf.threadContinue:
+                    if int(threading.currentThread().getName()) == numThreads - 1:
+                        partialValue = unicode()
+                        for v in value:
+                            if isinstance(v, basestring) and v is not None:
+                                partialValue += v
+
+                        if len(partialValue) > 0:
+                            dataToSessionFile(replaceNewlineTabs(partialValue))
+
             except (sqlmapConnectionException, sqlmapValueException), errMsg:
                 print
                 conf.threadException = True
@@ -381,7 +392,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         # Start the threads
         for numThread in range(numThreads):
-            thread = threading.Thread(target=downloadThread)
+            thread = threading.Thread(target=downloadThread, name=str(numThread))
             thread.start()
             threads.append(thread)
 
@@ -497,7 +508,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 break
 
             finalValue += val
-
             dataToSessionFile(replaceNewlineTabs(val))
 
             if showEta:
