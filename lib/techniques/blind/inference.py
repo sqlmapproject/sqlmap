@@ -354,12 +354,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
                             iolock.release()
 
-                #TODO: more
                 if not conf.threadContinue:
                     if int(threading.currentThread().getName()) == numThreads - 1:
                         partialValue = unicode()
                         for v in value:
-                            if isinstance(v, basestring) and v is not None:
+                            if v is None:
+                                break
+                            elif isinstance(v, basestring):
                                 partialValue += v
 
                         if len(partialValue) > 0:
