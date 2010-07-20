@@ -150,6 +150,9 @@ def resume(expression, payload):
     if not payload:
         return None
 
+    if not kb.dbms:
+        return None
+
     substringQuery = queries[kb.dbms].substring
     select = re.search("\ASELECT ", expression, re.I)
 
