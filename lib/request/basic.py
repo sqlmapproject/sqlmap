@@ -100,8 +100,10 @@ def checkCharEncoding(encoding):
     translate = { 'windows-874':'iso-8859-11' }
 
     #http://philip.html5.org/data/charsets-2.html
-    if encoding and encoding.startswith('cp-'):
+    if encoding.startswith('cp-'):
         encoding = 'cp%s' % encoding[3:]
+    elif ';' in encoding:
+        encoding = encoding[:encoding.find(';')]
     elif encoding in translate:
         encoding = translate[encoding]
     try:
