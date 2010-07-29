@@ -89,7 +89,7 @@ def __urllib2Opener():
 
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
-    
+
     handlers = [proxyHandler, authHandler, redirectHandler]
 
     if not conf.dropSetCookie:
@@ -258,11 +258,11 @@ def __setRequestFromFile():
 
     if not conf.requestFile:
         return
-    
+
     addedTargetUrls = set()
 
     conf.requestFile = os.path.expanduser(conf.requestFile)
-    
+
     infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
     logger.info(infoMsg)
 
@@ -272,7 +272,7 @@ def __setRequestFromFile():
         raise sqlmapFilePathException, errMsg
 
     __feedTargetsDict(conf.requestFile, addedTargetUrls)
-            
+
 def __setGoogleDorking():
     """
     This function checks if the way to request testable hosts is through
@@ -657,13 +657,13 @@ def __setHTTPAuthentication():
 
         authUsername = aCredRegExp.group(1)
         authPassword = aCredRegExp.group(2)
-    
+
         passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), authUsername, authPassword)
-    
+
         if aTypeLower == "basic":
             authHandler = urllib2.HTTPBasicAuthHandler(passwordMgr)
-    
+
         elif aTypeLower == "digest":
             authHandler = urllib2.HTTPDigestAuthHandler(passwordMgr)
 
@@ -675,28 +675,28 @@ def __setHTTPAuthentication():
                 errMsg += "in order to authenticate via NTLM, "
                 errMsg += "http://code.google.com/p/python-ntlm/"
                 raise sqlmapMissingDependence, errMsg
-    
+
             authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passwordMgr)
     else:
         debugMsg = "setting the HTTP(s) authentication certificate"
         logger.debug(debugMsg)
-        
+
         aCertRegExp = re.search("^(.+?),\s*(.+?)$", conf.aCert)
-    
+
         if not aCertRegExp:
             errMsg  = "HTTP authentication certificate option "
             errMsg += "must be in format key_file,cert_file"
             raise sqlmapSyntaxException, errMsg
-    
+
         #os.path.expanduser for support of paths with ~
         key_file = os.path.expanduser(aCertRegExp.group(1))
         cert_file = os.path.expanduser(aCertRegExp.group(2))
-        
+
         for ifile in (key_file, cert_file):
             if not os.path.exists(ifile):
                 errMsg  = "File '%s' does not exist" % ifile
                 raise sqlmapSyntaxException, errMsg
-        
+
         authHandler = HTTPSCertAuthHandler(key_file, cert_file)
 
 def __setHTTPMethod():
@@ -1011,6 +1011,7 @@ def __setKnowledgeBaseAttributes():
     kb.resumedQueries = {}
     kb.stackedTest    = None
     kb.targetUrls     = set()
+    kb.testedParams   = set()
     kb.timeTest       = None
     kb.unionComment   = ""
     kb.unionCount     = None
@@ -1129,7 +1130,7 @@ def __basicOptionValidation():
       conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop <= conf.limitStart:
         errMsg = "value for --start (limitStart) option must be smaller than value for --stop (limitStop) option"
         raise sqlmapSyntaxException, errMsg
-    
+
     if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or\
       conf.cpuThrottle < 0):
         errMsg = "value for --cpu-throttle (cpuThrottle) option must be in range [0,100]"

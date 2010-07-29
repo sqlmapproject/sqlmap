@@ -199,20 +199,25 @@ def start():
 
                     for parameter, value in paramDict.items():
                         testSqlInj = True
+                        paramKey = (conf.hostname, place, parameter)
 
+                        if paramKey in kb.testedParams:
+                            warnMsg = "skipping previously processed %s parameter '%s'" % (place, parameter)
+                            logger.warn(warnMsg)
+                            testSqlInj = False
                         # Avoid dinamicity test if the user provided the
                         # parameter manually
-                        if parameter in conf.testParameter:
+                        elif parameter in conf.testParameter:
                             pass
-
                         elif not checkDynParam(place, parameter, value):
                             warnMsg = "%s parameter '%s' is not dynamic" % (place, parameter)
                             logger.warn(warnMsg)
                             testSqlInj = False
-
                         else:
                             logMsg = "%s parameter '%s' is dynamic" % (place, parameter)
                             logger.info(logMsg)
+
+                        kb.testedParams.add(paramKey)
 
                         if testSqlInj:
                             for parenthesis in range(0, 4):
