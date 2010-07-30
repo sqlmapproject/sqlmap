@@ -95,7 +95,8 @@ def start():
         return
 
     if conf.smokeTest:
-        smokeTest()
+        if not smokeTest():
+            return
 
     if conf.direct:
         initTargetEnv()
