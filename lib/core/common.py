@@ -1413,6 +1413,7 @@ def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
 
 def smokeTest():
+    retVal = True
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
         for file in files:
             if os.path.splitext(file)[1].lower() == '.py' and file != '__init__.py':
@@ -1422,7 +1423,13 @@ def smokeTest():
                 try:
                     module = __import__(path)
                 except Exception, msg:
-                    raise sqlmapGenericException, "smoke test failed at importing module '%s' (%s):\n\n%s" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
-
-    infoMsg = "smoke test passed"
-    logger.info(infoMsg)
+                    retVal = False
+                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s\n" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
+                    logger.error(errMsg)
+    if retVal:
+        infoMsg = "smoke test PASSED"
+        logger.info(infoMsg)
+    else:
+        errMsg = "smoke test FAILED"
+        logger.error(errMsg)
+    return retVal
