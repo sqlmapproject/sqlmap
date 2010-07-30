@@ -34,21 +34,21 @@ def hideAscii(data):
             retVal += chr(ord(data[i]) ^ 127)
         else:
             retVal += data[i]
-            
+
     return retVal
 
 def cloak(inputFile):
     f = open(inputFile, 'rb')
     data = bz2.compress(f.read())
     f.close()
-    
+
     return hideAscii(data)
-        
+
 def decloak(inputFile):
     f = open(inputFile, 'rb')
     data = bz2.decompress(hideAscii(f.read()))
     f.close()
-    
+
     return data
 
 def main():
@@ -71,7 +71,7 @@ def main():
     if not os.path.isfile(args.inputFile):
         print 'ERROR: the provided input file \'%s\' is not a regular file' % args.inputFile
         sys.exit(1)
-    
+
     if not args.decrypt:
         data = cloak(args.inputFile)
     else:
@@ -82,7 +82,7 @@ def main():
             args.outputFile = args.inputFile + '_'
         else:
             args.outputFile = args.inputFile[:-1]
-        
+
     fpOut      = open(args.outputFile, 'wb')
     sys.stdout = fpOut
     sys.stdout.write(data)

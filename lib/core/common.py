@@ -57,6 +57,7 @@ from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.convert import urlencode
 from lib.core.exception import sqlmapFilePathException
+from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
@@ -471,7 +472,7 @@ def readInput(message, default=None):
 
         data = default
     else:
-        data = raw_input(message.encode(conf.dataEncoding))
+        data = raw_input(message.encode(sys.stdout.encoding))
 
         if not data:
             data = default
@@ -1410,3 +1411,18 @@ def longestCommonPrefix(*sequences):
 
 def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
+
+def smokeTest():
+    for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
+        for file in files:
+            if os.path.splitext(file)[1].lower() == '.py' and file != '__init__.py':
+                path = os.path.join(root, os.path.splitext(file)[0])
+                path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
+                path = path.replace(os.sep, '.').lstrip('.')
+                try:
+                    module = __import__(path)
+                except Exception, msg:
+                    raise sqlmapGenericException, "smoke test failed at importing module '%s' (%s):\n\n%s" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
+
+    infoMsg = "smoke test passed"
+    logger.info(infoMsg)

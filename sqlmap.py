@@ -23,7 +23,6 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import codecs
-import locale
 import os
 import sys
 import time
@@ -33,6 +32,7 @@ import warnings
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 
 # NOTE: This breaks SQL shell and OS shell history and TAB functionalities
+#import locale
 #sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
 try:

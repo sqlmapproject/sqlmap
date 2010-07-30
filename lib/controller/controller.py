@@ -33,6 +33,7 @@ from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
+from lib.core.common import smokeTest
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -92,6 +93,9 @@ def start():
 
     if not conf.start:
         return
+
+    if conf.smokeTest:
+        smokeTest()
 
     if conf.direct:
         initTargetEnv()
