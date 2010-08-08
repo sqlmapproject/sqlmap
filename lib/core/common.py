@@ -1354,7 +1354,7 @@ def getPartRun():
 
 def getUnicode(value):
     if isinstance(value, basestring):
-        return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding if 'dataEncoding' in conf else "utf-8")
+        return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding if 'dataEncoding' in conf else "utf-8", errors='replace')
     else:
         return unicode(value)
 
