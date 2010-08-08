@@ -161,7 +161,10 @@ def formatDBMSfp(versions=None):
     @rtype: C{str}
     """
 
-    if ( not versions or versions == [None] ) and kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown":
+    while None in versions:
+        versions.remove(None)
+    
+    if not versions and kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown":
         versions = kb.dbmsVersion
 
     if isinstance(versions, basestring):
