@@ -27,6 +27,7 @@ import re
 import os
 
 from lib.core.common import dataToDumpFile
+from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -44,12 +45,12 @@ class Dump:
 
     def __write(self, data, n=True):
         if n:
-            print data
-            self.__outputFP.write("%s\n" % data)
+	        text = "%s\n" % data
         else:
-            print data,
-            self.__outputFP.write("%s " % data)
+            text = "%s " % data
 
+        dataToStdout(text)
+        self.__outputFP.write(text)
         self.__outputFP.flush()
 
         conf.loggedToOut = True
