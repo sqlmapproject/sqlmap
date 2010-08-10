@@ -315,7 +315,7 @@ def resumeConfKb(expression, url, value):
             if not test or test[0] in ("y", "Y"):
                 conf.regexp = regexp
 
-    elif expression == "Match ratio" and url == conf.url:
+    elif expression == "Match ratio" and url == conf.url and conf.matchRatio is None:
         matchRatio = value[:-1]
 
         logMsg  = "resuming match ratio '%s' from session file" % matchRatio
