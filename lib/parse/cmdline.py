@@ -187,6 +187,9 @@ def cmdLineParser():
                              help="Matches to be excluded before "
                                   "comparing page contents")
 
+        injection.add_option("--ratio", dest="matchRatio", type="float",
+                             help="Page comparison treshold value")
+
         injection.add_option("--use-between", dest="useBetween",
                              action="store_true",
                              help="Use operator BETWEEN instead of default '>'")

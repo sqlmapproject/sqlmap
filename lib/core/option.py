@@ -943,7 +943,6 @@ def __setConfAttributes():
     conf.httpHeaders      = []
     conf.hostname         = None
     conf.loggedToOut      = None
-    conf.matchRatio       = None
     conf.md5hash          = None
     conf.multipleTargets  = False
     conf.outputPath       = None
@@ -1134,6 +1133,11 @@ def __basicOptionValidation():
     if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or\
       conf.cpuThrottle < 0):
         errMsg = "value for --cpu-throttle (cpuThrottle) option must be in range [0,100]"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.matchRatio is not None and isinstance(conf.matchRatio, float) and (conf.matchRatio > 1 or\
+      conf.cpuThrottle < 0):
+        errMsg = "value for --ratio (matchRatio) option must be in range [0,1]"
         raise sqlmapSyntaxException, errMsg
 
 def init(inputOptions=advancedDict()):

@@ -79,8 +79,8 @@ def comparison(page, headers=None, getSeqMatcher=False):
             logger.debug("setting match ratio to default value 0.900")
             conf.matchRatio = 0.900
 
-        if conf.matchRatio is not None:
-            setMatchRatio()
+    if conf.matchRatio is not None:
+		setMatchRatio()
 
     # If it has been requested to return the ratio and not a comparison
     # response
