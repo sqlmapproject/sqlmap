@@ -1823,7 +1823,7 @@ Option: <tt>-p</tt>
 By default sqlmap tests all <tt>GET</tt> parameters, <tt>POST</tt>
 parameters, HTTP <tt>Cookie</tt> header values and HTTP <tt>User-Agent</tt>
 header value for dynamicity and SQL injection vulnerability, but it is
-possible to manually specificy the parameter(s) you want sqlmap to perform
+possible to manually specify the parameter(s) you want sqlmap to perform
 tests on comma separeted in order to skip dynamicity tests and perform SQL
 injection test and inject directly only against the provided parameter(s).
 
