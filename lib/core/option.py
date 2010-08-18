@@ -578,7 +578,18 @@ def __setHTTPProxy():
         errMsg = "proxy value must be in format 'http://url:port'"
         raise sqlmapSyntaxException, errMsg
 
-    __proxyString = "%s:%d" % (__hostname, __port)
+    if conf.pCred:
+        pCredRegExp = re.search("^(.*?):(.*?)$", conf.pCred)
+
+        if not pCredRegExp:
+            errMsg  = "Proxy authentication credentials "
+            errMsg += "value must be in format username:password"
+            raise sqlmapSyntaxException, errMsg
+    
+        # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
+        __proxyString = "%s@%s:%d" % (conf.pCred, __hostname, __port)
+    else:
+        __proxyString = "%s:%d" % (__hostname, __port)
 
     # Workaround for http://bugs.python.org/issue1424152 (urllib/urllib2:
     # HTTPS over (Squid) Proxy fails) as long as HTTP over SSL requests
