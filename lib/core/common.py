@@ -1106,15 +1106,41 @@ def isWindowsDriveLetterPath(filepath):
     return re.search("\A[\w]\:", filepath) is not None
 
 def posixToNtSlashes(filepath):
+    """
+    Replaces all occurances of Posix slashes (/) in provided
+    filepath with NT ones (/)
+    >>> posixToNtSlashes('C:/Windows')
+    'C:\\\\Windows'
+    """
     return filepath.replace('/', '\\')
 
 def ntToPosixSlashes(filepath):
+    """
+    Replaces all occurances of NT slashes (\) in provided
+    filepath with Posix ones (/)
+    >>> ntToPosixSlashes('C:\\Windows')
+    'C:/Windows'
+    """
     return filepath.replace('\\', '/')
 
 def isBase64EncodedString(subject):
+    """
+    Checks if the provided string is Base64 encoded
+    >>> isBase64EncodedString('dGVzdA==')
+    True
+    >>> isBase64EncodedString('123456')
+    False
+    """
     return re.match(r"\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z", subject) is not None
     
 def isHexEncodedString(subject):
+    """
+    Checks if the provided string is hex encoded
+    >>> isHexEncodedString('DEADBEEF')
+    True
+    >>> isHexEncodedString('test')
+    False
+    """
     return re.match(r"\A[0-9a-fA-F]+\Z", subject) is not None
 
 def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
@@ -1217,6 +1243,10 @@ def parseXmlFile(xmlFile, handler):
     xfile.close()
 
 def calculateDeltaSeconds(start, epsilon=0.05):
+    """
+    Returns elapsed time from start till now (including expected 
+    error set by epsilon parameter)
+    """
     return int(time.time() - start + epsilon)
 
 def initCommonOutputs():
@@ -1316,6 +1346,8 @@ def getCompiledRegex(regex, *args):
     """
     Returns compiled regular expression and stores it in cache for further
     usage
+    >>> getCompiledRegex('test') # doctest: +ELLIPSIS
+    <_sre.SRE_Pattern object at...
     """
 
     if (regex, args) in kb.cache.regex:
