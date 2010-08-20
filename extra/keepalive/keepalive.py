@@ -18,13 +18,13 @@
 
 """An HTTP handler for urllib2 that supports HTTP 1.1 and keepalive.
 
->>> import urllib2
->>> from keepalive import HTTPHandler
->>> keepalive_handler = HTTPHandler()
->>> opener = urllib2.build_opener(keepalive_handler)
->>> urllib2.install_opener(opener)
->>> 
->>> fo = urllib2.urlopen('http://www.python.org')
+  import urllib2
+  from keepalive import HTTPHandler
+  keepalive_handler = HTTPHandler()
+  opener = urllib2.build_opener(keepalive_handler)
+  urllib2.install_opener(opener)
+ 
+  fo = urllib2.urlopen('http://www.python.org')
 
 To remove the handler, simply re-run build_opener with no arguments, and
 install that opener.
@@ -37,7 +37,9 @@ use the handler methods:
   close_all()
   open_connections()
 
->>> keepalive_handler.close_all()
+Example:
+
+  keepalive_handler.close_all()
 
 EXTRA ATTRIBUTES AND METHODS
 
@@ -53,8 +55,8 @@ EXTRA ATTRIBUTES AND METHODS
   If you want the best of both worlds, use this inside an
   AttributeError-catching try:
 
-  >>> try: status = fo.status
-  >>> except AttributeError: status = None
+    try: status = fo.status
+    except AttributeError: status = None
 
   Unfortunately, these are ONLY there if status == 200, so it's not
   easy to distinguish between non-200 responses.  The reason is that

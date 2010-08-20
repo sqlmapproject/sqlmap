@@ -1356,6 +1356,16 @@ def getPartRun():
     return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal
 
 def getUnicode(value):
+    """
+    Return the unicode representation of the supplied value:
+
+    >>> getUnicode(u'test')
+    u'test'
+    >>> getUnicode('test')
+    u'test'
+    >>> getUnicode(1)
+    u'1'
+    """
     if isinstance(value, basestring):
         return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding if 'dataEncoding' in conf else "utf-8", errors='replace')
     else:
@@ -1416,6 +1426,7 @@ def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
 
 def smokeTest():
+    import doctest
     retVal = True
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
         for file in files:
@@ -1424,15 +1435,24 @@ def smokeTest():
                 path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
                 path = path.replace(os.sep, '.').lstrip('.')
                 try:
-                    module = __import__(path)
+                    __import__(path)
+                    module = sys.modules[path]
                 except Exception, msg:
                     retVal = False
                     errMsg = "smoke test failed at importing module '%s' (%s):\n%s\n" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
                     logger.error(errMsg)
+                else:
+                    # Run doc tests
+                    # Reference: http://docs.python.org/library/doctest.html
+                    results = doctest.testmod(module)
+                    if results.failed > 0:
+                        retVal = False
+                    
+    infoMsg = "smoke test "
     if retVal:
-        infoMsg = "smoke test PASSED"
+        infoMsg += "PASSED"
         logger.info(infoMsg)
     else:
-        errMsg = "smoke test FAILED"
-        logger.error(errMsg)
+        infoMsg += "FAILED"
+        logger.error(infoMsg)
     return retVal
