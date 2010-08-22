@@ -256,7 +256,7 @@ class Connect:
         responseMsg += "(%s - %d):\n" % (status, code)
 
         if conf.verbose <= 4:
-            responseMsg += getUnicode(responseHeaders)
+            responseMsg += getUnicode(responseHeaders.__str__())
         elif conf.verbose > 4:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
