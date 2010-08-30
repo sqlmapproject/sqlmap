@@ -44,6 +44,46 @@ class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self)
 
+    def __versionCheck(self):
+        infoMsg = "executing SAP MaxDB SYSINFO version check"
+        logger.info(infoMsg)
+
+        query   = agent.prefixQuery(" /* NoValue */")
+        query   = agent.postfixQuery(query)
+        payload = agent.payload(newValue=query)
+        result  = Request.queryPage(payload)
+
+        if not result:
+            warnMsg = "unable to perform SAP MaxDB version check"
+            logger.warn(warnMsg)
+
+            return None
+
+        minor, major = None, None
+
+        for version in [6, 7]:
+            query   = agent.prefixQuery(" AND (SELECT MAJORVERSION FROM SYSINFO.VERSION)=%d" % version)
+            query   = agent.postfixQuery(query)
+            payload = agent.payload(newValue=query)
+            result  = Request.queryPage(payload)
+
+            if result:
+                major = version
+
+        for version in xrange(0, 10):
+            query   = agent.prefixQuery(" AND (SELECT MINORVERSION FROM SYSINFO.VERSION)=%d" % version)
+            query   = agent.postfixQuery(query)
+            payload = agent.payload(newValue=query)
+            result  = Request.queryPage(payload)
+
+            if result:
+                minor = version
+
+        if major and minor:
+            return "%s.%s" % (major, minor)
+        else:
+            return None
+
     def getFingerprint(self):
         value  = ""
         wsOsFp = formatFingerprint("web server", kb.headersFp)
@@ -64,7 +104,7 @@ class Fingerprint(GenericFingerprint):
             value += "SAP MaxDB"
             return value
 
-        actVer = formatDBMSfp() + " (%s)" % None
+        actVer = formatDBMSfp() + " (%s)" % self.__versionCheck()
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
