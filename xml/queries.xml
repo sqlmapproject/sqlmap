@@ -355,7 +355,7 @@
         <dbs/> 
         <tables>
             <inband query="SELECT Name FROM MSysObjects WHERE (Left([Name],1) &lt;&gt; '~') AND (Left([Name],4) &lt;&gt; 'MSys') AND ([Type] In (1, 4, 6))"/>
-        </tables>       
+        </tables>
    </dbms>
 
    <!-- Firebird -->
@@ -402,6 +402,13 @@
             <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT FIRST 1 SKIP %d %s FROM %s" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
+   </dbms>
+
+   <!-- SAP MaxDB -->
+   <dbms value="SAP MaxDB">
+       <inference/>
+       <timedelay/>
+       <banner query="SELECT ID FROM SYSINFO.VERSION"/>
    </dbms>
 
 </root>

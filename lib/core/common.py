@@ -164,7 +164,7 @@ def formatDBMSfp(versions=None):
     while versions and None in versions:
         versions.remove(None)
     
-    if not versions and kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown":
+    if not versions and kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown" and kb.dbmsVersion[0] != None:
         versions = kb.dbmsVersion
 
     if isinstance(versions, basestring):

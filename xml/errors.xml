@@ -62,13 +62,19 @@
     <dbms value="Firebird">
         <error regexp="Dynamic SQL Error"/>
     </dbms>
-    
+
     <!-- SQLite -->
     <dbms value="SQLite">
         <error regexp="Warning.*sqlite_.*"/>
         <error regexp="SQLite/JDBCDriver"/>
         <error regexp="SQLite.Exception"/>
         <error regexp="System.Data.SQLite.SQLiteException"/>
+    </dbms>
+
+    <!-- SAP MaxDB -->
+    <dbms value="SAP MaxDB">
+        <error regexp="Warning.*maxdb.*"/>
+        <error regexp="SQL error.*POS([0-9]+).*"/>
     </dbms>
 
 </root>

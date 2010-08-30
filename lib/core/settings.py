@@ -57,10 +57,10 @@ PYVERSION          = sys.version.split()[0]
 MSSQL_VERSIONS_URL = "http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx"
 
 # Database management system specific variables
-MSSQL_SYSTEM_DBS   = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
-MYSQL_SYSTEM_DBS   = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
-PGSQL_SYSTEM_DBS   = ( "information_schema", "pg_catalog", "pg_toast" )
-ORACLE_SYSTEM_DBS  = ( "SYSTEM", "SYSAUX" )                              # These are TABLESPACE_NAME
+MSSQL_SYSTEM_DBS    = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
+MYSQL_SYSTEM_DBS    = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
+PGSQL_SYSTEM_DBS    = ( "information_schema", "pg_catalog", "pg_toast" )
+ORACLE_SYSTEM_DBS   = ( "SYSTEM", "SYSAUX" )                              # These are TABLESPACE_NAME
 SQLITE_SYSTEM_DBS   = ( "sqlite_master", "sqlite_temp_master" )
 ACCESS_SYSTEM_DBS   = ( "MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
                         "MSysAccessXML", "MSysModules", "MSysModules2" )
@@ -70,19 +70,21 @@ FIREBIRD_SYSTEM_DBS = ( "RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_C
                         "RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS",\
                         "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS",\
                         "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS" )
+MAXDB_SYSTEM_DBS    = ( "SYSINFO", "DOMAIN" )
 
-MSSQL_ALIASES      = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
-MYSQL_ALIASES      = [ "mysql", "my" ]
-PGSQL_ALIASES      = [ "postgresql", "postgres", "pgsql", "psql", "pg" ]
-ORACLE_ALIASES     = [ "oracle", "orcl", "ora", "or" ]
-SQLITE_ALIASES     = [ "sqlite", "sqlite3" ]
-ACCESS_ALIASES     = [ "access", "jet", "microsoft access", "msaccess" ]
-FIREBIRD_ALIASES   = [ "firebird", "mozilla firebird", "interbase", "ibase", "fb" ]
+MSSQL_ALIASES       = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
+MYSQL_ALIASES       = [ "mysql", "my" ]
+PGSQL_ALIASES       = [ "postgresql", "postgres", "pgsql", "psql", "pg" ]
+ORACLE_ALIASES      = [ "oracle", "orcl", "ora", "or" ]
+SQLITE_ALIASES      = [ "sqlite", "sqlite3" ]
+ACCESS_ALIASES      = [ "access", "jet", "microsoft access", "msaccess" ]
+FIREBIRD_ALIASES    = [ "firebird", "mozilla firebird", "interbase", "ibase", "fb" ]
+MAXDB_ALIASES       = [ "maxdb", "sap maxdb", "sap db" ]
 
-SUPPORTED_DBMS     = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES
-SUPPORTED_OS       = ( "linux", "windows" )
+SUPPORTED_DBMS      = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES
+SUPPORTED_OS        = ( "linux", "windows" )
 
-SQL_STATEMENTS     = {
+SQL_STATEMENTS      = {
                        "SQL SELECT statement":  (
                              "select ",
                              "show ",
