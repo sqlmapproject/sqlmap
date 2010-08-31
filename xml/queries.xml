@@ -407,12 +407,13 @@
    <!-- SAP MaxDB -->
    <dbms value="SAP MaxDB">
         <length query="LENGTH(%s)"/>
-        <inference query="AND NUM(SUBSTR((%s), %d, 1)) > %d"/>
+        <inference/>
         <timedelay/>
         <banner query="SELECT ID FROM SYSINFO.VERSION"/>
-        <isnull query="%s IS NULL"/>
+        <isnull query="VALUE(%s,' ')"/>
         <comment query="--"/>
         <count query="COUNT(%s)"/>
+        <cast query="CHR(%s)"/>
    </dbms>
 
 </root>
