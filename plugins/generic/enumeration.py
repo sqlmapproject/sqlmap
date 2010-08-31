@@ -26,6 +26,7 @@ import re
 
 from lib.core.agent import agent
 from lib.core.common import getRange
+from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import parsePasswordHash
 from lib.core.common import readInput
@@ -881,7 +882,7 @@ class Enumeration:
                 columns = {}
                 
                 if kb.dbms == "SQLite":
-                    for match in re.finditer(r"(\w+) ([A-Z]+)[,\r\n]", value):
+                    for match in re.finditer(getCompiledRegex(r"(\w+) ([A-Z]+)[,\r\n]"), value):
                         columns[match.group(1)] = match.group(2)
                 else:
                     for column, colType in value:
