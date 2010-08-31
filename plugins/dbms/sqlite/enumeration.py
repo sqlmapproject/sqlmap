@@ -68,16 +68,6 @@ class Enumeration(GenericEnumeration):
 
         return []
 
-    def getColumns(self, onlyColNames=False):
-        errMsg  = "on SQLite it is not possible to enumerate database "
-        errMsg += "table columns"
-
-        if conf.dumpTable or conf.dumpAll:
-            errMsg += ", provide them with -C option"
-            raise sqlmapUnsupportedFeatureException, errMsg
-
-        logger.warn(errMsg)
-
     def dumpAll(self):
         errMsg = "on SQLite you must specify the table and columns to dump"
         raise sqlmapUnsupportedFeatureException, errMsg

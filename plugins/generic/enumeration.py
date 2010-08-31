@@ -871,15 +871,21 @@ class Enumeration:
                                                         conf.db, conf.db,
                                                         conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
+            elif kb.dbms == "SQLite":
+                query = rootQuery["inband"]["query"] % conf.tbl
 
             value = inject.getValue(query, blind=False)
 
             if value:
                 table = {}
                 columns = {}
-
-                for column, colType in value:
-                    columns[column] = colType
+                
+                if kb.dbms == "SQLite":
+                    for match in re.finditer(r"(\w+) ([A-Z]+)[,\r\n]", value):
+                        columns[match.group(1)] = match.group(2)
+                else:
+                    for column, colType in value:
+                        columns[column] = colType
 
                 table[conf.tbl] = columns
                 kb.data.cachedColumns[conf.db] = table

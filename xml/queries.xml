@@ -320,7 +320,9 @@
             <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY 1"/>
             <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' LIMIT %d, 1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
         </tables>
-        <columns/>
+        <columns>
+            <inband query="SELECT sql FROM sqlite_master WHERE tbl_name='%s'"/>
+        </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT %s FROM %s LIMIT %d, 1" count="SELECT COUNT(*) FROM %s"/>
