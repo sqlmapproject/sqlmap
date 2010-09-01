@@ -880,7 +880,7 @@ class Enumeration:
             if value:
                 table = {}
                 columns = {}
-                
+
                 if kb.dbms == "SQLite":
                     for match in re.finditer(getCompiledRegex(r"(\w+) ([A-Z]+)[,\r\n]"), value):
                         columns[match.group(1)] = match.group(2)
@@ -1061,10 +1061,13 @@ class Enumeration:
                         kb.data.dumpedTable[column] = { "length": 0, "values": [] }
 
                     for entry in entries:
+                        if entry is None or len(entry) == 0:
+                            continue
+
                         if isinstance(entry, basestring):
                             colEntry = entry
                         else:
-                            colEntry = entry[index]
+                            colEntry = entry[index] if index < len(entry) else u''
 
                         colEntryLen = len(getUnicode(colEntry))
                         maxLen = max(colLen, colEntryLen)
