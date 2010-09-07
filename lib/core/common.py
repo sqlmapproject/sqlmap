@@ -1386,7 +1386,7 @@ def getPartRun():
     # Return the INI tag to consider for common outputs (e.g. 'Databases')
     return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal
 
-def getUnicode(value):
+def getUnicode(value, encoding=None):
     """
     Return the unicode representation of the supplied value:
 
@@ -1397,8 +1397,10 @@ def getUnicode(value):
     >>> getUnicode(1)
     u'1'
     """
+    if encoding is None:
+        encoding = conf.dataEncoding if 'dataEncoding' in conf else "utf-8"
     if isinstance(value, basestring):
-        return value if isinstance(value, unicode) else unicode(value, conf.dataEncoding if 'dataEncoding' in conf else "utf-8", errors='replace')
+        return value if isinstance(value, unicode) else unicode(value, encoding, errors='replace')
     else:
         return unicode(value)
 
@@ -1475,10 +1477,10 @@ def smokeTest():
                 else:
                     # Run doc tests
                     # Reference: http://docs.python.org/library/doctest.html
-                    results = doctest.testmod(module)
-                    if results.failed > 0:
+                    (failure_count, test_count) = doctest.testmod(module)
+                    if failure_count > 0:
                         retVal = False
-                    
+
     infoMsg = "smoke test "
     if retVal:
         infoMsg += "PASSED"
