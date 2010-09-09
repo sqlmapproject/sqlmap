@@ -30,6 +30,7 @@ import StringIO
 import zlib
 
 from lib.core.common import getCompiledRegex
+from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
 from lib.core.common import urlEncodeCookieValues
@@ -99,13 +100,15 @@ def checkCharEncoding(encoding):
     #http://www.destructor.de/charsets/index.htm
     translate = { 'windows-874':'iso-8859-11' }
 
-    #http://philip.html5.org/data/charsets-2.html
-    if encoding.startswith('cp-'):
-        encoding = 'cp%s' % encoding[3:]
-    elif ';' in encoding:
+    if ';' in encoding:
         encoding = encoding[:encoding.find(';')]
-    elif encoding in translate:
+    #http://philip.html5.org/data/charsets-2.html
+    if encoding in translate:
         encoding = translate[encoding]
+    elif encoding.startswith('cp-'):
+        encoding = 'cp%s' % encoding[3:]
+    elif encoding.startswith('windows') and not encoding.startswith('windows-'):
+        encoding = 'windows-%s' % encoding[7:]
     try:
         codecs.lookup(encoding)
     except LookupError:
@@ -134,6 +137,6 @@ def decodePage(page, contentEncoding, contentType):
     if contentType and (contentType.find('charset=') != -1):
         charset = checkCharEncoding(contentType.split('charset=')[-1])
         if charset:
-            page = unicode(page, charset)     #don't use getUnicode here. it needs to stay as is.
+            page = getUnicode(page, charset)
 
     return page
