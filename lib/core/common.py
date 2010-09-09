@@ -1402,7 +1402,7 @@ def getUnicode(value, encoding=None):
     if isinstance(value, basestring):
         return value if isinstance(value, unicode) else unicode(value, encoding, errors='replace')
     else:
-        return unicode(value)
+        return unicode(value) #encoding ignored for non-basestring instances
 
 def getBruteUnicode(string):
     retVal = unicode()
