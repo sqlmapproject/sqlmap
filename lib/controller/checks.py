@@ -280,32 +280,53 @@ def checkDynParam(place, parameter, value):
 
     return condition
 
-def checkDynamicContent(firstPage, secondPage):
+def checkDynamicContent(*pages):
+    """
+    This function checks if the provided pages have dynamic content. If they
+    are dynamic, their content differs at specific lines.
+    """
     infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
 
-    linesFirst = preparePageForLineComparison(firstPage)
-    linesSecond = preparePageForLineComparison(secondPage)
+    for i in xrange(len(pages)):
+        firstPage = pages[i]
+        linesFirst = preparePageForLineComparison(firstPage)
+        pageLinesNumber = len(linesFirst)        
+        for j in xrange(i+1, len(pages)):
+            secondPage = pages[j]
+            linesSecond = preparePageForLineComparison(secondPage)
+            if pageLinesNumber == len(linesSecond):
+                for k in xrange(0, pageLinesNumber):
+                    if (linesFirst[k] != linesSecond[k]):
+                        item = DynamicContentItem(k, pageLinesNumber, \
+                            linesFirst[k-1] if k > 0 else None, \
+                            linesFirst[k+1] if k < pageLinesNumber - 1 else None)
 
-    if len(linesFirst) == len(linesSecond):
-        lastLineNumber = None
-        pageLinesNumber = len(linesFirst)
-        for i in range(0, pageLinesNumber):
-            if (linesFirst[i] != linesSecond[i]):
-                if lastLineNumber == i - 1:
-                    item = kb.dynamicContent[-1]
-                    if isinstance(item.lineNumber, int):
-                        item.lineNumber = [item.lineNumber]
-                    item.lineNumber.append(i)
-                else:
-                    kb.dynamicContent.append(DynamicContentItem(i, pageLinesNumber, linesFirst[i-1] if i > 0 else None, linesFirst[i+1] if i < pageLinesNumber - 1 else None))
-                lastLineNumber = i
-
-    randInt = getUnicode(randomInt(1))
-    payload = agent.fullPayload(" AND %s=%s" % (randInt, randInt))
-    result  = Request.queryPage(payload)
-    if result:
-        pass #TODO: the same as above
+                        found = None
+                        for other in kb.dynamicContent:
+                            found = True
+                            if other.pageTotal == item.pageTotal:
+                                if isinstance(other.lineNumber, int):
+                                    if other.lineNumber == item.lineNumber - 1:
+                                        other.lineNumber = [other.lineNumber, item.lineNumber]
+                                        other.lineContentAfter = item.lineContentAfter
+                                        break
+                                    elif other.lineNumber == item.lineNumber + 1:
+                                        other.lineNumber = [item.lineNumber, other.lineNumber]
+                                        other.lineContentBefore = item.lineContentBefore
+                                        break
+                                elif item.lineNumber - 1 == other.lineNumber[-1]:
+                                    other.lineNumber.append(item.lineNumber)
+                                    other.lineContentAfter = item.lineContentAfter
+                                    break
+                                elif item.lineNumber + 1 == other.lineNumber[0]:
+                                    other.lineNumber.insert(0, item.lineNumber)
+                                    other.lineContentBefore = item.lineContentBefore
+                                    break
+                            found = False
+                        
+                        if not found:
+                            kb.dynamicContent.append(item)
 
     if kb.dynamicContent:
         infoMsg = "found probably removable dynamic lines"

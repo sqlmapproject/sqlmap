@@ -163,7 +163,7 @@ def formatDBMSfp(versions=None):
 
     while versions and None in versions:
         versions.remove(None)
-    
+
     if not versions and kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown" and kb.dbmsVersion[0] != None:
         versions = kb.dbmsVersion
 
@@ -331,7 +331,7 @@ def getDirs(webApi=None):
         infoMsg  = "retrieved web server full paths: "
         infoMsg += "'%s'" % ", ".join(path for path in kb.absFilePaths)
         logger.info(infoMsg)
-        
+
         for absFilePath in kb.absFilePaths:
             if absFilePath:
                 directory = directoryPath(absFilePath)
@@ -423,7 +423,7 @@ def strToHex(inpStr):
         hexStr += hexChar
 
     return hexStr
-        
+
 def fileToStr(fileName):
     """
     @param fileName: file path to read the content and return as a no
@@ -481,7 +481,7 @@ def readInput(message, default=None):
             data = default
 
     return data
-        
+
 def randomRange(start=0, stop=1000):
     """
     @param start: starting number.
@@ -767,7 +767,7 @@ def parseTargetUrl():
         conf.parameters["GET"] = __urlSplit[3]
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
-    
+
 def expandAsteriskForColumns(expression):
     # If the user provided an asterisk rather than the column(s)
     # name, sqlmap will retrieve the columns itself and reprocess
@@ -819,7 +819,7 @@ def getRange(count, dump=False, plusOne=False):
         indexRange = range(limitStart - 1, limitStop)
 
     return indexRange
-    
+
 def parseUnionPage(output, expression, partial=False, condition=None, sort=True):
     data = []
 
@@ -896,7 +896,7 @@ def getDelayQuery(andCond=False):
             query = "(%s)>0" % query
 
     return query
-    
+
 def getLocalIP():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((conf.hostname, conf.port))
@@ -918,7 +918,7 @@ def getFileType(filePath):
         return "text"
     else:
         return "binary"
-    
+
 def pollProcess(process):
     while True:
         dataToStdout(".")
@@ -935,7 +935,7 @@ def pollProcess(process):
                 dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
 
             break
-            
+
 def getCharset(charsetType=None):
     asciiTbl = []
 
@@ -973,7 +973,7 @@ def getCharset(charsetType=None):
         asciiTbl.extend(range(96, 123))
 
     return asciiTbl
-    
+
 def searchEnvPath(fileName):
     envPaths = os.environ["PATH"]
     result = None
@@ -1137,7 +1137,7 @@ def isBase64EncodedString(subject):
     False
     """
     return re.match(r"\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z", subject) is not None
-    
+
 def isHexEncodedString(subject):
     """
     Checks if the provided string is hex encoded
@@ -1249,7 +1249,7 @@ def parseXmlFile(xmlFile, handler):
 
 def calculateDeltaSeconds(start, epsilon=0.05):
     """
-    Returns elapsed time from start till now (including expected 
+    Returns elapsed time from start till now (including expected
     error set by epsilon parameter)
     """
     return int(time.time() - start + epsilon)
@@ -1470,6 +1470,7 @@ def smokeTest():
         logger.error(infoMsg)
     return retVal
 
+
 class UnicodeRawConfigParser(RawConfigParser):
     def write(self, fp):
         """
@@ -1495,6 +1496,7 @@ class UnicodeRawConfigParser(RawConfigParser):
                         fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
 
             fp.write("\n")
+
 
 class DynamicContentItem:
     """
