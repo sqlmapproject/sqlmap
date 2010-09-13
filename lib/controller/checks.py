@@ -28,8 +28,10 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import getUnicode
+from lib.core.common import preparePageForLineComparison
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import DynamicContentItem
 from lib.core.convert import md5hash
 from lib.core.data import conf
 from lib.core.data import kb
@@ -278,6 +280,31 @@ def checkDynParam(place, parameter, value):
 
     return condition
 
+def checkDynamicContent(firstPage, secondPage):
+    infoMsg = "testing for dynamic content lines"
+    logger.info(infoMsg)
+
+    linesFirst = preparePageForLineComparison(firstPage)
+    linesSecond = preparePageForLineComparison(secondPage)
+
+    if len(linesFirst) == len(linesSecond):
+        lastLineNumber = None
+        pageLinesNumber = len(linesFirst)
+        for i in range(0, pageLinesNumber):
+            if (linesFirst[i] != linesSecond[i]):
+                if lastLineNumber == i - 1:
+                    item = kb.dynamicContent[-1]
+                    if isinstance(item.lineNumber, int):
+                        item.lineNumber = [item.lineNumber]
+                    item.lineNumber.append(i)
+                else:
+                    kb.dynamicContent.append(DynamicContentItem(i, pageLinesNumber, linesFirst[i-1] if i > 0 else None, linesFirst[i+1] if i < pageLinesNumber - 1 else None))
+                lastLineNumber = i
+
+    if kb.dynamicContent:
+        infoMsg = "found probably removable dynamic lines"
+        logger.info(infoMsg)
+
 def checkStability():
     """
     This function checks if the URL content is stable requesting the
@@ -317,6 +344,8 @@ def checkStability():
         warnMsg += "manual paragraph 'Page comparison' and provide a "
         warnMsg += "string or regular expression to match on"
         logger.warn(warnMsg)
+
+        checkDynamicContent(firstPage, secondPage)
 
     return condition
 

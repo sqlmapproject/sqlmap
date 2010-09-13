@@ -24,7 +24,9 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from lib.core.common import preparePageForLineComparison
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setMatchRatio
 
@@ -59,6 +61,21 @@ def comparison(page, headers=None, getSeqMatcher=False):
     if conf.regexp:
         return re.search(conf.regexp, page, re.I | re.M) is not None
 
+    # Dynamic content lines to be excluded before calculating page hash
+    if kb.dynamicContent:
+        lines = preparePageForLineComparison(page)
+        for item in kb.dynamicContent:
+            if len(lines) == item.pageTotal:
+                before = item.lineNumber - 1 if isinstance(item.lineNumber, int) else item.lineNumber[0] - 1
+                after = item.lineNumber + 1 if isinstance(item.lineNumber, int) else item.lineNumber[-1] + 1
+                if (item.lineContentBefore and lines[before] != item.lineContentBefore) or (item.lineContentAfter and lines[after] != item.lineContentAfter):
+                    continue
+                if isinstance(item.lineNumber, int):
+                    page = page.replace(lines[item.lineNumber], '')
+                else:
+                    for i in item.lineNumber:
+                        page = page.replace(lines[i], '')
+
     if conf.seqLock:
         conf.seqLock.acquire()
 
@@ -80,7 +97,7 @@ def comparison(page, headers=None, getSeqMatcher=False):
             conf.matchRatio = 0.900
 
     if conf.matchRatio is not None:
-		setMatchRatio()
+        setMatchRatio()
 
     # If it has been requested to return the ratio and not a comparison
     # response

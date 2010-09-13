@@ -522,7 +522,7 @@ def randomStr(length=4, lowercase=False):
         rndStr = "".join([random.choice(string.letters) for _ in xrange(0, length)])
 
     return rndStr
-    
+
 def sanitizeStr(inpStr):
     """
     @param inpStr: inpStr to sanitize: cast to str datatype and replace
@@ -566,7 +566,7 @@ def banner():
     %s - %s
     %s
     """ % (VERSION_STRING, DESCRIPTION, SITE)
-    
+
 def parsePasswordHash(password):
     blank = " " * 8
 
@@ -597,7 +597,7 @@ def cleanQuery(query):
                 upperQuery = upperQuery.replace(queryMatch.group(1), sqlStatement.upper())
 
     return upperQuery
-            
+
 def setPaths():
     # sqlmap paths
     paths.SQLMAP_CONTRIB_PATH    = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "contrib")
@@ -623,7 +623,7 @@ def setPaths():
     paths.MYSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
     paths.ORACLE_XML             = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
     paths.PGSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
-    
+
 def weAreFrozen():
     """
     Returns whether we are frozen via py2exe.
@@ -646,7 +646,7 @@ def parseTargetDirect():
 
     for dbms in SUPPORTED_DBMS:
         details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<user>.+?)\:(?P<pass>.*?)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_\-\/\\\\]+?)$" % dbms, conf.direct, re.I)
-        
+
         if details:
             conf.dbms = details.group('dbms')
 
@@ -1068,6 +1068,12 @@ def sanitizeAsciiString(subject):
     else:
         return None
 
+def preparePageForLineComparison(page):
+    retVal = page
+    if isinstance(page, basestring):
+        return page.replace("><", ">\n<").replace("<br>", "\n").splitlines()
+    return retVal
+
 def decloakToNamedTemporaryFile(filepath, name=None):
     retVal = NamedTemporaryFile()
 
@@ -1410,32 +1416,6 @@ def getBruteUnicode(string):
         retVal += unichr(ord(char))
     return retVal
 
-class UnicodeRawConfigParser(RawConfigParser):
-    def write(self, fp):
-        """
-        Write an .ini-format representation of the configuration state.
-        """
-
-        if self._defaults:
-            fp.write("[%s]\n" % DEFAULTSECT)
-
-            for (key, value) in self._defaults.items():
-                fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
-
-            fp.write("\n")
-
-        for section in self._sections:
-            fp.write("[%s]\n" % section)
-
-            for (key, value) in self._sections[section].items():
-                if key != "__name__":
-                    if value is None:
-                        fp.write("%s\n" % (key))
-                    else:
-                        fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
-
-            fp.write("\n")
-
 # http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 def longestCommonPrefix(*sequences):
     if len(sequences) == 1:
@@ -1489,3 +1469,40 @@ def smokeTest():
         infoMsg += "FAILED"
         logger.error(infoMsg)
     return retVal
+
+class UnicodeRawConfigParser(RawConfigParser):
+    def write(self, fp):
+        """
+        Write an .ini-format representation of the configuration state.
+        """
+
+        if self._defaults:
+            fp.write("[%s]\n" % DEFAULTSECT)
+
+            for (key, value) in self._defaults.items():
+                fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+
+            fp.write("\n")
+
+        for section in self._sections:
+            fp.write("[%s]\n" % section)
+
+            for (key, value) in self._sections[section].items():
+                if key != "__name__":
+                    if value is None:
+                        fp.write("%s\n" % (key))
+                    else:
+                        fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+
+            fp.write("\n")
+
+class DynamicContentItem:
+    """
+    Represents line in content page with dynamic properties (candidate for removal prior detection phase)
+    """
+
+    def __init__(self, lineNumber, pageTotal, lineContentBefore, lineContentAfter):
+        self.lineNumber = lineNumber
+        self.pageTotal = pageTotal
+        self.lineContentBefore = lineContentBefore
+        self.lineContentAfter = lineContentAfter

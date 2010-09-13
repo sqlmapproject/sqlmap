@@ -1001,6 +1001,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.dep            = None
     kb.docRoot        = None
+    kb.dynamicContent = []
     kb.headersCount   = 0
     kb.headersFp      = {}
     kb.htmlFp         = []
