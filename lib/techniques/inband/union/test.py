@@ -90,7 +90,7 @@ def __unionPosition(negative=False, falseCond=False):
         # server
         htmlParsed = htmlParser(resultPage)
 
-        if randQuery in resultPage and not htmlParsed:
+        if resultPage and randQuery in resultPage and not htmlParsed:
             setUnion(position=exprPosition)
             value = __forgeUserFriendlyValue(payload)
 
