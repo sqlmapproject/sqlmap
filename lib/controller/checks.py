@@ -280,7 +280,7 @@ def checkDynParam(place, parameter, value):
 
     return condition
 
-def checkDynamicContent(*pages):
+def checkDynamicContent(firstPage, secondPage):
     infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
 
