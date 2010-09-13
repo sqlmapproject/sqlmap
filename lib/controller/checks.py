@@ -305,7 +305,7 @@ def checkDynamicContent(*pages):
     payload = agent.fullPayload(" AND %s=%s" % (randInt, randInt))
     result  = Request.queryPage(payload)
     if result:
-        pass #do the same as above
+        pass #TODO: the same as above
 
     if kb.dynamicContent:
         infoMsg = "found probably removable dynamic lines"
