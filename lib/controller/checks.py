@@ -280,8 +280,8 @@ def checkDynParam(place, parameter, value):
 
     return condition
 
-def checkDynamicContent(firstPage, secondPage):
-    infoMsg = "testing for dynamic content lines"
+def checkDynamicContent(*pages):
+    infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
 
     linesFirst = preparePageForLineComparison(firstPage)
@@ -301,6 +301,12 @@ def checkDynamicContent(firstPage, secondPage):
                     kb.dynamicContent.append(DynamicContentItem(i, pageLinesNumber, linesFirst[i-1] if i > 0 else None, linesFirst[i+1] if i < pageLinesNumber - 1 else None))
                 lastLineNumber = i
 
+    randInt = getUnicode(randomInt(1))
+    payload = agent.fullPayload(" AND %s=%s" % (randInt, randInt))
+    result  = Request.queryPage(payload)
+    if result:
+        pass #do the same as above
+
     if kb.dynamicContent:
         infoMsg = "found probably removable dynamic lines"
         logger.info(infoMsg)
@@ -308,7 +314,7 @@ def checkDynamicContent(firstPage, secondPage):
 def checkStability():
     """
     This function checks if the URL content is stable requesting the
-    same page three times with a small delay within each request to
+    same page two times with a small delay within each request to
     assume that it is stable.
 
     In case the content of the page differs when requesting
