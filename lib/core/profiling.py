@@ -30,6 +30,9 @@ from lib.core.data import logger
 from lib.core.data import paths
 
 def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
+    """
+    This will run the program and present profiling data in a nice looking graph
+    """
     try:
         from extra.gprof2dot import gprof2dot
         from extra.xdot import xdot

@@ -1404,35 +1404,3 @@ def longestCommonPrefix(*sequences):
 
 def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
-
-def smokeTest():
-    import doctest
-    retVal = True
-    for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        for file in files:
-            if os.path.splitext(file)[1].lower() == '.py' and file != '__init__.py':
-                path = os.path.join(root, os.path.splitext(file)[0])
-                path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
-                path = path.replace(os.sep, '.').lstrip('.')
-                try:
-                    __import__(path)
-                    module = sys.modules[path]
-                except Exception, msg:
-                    retVal = False
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s\n" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
-                    logger.error(errMsg)
-                else:
-                    # Run doc tests
-                    # Reference: http://docs.python.org/library/doctest.html
-                    (failure_count, test_count) = doctest.testmod(module)
-                    if failure_count > 0:
-                        retVal = False
-
-    infoMsg = "smoke test "
-    if retVal:
-        infoMsg += "PASSED"
-        logger.info(infoMsg)
-    else:
-        infoMsg += "FAILED"
-        logger.error(infoMsg)
-    return retVal
