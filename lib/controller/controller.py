@@ -39,9 +39,9 @@ from lib.core.data import logger
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.session import setInjection
-from lib.core.smoketest import smokeTest
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
+from lib.core.testing import smokeTest
 from lib.utils.parenthesis import checkForParenthesis
 
 def __selectInjection(injData):

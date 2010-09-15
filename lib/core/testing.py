@@ -62,3 +62,9 @@ def smokeTest():
         infoMsg += "FAILED"
         logger.error(infoMsg)
     return retVal
+
+def liveTest():
+    """
+    This will run the testing of a program against the testing environment
+    """
+    pass
