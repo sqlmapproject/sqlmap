@@ -79,6 +79,9 @@ from lib.core.settings import FIREBIRD_ALIASES
 
 
 class UnicodeRawConfigParser(RawConfigParser):
+    """
+    RawConfigParser with unicode writing support
+    """
     def write(self, fp):
         """
         Write an .ini-format representation of the configuration state.
