@@ -77,6 +77,46 @@ from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 
+
+class UnicodeRawConfigParser(RawConfigParser):
+    def write(self, fp):
+        """
+        Write an .ini-format representation of the configuration state.
+        """
+
+        if self._defaults:
+            fp.write("[%s]\n" % DEFAULTSECT)
+
+            for (key, value) in self._defaults.items():
+                fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+
+            fp.write("\n")
+
+        for section in self._sections:
+            fp.write("[%s]\n" % section)
+
+            for (key, value) in self._sections[section].items():
+                if key != "__name__":
+                    if value is None:
+                        fp.write("%s\n" % (key))
+                    else:
+                        fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+
+            fp.write("\n")
+
+
+class DynamicContentItem:
+    """
+    Represents line in content page with dynamic properties (candidate for removal prior detection phase)
+    """
+
+    def __init__(self, lineNumber, pageTotal, lineContentBefore, lineContentAfter):
+        self.lineNumber = lineNumber
+        self.pageTotal = pageTotal
+        self.lineContentBefore = lineContentBefore
+        self.lineContentAfter = lineContentAfter
+
+
 def paramToDict(place, parameters=None):
     """
     Split the parameters into names and values, check if these parameters
@@ -1469,42 +1509,3 @@ def smokeTest():
         infoMsg += "FAILED"
         logger.error(infoMsg)
     return retVal
-
-
-class UnicodeRawConfigParser(RawConfigParser):
-    def write(self, fp):
-        """
-        Write an .ini-format representation of the configuration state.
-        """
-
-        if self._defaults:
-            fp.write("[%s]\n" % DEFAULTSECT)
-
-            for (key, value) in self._defaults.items():
-                fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
-
-            fp.write("\n")
-
-        for section in self._sections:
-            fp.write("[%s]\n" % section)
-
-            for (key, value) in self._sections[section].items():
-                if key != "__name__":
-                    if value is None:
-                        fp.write("%s\n" % (key))
-                    else:
-                        fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
-
-            fp.write("\n")
-
-
-class DynamicContentItem:
-    """
-    Represents line in content page with dynamic properties (candidate for removal prior detection phase)
-    """
-
-    def __init__(self, lineNumber, pageTotal, lineContentBefore, lineContentAfter):
-        self.lineNumber = lineNumber
-        self.pageTotal = pageTotal
-        self.lineContentBefore = lineContentBefore
-        self.lineContentAfter = lineContentAfter
