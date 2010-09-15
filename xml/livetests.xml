@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <global>
+        <host value="172.16.104.130"/>
+    </global>
+    <!-- Oracle -->
+    <case>
+        <switches>
+            <url value="http://$host/sqlmap/oracle/get_int.php?id=1"/>
+            <extensiveFp value="True"/>
+            <getUsers value="True"/>
+        </switches>
+        <log>
+            <item value="database management system users"/>
+            <item value="SYSMAN"/>
+        </log>
+        <session>
+            <item value="SELECT DISTINCT(USERNAME)"/>
+            <item value="[DBMS][Oracle]"/>
+        </session>
+    </case>
+</root>

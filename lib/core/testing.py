@@ -65,6 +65,6 @@ def smokeTest():
 
 def liveTest():
     """
-    This will run the testing of a program against the testing environment
+    This will run the test of a program against the live testing environment
     """
     pass
