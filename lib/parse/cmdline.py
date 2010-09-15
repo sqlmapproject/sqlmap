@@ -467,6 +467,9 @@ def cmdLineParser():
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--live-test", dest="liveTest", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(injection)
@@ -481,7 +484,8 @@ def cmdLineParser():
 
         (args, _) = parser.parse_args([utf8decode(arg) for arg in sys.argv])
 
-        if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile and not args.requestFile and not args.updateAll and not args.smokeTest:
+        if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile\
+            and not args.requestFile and not args.updateAll and not args.smokeTest and not args.liveTest:
             errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)

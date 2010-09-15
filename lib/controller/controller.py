@@ -42,6 +42,7 @@ from lib.core.session import setInjection
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from lib.core.testing import smokeTest
+from lib.core.testing import liveTest
 from lib.utils.parenthesis import checkForParenthesis
 
 def __selectInjection(injData):
@@ -95,8 +96,13 @@ def start():
         return
 
     if conf.smokeTest:
-        if not smokeTest():
-            return
+        smokeTest()
+
+    if conf.liveTest:
+        liveTest()
+
+    if conf.smokeTest or conf.liveTest:
+        return
 
     if conf.direct:
         initTargetEnv()
