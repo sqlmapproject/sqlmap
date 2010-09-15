@@ -45,7 +45,6 @@ except ImportError, _:
 from lib.controller.controller import start
 from lib.core.common import banner
 from lib.core.common import getUnicode
-from lib.core.common import profile
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
 from lib.core.data import conf
@@ -54,6 +53,7 @@ from lib.core.data import paths
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import unhandledException
 from lib.core.option import init
+from lib.core.profiling import profile
 from lib.core.xmldump import closeDumper
 from lib.parse.cmdline import cmdLineParser
 
