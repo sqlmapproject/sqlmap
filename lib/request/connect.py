@@ -272,7 +272,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -307,7 +307,7 @@ class Connect:
             if kb.queryCounter % conf.saFreq == 0:
                 Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
 
-        page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent)
+        page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method)
 
         if content:
             return page, headers
