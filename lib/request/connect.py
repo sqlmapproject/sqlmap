@@ -44,6 +44,7 @@ from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
+from lib.request.methodrequest import MethodRequest
 
 
 class Connect:
@@ -71,6 +72,7 @@ class Connect:
         url       = kwargs.get('url',       conf.url).replace(" ", "%20")
         get       = kwargs.get('get',       None)
         post      = kwargs.get('post',      None)
+        method    = kwargs.get('method',    None)
         cookie    = kwargs.get('cookie',    None)
         ua        = kwargs.get('ua',        None)
         direct    = kwargs.get('direct',    False)
@@ -127,7 +129,12 @@ class Connect:
 
             # Perform HTTP request
             headers = forgeHeaders(cookie, ua)
-            req = urllib2.Request(url, post, headers)
+
+            if method:
+                req = MethodRequest(url, post, headers)
+                req.set_method(method)
+            else:
+                req = urllib2.Request(url, post, headers)
 
             if not req.has_header("Accept-Encoding"):
                 requestHeaders += "Accept-Encoding: identity\n"
