@@ -96,6 +96,10 @@ def start():
     if not conf.start:
         return
 
+    if conf.optimize:
+        conf.useCommonPrediction = conf.useNullConnection = True
+
+
     if conf.smokeTest:
         smokeTest()
 

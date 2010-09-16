@@ -467,6 +467,9 @@ def cmdLineParser():
         parser.add_option("--null-connection", dest="useNullConnection", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("-o", dest="optimize", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
                           help=SUPPRESS_HELP)
 
