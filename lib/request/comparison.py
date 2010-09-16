@@ -30,7 +30,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setMatchRatio
 
-def comparison(page, headers=None, getSeqMatcher=False):
+def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     regExpResults = None
 
     # String to be excluded before calculating page hash
@@ -79,8 +79,13 @@ def comparison(page, headers=None, getSeqMatcher=False):
     if conf.seqLock:
         conf.seqLock.acquire()
 
-    conf.seqMatcher.set_seq2(page)
-    ratio = round(conf.seqMatcher.ratio(), 3)
+    if not conf.eRegexp and not conf.eString and kb.nullConnection:
+        ratio = 1. * pageLength / len(conf.seqMatcher.a)
+        if ratio > 1.:
+            ratio = 1. / ratio
+    else:
+        conf.seqMatcher.set_seq2(page)
+        ratio = round(conf.seqMatcher.ratio(), 3)
 
     if conf.seqLock:
         conf.seqLock.release()

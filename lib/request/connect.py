@@ -69,17 +69,17 @@ class Connect:
             delay = 0.00001 * (conf.cpuThrottle ** 2)
             time.sleep(delay)
 
-        url             = kwargs.get('url',       conf.url).replace(" ", "%20")
-        get             = kwargs.get('get',       None)
-        post            = kwargs.get('post',      None)
-        method          = kwargs.get('method',    None)
-        cookie          = kwargs.get('cookie',    None)
-        ua              = kwargs.get('ua',        None)
-        direct          = kwargs.get('direct',    False)
-        multipart       = kwargs.get('multipart', False)
-        silent          = kwargs.get('silent',    False)
-        raise404        = kwargs.get('raise404',  True)
-        auxHeaders      = kwargs.get('auxHeaders',    None)
+        url             = kwargs.get('url',        conf.url).replace(" ", "%20")
+        get             = kwargs.get('get',        None)
+        post            = kwargs.get('post',       None)
+        method          = kwargs.get('method',     None)
+        cookie          = kwargs.get('cookie',     None)
+        ua              = kwargs.get('ua',         None)
+        direct          = kwargs.get('direct',     False)
+        multipart       = kwargs.get('multipart',  False)
+        silent          = kwargs.get('silent',     False)
+        raise404        = kwargs.get('raise404',   True)
+        auxHeaders      = kwargs.get('auxHeaders', None)
 
         page            = ""
         cookieStr       = ""
@@ -277,7 +277,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=dict()):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -287,10 +287,12 @@ class Connect:
         if conf.direct:
             return direct(value, content)
 
-        get    = None
-        post   = None
-        cookie = None
-        ua     = None
+        get         = None
+        post        = None
+        cookie      = None
+        ua          = None
+        page        = None
+        pageLength  = None
 
         if not place:
             place = kb.injPlace
@@ -310,13 +312,27 @@ class Connect:
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
             if kb.queryCounter % conf.saFreq == 0:
-                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua, auxHeaders=auxHeaders)
+                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
 
-        page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method)
+        if not content and kb.nullConnection:
+            if kb.nullConnection == "HEAD":
+                _, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method="HEAD", auxHeaders=auxHeaders)
+                pageLength = int(headers['Content-Length'])
+            elif kb.nullConnection == "Range":
+                if not auxHeaders:
+                    auxHeaders = {}
+                auxHeaders["Range"] = "bytes=-1"
+                _, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders)
+                pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
+            else:
+                kb.nullConnection = None
+                page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders)
+        else:
+            page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders)
 
         if content:
             return page, headers
-        elif page:
-            return comparison(page, headers, getSeqMatcher)
+        elif pageLength or page:
+            return comparison(page, headers, getSeqMatcher, pageLength)
         else:
             return False
