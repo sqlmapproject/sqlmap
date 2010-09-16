@@ -437,6 +437,29 @@ def checkRegexp():
 
         return False
 
+def checkNullConnection():
+    infoMsg = "testing NULL connection to the target url"
+    logger.info(infoMsg)
+
+    try:
+        page, headers = Request.getPage(method="HEAD")
+        if not page and 'Content-Length' in headers:
+            kb.nullConnection = "HEAD"
+        else:
+            page, headers = Request.getPage(auxHeaders={"Range":"bytes=-1"})
+            if page and len(page) == 1 and 'Content-Range' in headers:
+                kb.nullConnection = "Range"
+
+    except sqlmapConnectionException, errMsg:
+        errMsg = getUnicode(errMsg)
+        raise sqlmapConnectionException, errMsg
+
+    if kb.nullConnection:
+        infoMsg = "method '%s' seems to be working" % kb.nullConnection
+        logger.info(infoMsg)
+
+    return kb.nullConnection is not None
+
 def checkConnection():
     try:
         socket.gethostbyname(conf.hostname)

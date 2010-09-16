@@ -29,6 +29,7 @@ from lib.controller.checks import checkStability
 from lib.controller.checks import checkString
 from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
+from lib.controller.checks import checkNullConnection
 from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
@@ -164,6 +165,8 @@ def start():
 
             if not checkConnection() or not checkString() or not checkRegexp():
                 continue
+
+            checkNullConnection()
 
             if not conf.dropSetCookie:
                 for _, cookie in enumerate(conf.cj):

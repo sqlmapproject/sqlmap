@@ -1010,6 +1010,7 @@ def __setKnowledgeBaseAttributes():
     kb.injPlace       = None
     kb.injType        = None
     kb.hintValue      = None
+    kb.nullConnection = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing
