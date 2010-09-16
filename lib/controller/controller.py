@@ -166,7 +166,8 @@ def start():
             if not checkConnection() or not checkString() or not checkRegexp():
                 continue
 
-            checkNullConnection()
+            if conf.useNullConnection:
+                checkNullConnection()
 
             if not conf.dropSetCookie:
                 for _, cookie in enumerate(conf.cj):

@@ -464,6 +464,9 @@ def cmdLineParser():
         parser.add_option("--common-prediction", dest="useCommonPrediction", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--null-connection", dest="useNullConnection", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
                           help=SUPPRESS_HELP)
 
