@@ -111,7 +111,7 @@ class XMLDump:
         elements = self.__root.getElementsByTagName(elemName)
         if elements :
             return elements[0]
-        
+
         return elements
 
     def __createTextNode(self,data):
@@ -151,8 +151,8 @@ class XMLDump:
         if isinstance(data, (list, tuple, set)):
             self.lister(header, data, sort)
             return
-        
-        messagesElem = self.__getRootChild(MESSAGES_ELEM_NAME) 
+
+        messagesElem = self.__getRootChild(MESSAGES_ELEM_NAME)
         if (not(messagesElem)):
             messagesElem = self.__doc.createElement(MESSAGES_ELEM_NAME)
             self.__addToRoot(messagesElem)
@@ -161,7 +161,7 @@ class XMLDump:
             data = self.__formatString(data)
         else :
             data = ""
-            
+
         elem = self.__doc.createElement(MESSAGE_ELEM)
         elem.setAttributeNode(self.__createAttribute(TYPE_ATTR, header))
         elem.appendChild(self.__createTextNode(data))
@@ -182,7 +182,7 @@ class XMLDump:
                     elements.sort(key=lambda x: x.lower())
                 except:
                     pass
-    
+
             for element in elements:
                 memberElem = self.__doc.createElement(MEMBER_ELEM)
                 lstElem.appendChild(memberElem)
@@ -302,10 +302,10 @@ class XMLDump:
             userElem = self.__doc.createElement(USER_ELEM_NAME)
             userSettingElem.appendChild(userElem)
             if user in self.__areAdmins:
-                userElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, ADMIN_USER))            
+                userElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, ADMIN_USER))
             else:
                 userElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, REGULAR_USER))
-                            
+
             settings = userSettings[user]
 
             settings.sort()
@@ -325,7 +325,7 @@ class XMLDump:
         if not isinstance(dbTables, dict):
             self.string(TABLES_ELEM_NAME, dbTables)
             return
-        
+
         dbTablesElem = self.__doc.createElement(DB_TABLES_ELEM_NAME)
 
         for db, tables in dbTables.items():
@@ -343,11 +343,11 @@ class XMLDump:
         '''
         Adds information about the columns of the existing tables to the xml
         '''
-        
+
         columnsElem = self.__getRootChild(COLUMNS_ELEM_NAME)
         if not(columnsElem):
             columnsElem = self.__doc.createElement(COLUMNS_ELEM_NAME)
-        
+
         for db, tables in tableColumns.items():
             if not db:
                 db = DEFAULT_DB
@@ -358,7 +358,7 @@ class XMLDump:
             for table, columns in tables.items():
                 tableElem = self.__doc.createElement(TABLE_ELEM_NAME)
                 tableElem.setAttributeNode(self.__createAttribute(NAME_ATTR, table))
-                
+
                 colList = columns.keys()
                 colList.sort(key=lambda x: x.lower())
 
@@ -368,10 +368,10 @@ class XMLDump:
                     if colType is not None:
                         colElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, colType))
                     else :
-                        colElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, UNKNOWN_COLUMN_TYPE))                        
+                        colElem.setAttributeNode(self.__createAttribute(TYPE_ATTR, UNKNOWN_COLUMN_TYPE))
                     colElem.appendChild(self.__createTextNode(column))
                     tableElem.appendChild(colElem)
-                    
+
         self.__addToRoot(columnsElem)
 
     def dbTableValues(self, tableValues):
@@ -380,19 +380,19 @@ class XMLDump:
         The values are organized according to the relevant row and column.
         '''
         tableElem = self.__doc.createElement(DB_TABLE_VALUES_ELEM_NAME)
-        if (tableValues is not None):            
+        if (tableValues is not None):
             db = tableValues["__infos__"]["db"]
             if not db:
                 db = "All"
             table = tableValues["__infos__"]["table"]
-    
+
             count     = int(tableValues["__infos__"]["count"])
             columns = tableValues.keys()
             columns.sort(key=lambda x: x.lower())
-    
+
             tableElem.setAttributeNode(self.__createAttribute(DB_ATTR, db))
             tableElem.setAttributeNode(self.__createAttribute(NAME_ATTR, table))
-    
+
             for i in range(count):
                 rowElem = self.__doc.createElement(ROW_ELEM_NAME)
                 tableElem.appendChild(rowElem)
@@ -400,27 +400,27 @@ class XMLDump:
                     if column != "__infos__":
                         info = tableValues[column]
                         value = info["values"][i]
-    
+
                         if re.search("^[\ *]*$", value):
                             value = "NULL"
-                        
+
                         cellElem = self.__doc.createElement(CELL_ELEM_NAME)
                         cellElem.setAttributeNode(self.__createAttribute(COLUMN_ATTR, column))
                         cellElem.appendChild(self.__createTextNode(value))
                         rowElem.appendChild(cellElem)
-                        
+
         dbValuesElem = self.__getRootChild(DB_VALUES_ELEM)
         if (not(dbValuesElem)):
             dbValuesElem = self.__doc.createElement(DB_VALUES_ELEM)
             self.__addToRoot(dbValuesElem)
-        
+
         dbValuesElem.appendChild(tableElem)
-        
+
         logger.info("Table '%s.%s' dumped to XML file" % (db, table))
 
     def dbColumns(self, dbColumns, colConsider, dbs):
         '''
-        Adds information about the columns 
+        Adds information about the columns
         '''
         for column in dbColumns.keys():
             printDbs = {}
@@ -494,7 +494,7 @@ class XMLDump:
 
                 self.__outputFP = codecs.open(self.__outputFile, "w+", conf.dataEncoding)
 
-                if self.__root is None:                    
+                if self.__root is None:
                     self.__root = self.__doc.createElementNS(NAME_SPACE_ATTR, RESULTS_ELEM_NAME)
                     self.__root.setAttributeNode(self.__createAttribute(XMLNS_ATTR,NAME_SPACE_ATTR))
                     self.__root.setAttributeNode(self.__createAttribute(SCHEME_NAME_ATTR,SCHEME_NAME))
