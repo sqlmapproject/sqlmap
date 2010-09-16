@@ -97,7 +97,7 @@ def start():
         return
 
     if conf.optimize:
-        conf.useCommonPrediction = conf.useNullConnection = True
+        conf.useCommonPrediction = conf.useNullConnection = conf.keepAlive = True
 
 
     if conf.smokeTest:
