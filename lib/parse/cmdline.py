@@ -424,6 +424,9 @@ def cmdLineParser():
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
+        miscellaneous.add_option("-o", dest="optimize", action="store_true",
+                                 help="General optimization switch")
+
         miscellaneous.add_option("-x", dest="xmlFile",
                                  help="Dump the data into an XML file")
 
@@ -465,9 +468,6 @@ def cmdLineParser():
                           help=SUPPRESS_HELP)
 
         parser.add_option("--null-connection", dest="useNullConnection", action="store_true",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("-o", dest="optimize", action="store_true",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
