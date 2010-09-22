@@ -293,6 +293,8 @@ class Connect:
         ua          = None
         page        = None
         pageLength  = None
+        uri         = conf.url
+        raise404    = place != "URI"
 
         if not place:
             place = kb.injPlace
@@ -309,6 +311,9 @@ class Connect:
         if "User-Agent" in conf.parameters:
             ua = conf.parameters["User-Agent"] if place != "User-Agent" or not value else value
 
+        if "URI" in conf.parameters:
+            uri = conf.url if place != "URI" or not value else value
+
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
             if kb.queryCounter % conf.saFreq == 0:
@@ -316,19 +321,19 @@ class Connect:
 
         if not content and kb.nullConnection:
             if kb.nullConnection == "HEAD":
-                _, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method="HEAD", auxHeaders=auxHeaders)
+                _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method="HEAD", auxHeaders=auxHeaders, raise404=raise404)
                 pageLength = int(headers['Content-Length'])
             elif kb.nullConnection == "Range":
                 if not auxHeaders:
                     auxHeaders = {}
                 auxHeaders["Range"] = "bytes=-1"
-                _, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders)
+                _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
                 pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
             else:
                 kb.nullConnection = None
 
         if not pageLength:
-            page, headers = Connect.getPage(get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders)
+            page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
         if content:
             return page, headers
