@@ -67,7 +67,7 @@ class Agent:
         falseValue = ""
         negValue   = ""
         retValue   = ""
-        newValue   = urlencode(newValue)
+        newValue   = urlencode(newValue) if place != "URI" else newValue
 
         if negative or kb.unionNegative:
             negValue = "-"
@@ -100,7 +100,7 @@ class Agent:
         elif parameter == "User-Agent":
             retValue = value.replace(value, newValue)
         elif parameter == "URI":
-            retValue = value.replace('*', newValue)
+            retValue = value.replace('*', ' %s ' % newValue.replace(value,''))
         else:
             paramString = conf.parameters[place]
 
