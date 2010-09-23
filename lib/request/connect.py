@@ -293,7 +293,7 @@ class Connect:
         ua          = None
         page        = None
         pageLength  = None
-        uri         = conf.url
+        uri         = None
         raise404    = place != "URI"
 
         if not place:
@@ -313,6 +313,8 @@ class Connect:
 
         if "URI" in conf.parameters:
             uri = conf.url if place != "URI" or not value else value
+        else:
+            uri = conf.url
 
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
