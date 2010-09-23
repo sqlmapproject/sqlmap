@@ -92,6 +92,9 @@ class Agent:
                     child.text = "%s%s" % (negValue, value + falseValue + newValue)
 
                 retValue = ET.tostring(root)
+            elif kb.injPlace == "URI":
+                retValue = paramString.replace("*",
+                                               "%s%s" % (negValue, falseValue + newValue))
             else:
                 retValue = paramString.replace("%s=%s" % (kb.injParameter, value),
                                                "%s=%s%s" % (kb.injParameter, negValue, value + falseValue + newValue))
