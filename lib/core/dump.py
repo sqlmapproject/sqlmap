@@ -263,7 +263,7 @@ class Dump:
         table = tableValues["__infos__"]["table"]
 
         if conf.replicate:
-            replication = Replication("%s%s%s.sqlite" % (conf.dumpPath, os.sep, db))
+            replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, db))
         elif not conf.multipleTargets:
             dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, db)
 
@@ -292,10 +292,30 @@ class Dump:
 
 
         if conf.replicate:
-            cols = list(columns)
-            if "__infos__" in cols:
-                cols.remove("__infos__")
-            rtable = replication.createTable(table, cols, True)
+            cols = []
+            for column in columns:
+                if column != "__infos__":
+                    colType = Replication.INTEGER
+                    for value in tableValues[column]['values']:
+                        try:
+                            if re.search("^[\ *]*$", value): #NULL
+                                continue
+                            temp = int(value)
+                        except ValueError:
+                            colType = None
+                            break
+                    if colType is None:
+                        colType = Replication.REAL
+                        for value in tableValues[column]['values']:
+                            try:
+                                if re.search("^[\ *]*$", value): #NULL
+                                    continue
+                                temp = float(value)
+                            except ValueError:
+                                colType = None
+                                break
+                    cols.append((column, colType if colType else Replication.TEXT))
+            rtable = replication.createTable(table, cols)
 
         if count == 1:
             self.__write("[1 entry]")
