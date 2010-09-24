@@ -1673,6 +1673,9 @@ class Enumeration:
                 stackedTest()
 
             if not kb.stackedTest and not conf.direct:
+                warnMsg  = "sql query option is only available "
+                warnMsg += "when stacked queries are supported"
+                logger.warn(warnMsg)
                 return None
             else:
                 if sqlType:
