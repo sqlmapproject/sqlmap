@@ -458,7 +458,7 @@ def cmdLineParser():
                                       "UDF and tables")
 
         miscellaneous.add_option("--replicate", dest="replicate", action="store_true",
-                                 help="Replicate dumped data into a sqlite database")
+                                 help="Replicate dumped data into a sqlite3 database")
 
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
