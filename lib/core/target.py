@@ -83,10 +83,18 @@ def __setRequestParams():
 
         conf.method = "POST"
 
-    if '*' in conf.url:
+    if "*" in conf.url:
         conf.parameters["URI"] = conf.url
-        conf.paramDict["URI"] = { "URI": conf.url } # similar as for User-Agent
-        conf.url = conf.url.replace('*', '')
+        conf.paramDict["URI"] = {}
+        parts = conf.url.split("*")
+        for i in range(len(parts)-1):
+            result = str()
+            for j in range(len(parts)):
+                result += parts[j]
+                if i == j:
+                    result += "*"
+            conf.paramDict["URI"]["#%d" % (i+1)] = result
+        conf.url = conf.url.replace("*", str())
         __testableParameters = True
 
     # Perform checks on Cookie parameters

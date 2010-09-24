@@ -102,7 +102,7 @@ class Agent:
         # Before identifing the injectable parameter
         elif parameter == "User-Agent":
             retValue = value.replace(value, newValue)
-        elif parameter == "URI":
+        elif place == "URI":
             retValue = value.replace("*", " %s " % newValue.replace(value, str()))
         else:
             paramString = conf.parameters[place]
