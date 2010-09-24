@@ -251,6 +251,9 @@ class Dump:
                     self.__write("+%s+\n" % lines1)
 
     def dbTableValues(self, tableValues):
+        replication = None
+        rtable      = None
+
         if tableValues is None:
             return
 
@@ -259,7 +262,9 @@ class Dump:
             db = "All"
         table = tableValues["__infos__"]["table"]
 
-        if not conf.multipleTargets:
+        if conf.replicate:
+            replication = Replication("%s%s%s.sqlite" % (conf.dumpPath, os.sep, db))
+        elif not conf.multipleTargets:
             dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, db)
 
             if not os.path.isdir(dumpDbPath):
@@ -272,8 +277,6 @@ class Dump:
         separator   = str()
         field       = 1
         fields      = len(tableValues) - 1
-        replication = None
-        rtable      = None
 
         columns = tableValues.keys()
         columns.sort(key=lambda x: x.lower())
@@ -289,7 +292,6 @@ class Dump:
 
 
         if conf.replicate:
-            replication = Replication("%s%s%s.sqlite" % (conf.outputPath, os.sep, db))
             cols = list(columns)
             if "__infos__" in cols:
                 cols.remove("__infos__")
@@ -310,16 +312,17 @@ class Dump:
 
                 self.__write("| %s%s" % (column, blank), n=False)
 
-                if not conf.multipleTargets and field == fields:
-                    dataToDumpFile(dumpFP, "%s" % column)
-                elif not conf.multipleTargets:
-                    dataToDumpFile(dumpFP, "%s," % column)
+                if not conf.replicate:
+                    if not conf.multipleTargets and field == fields:
+                        dataToDumpFile(dumpFP, "%s" % column)
+                    elif not conf.multipleTargets:
+                        dataToDumpFile(dumpFP, "%s," % column)
 
                 field += 1
 
         self.__write("|\n%s" % separator)
 
-        if not conf.multipleTargets:
+        if not conf.multipleTargets and not conf.replicate:
             dataToDumpFile(dumpFP, "\n")
 
         for i in range(count):
@@ -340,10 +343,11 @@ class Dump:
                     blank = " " * (maxlength - len(value))
                     self.__write("| %s%s" % (value, blank), n=False)
 
-                    if not conf.multipleTargets and field == fields:
-                        dataToDumpFile(dumpFP, "\"%s\"" % value)
-                    elif not conf.multipleTargets:
-                        dataToDumpFile(dumpFP, "\"%s\"," % value)
+                    if not conf.replicate:
+                        if not conf.multipleTargets and field == fields:
+                            dataToDumpFile(dumpFP, "\"%s\"" % value)
+                        elif not conf.multipleTargets:
+                            dataToDumpFile(dumpFP, "\"%s\"," % value)
 
                     field += 1
 
@@ -352,19 +356,18 @@ class Dump:
 
             self.__write("|")
 
-            if not conf.multipleTargets:
+            if not conf.multipleTargets and not conf.replicate:
                 dataToDumpFile(dumpFP, "\n")
 
         self.__write("%s\n" % separator)
 
-        if not conf.multipleTargets:
+        if conf.replicate:
+            logger.info("Table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
+        elif not conf.multipleTargets:
             dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
 
             logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
-
-            if conf.replicate:
-                logger.info("Table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
 
     def dbColumns(self, dbColumns, colConsider, dbs):
         for column in dbColumns.keys():
