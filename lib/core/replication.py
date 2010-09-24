@@ -30,19 +30,19 @@ class Replication:
     This class holds all methods/classes used for database
     replication purposes.
     """
-    
+
     def __init__(self, dbpath):
         self.dbpath = dbpath
         self.connection = sqlite3.connect(dbpath)
         self.connection.isolation_level = None
         self.cursor = self.connection.cursor()
-        
+
     class DataType:
         """
         Using this class we define auxiliary objects
         used for representing sqlite data types.
         """
-        
+
         def __init__(self, name):
             self.name = name
 
@@ -51,12 +51,12 @@ class Replication:
 
         def __repr__(self):
             return "<DataType: %s>" % self
-       
+
     class Table:
         """
         This class defines methods used to manipulate table objects.
         """
-        
+
         def __init__(self, parent, name, columns=None, create=True, typeless=False):
             self.parent = parent
             self.name = name
@@ -67,17 +67,17 @@ class Replication:
                     self.parent.cursor.execute('CREATE TABLE %s (%s)' % (self.name, ','.join('%s %s' % (colname, coltype) for colname, coltype in self.columns)))
                 else:
                     self.parent.cursor.execute('CREATE TABLE %s (%s)' % (self.name, ','.join(colname for colname in self.columns)))
-            
-        def insert(self, rows):
+
+        def insert(self, values):
             """
             This function is used for inserting row(s) into current table.
             """
-            self.parent.cursor.executemany('INSERT INTO %s VALUES (?,?,?,?,?)' % self.name, rows)
+            self.parent.cursor.execute('INSERT INTO %s VALUES (%s)' % (self.name, ','.join(['?']*len(values))), values)
 
         def select(self, condition=None):
             """
             This function is used for selecting row(s) from current table.
-            """        
+            """
             stmt = 'SELECT * FROM %s' % self.name
             if condition:
                 stmt += 'WHERE %s' % condition
@@ -89,19 +89,19 @@ class Replication:
     REAL    = DataType('REAL')
     TEXT    = DataType('TEXT')
     BLOB    = DataType('BLOB')
-    
-    def createTable(self, tblname, columns=None):
+
+    def createTable(self, tblname, columns=None, typeless=False):
         """
         This function creates Table instance with current connection settings.
         """
-        return Table(self, tblname, columns)
-    
+        return Replication.Table(parent=self, name=tblname, columns=columns, typeless=typeless)
+
     def dropTable(self, tblname):
         """
         This function drops table with given name using current connection.
         """
         self.cursor.execute('DROP TABLE IF EXISTS %s' % tblname)
-            
+
     def __del__(self):
         self.cursor.close()
         self.connection.close()

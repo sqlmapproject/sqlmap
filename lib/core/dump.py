@@ -30,7 +30,9 @@ from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.replication import Replication
 
 class Dump:
     """
@@ -44,10 +46,7 @@ class Dump:
         self.__outputFP   = None
 
     def __write(self, data, n=True):
-        if n:
-	        text = "%s\n" % data
-        else:
-            text = "%s " % data
+	text = "%s%s" % (data, "\n" if n else " ")
 
         dataToStdout(text)
         self.__outputFP.write(text)
@@ -84,7 +83,7 @@ class Dump:
                 self.__write("%s:    '%s'\n" % (header, data))
         else:
             self.__write("%s:\tNone\n" % header)
-            
+
     def lister(self, header, elements, sort=True):
         if elements:
             self.__write("%s [%d]:" % (header, len(elements)))
@@ -269,10 +268,12 @@ class Dump:
             dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, table)
             dumpFP = codecs.open(dumpFileName, "wb", conf.dataEncoding)
 
-        count     = int(tableValues["__infos__"]["count"])
-        separator = ""
-        field     = 1
-        fields    = len(tableValues) - 1
+        count       = int(tableValues["__infos__"]["count"])
+        separator   = str()
+        field       = 1
+        fields      = len(tableValues) - 1
+        replication = None
+        rtable      = None
 
         columns = tableValues.keys()
         columns.sort(key=lambda x: x.lower())
@@ -285,6 +286,14 @@ class Dump:
 
         separator += "+"
         self.__write("Database: %s\nTable: %s" % (db, table))
+
+
+        if conf.replicate:
+            replication = Replication("%s%s%s.sqlite" % (conf.outputPath, os.sep, db))
+            cols = list(columns)
+            if "__infos__" in cols:
+                cols.remove("__infos__")
+            rtable = replication.createTable(table, cols, True)
 
         if count == 1:
             self.__write("[1 entry]")
@@ -315,6 +324,7 @@ class Dump:
 
         for i in range(count):
             field = 1
+            values = []
 
             for column in columns:
                 if column != "__infos__":
@@ -325,6 +335,7 @@ class Dump:
                     if re.search("^[\ *]*$", value):
                         value = "NULL"
 
+                    values.append(value)
                     maxlength = int(info["length"])
                     blank = " " * (maxlength - len(value))
                     self.__write("| %s%s" % (value, blank), n=False)
@@ -335,6 +346,9 @@ class Dump:
                         dataToDumpFile(dumpFP, "\"%s\"," % value)
 
                     field += 1
+
+            if conf.replicate:
+                rtable.insert(values)
 
             self.__write("|")
 
@@ -348,6 +362,9 @@ class Dump:
             dumpFP.close()
 
             logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
+
+            if conf.replicate:
+                logger.info("Table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
 
     def dbColumns(self, dbColumns, colConsider, dbs):
         for column in dbColumns.keys():

@@ -158,6 +158,7 @@ optDict = {
                                "updateAll":         "boolean",
                                "batch":             "boolean",
                                "cleanup":           "boolean",
+                               "replicate":         "boolean",
                                "verbose":           "integer"
                              },
           }
