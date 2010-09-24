@@ -195,7 +195,7 @@ def cmdLineParser():
                              help="Page comparison threshold value (0.0-1.0)")
 
         injection.add_option("--space", dest="space",
-                             help="Use defined string instead of standard ' '")
+                             help="Use defined string for space instead of standard ' '")
 
         injection.add_option("--use-between", dest="useBetween",
                              action="store_true",
