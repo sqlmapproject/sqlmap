@@ -23,7 +23,10 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import sys
+import time
 
+from lib.core.common import dataToStdout
+from lib.core.common import getConsoleWidth
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
@@ -34,6 +37,12 @@ def smokeTest():
     """
     import doctest
     retVal = True
+    count, length = 0, 0
+    
+    for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
+        for file in files:
+            length += 1
+    
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
         for file in files:
             if os.path.splitext(file)[1].lower() == '.py' and file != '__init__.py':
@@ -45,7 +54,8 @@ def smokeTest():
                     module = sys.modules[path]
                 except Exception, msg:
                     retVal = False
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s\n" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
+                    dataToStdout("\r")
+                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
                     logger.error(errMsg)
                 else:
                     # Run doc tests
@@ -54,13 +64,16 @@ def smokeTest():
                     if failure_count > 0:
                         retVal = False
 
-    infoMsg = "smoke test "
+            count += 1
+            status = '%d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
+            dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+
+    dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
     if retVal:
-        infoMsg += "PASSED"
-        logger.info(infoMsg)
+        logger.info("smoke test result: passed")
     else:
-        infoMsg += "FAILED"
-        logger.error(infoMsg)
+        logger.info("smoke test result: failed")
+    
     return retVal
 
 def liveTest():
