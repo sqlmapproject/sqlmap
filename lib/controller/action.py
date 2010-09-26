@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from lib.controller.handler import setHandler
 from lib.core.common import getHtmlErrorFp
+from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.exception import sqlmapUnsupportedDBMSException
@@ -64,7 +65,7 @@ def action():
 
         raise sqlmapUnsupportedDBMSException, errMsg
 
-    print "%s\n" % conf.dbmsHandler.getFingerprint()
+    dataToStdout("%s\n" % conf.dbmsHandler.getFingerprint())
 
     # Techniques options
     if conf.stackedTest:

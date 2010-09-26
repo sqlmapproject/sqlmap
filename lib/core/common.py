@@ -412,11 +412,12 @@ def filePathToString(filePath):
     return strRepl
 
 def dataToStdout(data):
-    try:
-        sys.stdout.write(data)
-        sys.stdout.flush()
-    except UnicodeEncodeError:
-        print data.encode(conf.dataEncoding)
+    if conf.verbose > 0:
+        try:
+            sys.stdout.write(data)
+            sys.stdout.flush()
+        except UnicodeEncodeError:
+            print data.encode(conf.dataEncoding)
 
 def dataToSessionFile(data):
     if not conf.sessionFile:
@@ -659,6 +660,7 @@ def setPaths():
     paths.FUZZ_VECTORS           = os.path.join(paths.SQLMAP_TXT_PATH, "fuzz_vectors.txt")
     paths.DETECTION_RULES_XML    = os.path.join(paths.SQLMAP_XML_PATH, "detection.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
+    paths.LIVE_TESTS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
     paths.QUERIES_XML            = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
     paths.GENERIC_XML            = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
     paths.MSSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mssql.xml")

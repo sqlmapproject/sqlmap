@@ -1098,7 +1098,9 @@ def __setVerbosity():
 
     conf.verbose = int(conf.verbose)
 
-    if conf.verbose == 1:
+    if conf.verbose == 0:
+        logger.setLevel(logging.CRITICAL)
+    elif conf.verbose == 1:
         logger.setLevel(logging.INFO)
     elif conf.verbose > 2 and conf.eta:
         conf.verbose = 2
@@ -1173,7 +1175,7 @@ def init(inputOptions=advancedDict()):
     parseTargetUrl()
     parseTargetDirect()
 
-    if conf.url or conf.list or conf.requestFile or conf.googleDork:
+    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest:
         __setHTTPTimeout()
         __setHTTPExtraHeaders()
         __setHTTPCookies()

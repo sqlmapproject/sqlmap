@@ -42,8 +42,6 @@ from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.session import setInjection
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
-from lib.core.testing import smokeTest
-from lib.core.testing import liveTest
 from lib.utils.parenthesis import checkForParenthesis
 
 def __selectInjection(injData):
@@ -98,16 +96,6 @@ def start():
 
     if conf.optimize:
         conf.useCommonPrediction = conf.useNullConnection = conf.keepAlive = True
-
-
-    if conf.smokeTest:
-        smokeTest()
-
-    if conf.liveTest:
-        liveTest()
-
-    if conf.smokeTest or conf.liveTest:
-        return
 
     if conf.direct:
         initTargetEnv()
@@ -173,7 +161,7 @@ def start():
             if conf.useNullConnection:
                 checkNullConnection()
 
-            if not conf.dropSetCookie:
+            if not conf.dropSetCookie and conf.cj:
                 for _, cookie in enumerate(conf.cj):
                     cookie = getUnicode(cookie)
                     index  = cookie.index(" for ")

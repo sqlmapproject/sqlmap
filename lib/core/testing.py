@@ -21,15 +21,25 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
+import logging
 import os
+import re
 import sys
+import tempfile
 import time
 
+from xml.dom import minidom
+
+from lib.controller.controller import start
 from lib.core.common import dataToStdout
+from lib.core.common import getCompiledRegex
 from lib.core.common import getConsoleWidth
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.option import init
+from lib.parse.cmdline import cmdLineParser
 
 def smokeTest():
     """
@@ -80,4 +90,60 @@ def liveTest():
     """
     This will run the test of a program against the live testing environment
     """
-    pass
+    vars = {}
+    xfile = codecs.open(paths.LIVE_TESTS_XML, 'r', conf.dataEncoding)
+    livetests = minidom.parse(xfile).documentElement
+    xfile.close()
+    
+    global_ = livetests.getElementsByTagName("global")
+    if global_:
+        for item in global_:
+            for child in item.childNodes:
+                if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
+                    vars[child.tagName] = child.getAttribute("value")
+
+    for case in livetests.getElementsByTagName("case"):
+        log = []
+        session = []
+        switches = {}
+
+        if case.getElementsByTagName("switches"):
+            for child in case.getElementsByTagName("switches")[0].childNodes:
+                if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
+                    switches[child.tagName] = replaceVars(child.getAttribute("value"), vars)
+
+        if case.getElementsByTagName("log"):
+            for item in case.getElementsByTagName("log")[0].getElementsByTagName("item"):
+                if item.hasAttribute("value"):
+                    log.append(replaceVars(item.getAttribute("value"), vars))
+
+        if case.getElementsByTagName("session"):
+            for item in case.getElementsByTagName("session")[0].getElementsByTagName("item"):
+                if item.hasAttribute("value"):
+                    session.append(replaceVars(item.getAttribute("value"), vars))
+
+        runCase(switches, log, session)
+
+def initCase():
+    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp()
+    paths.SQLMAP_DUMP_PATH   = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
+    paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
+    cmdLineOptions = cmdLineParser()
+    cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
+    init(cmdLineOptions)
+    conf.suppressOutput = True
+    logger.setLevel(logging.CRITICAL)
+
+def runCase(switches, log=None, session=None):
+    initCase()
+    for key, value in switches.items():
+        conf[key] = value
+    start()
+
+def replaceVars(item, vars):
+    retVal = item
+    if item and vars:
+        for var in re.findall(getCompiledRegex("\$\{([^}]+)\}"), item):
+            if var in vars:
+                retVal = retVal.replace("${%s}" % var, vars[var])
+    return retVal

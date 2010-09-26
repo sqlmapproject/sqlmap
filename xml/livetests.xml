@@ -2,12 +2,19 @@
 
 <root>
     <global>
-        <host value="172.16.104.130"/>
+        <host value="192.168.228.130"/>
     </global>
-    <!-- Oracle -->
+    <!-- MySQL -->
     <case>
         <switches>
-            <url value="http://$host/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://${host}/sqlmap/mysql/get_int.php?id=1"/>
+            <getBanner value="True"/>
+        </switches>
+    </case>
+    <!-- Oracle
+    <case>
+        <switches>
+            <url value="http://${host}/sqlmap/oracle/get_int.php?id=1"/>
             <extensiveFp value="True"/>
             <getUsers value="True"/>
         </switches>
@@ -20,4 +27,5 @@
             <item value="[DBMS][Oracle]"/>
         </session>
     </case>
+     -->
 </root>

@@ -54,6 +54,8 @@ from lib.core.exception import exceptionsTuple
 from lib.core.exception import unhandledException
 from lib.core.option import init
 from lib.core.profiling import profile
+from lib.core.testing import smokeTest
+from lib.core.testing import liveTest
 from lib.core.xmldump import closeDumper
 from lib.parse.cmdline import cmdLineParser
 
@@ -84,7 +86,11 @@ def main():
     try:
         init(cmdLineOptions)
         if conf.profile:
-            profile()
+            profile()            
+        elif conf.smokeTest:
+            smokeTest()
+        elif conf.liveTest:
+            liveTest()
         else:
             start()
     except exceptionsTuple, e:
@@ -107,7 +113,7 @@ def main():
     except:
         print
         errMsg = unhandledException()
-        logger.error(errMsg)
+        logger.critical(errMsg)
         traceback.print_exc()
         closeDumper(False, errMsg)
 
