@@ -66,6 +66,9 @@ class Dump:
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
         self.__outputFP = codecs.open(self.__outputFile, "ab", conf.dataEncoding)
 
+    def getOutputFile(self):
+        return self.__outputFile
+
     def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
             self.lister(header, data, sort)

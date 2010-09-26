@@ -502,6 +502,9 @@ class XMLDump:
             except IOError, e:
                 raise sqlmapFilePathException("Wrong filename provided for saving the xml file: %s" % conf.xmlFile)
 
+    def getOutputFile(self):
+        return self.__outputFile                
+
     def finish(self, resultStatus, resultMsg=""):
         '''
         Finishes the dumper operation:

@@ -10,6 +10,9 @@
             <url value="http://${host}/sqlmap/mysql/get_int.php?id=1"/>
             <getBanner value="True"/>
         </switches>
+        <log>
+            <item value="5.1.41-3~bpo50+1"/>
+        </log>
     </case>
     <!-- Oracle
     <case>

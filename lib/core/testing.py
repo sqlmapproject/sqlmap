@@ -39,6 +39,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.option import init
+from lib.core.option import __setVerbosity
 from lib.parse.cmdline import cmdLineParser
 
 def smokeTest():
@@ -80,9 +81,9 @@ def smokeTest():
 
     dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
     if retVal:
-        logger.info("smoke test result: passed")
+        logger.info("smoke test final result: passed")
     else:
-        logger.info("smoke test result: failed")
+        logger.info("smoke test final result: failed")
     
     return retVal
 
@@ -90,6 +91,8 @@ def liveTest():
     """
     This will run the test of a program against the live testing environment
     """
+    retVal = True
+    count = 0
     vars = {}
     xfile = codecs.open(paths.LIVE_TESTS_XML, 'r', conf.dataEncoding)
     livetests = minidom.parse(xfile).documentElement
@@ -106,6 +109,7 @@ def liveTest():
         log = []
         session = []
         switches = {}
+        count += 1
 
         if case.getElementsByTagName("switches"):
             for child in case.getElementsByTagName("switches")[0].childNodes:
@@ -122,7 +126,18 @@ def liveTest():
                 if item.hasAttribute("value"):
                     session.append(replaceVars(item.getAttribute("value"), vars))
 
-        runCase(switches, log, session)
+        result = runCase(switches, log, session)
+        if not result:
+            errMsg = "live test failed at case #%d" % count
+            logger.error(errMsg)
+        retVal &= result 
+
+    if retVal:
+        logger.info("live test final result: passed")
+    else:
+        logger.info("live test final result: failed")        
+    
+    return retVal
 
 def initCase():
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp()
@@ -130,15 +145,50 @@ def initCase():
     paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     cmdLineOptions = cmdLineParser()
     cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
+    cmdLineOptions.verbose = 0
     init(cmdLineOptions)
-    conf.suppressOutput = True
-    logger.setLevel(logging.CRITICAL)
+    __setVerbosity()
+
+def cleanCase():
+    #remove dir: paths.SQLMAP_OUTPUT_PATH
+    paths.SQLMAP_OUTPUT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
+    paths.SQLMAP_DUMP_PATH   = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
+    paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
+    conf.verbose = 1
+    __setVerbosity()
 
 def runCase(switches, log=None, session=None):
+    retVal = True
     initCase()
     for key, value in switches.items():
         conf[key] = value
-    start()
+
+    result = start()
+    if result == False: #if None ignore
+        retVal = False
+
+    if session and retVal:
+        file = open(conf.sessionFile, 'r')
+        content = file.read()
+        file.close()
+        for item in session:
+            #if not re.search(item, content):
+            if content.find(item) < 0:
+                retVal = False
+                break
+
+    if log and retVal:
+        file = open(conf.dumper.getOutputFile(), 'r')
+        content = file.read()
+        file.close()
+        for item in log:
+            #if not re.search(item, content):
+            if content.find(item) < 0:            
+                retVal = False
+                break
+
+    cleanCase()
+    return retVal
 
 def replaceVars(item, vars):
     retVal = item

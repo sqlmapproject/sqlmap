@@ -92,7 +92,7 @@ def start():
     """
 
     if not conf.start:
-        return
+        return False
 
     if conf.optimize:
         conf.useCommonPrediction = conf.useNullConnection = conf.keepAlive = True
@@ -101,8 +101,7 @@ def start():
         initTargetEnv()
         setupTargetEnv()
         action()
-
-        return
+        return True
 
     if conf.url:
         kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
@@ -111,6 +110,7 @@ def start():
         errMsg  = "you did not edit the configuration file properly, set "
         errMsg += "the target url, list of targets or google dork"
         logger.error(errMsg)
+        return False
 
     if kb.targetUrls and len(kb.targetUrls) > 1:
         infoMsg = "sqlmap got a total of %d targets" % len(kb.targetUrls)
@@ -287,7 +287,9 @@ def start():
                 logger.error(e)
             else:
                 logger.error(e)
-                return
+                return False
 
     if conf.loggedToOut:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
+    
+    return True
