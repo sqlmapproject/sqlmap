@@ -22,6 +22,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import codecs
+import doctest
 import logging
 import os
 import re
@@ -41,13 +42,13 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.option import init
 from lib.core.option import __setVerbosity
+from lib.core.optiondict import optDict
 from lib.parse.cmdline import cmdLineParser
 
 def smokeTest():
     """
     This will run the basic smoke testing of a program
     """
-    import doctest
     retVal = True
     count, length = 0, 0
 
@@ -88,6 +89,21 @@ def smokeTest():
 
     return retVal
 
+def adjustValueType(tagName, value):
+    for family in optDict.keys():
+        for name, type_ in optDict[family].items():
+            if type(type_) == tuple:
+                type_ = type_[0]
+            if tagName == name:
+                if type_ == "boolean":
+                    value = (value == "True")
+                elif type_ == "integer":
+                    value = int(value)
+                elif type_ == "float":
+                    value = float(value)
+                break
+    return value
+
 def liveTest():
     """
     This will run the test of a program against the live testing environment
@@ -106,7 +122,7 @@ def liveTest():
         for item in element:
             for child in item.childNodes:
                 if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
-                    global_[child.tagName] = child.getAttribute("value")
+                    global_[child.tagName] = adjustValueType(child.tagName, child.getAttribute("value"))
 
     element = livetests.getElementsByTagName("vars")
     if element:
@@ -127,7 +143,8 @@ def liveTest():
         if case.getElementsByTagName("switches"):
             for child in case.getElementsByTagName("switches")[0].childNodes:
                 if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
-                    switches[child.tagName] = replaceVars(child.getAttribute("value"), vars_)
+                    value = replaceVars(child.getAttribute("value"), vars_)
+                    switches[child.tagName] = adjustValueType(child.tagName, value)
 
         if case.getElementsByTagName("log"):
             for item in case.getElementsByTagName("log")[0].getElementsByTagName("item"):
@@ -163,11 +180,11 @@ def initCase(switches=None):
     paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     cmdLineOptions = cmdLineParser()
     cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
-    cmdLineOptions.verbose = 0
 
     if switches:
         for key, value in switches.items():
-            conf[key] = value
+            if key in cmdLineOptions.__dict__:
+                cmdLineOptions.__dict__[key] = value
 
     conf.sessionFile = None
     init(cmdLineOptions)

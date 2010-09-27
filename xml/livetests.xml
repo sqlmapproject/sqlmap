@@ -3,6 +3,7 @@
 <root>
     <global>
         <ignoreProxy value="True"/>
+        <verbose value="0"/>
     </global>
     <vars>
         <host value="172.16.104.130"/>
