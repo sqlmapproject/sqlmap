@@ -25,6 +25,7 @@ import codecs
 import logging
 import os
 import re
+import shutil
 import sys
 import tempfile
 import time
@@ -49,11 +50,11 @@ def smokeTest():
     import doctest
     retVal = True
     count, length = 0, 0
-    
+
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
         for file in files:
             length += 1
-    
+
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
         for file in files:
             if os.path.splitext(file)[1].lower() == '.py' and file != '__init__.py':
@@ -81,10 +82,10 @@ def smokeTest():
 
     dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
     if retVal:
-        logger.info("smoke test final result: passed")
+        logger.info("smoke test final result: PASSED")
     else:
-        logger.info("smoke test final result: failed")
-    
+        logger.error("smoke test final result: FAILED")
+
     return retVal
 
 def liveTest():
@@ -93,75 +94,96 @@ def liveTest():
     """
     retVal = True
     count = 0
-    vars = {}
+    global_ = {}
+    vars_ = {}
     xfile = codecs.open(paths.LIVE_TESTS_XML, 'r', conf.dataEncoding)
     livetests = minidom.parse(xfile).documentElement
     xfile.close()
-    
-    global_ = livetests.getElementsByTagName("global")
-    if global_:
-        for item in global_:
+    length = len(livetests.getElementsByTagName("case"))
+
+    element = livetests.getElementsByTagName("global")
+    if element:
+        for item in element:
             for child in item.childNodes:
                 if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
-                    vars[child.tagName] = child.getAttribute("value")
+                    global_[child.tagName] = child.getAttribute("value")
+
+    element = livetests.getElementsByTagName("vars")
+    if element:
+        for item in element:
+            for child in item.childNodes:
+                if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
+                    vars_[child.tagName] = child.getAttribute("value")
 
     for case in livetests.getElementsByTagName("case"):
+        name = None
         log = []
         session = []
-        switches = {}
-        count += 1
+        switches = dict(global_)
+
+        if case.hasAttribute("name"):
+            name = case.getAttribute("name")
 
         if case.getElementsByTagName("switches"):
             for child in case.getElementsByTagName("switches")[0].childNodes:
                 if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
-                    switches[child.tagName] = replaceVars(child.getAttribute("value"), vars)
+                    switches[child.tagName] = replaceVars(child.getAttribute("value"), vars_)
 
         if case.getElementsByTagName("log"):
             for item in case.getElementsByTagName("log")[0].getElementsByTagName("item"):
                 if item.hasAttribute("value"):
-                    log.append(replaceVars(item.getAttribute("value"), vars))
+                    log.append(replaceVars(item.getAttribute("value"), vars_))
 
         if case.getElementsByTagName("session"):
             for item in case.getElementsByTagName("session")[0].getElementsByTagName("item"):
                 if item.hasAttribute("value"):
-                    session.append(replaceVars(item.getAttribute("value"), vars))
+                    session.append(replaceVars(item.getAttribute("value"), vars_))
 
-        result = runCase(switches, log, session)
-        if not result:
-            errMsg = "live test failed at case #%d" % count
-            logger.error(errMsg)
-        retVal &= result 
+        count += 1
+        msg = "running live test case '%s' (%d/%d)" % (name, count, length)
+        logger.info(msg)
+        result = runCase(name, switches, log, session)
+        if result:
+            logger.info("test passed")
+        else:
+            logger.error("test failed")
+        retVal &= result
 
+    dataToStdout("\n")
     if retVal:
-        logger.info("live test final result: passed")
+        logger.info("live test final result: PASSED")
     else:
-        logger.info("live test final result: failed")        
-    
+        logger.error("live test final result: FAILED")
+
     return retVal
 
-def initCase():
+def initCase(switches=None):
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp()
     paths.SQLMAP_DUMP_PATH   = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     cmdLineOptions = cmdLineParser()
     cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
     cmdLineOptions.verbose = 0
+
+    if switches:
+        for key, value in switches.items():
+            conf[key] = value
+
+    conf.sessionFile = None
     init(cmdLineOptions)
     __setVerbosity()
 
 def cleanCase():
-    #remove dir: paths.SQLMAP_OUTPUT_PATH
+    shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
     paths.SQLMAP_OUTPUT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
     paths.SQLMAP_DUMP_PATH   = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     conf.verbose = 1
     __setVerbosity()
 
-def runCase(switches, log=None, session=None):
+def runCase(name=None, switches=None, log=None, session=None):
     retVal = True
-    initCase()
-    for key, value in switches.items():
-        conf[key] = value
+    initCase(switches)
 
     result = start()
     if result == False: #if None ignore
@@ -172,8 +194,11 @@ def runCase(switches, log=None, session=None):
         content = file.read()
         file.close()
         for item in session:
-            #if not re.search(item, content):
-            if content.find(item) < 0:
+            if item.startswith("r'") and item.endswith("'"):
+                if not re.search(item[2:-1], content):
+                    retVal = False
+                    break
+            elif content.find(item) < 0:
                 retVal = False
                 break
 
@@ -182,18 +207,21 @@ def runCase(switches, log=None, session=None):
         content = file.read()
         file.close()
         for item in log:
-            #if not re.search(item, content):
-            if content.find(item) < 0:            
+            if item.startswith("r'") and item.endswith("'"):
+                if not re.search(item[2:-1], content):
+                    retVal = False
+                    break
+            elif content.find(item) < 0:
                 retVal = False
                 break
 
     cleanCase()
     return retVal
 
-def replaceVars(item, vars):
+def replaceVars(item, vars_):
     retVal = item
-    if item and vars:
+    if item and vars_:
         for var in re.findall(getCompiledRegex("\$\{([^}]+)\}"), item):
-            if var in vars:
-                retVal = retVal.replace("${%s}" % var, vars[var])
+            if var in vars_:
+                retVal = retVal.replace("${%s}" % var, vars_[var])
     return retVal

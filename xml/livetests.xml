@@ -2,33 +2,44 @@
 
 <root>
     <global>
-        <host value="192.168.228.130"/>
+        <ignoreProxy value="True"/>
     </global>
-    <!-- MySQL -->
-    <case>
+    <vars>
+        <host value="172.16.104.130"/>
+    </vars>
+    <case name="Postgres (--is-dba)">
+        <switches>
+            <url value="http://${host}/sqlmap/pgsql/get_int.php?id=1"/>
+            <isDba value="True"/>
+        </switches>
+        <log>
+            <item value="current user is DBA:    'True'"/>
+        </log>
+    </case>
+    <case name="MySQL (--banner --threads=5)">
         <switches>
             <url value="http://${host}/sqlmap/mysql/get_int.php?id=1"/>
             <getBanner value="True"/>
+            <threads value="5"/>
         </switches>
         <log>
             <item value="5.1.41-3~bpo50+1"/>
         </log>
     </case>
-    <!-- Oracle
-    <case>
+    <case name="Oracle (-o -f --users)">
         <switches>
             <url value="http://${host}/sqlmap/oracle/get_int.php?id=1"/>
             <extensiveFp value="True"/>
+            <optimize value="True"/>
             <getUsers value="True"/>
         </switches>
         <log>
             <item value="database management system users"/>
-            <item value="SYSMAN"/>
+            <item value="r'SYS.*N'"/> <!--sample for regex-->
         </log>
         <session>
             <item value="SELECT DISTINCT(USERNAME)"/>
             <item value="[DBMS][Oracle]"/>
         </session>
     </case>
-     -->
 </root>
