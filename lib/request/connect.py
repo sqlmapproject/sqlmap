@@ -250,7 +250,7 @@ class Connect:
                 conf.retriesCount += 1
 
                 warnMsg += ", sqlmap is going to retry the request"
-                logger.warn(warnMsg)
+                logger.critical(warnMsg)
 
                 time.sleep(1)
 
