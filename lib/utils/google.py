@@ -98,7 +98,7 @@ class Google:
 
         gpage = conf.googlePage if conf.googlePage > 1 else 1
         logger.info("using Google result page #%d" % gpage)
-        
+
         if not googleDork:
             return None
 
@@ -122,12 +122,12 @@ class Google:
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
             responseMsg = "HTTP response (%s - %d):\n" % (status, code)
-    
+
             if conf.verbose <= 4:
                 responseMsg += getUnicode(responseHeaders)
             elif conf.verbose > 4:
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
-    
+
             logger.log(8, responseMsg)
         except urllib2.HTTPError, e:
             try:
@@ -135,7 +135,7 @@ class Google:
             except socket.timeout:
                 warnMsg  = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % e.code
-                logger.warn(warnMsg)
+                logger.critical(warnMsg)
                 return None
         except (urllib2.URLError, socket.error, socket.timeout), _:
             errMsg = "unable to connect to Google"

@@ -286,7 +286,7 @@ def start():
                 e += ", skipping to next url"
                 logger.error(e)
             else:
-                logger.error(e)
+                logger.critical(e)
                 return False
 
     if conf.loggedToOut:

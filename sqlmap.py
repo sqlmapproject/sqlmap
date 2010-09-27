@@ -86,7 +86,7 @@ def main():
     try:
         init(cmdLineOptions)
         if conf.profile:
-            profile()            
+            profile()
         elif conf.smokeTest:
             smokeTest()
         elif conf.liveTest:
@@ -95,7 +95,7 @@ def main():
             start()
     except exceptionsTuple, e:
         e = getUnicode(e)
-        logger.error(e)
+        logger.critical(e)
         closeDumper(False, e)
 
     except KeyboardInterrupt, _:
