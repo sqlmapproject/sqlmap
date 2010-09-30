@@ -1176,7 +1176,6 @@ department_to_major
 geo_river
 dd_users
 bn_user_membership
-||v_owner_name||'.'||v_table_name||'_bad
 activite
 skill
 search_words
