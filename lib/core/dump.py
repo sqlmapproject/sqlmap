@@ -157,36 +157,57 @@ class Dump:
         self.lister("available databases", dbs)
 
     def dbTables(self, dbTables):
-        if not isinstance(dbTables, dict):
-            self.string("tables", dbTables)
+        if isinstance(dbTables, list):
+            maxlength = 0
 
-            return
-
-        maxlength = 0
-
-        for tables in dbTables.values():
-            for table in tables:
+            for table in dbTables:
                 maxlength = max(maxlength, len(table))
 
-        lines = "-" * (int(maxlength) + 2)
+            lines = "-" * (int(maxlength) + 2)
 
-        for db, tables in dbTables.items():
-            tables.sort(key=lambda x: x.lower())
+            dbTables.sort(key=lambda x: x.lower())
 
-            self.__write("Database: %s" % db)
-
-            if len(tables) == 1:
+            if len(dbTables) == 1:
                 self.__write("[1 table]")
             else:
-                self.__write("[%d tables]" % len(tables))
+                self.__write("[%d tables]" % len(dbTables))
 
             self.__write("+%s+" % lines)
 
-            for table in tables:
+            for table in dbTables:
                 blank = " " * (maxlength - len(table))
                 self.__write("| %s%s |" % (table, blank))
 
             self.__write("+%s+\n" % lines)
+
+        elif isinstance(dbTables, dict):
+            maxlength = 0
+
+            for tables in dbTables.values():
+                for table in tables:
+                    maxlength = max(maxlength, len(table))
+
+            lines = "-" * (int(maxlength) + 2)
+
+            for db, tables in dbTables.items():
+                tables.sort(key=lambda x: x.lower())
+
+                self.__write("Database: %s" % db)
+
+                if len(tables) == 1:
+                    self.__write("[1 table]")
+                else:
+                    self.__write("[%d tables]" % len(tables))
+
+                self.__write("+%s+" % lines)
+
+                for table in tables:
+                    blank = " " * (maxlength - len(table))
+                    self.__write("| %s%s |" % (table, blank))
+
+                self.__write("+%s+\n" % lines)
+        else:
+            self.string("tables", dbTables)
 
     def dbTableColumns(self, tableColumns):
         for db, tables in tableColumns.items():

@@ -332,6 +332,12 @@ def cmdLineParser():
                                action="store_true", default=False,
                                help="Prompt for an interactive SQL shell")
 
+        enumeration.add_option("--common-exists", dest="cExists", action="store_true",
+                               default=False, help="Check existence of common tables")
+
+        enumeration.add_option("--exists", dest="tableFile",
+                               help="Check existence of user specified tables")
+
         # User-defined function options
         udf = OptionGroup(parser, "User-defined function injection", "These "
                           "options can be used to create custom user-defined "

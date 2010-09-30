@@ -23,12 +23,18 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import re
+import time
 
 from lib.core.agent import agent
+from lib.core.common import dataToStdout
 from lib.core.common import getRange
 from lib.core.common import getCompiledRegex
+from lib.core.common import getConsoleWidth
+from lib.core.common import getFileItems
 from lib.core.common import getUnicode
 from lib.core.common import parsePasswordHash
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
@@ -47,6 +53,7 @@ from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
+from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
 
@@ -800,6 +807,41 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedTables
+
+    def tableExists(self, tableFile):
+        tables = getFileItems(tableFile)
+        retVal = []
+        infoMsg = "checking tables existence using items from '%s'" % tableFile
+        logger.info(infoMsg)
+
+        pushValue(conf.verbose)
+        conf.verbose = 0
+        count = 0
+        length = len(tables)
+
+        for table in tables:
+            query = agent.prefixQuery(" %s" % safeStringFormat("AND EXISTS(SELECT 1 FROM %s)", table))
+            query = agent.postfixQuery(query)
+            result = Request.queryPage(urlencode(agent.payload(newValue=query)))
+
+            if result:
+                infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), table)
+                infoMsg = "%s%s\n" % (infoMsg, " "*(getConsoleWidth()-1-len(infoMsg)))
+                dataToStdout(infoMsg, True)
+                retVal.append(table)
+
+            count += 1
+            status = '%d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
+            dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status), True)
+
+        conf.verbose = popValue()
+
+        dataToStdout("\r%s\n" % (" "*(getConsoleWidth()-1)), True)
+        if not retVal:
+            warnMsg = "no table found"
+            logger.warn(warnMsg)
+
+        return retVal
 
     def getColumns(self, onlyColNames=False):
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:

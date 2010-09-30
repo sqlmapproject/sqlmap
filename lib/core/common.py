@@ -411,8 +411,8 @@ def filePathToString(filePath):
 
     return strRepl
 
-def dataToStdout(data):
-    if conf.verbose > 0:
+def dataToStdout(data, forceOutput=False):
+    if conf.verbose > 0 or forceOutput:
         try:
             sys.stdout.write(data)
             sys.stdout.flush()
@@ -657,6 +657,8 @@ def setPaths():
     # sqlmap files
     paths.SQLMAP_HISTORY         = os.path.join(paths.SQLMAP_ROOT_PATH, ".sqlmap_history")
     paths.SQLMAP_CONFIG          = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
+    paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
+    paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.FUZZ_VECTORS           = os.path.join(paths.SQLMAP_TXT_PATH, "fuzz_vectors.txt")
     paths.DETECTION_RULES_XML    = os.path.join(paths.SQLMAP_XML_PATH, "detection.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
@@ -1233,8 +1235,7 @@ def initCommonOutputs():
     kb.commonOutputs = {}
     key = None
 
-    fileName = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
-    cfile = codecs.open(fileName, 'r', conf.dataEncoding)
+    cfile = codecs.open(paths.COMMON_OUTPUTS, 'r', conf.dataEncoding)
 
     for line in cfile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
         if line.find('#') != -1:
@@ -1253,6 +1254,21 @@ def initCommonOutputs():
                     kb.commonOutputs[key].add(line)
 
     cfile.close()
+
+def getFileItems(filename):
+    retVal = []
+
+    checkFile(filename)
+    file = codecs.open(filename, 'r', conf.dataEncoding)
+
+    for line in file.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
+        if line.find('#') != -1:
+            line = line[:line.find('#')]
+        line = line.strip()
+        if line:
+            retVal.append(line)
+
+    return retVal
 
 def goGoodSamaritan(prevValue, originalCharset):
     """
@@ -1412,3 +1428,9 @@ def replaceSpaces(query):
         return query if conf.space is None else query.replace(' ', conf.space)
     else:
         return query
+
+def pushValue(value):
+    kb.valueStack.append(value)
+
+def popValue():
+    return kb.valueStack.pop()

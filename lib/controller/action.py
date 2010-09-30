@@ -27,6 +27,7 @@ from lib.core.common import getHtmlErrorFp
 from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.blind.timebased import timeTest
@@ -110,6 +111,12 @@ def action():
 
     if conf.getTables:
         conf.dumper.dbTables(conf.dbmsHandler.getTables())
+
+    if conf.cExists:
+        conf.dumper.dbTables(conf.dbmsHandler.tableExists(paths.COMMON_TABLES))
+
+    if conf.tableFile:
+        conf.dumper.dbTables(conf.dbmsHandler.tableExists(conf.tableFile))
 
     if conf.getColumns:
         conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns())

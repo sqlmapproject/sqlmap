@@ -1031,6 +1031,7 @@ def __setKnowledgeBaseAttributes():
     kb.unionPosition  = None
     kb.unionNegative  = False
     kb.unionFalseCond = False
+    kb.valueStack     = []
 
 def __saveCmdline():
     """
