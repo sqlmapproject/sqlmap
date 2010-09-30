@@ -51,6 +51,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import exceptionsTuple
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.exception import unhandledException
 from lib.core.option import init
 from lib.core.profiling import profile
@@ -93,6 +94,12 @@ def main():
             liveTest()
         else:
             start()
+
+    except sqlmapUserQuitException:
+        errMsg = "user quit"
+        logger.error(errMsg)
+        closeDumper(False, errMsg)
+
     except exceptionsTuple, e:
         e = getUnicode(e)
         logger.critical(e)

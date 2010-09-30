@@ -39,6 +39,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapNotVulnerableException
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
@@ -278,6 +279,9 @@ def start():
                 if condition:
                     checkForParenthesis()
                     action()
+
+        except sqlmapUserQuitException:
+            raise
 
         except exceptionsTuple, e:
             e = getUnicode(e)

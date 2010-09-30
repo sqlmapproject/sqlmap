@@ -42,11 +42,13 @@ from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.data import temp
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
@@ -695,7 +697,17 @@ class Enumeration:
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            logger.error(errMsg)
+            
+            message = "do you want to use common table existance check? [Y/n/q]"
+            test = readInput(message, default="Y")
+
+            if test[0] in ("n", "N"):
+                return
+            elif test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+            else:    
+                return self.tableExists(paths.COMMON_TABLES)
 
         self.forceDbmsEnum()
 
