@@ -502,7 +502,7 @@ sql_parts
 sql_sizing
 sql_sizing_profiles
 
-# Oracle
+# Oracle (demo database)
 BONUS
 DEPT
 EMP
@@ -835,7 +835,6 @@ xml_schema_wildcard_namespaces
 xml_schema_wildcards
 
 ## Database: msdb
-
 backupfile
 backupfilegroup
 backupmediafamily
