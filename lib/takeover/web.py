@@ -192,6 +192,9 @@ class Web:
 
             requestDir = normalizePath(requestDir)
 
+            if requestDir[0] != '/':
+                requestDir = '/' + requestDir
+
             self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
             self.webUploaderUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), uploaderName)
             self.webUploaderUrl = ntToPosixSlashes(self.webUploaderUrl.replace("./", "/"))
