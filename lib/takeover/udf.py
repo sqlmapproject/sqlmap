@@ -34,6 +34,7 @@ from lib.core.data import queries
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
@@ -308,9 +309,12 @@ class UDF:
         msg   += "functions now? [Y/n/q] "
         choice = readInput(msg, default="Y")
 
-        if choice[0] not in ( "y", "Y" ):
+        if choice[0] in ( "n", "N" ):
             self.cleanup(udfDict=self.udfs)
             return
+        elif choice[0] in ( "q", "Q" ):
+            self.cleanup(udfDict=self.udfs)
+            raise sqlmapUserQuitException
 
         while True:
             udfList = []
