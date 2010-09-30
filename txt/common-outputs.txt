@@ -834,8 +834,8 @@ xml_schema_types
 xml_schema_wildcard_namespaces
 xml_schema_wildcards
 
-Database:msdb
-[92tables]
+## Database: msdb
+
 backupfile
 backupfilegroup
 backupmediafamily
