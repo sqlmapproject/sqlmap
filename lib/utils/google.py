@@ -28,6 +28,7 @@ import socket
 import urllib2
 
 from lib.core.common import getUnicode
+from lib.core.convert import htmlunescape
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -71,7 +72,7 @@ class Google:
 
         for match in self.__matches:
             if re.search("(.*?)\?(.+)", match, re.I):
-                kb.targetUrls.add(( match, None, None, None ))
+                kb.targetUrls.add(( htmlunescape(match), None, None, None ))
 
     def getCookie(self):
         """

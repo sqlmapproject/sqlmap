@@ -79,7 +79,7 @@ def sha1hash(string):
 
 def urldecode(string):
     result = None
-    
+
     if string:
         result = urllib.unquote_plus(string)
 
@@ -106,3 +106,9 @@ def utf8encode(string):
 
 def utf8decode(string):
     return string.decode("utf-8")
+
+def htmlescape(string):
+    return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+
+def htmlunescape(string):
+    return string.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'")
