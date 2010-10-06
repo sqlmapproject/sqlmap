@@ -15,15 +15,14 @@
     </case>
     <case tag="likesingle" desc="LIKE single quoted string">
         <positive format="%s'%s AND %s'%s' LIKE '%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
-        <negative format="" params=""/>
+        <negative format="%s'%s AND %s'%s' LIKE '%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
     </case>
-    <case tag="custom" desc="custom">
-        <positive format="" params=""/>
-        <negative format="" params=""/>
+    <case tag="stringdouble" desc="double quoted string">
+        <positive format="%s\&quot;%s AND %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
+        <negative format="%s\&quot;%s AND %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
     </case>
-    <case tag="custom" desc="custom">
-        <positive format="" params=""/>
-        <negative format="" params=""/>
+    <case tag="likedouble" desc="LIKE double quoted string">
+        <positive format="%s\&quot;%s AND %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
+        <negative format="%s\&quot;%s AND %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
     </case>
-
 </root>

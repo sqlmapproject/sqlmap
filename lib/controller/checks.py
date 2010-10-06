@@ -22,9 +22,12 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import codecs
 import re
 import socket
 import time
+
+from xml.dom import minidom
 
 from lib.core.agent import agent
 from lib.core.common import getUnicode
@@ -36,6 +39,7 @@ from lib.core.convert import md5hash
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import paths
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.session import setString
@@ -55,197 +59,53 @@ def checkSqlInjection(place, parameter, value, parenthesis):
 
     randInt = randomInt()
     randStr = randomStr()
+    prefix = ""
+    postfix = ""
 
     if conf.prefix or conf.postfix:
-        prefix  = ""
-        postfix = ""
-
         if conf.prefix:
             prefix = conf.prefix
 
         if conf.postfix:
             postfix = conf.postfix
 
-        infoMsg  = "testing custom injection "
+    f = codecs.open(paths.INJECTIONS_XML, 'r', conf.dataEncoding)
+    injections = minidom.parse(f).documentElement
+    f.close()
+
+    for case in injections.getElementsByTagName("case"):
+        tag = case.getAttribute("tag")
+        desc = case.getAttribute("desc")
+
+        infoMsg  = "testing %s injection " % desc
         infoMsg += "on %s parameter '%s'" % (place, parameter)
         logger.info(infoMsg)
 
-        payload = agent.payload(place, parameter, value, "%s%s%s AND %s%d=%d %s" % (value, prefix, ")" * parenthesis, "(" * parenthesis, randInt, randInt, postfix))
+        positive = case.getElementsByTagName("positive")[0]
+        negative = case.getElementsByTagName("negative")[0]
+
+        params = positive.getAttribute("params")
+        format = positive.getAttribute("format")
+        
+        if not prefix and not postfix and tag == "custom":
+            continue
+        
+        payload = agent.payload(place, parameter, value, format % eval(params))
+
         trueResult = Request.queryPage(payload, place)
 
         if trueResult:
-            payload = agent.payload(place, parameter, value, "%s%s%s AND %s%d=%d %s" % (value, prefix, ")" * parenthesis, "(" * parenthesis, randInt, randInt + 1, postfix))
+            params = negative.getAttribute("params")
+            format = negative.getAttribute("format")
+            payload = agent.payload(place, parameter, value, format % eval(params))
+
             falseResult = Request.queryPage(payload, place)
 
             if not falseResult:
-                infoMsg  = "confirming custom injection "
-                infoMsg += "on %s parameter '%s'" % (place, parameter)
-                logger.info(infoMsg)
-
-                payload = agent.payload(place, parameter, value, "%s%s%s AND %s%s %s" % (value, prefix, ")" * parenthesis, "(" * parenthesis, randStr, postfix))
-                falseResult = Request.queryPage(payload, place)
-
-                if not falseResult:
-                    infoMsg  = "%s parameter '%s' is " % (place, parameter)
-                    infoMsg += "custom injectable "
-                    logger.info(infoMsg)
-
-                    return "custom"
-
-    infoMsg  = "testing unescaped numeric injection "
-    infoMsg += "on %s parameter '%s'" % (place, parameter)
-    logger.info(infoMsg)
-
-    payload = agent.payload(place, parameter, value, "%s%s AND %s%d=%d" % (value, ")" * parenthesis, "(" * parenthesis, randInt, randInt))
-    trueResult = Request.queryPage(payload, place)
-
-    if trueResult:
-        payload = agent.payload(place, parameter, value, "%s%s AND %s%d=%d" % (value, ")" * parenthesis, "(" * parenthesis, randInt, randInt + 1))
-        falseResult = Request.queryPage(payload, place)
-
-        if not falseResult:
-            infoMsg  = "confirming unescaped numeric injection "
-            infoMsg += "on %s parameter '%s'" % (place, parameter)
-            logger.info(infoMsg)
-
-            payload = agent.payload(place, parameter, value, "%s%s AND %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
-            falseResult = Request.queryPage(payload, place)
-
-            if not falseResult:
-                infoMsg  = "%s parameter '%s' is " % (place, parameter)
-                infoMsg += "unescaped numeric injectable "
+                infoMsg  = "%s parameter '%s' is %s injectable " % (place, parameter, desc)
                 infoMsg += "with %d parenthesis" % parenthesis
                 logger.info(infoMsg)
-
-                return "numeric"
-
-    infoMsg  = "%s parameter '%s' is not " % (place, parameter)
-    infoMsg += "unescaped numeric injectable"
-    logger.info(infoMsg)
-
-    infoMsg  = "testing single quoted string injection "
-    infoMsg += "on %s parameter '%s'" % (place, parameter)
-    logger.info(infoMsg)
-
-    payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s'='%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
-    trueResult = Request.queryPage(payload, place)
-
-    if trueResult:
-        payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s'='%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
-        falseResult = Request.queryPage(payload, place)
-
-        if not falseResult:
-            infoMsg  = "confirming single quoted string injection "
-            infoMsg += "on %s parameter '%s'" % (place, parameter)
-            logger.info(infoMsg)
-
-            payload = agent.payload(place, parameter, value, "%s'%s and %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
-            falseResult = Request.queryPage(payload, place)
-
-            if not falseResult:
-                infoMsg  = "%s parameter '%s' is " % (place, parameter)
-                infoMsg += "single quoted string injectable "
-                infoMsg += "with %d parenthesis" % parenthesis
-                logger.info(infoMsg)
-
-                return "stringsingle"
-
-    infoMsg  = "%s parameter '%s' is not " % (place, parameter)
-    infoMsg += "single quoted string injectable"
-    logger.info(infoMsg)
-
-    infoMsg  = "testing LIKE single quoted string injection "
-    infoMsg += "on %s parameter '%s'" % (place, parameter)
-    logger.info(infoMsg)
-
-    payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s' LIKE '%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
-    trueResult = Request.queryPage(payload, place)
-
-    if trueResult:
-        payload = agent.payload(place, parameter, value, "%s'%s AND %s'%s' LIKE '%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
-        falseResult = Request.queryPage(payload, place)
-
-        if not falseResult:
-            infoMsg  = "confirming LIKE single quoted string injection "
-            infoMsg += "on %s parameter '%s'" % (place, parameter)
-            logger.info(infoMsg)
-
-            payload = agent.payload(place, parameter, value, "%s'%s and %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
-            falseResult = Request.queryPage(payload, place)
-
-            if not falseResult:
-                infoMsg  = "%s parameter '%s' is " % (place, parameter)
-                infoMsg += "LIKE single quoted string injectable "
-                infoMsg += "with %d parenthesis" % parenthesis
-                logger.info(infoMsg)
-
-                return "likesingle"
-
-    infoMsg  = "%s parameter '%s' is not " % (place, parameter)
-    infoMsg += "LIKE single quoted string injectable"
-    logger.info(infoMsg)
-
-    infoMsg  = "testing double quoted string injection "
-    infoMsg += "on %s parameter '%s'" % (place, parameter)
-    logger.info(infoMsg)
-
-    payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\"=\"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
-    trueResult = Request.queryPage(payload, place)
-
-    if trueResult:
-        payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\"=\"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
-        falseResult = Request.queryPage(payload, place)
-
-        if not falseResult:
-            infoMsg  = "confirming double quoted string injection "
-            infoMsg += "on %s parameter '%s'" % (place, parameter)
-            logger.info(infoMsg)
-
-            payload = agent.payload(place, parameter, value, "%s\"%s AND %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
-            falseResult = Request.queryPage(payload, place)
-
-            if not falseResult:
-                infoMsg  = "%s parameter '%s' is " % (place, parameter)
-                infoMsg += "double quoted string injectable "
-                infoMsg += "with %d parenthesis" % parenthesis
-                logger.info(infoMsg)
-
-                return "stringdouble"
-
-    infoMsg  = "%s parameter '%s' is not " % (place, parameter)
-    infoMsg += "double quoted string injectable"
-    logger.info(infoMsg)
-
-    infoMsg  = "testing LIKE double quoted string injection "
-    infoMsg += "on %s parameter '%s'" % (place, parameter)
-    logger.info(infoMsg)
-
-    payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\" LIKE \"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr))
-    trueResult = Request.queryPage(payload, place)
-
-    if trueResult:
-        payload = agent.payload(place, parameter, value, "%s\"%s AND %s\"%s\" LIKE \"%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr, randStr + randomStr(1)))
-        falseResult = Request.queryPage(payload, place)
-
-        if not falseResult:
-            infoMsg  = "confirming LIKE double quoted string injection "
-            infoMsg += "on %s parameter '%s'" % (place, parameter)
-            logger.info(infoMsg)
-
-            payload = agent.payload(place, parameter, value, "%s\"%s and %s%s" % (value, ")" * parenthesis, "(" * parenthesis, randStr))
-            falseResult = Request.queryPage(payload, place)
-
-            if not falseResult:
-                infoMsg  = "%s parameter '%s' is " % (place, parameter)
-                infoMsg += "LIKE double quoted string injectable "
-                infoMsg += "with %d parenthesis" % parenthesis
-                logger.info(infoMsg)
-
-                return "likedouble"
-
-    infoMsg  = "%s parameter '%s' is not " % (place, parameter)
-    infoMsg += "LIKE double quoted string injectable"
-    logger.info(infoMsg)
+                return tag
 
     return None
 
@@ -291,10 +151,12 @@ def checkDynamicContent(*pages):
     for i in xrange(len(pages)):
         firstPage = pages[i]
         linesFirst = preparePageForLineComparison(firstPage)
-        pageLinesNumber = len(linesFirst)        
+        pageLinesNumber = len(linesFirst)
+
         for j in xrange(i+1, len(pages)):
             secondPage = pages[j]
             linesSecond = preparePageForLineComparison(secondPage)
+
             if pageLinesNumber == len(linesSecond):
                 for k in xrange(0, pageLinesNumber):
                     if (linesFirst[k] != linesSecond[k]):
@@ -303,6 +165,7 @@ def checkDynamicContent(*pages):
                             linesFirst[k+1] if k < pageLinesNumber - 1 else None)
 
                         found = None
+
                         for other in kb.dynamicContent:
                             found = True
                             if other.pageTotal == item.pageTotal:
@@ -311,18 +174,22 @@ def checkDynamicContent(*pages):
                                         other.lineNumber = [other.lineNumber, item.lineNumber]
                                         other.lineContentAfter = item.lineContentAfter
                                         break
+
                                     elif other.lineNumber == item.lineNumber + 1:
                                         other.lineNumber = [item.lineNumber, other.lineNumber]
                                         other.lineContentBefore = item.lineContentBefore
                                         break
+
                                 elif item.lineNumber - 1 == other.lineNumber[-1]:
                                     other.lineNumber.append(item.lineNumber)
                                     other.lineContentAfter = item.lineContentAfter
                                     break
+
                                 elif item.lineNumber + 1 == other.lineNumber[0]:
                                     other.lineNumber.insert(0, item.lineNumber)
                                     other.lineContentBefore = item.lineContentBefore
                                     break
+
                             found = False
                         
                         if not found:

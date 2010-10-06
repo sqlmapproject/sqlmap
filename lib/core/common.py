@@ -662,6 +662,7 @@ def setPaths():
     paths.FUZZ_VECTORS           = os.path.join(paths.SQLMAP_TXT_PATH, "fuzz_vectors.txt")
     paths.DETECTION_RULES_XML    = os.path.join(paths.SQLMAP_XML_PATH, "detection.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
+    paths.INJECTIONS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
     paths.LIVE_TESTS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
     paths.QUERIES_XML            = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
     paths.GENERIC_XML            = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
