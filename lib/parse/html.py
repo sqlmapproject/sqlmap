@@ -57,6 +57,7 @@ class htmlHandler(ContentHandler):
             if self.__match:
                 self.dbms = self.__dbms
                 self.__match = None
+                kb.errorPages.add(self.__page)
 
 def htmlParser(page):
     """

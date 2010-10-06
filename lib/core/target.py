@@ -266,6 +266,7 @@ def initTargetEnv():
         kb.dbms           = None
         kb.dbmsDetected   = False
         kb.dbmsVersion    = [ "Unknown" ]
+        kb.errorPages     = set()
         kb.injParameter   = None
         kb.injPlace       = None
         kb.injType        = None
