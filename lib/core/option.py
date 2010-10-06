@@ -1003,7 +1003,7 @@ def __setKnowledgeBaseAttributes():
     kb.dep            = None
     kb.docRoot        = None
     kb.dynamicContent = []
-    kb.errorPages     = set()
+    kb.lastErrorPage  = None
     kb.headersCount   = 0
     kb.headersFp      = {}
     kb.htmlFp         = []
@@ -1021,6 +1021,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.parenthesis    = None
     kb.partRun        = None
+    kb.requestUID     = 0
     kb.queryCounter   = 0
     kb.resumedQueries = {}
     kb.stackedTest    = None

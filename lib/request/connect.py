@@ -89,6 +89,8 @@ class Connect:
         requestHeaders  = ""
         responseHeaders = ""
 
+        kb.requestUID  += 1
+
         try:
             if silent:
                 socket.setdefaulttimeout(3)
