@@ -22,18 +22,16 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import codecs
 import re
 import socket
 import time
-
-from xml.dom import minidom
 
 from lib.core.agent import agent
 from lib.core.common import getUnicode
 from lib.core.common import preparePageForLineComparison
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import readXmlFile
 from lib.core.common import DynamicContentItem
 from lib.core.convert import md5hash
 from lib.core.data import conf
@@ -69,17 +67,11 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         if conf.postfix:
             postfix = conf.postfix
 
-    f = codecs.open(paths.INJECTIONS_XML, 'r', conf.dataEncoding)
-    injections = minidom.parse(f).documentElement
-    f.close()
+    injections = readXmlFile(paths.INJECTIONS_XML)
 
     for case in injections.getElementsByTagName("case"):
         tag = case.getAttribute("tag")
         desc = case.getAttribute("desc")
-
-        infoMsg  = "testing %s injection " % desc
-        infoMsg += "on %s parameter '%s'" % (place, parameter)
-        logger.info(infoMsg)
 
         positive = case.getElementsByTagName("positive")[0]
         negative = case.getElementsByTagName("negative")[0]
@@ -89,6 +81,10 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         
         if not prefix and not postfix and tag == "custom":
             continue
+
+        infoMsg  = "testing %s injection " % desc
+        infoMsg += "on %s parameter '%s'" % (place, parameter)
+        logger.info(infoMsg)
         
         payload = agent.payload(place, parameter, value, format % eval(params))
 

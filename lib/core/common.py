@@ -44,6 +44,7 @@ from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
 from xml.etree import ElementTree as ET
+from xml.dom import minidom
 from xml.sax import parse
 
 from extra.cloak.cloak import decloak
@@ -1218,12 +1219,20 @@ def getConsoleWidth(default=80):
     return width if width else default
 
 def parseXmlFile(xmlFile, handler):
+    checkFile(xmlFile)  
     xfile = codecs.open(xmlFile, 'rb', conf.dataEncoding)
     content = xfile.read()
     stream = StringIO(content)
     parse(stream, handler)
     stream.close()
     xfile.close()
+
+def readXmlFile(xmlFile):
+    checkFile(xmlFile)  
+    xfile = codecs.open(xmlFile, 'r', conf.dataEncoding)
+    retVal = minidom.parse(xfile).documentElement
+    xfile.close()
+    return retVal
 
 def calculateDeltaSeconds(start, epsilon=0.05):
     """

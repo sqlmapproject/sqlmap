@@ -21,7 +21,6 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import codecs
 import doctest
 import logging
 import os
@@ -31,12 +30,11 @@ import sys
 import tempfile
 import time
 
-from xml.dom import minidom
-
 from lib.controller.controller import start
 from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
 from lib.core.common import getConsoleWidth
+from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
@@ -112,9 +110,7 @@ def liveTest():
     count = 0
     global_ = {}
     vars_ = {}
-    xfile = codecs.open(paths.LIVE_TESTS_XML, 'r', conf.dataEncoding)
-    livetests = minidom.parse(xfile).documentElement
-    xfile.close()
+    livetests = readXmlFile(paths.LIVE_TESTS_XML)
     length = len(livetests.getElementsByTagName("case"))
 
     element = livetests.getElementsByTagName("global")

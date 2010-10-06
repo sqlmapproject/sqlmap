@@ -22,13 +22,11 @@ with sqlmap; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import codecs
 import re
 import sre_constants
 
-from xml.dom import minidom
-
 from lib.core.common import getCompiledRegex
+from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.data import logger
@@ -53,9 +51,7 @@ def checkPayload(string):
     global rules
 
     if not rules:
-        xfile = codecs.open(paths.DETECTION_RULES_XML, 'r', conf.dataEncoding)
-        xmlrules = minidom.parse(xfile).documentElement
-        xfile.close()
+        xmlrules = readXmlFile(paths.DETECTION_RULES_XML)
         rules = []
 
         for xmlrule in xmlrules.getElementsByTagName("filter"):
