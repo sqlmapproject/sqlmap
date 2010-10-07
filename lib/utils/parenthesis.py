@@ -23,6 +23,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 from lib.core.agent import agent
+from lib.core.common import getInjectionCase
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.data import conf
@@ -42,6 +43,10 @@ def checkForParenthesis():
     logger.info(logMsg)
 
     count = 0
+    case = getInjectionCase(kb.injType)
+
+    if case is None:
+        raise sqlmapNoneDataException, "unsupported injection type"
 
     if kb.parenthesis is not None:
         return
@@ -57,18 +62,10 @@ def checkForParenthesis():
         randInt = randomInt()
         randStr = randomStr()
 
-        if kb.injType == "numeric":
-            query += "%d=%d" % (randInt, randInt)
-        elif kb.injType == "stringsingle":
-            query += "'%s'='%s" % (randStr, randStr)
-        elif kb.injType == "likesingle":
-            query += "'%s' LIKE '%s" % (randStr, randStr)
-        elif kb.injType == "stringdouble":
-            query += "\"%s\"=\"%s" % (randStr, randStr)
-        elif kb.injType == "likedouble":
-            query += "\"%s\" LIKE \"%s" % (randStr, randStr)
-        else:
-            raise sqlmapNoneDataException, "unsupported injection type"
+        if case.usage.postfix._has_key('value'):
+            query += case.usage.postfix.value
+        elif case.usage.postfix._has_key('format'):
+            query += case.usage.postfix.format % eval(case.usage.postfix.params)
 
         payload = agent.payload(newValue=query)
         result = Request.queryPage(payload)
