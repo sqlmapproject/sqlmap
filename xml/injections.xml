@@ -1,28 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root>
-    <case tag="custom" desc="custom">
-        <positive format="%s%s%s AND %s%d=%d %s" params="value, prefix, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt, postfix"/>
-        <negative format="%s%s%s AND %s%d=%d %s" params="value, prefix, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt + 1, postfix"/>
+    <case name="custom" desc="custom">
+        <test>
+            <positive format="%s%s%s AND %s%d=%d %s" params="value, prefix, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt, postfix"/>
+            <negative format="%s%s%s AND %s%d=%d %s" params="value, prefix, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt + 1, postfix"/>
+        </test>
+        <usage>
+            <prefix/>
+            <postfix/>
+        </usage>
     </case>
-    <case tag="numeric" desc="unescaped numeric">
-        <positive format="%s%s AND %s%d=%d" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt"/>
-        <negative format="%s%s AND %s%d=%d" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt + 1"/>
+    <case name="numeric" desc="unescaped numeric">
+        <test>
+            <positive format="%s%s AND %s%d=%d" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt"/>
+            <negative format="%s%s AND %s%d=%d" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randInt, randInt + 1"/>
+        </test>
+        <usage>
+            <prefix/>
+            <postfix format="%d=%d" params="randInt, randInt"/>
+        </usage>
     </case>
-    <case tag="stringsingle" desc="single quoted string">
-        <positive format="%s'%s AND %s'%s'='%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
-        <negative format="%s'%s AND %s'%s'='%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+    <case name="stringsingle" desc="single quoted string">
+        <test>
+            <positive format="%s'%s AND %s'%s'='%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
+            <negative format="%s'%s AND %s'%s'='%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+        </test>
+        <usage>
+            <prefix value="'"/>
+            <postfix format="'%s'='%s" params="randStr, randStr"/>
+        </usage>
     </case>
-    <case tag="likesingle" desc="LIKE single quoted string">
-        <positive format="%s'%s AND %s'%s' LIKE '%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
-        <negative format="%s'%s AND %s'%s' LIKE '%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+    <case name="likesingle" desc="LIKE single quoted string">
+        <test>
+            <positive format="%s'%s AND %s'%s' LIKE '%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
+            <negative format="%s'%s AND %s'%s' LIKE '%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+        </test>
+        <usage>
+            <prefix value="'"/>
+            <postfix format="'%s' LIKE '%s" params="randStr, randStr"/>
+        </usage>
     </case>
-    <case tag="stringdouble" desc="double quoted string">
-        <positive format="%s\&quot;%s AND %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
-        <negative format="%s\&quot;%s AND %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+    <case name="stringdouble" desc="double quoted string">
+        <test>
+            <positive format="%s\&quot;%s AND %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
+            <negative format="%s\&quot;%s AND %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+        </test>
+        <usage>
+            <prefix value="&quot;"/>
+            <postfix format="\&quot;%s\&quot;=\&quot;%s" params="randStr, randStr"/>
+        </usage>
     </case>
-    <case tag="likedouble" desc="LIKE double quoted string">
-        <positive format="%s\&quot;%s AND %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
-        <negative format="%s\&quot;%s AND %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+    <case name="likedouble" desc="LIKE double quoted string">
+        <test>
+            <positive format="%s\&quot;%s AND %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr"/>
+            <negative format="%s\&quot;%s AND %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+        </test>
+        <usage>
+            <prefix value="&quot;"/>
+            <postfix format="\&quot;%s\&quot; LIKE \&quot;%s" params="randStr, randStr"/>
+        </usage>
     </case>
 </root>

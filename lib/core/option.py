@@ -34,6 +34,7 @@ import urllib2
 import urlparse
 
 from extra.keepalive import keepalive
+from extra.xmlobject import xmlobject
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileType
 from lib.core.common import normalizePath
@@ -1010,6 +1011,7 @@ def __setKnowledgeBaseAttributes():
     kb.injParameter   = None
     kb.injPlace       = None
     kb.injType        = None
+    kb.injections     = xmlobject.XMLFile(path=paths.INJECTIONS_XML)
     kb.hintValue      = None
     kb.nullConnection = None
 

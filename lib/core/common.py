@@ -1241,6 +1241,14 @@ def calculateDeltaSeconds(start, epsilon=0.05):
     """
     return int(time.time() - start + epsilon)
 
+def getInjectionCase(name):
+    retVal = None
+    for case in kb.injections.root.case:
+        if case.name == name:
+            retVal = case
+            break
+    return retVal
+
 def initCommonOutputs():
     kb.commonOutputs = {}
     key = None

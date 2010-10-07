@@ -31,7 +31,6 @@ from lib.core.common import getUnicode
 from lib.core.common import preparePageForLineComparison
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import readXmlFile
 from lib.core.common import DynamicContentItem
 from lib.core.convert import md5hash
 from lib.core.data import conf
@@ -67,41 +66,30 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         if conf.postfix:
             postfix = conf.postfix
 
-    injections = readXmlFile(paths.INJECTIONS_XML)
+    for case in kb.injections.root.case:
+        positive = case.test.positive
+        negative = case.test.negative
 
-    for case in injections.getElementsByTagName("case"):
-        tag = case.getAttribute("tag")
-        desc = case.getAttribute("desc")
-
-        positive = case.getElementsByTagName("positive")[0]
-        negative = case.getElementsByTagName("negative")[0]
-
-        params = positive.getAttribute("params")
-        format = positive.getAttribute("format")
-        
-        if not prefix and not postfix and tag == "custom":
+        if not prefix and not postfix and case.name == "custom":
             continue
 
-        infoMsg  = "testing %s injection " % desc
+        infoMsg  = "testing %s injection " % case.desc
         infoMsg += "on %s parameter '%s'" % (place, parameter)
         logger.info(infoMsg)
-        
-        payload = agent.payload(place, parameter, value, format % eval(params))
 
+        payload = agent.payload(place, parameter, value, positive.format % eval(positive.params))
         trueResult = Request.queryPage(payload, place)
 
         if trueResult:
-            params = negative.getAttribute("params")
-            format = negative.getAttribute("format")
-            payload = agent.payload(place, parameter, value, format % eval(params))
+            payload = agent.payload(place, parameter, value, negative.format % eval(negative.params))
 
             falseResult = Request.queryPage(payload, place)
 
             if not falseResult:
-                infoMsg  = "%s parameter '%s' is %s injectable " % (place, parameter, desc)
+                infoMsg  = "%s parameter '%s' is %s injectable " % (place, parameter, case.desc)
                 infoMsg += "with %d parenthesis" % parenthesis
                 logger.info(infoMsg)
-                return tag
+                return case.name
 
     return None
 
@@ -187,7 +175,7 @@ def checkDynamicContent(*pages):
                                     break
 
                             found = False
-                        
+
                         if not found:
                             kb.dynamicContent.append(item)
 

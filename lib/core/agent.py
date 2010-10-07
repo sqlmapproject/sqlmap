@@ -26,6 +26,7 @@ import re
 
 from xml.etree import ElementTree as ET
 
+from lib.core.common import getInjectionCase
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import replaceSpaces
@@ -142,19 +143,19 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
-        query = ""
+        query = str()
+        case = getInjectionCase(kb.injType)
+
+        if case is None:
+            raise sqlmapNoneDataException, "unsupported injection type"
 
         if conf.prefix:
             query = conf.prefix
         else:
-            if kb.injType == "numeric" or conf.postfix:
-                pass
-            elif kb.injType in ( "stringsingle", "likesingle" ):
-                query = "'"
-            elif kb.injType in ( "stringdouble", "likedouble" ):
-                query = "\""
-            else:
-                raise sqlmapNoneDataException, "unsupported injection type"
+            if case.usage.prefix._has_key('value'):
+                query = case.usage.prefix.value
+            elif case.usage.prefix._has_key('format'):
+                query = case.usage.prefix.format % eval(case.usage.prefix.params)
 
             if kb.parenthesis not in ( None, 0 ):
                 query += "%s " % (")" * kb.parenthesis)
@@ -172,6 +173,11 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
+        case = getInjectionCase(kb.injType)
+
+        if case is None:
+            raise sqlmapNoneDataException, "unsupported injection type"
+
         randInt = randomInt()
         randStr = randomStr()
 
@@ -186,18 +192,10 @@ class Agent:
             else:
                 raise sqlmapNoneDataException, "unable to get the number of parenthesis"
 
-            if kb.injType == "numeric":
-                string += "%d=%d" % (randInt, randInt)
-            elif kb.injType == "stringsingle":
-                string += "'%s'='%s" % (randStr, randStr)
-            elif kb.injType == "likesingle":
-                string += "'%s' LIKE '%s" % (randStr, randStr)
-            elif kb.injType == "stringdouble":
-                string += "\"%s\"=\"%s" % (randStr, randStr)
-            elif kb.injType == "likedouble":
-                string += "\"%s\" LIKE \"%s" % (randStr, randStr)
-            else:
-                raise sqlmapNoneDataException, "unsupported injection type"
+            if case.usage.postfix._has_key('value'):
+                string += case.usage.postfix.value
+            elif case.usage.postfix._has_key('format'):
+                string += case.usage.postfix.format % eval(case.usage.postfix.params)
 
         return replaceSpaces(string)
 
