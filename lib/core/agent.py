@@ -143,6 +143,7 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
+        logic = conf.logic
         query = str()
         case = getInjectionCase(kb.injType)
 
@@ -172,6 +173,7 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
+        logic = conf.logic
         case = getInjectionCase(kb.injType)
 
         if case is None:

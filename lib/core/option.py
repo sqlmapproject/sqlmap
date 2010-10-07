@@ -955,6 +955,7 @@ def __setConfAttributes():
     conf.httpHeaders      = []
     conf.hostname         = None
     conf.loggedToOut      = None
+    conf.logic            = "AND"
     conf.matchRatio       = None
     conf.md5hash          = None
     conf.multipleTargets  = False

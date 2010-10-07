@@ -54,6 +54,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
       * Double quoted string injection
     """
 
+    logic = conf.logic
     randInt = randomInt()
     randStr = randomStr()
     prefix = ""
@@ -73,7 +74,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         if not prefix and not postfix and case.name == "custom":
             continue
 
-        infoMsg  = "testing %s injection " % case.desc
+        infoMsg  = "testing %s (%s) injection " % (case.desc, logic)
         infoMsg += "on %s parameter '%s'" % (place, parameter)
         logger.info(infoMsg)
 
@@ -86,7 +87,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
             falseResult = Request.queryPage(payload, place)
 
             if not falseResult:
-                infoMsg  = "%s parameter '%s' is %s injectable " % (place, parameter, case.desc)
+                infoMsg  = "%s parameter '%s' is %s (%s) injectable " % (place, parameter, case.desc, logic)
                 infoMsg += "with %d parenthesis" % parenthesis
                 logger.info(infoMsg)
                 return case.name
