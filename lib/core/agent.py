@@ -146,19 +146,18 @@ class Agent:
         query = str()
         case = getInjectionCase(kb.injType)
 
+        if kb.parenthesis is not None:
+            parenthesis = kb.parenthesis
+        else:
+            raise sqlmapNoneDataException, "unable to get the number of parenthesis"
+
         if case is None:
             raise sqlmapNoneDataException, "unsupported injection type"
 
         if conf.prefix:
             query = conf.prefix
         else:
-            if case.usage.prefix._has_key('value'):
-                query = case.usage.prefix.value
-            elif case.usage.prefix._has_key('format'):
-                query = case.usage.prefix.format % eval(case.usage.prefix.params)
-
-            if kb.parenthesis not in ( None, 0 ):
-                query += "%s " % (")" * kb.parenthesis)
+            query = case.usage.prefix.format % eval(case.usage.prefix.params)
 
         query += string
 
@@ -181,21 +180,18 @@ class Agent:
         randInt = randomInt()
         randStr = randomStr()
 
+        if kb.parenthesis is not None:
+            parenthesis = kb.parenthesis
+        else:
+            raise sqlmapNoneDataException, "unable to get the number of parenthesis"
+
         if comment:
             string += comment
 
         if conf.postfix:
             string += " %s" % conf.postfix
         else:
-            if kb.parenthesis is not None:
-                string += " AND %s" % ("(" * kb.parenthesis)
-            else:
-                raise sqlmapNoneDataException, "unable to get the number of parenthesis"
-
-            if case.usage.postfix._has_key('value'):
-                string += case.usage.postfix.value
-            elif case.usage.postfix._has_key('format'):
-                string += case.usage.postfix.format % eval(case.usage.postfix.params)
+            string += case.usage.postfix.format % eval(case.usage.postfix.params)
 
         return replaceSpaces(string)
 

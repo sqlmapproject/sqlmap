@@ -56,16 +56,11 @@ def checkForParenthesis():
         return
 
     for parenthesis in range(1, 4):
-        query  = agent.prefixQuery("%s " % (")" * parenthesis))
-        query += "AND %s" % ("(" * parenthesis)
-
         randInt = randomInt()
         randStr = randomStr()
 
-        if case.usage.postfix._has_key('value'):
-            query += case.usage.postfix.value
-        elif case.usage.postfix._has_key('format'):
-            query += case.usage.postfix.format % eval(case.usage.postfix.params)
+        query  = case.usage.prefix.format % eval(case.usage.prefix.params) +\
+            case.usage.postfix.format % eval(case.usage.postfix.params)
 
         payload = agent.payload(newValue=query)
         result = Request.queryPage(payload)
