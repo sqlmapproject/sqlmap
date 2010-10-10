@@ -43,7 +43,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
-from lib.core.target import __setPageForms
+from lib.core.target import __findPageForms
 from lib.utils.parenthesis import checkForParenthesis
 
 def __selectInjection(injData):
@@ -107,7 +107,7 @@ def start():
 
     if conf.url:
         if conf.forms:
-            __setPageForms()
+            __findPageForms()
         else:
             kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
