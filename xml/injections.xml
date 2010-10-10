@@ -43,22 +43,22 @@
     </case>
     <case name="stringdouble" desc="double quoted string">
         <test>
-            <positive format="%s\&quot;%s %s %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr"/>
-            <negative format="%s\&quot;%s %s %s\&quot;%s\&quot;=\&quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+            <positive format="%s&quot;%s %s %s&quot;%s&quot;=&quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr"/>
+            <negative format="%s&quot;%s %s %s&quot;%s&quot;=&quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
         </test>
         <usage>
             <prefix format="&quot;%s " params="')' * parenthesis"/>
-            <postfix format=" %s %s\&quot;%s\&quot;=\&quot;%s" params="logic, '(' * parenthesis, randStr, randStr"/>
+            <postfix format=" %s %s&quot;%s&quot;=&quot;%s" params="logic, '(' * parenthesis, randStr, randStr"/>
         </usage>
     </case>
     <case name="likedouble" desc="LIKE double quoted string">
         <test>
-            <positive format="%s\&quot;%s %s %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr"/>
-            <negative format="%s\&quot;%s %s %s\&quot;%s\&quot; LIKE \&quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
+            <positive format="%s&quot;%s %s %s&quot;%s&quot; LIKE &quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr"/>
+            <negative format="%s&quot;%s %s %s&quot;%s&quot; LIKE &quot;%s" params="value, &quot;)&quot; * parenthesis, logic, &quot;(&quot; * parenthesis, randStr, randStr + randomStr(1)"/>
         </test>
         <usage>
             <prefix format="&quot;%s " params="')' * parenthesis"/>
-            <postfix format=" %s %s\&quot;%s\&quot; LIKE \&quot;%s" params="logic, '(' * parenthesis, randStr, randStr"/>
+            <postfix format=" %s %s&quot;%s&quot; LIKE &quot;%s" params="logic, '(' * parenthesis, randStr, randStr"/>
         </usage>
     </case>
 </root>
