@@ -35,6 +35,18 @@ from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
 
+def safeFormatString(value):
+    retVal = value
+    if retVal:
+        retVal = retVal.replace("[", "__LEFT_SQUARE_BRACKET__").replace("]", "__RIGHT_SQUARE_BRACKET__")
+    return retVal
+
+def unSafeFormatString(value):
+    retVal = value
+    if retVal:
+        retVal = retVal.replace("__LEFT_SQUARE_BRACKET__", "[").replace("__RIGHT_SQUARE_BRACKET__", "]")
+    return retVal
+
 def setString():
     """
     Save string to match in session file.
@@ -46,7 +58,7 @@ def setString():
                 )
 
     if condition:
-        dataToSessionFile("[%s][None][None][String][%s]\n" % (conf.url, conf.string))
+        dataToSessionFile("[%s][None][None][String][%s]\n" % (conf.url, safeFormatString(conf.string)))
 
 def setRegexp():
     """
@@ -59,7 +71,7 @@ def setRegexp():
                 )
 
     if condition:
-        dataToSessionFile("[%s][None][None][Regular expression][%s]\n" % (conf.url, conf.regexp))
+        dataToSessionFile("[%s][None][None][Regular expression][%s]\n" % (conf.url, safeFormatString(conf.regexp)))
 
 def setMatchRatio():
     condition = (
@@ -90,9 +102,9 @@ def setInjection():
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Injection point][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.injPlace))
-        dataToSessionFile("[%s][%s][%s][Injection parameter][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.injParameter))
-        dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.injType))
+        dataToSessionFile("[%s][%s][%s][Injection point][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.injPlace))
+        dataToSessionFile("[%s][%s][%s][Injection parameter][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.injParameter))
+        dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.injType))
 
 def setParenthesis(parenthesisCount):
     """
@@ -107,7 +119,7 @@ def setParenthesis(parenthesisCount):
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Parenthesis][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], parenthesisCount))
+        dataToSessionFile("[%s][%s][%s][Parenthesis][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), parenthesisCount))
 
     kb.parenthesis = parenthesisCount
 
@@ -125,7 +137,7 @@ def setDbms(dbms):
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][DBMS][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], dbms))
+        dataToSessionFile("[%s][%s][%s][DBMS][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(dbms)))
 
     firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
                                      "|".join([alias for alias in MYSQL_ALIASES]),
@@ -185,7 +197,7 @@ def setOs():
         logger.info(infoMsg)
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.os))
+        dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(kb.os)))
 
 def setStacked():
     condition = (
@@ -197,7 +209,7 @@ def setStacked():
         return
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], kb.stackedTest))
+        dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.stackedTest))
 
 def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False):
     """
@@ -220,8 +232,8 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union comment][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], comment))
-            dataToSessionFile("[%s][%s][%s][Union count][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], count))
+            dataToSessionFile("[%s][%s][%s][Union comment][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(comment)))
+            dataToSessionFile("[%s][%s][%s][Union count][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), count))
 
         kb.unionComment = comment
         kb.unionCount = count
@@ -234,7 +246,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union position][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], position))
+            dataToSessionFile("[%s][%s][%s][Union position][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), position))
 
         kb.unionPosition = position
 
@@ -246,7 +258,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union negative][Yes]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace]))
+            dataToSessionFile("[%s][%s][%s][Union negative][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
 
         kb.unionNegative = True
 
@@ -258,7 +270,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union false condition][Yes]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace]))
+            dataToSessionFile("[%s][%s][%s][Union false condition][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
 
         kb.unionFalseCond = True
 
@@ -269,11 +281,11 @@ def setRemoteTempPath():
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], conf.tmpPath))
+        dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(conf.tmpPath)))
 
 def resumeConfKb(expression, url, value):
     if expression == "String" and url == conf.url:
-        string = value[:-1]
+        string = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming string match '%s' from session file" % string
         logger.info(logMsg)
@@ -294,7 +306,7 @@ def resumeConfKb(expression, url, value):
                 conf.string = string
 
     elif expression == "Regular expression" and url == conf.url:
-        regexp = value[:-1]
+        regexp = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming regular expression match '%s' from session file" % regexp
         logger.info(logMsg)
@@ -339,7 +351,7 @@ def resumeConfKb(expression, url, value):
             kb.injPlace = injPlace
 
     elif expression == "Injection parameter" and url == conf.url:
-        injParameter = value[:-1]
+        injParameter = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming injection parameter '%s' from session file" % injParameter
         logger.info(logMsg)
@@ -359,7 +371,7 @@ def resumeConfKb(expression, url, value):
             kb.injParameter = injParameter
 
     elif expression == "Injection type" and url == conf.url:
-        kb.injType = value[:-1]
+        kb.injType = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming injection type '%s' from session file" % kb.injType
         logger.info(logMsg)
@@ -372,7 +384,7 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
     elif expression == "DBMS" and url == conf.url:
-        dbms        = value[:-1]
+        dbms        = unSafeFormatString(value[:-1])
         dbms        = dbms.lower()
         dbmsVersion = None
 
@@ -406,7 +418,7 @@ def resumeConfKb(expression, url, value):
             kb.dbmsVersion = dbmsVersion
 
     elif expression == "OS" and url == conf.url:
-        os = value[:-1]
+        os = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming back-end DBMS operating system '%s' " % os
         logMsg += "from session file"
@@ -427,14 +439,14 @@ def resumeConfKb(expression, url, value):
             conf.os = os
 
     elif expression == "Stacked queries" and url == conf.url:
-        kb.stackedTest = value[:-1]
+        kb.stackedTest = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming stacked queries syntax "
         logMsg += "'%s' from session file" % kb.stackedTest
         logger.info(logMsg)
 
     elif expression == "Union comment" and url == conf.url:
-        kb.unionComment = value[:-1]
+        kb.unionComment = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming union comment "
         logMsg += "'%s' from session file" % kb.unionComment
@@ -469,7 +481,7 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
     elif expression == "Remote temp path" and url == conf.url:
-        conf.tmpPath = value[:-1]
+        conf.tmpPath = unSafeFormatString(value[:-1])
 
         logMsg  = "resuming remote absolute path of temporary "
         logMsg += "files directory '%s' from session file" % conf.tmpPath
