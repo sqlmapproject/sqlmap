@@ -27,8 +27,10 @@ import os
 import re
 import time
 
+from extra.clientform.clientform import ParseResponse
 from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
+from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -39,6 +41,7 @@ from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.session import resumeConfKb
 from lib.core.xmldump import dumper as xmldumper
+from lib.request.connect import Connect as Request
 
 def __setRequestParams():
     """
@@ -132,6 +135,20 @@ def __setRequestParams():
         errMsg  = "all testable parameters you provided are not present "
         errMsg += "within the GET, POST and Cookie parameters"
         raise sqlmapGenericException, errMsg
+
+def __setPageForms():
+    response, _ = Request.queryPage(response=True)
+    forms = ParseResponse(response, backwards_compat=False)
+    count = 1
+    for form in forms:
+        request = form.click()
+        url = request.get_full_url()
+        method = request.get_method()
+        data = request.get_data() if request.has_data() else None
+        message = "Form #%d (%s) [default: '%s'] " % (count, form.name, data)
+        test = readInput(message, default=data)
+        count +=1
+        kb.targetUrls.add((url, method, data, conf.cookie))
 
 def __setOutputResume():
     """

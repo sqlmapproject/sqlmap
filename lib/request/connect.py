@@ -80,6 +80,7 @@ class Connect:
         silent          = kwargs.get('silent',     False)
         raise404        = kwargs.get('raise404',   True)
         auxHeaders      = kwargs.get('auxHeaders', None)
+        response        = kwargs.get('response',   False)
 
         page            = ""
         cookieStr       = ""
@@ -197,6 +198,10 @@ class Connect:
 
             # Reset the number of connection retries
             conf.retriesCount = 0
+            
+            # Return response object
+            if response:
+                return conn, None
 
             # Get HTTP response
             page = conn.read()
@@ -279,7 +284,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -323,23 +328,25 @@ class Connect:
             if kb.queryCounter % conf.saFreq == 0:
                 Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
 
-        if not content and kb.nullConnection:
+        if not content and not response and kb.nullConnection:
             if kb.nullConnection == "HEAD":
-                _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method="HEAD", auxHeaders=auxHeaders, raise404=raise404)
-                pageLength = int(headers['Content-Length'])
+                method = "HEAD"
             elif kb.nullConnection == "Range":
                 if not auxHeaders:
                     auxHeaders = {}
                 auxHeaders["Range"] = "bytes=-1"
-                _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
+
+            _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
+
+            if kb.nullConnection == "HEAD":
+                pageLength = int(headers['Content-Length'])
+            elif kb.nullConnection == "Range":
                 pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
-            else:
-                kb.nullConnection = None
 
         if not pageLength:
-            page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
+            page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404)
 
-        if content:
+        if content or response:
             return page, headers
         elif pageLength or page:
             return comparison(page, headers, getSeqMatcher, pageLength)

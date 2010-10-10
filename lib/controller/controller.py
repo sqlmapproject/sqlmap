@@ -43,6 +43,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
+from lib.core.target import __setPageForms
 from lib.utils.parenthesis import checkForParenthesis
 
 def __selectInjection(injData):
@@ -105,7 +106,10 @@ def start():
         return True
 
     if conf.url:
-        kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
+        if conf.forms:
+            __setPageForms()
+        else:
+            kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
     if conf.configFile and not kb.targetUrls:
         errMsg  = "you did not edit the configuration file properly, set "

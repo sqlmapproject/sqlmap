@@ -455,6 +455,10 @@ def cmdLineParser():
                                  action="store_true", default=False,
                                  help="Flush session file for current target")
 
+        miscellaneous.add_option("--forms", dest="forms",
+                                 action="store_true", default=False,
+                                 help="Parse and test forms on target url")
+
         miscellaneous.add_option("--eta", dest="eta",
                                  action="store_true", default=False,
                                  help="Display for each output the "
