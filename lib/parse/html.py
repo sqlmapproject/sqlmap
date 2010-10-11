@@ -57,7 +57,7 @@ class htmlHandler(ContentHandler):
             if self.__match:
                 self.dbms = self.__dbms
                 self.__match = None
-                kb.lastErrorPage = (kb.requestUID, self.__page)
+                kb.lastErrorPage = (kb.lastRequestUID, self.__page)
 
 def htmlParser(page):
     """

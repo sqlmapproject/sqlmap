@@ -551,7 +551,7 @@ def randomInt(length=4):
 
     return int("".join([random.choice(string.digits) for _ in xrange(0, length)]))
 
-def randomStr(length=4, lowercase=False):
+def randomStr(length=4, lowercase=False, alphabet=None):
     """
     @param length: length of the random string.
     @type length: C{int}
@@ -560,7 +560,9 @@ def randomStr(length=4, lowercase=False):
     @rtype: C{str}
     """
 
-    if lowercase:
+    if alphabet:
+        rndStr = "".join([random.choice(alphabet) for _ in xrange(0, length)])    
+    elif lowercase:
         rndStr = "".join([random.choice(string.lowercase) for _ in xrange(0, length)])
     else:
         rndStr = "".join([random.choice(string.letters) for _ in xrange(0, length)])

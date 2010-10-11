@@ -96,6 +96,28 @@ def checkSqlInjection(place, parameter, value, parenthesis):
 
     return None
 
+def heuristicCheckSqlInjection(place, parameter, value):
+    prefix = ""
+    postfix = ""
+
+    if conf.prefix or conf.postfix:
+        if conf.prefix:
+            prefix = conf.prefix
+
+        if conf.postfix:
+            postfix = conf.postfix
+
+    payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
+    Request.queryPage(payload, place)
+    result = kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
+    infoMsg = "heuristics show that %s parameter '%s' is " % (place, parameter)
+    if result:
+        infoMsg += "injectable"
+        logger.info(infoMsg)
+    else:
+        infoMsg += "not injectable"
+        logger.warning(infoMsg)
+
 def checkDynParam(place, parameter, value):
     """
     This function checks if the url parameter is dynamic. If it is

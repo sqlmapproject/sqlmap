@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from lib.controller.action import action
 from lib.controller.checks import checkSqlInjection
+from lib.controller.checks import heuristicCheckSqlInjection
 from lib.controller.checks import checkDynParam
 from lib.controller.checks import checkStability
 from lib.controller.checks import checkString
@@ -232,6 +233,7 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
+                            heuristicCheckSqlInjection(place, parameter, value)
                             for parenthesis in range(0, 4):
                                 logMsg  = "testing sql injection on %s " % place
                                 logMsg += "parameter '%s' with " % parameter

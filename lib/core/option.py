@@ -1024,7 +1024,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.parenthesis    = None
     kb.partRun        = None
-    kb.requestUID     = 0
+    kb.lastRequestUID = 0
     kb.queryCounter   = 0
     kb.resumedQueries = {}
     kb.stackedTest    = None

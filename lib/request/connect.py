@@ -90,7 +90,7 @@ class Connect:
         requestHeaders  = ""
         responseHeaders = ""
 
-        kb.requestUID  += 1
+        kb.lastRequestUID  += 1
 
         try:
             if silent:
