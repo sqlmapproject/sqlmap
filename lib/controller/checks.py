@@ -31,6 +31,7 @@ from lib.core.common import getUnicode
 from lib.core.common import preparePageForLineComparison
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.common import DynamicContentItem
 from lib.core.convert import md5hash
 from lib.core.data import conf
@@ -39,6 +40,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.request.connect import Connect as Request
@@ -223,6 +225,11 @@ def checkStability():
         warnMsg += "manual paragraph 'Page comparison' and provide a "
         warnMsg += "string or regular expression to match on"
         logger.warn(warnMsg)
+        
+        message = "do you want to continue? [Y/n] "
+        test = readInput(message, default="Y")
+        if test and test[0] not in ("y", "Y"):
+            raise sqlmapUserQuitException
 
         checkDynamicContent(firstPage, secondPage)
 
