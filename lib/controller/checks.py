@@ -100,6 +100,9 @@ def heuristicCheckSqlInjection(place, parameter, value):
     prefix = ""
     postfix = ""
 
+    if place == "URI":
+        return
+
     if conf.prefix or conf.postfix:
         if conf.prefix:
             prefix = conf.prefix
