@@ -25,37 +25,37 @@ Example XML file::
 
 Example usage::
 
-    >>> from xmlobject import XMLFile
+    >> from xmlobject import XMLFile
 
-    >>> x = XMLFile(path="sample.xml)
+    >> x = XMLFile(path="sample.xml")
 
-    >>> print x
+    >> print x
     <xmlobj.XMLFile instance at 0xb7ccc52c>
 
-    >>> print x.root
+    >> print x.root
     <XMLNode: rapsheets>
 
-    >>> print x.root._children
+    >> print x.root._children
     [<XMLNode: text>, <XMLNode: person>, <XMLNode: text>,
      <XMLNode: person>, <XMLNode: text>]
 
-    >>> print x.root.person
+    >> print x.root.person
     [<XMLNode: person>, <XMLNode: person>]
 
-    >>> print x.root.person[0].name
+    >> print x.root.person[0].name
     John Smith
 
-    >>> john = x.root.person[0]
+    >> john = x.root.person[0]
 
-    >>> john.height = 184
+    >> john.height = 184
 
-    >>> c = john._addNode("crime")
+    >> c = john._addNode("crime")
 
-    >>> c.name = "Grand Theft Auto"
+    >> c.name = "Grand Theft Auto"
 
-    >>> c.date = "4 May, 2005"
+    >> c.date = "4 May, 2005"
 
-    >>> print x.toxml()
+    >> print x.toxml()
     <?xml version="1.0" ?>
     <rapsheets>
      <person age="42" height="184" name="John Smith">
@@ -70,7 +70,7 @@ Example usage::
      </person>
     </rapsheets>
 
-    >>>
+    >>
 
 """
 
@@ -360,18 +360,18 @@ class XMLNode:
                 <child>foo</child>
               </somenode>
 
-            >>> somenode
+            >> somenode
             <XMLNODE: somenode>
-            >>> somenode.child
+            >> somenode.child
             <XMLNODE: child>
-            >>> somenode.child._text
+            >> somenode.child._text
             'foo'
-            >>> somenode._toxml()
+            >> somenode._toxml()
             u'<somenode><child>foo</child></somenode>'
-            >>> somenode.child._text = 'bar'
-            >>> somenode.child._text
+            >> somenode.child._text = 'bar'
+            >> somenode.child._text
             'bar'
-            >>> somenode.child._toxml()
+            >> somenode.child._toxml()
             u'<somenode><child>bar/child></somenode>'
 
         """

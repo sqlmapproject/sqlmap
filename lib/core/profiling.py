@@ -25,6 +25,7 @@ import codecs
 import os
 import cProfile
 
+from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
