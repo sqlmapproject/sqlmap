@@ -194,7 +194,7 @@ class Fingerprint(GenericFingerprint):
             query += "LIKE '%Windows NT " + data[0] + "%')>0"
             query  = agent.forgeCaseStatement(query)
 
-            if inject.getValue(query, charsetType=1) == "1":
+            if inject.getValue(query, charsetType=1, suppressOutput=True) == "1":
                 kb.osVersion = version
                 infoMsg     += " %s" % kb.osVersion
 
@@ -221,7 +221,7 @@ class Fingerprint(GenericFingerprint):
             query += "LIKE '%Service Pack " + getUnicode(sp) + "%')>0"
             query  = agent.forgeCaseStatement(query)
 
-            if inject.getValue(query, charsetType=1) == "1":
+            if inject.getValue(query, charsetType=1, suppressOutput=True) == "1":
                 kb.osSP = sp
                 break
 

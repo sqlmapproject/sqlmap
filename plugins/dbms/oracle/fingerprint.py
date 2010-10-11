@@ -123,7 +123,7 @@ class Fingerprint(GenericFingerprint):
                 return True
 
             query = "SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1"
-            version = inject.getValue(query, unpack=False)
+            version = inject.getValue(query, unpack=False, suppressOutput=True)
 
             if re.search("^11", version):
                 kb.dbmsVersion = ["11i"]

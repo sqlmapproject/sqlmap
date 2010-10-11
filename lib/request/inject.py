@@ -31,6 +31,8 @@ from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import parseUnionPage
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -339,7 +341,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
 
     return data
 
-def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
+def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -347,37 +349,44 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     (if selected).
     """
 
+    if suppressOutput:
+        pushValue(conf.verbose)
+        conf.verbose = 0
+    
     if conf.direct:
-        return direct(expression)
+        value = direct(expression)
+    else:
+        expression = cleanQuery(expression)
+        expression = expandAsteriskForColumns(expression)
+        value      = None
 
-    expression = cleanQuery(expression)
-    expression = expandAsteriskForColumns(expression)
-    value      = None
+        expression = expression.replace("DISTINCT ", "")
 
-    expression = expression.replace("DISTINCT ", "")
+        if inband and kb.unionPosition:
+            value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
-    if inband and kb.unionPosition:
-        value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
+            if not value:
+                warnMsg  = "for some reasons it was not possible to retrieve "
+                warnMsg += "the query output through inband SQL injection "
+                warnMsg += "technique, sqlmap is going blind"
+                logger.warn(warnMsg)
 
-        if not value:
-            warnMsg  = "for some reasons it was not possible to retrieve "
-            warnMsg += "the query output through inband SQL injection "
-            warnMsg += "technique, sqlmap is going blind"
-            logger.warn(warnMsg)
+        oldParamFalseCond   = kb.unionFalseCond
+        oldParamNegative    = kb.unionNegative
+        kb.unionFalseCond   = False
+        kb.unionNegative    = False
 
-    oldParamFalseCond   = kb.unionFalseCond
-    oldParamNegative    = kb.unionNegative
-    kb.unionFalseCond   = False
-    kb.unionNegative    = False
+        if blind and not value:
+            value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
-    if blind and not value:
-        value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+        kb.unionFalseCond = oldParamFalseCond
+        kb.unionNegative  = oldParamNegative
 
-    kb.unionFalseCond = oldParamFalseCond
-    kb.unionNegative  = oldParamNegative
+        if value and isinstance(value, basestring):
+            value = value.strip()
 
-    if value and isinstance(value, basestring):
-        value = value.strip()
+    if suppressOutput:
+        conf.verbose = popValue()
 
     return value
 

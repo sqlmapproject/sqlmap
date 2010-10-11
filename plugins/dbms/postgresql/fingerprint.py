@@ -123,33 +123,33 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            if inject.getValue("SELECT DIV(6, 3)", unpack=False, charsetType=2) == "2":
+            if inject.getValue("SELECT DIV(6, 3)", unpack=False, charsetType=2, suppressOutput=True) == "2":
                 kb.dbmsVersion = [">= 8.4.0"]
-            elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)", unpack=False, charsetType=2) in ( "1", "2" ) and not inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2) in ( "1", "2" ):
+            elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)", unpack=False, charsetType=2, suppressOutput=True) in ( "1", "2" ) and not inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2, suppressOutput=True) in ( "1", "2" ):
                 kb.dbmsVersion = [">= 8.3.0", "< 8.4"]
-            elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2):
+            elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2, suppressOutput=True):
                 kb.dbmsVersion = [">= 8.2.0", "< 8.3.0"]
-            elif inject.getValue("SELECT GREATEST(5, 9, 1)", unpack=False, charsetType=2) == "9":
+            elif inject.getValue("SELECT GREATEST(5, 9, 1)", unpack=False, charsetType=2, suppressOutput=True) == "9":
                 kb.dbmsVersion = [">= 8.1.0", "< 8.2.0"]
-            elif inject.getValue("SELECT WIDTH_BUCKET(5.35, 0.024, 10.06, 5)", unpack=False, charsetType=2) == "3":
+            elif inject.getValue("SELECT WIDTH_BUCKET(5.35, 0.024, 10.06, 5)", unpack=False, charsetType=2, suppressOutput=True) == "3":
                 kb.dbmsVersion = [">= 8.0.0", "< 8.1.0"]
-            elif inject.getValue("SELECT SUBSTR(MD5('sqlmap'), 1, 1)", unpack=False):
+            elif inject.getValue("SELECT SUBSTR(MD5('sqlmap'), 1, 1)", unpack=False, suppressOutput=True):
                 kb.dbmsVersion = [">= 7.4.0", "< 8.0.0"]
-            elif inject.getValue("SELECT SUBSTR(CURRENT_SCHEMA(), 1, 1)", unpack=False) == "p":
+            elif inject.getValue("SELECT SUBSTR(CURRENT_SCHEMA(), 1, 1)", unpack=False, suppressOutput=True) == "p":
                 kb.dbmsVersion = [">= 7.3.0", "< 7.4.0"]
             elif inject.getValue("SELECT BIT_LENGTH(1)") == "8":
                 kb.dbmsVersion = [">= 7.2.0", "< 7.3.0"]
-            elif inject.getValue("SELECT SUBSTR(QUOTE_LITERAL('a'), 2, 1)", unpack=False) == "a":
+            elif inject.getValue("SELECT SUBSTR(QUOTE_LITERAL('a'), 2, 1)", unpack=False, suppressOutput=True) == "a":
                 kb.dbmsVersion = [">= 7.1.0", "< 7.2.0"]
-            elif inject.getValue("SELECT POW(2, 3)", unpack=False, charsetType=2) == "8":
+            elif inject.getValue("SELECT POW(2, 3)", unpack=False, charsetType=2, suppressOutput=True) == "8":
                 kb.dbmsVersion = [">= 7.0.0", "< 7.1.0"]
             elif inject.getValue("SELECT MAX('a')") == "a":
                 kb.dbmsVersion = [">= 6.5.0", "< 6.5.3"]
-            elif re.search("([\d\.]+)", inject.getValue("SELECT SUBSTR(VERSION(), 12, 5)", unpack=False)):
+            elif re.search("([\d\.]+)", inject.getValue("SELECT SUBSTR(VERSION(), 12, 5)", unpack=False, suppressOutput=True)):
                 kb.dbmsVersion = [">= 6.4.0", "< 6.5.0"]
-            elif inject.getValue("SELECT SUBSTR(CURRENT_DATE, 1, 1)", unpack=False, charsetType=2) == "2":
+            elif inject.getValue("SELECT SUBSTR(CURRENT_DATE, 1, 1)", unpack=False, charsetType=2, suppressOutput=True) == "2":
                 kb.dbmsVersion = [">= 6.3.0", "< 6.4.0"]
-            elif inject.getValue("SELECT SUBSTRING('sqlmap', 1, 1)", unpack=False) == "s":
+            elif inject.getValue("SELECT SUBSTRING('sqlmap', 1, 1)", unpack=False, suppressOutput=True) == "s":
                 kb.dbmsVersion = [">= 6.2.0", "< 6.3.0"]
             else:
                 kb.dbmsVersion = ["< 6.2.0"]
@@ -180,7 +180,7 @@ class Fingerprint(GenericFingerprint):
             query += "LIKE '%" + osPattern + "%')>0"
             query  = agent.forgeCaseStatement(query)
 
-            if inject.getValue(query, charsetType=1) == "1":
+            if inject.getValue(query, charsetType=1, suppressOutput=True) == "1":
                 kb.os = "Windows"
 
                 break
