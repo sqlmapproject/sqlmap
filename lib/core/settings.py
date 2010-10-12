@@ -71,6 +71,7 @@ FIREBIRD_SYSTEM_DBS = ( "RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_C
                         "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS",\
                         "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS" )
 MAXDB_SYSTEM_DBS    = ( "SYSINFO", "DOMAIN" )
+SYBASE_SYSTEM_DBS   = ( "master", "model", "sybsystemdb", "sybsystemprocs" )
 
 MSSQL_ALIASES       = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
 MYSQL_ALIASES       = [ "mysql", "my" ]
@@ -80,8 +81,9 @@ SQLITE_ALIASES      = [ "sqlite", "sqlite3" ]
 ACCESS_ALIASES      = [ "access", "jet", "microsoft access", "msaccess" ]
 FIREBIRD_ALIASES    = [ "firebird", "mozilla firebird", "interbase", "ibase", "fb" ]
 MAXDB_ALIASES       = [ "maxdb", "sap maxdb", "sap db" ]
+SYBASE_ALIASES      = [ "sybase", "sybase sql server" ]
 
-SUPPORTED_DBMS      = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES
+SUPPORTED_DBMS      = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES
 SUPPORTED_OS        = ( "linux", "windows" )
 
 SQL_STATEMENTS      = {

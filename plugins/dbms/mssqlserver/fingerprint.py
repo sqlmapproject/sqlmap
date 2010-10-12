@@ -103,7 +103,8 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            payload = agent.fullPayload(" AND LEN(@@VERSION)=LEN(@@VERSION)")
+            randInt = randomInt()
+            payload = agent.fullPayload(" AND BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d))" % (randInt, randInt))
             result  = Request.queryPage(payload)
 
         if result:

