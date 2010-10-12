@@ -96,7 +96,7 @@ def __setRequestParams():
                 result += parts[j]
                 if i == j:
                     result += "*"
-            conf.paramDict["URI"]["#%d" % (i+1)] = result
+            conf.paramDict["URI"]["#%d*" % (i+1)] = result
         conf.url = conf.url.replace("*", str())
         __testableParameters = True
 
