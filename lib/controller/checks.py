@@ -245,13 +245,14 @@ def checkStability():
 
     elif not condition:
         warnMsg  = "url is not stable, sqlmap will base the page "
-        warnMsg += "comparison on a sequence matcher, if no dynamic nor "
-        warnMsg += "injectable parameters are detected, refer to user's "
+        warnMsg += "comparison on a sequence matcher. if no dynamic nor "
+        warnMsg += "injectable parameters are detected, or in case of junk "
+        warnMsg += "results, refer to user's "
         warnMsg += "manual paragraph 'Page comparison' and provide a "
         warnMsg += "string or regular expression to match on"
         logger.warn(warnMsg)
         
-        message = "do you want to continue? [Y/n] "
+        message = "do you still want to continue (possible BAD results)? [Y/n] "
         test = readInput(message, default="Y")
         if test and test[0] not in ("y", "Y"):
             raise sqlmapUserQuitException
