@@ -406,16 +406,26 @@
         </dump_table>
    </dbms>
 
+   <!-- http://dev.mysql.com/tech-resources/articles/maxdb-php-ready-for-web.html -->
+   <!-- http://dev.mysql.com/doc/refman/5.0/es/maxdb-reserved-words.html -->
+   <!-- http://maxdb.sap.com/doc/7_6/default.htm -->
+
    <!-- SAP MaxDB -->
    <dbms value="SAP MaxDB">
         <length query="LENGTH(%s)"/>
         <inference/>
         <timedelay/>
         <banner query="SELECT ID FROM SYSINFO.VERSION"/>
-        <isnull query="VALUE(%s,' ')"/>
-        <comment query="--"/>
+        <isnull query="VALUE(%s,' ')" query2="IFNULL(%s, ' ')"/>
+        <comment query="--" query2="#"/>
         <count query="COUNT(%s)"/>
         <cast query="CHR(%s)"/>
+        <current_user query="SELECT USER() FROM DUAL"/>
+        <current_db query="SELECT DATABASE() FROM DUAL"/>
+        <order query="ORDER BY %s ASC"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <delimiter query=","/>
+        <substring query="SUBSTR((%s), %d, %d)"/>
    </dbms>
 
 </root>
