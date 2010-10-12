@@ -204,6 +204,9 @@ def cmdLineParser():
                              action="store_true", default=False,
                              help="Use operator BETWEEN instead of default '>'")
 
+        injection.add_option("--tamper", dest="tamper",
+                             help="Use given module(s) for tampering injection data")
+
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
                                  "be used to test for specific SQL injection "

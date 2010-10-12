@@ -305,9 +305,13 @@ class Connect:
 
         if not place:
             place = kb.injPlace
+        
+        if kb.tamperFunctions:
+            for function in kb.tamperFunctions:
+                value = function(place, value)
 
         if "GET" in conf.parameters:
-            get = conf.parameters["GET"] if place != "GET" or not value else value
+            get = conf.parameters["GET"] if place != "GET" or not value else value            
 
         if "POST" in conf.parameters:
             post = conf.parameters["POST"] if place != "POST" or not value else value

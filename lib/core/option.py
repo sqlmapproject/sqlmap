@@ -542,6 +542,45 @@ def __setDBMS():
         errMsg += "fingerprint it for you."
         raise sqlmapUnsupportedDBMSException, errMsg
 
+def __setTamperingFunctions():
+    """
+    Loads tampering functions from given module path(s).
+    """
+    if conf.tamper:
+        kb.tamperFunctions = []
+        import inspect
+        import sys
+        for file in conf.tamper.split(';'):
+            if not file:
+                continue
+            elif not os.path.exists(file):
+                errMsg = "missing tampering module file '%s'" % file
+                raise sqlmapFilePathException, errMsg
+            elif os.path.splitext(file)[1] != '.py':
+                errMsg = "tampering module file should have an extension '.py'"
+                raise sqlmapSyntaxException, errMsg
+            dirname, filename = os.path.split(file)
+            dirname = os.path.abspath(dirname)
+            if not os.path.exists(os.path.join(dirname, '__init__.py')):
+                errMsg  = "make sure that there is an empty file '__init__.py' "
+                errMsg += "inside of tampering module directory '%s'" % dirname
+                raise sqlmapGenericException, errMsg
+            if dirname not in sys.path:
+                sys.path.insert(0, dirname)
+            try:
+                module = __import__(filename[:-3])
+            except ImportError, msg:
+                raise sqlmapSyntaxException, "can't import module file '%s' (%s)" % (file, msg)
+            
+            found = False
+            for name, function in inspect.getmembers(module, inspect.isfunction):
+                if name=="tamper" and function.func_code.co_argcount == 2:
+                    kb.tamperFunctions.append(function)
+                    found = True
+                    break            
+            if not found:
+                raise sqlmapGenericException, "missing function 'tamper(place, value)' in tampering module '%s'" % filename
+
 def __setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
         conf.threads = 1
@@ -989,58 +1028,59 @@ def __setKnowledgeBaseAttributes():
     debugMsg = "initializing the knowledge base"
     logger.debug(debugMsg)
 
-    kb.absFilePaths   = set()
-    kb.assumeEmpty    = False
-    kb.bannerFp       = advancedDict()
+    kb.absFilePaths    = set()
+    kb.assumeEmpty     = False
+    kb.bannerFp        = advancedDict()
 
-    kb.cache          = advancedDict()
-    kb.cache.regex    = {}
+    kb.cache           = advancedDict()
+    kb.cache.regex     = {}
 
-    kb.commonOutputs  = None
-    kb.data           = advancedDict()
+    kb.commonOutputs   = None
+    kb.data            = advancedDict()
 
     # Basic back-end DBMS fingerprint
-    kb.dbms           = None
-    kb.dbmsDetected   = False
+    kb.dbms            = None
+    kb.dbmsDetected    = False
 
     # Active (extensive) back-end DBMS fingerprint
-    kb.dbmsVersion    = [ "Unknown" ]
+    kb.dbmsVersion     = [ "Unknown" ]
 
-    kb.dep            = None
-    kb.docRoot        = None
-    kb.dynamicContent = []
-    kb.lastErrorPage  = None
-    kb.headersCount   = 0
-    kb.headersFp      = {}
-    kb.htmlFp         = []
-    kb.injParameter   = None
-    kb.injPlace       = None
-    kb.injType        = None
-    kb.injections     = xmlobject.XMLFile(path=paths.INJECTIONS_XML)
-    kb.hintValue      = None
-    kb.nullConnection = None
+    kb.dep             = None
+    kb.docRoot         = None
+    kb.dynamicContent  = []
+    kb.lastErrorPage   = None
+    kb.headersCount    = 0
+    kb.headersFp       = {}
+    kb.htmlFp          = []
+    kb.injParameter    = None
+    kb.injPlace        = None
+    kb.injType         = None
+    kb.injections      = xmlobject.XMLFile(path=paths.INJECTIONS_XML)
+    kb.hintValue       = None
+    kb.nullConnection  = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing
-    kb.os             = None
-    kb.osVersion      = None
-    kb.osSP           = None
+    kb.os              = None
+    kb.osVersion       = None
+    kb.osSP            = None
 
-    kb.parenthesis    = None
-    kb.partRun        = None
-    kb.lastRequestUID = 0
-    kb.queryCounter   = 0
-    kb.resumedQueries = {}
-    kb.stackedTest    = None
-    kb.targetUrls     = set()
-    kb.testedParams   = set()
-    kb.timeTest       = None
-    kb.unionComment   = ""
-    kb.unionCount     = None
-    kb.unionPosition  = None
-    kb.unionNegative  = False
-    kb.unionFalseCond = False
-    kb.valueStack     = []
+    kb.parenthesis     = None
+    kb.partRun         = None
+    kb.lastRequestUID  = 0
+    kb.queryCounter    = 0
+    kb.resumedQueries  = {}
+    kb.stackedTest     = None
+    kb.tamperFunctions = None
+    kb.targetUrls      = set()
+    kb.testedParams    = set()
+    kb.timeTest        = None
+    kb.unionComment    = ""
+    kb.unionCount      = None
+    kb.unionPosition   = None
+    kb.unionNegative   = False
+    kb.unionFalseCond  = False
+    kb.valueStack      = []
 
 def __saveCmdline():
     """
@@ -1185,6 +1225,7 @@ def init(inputOptions=advancedDict()):
     __basicOptionValidation()
     __setRequestFromFile()
     __setMultipleTargets()
+    __setTamperingFunctions()
 
     parseTargetUrl()
     parseTargetDirect()
