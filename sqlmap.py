@@ -51,6 +51,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import exceptionsTuple
+from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.exception import unhandledException
 from lib.core.option import init
@@ -99,6 +100,9 @@ def main():
         errMsg = "user quit"
         logger.error(errMsg)
         closeDumper(False, errMsg)
+
+    except sqlmapSilentQuitException:
+        closeDumper(False)
 
     except exceptionsTuple, e:
         e = getUnicode(e)

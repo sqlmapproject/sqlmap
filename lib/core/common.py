@@ -39,6 +39,7 @@ import subprocess
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
 from StringIO import StringIO
+from difflib import SequenceMatcher
 from subprocess import PIPE
 from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
@@ -1123,6 +1124,33 @@ def preparePageForLineComparison(page):
     if isinstance(page, basestring):
         return page.replace("><", ">\n<").replace("<br>", "\n").splitlines()
     return retVal
+
+def getFilteredPageContent(page):
+    retVal = page
+    if isinstance(page, basestring):
+        retVal = re.sub(r"(?s)<script.+?</script>|<style.+?</style>|<[^>]+>|\t|\n|\r", "", page)
+    return retVal
+
+def getPageTextWordsSet(page):
+    retVal = None
+    if isinstance(page, basestring):
+        page = getFilteredPageContent(page)
+        retVal = set(re.findall(r"\w+", page))
+    return retVal
+
+def showStaticWords(firstPage, secondPage):
+    infoMsg = "finding static words in longest matching part of dynamic page content"
+    logger.info(infoMsg)
+    firstPage = getFilteredPageContent(firstPage)
+    secondPage = getFilteredPageContent(secondPage)
+    match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
+    commonText = firstPage[match[0]:match[0]+match[2]]
+    commonWords = getPageTextWordsSet(commonText)
+    infoMsg = "static words: "
+    for word in commonWords:
+        if len(word) > 2:
+            infoMsg += "'%s', " % word
+    logger.info(infoMsg)
 
 def decloakToNamedTemporaryFile(filepath, name=None):
     retVal = NamedTemporaryFile()

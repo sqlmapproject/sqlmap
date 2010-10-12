@@ -26,12 +26,15 @@ import re
 import socket
 import time
 
+from difflib import SequenceMatcher
+
 from lib.core.agent import agent
 from lib.core.common import getUnicode
 from lib.core.common import preparePageForLineComparison
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import showStaticWords
 from lib.core.common import DynamicContentItem
 from lib.core.convert import md5hash
 from lib.core.data import conf
@@ -41,6 +44,7 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import sqlmapSilentQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.request.connect import Connect as Request
@@ -251,13 +255,28 @@ def checkStability():
         warnMsg += "manual paragraph 'Page comparison' and provide a "
         warnMsg += "string or regular expression to match on"
         logger.warn(warnMsg)
-        
-        message = "do you still want to continue (possible BAD results)? [Y/n] "
-        test = readInput(message, default="Y")
-        if test and test[0] not in ("y", "Y"):
-            raise sqlmapUserQuitException
 
-        checkDynamicContent(firstPage, secondPage)
+        message = "how do you want to proceed? [C(ontinue)/s(tring)/r(egex)/q(uit)] "
+        test = readInput(message, default="C")
+        if test and test[0] in ("q", "Q"):
+            raise sqlmapUserQuitException
+        elif test and test[0] in ("s", "S"):
+            showStaticWords(firstPage, secondPage)
+            message = "please enter value for parameter 'string': "
+            test = readInput(message)
+            if test:
+                conf.string = test
+            else:
+                raise sqlmapSilentQuitException
+        elif test and test[0] in ("r", "R"):
+            message = "please enter value for parameter 'regex': "
+            test = readInput(message)
+            if test:
+                conf.regex = test
+            else:
+                raise sqlmapSilentQuitException
+        else:
+            checkDynamicContent(firstPage, secondPage)
 
     return condition
 

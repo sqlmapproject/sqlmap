@@ -55,6 +55,9 @@ class sqlmapNoneDataException(Exception):
 class sqlmapNotVulnerableException(Exception):
     pass
 
+class sqlmapSilentQuitException(Exception):
+    pass
+
 class sqlmapUserQuitException(Exception):
     pass
 
@@ -96,6 +99,7 @@ exceptionsTuple = (
                     sqlmapMissingDependence,
                     sqlmapMissingMandatoryOptionException,
                     sqlmapNoneDataException,
+                    sqlmapSilentQuitException,
                     sqlmapUserQuitException,
                     sqlmapRegExprException,
                     sqlmapSyntaxException,
