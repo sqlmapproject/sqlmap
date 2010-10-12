@@ -193,6 +193,10 @@ def cmdLineParser():
         injection.add_option("--threshold", dest="thold", type="float",
                              help="Page comparison threshold value (0.0-1.0)")
 
+        injection.add_option("--text-only", dest="textOnly",
+                             action="store_true", default=False,
+                             help="Compare pages based only on their textual content")
+
         injection.add_option("--space", dest="space",
                              help="Use defined string for space instead of standard ' '")
 

@@ -29,6 +29,7 @@ import time
 from difflib import SequenceMatcher
 
 from lib.core.agent import agent
+from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import preparePageForLineComparison
 from lib.core.common import randomInt
@@ -376,7 +377,7 @@ def checkConnection():
 
     try:
         page, _ = Request.getPage()
-        conf.seqMatcher.set_seq1(page)
+        conf.seqMatcher.set_seq1(page if not conf.textOnly else getFilteredPageContent(page))
 
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)

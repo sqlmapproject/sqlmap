@@ -98,9 +98,6 @@ def start():
     if not conf.start:
         return False
 
-    if conf.optimize:
-        conf.useCommonPrediction = conf.useNullConnection = conf.keepAlive = True
-
     if conf.direct:
         initTargetEnv()
         setupTargetEnv()

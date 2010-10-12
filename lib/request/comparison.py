@@ -24,6 +24,7 @@ Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 
+from lib.core.common import getFilteredPageContent
 from lib.core.common import preparePageForLineComparison
 from lib.core.data import conf
 from lib.core.data import kb
@@ -84,7 +85,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         if ratio > 1.:
             ratio = 1. / ratio
     else:
-        conf.seqMatcher.set_seq2(page)
+        conf.seqMatcher.set_seq2(page if not conf.textOnly else getFilteredPageContent(page))
         ratio = round(conf.seqMatcher.ratio(), 3)
 
     if conf.seqLock:

@@ -938,6 +938,10 @@ def __cleanupOptions():
     if conf.googleDork or conf.list:
         conf.multipleTargets = True
 
+    if conf.optimize:
+        conf.useCommonPrediction = conf.keepAlive = True
+        conf.useNullConnection = not conf.textOnly
+
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration
@@ -1160,6 +1164,10 @@ def __basicOptionValidation():
     if conf.matchRatio is not None and isinstance(conf.matchRatio, float) and (conf.matchRatio > 1 or\
       conf.cpuThrottle < 0):
         errMsg = "value for --ratio (matchRatio) option must be in range [0,1]"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.textOnly and conf.useNullConnection:
+        errMsg = "switch --text-only is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
 def init(inputOptions=advancedDict()):
