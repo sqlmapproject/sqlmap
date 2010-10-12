@@ -1128,7 +1128,9 @@ def preparePageForLineComparison(page):
 def getFilteredPageContent(page):
     retVal = page
     if isinstance(page, basestring):
-        retVal = re.sub(r"(?s)<script.+?</script>|<style.+?</style>|<[^>]+>|\t|\n|\r", "", page)
+        retVal = re.sub(r"(?s)<script.+?</script>|<style.+?</style>|<[^>]+>|\t|\n|\r", " ", page)
+        while retVal.find("  ") != -1:
+            retVal = retVal.replace("  ", " ")
     return retVal
 
 def getPageTextWordsSet(page):
