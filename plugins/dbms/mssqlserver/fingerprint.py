@@ -104,7 +104,9 @@ class Fingerprint(GenericFingerprint):
             result = True
         else:
             randInt = randomInt()
-            payload = agent.fullPayload(" AND BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d))" % (randInt, randInt))
+            payload = agent.fullPayload(" AND BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt))
+            import pdb
+            pdb.set_trace()
             result  = Request.queryPage(payload)
 
         if result:
