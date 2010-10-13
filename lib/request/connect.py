@@ -134,6 +134,8 @@ class Connect:
             # Perform HTTP request
             headers = forgeHeaders(cookie, ua)
 
+            headers["Referer"] = "%s://%s" % (conf.scheme, conf.hostname)
+
             if auxHeaders:
                 for key, item in auxHeaders.items():
                     headers[key] = item
