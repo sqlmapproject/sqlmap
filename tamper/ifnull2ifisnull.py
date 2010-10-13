@@ -4,7 +4,7 @@ from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 
 """
-Tampering IFNULL(A,B) -> IF(ISNULL(A),B,A)
+IFNULL(A,B) -> IF(ISNULL(A),B,A)
 """
 def tamper(place, value):
     if value and value.find("IFNULL") > -1:
@@ -25,10 +25,13 @@ def tamper(place, value):
                     deepness += 1
                 elif value[i] == ')':
                     deepness -= 1
-            A = value[index + len("IFNULL("):comma]
-            B = value[comma + 1:end]
-            newVal = "IF(ISNULL(%s),%s,%s)" % (A, B, A)
-            value = value[:index] + newVal + value[end+1:]
+            if comma and end:
+                A = value[index + len("IFNULL("):comma]
+                B = value[comma + 1:end]
+                newVal = "IF(ISNULL(%s),%s,%s)" % (A, B, A)
+                value = value[:index] + newVal + value[end+1:]
+            else:
+                break
         if place != "URI":
             value = urlencode(value)
     return value

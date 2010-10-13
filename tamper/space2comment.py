@@ -4,7 +4,7 @@ from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 
 """
-Tampering ' ' -> /**/
+' ' -> /**/
 """
 def tamper(place, value):
     if value:
