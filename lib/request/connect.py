@@ -347,10 +347,7 @@ class Connect:
             if kb.nullConnection == "HEAD":
                 pageLength = int(headers['Content-Length'])
             elif kb.nullConnection == "Range":
-                if 'Content-Range' in headers:
-                    pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
-                elif 'content-length' in headers: #sometimes
-                    pageLength = int(headers['content-length'])
+                pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
 
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404)

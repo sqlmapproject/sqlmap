@@ -295,10 +295,10 @@ class HTTPResponse(httplib.HTTPResponse):
 class HTTPConnection(httplib.HTTPConnection):
     # use the modified response class
     response_class = HTTPResponse
-    _headers = {}
+    _headers = None
 
     def clearheaders(self):
-        self._headers.clear()
+        self._headers = {}
 
     def putheader(self, header, value):
         """Send a request header line to the server.
