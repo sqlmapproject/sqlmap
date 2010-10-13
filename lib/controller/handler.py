@@ -51,8 +51,8 @@ from plugins.dbms.firebird import FirebirdMap
 from plugins.dbms.firebird.connector import Connector as FirebirdConn
 from plugins.dbms.maxdb import MaxDBMap
 from plugins.dbms.maxdb.connector import Connector as MaxDBConn
-from plugins.dbms.sybase import SybaseMap
-from plugins.dbms.sybase.connector import Connector as SybaseConn
+#from plugins.dbms.sybase import SybaseMap
+#from plugins.dbms.sybase.connector import Connector as SybaseConn
 
 def setHandler():
     """
@@ -71,7 +71,7 @@ def setHandler():
                   ( ACCESS_ALIASES, AccessMap, AccessConn ),
                   ( FIREBIRD_ALIASES, FirebirdMap, FirebirdConn ),
                   ( MAXDB_ALIASES, MaxDBMap, MaxDBConn ),
-                  ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
+#                  ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
                 )
 
     for dbmsAliases, dbmsMap, dbmsConn in dbmsMap:
