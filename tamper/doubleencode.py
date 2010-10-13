@@ -11,5 +11,5 @@ def tamper(place, value):
         if place != "URI":
             value = urlencode(value)
         else:
-            raise sqlmapUnsupportedFeatureException, "can't use tampering module 'doubleencode.py' with 'URI' type injections"
+            raise sqlmapUnsupportedFeatureException, "can't use tampering module '%s' with 'URI' type injections" % __name__
     return value

@@ -8,7 +8,6 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 value -> urlencode of nonencoded chars in value
 """
 def tamper(place, value):
-    raise sqlmapUnsupportedFeatureException, "can't use tampering module 'charencode.py' with 'URI' type injections"
     retVal = value
     if value:
         if place != "URI":
@@ -22,5 +21,5 @@ def tamper(place, value):
                     retVal += '%%%X' % ord(value[i])
                     i += 1
         else:
-            raise sqlmapUnsupportedFeatureException, "can't use tampering module 'charencode.py' with 'URI' type injections"
+            raise sqlmapUnsupportedFeatureException, "can't use tampering module '%s' with 'URI' type injections" % __name__
     return retVal
