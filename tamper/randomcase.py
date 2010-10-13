@@ -6,7 +6,7 @@ from lib.core.common import randomRange
 from lib.core.exception import sqlmapUnsupportedFeatureException
 
 """
-value -> random case of chars in value
+value -> chars from value with random case
 """
 def tamper(place, value):
     retVal = value
