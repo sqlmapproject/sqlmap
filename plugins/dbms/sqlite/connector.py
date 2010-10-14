@@ -4,7 +4,7 @@
 $Id$
 
 Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
-See the file doc/COPYING for copying permission.
+See the file 'doc/COPYING' for copying permission
 """
 
 try:
@@ -54,6 +54,8 @@ class Connector(GenericConnector):
 
     def execute(self, query):
         try:
+            import pdb
+            pdb.set_trace()
             self.cursor.execute(utf8encode(query))
         except sqlite3.OperationalError, msg:
             logger.log(8, msg[0])
