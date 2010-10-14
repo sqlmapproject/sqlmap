@@ -87,18 +87,20 @@ def checkCharEncoding(encoding):
 
     if ';' in encoding:
         encoding = encoding[:encoding.find(';')]
-    #http://philip.html5.org/data/charsets-2.html
+
+    # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
         encoding = translate[encoding]
     elif encoding.startswith('cp-'):
         encoding = 'cp%s' % encoding[3:]
     elif encoding.startswith('windows') and not encoding.startswith('windows-'):
         encoding = 'windows-%s' % encoding[7:]
+
     try:
         codecs.lookup(encoding)
     except LookupError:
         warnMsg  = "unknown charset '%s'. " % encoding
-        warnMsg += "please report by e-mail to sqlmap-users@lists.sourceforge.net."
+        warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
 
         logger.warn(warnMsg)
         encoding = conf.dataEncoding

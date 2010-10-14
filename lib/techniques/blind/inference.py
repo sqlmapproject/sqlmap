@@ -93,7 +93,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progress = ProgressBar(maxValue=length)
         progressTime = []
 
-    if numThreads is not None:
+    if numThreads > 1:
         debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
         logger.debug(debugMsg)
 
