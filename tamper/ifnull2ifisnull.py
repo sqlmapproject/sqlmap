@@ -4,7 +4,7 @@ from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 
 """
-IFNULL(A,B) -> IF(ISNULL(A),B,A)
+IFNULL(A,B) -> IF(ISNULL(A),B,A) (e.g., IFNULL(1,2) -> IF(ISNULL(1),2,1))
 """
 def tamper(place, value):
     if value and value.find("IFNULL") > -1:

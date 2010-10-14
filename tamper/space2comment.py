@@ -4,7 +4,7 @@ from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 
 """
-' ' -> /**/
+' ' -> /**/ (e.g., SELECT id FROM users->SELECT/**/id/**/FROM users)
 """
 def tamper(place, value):
     if value:

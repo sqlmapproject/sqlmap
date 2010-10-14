@@ -1,12 +1,11 @@
 import re
 import string
 
-from lib.core.convert import urlencode
 from lib.core.common import randomRange
 from lib.core.exception import sqlmapUnsupportedFeatureException
 
 """
-value -> chars from value with random case
+value -> chars from value with random case (e.g., INSERT->InsERt)
 """
 def tamper(place, value):
     retVal = value

@@ -1,11 +1,10 @@
 import re
 import string
 
-from lib.core.convert import urlencode
 from lib.core.exception import sqlmapUnsupportedFeatureException
 
 """
-value -> urlencode of nonencoded chars in value
+value -> urlencode of nonencoded chars in value (e.g., SELECT%20FIELD%20FROM%20TABLE -> %53%45%4c%45%43%54%20%46%49%45%4c%44%20%46%52%4f%4d%20%54%41%42%4c%45)
 """
 def tamper(place, value):
     retVal = value
