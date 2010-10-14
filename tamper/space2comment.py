@@ -2,8 +2,9 @@
 
 """
 $Id$
-$Copyright$
-$License$
+
+Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
+See the file doc/COPYING for copying permission.
 """
 
 import re
