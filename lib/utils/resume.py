@@ -189,7 +189,7 @@ def resume(expression, payload):
             return "%s%s" % (resumedValue, finalValue)
 
         return None
-    except:
+    except ValueError:
         errMsg = "invalid resume value for expression: '%s'" % expression
         logger.error(errMsg)
         return None
