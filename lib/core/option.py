@@ -1064,7 +1064,7 @@ def __setKnowledgeBaseAttributes():
     kb.injPlace        = None
     kb.injType         = None
     kb.injections      = xmlobject.XMLFile(path=paths.INJECTIONS_XML)
-    kb.keywords        = getFileItems(paths.SQLKEYWORDS)
+    kb.keywords        = set(getFileItems(paths.SQLKEYWORDS))
     kb.nullConnection  = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)

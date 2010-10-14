@@ -1150,9 +1150,16 @@ def showStaticWords(firstPage, secondPage):
     commonText = firstPage[match[0]:match[0]+match[2]]
     commonWords = getPageTextWordsSet(commonText)
     infoMsg = "static words: "
+
+    if commonWords:
+        commonWords = list(commonWords)
+        commonWords.sort(lambda a, b: cmp(a.lower(), b.lower()))
+
     for word in commonWords:
         if len(word) > 2:
             infoMsg += "'%s', " % word
+
+    infoMsg = infoMsg.rstrip(", ")
     logger.info(infoMsg)
 
 def decloakToNamedTemporaryFile(filepath, name=None):
