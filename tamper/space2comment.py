@@ -17,7 +17,10 @@ def tamper(place, value):
 
         for i in xrange(len(value)):
             if not firstspace:
-                firstspace = value[i].isspace()
+                if value[i].isspace():
+                    firstspace = True
+                    retVal += "/**/"
+                    continue
             elif value[i] == '\'':
                 qoute = not qoute
             elif value[i] == '"':
