@@ -559,12 +559,18 @@ def __setTamperingFunctions():
             elif os.path.splitext(file)[1] != '.py':
                 errMsg = "tampering module file should have an extension '.py'"
                 raise sqlmapSyntaxException, errMsg
+
             dirname, filename = os.path.split(file)
             dirname = os.path.abspath(dirname)
+
+            infoMsg  = "loading tampering module: '%s'" % filename[:-3]
+            logger.info(infoMsg)
+
             if not os.path.exists(os.path.join(dirname, '__init__.py')):
                 errMsg  = "make sure that there is an empty file '__init__.py' "
                 errMsg += "inside of tampering module directory '%s'" % dirname
                 raise sqlmapGenericException, errMsg
+
             if dirname not in sys.path:
                 sys.path.insert(0, dirname)
             try:
