@@ -1,3 +1,6 @@
+# Copyright (c) 2006-2010 sqlmap project (http://sqlmap.sourceforge.net/)
+# See the file doc/COPYING for copying permission.
+
 import re
 import string
 
@@ -11,6 +14,7 @@ value -> value with inserted random blanks (e.g., INSERT->IN/**/S/**/ERT)
 """
 def tamper(place, value):
     retVal = value
+
     if value:
         if place != "URI":
             retVal = urldecode(retVal)
@@ -23,11 +27,14 @@ def tamper(place, value):
 
             if word.upper() in kb.keywords:
                 newWord = word[0]
+
                 for i in xrange(1, len(word) - 1):
                     newWord += "%s%s" % ("/**/" if randomRange(0,1) else "", word[i])
+
                 newWord += word[-1]
                 retVal = retVal.replace(word, newWord)
 
         if place != "URI":
             retVal = urlencode(retVal)
+
     return retVal

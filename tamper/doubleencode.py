@@ -1,3 +1,6 @@
+# Copyright (c) 2006-2010 sqlmap project (http://sqlmap.sourceforge.net/)
+# See the file doc/COPYING for copying permission.
+
 import re
 
 from lib.core.convert import urlencode
@@ -12,4 +15,5 @@ def tamper(place, value):
             value = urlencode(value)
         else:
             raise sqlmapUnsupportedFeatureException, "can't use tampering module '%s' with 'URI' type injections" % __name__
+
     return value

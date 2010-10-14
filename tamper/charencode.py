@@ -1,3 +1,6 @@
+# Copyright (c) 2006-2010 sqlmap project (http://sqlmap.sourceforge.net/)
+# See the file doc/COPYING for copying permission.
+
 import re
 import string
 
@@ -8,10 +11,12 @@ value -> urlencode of nonencoded chars in value (e.g., SELECT%20FIELD%20FROM%20T
 """
 def tamper(place, value):
     retVal = value
+
     if value:
         if place != "URI":
             retVal = ""
             i = 0
+
             while i < len(value):
                 if value[i] == '%' and (i < len(value) - 2) and value[i+1] in string.hexdigits and value[i+2] in string.hexdigits:
                     retVal += value[i:i+3]
@@ -21,4 +26,5 @@ def tamper(place, value):
                     i += 1
         else:
             raise sqlmapUnsupportedFeatureException, "can't use tampering module '%s' with 'URI' type injections" % __name__
+
     return retVal
