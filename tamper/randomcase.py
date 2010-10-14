@@ -2,19 +2,28 @@ import re
 import string
 
 from lib.core.common import randomRange
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.convert import urldecode
+from lib.core.convert import urlencode
+from lib.core.data import kb
 
 """
 value -> chars from value with random case (e.g., INSERT->InsERt)
 """
-#TODO: only do it for deepness = 0 regarding '"
 def tamper(place, value):
     retVal = value
     if value:
-        retVal = ""
-        for i in xrange(len(value)):
-            if value[i].isalpha():
-                retVal += value[i].upper() if randomRange(0,1) else value[i].lower()
-            else:
-                retVal += value[i]
+        if place != "URI":
+            retVal = urldecode(retVal)
+
+        for match in re.finditer(r"[A-Za-z_]+", retVal):
+            word = match.group()
+            if word.upper() in kb.keywords:
+                newWord = str()
+                for i in xrange(len(word)):
+                    newWord += word[i].upper() if randomRange(0,1) else word[i].lower()
+                retVal = retVal.replace(word, newWord)
+
+        if place != "URI":
+            retVal = urlencode(retVal)
+
     return retVal

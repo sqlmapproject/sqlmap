@@ -38,6 +38,7 @@ from lib.core.common import readInput
 from lib.core.common import showStaticWords
 from lib.core.common import DynamicContentItem
 from lib.core.convert import md5hash
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -105,9 +106,6 @@ def heuristicCheckSqlInjection(place, parameter, value):
     prefix = ""
     postfix = ""
 
-    if place == "URI":
-        return
-
     if conf.prefix or conf.postfix:
         if conf.prefix:
             prefix = conf.prefix
@@ -116,9 +114,11 @@ def heuristicCheckSqlInjection(place, parameter, value):
             postfix = conf.postfix
 
     payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
+    if place == "URI":
+        payload = conf.paramDict[place][parameter].replace('*', payload)
     Request.queryPage(payload, place)
     result = kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
-    infoMsg = "heuristics show that %s parameter '%s' is " % (place, parameter)
+    infoMsg = "(error based) heuristics show that %s parameter '%s' is " % (place, parameter)
     if result:
         infoMsg += "injectable"
         logger.info(infoMsg)

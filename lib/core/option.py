@@ -36,6 +36,7 @@ import urlparse
 from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
 from lib.core.common import getConsoleWidth
+from lib.core.common import getFileItems
 from lib.core.common import getFileType
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -1057,12 +1058,13 @@ def __setKnowledgeBaseAttributes():
     kb.lastErrorPage   = None
     kb.headersCount    = 0
     kb.headersFp       = {}
+    kb.hintValue       = None
     kb.htmlFp          = []
     kb.injParameter    = None
     kb.injPlace        = None
     kb.injType         = None
     kb.injections      = xmlobject.XMLFile(path=paths.INJECTIONS_XML)
-    kb.hintValue       = None
+    kb.keywords        = getFileItems(paths.SQLKEYWORDS)
     kb.nullConnection  = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)

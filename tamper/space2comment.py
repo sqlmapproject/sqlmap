@@ -6,12 +6,28 @@ from lib.core.convert import urlencode
 """
 ' ' -> /**/ (e.g., SELECT id FROM users->SELECT/**/id/**/FROM users)
 """
-#TODO: only do it for deepness = 0 regarding '"
 def tamper(place, value):
+    retVal = value
     if value:
         if place != "URI":
             value = urldecode(value)
-        value = value.replace(" ", "/**/")
+
+        retVal = ""
+        qoute, doublequote, firstspace = False, False, False
+
+        for i in xrange(len(value)):
+            if not firstspace:
+                firstspace = value[i].isspace()
+            elif value[i] == '\'':
+                qoute = not qoute
+            elif value[i] == '"':
+                doublequote = not doublequote
+            elif value[i]==" " and not doublequote and not qoute:
+                retVal += "/**/"
+                continue
+            retVal += value[i]
+
         if place != "URI":
-            value = urlencode(value)
-    return value
+            retVal = urlencode(retVal)
+    return retVal
+
