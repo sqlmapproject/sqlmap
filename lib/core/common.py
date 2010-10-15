@@ -1467,12 +1467,6 @@ def longestCommonPrefix(*sequences):
 def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
 
-def replaceSpaces(query):
-    if query:
-        return query if conf.space is None else query.replace(' ', conf.space)
-    else:
-        return query
-
 def pushValue(value):
     kb.valueStack.append(value)
 

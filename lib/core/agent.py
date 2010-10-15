@@ -14,7 +14,6 @@ from xml.etree import ElementTree as ET
 from lib.core.common import getInjectionCase
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import replaceSpaces
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -106,7 +105,7 @@ class Agent:
                 retValue = paramString.replace("%s=%s" % (parameter, value),
                                                "%s=%s" % (parameter, newValue))
 
-        return replaceSpaces(retValue)
+        return retValue
 
     def fullPayload(self, query):
         if conf.direct:
@@ -147,7 +146,7 @@ class Agent:
 
         query += string
 
-        return replaceSpaces(query)
+        return query
 
     def postfixQuery(self, string, comment=None):
         """
@@ -180,7 +179,7 @@ class Agent:
         else:
             string += case.usage.postfix.format % eval(case.usage.postfix.params)
 
-        return replaceSpaces(string)
+        return string
 
     def nullAndCastField(self, field):
         """
@@ -215,7 +214,7 @@ class Agent:
         # SQLite version 2 does not support neither CAST() nor IFNULL(),
         # introduced only in SQLite version 3
         if kb.dbms == "SQLite":
-            return replaceSpaces(field)
+            return field
 
         if field.startswith("(CASE"):
             nulledCastedField = field
@@ -223,7 +222,7 @@ class Agent:
             nulledCastedField = queries[kb.dbms].cast % field
             nulledCastedField = queries[kb.dbms].isnull % nulledCastedField
 
-        return replaceSpaces(nulledCastedField)
+        return nulledCastedField
 
     def nullCastConcatFields(self, fields):
         """
@@ -256,7 +255,7 @@ class Agent:
         """
 
         if not kb.dbmsDetected:
-            return replaceSpaces(fields)
+            return fields
 
         fields             = fields.replace(", ", ",")
         fieldsSplitted     = fields.split(",")
@@ -269,7 +268,7 @@ class Agent:
         delimiterStr = "%s'%s'%s" % (dbmsDelimiter, temp.delimiter, dbmsDelimiter)
         nulledCastedConcatFields = delimiterStr.join([field for field in nulledCastedFields])
 
-        return replaceSpaces(nulledCastedConcatFields)
+        return nulledCastedConcatFields
 
     def getFields(self, query):
         """
@@ -328,7 +327,7 @@ class Agent:
         elif kb.dbms == "Microsoft SQL Server":
             concatenatedQuery = "%s+%s" % (query1, query2)
 
-        return replaceSpaces(concatenatedQuery)
+        return concatenatedQuery
 
     def concatQuery(self, query, unpack=True):
         """
@@ -413,7 +412,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'+%s+'%s'" % (temp.start, concatenatedQuery, temp.stop)
 
-        return replaceSpaces(concatenatedQuery)
+        return concatenatedQuery
 
     def forgeInbandQuery(self, query, exprPosition=None, nullChar="NULL"):
         """
@@ -491,7 +490,7 @@ class Agent:
 
         inbandQuery = self.postfixQuery(inbandQuery, kb.unionComment)
 
-        return replaceSpaces(inbandQuery)
+        return inbandQuery
 
     def limitQuery(self, num, query, field=None):
         """
@@ -583,7 +582,7 @@ class Agent:
         if orderBy:
             limitedQuery += orderBy
 
-        return replaceSpaces(limitedQuery)
+        return limitedQuery
 
     def forgeCaseStatement(self, expression):
         """
@@ -602,7 +601,7 @@ class Agent:
         @rtype: C{str}
         """
 
-        return replaceSpaces(queries[kb.dbms].case % expression)
+        return queries[kb.dbms].case % expression
 
 # SQL agent
 agent = Agent()

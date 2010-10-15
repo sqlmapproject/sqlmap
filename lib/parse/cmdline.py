@@ -182,9 +182,6 @@ def cmdLineParser():
                              action="store_true", default=False,
                              help="Compare pages based only on their textual content")
 
-        injection.add_option("--space", dest="space",
-                             help="Use defined string for space instead of standard ' '")
-
         injection.add_option("--use-between", dest="useBetween",
                              action="store_true", default=False,
                              help="Use operator BETWEEN instead of default '>'")
