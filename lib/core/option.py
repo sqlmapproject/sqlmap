@@ -1208,6 +1208,10 @@ def __basicOptionValidation():
         errMsg = "switch --text-only is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.data and conf.useNullConnection:
+        errMsg = "switch --data is incompatible with switch --null-connection"
+        raise sqlmapSyntaxException, errMsg
+
 def init(inputOptions=advancedDict()):
     """
     Set attributes into both configuration and knowledge base singletons
