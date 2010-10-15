@@ -118,10 +118,10 @@ def start():
             conf.data   = targetData
             conf.cookie = targetCookie
             injData     = []
-            
+
             initTargetEnv()
             parseTargetUrl()
-            
+
             testSqlInj = False
             if "GET" in conf.parameters:
                 for parameter in re.findall(r"([^=]+)=[^&]+&?", conf.parameters["GET"]):
@@ -129,6 +129,11 @@ def start():
                     if paramKey not in kb.testedParams:
                         testSqlInj = True
                         break
+            else:
+                paramKey = (conf.hostname, conf.path, None, None)
+                if paramKey not in kb.testedParams:
+                    testSqlInj = True
+
             if not testSqlInj:
                 infoMsg = "skipping '%s'" % targetUrl
                 logger.info(infoMsg)
