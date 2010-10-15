@@ -340,14 +340,14 @@ def checkNullConnection():
         if not page and 'Content-Length' in headers:
             kb.nullConnection = "HEAD"
 
-            infoMsg = "null connection is supported with HEAD header"
+            infoMsg = "NULL connection is supported with HEAD header"
             logger.info(infoMsg)
         else:
             page, headers = Request.getPage(auxHeaders={"Range":"bytes=-1"})
             if page and len(page) == 1 and 'Content-Range' in headers:
                 kb.nullConnection = "Range"
 
-                infoMsg = "null connection is supported with GET header "
+                infoMsg = "NULL connection is supported with GET header "
                 infoMsg += "'%s'" % kb.nullConnection
                 logger.info(infoMsg)
     except sqlmapConnectionException, errMsg:
