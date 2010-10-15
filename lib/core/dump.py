@@ -142,7 +142,7 @@ class Dump:
         self.lister("available databases", dbs)
 
     def dbTables(self, dbTables):
-        if isinstance(dbTables, list):
+        if isinstance(dbTables, list) and len(dbTables) > 0:
             maxlength = 0
 
             for table in dbTables:
@@ -151,6 +151,8 @@ class Dump:
             lines = "-" * (int(maxlength) + 2)
 
             dbTables.sort(key=lambda x: x.lower())
+
+            self.__write("Brute-forced databases:")
 
             if len(dbTables) == 1:
                 self.__write("[1 table]")
@@ -165,7 +167,7 @@ class Dump:
 
             self.__write("+%s+\n" % lines)
 
-        elif isinstance(dbTables, dict):
+        elif isinstance(dbTables, dict) and len(dbTables) > 0:
             maxlength = 0
 
             for tables in dbTables.values():

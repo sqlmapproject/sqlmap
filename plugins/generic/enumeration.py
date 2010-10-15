@@ -828,12 +828,13 @@ class Enumeration:
                 retVal.append(table)
 
             count += 1
-            status = '%d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
-            dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status), True)
+            status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
+            dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
 
         conf.verbose = popValue()
 
-        dataToStdout("\r%s\n" % (" "*(getConsoleWidth()-1)), True)
+        dataToStdout("\n", True)
+
         if not retVal:
             warnMsg = "no table found"
             logger.warn(warnMsg)
@@ -1712,8 +1713,8 @@ class Enumeration:
                 stackedTest()
 
             if not kb.stackedTest and not conf.direct:
-                warnMsg  = "sql query option is only available "
-                warnMsg += "when stacked queries are supported"
+                warnMsg  = "execution of custom SQL queries is only "
+                warnMsg += "available when stacked queries are supported"
                 logger.warn(warnMsg)
                 return None
             else:
