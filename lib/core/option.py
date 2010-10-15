@@ -15,6 +15,7 @@ import logging
 import os
 import re
 import socket
+import sys
 import urllib2
 import urlparse
 
@@ -534,14 +535,17 @@ def __setTamperingFunctions():
     """
     if conf.tamper:
         kb.tamperFunctions = []
+
         import inspect
-        import sys
+
         for file in conf.tamper.split(';'):
             if not file:
                 continue
+
             elif not os.path.exists(file):
                 errMsg = "missing tampering module file '%s'" % file
                 raise sqlmapFilePathException, errMsg
+
             elif os.path.splitext(file)[1] != '.py':
                 errMsg = "tampering module file should have an extension '.py'"
                 raise sqlmapSyntaxException, errMsg
@@ -559,17 +563,19 @@ def __setTamperingFunctions():
 
             if dirname not in sys.path:
                 sys.path.insert(0, dirname)
+
             try:
                 module = __import__(filename[:-3])
             except ImportError, msg:
                 raise sqlmapSyntaxException, "can't import module file '%s' (%s)" % (file, msg)
-            
+
             found = False
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name=="tamper" and function.func_code.co_argcount == 2:
                     kb.tamperFunctions.append(function)
                     found = True
-                    break            
+                    break
+
             if not found:
                 raise sqlmapGenericException, "missing function 'tamper(place, value)' in tampering module '%s'" % filename
 
