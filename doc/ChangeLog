@@ -12,6 +12,10 @@ sqlmap (0.9-1) stable; urgency=low
   * Added support for SOAP based web services requests (Bernardo).
   * Added support to use persistent HTTP(s) connection for speed
     improvement, --keep-alive switch (Miroslav).
+  * Implemented HTTP proxy authentication support, --proxy-cred switch
+    (Miroslav).
+  * Implemented support for SQLite 2 and 3 (Bernardo and Miroslav).
+  * Added initial support for SAP MaxDB (Miroslav).
   * Added safe URL feature, --safe-url and --safe-freq (Miroslav).
   * Added --use-between switch to use BETWEEN syntax in inferencial
     statement and bypass firewalls filtering '>' character (Bernardo and

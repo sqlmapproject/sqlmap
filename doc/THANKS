@@ -68,9 +68,6 @@ Dan Guido <dguido@gmail.com>
     Vulnerability Analysis class at the Polytechnic University of New York,
     http://isisblogs.poly.edu/courses/pentest/
 
-Brandon E. <brandonpoc@gmail.com>
-    for reporting a bug
-
 Adam Faheem <faheem.adam@is.co.za>
     for reporting a few bugs
 
@@ -195,6 +192,9 @@ Nico Leidecker <nico@leidecker.info>
 Gabriel Lima <pato@bugnet.com.br>
     for reporting a couple of bugs
 
+Truong Duc Luong <luongductruong@gmail.com>
+    for reporting a minor bug
+
 Pavol Luptak <pavol.luptak@nethemba.com>
     for reporting a bug when injecting on a POST data parameter
 
@@ -244,9 +244,6 @@ Chris Patten <cpatten@sunera.com>
 
 Adam Pridgen <adam.pridgen@gmail.com>
     for suggesting some features
-
-Phat R. <phatthanaphol@gmail.com>
-    for reporting a minor bug
 
 Ole Rasmussen <olerass@gmail.com>
     for reporting a bug
@@ -352,6 +349,9 @@ Anthony Zboralski <anthony.zboralski@bellua.com>
 Thierry Zoller <thierry@zoller.lu>
     for reporting a couple of major bugs
 
+Brandon E. <brandonpoc@gmail.com>
+    for reporting a bug
+
 dragoun dash <dragoun.dash@gmail.com>
     for reporting a minor bug
 	
@@ -372,6 +372,9 @@ mitchell <mitchell@tufala.net>
 
 pacman730 <pacman730@users.sourceforge.net>
     for reporting a bug
+
+Phat R. <phatthanaphol@gmail.com>
+    for reporting a minor bug
 
 shiftzwei <shiftzwei@gmail.com>
     for reporting a couple of bugs
