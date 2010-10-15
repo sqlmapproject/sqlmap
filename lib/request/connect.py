@@ -325,6 +325,7 @@ class Connect:
             elif kb.nullConnection == "Range":
                 if not auxHeaders:
                     auxHeaders = {}
+
                 auxHeaders["Range"] = "bytes=-1"
 
             _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)

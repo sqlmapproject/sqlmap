@@ -328,6 +328,10 @@ def checkRegexp():
         return False
 
 def checkNullConnection():
+    """
+    Reference: http://www.wisec.it/sectou.php?id=472f952d79293
+    """
+
     infoMsg = "testing NULL connection to the target url"
     logger.info(infoMsg)
 
