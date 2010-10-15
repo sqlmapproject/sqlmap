@@ -105,7 +105,7 @@ def cmdLineParser():
                            help="Use a HTTP proxy to connect to the target url")
 
         request.add_option("--proxy-cred", dest="pCred",
-                           help="Proxy authentication credentials "
+                           help="HTTP proxy authentication credentials "
                                 "(name:password)")
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
