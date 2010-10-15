@@ -90,7 +90,7 @@ class Agent:
         elif parameter == "User-Agent":
             retValue = value.replace(value, newValue)
         elif place == "URI":
-            retValue = value.replace("*", " %s " % newValue.replace(value, str()))
+            retValue = value.replace("*", "%s" % newValue.replace(value, str()))
         else:
             paramString = conf.parameters[place]
 
