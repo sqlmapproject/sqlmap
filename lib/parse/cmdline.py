@@ -98,9 +98,6 @@ def cmdLineParser():
                            help="HTTP authentication certificate ("
                                 "key_file,cert_file)")
 
-        request.add_option("--keep-alive", dest="keepAlive", action="store_true",
-                           default=False, help="Use persistent HTTP(s) connections")
-
         request.add_option("--proxy", dest="proxy",
                            help="Use a HTTP proxy to connect to the target url")
 
@@ -110,10 +107,6 @@ def cmdLineParser():
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
                            default=False, help="Ignore system default HTTP proxy")
-
-        request.add_option("--threads", dest="threads", type="int", default=1,
-                           help="Maximum number of concurrent HTTP "
-                                "requests (default 1)")
 
         request.add_option("--delay", dest="delay", type="float",
                            help="Delay in seconds between each HTTP request")
@@ -426,12 +419,30 @@ def cmdLineParser():
         windows.add_option("--reg-type", dest="regType",
                             help="Windows registry key value type")
 
+        # Optimization options
+        optimization = OptionGroup(parser, "Optimization", "These "
+                               "options can be used to optimize the "
+                               "performance of sqlmap.")
+
+        optimization.add_option("-o", dest="optimize",
+                                 action="store_true", default=False,
+                                 help="Use all optimization options")
+
+        optimization.add_option("--common-prediction", dest="useCommonPrediction", action="store_true",
+                          default=False, help="Use 'Good samaritan' feature")
+
+        optimization.add_option("--keep-alive", dest="keepAlive", action="store_true",
+                           default=False, help="Use persistent HTTP(s) connections")
+
+        optimization.add_option("--null-connection", dest="useNullConnection", action="store_true",
+                          default=False, help="Retrieve page length without actual HTTP response body")
+
+        optimization.add_option("--threads", dest="threads", type="int", default=1,
+                           help="Maximum number of concurrent HTTP "
+                                "requests (default 1)")
+
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
-
-        miscellaneous.add_option("-o", dest="optimize",
-                                 action="store_true", default=False,
-                                 help="General optimization switch")
 
         miscellaneous.add_option("-x", dest="xmlFile",
                                  help="Dump the data into an XML file")
@@ -484,12 +495,6 @@ def cmdLineParser():
         parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int", default=10,
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--common-prediction", dest="useCommonPrediction", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
-
-        parser.add_option("--null-connection", dest="useNullConnection", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
-
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
                           default=False, help=SUPPRESS_HELP)
 
@@ -506,6 +511,7 @@ def cmdLineParser():
         parser.add_option_group(filesystem)
         parser.add_option_group(takeover)
         parser.add_option_group(windows)
+        parser.add_option_group(optimization)
         parser.add_option_group(miscellaneous)
 
         args = []
