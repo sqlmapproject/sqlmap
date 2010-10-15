@@ -16,10 +16,6 @@ import warnings
 
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 
-# NOTE: This breaks SQL shell and OS shell history and TAB functionalities
-#import locale
-#sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-
 try:
     import psyco
     psyco.full()
