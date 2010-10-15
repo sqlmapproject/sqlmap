@@ -124,20 +124,26 @@ def __setRequestParams():
 def __findPageForms():
     infoMsg = "searching for forms"
     logger.info(infoMsg)
+
     response, _ = Request.queryPage(response=True)
     forms = ParseResponse(response, backwards_compat=False)
+
     count = 1
     for form in forms:
         request = form.click()
+
         url = request.get_full_url()
         method = request.get_method()
         data = request.get_data() if request.has_data() else None
+
         message = "(#%d) Do you want to test form '%s' (%s, %s%s) [Y/n] " % (count, form.name, method, url, ", %s" % repr(data) if data else "")
         test = readInput(message, default="Y")
+
         if not test or test[0] in ("y", "Y"):
             if method == "POST":
                 message = " Edit POST data [default: %s]: " % (data if data else "")
                 test = readInput(message, default=data)
+
             elif method == "GET":
                 if url.find("?") > -1:
                     firstPart = url[:url.find("?")]
@@ -145,7 +151,9 @@ def __findPageForms():
                     message = " Edit GET data [default: %s]: " % secondPart
                     test = readInput(message, default=secondPart)
                     url = "%s?%s" % (firstPart, test)
+
             kb.targetUrls.add((url, method, data, conf.cookie))
+
         count +=1
 
 def __setOutputResume():

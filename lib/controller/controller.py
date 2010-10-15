@@ -7,6 +7,8 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
+
 from lib.controller.action import action
 from lib.controller.checks import checkSqlInjection
 from lib.controller.checks import heuristicCheckSqlInjection
@@ -116,6 +118,21 @@ def start():
             conf.data   = targetData
             conf.cookie = targetCookie
             injData     = []
+            
+            initTargetEnv()
+            parseTargetUrl()
+            
+            testSqlInj = False
+            if "GET" in conf.parameters:
+                for parameter in re.findall(r"([^=]+)=[^&]+&?", conf.parameters["GET"]):
+                    paramKey = (conf.hostname, conf.path, "GET", parameter)
+                    if paramKey not in kb.testedParams:
+                        testSqlInj = True
+                        break
+            if not testSqlInj:
+                infoMsg = "skipping '%s'" % targetUrl
+                logger.info(infoMsg)
+                continue
 
             if conf.multipleTargets:
                 hostCount += 1
@@ -140,8 +157,6 @@ def start():
                 logMsg = "testing url %s" % targetUrl
                 logger.info(logMsg)
 
-            initTargetEnv()
-            parseTargetUrl()
             setupTargetEnv()
 
             if not checkConnection() or not checkString() or not checkRegexp():
@@ -192,23 +207,26 @@ def start():
                         continue
 
                     paramDict = conf.paramDict[place]
-
                     for parameter, value in paramDict.items():
                         testSqlInj = True
-                        paramKey = (conf.hostname, place, parameter)
+                        paramKey = (conf.hostname, conf.path, place, parameter)
 
                         if paramKey in kb.testedParams:
-                            warnMsg = "skipping previously processed %s parameter '%s'" % (place, parameter)
-                            logger.warn(warnMsg)
                             testSqlInj = False
+
+                            infoMsg = "skipping previously processed %s parameter '%s'" % (place, parameter)
+                            logger.info(infoMsg)
+
                         # Avoid dinamicity test if the user provided the
                         # parameter manually
                         elif parameter in conf.testParameter:
                             pass
+
                         elif not checkDynParam(place, parameter, value):
                             warnMsg = "%s parameter '%s' is not dynamic" % (place, parameter)
                             logger.warn(warnMsg)
                             testSqlInj = False
+
                         else:
                             logMsg = "%s parameter '%s' is dynamic" % (place, parameter)
                             logger.info(logMsg)
@@ -217,6 +235,7 @@ def start():
 
                         if testSqlInj:
                             heuristicCheckSqlInjection(place, parameter, value)
+
                             for parenthesis in range(0, 4):
                                 logMsg  = "testing sql injection on %s " % place
                                 logMsg += "parameter '%s' with " % parameter
@@ -227,8 +246,8 @@ def start():
 
                                 if injType:
                                     injData.append((place, parameter, injType))
-
                                     break
+
                                 else:
                                     infoMsg  = "%s parameter '%s' is not " % (place, parameter)
                                     infoMsg += "injectable with %d parenthesis" % parenthesis
