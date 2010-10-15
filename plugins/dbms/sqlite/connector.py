@@ -45,7 +45,7 @@ class Connector(GenericConnector):
             cursor.close()
 
         except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
-            errMsg = "unable to connect using SQLite 3 library, trying with SQLite 2 (%s)" % msg[0]
+            errMsg = "unable to connect using SQLite 3 library, trying with SQLite 2"
             logger.error(errMsg)
             try:
                 try:
