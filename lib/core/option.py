@@ -599,6 +599,7 @@ def __setHTTPProxy():
     __scheme       = __proxySplit[0]
     __hostname     = __hostnamePort[0]
     __port         = None
+    __proxyString  = ""
 
     if len(__hostnamePort) == 2:
         try:
@@ -619,9 +620,9 @@ def __setHTTPProxy():
             raise sqlmapSyntaxException, errMsg
     
         # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
-        __proxyString = "%s@%s:%d" % (conf.pCred, __hostname, __port)
-    else:
-        __proxyString = "%s:%d" % (__hostname, __port)
+        __proxyString = "%s@" % conf.pCred
+
+    __proxyString += "%s:%d" % (__hostname, __port)
 
     # Workaround for http://bugs.python.org/issue1424152 (urllib/urllib2:
     # HTTPS over (Squid) Proxy fails) as long as HTTP over SSL requests
@@ -1184,19 +1185,17 @@ def __basicOptionValidation():
         errMsg = "value for --stop (limitStop) option must be an integer value greater than zero (>0)"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and\
+    if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
       conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop <= conf.limitStart:
         errMsg = "value for --start (limitStart) option must be smaller than value for --stop (limitStop) option"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or\
-      conf.cpuThrottle < 0):
+    if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or conf.cpuThrottle < 0):
         errMsg = "value for --cpu-throttle (cpuThrottle) option must be in range [0,100]"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.matchRatio is not None and isinstance(conf.matchRatio, float) and (conf.matchRatio > 1 or\
-      conf.cpuThrottle < 0):
-        errMsg = "value for --ratio (matchRatio) option must be in range [0,1]"
+    if conf.thold is not None and isinstance(conf.thold, float) and (conf.thold > 1 or conf.cpuThrottle < 0):
+        errMsg = "value for --threshold (thold) option must be in range [0,1]"
         raise sqlmapSyntaxException, errMsg
 
     if conf.textOnly and conf.useNullConnection:

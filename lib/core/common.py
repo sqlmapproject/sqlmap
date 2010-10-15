@@ -1437,12 +1437,13 @@ def getUnicode(value, encoding=None):
     >>> getUnicode(1)
     u'1'
     """
+
     if encoding is None:
         encoding = conf.dataEncoding if 'dataEncoding' in conf else "utf-8"
     if isinstance(value, basestring):
         return value if isinstance(value, unicode) else unicode(value, encoding, errors='replace')
     else:
-        return unicode(value) #encoding ignored for non-basestring instances
+        return unicode(value) # encoding ignored for non-basestring instances
 
 # http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 def longestCommonPrefix(*sequences):

@@ -31,9 +31,9 @@ class Dump:
         self.__outputFP   = None
 
     def __write(self, data, n=True):
-	text = "%s%s" % (data, "\n" if n else " ")
-
+        text = "%s%s" % (data, "\n" if n else " ")
         dataToStdout(text)
+
         self.__outputFP.write(text)
         self.__outputFP.flush()
 
