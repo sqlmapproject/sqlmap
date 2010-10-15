@@ -763,9 +763,9 @@ def parseTargetDirect():
                 elif dbmsName == "Firebird":
                     import kinterbasdb
             except ImportError, _:
-                errMsg  = "sqlmap requires %s third-party library " % data[1]
+                errMsg  = "sqlmap requires '%s' third-party library " % data[1]
                 errMsg += "in order to directly connect to the database "
-                errMsg += "%s. Download from %s" % (dbmsName, data[2])
+                errMsg += "'%s'. Download from '%s'" % (dbmsName, data[2])
                 raise sqlmapMissingDependence, errMsg
 
 def parseTargetUrl():
