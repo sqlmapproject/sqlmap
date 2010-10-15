@@ -175,10 +175,6 @@ def cmdLineParser():
                              action="store_true", default=False,
                              help="Compare pages based only on their textual content")
 
-        injection.add_option("--use-between", dest="useBetween",
-                             action="store_true", default=False,
-                             help="Use operator BETWEEN instead of default '>'")
-
         injection.add_option("--tamper", dest="tamper",
                              help="Use given module(s) for tampering injection data")
 

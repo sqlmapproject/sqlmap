@@ -58,7 +58,6 @@ optDict = {
                                "eString":           "string",
                                "eRegexp":           "string",
                                "thold":             "float",
-                               "useBetween":        "boolean",
                              },
 
             "Techniques":    {

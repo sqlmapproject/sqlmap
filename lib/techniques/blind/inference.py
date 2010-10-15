@@ -169,10 +169,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 posValueOld = posValue
                 posValue = chr(posValue) if posValue < 128 else unichr(posValue)
 
-            if not conf.useBetween or kb.dbms == "SQLite":
-                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
-            else:
-                forgedPayload = safeStringFormat(payload.replace('%3E', 'NOT BETWEEN 0 AND'), (expressionUnescaped, idx, posValue))
+            forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
 
             queriesCount[0] += 1
             result = Request.queryPage(urlencode(forgedPayload))
