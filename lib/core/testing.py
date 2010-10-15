@@ -36,14 +36,14 @@ def smokeTest():
     retVal = True
     count, length = 0, 0
 
-    for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        for file in files:
+    for _, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
+        for ifile in files:
             length += 1
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        for file in files:
-            if os.path.splitext(file)[1].lower() == '.py' and file != '__init__.py':
-                path = os.path.join(root, os.path.splitext(file)[0])
+        for ifile in files:
+            if os.path.splitext(ifile)[1].lower() == '.py' and ifile != '__init__.py':
+                path = os.path.join(root, os.path.splitext(ifile)[0])
                 path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
                 path = path.replace(os.sep, '.').lstrip('.')
                 try:
@@ -52,7 +52,7 @@ def smokeTest():
                 except Exception, msg:
                     retVal = False
                     dataToStdout("\r")
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, file), msg)
+                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, ifile), msg)
                     logger.error(errMsg)
                 else:
                     # Run doc tests
@@ -62,7 +62,7 @@ def smokeTest():
                         retVal = False
 
             count += 1
-            status = '%d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
+            status = '%d/%d (%d%s) ' % (count, length, round(100.0*count/length), '%')
             dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
     dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
@@ -189,9 +189,9 @@ def runCase(name=None, switches=None, log=None, session=None):
         retVal = False
 
     if session and retVal:
-        file = open(conf.sessionFile, 'r')
-        content = file.read()
-        file.close()
+        ifile = open(conf.sessionFile, 'r')
+        content = ifile.read()
+        ifile.close()
         for item in session:
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], content):
@@ -202,9 +202,9 @@ def runCase(name=None, switches=None, log=None, session=None):
                 break
 
     if log and retVal:
-        file = open(conf.dumper.getOutputFile(), 'r')
-        content = file.read()
-        file.close()
+        ifile = open(conf.dumper.getOutputFile(), 'r')
+        content = ifile.read()
+        ifile.close()
         for item in log:
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], content):
