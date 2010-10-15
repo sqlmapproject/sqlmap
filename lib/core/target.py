@@ -293,6 +293,7 @@ def initTargetEnv():
         kb.injParameter   = None
         kb.injPlace       = None
         kb.injType        = None
+        kb.nullConnection = None
         kb.parenthesis    = None
         kb.unionComment   = ""
         kb.unionCount     = None
