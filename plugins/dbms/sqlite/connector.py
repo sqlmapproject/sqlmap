@@ -45,8 +45,8 @@ class Connector(GenericConnector):
             cursor.close()
 
         except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
-            errMsg = "unable to connect using SQLite 3 library, trying with SQLite 2"
-            logger.error(errMsg)
+            warnMsg = "unable to connect using SQLite 3 library, trying with SQLite 2"
+            logger.warning(warnMsg)
             try:
                 try:
                     import sqlite
