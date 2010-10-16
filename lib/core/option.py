@@ -11,6 +11,7 @@ import codecs
 import cookielib
 import ctypes
 import difflib
+import inspect
 import logging
 import os
 import re
@@ -531,34 +532,33 @@ def __setDBMS():
 
 def __setTamperingFunctions():
     """
-    Loads tampering functions from given module path(s).
+    Loads tampering functions from given script(s)
     """
+
     if conf.tamper:
-        kb.tamperFunctions = []
+        for tfile in conf.tamper.split(';'):
+            found = False
 
-        import inspect
-
-        for file in conf.tamper.split(';'):
-            if not file:
+            if not tfile:
                 continue
 
-            elif not os.path.exists(file):
-                errMsg = "missing tampering module file '%s'" % file
+            elif not os.path.exists(tfile):
+                errMsg = "tamper script '%s' does not exist" % tfile
                 raise sqlmapFilePathException, errMsg
 
-            elif os.path.splitext(file)[1] != '.py':
-                errMsg = "tampering module file should have an extension '.py'"
+            elif not tfile.endswith('.py'):
+                errMsg = "tamper script '%s' should have an extension '.py'" % tfile
                 raise sqlmapSyntaxException, errMsg
 
-            dirname, filename = os.path.split(file)
+            dirname, filename = os.path.split(tfile)
             dirname = os.path.abspath(dirname)
 
-            infoMsg  = "loading tampering module: '%s'" % filename[:-3]
+            infoMsg  = "loading tamper script '%s'" % filename[:-3]
             logger.info(infoMsg)
 
             if not os.path.exists(os.path.join(dirname, '__init__.py')):
                 errMsg  = "make sure that there is an empty file '__init__.py' "
-                errMsg += "inside of tampering module directory '%s'" % dirname
+                errMsg += "inside of tamper scripts directory '%s'" % dirname
                 raise sqlmapGenericException, errMsg
 
             if dirname not in sys.path:
@@ -567,17 +567,17 @@ def __setTamperingFunctions():
             try:
                 module = __import__(filename[:-3])
             except ImportError, msg:
-                raise sqlmapSyntaxException, "can't import module file '%s' (%s)" % (file, msg)
+                raise sqlmapSyntaxException, "can not import tamper script '%s' (%s)" % (filename[:-3], msg)
 
-            found = False
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name=="tamper" and function.func_code.co_argcount == 2:
+                if name == "tamper" and function.func_code.co_argcount == 2:
                     kb.tamperFunctions.append(function)
                     found = True
+
                     break
 
             if not found:
-                raise sqlmapGenericException, "missing function 'tamper(place, value)' in tampering module '%s'" % filename
+                raise sqlmapGenericException, "missing function 'tamper(place, value)' in tamper script '%s'" % tfile
 
 def __setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
@@ -943,6 +943,9 @@ def __cleanupOptions():
     else:
         conf.testParameter = []
 
+    if conf.tamper:
+        conf.tamper = conf.tamper.replace(" ", "")
+
     if conf.db:
         conf.db = conf.db.replace(" ", "")
 
@@ -1071,7 +1074,7 @@ def __setKnowledgeBaseAttributes():
     kb.queryCounter    = 0
     kb.resumedQueries  = {}
     kb.stackedTest     = None
-    kb.tamperFunctions = None
+    kb.tamperFunctions = []
     kb.targetUrls      = set()
     kb.testedParams    = set()
     kb.timeTest        = None

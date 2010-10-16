@@ -70,7 +70,7 @@ class sqlmapValueException(Exception):
 def unhandledException():
     errMsg  = "unhandled exception in %s, please copy " % VERSION_STRING
     errMsg += "the command line and the following text and send by e-mail "
-    errMsg += "to sqlmap-users@lists.sourceforge.net. The developer will "
+    errMsg += "to sqlmap-users@lists.sourceforge.net. The developers will "
     errMsg += "fix it as soon as possible:\nsqlmap version: %s\n" % VERSION
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s" % PLATFORM

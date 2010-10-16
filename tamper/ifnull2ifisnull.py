@@ -7,15 +7,14 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
-
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 
-"""
-IFNULL(A,B) -> IF(ISNULL(A),B,A) (e.g., IFNULL(1,2) -> IF(ISNULL(1),2,1))
-"""
 def tamper(place, value):
+    """
+    Replaces 'IFNULL(A, B)' with 'IF(ISNULL(A), B, A)'
+    Example: 'IFNULL(1, 2)' becomes 'IF(ISNULL(1), 2, 1)'
+    """
 
     if value and value.find("IFNULL") > -1:
         if place != "URI":

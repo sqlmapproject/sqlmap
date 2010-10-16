@@ -8,17 +8,18 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
-import string
 
 from lib.core.common import randomRange
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.data import kb
 
-"""
-value -> value with inserted random blanks (e.g., INSERT->IN/**/S/**/ERT)
-"""
 def tamper(place, value):
+    """
+    Add random comments to value
+    Example: 'INSERT' becomes 'IN/**/S/**/ERT'
+    """
+
     retVal = value
 
     if value:

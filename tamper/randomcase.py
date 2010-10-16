@@ -8,17 +8,18 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
-import string
 
 from lib.core.common import randomRange
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.data import kb
 
-"""
-value -> chars from value with random case (e.g., INSERT->InsERt)
-"""
 def tamper(place, value):
+    """
+    Replaces each character with random case value
+    Example: 'INSERT' might become 'InsERt'
+    """
+
     retVal = value
 
     if value:
