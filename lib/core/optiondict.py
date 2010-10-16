@@ -27,24 +27,30 @@ optDict = {
                                "cookie":            "string",
                                "cookieUrlencode":   "boolean",
                                "dropSetCookie":     "boolean",
-                               "referer":           "string",
                                "agent":             "string",
                                "userAgentsFile":    "string",
+                               "referer":           "string",
                                "headers":           "string",
                                "aType":             "string",
                                "aCred":             "string",
                                "aCert":             "string",
-                               "keepAlive":         "boolean",
                                "proxy":             "string",
                                "pCred":             "string",
                                "ignoreProxy":       "boolean",
-                               "threads":           "integer",
                                "delay":             "float",
                                "timeout":           "float",
                                "retries":           "integer",
                                "scope":             "string",
                                "safUrl":            "string",
                                "saFreq":            "integer"
+                             },
+
+            "Optimization":  {
+                               "optimize":          "boolean",
+                               "commonPrediction":  "boolean",
+                               "keepAlive":         "boolean",
+                               "nullConnection":    "boolean",
+                               "threads":           "integer"
                              },
 
             "Injection":     {
@@ -58,6 +64,8 @@ optDict = {
                                "eString":           "string",
                                "eRegexp":           "string",
                                "thold":             "float",
+                               "textOnly":          "boolean",
+                               "tamper":            "string"
                              },
 
             "Techniques":    {
@@ -88,17 +96,19 @@ optDict = {
                                "dumpTable":         "boolean",
                                "dumpAll":           "boolean",
                                "search":            "boolean",
-                               "user":              "string",
                                "db":                "string",
                                "tbl":               "string",
                                "col":               "string",
+                               "user":              "string",
                                "excludeSysDbs":     "boolean",
                                "limitStart":        "integer",
                                "limitStop":         "integer",
                                "firstChar":         "integer",
                                "lastChar":          "integer",
                                "query":             "string",
-                               "sqlShell":          "boolean"
+                               "sqlShell":          "boolean",
+                               "cExists":           "boolean",
+                               "tableFile":         "string"
                              },
 
             "User-defined function": {
@@ -137,6 +147,7 @@ optDict = {
                                "xmlFile":           "string",
                                "sessionFile":       "string",
                                "flushSession":      "boolean",
+                               "forms":             "boolean",
                                "eta":               "boolean",
                                "googlePage":        "integer",
                                "updateAll":         "boolean",

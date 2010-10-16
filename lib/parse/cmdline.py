@@ -128,6 +128,28 @@ def cmdLineParser():
         request.add_option("--safe-freq", dest="saFreq", type="int", default=0,
                            help="Test requests between two visits to a given safe url")
 
+        # Optimization options
+        optimization = OptionGroup(parser, "Optimization", "These "
+                               "options can be used to optimize the "
+                               "performance of sqlmap.")
+
+        optimization.add_option("-o", dest="optimize",
+                                 action="store_true", default=False,
+                                 help="Use all optimization options")
+
+        optimization.add_option("--common-prediction", dest="commonPrediction", action="store_true",
+                          default=False, help="Use 'Good samaritan' feature")
+
+        optimization.add_option("--keep-alive", dest="keepAlive", action="store_true",
+                           default=False, help="Use persistent HTTP(s) connections")
+
+        optimization.add_option("--null-connection", dest="nullConnection", action="store_true",
+                          default=False, help="Retrieve page length without actual HTTP response body")
+
+        optimization.add_option("--threads", dest="threads", type="int", default=1,
+                           help="Maximum number of concurrent HTTP "
+                                "requests (default 1)")
+
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
                                 "used to specify which parameters to test "
@@ -415,28 +437,6 @@ def cmdLineParser():
         windows.add_option("--reg-type", dest="regType",
                             help="Windows registry key value type")
 
-        # Optimization options
-        optimization = OptionGroup(parser, "Optimization", "These "
-                               "options can be used to optimize the "
-                               "performance of sqlmap.")
-
-        optimization.add_option("-o", dest="optimize",
-                                 action="store_true", default=False,
-                                 help="Use all optimization options")
-
-        optimization.add_option("--common-prediction", dest="useCommonPrediction", action="store_true",
-                          default=False, help="Use 'Good samaritan' feature")
-
-        optimization.add_option("--keep-alive", dest="keepAlive", action="store_true",
-                           default=False, help="Use persistent HTTP(s) connections")
-
-        optimization.add_option("--null-connection", dest="useNullConnection", action="store_true",
-                          default=False, help="Retrieve page length without actual HTTP response body")
-
-        optimization.add_option("--threads", dest="threads", type="int", default=1,
-                           help="Maximum number of concurrent HTTP "
-                                "requests (default 1)")
-
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
@@ -499,6 +499,7 @@ def cmdLineParser():
 
         parser.add_option_group(target)
         parser.add_option_group(request)
+        parser.add_option_group(optimization)
         parser.add_option_group(injection)
         parser.add_option_group(techniques)
         parser.add_option_group(fingerprint)
@@ -507,7 +508,6 @@ def cmdLineParser():
         parser.add_option_group(filesystem)
         parser.add_option_group(takeover)
         parser.add_option_group(windows)
-        parser.add_option_group(optimization)
         parser.add_option_group(miscellaneous)
 
         args = []

@@ -536,7 +536,7 @@ def __setTamperingFunctions():
     """
 
     if conf.tamper:
-        for tfile in conf.tamper.split(';'):
+        for tfile in conf.tamper.split(','):
             found = False
 
             if not tfile:
@@ -980,8 +980,8 @@ def __cleanupOptions():
         conf.multipleTargets = True
 
     if conf.optimize:
-        conf.useCommonPrediction = conf.keepAlive = True
-        conf.useNullConnection = not conf.textOnly
+        conf.commonPrediction = conf.keepAlive = True
+        conf.nullConnection = not conf.textOnly
 
 def __setConfAttributes():
     """
@@ -1207,11 +1207,11 @@ def __basicOptionValidation():
         errMsg = "value for --threshold (thold) option must be in range [0,1]"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.textOnly and conf.useNullConnection:
+    if conf.textOnly and conf.nullConnection:
         errMsg = "switch --text-only is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.data and conf.useNullConnection:
+    if conf.data and conf.nullConnection:
         errMsg = "switch --data is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
