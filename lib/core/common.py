@@ -1107,33 +1107,42 @@ def sanitizeAsciiString(subject):
 
 def preparePageForLineComparison(page):
     retVal = page
+
     if isinstance(page, basestring):
         return page.replace("><", ">\n<").replace("<br>", "\n").splitlines()
+
     return retVal
 
 def getFilteredPageContent(page):
     retVal = page
+
     if isinstance(page, basestring):
         retVal = re.sub(r"(?s)<script.+?</script>|<style.+?</style>|<[^>]+>|\t|\n|\r", " ", page)
+
         while retVal.find("  ") != -1:
             retVal = retVal.replace("  ", " ")
+
     return retVal
 
 def getPageTextWordsSet(page):
     retVal = None
+
     if isinstance(page, basestring):
         page = getFilteredPageContent(page)
         retVal = set(re.findall(r"\w+", page))
+
     return retVal
 
 def showStaticWords(firstPage, secondPage):
     infoMsg = "finding static words in longest matching part of dynamic page content"
     logger.info(infoMsg)
+
     firstPage = getFilteredPageContent(firstPage)
     secondPage = getFilteredPageContent(secondPage)
     match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
     commonText = firstPage[match[0]:match[0]+match[2]]
     commonWords = getPageTextWordsSet(commonText)
+
     infoMsg = "static words: "
 
     if commonWords:
@@ -1190,6 +1199,7 @@ def posixToNtSlashes(filepath):
     >>> posixToNtSlashes('C:/Windows')
     'C:\\\\Windows'
     """
+
     return filepath.replace('/', '\\')
 
 def ntToPosixSlashes(filepath):
@@ -1199,6 +1209,7 @@ def ntToPosixSlashes(filepath):
     >>> ntToPosixSlashes('C:\\Windows')
     'C:/Windows'
     """
+
     return filepath.replace('\\', '/')
 
 def isBase64EncodedString(subject):
@@ -1209,6 +1220,7 @@ def isBase64EncodedString(subject):
     >>> isBase64EncodedString('123456')
     False
     """
+
     return re.match(r"\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z", subject) is not None
 
 def isHexEncodedString(subject):
@@ -1219,6 +1231,7 @@ def isHexEncodedString(subject):
     >>> isHexEncodedString('test')
     False
     """
+
     return re.match(r"\A[0-9a-fA-F]+\Z", subject) is not None
 
 def getConsoleWidth(default=80):
@@ -1229,12 +1242,14 @@ def getConsoleWidth(default=80):
     else:
         output=subprocess.Popen('stty size', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.read()
         items = output.split()
+
         if len(items) == 2 and items[1].isdigit():
             width = int(items[1])
 
     if width is None:
         try:
             import curses
+
             stdscr = curses.initscr()
             _, width = stdscr.getmaxyx()
             curses.endwin()
@@ -1268,10 +1283,13 @@ def calculateDeltaSeconds(start, epsilon=0.05):
 
 def getInjectionCase(name):
     retVal = None
+
     for case in kb.injections.root.case:
         if case.name == name:
             retVal = case
+
             break
+
     return retVal
 
 def initCommonOutputs():
@@ -1302,9 +1320,9 @@ def getFileItems(filename):
     retVal = []
 
     checkFile(filename)
-    file = codecs.open(filename, 'r', conf.dataEncoding)
+    ifile = codecs.open(filename, 'r', conf.dataEncoding)
 
-    for line in file.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
+    for line in ifile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
         if line.find('#') != -1:
             line = line[:line.find('#')]
         line = line.strip()

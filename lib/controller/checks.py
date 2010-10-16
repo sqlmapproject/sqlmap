@@ -99,11 +99,15 @@ def heuristicCheckSqlInjection(place, parameter, value):
             postfix = conf.postfix
 
     payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
+
     if place == "URI":
         payload = conf.paramDict[place][parameter].replace('*', payload)
+
     Request.queryPage(payload, place)
     result = kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
+
     infoMsg = "(error based) heuristics show that %s parameter '%s' is " % (place, parameter)
+
     if result:
         infoMsg += "injectable"
         logger.info(infoMsg)
@@ -147,6 +151,7 @@ def checkDynamicContent(*pages):
     This function checks if the provided pages have dynamic content. If they
     are dynamic, their content differs at specific lines.
     """
+
     infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
 
@@ -170,6 +175,7 @@ def checkDynamicContent(*pages):
 
                         for other in kb.dynamicContent:
                             found = True
+
                             if other.pageTotal == item.pageTotal:
                                 if isinstance(other.lineNumber, int):
                                     if other.lineNumber == item.lineNumber - 1:
@@ -235,28 +241,34 @@ def checkStability():
 
     elif not condition:
         warnMsg  = "url is not stable, sqlmap will base the page "
-        warnMsg += "comparison on a sequence matcher. if no dynamic nor "
-        warnMsg += "injectable parameters are detected, or in case of junk "
-        warnMsg += "results, refer to user's "
-        warnMsg += "manual paragraph 'Page comparison' and provide a "
-        warnMsg += "string or regular expression to match on"
+        warnMsg += "comparison on a sequence matcher. If no dynamic nor "
+        warnMsg += "injectable parameters are detected, or in case of "
+        warnMsg += "junk results, refer to user's manual paragraph "
+        warnMsg += "'Page comparison' and provide a string or regular "
+        warnMsg += "expression to match on"
         logger.warn(warnMsg)
 
         message = "how do you want to proceed? [C(ontinue)/s(tring)/r(egex)/q(uit)] "
         test = readInput(message, default="C")
+
         if test and test[0] in ("q", "Q"):
             raise sqlmapUserQuitException
+
         elif test and test[0] in ("s", "S"):
             showStaticWords(firstPage, secondPage)
+
             message = "please enter value for parameter 'string': "
             test = readInput(message)
+
             if test:
                 conf.string = test
             else:
                 raise sqlmapSilentQuitException
+
         elif test and test[0] in ("r", "R"):
             message = "please enter value for parameter 'regex': "
             test = readInput(message)
+
             if test:
                 conf.regex = test
             else:
