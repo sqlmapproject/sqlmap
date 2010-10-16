@@ -198,7 +198,7 @@ def cmdLineParser():
                              help="Compare pages based only on their textual content")
 
         injection.add_option("--tamper", dest="tamper",
-                             help="Use given module(s) for tampering injection data")
+                             help="Use given script(s) for tampering injection data")
 
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "

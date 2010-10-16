@@ -121,7 +121,7 @@ def __setRequestParams():
         errMsg += "within the GET, POST and Cookie parameters"
         raise sqlmapGenericException, errMsg
 
-def __findPageForms():
+def findPageForms():
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
