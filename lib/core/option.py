@@ -539,6 +539,8 @@ def __setTamperingFunctions():
         for tfile in conf.tamper.split(','):
             found = False
 
+            tfile = tfile.strip()
+
             if not tfile:
                 continue
 
@@ -942,9 +944,6 @@ def __cleanupOptions():
         conf.testParameter = conf.testParameter.split(",")
     else:
         conf.testParameter = []
-
-    if conf.tamper:
-        conf.tamper = conf.tamper.replace(" ", "")
 
     if conf.db:
         conf.db = conf.db.replace(" ", "")

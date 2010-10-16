@@ -33,7 +33,7 @@ def tamper(place, value):
                 newWord = str()
 
                 for i in xrange(len(word)):
-                    newWord += word[i].upper() if randomRange(0,1) else word[i].lower()
+                    newWord += word[i].upper() if randomRange(0, 1) else word[i].lower()
 
                 retVal = retVal.replace(word, newWord)
 

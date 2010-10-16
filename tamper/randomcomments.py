@@ -36,7 +36,7 @@ def tamper(place, value):
                 newWord = word[0]
 
                 for i in xrange(1, len(word) - 1):
-                    newWord += "%s%s" % ("/**/" if randomRange(0,1) else "", word[i])
+                    newWord += "%s%s" % ("/**/" if randomRange(0, 1) else "", word[i])
 
                 newWord += word[-1]
                 retVal = retVal.replace(word, newWord)
