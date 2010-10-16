@@ -175,7 +175,7 @@ class Web:
             if isWindowsDriveLetterPath(requestDir):
                 requestDir = requestDir[2:]
 
-            requestDir = normalizePath(requestDir)
+            requestDir = normalizePath(requestDir).replace("//", "/")
 
             if requestDir[0] != '/':
                 requestDir = '/' + requestDir
