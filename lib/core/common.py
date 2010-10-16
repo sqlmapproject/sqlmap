@@ -648,7 +648,7 @@ def setPaths():
     paths.SQLMAP_CONFIG          = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
     paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
-    paths.SQLKEYWORDS            = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
+    paths.SQL_KEYWORDS            = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
     paths.FUZZ_VECTORS           = os.path.join(paths.SQLMAP_TXT_PATH, "fuzz_vectors.txt")
     paths.DETECTION_RULES_XML    = os.path.join(paths.SQLMAP_XML_PATH, "detection.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
