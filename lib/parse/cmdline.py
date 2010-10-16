@@ -137,8 +137,8 @@ def cmdLineParser():
                                  action="store_true", default=False,
                                  help="Use all optimization options")
 
-        optimization.add_option("--common-prediction", dest="commonPrediction", action="store_true",
-                          default=False, help="Use 'Good samaritan' feature")
+        optimization.add_option("--predict-output", dest="predictOutput", action="store_true",
+                          default=False, help="Predict common queries output")
 
         optimization.add_option("--keep-alive", dest="keepAlive", action="store_true",
                            default=False, help="Use persistent HTTP(s) connections")

@@ -45,7 +45,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     # Set kb.partRun in case "common prediction" feature (a.k.a. "good
     # samaritan") is used
-    kb.partRun = getPartRun() if conf.commonPrediction else None
+    kb.partRun = getPartRun() if conf.predictOutput else None
 
     if "LENGTH(" in expression or "LEN(" in expression:
         firstChar = 0
@@ -427,7 +427,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             # Common prediction feature (a.k.a. "good samaritan")
             # NOTE: to be used only when multi-threading is not set for
             # the moment
-            if conf.commonPrediction and len(finalValue) > 0 and kb.partRun is not None:
+            if conf.predictOutput and len(finalValue) > 0 and kb.partRun is not None:
                 val = None
                 commonValue, commonPattern, commonCharset, otherCharset = goGoodSamaritan(finalValue, asciiTbl)
 

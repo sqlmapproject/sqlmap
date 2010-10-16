@@ -979,7 +979,7 @@ def __cleanupOptions():
         conf.multipleTargets = True
 
     if conf.optimize:
-        conf.commonPrediction = conf.keepAlive = True
+        conf.predictOutput = conf.keepAlive = True
         conf.nullConnection = not conf.textOnly
 
 def __setConfAttributes():
