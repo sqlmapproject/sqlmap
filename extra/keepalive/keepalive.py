@@ -152,7 +152,7 @@ class HTTPHandler(urllib2.HTTPHandler):
             if not h is None:
                 try:
                     self._start_connection(h, req)
-                except socket.error, e:
+                except:
                     r = None
                 else:
                     try: r = h.getresponse()
