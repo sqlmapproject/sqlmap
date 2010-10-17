@@ -128,6 +128,9 @@ class HTTPHandler(urllib2.HTTPHandler):
             else:
                 h.putrequest('GET', req.get_selector())
 
+            if not req.headers.has_key('Connection'):
+                h.putheader('Connection', 'keep-alive')
+
             for args in self.parent.addheaders:
                 h.putheader(*args)
             for k, v in req.headers.items():
