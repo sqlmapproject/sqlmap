@@ -108,7 +108,7 @@ def cmdLineParser():
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
                            default=False, help="Ignore system default HTTP proxy")
 
-        request.add_option("--delay", dest="delay", type="float",
+        request.add_option("--delay", dest="delay", type="float", default=0,
                            help="Delay in seconds between each HTTP request")
 
         request.add_option("--timeout", dest="timeout", type="float", default=30,
@@ -147,8 +147,8 @@ def cmdLineParser():
                           default=False, help="Retrieve page length without actual HTTP response body")
 
         optimization.add_option("--threads", dest="threads", type="int", default=1,
-                           help="Maximum number of concurrent HTTP "
-                                "requests (default 1)")
+                           help="Maximum number of concurrent HTTP(s) "
+                                "requests (def 1)")
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
