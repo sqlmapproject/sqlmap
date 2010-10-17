@@ -70,11 +70,6 @@ class Takeover(GenericTakeover):
             self.__datadir = "."
             self.__datadir = ntToPosixSlashes(normalizePath(self.__datadir))
 
-            if re.search("^[\w]\:[\/\\\\]+", self.__datadir, re.I):
-                kb.os = "Windows"
-            else:
-                kb.os = "Linux"
-
             # The DLL can be in either C:\WINDOWS, C:\WINDOWS\system,
             # C:\WINDOWS\system32, @@basedir\bin or @@datadir
             self.udfRemoteFile = "%s/%s.%s" % (self.__datadir, self.udfSharedLibName, self.udfSharedLibExt)
