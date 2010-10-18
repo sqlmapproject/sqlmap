@@ -13,7 +13,7 @@ from lib.core.convert import urlencode
 def tamper(place, value):
     """
     Replaces ' ' with '/**/'
-    Example: 'SELECT id FROM users' becomes 'SELECT+id+FROM users'
+    Example: 'SELECT id FROM users' becomes 'SELECT+id+FROM+users'
     """
 
     retVal = value
