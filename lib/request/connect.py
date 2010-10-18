@@ -197,7 +197,7 @@ class Connect:
 
             # Reset the number of connection retries
             conf.retriesCount = 0
-            
+
             # Return response object
             if response:
                 return conn, None

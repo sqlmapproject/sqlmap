@@ -109,7 +109,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
     infoMsg = "(error based) heuristics show that %s parameter '%s' is " % (place, parameter)
 
     if result:
-        infoMsg += "injectable"
+        infoMsg += "injectable (DBMS: %s)" % kb.htmlFp[-1]
         logger.info(infoMsg)
     else:
         infoMsg += "not injectable"
