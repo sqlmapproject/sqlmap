@@ -1031,6 +1031,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.absFilePaths    = set()
     kb.assumeEmpty     = False
+    kb.authHeader      = None
     kb.bannerFp        = advancedDict()
 
     kb.cache           = advancedDict()

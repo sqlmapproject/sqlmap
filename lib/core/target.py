@@ -286,6 +286,7 @@ def initTargetEnv():
         conf.parameters   = {}
         conf.sessionFile  = None
 
+        kb.authHeader     = None
         kb.dbms           = None
         kb.dbmsDetected   = False
         kb.dbmsVersion    = [ "Unknown" ]

@@ -121,6 +121,9 @@ class Connect:
 
             headers["Referer"] = "%s://%s" % (conf.scheme, conf.hostname)
 
+            if kb.authHeader:
+                headers["Authorization"] = kb.authHeader
+
             if auxHeaders:
                 for key, item in auxHeaders.items():
                     headers[key] = item
@@ -140,10 +143,10 @@ class Connect:
                 for _, cookie in enumerate(conf.cj):
                     if not cookieStr:
                         cookieStr = "Cookie: "
-    
+
                     cookie = getUnicode(cookie)
                     index  = cookie.index(" for ")
-    
+
                     cookieStr += "%s; " % cookie[8:index]
 
             if not req.has_header("Cookie") and cookieStr:
@@ -162,6 +165,9 @@ class Connect:
             logger.log(9, requestMsg)
 
             conn = urllib2.urlopen(req)
+
+            if req.has_header("Authorization"):
+                kb.authHeader = req.headers["Authorization"]
 
             if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled:
                 msg  = "sqlmap got a %d redirect to " % conn.redcode
