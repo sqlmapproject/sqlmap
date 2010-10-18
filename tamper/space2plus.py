@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: space2comment.py 2035 2010-10-16 21:33:15Z inquisb $
+$Id$
 
 Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
