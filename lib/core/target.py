@@ -296,6 +296,7 @@ def initTargetEnv():
         kb.injType        = None
         kb.nullConnection = None
         kb.parenthesis    = None
+        kb.proxyAuthHeader = None
         kb.unionComment   = ""
         kb.unionCount     = None
         kb.unionPosition  = None

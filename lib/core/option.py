@@ -1070,6 +1070,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.parenthesis     = None
     kb.partRun         = None
+    kb.proxyAuthHeader = None
     kb.lastRequestUID  = 0
     kb.queryCounter    = 0
     kb.resumedQueries  = {}

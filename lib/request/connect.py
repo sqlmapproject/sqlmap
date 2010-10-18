@@ -124,6 +124,9 @@ class Connect:
             if kb.authHeader:
                 headers["Authorization"] = kb.authHeader
 
+            if kb.proxyAuthHeader:
+                headers["Proxy-authorization"] = kb.proxyAuthHeader
+
             if auxHeaders:
                 for key, item in auxHeaders.items():
                     headers[key] = item
@@ -168,6 +171,9 @@ class Connect:
 
             if req.has_header("Authorization"):
                 kb.authHeader = req.headers["Authorization"]
+
+            if req.has_header("Proxy-authorization"):
+                kb.proxyAuthHeader = req.headers["Proxy-authorization"]
 
             if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled:
                 msg  = "sqlmap got a %d redirect to " % conn.redcode
