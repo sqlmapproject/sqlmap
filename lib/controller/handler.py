@@ -7,6 +7,8 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -64,9 +66,9 @@ def setHandler():
             dbmsAliases, _, _ = dbmsMap[i]
             if kb.htmlFp[-1].lower() in dbmsAliases:
                 if i > 0:
-                    temp = dbmsMap[i]
-                    dbmsMap.remove(temp)
-                    dbmsMap.insert(0, temp)
+                    pushValue(dbmsMap[i])
+                    dbmsMap.remove(dbmsMap[i])
+                    dbmsMap.insert(0, popValue())
                 break
 
 
