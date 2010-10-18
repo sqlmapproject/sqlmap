@@ -290,6 +290,7 @@ def initTargetEnv():
         kb.dbms           = None
         kb.dbmsDetected   = False
         kb.dbmsVersion    = [ "Unknown" ]
+        kb.htmlFp         = None
         kb.lastErrorPage  = None
         kb.injParameter   = None
         kb.injPlace       = None
