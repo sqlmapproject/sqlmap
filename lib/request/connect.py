@@ -169,11 +169,11 @@ class Connect:
 
             conn = urllib2.urlopen(req)
 
-            if req.has_header("Authorization"):
-                kb.authHeader = req.headers["Authorization"]
+            if not kb.authHeader and req.has_header("Authorization"):
+                kb.authHeader = req.get_header("Authorization")
 
-            if req.has_header("Proxy-authorization"):
-                kb.proxyAuthHeader = req.headers["Proxy-authorization"]
+            if not kb.proxyAuthHeader and req.has_header("Proxy-authorization"):
+                kb.proxyAuthHeader = req.get_header("Proxy-authorization")
 
             if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled:
                 msg  = "sqlmap got a %d redirect to " % conn.redcode
