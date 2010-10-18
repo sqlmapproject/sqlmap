@@ -47,7 +47,7 @@ def setHandler():
 
     count     = 0
     dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird", "SAP MaxDB", "Sybase" )
-    dbmsMap   = (
+    dbmsMap   = [
                   ( MYSQL_ALIASES, MySQLMap, MySQLConn ),
                   ( ORACLE_ALIASES, OracleMap, OracleConn ),
                   ( PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn ),
@@ -57,7 +57,18 @@ def setHandler():
                   ( FIREBIRD_ALIASES, FirebirdMap, FirebirdConn ),
                   ( MAXDB_ALIASES, MaxDBMap, MaxDBConn ),
                   ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
-                )
+                ]
+
+    if kb.htmlFp:
+        for i in xrange(len(dbmsMap)):
+            dbmsAliases, _, _ = dbmsMap[i]
+            if kb.htmlFp[-1].lower() in dbmsAliases:
+                if i > 0:
+                    temp = dbmsMap[i]
+                    dbmsMap.remove(temp)
+                    dbmsMap.insert(0, temp)
+                break
+
 
     for dbmsAliases, dbmsMap, dbmsConn in dbmsMap:
         if conf.dbms and conf.dbms not in dbmsAliases:
