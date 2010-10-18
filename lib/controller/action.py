@@ -46,8 +46,8 @@ def action():
             errMsg += ". Do not specify the back-end DBMS manually, "
             errMsg += "sqlmap will fingerprint the DBMS for you"
         else:
-            errMsg += ". Support for this DBMS will be implemented if "
-            errMsg += "you ask, just drop us an email"
+            errMsg += ". Support for this DBMS will be implemented at "
+            errMsg += "some point"
 
         raise sqlmapUnsupportedDBMSException, errMsg
 
