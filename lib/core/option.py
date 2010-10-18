@@ -1050,7 +1050,6 @@ def __setKnowledgeBaseAttributes():
     kb.dep             = None
     kb.docRoot         = None
     kb.dynamicContent  = []
-    kb.lastErrorPage   = None
     kb.headersCount    = 0
     kb.headersFp       = {}
     kb.hintValue       = None
@@ -1060,6 +1059,8 @@ def __setKnowledgeBaseAttributes():
     kb.injType         = None
     kb.injections      = xmlobject.XMLFile(path=paths.INJECTIONS_XML)
     kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
+    kb.lastErrorPage   = None
+    kb.lastRequestUID  = 0
     kb.nullConnection  = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
@@ -1071,7 +1072,6 @@ def __setKnowledgeBaseAttributes():
     kb.parenthesis     = None
     kb.partRun         = None
     kb.proxyAuthHeader = None
-    kb.lastRequestUID  = 0
     kb.queryCounter    = 0
     kb.resumedQueries  = {}
     kb.stackedTest     = None
