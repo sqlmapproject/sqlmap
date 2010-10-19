@@ -29,7 +29,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
-from lib.core.data import temp
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -62,10 +61,7 @@ class Enumeration:
         kb.data.cachedTables           = {}
         kb.data.cachedColumns          = {}
         kb.data.dumpedTable            = {}
-
-        temp.inference                 = queries[dbms].inference
-        temp.error                     = queries[dbms].error
-        temp.errorRegex                = queries[dbms].errorRegex
+        kb.misc.testedDbms             = dbms
 
     def getBanner(self):
         if not conf.getBanner:

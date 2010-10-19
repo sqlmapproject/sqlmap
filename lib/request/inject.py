@@ -27,7 +27,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.data import temp
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -97,7 +96,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     parameter through a bisection algorithm.
     """
 
-    query          = agent.prefixQuery(" %s" % temp.inference)
+    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].inference)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
     count          = None
@@ -336,7 +335,7 @@ def __goError(expression, resumeValue=True):
     Retrieve the output of a SQL query taking advantage of an error SQL
     injection vulnerability on the affected parameter.
     """
-    query          = agent.prefixQuery(" %s" % temp.error)
+    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].error)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
 
@@ -356,13 +355,13 @@ def __goError(expression, resumeValue=True):
     forgedPayload = safeStringFormat(payload, expressionUnescaped)
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
-    match = re.search(temp.errorRegex, result[0], re.DOTALL | re.IGNORECASE)
+    match = re.search(queries[kb.misc.testedDbms].errorRegex, result[0], re.DOTALL | re.IGNORECASE)
     if match:
         output = match.group('result')
         if output:
             output = output.replace("%c%c%c" % (58, 95, 58), " ").replace("%c%c%c" % (58, 120, 58), "") #':_:' -> EMPTY CHAR, ':x:' -> SPACE CHAR
 
-            if temp.error == queries['MySQL'].error:
+            if kb.misc.testedDbms == 'MySQL':
                 output = output[:-1]
 
             infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)

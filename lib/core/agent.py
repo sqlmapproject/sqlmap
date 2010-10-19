@@ -18,7 +18,7 @@ from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
-from lib.core.data import temp
+from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapNoneDataException
 
 class Agent:
@@ -27,9 +27,10 @@ class Agent:
     """
 
     def __init__(self):
-        temp.delimiter = randomStr(6)
-        temp.start     = randomStr(6)
-        temp.stop      = randomStr(6)
+        kb.misc           = advancedDict()
+        kb.misc.delimiter = randomStr(6)
+        kb.misc.start     = randomStr(6)
+        kb.misc.stop      = randomStr(6)
 
     def payloadDirect(self, query):
         if query.startswith(" AND "):
@@ -265,7 +266,7 @@ class Agent:
         for field in fieldsSplitted:
             nulledCastedFields.append(self.nullAndCastField(field))
 
-        delimiterStr = "%s'%s'%s" % (dbmsDelimiter, temp.delimiter, dbmsDelimiter)
+        delimiterStr = "%s'%s'%s" % (dbmsDelimiter, kb.misc.delimiter, dbmsDelimiter)
         nulledCastedConcatFields = delimiterStr.join([field for field in nulledCastedFields])
 
         return nulledCastedConcatFields
@@ -368,29 +369,29 @@ class Agent:
 
         if kb.dbms == "MySQL":
             if fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
-                concatenatedQuery += ",'%s')" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
+                concatenatedQuery += ",'%s')" % kb.misc.stop
             elif fieldsSelectFrom:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", ",'%s') FROM " % temp.stop, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", ",'%s') FROM " % kb.misc.stop, 1)
             elif fieldsSelect:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % temp.start, 1)
-                concatenatedQuery += ",'%s')" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
+                concatenatedQuery += ",'%s')" % kb.misc.stop
             elif fieldsNoSelect:
-                concatenatedQuery = "CONCAT('%s',%s,'%s')" % (temp.start, concatenatedQuery, temp.stop)
+                concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
         elif kb.dbms in ( "PostgreSQL", "Oracle", "SQLite" ):
             if fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
-                concatenatedQuery += "||'%s'" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
+                concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsSelectFrom:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % temp.stop, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.misc.stop, 1)
             elif fieldsSelect:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % temp.start, 1)
-                concatenatedQuery += "||'%s'" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
+                concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsNoSelect:
-                concatenatedQuery = "'%s'||%s||'%s'" % (temp.start, concatenatedQuery, temp.stop)
+                concatenatedQuery = "'%s'||%s||'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
             if kb.dbms == "Oracle" and " FROM " not in concatenatedQuery and ( fieldsSelect or fieldsNoSelect ):
                 concatenatedQuery += " FROM DUAL"
@@ -398,19 +399,19 @@ class Agent:
         elif kb.dbms == "Microsoft SQL Server":
             if fieldsSelectTop:
                 topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatenatedQuery, re.I).group(1)
-                concatenatedQuery = concatenatedQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, temp.start), 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, kb.misc.start), 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.misc.stop, 1)
             elif fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
-                concatenatedQuery += "+'%s'" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
+                concatenatedQuery += "+'%s'" % kb.misc.stop
             elif fieldsSelectFrom:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % temp.stop, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.misc.stop, 1)
             elif fieldsSelect:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % temp.start, 1)
-                concatenatedQuery += "+'%s'" % temp.stop
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
+                concatenatedQuery += "+'%s'" % kb.misc.stop
             elif fieldsNoSelect:
-                concatenatedQuery = "'%s'+%s+'%s'" % (temp.start, concatenatedQuery, temp.stop)
+                concatenatedQuery = "'%s'+%s+'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
         return concatenatedQuery
 

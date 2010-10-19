@@ -18,7 +18,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.data import temp
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
@@ -206,13 +205,13 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         resultPage, _ = Request.queryPage(payload, content=True)
         reqCount += 1
 
-        if temp.start not in resultPage or temp.stop not in resultPage:
+        if kb.misc.start not in resultPage or kb.misc.stop not in resultPage:
             return
 
         # Parse the returned page to get the exact inband
         # sql injection output
-        startPosition = resultPage.index(temp.start)
-        endPosition = resultPage.rindex(temp.stop) + len(temp.stop)
+        startPosition = resultPage.index(kb.misc.start)
+        endPosition = resultPage.rindex(kb.misc.stop) + len(kb.misc.stop)
         value = getUnicode(resultPage[startPosition:endPosition])
 
         duration = calculateDeltaSeconds(start)

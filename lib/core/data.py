@@ -20,10 +20,6 @@ conf = advancedDict()
 # object to share within function and classes results
 kb = advancedDict()
 
-# object to share within function and classes temporary data,
-# just for internal use
-temp = advancedDict()
-
 # object with each database management system specific queries
 queries = {}
 

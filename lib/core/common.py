@@ -40,7 +40,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
-from lib.core.data import temp
 from lib.core.convert import urlencode
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -585,7 +584,7 @@ def replaceNewlineTabs(inpStr, stdout=False):
     else:
         replacedString = inpStr.replace("\n", "__NEWLINE__").replace("\t", "__TAB__")
 
-    replacedString = replacedString.replace(temp.delimiter, "__DEL__")
+    replacedString = replacedString.replace(kb.misc.delimiter, "__DEL__")
 
     return replacedString
 
@@ -860,12 +859,12 @@ def getRange(count, dump=False, plusOne=False):
 def parseUnionPage(output, expression, partial=False, condition=None, sort=True):
     data = []
 
-    outCond1 = ( output.startswith(temp.start) and output.endswith(temp.stop) )
+    outCond1 = ( output.startswith(kb.misc.start) and output.endswith(kb.misc.stop) )
     outCond2 = ( output.startswith("__START__") and output.endswith("__STOP__") )
 
     if outCond1 or outCond2:
         if outCond1:
-            regExpr = '%s(.*?)%s' % (temp.start, temp.stop)
+            regExpr = '%s(.*?)%s' % (kb.misc.start, kb.misc.stop)
         elif outCond2:
             regExpr = '__START__(.*?)__STOP__'
 
@@ -890,7 +889,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
             if "__DEL__" in entry:
                 entry = entry.split("__DEL__")
             else:
-                entry = entry.split(temp.delimiter)
+                entry = entry.split(kb.misc.delimiter)
 
             if len(entry) == 1:
                 data.append(entry[0])
