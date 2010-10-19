@@ -355,10 +355,15 @@ def __goError(expression, resumeValue=True):
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
     match = re.search(temp.errorRegex, result[0], re.DOTALL | re.IGNORECASE)
+    #import pdb
+    #pdb.set_trace()
     if match:
         output = match.group('result')
         if output:
             output = output.replace("%c%c%c" % (58, 95, 58), " ").replace("%c%c%c" % (58, 120, 58), "") #':_:' -> EMPTY CHAR, ':x:' -> SPACE CHAR
+
+            if kb.dbms == "MySQL":
+                output = output[:-1]
 
     return output
 
