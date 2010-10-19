@@ -243,7 +243,7 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <error query="AND 1=CONVERT(INT,(%s))" regex="Conversion failed when converting.*'(?P&lt;result&gt;.+?)' to data type int"/>
+        <error query="AND 1=CONVERT(INT,((%s)+CHAR(58)+CHAR(120)+CHAR(58)))" regex="Conversion failed when converting.*'(?P&lt;result&gt;.+?)' to data type int"/>
         <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
