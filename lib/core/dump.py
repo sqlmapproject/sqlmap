@@ -172,12 +172,15 @@ class Dump:
 
             for tables in dbTables.values():
                 for table in tables:
+                    if isinstance(table, (list, tuple, set)):
+                        table = table[0]
+
                     maxlength = max(maxlength, len(table))
 
             lines = "-" * (int(maxlength) + 2)
 
             for db, tables in dbTables.items():
-                tables.sort(key=lambda x: x.lower())
+                tables.sort()
 
                 self.__write("Database: %s" % db)
 
@@ -189,6 +192,9 @@ class Dump:
                 self.__write("+%s+" % lines)
 
                 for table in tables:
+                    if isinstance(table, (list, tuple, set)):
+                        table = table[0]
+
                     blank = " " * (maxlength - len(table))
                     self.__write("| %s%s |" % (table, blank))
 
