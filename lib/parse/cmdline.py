@@ -491,6 +491,10 @@ def cmdLineParser():
         parser.add_option("--error", dest="error", action="store_true",
                           default=False, help=SUPPRESS_HELP)
 
+        parser.add_option("--error-test", dest="errorTest",
+                          action="store_true", default=False,
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int", default=10,
                           help=SUPPRESS_HELP)
 

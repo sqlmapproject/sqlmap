@@ -16,6 +16,7 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.blind.timebased import timeTest
+from lib.techniques.error.error import errorTest
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
 
@@ -56,6 +57,9 @@ def action():
     # Techniques options
     if conf.stackedTest:
         conf.dumper.technic("stacked queries support", stackedTest())
+
+    if conf.errorTest:
+        conf.dumper.technic("error based injection support", errorTest())
 
     if conf.timeTest:
         conf.dumper.technic("time based blind sql injection payload", timeTest())

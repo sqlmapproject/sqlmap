@@ -1050,6 +1050,7 @@ def __setKnowledgeBaseAttributes():
     kb.dep             = None
     kb.docRoot         = None
     kb.dynamicContent  = []
+    kb.errorTest       = None
     kb.headersCount    = 0
     kb.headersFp       = {}
     kb.hintValue       = None

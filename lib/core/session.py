@@ -196,6 +196,15 @@ def setStacked():
     if condition:
         dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.stackedTest))
 
+def setError():
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Error based injection") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Error based injection][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
+
 def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False):
     """
     @param comment: union comment to save in session file

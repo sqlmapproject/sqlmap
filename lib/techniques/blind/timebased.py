@@ -20,7 +20,7 @@ from lib.request.connect import Connect as Request
 
 def timeTest():
     infoMsg  = "testing time based blind sql injection on parameter "
-    infoMsg += "'%s' with AND condition syntax" % kb.injParameter
+    infoMsg += "'%s' with %s condition syntax" % (kb.injParameter, conf.logic)
     logger.info(infoMsg)
 
     timeQuery = getDelayQuery(andCond=True)

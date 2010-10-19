@@ -445,3 +445,13 @@ def goStacked(expression, silent=False):
     page, _ = Request.queryPage(payload, content=True, silent=silent)
 
     return payload, page
+
+def goError(expression):
+    #expression = cleanQuery(expression)
+
+    if conf.direct:
+        return direct(expression), None
+
+    result = __goError(expression)
+
+    return result

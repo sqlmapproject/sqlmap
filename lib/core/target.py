@@ -282,25 +282,28 @@ def initTargetEnv():
         if conf.cj:
             conf.cj.clear()
 
-        conf.paramDict    = {}
-        conf.parameters   = {}
-        conf.sessionFile  = None
+        conf.paramDict     = {}
+        conf.parameters    = {}
+        conf.sessionFile   = None
 
-        kb.authHeader     = None
-        kb.dbms           = None
-        kb.dbmsDetected   = False
-        kb.dbmsVersion    = [ "Unknown" ]
-        kb.htmlFp         = []
-        kb.lastErrorPage  = None
-        kb.injParameter   = None
-        kb.injPlace       = None
-        kb.injType        = None
-        kb.nullConnection = None
-        kb.parenthesis    = None
+        kb.authHeader      = None
+        kb.dbms            = None
+        kb.dbmsDetected    = False
+        kb.dbmsVersion     = [ "Unknown" ]
+        kb.errorTest       = None        
+        kb.htmlFp          = []
+        kb.lastErrorPage   = None
+        kb.injParameter    = None
+        kb.injPlace        = None
+        kb.injType         = None
+        kb.nullConnection  = None
+        kb.parenthesis     = None
         kb.proxyAuthHeader = None
-        kb.unionComment   = ""
-        kb.unionCount     = None
-        kb.unionPosition  = None
+        kb.stackedTest     = None
+        kb.timeTest        = None        
+        kb.unionComment    = ""
+        kb.unionCount      = None
+        kb.unionPosition   = None
 
 def setupTargetEnv():
     __createTargetDirs()
