@@ -431,7 +431,7 @@ class Dump:
             self.dbTableColumns(printDbs)
 
     def query(self, query, queryRes):
-        self.string(query, queryRes)    
+        self.string(query, queryRes)
 
     def rFile(self,filePath,fileData):
         self.string("%s file saved to" % filePath,fileData,sort=False) 

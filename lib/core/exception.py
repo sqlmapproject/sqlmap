@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import VERSION
+from lib.core.settings import REVISION
 from lib.core.settings import VERSION_STRING
 
 
@@ -75,7 +76,7 @@ def unhandledException():
     errMsg += "following text and any information needed to reproduce the "
     errMsg += "bug. The developers will try to reproduce the bug, fix it "
     errMsg += "accordingly and get back to you.\n"
-    errMsg += "sqlmap version: %s\n" % VERSION
+    errMsg += "sqlmap version: %s%s\n" % (VERSION, " (r%d)" % REVISION if REVISION else "")
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s" % PLATFORM
     return errMsg
