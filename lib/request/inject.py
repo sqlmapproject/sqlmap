@@ -364,7 +364,7 @@ def __goError(expression, resumeValue=True):
     return output
 
 
-def getValue(expression, blind=True, inband=True, error=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
+def getValue(expression, blind=True, inband=True, error=False, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
