@@ -27,6 +27,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.settings import ERROR_SPACE
+from lib.core.settings import ERROR_EMPTY_CHAR
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -359,7 +361,7 @@ def __goError(expression, resumeValue=True):
     if match:
         output = match.group('result')
         if output:
-            output = output.replace("%c%c%c" % (58, 95, 58), " ").replace("%c%c%c" % (58, 120, 58), "") #':_:' -> EMPTY CHAR, ':x:' -> SPACE CHAR
+            output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
 
             if kb.misc.testedDbms == 'MySQL':
                 output = output[:-1]

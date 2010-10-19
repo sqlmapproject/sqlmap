@@ -33,6 +33,10 @@ LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
 LOGGER.setLevel(logging.WARN)
 
+# error based injection
+ERROR_SPACE        = "%c%c%c" % (58, 95, 58)
+ERROR_EMPTY_CHAR   = "%c%c%c" % (58, 120, 58)
+
 # System variables
 IS_WIN             = subprocess.mswindows
 # The name of the operating system dependent module imported. The following
