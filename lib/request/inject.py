@@ -14,11 +14,13 @@ from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
+from lib.core.common import dataToStdout
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import readInput
+from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
 from lib.core.data import conf
@@ -355,8 +357,6 @@ def __goError(expression, resumeValue=True):
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
     match = re.search(temp.errorRegex, result[0], re.DOTALL | re.IGNORECASE)
-    #import pdb
-    #pdb.set_trace()
     if match:
         output = match.group('result')
         if output:
@@ -364,6 +364,9 @@ def __goError(expression, resumeValue=True):
 
             if kb.dbms == "MySQL":
                 output = output[:-1]
+
+            infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
+            logger.info(infoMsg)
 
     return output
 
