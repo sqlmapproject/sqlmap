@@ -362,7 +362,7 @@ def __goError(expression, resumeValue=True):
         if output:
             output = output.replace("%c%c%c" % (58, 95, 58), " ").replace("%c%c%c" % (58, 120, 58), "") #':_:' -> EMPTY CHAR, ':x:' -> SPACE CHAR
 
-            if kb.dbms == "MySQL":
+            if temp.error == queries['MySQL'].error:
                 output = output[:-1]
 
             infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
