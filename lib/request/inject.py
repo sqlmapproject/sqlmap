@@ -355,11 +355,10 @@ def __goError(expression, resumeValue=True):
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
     match = re.search(temp.errorRegex, result[0], re.DOTALL | re.IGNORECASE)
-
     if match:
         output = match.group('result')
         if output:
-            output = output.replace("%c%c" % (58, 59), " ").replace("%c%c" % (59, 58), "")
+            output = output.replace("%c%c%c" % (58, 95, 58), " ").replace("%c%c%c" % (58, 120, 58), "") #':_:' -> EMPTY CHAR, ':x:' -> SPACE CHAR
 
     return output
 
