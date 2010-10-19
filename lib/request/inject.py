@@ -358,8 +358,8 @@ def __goError(expression, resumeValue=True):
 
     if match:
         output = match.group('result')
-        if kb.dbms == "Oracle" and output:
-            output = output.replace("__SPACE__", " ")
+        if output:
+            output = output.replace("%c%c" % (58, 59), " ").replace("%c%c" % (59, 58), "")
 
     return output
 
@@ -385,7 +385,7 @@ def getValue(expression, blind=True, inband=True, error=False, fromUser=False, e
 
         expression = expression.replace("DISTINCT ", "")
 
-        if error:
+        if error or conf.error:
             value = __goError(expression)
 
             if not value:
