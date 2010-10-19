@@ -64,6 +64,8 @@ class Enumeration:
         kb.data.dumpedTable            = {}
 
         temp.inference                 = queries[dbms].inference
+        temp.error                     = queries[dbms].error
+        temp.errorRegex                = queries[dbms].errorRegex
 
     def getBanner(self):
         if not conf.getBanner:

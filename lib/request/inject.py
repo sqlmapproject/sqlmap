@@ -19,11 +19,14 @@ from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import readInput
+from lib.core.common import safeStringFormat
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.data import temp
+from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.techniques.inband.union.use import unionUse
@@ -326,7 +329,40 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
 
     return data
 
-def getValue(expression, blind=True, inband=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
+def __goError(expression, resumeValue=True):
+    """
+    Retrieve the output of a SQL query taking advantage of an error SQL
+    injection vulnerability on the affected parameter.
+    """
+    query          = agent.prefixQuery(" %s" % temp.error)
+    query          = agent.postfixQuery(query)
+    payload        = agent.payload(newValue=query)
+
+    if resumeValue:
+        output = resume(expression, payload)
+    else:
+        output = None
+
+    if output and ( expected is None or ( expected == "int" and output.isdigit() ) ):
+        return output
+
+    expressionUnescaped = unescaper.unescape(expression)
+
+    debugMsg = "query: %s" % expressionUnescaped
+    logger.debug(debugMsg)
+
+    forgedPayload = safeStringFormat(payload, expressionUnescaped)
+    result = Request.queryPage(urlencode(forgedPayload), content=True)
+
+    match = re.search(temp.errorRegex, result[0], re.DOTALL | re.IGNORECASE)
+
+    if match:
+        output = match.group('result')
+
+    return output
+
+
+def getValue(expression, blind=True, inband=True, error=False, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -337,7 +373,7 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
     if suppressOutput:
         pushValue(conf.verbose)
         conf.verbose = 0
-    
+
     if conf.direct:
         value = direct(expression)
     else:
@@ -347,7 +383,16 @@ def getValue(expression, blind=True, inband=True, fromUser=False, expected=None,
 
         expression = expression.replace("DISTINCT ", "")
 
-        if inband and kb.unionPosition:
+        if error:
+            value = __goError(expression)
+
+            if not value:
+                warnMsg  = "for some reasons it was not possible to retrieve "
+                warnMsg += "the query output through error SQL injection "
+                warnMsg += "technique, sqlmap is going %s" % ("inband" if inband and kb.unionPosition else "blind")
+                logger.warn(warnMsg)
+
+        if inband and kb.unionPosition and not value:
             value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
             if not value:
