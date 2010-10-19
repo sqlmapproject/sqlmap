@@ -24,7 +24,7 @@
         <timedelay query="SELECT SLEEP(%d)" query2="SELECT BENCHMARK(5000000, MD5('%d'))"/>
         <substring query="MID((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <error query="AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT((%s),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)" regex="SQL error:.*Duplicate entry '(?P&lt;result&gt;.+)' for key"/>
+        <error query="AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT((%s),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)" regex="SQL error:.*Duplicate entry '(?P&lt;result&gt;.+?)' for key"/>
         <inference query="AND ORD(MID((%s), %d, 1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER()"/>
@@ -91,7 +91,7 @@
         <timedelay query="BEGIN DBMS_LOCK.SLEEP(%d); END" query2="EXEC DBMS_LOCK.SLEEP(%d.00)" query3="EXEC USER_LOCK.SLEEP(%d00)"/>
         <substring query="SUBSTR((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END) FROM DUAL"/>
-        <error query="AND 1=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||CHR(58)||(%s)||CHR(62))) FROM DUAL)" regex="Warning: invalid QName.*::(?P&lt;result&gt;.+)&amp;quot;"/>
+        <error query="AND 1=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||CHR(58)||(%s)||CHR(62))) FROM DUAL)" regex="Warning: invalid QName.*::(?P&lt;result&gt;.+?)&amp;quot;"/>
         <inference query="AND ASCII(SUBSTR((%s), %d, 1)) > %d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>
@@ -175,7 +175,7 @@
         <timedelay query="SELECT PG_SLEEP(%d)" query2="SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1, 300000%d))" query3="CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep(%d)"/>
         <substring query="SUBSTR((%s)::text, %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <error query="AND 1=CAST((%s)::text AS NUMERIC)" regex="SQL error:.*invalid input syntax for type numeric:.*&quot;(?P&lt;result&gt;.+)&quot;"/>
+        <error query="AND 1=CAST((%s)::text AS NUMERIC)" regex="SQL error:.*invalid input syntax for type numeric:.*&quot;(?P&lt;result&gt;.+?)&quot;"/>
         <inference query="AND ASCII(SUBSTR((%s)::text, %d, 1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER"/>
@@ -242,7 +242,7 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <error query="AND 1=CONVERT(INT,(%s))" regex="Conversion failed when converting.*'(?P&lt;result&gt;.+)' to data type int"/>
+        <error query="AND 1=CONVERT(INT,(%s))" regex="Conversion failed when converting.*'(?P&lt;result&gt;.+?)' to data type int"/>
         <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
