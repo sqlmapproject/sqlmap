@@ -392,7 +392,7 @@ def getValue(expression, blind=True, inband=True, error=False, fromUser=False, e
 
         expression = expression.replace("DISTINCT ", "")
 
-        if error or conf.error:
+        if error or conf.errorTest:
             value = __goError(expression)
 
             if not value:

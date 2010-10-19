@@ -488,9 +488,6 @@ def cmdLineParser():
         parser.add_option("--profile", dest="profile", action="store_true",
                           default=False, help=SUPPRESS_HELP)
 
-        parser.add_option("--error", dest="error", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
-
         parser.add_option("--error-test", dest="errorTest",
                           action="store_true", default=False,
                           help=SUPPRESS_HELP)
