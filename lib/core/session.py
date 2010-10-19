@@ -439,6 +439,13 @@ def resumeConfKb(expression, url, value):
         logMsg += "'%s' from session file" % kb.stackedTest
         logger.info(logMsg)
 
+    elif expression == "Error based injection" and url == conf.url:
+        kb.errorTest = unSafeFormatString(value[:-1]) == 'Yes'
+
+        logMsg  = "resuming error based injection "
+        logMsg += "'%s' from session file" % kb.errorTest
+        logger.info(logMsg)
+
     elif expression == "Union comment" and url == conf.url:
         kb.unionComment = unSafeFormatString(value[:-1])
 
