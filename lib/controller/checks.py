@@ -106,10 +106,11 @@ def heuristicCheckSqlInjection(place, parameter, value):
     Request.queryPage(payload, place)
     result = kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
 
-    infoMsg = "(error based) heuristics show that %s parameter '%s' is " % (place, parameter)
+    infoMsg  = "(error based) heuristics shows that %s " % place
+    infoMsg += "parameter '%s' is " % parameter
 
     if result:
-        infoMsg += "injectable (DBMS: %s)" % kb.htmlFp[-1]
+        infoMsg += "injectable (possible DBMS: %s)" % kb.htmlFp[-1]
         logger.info(infoMsg)
     else:
         infoMsg += "not injectable"

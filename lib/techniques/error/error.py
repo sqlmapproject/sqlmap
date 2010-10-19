@@ -30,7 +30,7 @@ def errorTest():
     logger.info(infoMsg)
 
     randInt = getUnicode(randomInt(1))    
-    query      = queries[kb.dbms].case % ("%s=%s" % (randInt, randInt))
+    query = queries[kb.dbms].case % ("%s=%s" % (randInt, randInt))
     result = inject.goError(query)
 
     if result:

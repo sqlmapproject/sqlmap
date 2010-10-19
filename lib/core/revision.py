@@ -23,10 +23,8 @@ def getRevisionNumber():
         client = pysvn.Client()
         if client.info(curDir):
             retVal = client.info(curDir).revision.number
-
     except ImportError, _:
         process = execute("svn info %s" % curDir, shell=True, stdout=PIPE, stderr=PIPE)
-
         svnStdout, svnStderr = process.communicate()
 
         if svnStdout:
@@ -40,9 +38,5 @@ def getRevisionNumber():
             retVal = int(retVal)
         except ValueError:
             retVal = None
-
-    #if not retVal:
-        #debugMsg = "sqlmap was not able to retrieve the revision number"
-        #logger.debug(debugMsg)
 
     return retVal
