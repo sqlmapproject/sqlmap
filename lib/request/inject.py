@@ -37,9 +37,6 @@ from lib.techniques.error.use import errorUse
 from lib.utils.resume import queryOutputLength
 from lib.utils.resume import resume
 
-from lib.core.settings import ERROR_SPACE
-from lib.core.settings import ERROR_EMPTY_CHAR
-
 def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None):
     start = time.time()
 
