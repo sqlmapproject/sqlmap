@@ -22,7 +22,7 @@ class Enumeration(GenericEnumeration):
     def __init__(self):
         GenericEnumeration.__init__(self, "Microsoft SQL Server")
 
-    def getPrivileges(self):
+    def getPrivileges(self, _):
         warnMsg  = "on Microsoft SQL Server it is not possible to fetch "
         warnMsg += "database users privileges"
         logger.warn(warnMsg)
