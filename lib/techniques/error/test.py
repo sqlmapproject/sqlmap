@@ -29,7 +29,7 @@ def errorTest():
     infoMsg += "'%s' with %s condition syntax" % (kb.injParameter, conf.logic)
     logger.info(infoMsg)
 
-    randInt = getUnicode(randomInt(1))    
+    randInt = getUnicode(randomInt(1))
     query = queries[kb.dbms].case % ("%s=%s" % (randInt, randInt))
     result = inject.goError(query)
 

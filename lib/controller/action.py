@@ -16,7 +16,7 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.blind.timebased import timeTest
-from lib.techniques.error.error import errorTest
+from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
 
