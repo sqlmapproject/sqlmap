@@ -348,17 +348,16 @@ def __goError(expression, resumeValue=True):
 
     if output and ( expected is None or ( expected == "int" and output.isdigit() ) ):
         return output
-    
-    if kb.misc.testedDbms != "MySQL":
-        if kb.dbmsDetected:
-            _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
-            nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
-            expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
-            expressionUnescaped              = unescaper.unescape(expressionReplaced)
-        else:
-            expressionUnescaped              = unescaper.unescape(expression)    
-    else: #temporary (have to find out what's wrong with that "Subquery with more than 1 row")
-        expressionUnescaped = unescaper.unescape(expression)
+
+    if kb.dbmsDetected:
+        _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
+        nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
+        if kb.dbms == "MySQL":
+            nulledCastedField            = nulledCastedField.replace("CHAR(10000)", "CHAR(255)") #fix for that 'Subquery returns more than 1 row'
+        expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
+        expressionUnescaped              = unescaper.unescape(expressionReplaced)
+    else:
+        expressionUnescaped              = unescaper.unescape(expression)
 
     debugMsg = "query: %s" % expressionUnescaped
     logger.debug(debugMsg)
