@@ -81,9 +81,9 @@ def setHandler():
 
             continue
 
-        handler = dbmsMap()
+        kb.misc.handler = handler = dbmsMap()
         conf.dbmsConnector = dbmsConn()
-        
+
         if conf.direct:
             logger.debug("forcing timeout to 10 seconds")
             conf.timeout = 10

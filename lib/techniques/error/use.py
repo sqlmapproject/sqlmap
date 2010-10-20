@@ -43,6 +43,8 @@ def errorUse(expression, resumeValue=True):
     startLimiter   = ""
     endLimiter     = ""
 
+    expressionUnescaped = expression
+
     if resumeValue:
         output = resume(expression, payload)
     else:
@@ -61,7 +63,9 @@ def errorUse(expression, resumeValue=True):
         startLimiter                     = unescaper.unescape("'%s'" % ERROR_START_CHAR)
         endLimiter                       = unescaper.unescape("'%s'" % ERROR_END_CHAR)
     else:
-        expressionUnescaped              = unescaper.unescape(expression)
+        expressionUnescaped              = kb.misc.handler.unescape(expression)
+        startLimiter                     = kb.misc.handler.unescape("'%s'" % ERROR_START_CHAR)
+        endLimiter                       = kb.misc.handler.unescape("'%s'" % ERROR_END_CHAR)
 
     debugMsg = "query: %s" % expressionUnescaped
     logger.debug(debugMsg)
