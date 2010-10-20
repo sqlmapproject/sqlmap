@@ -40,6 +40,8 @@ def errorUse(expression, resumeValue=True):
     query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].error)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
+    startLimiter   = ""
+    endLimiter     = ""
 
     if resumeValue:
         output = resume(expression, payload)
@@ -56,13 +58,15 @@ def errorUse(expression, resumeValue=True):
             nulledCastedField            = nulledCastedField.replace("CHAR(10000)", "CHAR(255)") #fix for that 'Subquery returns more than 1 row'
         expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
         expressionUnescaped              = unescaper.unescape(expressionReplaced)
+        startLimiter                     = unescaper.unescape("'%s'" % ERROR_START_CHAR)
+        endLimiter                       = unescaper.unescape("'%s'" % ERROR_END_CHAR)
     else:
         expressionUnescaped              = unescaper.unescape(expression)
 
     debugMsg = "query: %s" % expressionUnescaped
     logger.debug(debugMsg)
 
-    forgedPayload = safeStringFormat(payload, (logic, randInt, expressionUnescaped))
+    forgedPayload = safeStringFormat(payload, (logic, randInt, startLimiter, expressionUnescaped, endLimiter))
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
     match = re.search('%s(?P<result>.+?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
