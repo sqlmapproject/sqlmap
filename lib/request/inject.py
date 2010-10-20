@@ -19,6 +19,7 @@ from lib.core.common import expandAsteriskForColumns
 from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
+from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
@@ -337,6 +338,8 @@ def __goError(expression, resumeValue=True):
     Retrieve the output of a SQL query taking advantage of an error SQL
     injection vulnerability on the affected parameter.
     """
+    logic          = conf.logic
+    randInt        = randomInt(1)
     query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].error)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
@@ -362,7 +365,7 @@ def __goError(expression, resumeValue=True):
     debugMsg = "query: %s" % expressionUnescaped
     logger.debug(debugMsg)
 
-    forgedPayload = safeStringFormat(payload, expressionUnescaped)
+    forgedPayload = safeStringFormat(payload, (logic, randInt, expressionUnescaped))
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
     match = re.search(queries[kb.misc.testedDbms].errorRegex, result[0], re.DOTALL | re.IGNORECASE)
