@@ -151,8 +151,14 @@ def paramToDict(place, parameters=None):
 
         for child in iterator:
             parameter = child.tag
+
+            if "}" in parameter:
+                testParam = parameter.split("}")[1]
+            else:
+                testParam = parameter
+
             condition = not conf.testParameter
-            condition |= parameter.split("}")[1] in conf.testParameter
+            condition |= testParam in conf.testParameter
 
             if condition:
                 testableParameters[parameter] = child.text
