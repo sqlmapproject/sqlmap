@@ -36,6 +36,8 @@ LOGGER.setLevel(logging.WARN)
 # error based injection
 ERROR_SPACE        = "%c%c%c" % (58, 95, 58)
 ERROR_EMPTY_CHAR   = "%c%c%c" % (58, 120, 58)
+ERROR_START_CHAR   = "%c%c%c" % (58, 115, 58)
+ERROR_END_CHAR     = "%c%c%c" % (58, 101, 58)
 
 # System variables
 IS_WIN             = subprocess.mswindows

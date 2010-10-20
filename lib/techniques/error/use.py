@@ -27,6 +27,8 @@ from lib.utils.resume import resume
 
 from lib.core.settings import ERROR_SPACE
 from lib.core.settings import ERROR_EMPTY_CHAR
+from lib.core.settings import ERROR_START_CHAR
+from lib.core.settings import ERROR_END_CHAR
 
 def errorUse(expression, resumeValue=True):
     """
@@ -63,14 +65,11 @@ def errorUse(expression, resumeValue=True):
     forgedPayload = safeStringFormat(payload, (logic, randInt, expressionUnescaped))
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
-    match = re.search(queries[kb.misc.testedDbms].errorRegex, result[0], re.DOTALL | re.IGNORECASE)
+    match = re.search('%s(?P<result>.+?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
     if match:
         output = match.group('result')
         if output:
             output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
-
-            if kb.misc.testedDbms == 'MySQL':
-                output = output[:-1]
 
             if conf.verbose > 0:
                 infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)

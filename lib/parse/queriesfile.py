@@ -99,9 +99,6 @@ class queriesHandler(ContentHandler):
             data = sanitizeStr(attrs.get("query"))
             self.__queries.error = data
 
-            data = sanitizeStr(attrs.get("regex"))
-            self.__queries.errorRegex = data
-
         elif name == "inference":
             data = sanitizeStr(attrs.get("query"))
             self.__queries.inference = data
