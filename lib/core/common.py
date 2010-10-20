@@ -453,36 +453,6 @@ def strToHex(inpStr):
 
     return hexStr
 
-def fileToStr(fileName):
-    """
-    @param fileName: file path to read the content and return as a no
-    NEWLINE string.
-    @type fileName: C{file.open}
-
-    @return: the file content as a string without TAB and NEWLINE.
-    @rtype: C{str}
-    """
-
-    filePointer = codecs.open(fileName, "rb")
-    fileText = filePointer.read()
-
-    return fileText.replace("    ", "").replace("\t", "").replace("\r", "").replace("\n", " ")
-
-def fileToHex(fileName):
-    """
-    @param fileName: file path to read the content and return as an
-    hexadecimal string.
-    @type fileName: C{file.open}
-
-    @return: the file content as an hexadecimal string.
-    @rtype: C{str}
-    """
-
-    fileText = fileToStr(fileName)
-    hexFile = strToHex(fileText)
-
-    return hexFile
-
 def readInput(message, default=None):
     """
     @param message: message to display on terminal.

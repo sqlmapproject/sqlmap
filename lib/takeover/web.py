@@ -15,7 +15,6 @@ import re
 from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import decloakToNamedTemporaryFile
-from lib.core.common import fileToStr
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
 from lib.core.common import ntToPosixSlashes
