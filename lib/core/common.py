@@ -582,7 +582,7 @@ def parsePasswordHash(password):
     if not password or password == " ":
         password = "NULL"
 
-    if kb.dbms == "Microsoft SQL Server" and password != "NULL":
+    if kb.dbms == "Microsoft SQL Server" and password != "NULL" and isHexEncodedString(password):
         hexPassword = password
         password  = "%s\n" % hexPassword
         password += "%sheader: %s\n" % (blank, hexPassword[:6])
@@ -1209,7 +1209,7 @@ def isHexEncodedString(subject):
     False
     """
 
-    return re.match(r"\A[0-9a-fA-F]+\Z", subject) is not None
+    return re.match(r"\A[0-9a-fA-Fx]+\Z", subject) is not None
 
 def getConsoleWidth(default=80):
     width = None
