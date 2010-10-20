@@ -185,6 +185,10 @@ Guido Landi <lists@keamera.org>
 Lee Lawson <Lee.Lawson@dns.co.uk>
     for reporting a minor bug
 
+John J. Lee <jjl@pobox.com> & others
+    for developing the clientform Python library used by sqlmap to parse
+    forms when --forms switch is specified
+
 Nico Leidecker <nico@leidecker.info>
     for providing me with feedback on a few features
     for reporting a couple of bugs
