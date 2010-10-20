@@ -24,8 +24,8 @@ from xml.dom.minidom import Document
 from subprocess import PIPE
 from subprocess import Popen as execute
 
-from lib.core.common import getUnicode
 from lib.core.common import dataToStdout
+from lib.core.common import getUnicode
 from lib.core.common import pollProcess
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -209,7 +209,7 @@ def __updateSqlmap():
                 return
 
             if action.find('_completed') == -1:
-                print "%s\t%s" % (prefix, event_dict['path'])
+                dataToStdout("%s\t%s\n" % (prefix, event_dict['path']))
             else:
                 revision = getUnicode(event_dict['revision'])
                 index = revision.find('number ')

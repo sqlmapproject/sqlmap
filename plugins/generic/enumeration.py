@@ -1769,4 +1769,4 @@ class Enumeration:
                 pass
 
             elif output != "Quit":
-                print "No output"
+                dataToStdout("No output\n")

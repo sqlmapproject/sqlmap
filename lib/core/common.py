@@ -404,7 +404,7 @@ def filePathToString(filePath):
     return strRepl
 
 def dataToStdout(data, forceOutput=False):
-    if conf.verbose > 0 or forceOutput:
+    if forceOutput or conf.verbose > 0:
         try:
             sys.stdout.write(data)
             sys.stdout.flush()
@@ -569,10 +569,12 @@ def banner():
     This function prints sqlmap banner with its version
     """
 
-    print """
+    ban = """
     %s - %s
-    %s
-    """ % (VERSION_STRING, DESCRIPTION, SITE)
+    %s\n
+""" % (VERSION_STRING, DESCRIPTION, SITE)
+
+    dataToStdout(ban, forceOutput=True)
 
 def parsePasswordHash(password):
     blank = " " * 8

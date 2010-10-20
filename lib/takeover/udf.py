@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 
 from lib.core.agent import agent
+from lib.core.common import dataToStdout
 from lib.core.common import readInput
 from lib.core.convert import urlencode
 from lib.core.data import conf
@@ -360,7 +361,7 @@ class UDF:
                 if output:
                     conf.dumper.string("return value", output)
                 else:
-                    print "No return value"
+                    dataToStdout("No return value\n")
             else:
                 self.udfExecCmd(cmd, udfName=udfToCall, silent=True)
 

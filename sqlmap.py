@@ -25,6 +25,7 @@ except ImportError, _:
 
 from lib.controller.controller import start
 from lib.core.common import banner
+from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
@@ -64,7 +65,7 @@ def main():
     banner()
     cmdLineOptions = cmdLineParser()
 
-    print "[*] starting at: %s\n" % time.strftime("%X")
+    dataToStdout("[*] starting at: %s\n\n" % time.strftime("%X"), forceOutput=True)
 
     try:
         init(cmdLineOptions)
@@ -112,7 +113,7 @@ def main():
     else:
         closeDumper(True)
 
-    print "\n[*] shutting down at: %s\n" % time.strftime("%X")
+    dataToStdout("\n[*] shutting down at: %s\n\n" % time.strftime("%X"), forceOutput=True)
 
 if __name__ == "__main__":
     main()
