@@ -50,7 +50,7 @@ def errorUse(expression, resumeValue=True):
     else:
         output = None
 
-    if output and ( expected is None or ( expected == "int" and output.isdigit() ) ):
+    if output:
         return output
 
     if kb.dbmsDetected:
