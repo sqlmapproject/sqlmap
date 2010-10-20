@@ -56,8 +56,10 @@ def errorUse(expression, resumeValue=True):
     if kb.dbmsDetected:
         _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
         nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
+
         if kb.dbms == "MySQL":
             nulledCastedField            = nulledCastedField.replace("CHAR(10000)", "CHAR(255)") #fix for that 'Subquery returns more than 1 row'
+
         expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
         expressionUnescaped              = unescaper.unescape(expressionReplaced)
         startLimiter                     = unescaper.unescape("'%s'" % ERROR_START_CHAR)
