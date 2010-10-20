@@ -73,7 +73,7 @@ def errorUse(expression, resumeValue=True):
     forgedPayload = safeStringFormat(payload, (logic, randInt, startLimiter, expressionUnescaped, endLimiter))
     result = Request.queryPage(urlencode(forgedPayload), content=True)
 
-    match = re.search('%s(?P<result>.+?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
+    match = re.search('%s(?P<result>.*?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
     if match:
         output = match.group('result')
         if output:
