@@ -9,6 +9,8 @@ sqlmap (0.9-1) stable; urgency=low
     specific database(s), table(s) and column(s), --search switch
     (Bernardo).
   * Added support for SOAP based web services requests (Bernardo).
+  * Added support to tamper injection data with --tamper switch (Bernardo
+    and Miroslav).
   * Added support to fetch unicode data (Bernardo and Miroslav).
   * Added support to use persistent HTTP(s) connection for speed
     improvement, --keep-alive switch (Miroslav).
