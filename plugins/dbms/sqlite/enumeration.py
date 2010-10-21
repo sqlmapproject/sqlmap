@@ -41,7 +41,7 @@ class Enumeration(GenericEnumeration):
 
         return {}
 
-    def getPrivileges(self, *args):
+    def getPrivileges(self):
         warnMsg = "on SQLite it is not possible to enumerate the user privileges"
         logger.warn(warnMsg)
 
