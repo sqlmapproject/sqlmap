@@ -21,7 +21,6 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import readInput
-from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
 from lib.core.data import conf

@@ -33,7 +33,14 @@ LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
 LOGGER.setLevel(logging.WARN)
 
-# error based injection
+# dump markers
+DUMP_NEWLINE_MARKER = "__NEWLINE__"
+DUMP_DEL_MARKER     = "__DEL__"
+DUMP_TAB_MARKER     = "__TAB__"
+DUMP_START_MARKER   = "__START__"
+DUMP_STOP_MARKER    = "__STOP__"
+
+# error based injection markers
 ERROR_SPACE        = ":_:"
 ERROR_EMPTY_CHAR   = ":x:"
 ERROR_START_CHAR   = ":s:"

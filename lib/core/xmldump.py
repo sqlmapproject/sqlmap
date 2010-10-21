@@ -12,6 +12,7 @@ from xml.parsers.expat import ExpatError
 
 from extra.prettyprint import prettyprint
 from lib.core.common import getUnicode
+from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapFilePathException
@@ -137,12 +138,8 @@ class XMLDump:
             attr.nodeValue = getUnicode(attrValue)
         return attr
 
-    def __formatString(self, string):
-        string = getUnicode(string)
-        string = string.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
-        string = string.replace("__START__", "").replace("__STOP__", "")
-        string = string.replace("__DEL__", ", ")
-        return string
+    def __formatString(self, inpStr):
+        return restoreDumpMarkedChars(getUnicode(inpStr))
 
     def string(self, header, data, sort=True):
         '''

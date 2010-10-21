@@ -14,6 +14,7 @@ import os
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
+from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -39,13 +40,8 @@ class Dump:
 
         conf.loggedToOut = True
 
-    def __formatString(self, string):
-        string = getUnicode(string)
-        string = string.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
-        string = string.replace("__START__", "").replace("__STOP__", "")
-        string = string.replace("__DEL__", ", ")
-
-        return string
+    def __formatString(self, inpStr):
+        return restoreDumpMarkedChars(getUnicode(inpStr))
 
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)

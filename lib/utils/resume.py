@@ -14,13 +14,16 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
-from lib.core.common import replaceNewlineTabs
+from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
+from lib.core.settings import DUMP_START_MARKER
+from lib.core.settings import DUMP_STOP_MARKER
+from lib.core.settings import DUMP_DEL_MARKER
 
 def queryOutputLength(expression, payload):
     """
@@ -105,16 +108,16 @@ def resume(expression, payload):
         if not resumedValue:
             return None
 
-        resumedValue = resumedValue.replace("__NEWLINE__", "\n").replace("__TAB__", "\t")
+        resumedValue = restoreDumpMarkedChars(resumedValue, True)
 
         if resumedValue[-1] == "]":
             resumedValue = resumedValue[:-1]
 
             infoMsg  = "read from file '%s': " % conf.sessionFile
-            logValue = re.findall("__START__(.*?)__STOP__", resumedValue, re.S)
+            logValue = re.findall("%s(.*?)%s" % (DUMP_START_MARKER, DUMP_STOP_MARKER), resumedValue, re.S)
 
             if logValue:
-                logValue = ", ".join([value.replace("__DEL__", ", ") for value in logValue])
+                logValue = ", ".join([value.replace(DUMP_DEL_MARKER, ", ") for value in logValue])
             else:
                 logValue = resumedValue
 

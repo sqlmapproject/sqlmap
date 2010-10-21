@@ -61,7 +61,11 @@ from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
-
+from lib.core.settings import DUMP_NEWLINE_MARKER
+from lib.core.settings import DUMP_DEL_MARKER
+from lib.core.settings import DUMP_TAB_MARKER
+from lib.core.settings import DUMP_START_MARKER
+from lib.core.settings import DUMP_STOP_MARKER
 
 class UnicodeRawConfigParser(RawConfigParser):
     """
@@ -558,9 +562,20 @@ def replaceNewlineTabs(inpStr, stdout=False):
     if stdout:
         replacedString = inpStr.replace("\n", " ").replace("\t", " ")
     else:
-        replacedString = inpStr.replace("\n", "__NEWLINE__").replace("\t", "__TAB__")
+        replacedString = inpStr.replace("\n", DUMP_NEWLINE_MARKER).replace("\t", DUMP_TAB_MARKER)
 
-    replacedString = replacedString.replace(kb.misc.delimiter, "__DEL__")
+    replacedString = replacedString.replace(kb.misc.delimiter, DUMP_DEL_MARKER)
+
+    return replacedString
+
+def restoreDumpMarkedChars(inpStr, onlyNewlineTab=False):
+    replacedString = inpStr
+
+    if isinstance(replacedString, basestring):
+        replacedString = replacedString.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_TAB_MARKER, "\t")
+        if not onlyNewlineTab:
+            replacedString = replacedString.replace(DUMP_START_MARKER, "").replace(DUMP_STOP_MARKER, "")
+            replacedString = replacedString.replace(DUMP_DEL_MARKER, ", ")
 
     return replacedString
 
@@ -838,13 +853,13 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
     data = []
 
     outCond1 = ( output.startswith(kb.misc.start) and output.endswith(kb.misc.stop) )
-    outCond2 = ( output.startswith("__START__") and output.endswith("__STOP__") )
+    outCond2 = ( output.startswith(DUMP_START_MARKER) and output.endswith(DUMP_STOP_MARKER) )
 
     if outCond1 or outCond2:
         if outCond1:
             regExpr = '%s(.*?)%s' % (kb.misc.start, kb.misc.stop)
         elif outCond2:
-            regExpr = '__START__(.*?)__STOP__'
+            regExpr = '%s(.*?)%s' % (DUMP_START_MARKER, DUMP_STOP_MARKER)
 
         output = re.findall(regExpr, output, re.S)
 
@@ -855,7 +870,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
                         )
 
         if partial or not condition:
-            logOutput = "".join(["__START__%s__STOP__" % replaceNewlineTabs(value) for value in output])
+            logOutput = "".join(["%s%s%s" % (DUMP_START_MARKER, replaceNewlineTabs(value), DUMP_STOP_MARKER) for value in output])
             dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, logOutput))
 
         if sort:
@@ -864,8 +879,8 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
         for entry in output:
             info = []
 
-            if "__DEL__" in entry:
-                entry = entry.split("__DEL__")
+            if DUMP_DEL_MARKER in entry:
+                entry = entry.split(DUMP_DEL_MARKER)
             else:
                 entry = entry.split(kb.misc.delimiter)
 
