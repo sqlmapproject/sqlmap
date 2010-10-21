@@ -114,7 +114,7 @@ class Connect:
                     if conf.parameters.has_key("POST") and not post:
                         post = conf.parameters["POST"]
 
-            requestMsg += " HTTP/1.1"
+            requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
             # Perform HTTP request
             headers = forgeHeaders(cookie, ua)
