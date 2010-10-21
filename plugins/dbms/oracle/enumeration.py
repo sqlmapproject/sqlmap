@@ -174,7 +174,7 @@ class Enumeration(GenericEnumeration):
         return []
 
     def searchColumn(self):
-        rootQuery = queries[kb.dbms].searchColumn
+        rootQuery = queries[kb.dbms].search_column
         foundCols = {}
         dbs = { "USERS": {} }
         colList = conf.col.split(",")

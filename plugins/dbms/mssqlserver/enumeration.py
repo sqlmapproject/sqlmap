@@ -105,7 +105,7 @@ class Enumeration(GenericEnumeration):
         return kb.data.cachedTables
 
     def searchTable(self):
-        rootQuery = queries[kb.dbms].searchTable
+        rootQuery = queries[kb.dbms].search_table
         foundTbls = {}
         tblList = conf.tbl.split(",")
         tblCond = rootQuery.inband.condition
@@ -189,7 +189,7 @@ class Enumeration(GenericEnumeration):
         return foundTbls
 
     def searchColumn(self):
-        rootQuery = queries[kb.dbms].searchColumn
+        rootQuery = queries[kb.dbms].search_column
         foundCols = {}
         dbs = {}
         colList = conf.col.split(",")

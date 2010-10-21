@@ -50,7 +50,7 @@ class UDF:
     def __checkExistUdf(self, udf):
         logger.info("checking if UDF '%s' already exist" % udf)
 
-        query  = agent.forgeCaseStatement(queries[kb.dbms].checkUdf % (udf, udf))
+        query  = agent.forgeCaseStatement(queries[kb.dbms].check_udf.query % (udf, udf))
         exists = inject.getValue(query, resumeValue=False, unpack=False, charsetType=2)
 
         if exists == "1":

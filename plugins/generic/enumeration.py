@@ -119,7 +119,7 @@ class Enumeration:
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
 
-        query = agent.forgeCaseStatement(queries[kb.dbms].isDba.query)
+        query = agent.forgeCaseStatement(queries[kb.dbms].is_dba.query)
 
         kb.data.isDba = inject.getValue(query, unpack=False, charsetType=1)
 
@@ -1045,7 +1045,7 @@ class Enumeration:
 
             conf.db = self.getCurrentDb()
 
-        rootQuery = queries[kb.dbms].dumpTable
+        rootQuery = queries[kb.dbms].dump_table
 
         if conf.col:
             colList = conf.col.split(",")
@@ -1307,7 +1307,7 @@ class Enumeration:
 
     def searchDb(self):
         foundDbs = []
-        rootQuery = queries[kb.dbms].searchDb
+        rootQuery = queries[kb.dbms].search_db
         dbList = conf.db.split(",")
 
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
@@ -1394,7 +1394,7 @@ class Enumeration:
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-        rootQuery = queries[kb.dbms].searchTable
+        rootQuery = queries[kb.dbms].search_table
         foundTbls = {}
         tblList = conf.tbl.split(",")
         tblCond = rootQuery.inband.condition
@@ -1515,7 +1515,7 @@ class Enumeration:
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-        rootQuery = queries[kb.dbms].searchColumn
+        rootQuery = queries[kb.dbms].search_column
         foundCols = {}
         dbs = {}
         colList = conf.col.split(",")
