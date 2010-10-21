@@ -425,6 +425,12 @@ class XMLNode:
         """
         return self._node.hasAttribute(k) or self._childrenByName.has_key(k)
 
+    def _get_name(self):
+        if self._type == "node":
+            return self._node.nodeName
+        else:
+            return self._type
+
     def _get(self, k, default=None):
         """
         returns the value of attribute k, or default if no such attribute
@@ -433,6 +439,7 @@ class XMLNode:
             return getattr(self, k)
         else:
             return default
+
     def __len__(self):
         """
         returns number of child nodes
@@ -538,3 +545,15 @@ class XMLNode:
         """
         return self._node.toxml()
 
+    def _treeWalker(self, node, nodes):
+        for child in node._children:
+            if child._type == 'node':
+                nodes.append(child)
+                self._treeWalker(child, nodes)
+
+    def _toflat(self):
+        ret = [self]
+        self._treeWalker(self, ret)
+        return ret
+
+    _name = property(_get_name)
