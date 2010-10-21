@@ -909,14 +909,14 @@ def getDelayQuery(andCond=False):
         banVer = kb.bannerFp["dbmsVersion"]
 
         if (kb.dbms == "MySQL" and banVer >= "5.0.12") or (kb.dbms == "PostgreSQL" and banVer >= "8.2"):
-            query = queries[kb.dbms].timedelay % conf.timeSec
+            query = queries[kb.dbms].timedelay.query % conf.timeSec
 
         else:
-            query = queries[kb.dbms].timedelay2 % conf.timeSec
+            query = queries[kb.dbms].timedelay.query2 % conf.timeSec
     elif kb.dbms == "Firebird":
-        query = queries[kb.dbms].timedelay
+        query = queries[kb.dbms].timedelay.query
     else:
-        query = queries[kb.dbms].timedelay % conf.timeSec
+        query = queries[kb.dbms].timedelay.query % conf.timeSec
 
     if andCond:
         if kb.dbms in ( "MySQL", "SQLite" ):
@@ -1078,6 +1078,8 @@ def safeStringFormat(formatStr, params):
                 if count < len(params):
                     retVal = retVal[:index] + getUnicode(params[count]) + retVal[index+2:]
                 else:
+                    import pdb
+                    pdb.set_trace()
                     raise sqlmapNoneDataException, "wrong number of parameters during string formatting"
                 count += 1
 

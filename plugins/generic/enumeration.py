@@ -76,7 +76,7 @@ class Enumeration:
             if conf.unionUse or conf.unionTest:
                 conf.dumper.technic("valid union", unionTest())
 
-            query          = queries[kb.dbms].banner
+            query          = queries[kb.dbms].banner.query
             kb.data.banner = inject.getValue(query)
             bannerParser(kb.data.banner)
 
@@ -97,7 +97,7 @@ class Enumeration:
         infoMsg = "fetching current user"
         logger.info(infoMsg)
 
-        query = queries[kb.dbms].currentUser
+        query = queries[kb.dbms].currentUser.query
 
         if not kb.data.currentUser:
             kb.data.currentUser = inject.getValue(query)
@@ -108,7 +108,7 @@ class Enumeration:
         infoMsg = "fetching current database"
         logger.info(infoMsg)
 
-        query = queries[kb.dbms].currentDb
+        query = queries[kb.dbms].currentDb.query
 
         if not kb.data.currentDb:
             kb.data.currentDb = inject.getValue(query)
@@ -119,7 +119,7 @@ class Enumeration:
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
 
-        query = agent.forgeCaseStatement(queries[kb.dbms].isDba)
+        query = agent.forgeCaseStatement(queries[kb.dbms].isDba.query)
 
         kb.data.isDba = inject.getValue(query, unpack=False, charsetType=1)
 
@@ -136,9 +136,9 @@ class Enumeration:
 
         if kb.unionPosition or conf.direct:
             if condition:
-                query = rootQuery["inband"]["query2"]
+                query = rootQuery.inband.query2
             else:
-                query = rootQuery["inband"]["query"]
+                query = rootQuery.inband.query
             value = inject.getValue(query, blind=False)
 
             if value:
@@ -149,9 +149,9 @@ class Enumeration:
             logger.info(infoMsg)
 
             if condition:
-                query = rootQuery["blind"]["count2"]
+                query = rootQuery.blind.count2
             else:
-                query = rootQuery["blind"]["count"]
+                query = rootQuery.blind.count
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
@@ -166,9 +166,9 @@ class Enumeration:
 
             for index in indexRange:
                 if condition:
-                    query = rootQuery["blind"]["query2"] % index
+                    query = rootQuery.blind.query2 % index
                 else:
-                    query = rootQuery["blind"]["query"] % index
+                    query = rootQuery.blind.query % index
                 user = inject.getValue(query, inband=False)
 
                 if user:
@@ -193,11 +193,11 @@ class Enumeration:
 
         if kb.unionPosition or conf.direct:
             if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
-                query = rootQuery["inband"]["query2"]
+                query = rootQuery.inband.query2
             else:
-                query = rootQuery["inband"]["query"]
+                query = rootQuery.inband.query
 
-            condition = rootQuery["inband"]["condition"]
+            condition = rootQuery.inband.condition
 
             if conf.user:
                 if "," in conf.user:
@@ -256,9 +256,9 @@ class Enumeration:
                 logger.info(infoMsg)
 
                 if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
-                    query = rootQuery["blind"]["count2"] % user
+                    query = rootQuery.blind.count2 % user
                 else:
-                    query = rootQuery["blind"]["count"] % user
+                    query = rootQuery.blind.count % user
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
@@ -281,11 +281,11 @@ class Enumeration:
                 for index in indexRange:
                     if kb.dbms == "Microsoft SQL Server":
                         if kb.dbmsVersion[0] in ( "2005", "2008" ):
-                            query = rootQuery["blind"]["query2"] % (user, index, user)
+                            query = rootQuery.blind.query2 % (user, index, user)
                         else:
-                            query = rootQuery["blind"]["query"] % (user, index, user)
+                            query = rootQuery.blind.query % (user, index, user)
                     else:
-                        query = rootQuery["blind"]["query"] % (user, index)
+                        query = rootQuery.blind.query % (user, index)
                     password = inject.getValue(query, inband=False)
                     password = parsePasswordHash(password)
                     passwords.append(password)
@@ -390,14 +390,14 @@ class Enumeration:
 
         if kb.unionPosition or conf.direct:
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                query     = rootQuery["inband"]["query2"]
-                condition = rootQuery["inband"]["condition2"]
+                query     = rootQuery.inband.query2
+                condition = rootQuery.inband.condition2
             elif kb.dbms == "Oracle" and query2:
-                query     = rootQuery["inband"]["query2"]
-                condition = rootQuery["inband"]["condition2"]
+                query     = rootQuery.inband.query2
+                condition = rootQuery.inband.condition2
             else:
-                query     = rootQuery["inband"]["query"]
-                condition = rootQuery["inband"]["condition"]
+                query     = rootQuery.inband.query
+                condition = rootQuery.inband.condition
 
             if conf.user:
                 users = conf.user.split(",")
@@ -506,13 +506,13 @@ class Enumeration:
                     queryUser = user
 
                 if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                    query = rootQuery["blind"]["count2"] % queryUser
+                    query = rootQuery.blind.count2 % queryUser
                 elif kb.dbms == "MySQL" and kb.data.has_information_schema:
-                    query = rootQuery["blind"]["count"] % (conditionChar, queryUser)
+                    query = rootQuery.blind.count % (conditionChar, queryUser)
                 elif kb.dbms == "Oracle" and query2:
-                    query = rootQuery["blind"]["count2"] % queryUser
+                    query = rootQuery.blind.count2 % queryUser
                 else:
-                    query = rootQuery["blind"]["count"] % queryUser
+                    query = rootQuery.blind.count % queryUser
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
@@ -540,15 +540,15 @@ class Enumeration:
 
                 for index in indexRange:
                     if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                        query = rootQuery["blind"]["query2"] % (queryUser, index)
+                        query = rootQuery.blind.query2 % (queryUser, index)
                     elif kb.dbms == "MySQL" and kb.data.has_information_schema:
-                        query = rootQuery["blind"]["query"] % (conditionChar, queryUser, index)
+                        query = rootQuery.blind.query % (conditionChar, queryUser, index)
                     elif kb.dbms == "Oracle" and query2:
-                        query = rootQuery["blind"]["query2"] % (queryUser, index)
+                        query = rootQuery.blind.query2 % (queryUser, index)
                     elif kb.dbms == "Firebird":
-                        query = rootQuery["blind"]["query"] % (index, queryUser)
+                        query = rootQuery.blind.query % (index, queryUser)
                     else:
-                        query = rootQuery["blind"]["query"] % (queryUser, index)
+                        query = rootQuery.blind.query % (queryUser, index)
                     privilege = inject.getValue(query, inband=False)
 
                     # In PostgreSQL we get 1 if the privilege is True,
@@ -636,9 +636,9 @@ class Enumeration:
 
         if kb.unionPosition or conf.direct:
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                query = rootQuery["inband"]["query2"]
+                query = rootQuery.inband.query2
             else:
-                query = rootQuery["inband"]["query"]
+                query = rootQuery.inband.query
             value = inject.getValue(query, blind=False)
 
             if value:
@@ -649,9 +649,9 @@ class Enumeration:
             logger.info(infoMsg)
 
             if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                query = rootQuery["blind"]["count2"]
+                query = rootQuery.blind.count2
             else:
-                query = rootQuery["blind"]["count"]
+                query = rootQuery.blind.count
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
@@ -662,9 +662,9 @@ class Enumeration:
 
             for index in indexRange:
                 if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                    query = rootQuery["blind"]["query2"] % index
+                    query = rootQuery.blind.query2 % index
                 else:
-                    query = rootQuery["blind"]["query"] % index
+                    query = rootQuery.blind.query % index
                 db = inject.getValue(query, inband=False)
 
                 if db:
@@ -702,8 +702,8 @@ class Enumeration:
         rootQuery = queries[kb.dbms].tables
 
         if kb.unionPosition or conf.direct:
-            query = rootQuery["inband"]["query"]
-            condition = rootQuery["inband"]["condition"]
+            query = rootQuery.inband.query
+            condition = rootQuery.inband.condition
 
             if conf.db and kb.dbms != "SQLite":
                 if "," in conf.db:
@@ -762,9 +762,9 @@ class Enumeration:
                 logger.info(infoMsg)
 
                 if kb.dbms in ("SQLite", "Firebird"):
-                    query = rootQuery["blind"]["count"]
+                    query = rootQuery.blind.count
                 else:
-                    query = rootQuery["blind"]["count"] % db
+                    query = rootQuery.blind.count % db
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
@@ -783,9 +783,9 @@ class Enumeration:
 
                 for index in indexRange:
                     if kb.dbms in ("SQLite", "Firebird"):
-                        query = rootQuery["blind"]["query"] % index
+                        query = rootQuery.blind.query % index
                     else:
-                        query = rootQuery["blind"]["query"] % (db, index)
+                        query = rootQuery.blind.query % (db, index)
                     table = inject.getValue(query, inband=False)
                     tables.append(table)
                     kb.hintValue = table
@@ -880,7 +880,7 @@ class Enumeration:
                         }
 
         rootQuery = queries[kb.dbms].columns
-        condition = rootQuery["blind"]["condition"]
+        condition = rootQuery.blind.condition
 
         infoMsg = "fetching columns "
 
@@ -899,19 +899,19 @@ class Enumeration:
 
         if kb.unionPosition or conf.direct:
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                query = rootQuery["inband"]["query"] % (conf.tbl, conf.db)
+                query = rootQuery.inband.query % (conf.tbl, conf.db)
                 query += condQuery
             elif kb.dbms == "Oracle":
-                query = rootQuery["inband"]["query"] % conf.tbl.upper()
+                query = rootQuery.inband.query % conf.tbl.upper()
                 query += condQuery
             elif kb.dbms == "Microsoft SQL Server":
-                query = rootQuery["inband"]["query"] % (conf.db, conf.db,
+                query = rootQuery.inband.query % (conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
             elif kb.dbms == "SQLite":
-                query = rootQuery["inband"]["query"] % conf.tbl
+                query = rootQuery.inband.query % conf.tbl
 
             value = inject.getValue(query, blind=False)
 
@@ -936,16 +936,16 @@ class Enumeration:
             logger.info(infoMsg)
 
             if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                query = rootQuery["blind"]["count"] % (conf.tbl, conf.db)
+                query = rootQuery.blind.count % (conf.tbl, conf.db)
                 query += condQuery
             elif kb.dbms == "Oracle":
-                query = rootQuery["blind"]["count"] % conf.tbl.upper()
+                query = rootQuery.blind.count % conf.tbl.upper()
                 query += condQuery
             elif kb.dbms == "Microsoft SQL Server":
-                query = rootQuery["blind"]["count"] % (conf.db, conf.db, conf.tbl)
+                query = rootQuery.blind.count % (conf.db, conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
             elif kb.dbms == "Firebird":
-                query = rootQuery["blind"]["count"] % (conf.tbl)
+                query = rootQuery.blind.count % (conf.tbl)
                 query += condQuery
 
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -963,22 +963,22 @@ class Enumeration:
 
             for index in indexRange:
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                    query = rootQuery["blind"]["query"] % (conf.tbl, conf.db)
+                    query = rootQuery.blind.query % (conf.tbl, conf.db)
                     query += condQuery
                     field = None
                 elif kb.dbms == "Oracle":
-                    query = rootQuery["blind"]["query"] % (conf.tbl.upper())
+                    query = rootQuery.blind.query % (conf.tbl.upper())
                     query += condQuery
                     field = None
                 elif kb.dbms == "Microsoft SQL Server":
-                    query = rootQuery["blind"]["query"] % (conf.db, conf.db,
+                    query = rootQuery.blind.query % (conf.db, conf.db,
                                                            conf.db, conf.db,
                                                            conf.db, conf.db,
                                                            conf.tbl)
                     query += condQuery.replace("[DB]", conf.db)
                     field = condition.replace("[DB]", conf.db)
                 elif kb.dbms == "Firebird":
-                    query = rootQuery["blind"]["query"] % (conf.tbl)
+                    query = rootQuery.blind.query % (conf.tbl)
                     query += condQuery
                     field = None
 
@@ -987,15 +987,15 @@ class Enumeration:
 
                 if not onlyColNames:
                     if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                        query = rootQuery["blind"]["query2"] % (conf.tbl, column, conf.db)
+                        query = rootQuery.blind.query2 % (conf.tbl, column, conf.db)
                     elif kb.dbms == "Oracle":
-                        query = rootQuery["blind"]["query2"] % (conf.tbl.upper(), column)
+                        query = rootQuery.blind.query2 % (conf.tbl.upper(), column)
                     elif kb.dbms == "Microsoft SQL Server":
-                        query = rootQuery["blind"]["query2"] % (conf.db, conf.db, conf.db,
+                        query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db,
                                                                 conf.db, column, conf.db,
                                                                 conf.db, conf.db, conf.tbl)
                     elif kb.dbms == "Firebird":
-                        query = rootQuery["blind"]["query2"] % (conf.tbl, column)
+                        query = rootQuery.blind.query2 % (conf.tbl, column)
 
                     colType = inject.getValue(query, inband=False)
 
@@ -1078,11 +1078,11 @@ class Enumeration:
 
         if kb.unionPosition or conf.direct:
             if kb.dbms == "Oracle":
-                query = rootQuery["inband"]["query"] % (colString, conf.tbl.upper())
+                query = rootQuery.inband.query % (colString, conf.tbl.upper())
             elif kb.dbms == "SQLite":
-                query = rootQuery["inband"]["query"] % (colString, conf.tbl)
+                query = rootQuery.inband.query % (colString, conf.tbl)
             else:
-                query = rootQuery["inband"]["query"] % (colString, conf.db, conf.tbl)
+                query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
             entries = inject.getValue(query, blind=False, dump=True)
 
             if entries:
@@ -1126,11 +1126,11 @@ class Enumeration:
             logger.info(infoMsg)
 
             if kb.dbms == "Oracle":
-                query = rootQuery["blind"]["count"] % conf.tbl.upper()
+                query = rootQuery.blind.count % conf.tbl.upper()
             elif kb.dbms == "SQLite":
-                query = rootQuery["blind"]["count"] % conf.tbl
+                query = rootQuery.blind.count % conf.tbl
             else:
-                query = rootQuery["blind"]["count"] % (conf.db, conf.tbl)
+                query = rootQuery.blind.count % (conf.db, conf.tbl)
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
             if not count.isdigit() or not len(count) or count == "0":
@@ -1162,19 +1162,19 @@ class Enumeration:
                         entries[column] = []
 
                     if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                        query = rootQuery["blind"]["query"] % (column, conf.db,
+                        query = rootQuery.blind.query % (column, conf.db,
                                                                conf.tbl, index)
                     elif kb.dbms == "Oracle":
-                        query = rootQuery["blind"]["query"] % (column, column,
+                        query = rootQuery.blind.query % (column, column,
                                                                conf.tbl.upper(),
                                                                index)
                     elif kb.dbms == "Microsoft SQL Server":
-                        query = rootQuery["blind"]["query"] % (column, conf.db,
+                        query = rootQuery.blind.query % (column, conf.db,
                                                                conf.tbl, column,
                                                                index, column,
                                                                conf.db, conf.tbl)
                     elif kb.dbms == "SQLite":
-                        query = rootQuery["blind"]["query"] % (column, conf.tbl, index)
+                        query = rootQuery.blind.query % (column, conf.tbl, index)
 
                     value = inject.getValue(query, inband=False)
 
@@ -1311,9 +1311,9 @@ class Enumeration:
         dbList = conf.db.split(",")
 
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-            dbCond = rootQuery["inband"]["condition2"]
+            dbCond = rootQuery.inband.condition2
         else:
-            dbCond = rootQuery["inband"]["condition"]
+            dbCond = rootQuery.inband.condition
 
         dbConsider, dbCondParam = self.likeOrExact("database")
 
@@ -1336,9 +1336,9 @@ class Enumeration:
 
             if kb.unionPosition or conf.direct:
                 if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                    query = rootQuery["inband"]["query2"]
+                    query = rootQuery.inband.query2
                 else:
-                    query = rootQuery["inband"]["query"]
+                    query = rootQuery.inband.query
                 query += dbQuery
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
@@ -1357,9 +1357,9 @@ class Enumeration:
                 logger.info(infoMsg)
 
                 if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                    query = rootQuery["blind"]["count2"]
+                    query = rootQuery.blind.count2
                 else:
-                    query = rootQuery["blind"]["count"]
+                    query = rootQuery.blind.count
                 query += dbQuery
                 query += exclDbsQuery
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -1377,9 +1377,9 @@ class Enumeration:
 
                 for index in indexRange:
                     if kb.dbms == "MySQL" and not kb.data.has_information_schema:
-                        query = rootQuery["blind"]["query2"]
+                        query = rootQuery.blind.query2
                     else:
-                        query = rootQuery["blind"]["query"]
+                        query = rootQuery.blind.query
                     query += dbQuery
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query, dbCond)
@@ -1397,8 +1397,8 @@ class Enumeration:
         rootQuery = queries[kb.dbms].searchTable
         foundTbls = {}
         tblList = conf.tbl.split(",")
-        tblCond = rootQuery["inband"]["condition"]
-        dbCond = rootQuery["inband"]["condition2"]
+        tblCond = rootQuery.inband.condition
+        dbCond = rootQuery.inband.condition2
 
         tblConsider, tblCondParam = self.likeOrExact("table")
 
@@ -1423,7 +1423,7 @@ class Enumeration:
             tblQuery = tblQuery % tbl
 
             if kb.unionPosition or conf.direct:
-                query = rootQuery["inband"]["query"]
+                query = rootQuery.inband.query
                 query += tblQuery
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
@@ -1444,7 +1444,7 @@ class Enumeration:
                 infoMsg += " '%s'" % tbl
                 logger.info(infoMsg)
 
-                query = rootQuery["blind"]["count"]
+                query = rootQuery.blind.count
                 query += tblQuery
                 query += exclDbsQuery
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -1461,7 +1461,7 @@ class Enumeration:
                 indexRange = getRange(count)
 
                 for index in indexRange:
-                    query = rootQuery["blind"]["query"]
+                    query = rootQuery.blind.query
                     query += tblQuery
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query)
@@ -1481,7 +1481,7 @@ class Enumeration:
                     infoMsg += " '%s' in database '%s'" % (tbl, db)
                     logger.info(infoMsg)
 
-                    query = rootQuery["blind"]["count2"]
+                    query = rootQuery.blind.count2
                     query = query % db
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -1499,7 +1499,7 @@ class Enumeration:
                     indexRange = getRange(count)
 
                     for index in indexRange:
-                        query = rootQuery["blind"]["query2"]
+                        query = rootQuery.blind.query2
                         query = query % db
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query)
@@ -1519,8 +1519,8 @@ class Enumeration:
         foundCols = {}
         dbs = {}
         colList = conf.col.split(",")
-        colCond = rootQuery["inband"]["condition"]
-        dbCond = rootQuery["inband"]["condition2"]
+        colCond = rootQuery.inband.condition
+        dbCond = rootQuery.inband.condition2
 
         colConsider, colCondParam = self.likeOrExact("column")
 
@@ -1544,7 +1544,7 @@ class Enumeration:
             colQuery = colQuery % column
 
             if kb.unionPosition or conf.direct:
-                query = rootQuery["inband"]["query"]
+                query = rootQuery.inband.query
                 query += colQuery
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
@@ -1583,7 +1583,7 @@ class Enumeration:
                 infoMsg += " '%s'" % column
                 logger.info(infoMsg)
 
-                query = rootQuery["blind"]["count"]
+                query = rootQuery.blind.count
                 query += colQuery
                 query += exclDbsQuery
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -1600,7 +1600,7 @@ class Enumeration:
                 indexRange = getRange(count)
 
                 for index in indexRange:
-                    query = rootQuery["blind"]["query"]
+                    query = rootQuery.blind.query
                     query += colQuery
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query)
@@ -1623,7 +1623,7 @@ class Enumeration:
                         infoMsg += " '%s' in database '%s'" % (column, db)
                         logger.info(infoMsg)
 
-                        query = rootQuery["blind"]["count2"]
+                        query = rootQuery.blind.count2
                         query = query % db
                         query += " AND %s" % colQuery
                         count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -1641,7 +1641,7 @@ class Enumeration:
                         indexRange = getRange(count)
 
                         for index in indexRange:
-                            query = rootQuery["blind"]["query2"]
+                            query = rootQuery.blind.query2
                             query = query % db
                             query += " AND %s" % colQuery
                             query = agent.limitQuery(index, query)

@@ -56,7 +56,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                query = rootQuery["inband"]["query"] % db
+                query = rootQuery.inband.query % db
                 value = inject.getValue(query, blind=False)
 
                 if value:
@@ -74,7 +74,7 @@ class Enumeration(GenericEnumeration):
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
-                query = rootQuery["blind"]["count"] % db
+                query = rootQuery.blind.count % db
                 count = inject.getValue(query, inband=False, charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
@@ -86,7 +86,7 @@ class Enumeration(GenericEnumeration):
                 tables = []
 
                 for index in range(int(count)):
-                    query = rootQuery["blind"]["query"] % (db, index, db)
+                    query = rootQuery.blind.query % (db, index, db)
                     table = inject.getValue(query, inband=False)
                     tables.append(table)
                     kb.hintValue = table
@@ -108,8 +108,8 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[kb.dbms].searchTable
         foundTbls = {}
         tblList = conf.tbl.split(",")
-        tblCond = rootQuery["inband"]["condition"]
-        dbCond = rootQuery["inband"]["condition2"]
+        tblCond = rootQuery.inband.condition
+        dbCond = rootQuery.inband.condition2
 
         tblConsider, tblCondParam = self.likeOrExact("table")
 
@@ -193,7 +193,7 @@ class Enumeration(GenericEnumeration):
         foundCols = {}
         dbs = {}
         colList = conf.col.split(",")
-        colCond = rootQuery["inband"]["condition"]
+        colCond = rootQuery.inband.condition
         colConsider, colCondParam = self.likeOrExact("column")
 
         if not len(kb.data.cachedDbs):

@@ -67,7 +67,7 @@ class Miscellaneous:
         else:
             raise sqlmapUnsupportedFeatureException, "unsupported DBMS"
 
-        query = queries[kb.dbms].substring % (queries[kb.dbms].banner, first, last)
+        query = queries[kb.dbms].substring.query % (queries[kb.dbms].banner.query, first, last)
 
         if conf.direct:
             query = "SELECT %s" % query

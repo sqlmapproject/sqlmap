@@ -38,11 +38,11 @@ class Enumeration(GenericEnumeration):
 
         if kb.unionPosition or conf.direct:
             if query2:
-                query     = rootQuery["inband"]["query2"]
-                condition = rootQuery["inband"]["condition2"]
+                query     = rootQuery.inband.query2
+                condition = rootQuery.inband.condition2
             else:
-                query     = rootQuery["inband"]["query"]
-                condition = rootQuery["inband"]["condition"]
+                query     = rootQuery.inband.query
+                condition = rootQuery.inband.condition
 
             if conf.user:
                 users = conf.user.split(",")
@@ -111,9 +111,9 @@ class Enumeration(GenericEnumeration):
                     queryUser = user
 
                 if query2:
-                    query = rootQuery["blind"]["count2"] % queryUser
+                    query = rootQuery.blind.count2 % queryUser
                 else:
-                    query = rootQuery["blind"]["count"] % queryUser
+                    query = rootQuery.blind.count % queryUser
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
@@ -137,9 +137,9 @@ class Enumeration(GenericEnumeration):
 
                 for index in indexRange:
                     if query2:
-                        query = rootQuery["blind"]["query2"] % (queryUser, index)
+                        query = rootQuery.blind.query2 % (queryUser, index)
                     else:
-                        query = rootQuery["blind"]["query"] % (queryUser, index)
+                        query = rootQuery.blind.query % (queryUser, index)
                     role = inject.getValue(query, inband=False)
 
                     # In Oracle we get the list of roles as string
@@ -178,7 +178,7 @@ class Enumeration(GenericEnumeration):
         foundCols = {}
         dbs = { "USERS": {} }
         colList = conf.col.split(",")
-        colCond = rootQuery["inband"]["condition"]
+        colCond = rootQuery.inband.condition
         colConsider, colCondParam = self.likeOrExact("column")
 
         for column in colList:
@@ -197,7 +197,7 @@ class Enumeration(GenericEnumeration):
 
             for db in dbs.keys():
                 if kb.unionPosition or conf.direct:
-                    query = rootQuery["inband"]["query"]
+                    query = rootQuery.inband.query
                     query += colQuery
                     values = inject.getValue(query, blind=False)
 
@@ -234,7 +234,7 @@ class Enumeration(GenericEnumeration):
                     infoMsg += " '%s' in database '%s'" % (column, db)
                     logger.info(infoMsg)
 
-                    query = rootQuery["blind"]["count2"]
+                    query = rootQuery.blind.count2
                     query += " WHERE %s" % colQuery
                     count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
@@ -251,7 +251,7 @@ class Enumeration(GenericEnumeration):
                     indexRange = getRange(count)
 
                     for index in indexRange:
-                        query = rootQuery["blind"]["query2"]
+                        query = rootQuery.blind.query2
                         query += " WHERE %s" % colQuery
                         query = agent.limitQuery(index, query)
                         tbl = inject.getValue(query, inband=False)

@@ -37,6 +37,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -55,7 +56,6 @@ from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
-from lib.parse.queriesfile import queriesParser
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.redirecthandler import SmartRedirectHandler
@@ -194,6 +194,13 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
             if not kb.targetUrls or url not in addedTargetUrls:
                 kb.targetUrls.add((url, method, data, cookie))
                 addedTargetUrls.add(url)
+
+def __loadQueries():
+    """
+    Loads queries from 'xml/queries.xml' file.
+    """
+    for node in xmlobject.XMLFile(path=paths.QUERIES_XML, textfilter=sanitizeStr).root.dbms:
+        queries[node.value] = node
 
 def __setMultipleTargets():
     """
@@ -1258,4 +1265,4 @@ def init(inputOptions=advancedDict()):
     __setMetasploit()
 
     update()
-    queriesParser()
+    __loadQueries()

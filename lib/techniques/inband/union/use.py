@@ -65,12 +65,12 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         # NOTE: I assume that only queries that get data from a table can
         # return multiple entries
         if " FROM " in expression:
-            limitRegExp = re.search(queries[kb.dbms].limitregexp, expression, re.I)
+            limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
 
             if limitRegExp:
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                    limitGroupStart = queries[kb.dbms].limitgroupstart
-                    limitGroupStop  = queries[kb.dbms].limitgroupstop
+                    limitGroupStart = queries[kb.dbms].limitgroupstart.query
+                    limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -79,8 +79,8 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     limitCond = int(stopLimit) > 1
 
                 elif kb.dbms == "Microsoft SQL Server":
-                    limitGroupStart = queries[kb.dbms].limitgroupstart
-                    limitGroupStop  = queries[kb.dbms].limitgroupstop
+                    limitGroupStart = queries[kb.dbms].limitgroupstart.query
+                    limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -104,7 +104,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     # (or similar, depending on the back-end DBMS) word
                     if kb.dbms in ( "MySQL", "PostgreSQL" ):
                         stopLimit += startLimit
-                        untilLimitChar = expression.index(queries[kb.dbms].limitstring)
+                        untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
                         expression = expression[:untilLimitChar]
 
                     elif kb.dbms == "Microsoft SQL Server":
@@ -123,7 +123,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                 if test:
                     # Count the number of SQL query entries output
-                    countFirstField   = queries[kb.dbms].count % expressionFieldsList[0]
+                    countFirstField   = queries[kb.dbms].count.query % expressionFieldsList[0]
                     countedExpression = origExpr.replace(expressionFields, countFirstField, 1)
 
                     if re.search(" ORDER BY ", expression, re.I):

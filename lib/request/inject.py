@@ -96,8 +96,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     advantage of an blind SQL injection vulnerability on the affected
     parameter through a bisection algorithm.
     """
-
-    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].inference)
+    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].inference.query)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
     count          = None
@@ -139,13 +138,13 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         # NOTE: I assume that only queries that get data from a table
         # can return multiple entries
         if fromUser and " FROM " in expression:
-            limitRegExp = re.search(queries[kb.dbms].limitregexp, expression, re.I)
+            limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
             topLimit    = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
             if limitRegExp or ( kb.dbms == "Microsoft SQL Server" and topLimit ):
                 if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                    limitGroupStart = queries[kb.dbms].limitgroupstart
-                    limitGroupStop  = queries[kb.dbms].limitgroupstop
+                    limitGroupStart = queries[kb.dbms].limitgroupstart.query
+                    limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -155,8 +154,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                 elif kb.dbms == "Microsoft SQL Server":
                     if limitRegExp:
-                        limitGroupStart = queries[kb.dbms].limitgroupstart
-                        limitGroupStop  = queries[kb.dbms].limitgroupstop
+                        limitGroupStart = queries[kb.dbms].limitgroupstart.query
+                        limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
                         if limitGroupStart.isdigit():
                             startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -184,7 +183,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                     # (or similar, depending on the back-end DBMS) word
                     if kb.dbms in ( "MySQL", "PostgreSQL" ):
                         stopLimit += startLimit
-                        untilLimitChar = expression.index(queries[kb.dbms].limitstring)
+                        untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
                         expression = expression[:untilLimitChar]
 
                     elif kb.dbms == "Microsoft SQL Server":
@@ -202,7 +201,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                 if not test or test[0] in ("y", "Y"):
                     # Count the number of SQL query entries output
-                    countFirstField   = queries[kb.dbms].count % expressionFieldsList[0]
+                    countFirstField   = queries[kb.dbms].count.query % expressionFieldsList[0]
                     countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
                     if re.search(" ORDER BY ", expression, re.I):
@@ -398,7 +397,7 @@ def goStacked(expression, silent=False):
     debugMsg = "query: %s" % expression
     logger.debug(debugMsg)
 
-    comment = queries[kb.dbms].comment
+    comment = queries[kb.dbms].comment.query
     query   = agent.prefixQuery("; %s" % expression)
     query   = agent.postfixQuery("%s;%s" % (query, comment))
     payload = agent.payload(newValue=query)

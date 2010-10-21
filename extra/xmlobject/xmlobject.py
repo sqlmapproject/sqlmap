@@ -142,6 +142,7 @@ class XMLFile:
         fobj = kw.get("file", None)
         raw = kw.get("raw", None)
         root = kw.get("root", None)
+        textfilter = kw.get("textfilter", None)
 
         if path:
             self.path = path
@@ -175,6 +176,11 @@ class XMLFile:
             if rootnode.nodeName != root:
                 raise IncorrectRootTag("Gave root='%s', input has root='%s'" % (
                     root, rootnode.nodeName))
+
+        if textfilter:
+            self.textfilter = textfilter
+        else:
+            self.textfilter = lambda x: x
 
         # need this for recursion in XMLNode
         self._childrenByName = {}
@@ -278,7 +284,7 @@ class XMLNode:
         self._value = None
         if isinstance(node, xml.dom.minidom.Text):
             self._type = "text"
-            self._value = node.nodeValue
+            self._value = self._root.textfilter(node.nodeValue)
         elif isinstance(node, xml.dom.minidom.Element):
             self._type = "node"
         elif isinstance(node, xml.dom.minidom.Comment):

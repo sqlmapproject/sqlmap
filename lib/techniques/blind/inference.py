@@ -461,7 +461,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # check it via equal against the substring-query output
                 if commonPattern is not None:
                     # Substring-query containing equals commonPattern
-                    subquery = queries[kb.dbms].substring % (expressionUnescaped, 1, len(commonPattern))
+                    subquery = queries[kb.dbms].substring.query % (expressionUnescaped, 1, len(commonPattern))
                     testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
                     query = agent.prefixQuery(" %s" % safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                     query = agent.postfixQuery(query)

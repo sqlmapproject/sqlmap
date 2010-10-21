@@ -220,8 +220,8 @@ class Agent:
         if field.startswith("(CASE"):
             nulledCastedField = field
         else:
-            nulledCastedField = queries[kb.dbms].cast % field
-            nulledCastedField = queries[kb.dbms].isnull % nulledCastedField
+            nulledCastedField = queries[kb.dbms].cast.query % field
+            nulledCastedField = queries[kb.dbms].isnull.query % nulledCastedField
 
         return nulledCastedField
 
@@ -260,7 +260,7 @@ class Agent:
 
         fields             = fields.replace(", ", ",")
         fieldsSplitted     = fields.split(",")
-        dbmsDelimiter      = queries[kb.dbms].delimiter
+        dbmsDelimiter      = queries[kb.dbms].delimiter.query
         nulledCastedFields = []
 
         for field in fieldsSplitted:
@@ -516,18 +516,18 @@ class Agent:
         """
 
         limitedQuery = query
-        limitStr = queries[kb.dbms].limit
+        limitStr = queries[kb.dbms].limit.query
         fromIndex = limitedQuery.index(" FROM ")
         untilFrom = limitedQuery[:fromIndex]
         fromFrom = limitedQuery[fromIndex+1:]
         orderBy = False
 
         if kb.dbms in ( "MySQL", "PostgreSQL", "SQLite" ):
-            limitStr = queries[kb.dbms].limit % (num, 1)
+            limitStr = queries[kb.dbms].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
             
         elif kb.dbms == "Firebird":
-            limitStr = queries[kb.dbms].limit % (num+1, num+1)
+            limitStr = queries[kb.dbms].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
         elif kb.dbms == "Oracle":
@@ -556,7 +556,7 @@ class Agent:
                 limitedQuery = limitedQuery.replace("DISTINCT %s" % notDistinct, notDistinct)
 
             if limitedQuery.startswith("SELECT TOP ") or limitedQuery.startswith("TOP "):
-                topNums         = re.search(queries[kb.dbms].limitregexp, limitedQuery, re.I)
+                topNums         = re.search(queries[kb.dbms].limitregexp.query, limitedQuery, re.I)
 
                 if topNums:
                     topNums = topNums.groups()
@@ -602,7 +602,7 @@ class Agent:
         @rtype: C{str}
         """
 
-        return queries[kb.dbms].case % expression
+        return queries[kb.dbms].case.query % expression
 
 # SQL agent
 agent = Agent()

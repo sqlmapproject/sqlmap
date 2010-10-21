@@ -14,6 +14,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
+from lib.core.common import replaceNewlineTabs
 from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import kb
@@ -30,7 +31,7 @@ def queryOutputLength(expression, payload):
     Returns the query output length.
     """
 
-    lengthQuery         = queries[kb.dbms].length
+    lengthQuery         = queries[kb.dbms].length.query
 
     select              = re.search("\ASELECT\s+", expression, re.I)
     selectTopExpr       = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
@@ -83,7 +84,7 @@ def queryOutputLength(expression, payload):
 
     if length == " ":
         length = 0
-    
+
     return count, length, regExpr
 
 def resume(expression, payload):
@@ -141,7 +142,7 @@ def resume(expression, payload):
         if not kb.dbms:
             return None
 
-        substringQuery = queries[kb.dbms].substring
+        substringQuery = queries[kb.dbms].substring.query
         select = re.search("\ASELECT ", expression, re.I)
 
         _, length, regExpr = queryOutputLength(expression, payload)

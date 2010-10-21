@@ -203,7 +203,7 @@ def unionTest():
     value   = None
     columns = None
 
-    for comment in (queries[kb.dbms].comment, ""):
+    for comment in (queries[kb.dbms].comment.query, ""):
         if conf.uTech == "orderby":
             columns = __unionTestByOrderBy(comment)
         else:

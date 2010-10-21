@@ -30,28 +30,21 @@ from lib.core.settings import ERROR_EMPTY_CHAR
 from lib.core.settings import ERROR_START_CHAR
 from lib.core.settings import ERROR_END_CHAR
 
-def errorUse(expression, resumeValue=True):
+def errorUse(expression):
     """
     Retrieve the output of a SQL query taking advantage of an error SQL
     injection vulnerability on the affected parameter.
     """
+    output         = None
     logic          = conf.logic
     randInt        = randomInt(1)
-    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].error)
+    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].error.query)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
     startLimiter   = ""
     endLimiter     = ""
 
     expressionUnescaped = expression
-
-    if resumeValue:
-        output = resume(expression, payload)
-    else:
-        output = None
-
-    if output:
-        return output
 
     if kb.dbmsDetected:
         _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
