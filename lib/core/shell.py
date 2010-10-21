@@ -29,15 +29,9 @@ def loadHistory():
 def queriesForAutoCompletion():
     autoComplQueries = {}
 
-    for _, query in queries[kb.dbms].items():
-        if isinstance(query, basestring) and len(query) > 1:
-            autoComplQuery = query
-        elif isinstance(query, dict) and "inband" in query:
-            autoComplQuery = query["inband"]["query"]
-        else:
-            continue
-
-        autoComplQueries[autoComplQuery] = None
+    for item in queries[kb.dbms]._toflat():
+        if item._has_key('query') and len(item.query) > 1 and item._name != 'blind':
+            autoComplQueries[item.query] = None
 
     return autoComplQueries
 
