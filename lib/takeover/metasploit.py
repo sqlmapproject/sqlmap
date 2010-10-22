@@ -371,14 +371,14 @@ class Metasploit:
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self.__cliCmd)
-        self.__msfCliProc = execute(self.__cliCmd, shell=True, stdin=PIPE, stdout=PIPE)
+        self.__msfCliProc = execute(self.__cliCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def __runMsfConsole(self):
         infoMsg = "running Metasploit Framework 3 console locally, wait.."
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self.__consoleCmd)
-        self.__msfConsoleProc = execute(self.__consoleCmd, shell=True, stdin=PIPE, stdout=PIPE)
+        self.__msfConsoleProc = execute(self.__consoleCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def __runMsfShellcodeRemote(self):
         infoMsg  = "running Metasploit Framework 3 shellcode "
