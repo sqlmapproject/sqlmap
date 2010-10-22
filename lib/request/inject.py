@@ -124,7 +124,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
         if rdbRegExp and kb.dbms == "Firebird":
             expressionFieldsList = [expressionFields]
-        
+
         if len(expressionFieldsList) > 1:
             infoMsg  = "the SQL query provided has more than a field. "
             infoMsg += "sqlmap will now unpack it into distinct queries "

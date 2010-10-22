@@ -1169,10 +1169,10 @@ class Enumeration:
                                                                conf.tbl.upper(),
                                                                index)
                     elif kb.dbms == "Microsoft SQL Server":
-                        query = rootQuery.blind.query % (column, conf.db,
-                                                               conf.tbl, column,
-                                                               index, column,
-                                                               conf.db, conf.tbl)
+                        query = rootQuery.blind.query % (column, index + 1, conf.db,
+                                                               conf.tbl, colList[0],
+                                                               colList[0], colList[0])
+
                     elif kb.dbms == "SQLite":
                         query = rootQuery.blind.query % (column, conf.tbl, index)
 

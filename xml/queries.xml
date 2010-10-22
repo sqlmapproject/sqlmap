@@ -273,7 +273,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s..%s"/>
-            <blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s)" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
+            <!--<blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s)" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>-->
+            <blind query="SELECT TOP 1 %s FROM (SELECT TOP 1 * FROM ( SELECT TOP %d * FROM %s..%s ORDER BY %s ASC ) AS t1 ORDER BY %s DESC) AS t2 ORDER BY %s ASC" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
@@ -358,7 +359,7 @@
         <current_db/>
         <inference query="AND ASC(MID((%s), %d, 1)) > %d"/>
         <is_dba query="IIF(CURRENTUSER()='Admin',1,0)"/>
-        <dbs/> 
+        <dbs/>
         <tables>
             <inband query="SELECT Name FROM MSysObjects WHERE (Left([Name],1) &lt;&gt; '~') AND (Left([Name],4) &lt;&gt; 'MSys') AND ([Type] In (1, 4, 6))"/>
         </tables>
