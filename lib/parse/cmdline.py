@@ -135,7 +135,7 @@ def cmdLineParser():
 
         optimization.add_option("-o", dest="optimize",
                                  action="store_true", default=False,
-                                 help="Use all optimization options")
+                                 help="Turn on all optimization switches")
 
         optimization.add_option("--predict-output", dest="predictOutput", action="store_true",
                           default=False, help="Predict common queries output")
@@ -147,8 +147,8 @@ def cmdLineParser():
                           default=False, help="Retrieve page length without actual HTTP response body")
 
         optimization.add_option("--threads", dest="threads", type="int", default=1,
-                           help="Maximum number of concurrent HTTP(s) "
-                                "requests (def 1)")
+                           help="Max. number of concurrent HTTP(s) "
+                                "requests (default 1)")
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
