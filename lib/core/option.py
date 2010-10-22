@@ -199,6 +199,7 @@ def __loadQueries():
     """
     Loads queries from 'xml/queries.xml' file.
     """
+
     for node in xmlobject.XMLFile(path=paths.QUERIES_XML, textfilter=sanitizeStr).root.dbms:
         queries[node.value] = node
 

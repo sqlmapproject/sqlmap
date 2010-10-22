@@ -573,6 +573,7 @@ def restoreDumpMarkedChars(inpStr, onlyNewlineTab=False):
 
     if isinstance(replacedString, basestring):
         replacedString = replacedString.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_TAB_MARKER, "\t")
+
         if not onlyNewlineTab:
             replacedString = replacedString.replace(DUMP_START_MARKER, "").replace(DUMP_STOP_MARKER, "")
             replacedString = replacedString.replace(DUMP_DEL_MARKER, ", ")
