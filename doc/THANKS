@@ -211,6 +211,10 @@ Ferruh Mavituna <ferruh@mavituna.com>
     for providing me with ideas on the implementation of a couple of
     new features
 
+David McNab <david@conscious.co.nz>
+    for his XMLObject module that allows XML files to be operated on 
+    like Python objects
+
 Enrico Milanese <enricomilanese@gmail.com>
     for reporting a bugs when using (-a) a single line User-Agent file
     for providing me with some ideas for the PHP backdoor
@@ -305,6 +309,10 @@ M Simkin <mlsimkin@cox.net>
 Konrads Smelkovs <konrads@smelkovs.com>
     for reporting a few bugs in --sql-shell and --sql-query on Microsoft
     SQL Server
+
+Michael D. Stenner <mstenner@linux.duke.edu>
+    for his keepalive module that allows handling of persistent 
+    HTTP 1.1 keep-alive connections
 
 Marek Stiefenhofer <m.stiefenhofer@r-tec.net>
     for reporting a bug
