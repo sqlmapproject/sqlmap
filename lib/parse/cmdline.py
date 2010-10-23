@@ -484,6 +484,10 @@ def cmdLineParser():
                                  action="store_true", default=False,
                                  help="Replicate dumped data into a sqlite3 database")
 
+        miscellaneous.add_option("--beep", dest="beep",
+                                 action="store_true", default=False,
+                                 help="Alert with audio beep when sql injection found")
+
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
                           default=False, help=SUPPRESS_HELP)

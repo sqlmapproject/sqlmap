@@ -81,7 +81,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
 
             if not falseResult:
                 infoMsg  = "%s parameter '%s' is %s (%s) injectable " % (place, parameter, case.desc, logic)
-                infoMsg += "with %d parenthesis" % parenthesis
+                infoMsg += "with %d parenthesis%s" % (parenthesis, "\a" if conf.beep else "")
                 logger.info(infoMsg)
                 return case.name
 
