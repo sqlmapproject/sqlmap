@@ -97,7 +97,7 @@ class Enumeration:
         infoMsg = "fetching current user"
         logger.info(infoMsg)
 
-        query = queries[kb.dbms].currentUser.query
+        query = queries[kb.dbms].current_user.query
 
         if not kb.data.currentUser:
             kb.data.currentUser = inject.getValue(query)
@@ -108,7 +108,7 @@ class Enumeration:
         infoMsg = "fetching current database"
         logger.info(infoMsg)
 
-        query = queries[kb.dbms].currentDb.query
+        query = queries[kb.dbms].current_db.query
 
         if not kb.data.currentDb:
             kb.data.currentDb = inject.getValue(query)
