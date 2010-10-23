@@ -354,6 +354,7 @@
         <timedelay/>
         <substring query="MID((%s), %d, %d)"/>
         <case query="IIF(%s,1,0)"/>
+        <inference query="AND MID((%s), %d, 1) > '%s'"/>
         <banner/>
         <current_user query="SELECT CURRENTUSER()"/>
         <current_db/>
@@ -429,6 +430,7 @@
         <current_db query="SELECT DATABASE() FROM DUAL"/>
         <order query="ORDER BY %s ASC"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <inference query="AND SUBSTR((%s), %d, 1) > '%s'"/>
         <delimiter query=","/>
         <substring query="SUBSTR((%s), %d, %d)"/>
    </dbms>

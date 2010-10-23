@@ -17,6 +17,8 @@ from lib.core.common import dataToStdout
 from lib.core.common import getCharset
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
@@ -113,7 +115,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         hintlock.release()
 
         if hintValue is not None and len(hintValue) >= idx:
-            if kb.dbms == "SQLite":
+            if kb.dbms in ("SQLite", "Microsoft Access", "SAP MaxDB"):
                 posValue = hintValue[idx-1]
             else:
                 posValue = ord(hintValue[idx-1])
@@ -165,8 +167,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             position = (len(charTbl) >> 1)
             posValue = charTbl[position]
 
-            if kb.dbms == "SQLite":
-                posValueOld = posValue
+            if kb.dbms in ("SQLite", "Microsoft Access", "SAP MaxDB"):
+                pushValue(posValue)
                 posValue = chr(posValue) if posValue < 128 else unichr(posValue)
 
             forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
@@ -174,8 +176,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             queriesCount[0] += 1
             result = Request.queryPage(urlencode(forgedPayload))
 
-            if kb.dbms == "SQLite":
-                posValue = posValueOld
+            if kb.dbms in ("SQLite", "Microsoft Access", "SAP MaxDB"):
+                posValue = popValue()
 
             if result:
                 minValue = posValue
