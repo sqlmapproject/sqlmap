@@ -1168,7 +1168,7 @@ class Enumeration:
                         query = rootQuery.blind.query % (column, column,
                                                                conf.tbl.upper(),
                                                                index)
-                    elif kb.dbms == "Microsoft SQL Server":
+                    elif kb.dbms in ("Microsoft SQL Server", "Sybase"):
                         query = rootQuery.blind.query % (column, index + 1, conf.db,
                                                                conf.tbl, colList[0],
                                                                colList[0], colList[0])

