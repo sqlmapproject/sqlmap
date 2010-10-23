@@ -438,7 +438,7 @@
             <inband query="SELECT username FROM domain.users ORDER BY 1"/>
         </users>
         <tables>
-            <inband query="SELECT tablename FROM domain.tables WHERE schemaname='%s'"/>
+            <inband query="SELECT tablename FROM domain.tables WHERE schemaname='%s' AND type='TABLE'"/>
         </tables>
         <roles>
             <inband query="SELECT owner, role FROM domain.roles" condition="owner"/>
