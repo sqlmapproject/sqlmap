@@ -1147,7 +1147,7 @@ class Enumeration:
             lengths = {}
             entries = {}
 
-            if kb.dbms == "Oracle":
+            if kb.dbms in ("Oracle", "Microsoft SQL Server", "Sybase"):
                 plusOne = True
             else:
                 plusOne = False
@@ -1169,7 +1169,7 @@ class Enumeration:
                                                                conf.tbl.upper(),
                                                                index)
                     elif kb.dbms in ("Microsoft SQL Server", "Sybase"):
-                        query = rootQuery.blind.query % (column, index + 1, conf.db,
+                        query = rootQuery.blind.query % (column, index, conf.db,
                                                                conf.tbl, colList[0],
                                                                colList[0], colList[0])
 
