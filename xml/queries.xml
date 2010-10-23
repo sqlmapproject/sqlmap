@@ -415,6 +415,7 @@
    <!-- http://dev.mysql.com/tech-resources/articles/maxdb-php-ready-for-web.html -->
    <!-- http://dev.mysql.com/doc/refman/5.0/es/maxdb-reserved-words.html -->
    <!-- http://maxdb.sap.com/doc/7_6/default.htm -->
+   <!-- http://www.sapdb.org/7.4/htmhelp/35/f8823cb7e5d42be10000000a114027/content.htm -->
 
    <!-- SAP MaxDB -->
    <dbms value="SAP MaxDB">
@@ -433,6 +434,18 @@
         <inference query="AND SUBSTR((%s), %d, 1) > '%s'"/>
         <delimiter query=","/>
         <substring query="SUBSTR((%s), %d, %d)"/>
+        <users>
+            <inband query="SELECT username FROM domain.users ORDER BY 1"/>
+        </users>
+        <tables>
+            <inband query="SELECT tablename FROM domain.tables WHERE schemaname='%s'"/>
+        </tables>
+        <roles>
+            <inband query="SELECT owner, role FROM domain.roles" condition="owner"/>
+        </roles>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+        </dump_table>
    </dbms>
 
     <!-- Sybase -->
