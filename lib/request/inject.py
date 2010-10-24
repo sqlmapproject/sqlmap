@@ -405,12 +405,19 @@ def goStacked(expression, silent=False):
 
     return payload, page
 
-def goError(expression):
+def goError(expression, suppressOutput=False):
     #expression = cleanQuery(expression)
+
+    if suppressOutput:
+        pushValue(conf.verbose)
+        conf.verbose = 0
 
     if conf.direct:
         return direct(expression), None
 
     result = errorUse(expression)
+
+    if suppressOutput:
+        conf.verbose = popValue()
 
     return result

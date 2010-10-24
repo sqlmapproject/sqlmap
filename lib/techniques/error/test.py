@@ -31,7 +31,7 @@ def errorTest():
 
     randInt = getUnicode(randomInt(1))
     query = queries[kb.dbms].case.query % ("%s=%s" % (randInt, randInt))
-    result = inject.goError(query)
+    result = inject.goError(query, True)
 
     if result:
         infoMsg  = "the web application supports error based injection "
