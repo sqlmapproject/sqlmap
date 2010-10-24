@@ -212,6 +212,10 @@ def cmdLineParser():
                               help="Test for stacked queries (multiple "
                                    "statements) support")
 
+        techniques.add_option("--error-test", dest="errorTest",
+                          action="store_true", default=False,
+                          help="Test for error based SQL injection support (beta)")
+
         techniques.add_option("--time-test", dest="timeTest",
                               action="store_true", default=False,
                               help="Test for time based blind SQL injection")
@@ -491,10 +495,6 @@ def cmdLineParser():
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
                           default=False, help=SUPPRESS_HELP)
-
-        parser.add_option("--error-test", dest="errorTest",
-                          action="store_true", default=False,
-                          help=SUPPRESS_HELP)
 
         parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int", default=10,
                           help=SUPPRESS_HELP)
