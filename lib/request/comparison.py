@@ -11,6 +11,7 @@ import re
 
 from lib.core.common import getFilteredPageContent
 from lib.core.common import preparePageForLineComparison
+from lib.core.common import wasLastRequestError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -94,7 +95,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         return ratio
 
     # In case of an DBMS error page return False
-    elif conf.errorComparison and kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID:
+    elif wasLastRequestError():
         return False
 
     # If the url is not stable it returns sequence matcher between the

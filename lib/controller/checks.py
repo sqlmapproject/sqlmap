@@ -21,6 +21,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import showStaticWords
+from lib.core.common import wasLastRequestError
 from lib.core.common import DynamicContentItem
 from lib.core.convert import urlencode
 from lib.core.data import conf
@@ -103,7 +104,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
         payload = conf.paramDict[place][parameter].replace('*', payload)
 
     Request.queryPage(payload, place)
-    result = kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
+    result = wasLastRequestError()
 
     infoMsg  = "(error based) heuristics shows that %s " % place
     infoMsg += "parameter '%s' is " % parameter

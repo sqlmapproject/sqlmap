@@ -1479,7 +1479,19 @@ def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
 
 def pushValue(value):
+    """
+    Push value to the stack
+    """
     kb.valueStack.append(value)
 
 def popValue():
+    """
+    Pop value from the stack
+    """
     return kb.valueStack.pop()
+
+def wasLastRequestError():
+    """
+    Returns True if the last web request resulted in a (recognized) DBMS error page
+    """
+    return kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
