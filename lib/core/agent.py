@@ -453,7 +453,7 @@ class Agent:
             query        = query[len("TOP %s " % topNum):]
             inbandQuery += "TOP %s " % topNum
 
-        if not exprPosition:
+        if not isinstance(exprPosition, int):
             exprPosition = kb.unionPosition
 
         intoRegExp = re.search("(\s+INTO (DUMP|OUT)FILE\s+\'(.+?)\')", query, re.I)

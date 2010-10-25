@@ -108,23 +108,23 @@ def __unionConfirm():
         # Assure that the above function found the exploitable full inband
         # SQL injection position
         if not isinstance(kb.unionPosition, int):
-            value = __unionPosition(falseCond=True)
+            value = __unionPosition(negative=True)
 
             # Assure that the above function found the exploitable partial
-            # (single entry) inband SQL injection position by appending
-            # a false condition after the parameter value
+            # (single entry) inband SQL injection position with negative
+            # parameter value
             if not isinstance(kb.unionPosition, int):
-                value = __unionPosition(negative=True)
+                value = __unionPosition(falseCond=True)
 
                 # Assure that the above function found the exploitable partial
-                # (single entry) inband SQL injection position with negative
-                # parameter value
+                # (single entry) inband SQL injection position by appending
+                # a false condition after the parameter value
                 if not isinstance(kb.unionPosition, int):
                     return
                 else:
-                    setUnion(negative=True)
+                    setUnion(falseCond=True)
             else:
-                setUnion(falseCond=True)
+                setUnion(negative=True)
 
     return value
 

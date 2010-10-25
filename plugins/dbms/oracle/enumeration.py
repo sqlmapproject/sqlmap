@@ -36,7 +36,7 @@ class Enumeration(GenericEnumeration):
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if kb.unionPosition or conf.direct:
+        if kb.unionPosition is not None or conf.direct:
             if query2:
                 query     = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -196,7 +196,7 @@ class Enumeration(GenericEnumeration):
             colQuery = colQuery % column
 
             for db in dbs.keys():
-                if kb.unionPosition or conf.direct:
+                if kb.unionPosition is not None or conf.direct:
                     query = rootQuery.inband.query
                     query += colQuery
                     values = inject.getValue(query, blind=False, error=False)

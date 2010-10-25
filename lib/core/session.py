@@ -232,7 +232,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
         kb.unionComment = comment
         kb.unionCount = count
 
-    if position:
+    if position is not None:
         condition = (
                       not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
                       ( not kb.resumedQueries[conf.url].has_key("Union position")

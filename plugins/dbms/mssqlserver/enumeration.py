@@ -48,7 +48,7 @@ class Enumeration(GenericEnumeration):
             else:
                 dbs = [conf.db]
 
-        if kb.unionPosition or conf.direct:
+        if kb.unionPosition is not None or conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -138,7 +138,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                if kb.unionPosition or conf.direct:
+                if kb.unionPosition is not None or conf.direct:
                     query = rootQuery["inband"]["query"] % db
                     query += tblQuery
                     values = inject.getValue(query, blind=False, error=False)
@@ -223,7 +223,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                if kb.unionPosition or conf.direct:
+                if kb.unionPosition is not None or conf.direct:
                     query = rootQuery["inband"]["query"] % (db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     values = inject.getValue(query, blind=False, error=False)

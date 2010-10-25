@@ -92,7 +92,7 @@ class Filesystem(GenericFilesystem):
         binToHexQuery = urlencode(binToHexQuery, convall=True)
         inject.goStacked(binToHexQuery)
 
-        if kb.unionPosition:
+        if kb.unionPosition is not None:
             result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), sort=False, resumeValue=False, blind=False, error=False)
 
         if not result:

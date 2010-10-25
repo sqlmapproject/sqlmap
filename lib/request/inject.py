@@ -358,10 +358,10 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
             if not value:
                 warnMsg  = "for some reason(s) it was not possible to retrieve "
                 warnMsg += "the query output through error SQL injection "
-                warnMsg += "technique, sqlmap is going %s" % ("inband" if inband and kb.unionPosition else "blind")
+                warnMsg += "technique, sqlmap is going %s" % ("inband" if inband and kb.unionPosition is not None else "blind")
                 logger.warn(warnMsg)
 
-        if inband and kb.unionPosition and not value:
+        if inband and kb.unionPosition is not None and not value:
             value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
             if not value:
