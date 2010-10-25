@@ -77,11 +77,11 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         if conf.thold:
             conf.matchRatio = conf.thold
 
-        elif conf.md5hash is not None and ratio > 0.6 and ratio < 1:
+        elif kb.pageStable and ratio > 0.6 and ratio < 1:
             logger.debug("setting match ratio to %.3f" % ratio)
             conf.matchRatio = ratio
 
-        elif conf.md5hash is None or ( conf.md5hash is not None and ratio < 0.6 ):
+        elif not kb.pageStable or ( kb.pageStable and ratio < 0.6 ):
             logger.debug("setting match ratio to default value 0.900")
             conf.matchRatio = 0.900
 
@@ -92,13 +92,6 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     # response
     if getSeqMatcher:
         return ratio
-
-    # If the url is stable it returns True if the page has the same MD5
-    # hash of the original one
-    # NOTE: old implementation, it did not handle automatically the fact
-    # that the url could be not stable (due to VIEWSTATE, counter, etc.)
-    #elif conf.md5hash is not None:
-    #    return conf.md5hash == md5hash(page)
 
     # In case of an DBMS error page return False
     elif conf.errorComparison and kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID:

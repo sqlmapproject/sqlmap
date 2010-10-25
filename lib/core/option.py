@@ -1014,7 +1014,6 @@ def __setConfAttributes():
     conf.loggedToOut      = None
     conf.logic            = "AND"
     conf.matchRatio       = None
-    conf.md5hash          = None
     conf.multipleTargets  = False
     conf.outputPath       = None
     conf.paramDict        = {}
@@ -1083,6 +1082,7 @@ def __setKnowledgeBaseAttributes():
     kb.osVersion       = None
     kb.osSP            = None
 
+    kb.pageStable      = None
     kb.parenthesis     = None
     kb.partRun         = None
     kb.proxyAuthHeader = None

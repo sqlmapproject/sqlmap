@@ -22,7 +22,6 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import showStaticWords
 from lib.core.common import DynamicContentItem
-from lib.core.convert import md5hash
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -202,11 +201,10 @@ def checkStability():
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True)
 
-    condition = (firstPage == secondPage)
+    kb.pageStable = (firstPage == secondPage)
 
-    if condition:
+    if kb.pageStable:
         if firstPage:
-            conf.md5hash = md5hash(firstPage)
             logMsg  = "url is stable"
             logger.info(logMsg)
         else:
@@ -216,7 +214,7 @@ def checkStability():
             errMsg += "using higher verbosity levels"
             raise sqlmapNoneDataException, errMsg
 
-    elif not condition:
+    else:
         warnMsg  = "url is not stable, sqlmap will base the page "
         warnMsg += "comparison on a sequence matcher. If no dynamic nor "
         warnMsg += "injectable parameters are detected, or in case of "
@@ -253,7 +251,7 @@ def checkStability():
         else:
             checkDynamicContent(firstPage, secondPage)
 
-    return condition
+    return kb.pageStable
 
 def checkString():
     if not conf.string:

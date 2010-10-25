@@ -298,10 +298,11 @@ def initTargetEnv():
         kb.injPlace        = None
         kb.injType         = None
         kb.nullConnection  = None
+        kb.pageStable      = None
         kb.parenthesis     = None
         kb.proxyAuthHeader = None
         kb.stackedTest     = None
-        kb.timeTest        = None        
+        kb.timeTest        = None
         kb.unionComment    = ""
         kb.unionCount      = None
         kb.unionPosition   = None
