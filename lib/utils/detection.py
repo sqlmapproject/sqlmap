@@ -12,9 +12,11 @@ import sre_constants
 
 from lib.core.common import getCompiledRegex
 from lib.core.common import readXmlFile
+from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.data import logger
+
 
 rules = None
 
@@ -27,7 +29,7 @@ def __adjustGrammar(string):
 
     return string
 
-def checkPayload(string):
+def checkPayload(payload):
     """
     This method checks if the generated payload is detectable by the
     PHPIDS filter rules
@@ -35,20 +37,22 @@ def checkPayload(string):
 
     global rules
 
+    payload = urldecode(payload)
+
     if not rules:
         xmlrules = readXmlFile(paths.DETECTION_RULES_XML)
         rules = []
 
         for xmlrule in xmlrules.getElementsByTagName("filter"):
-            try:
-                rule = "(?i)%s" % xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue
-                desc = __adjustGrammar(xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue)
-                rules.append((rule, desc))
-            except sre_constants.error: # Some issues with some regex expressions in Python 2.5
-                pass
-    
-    for rule, desc in rules:
-        regObj = getCompiledRegex(rule)
+            rule = "(?i)%s" % xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue
+            desc = __adjustGrammar(xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue)
+            rules.append((rule, desc))
 
-        if regObj.search(string):
-            logger.warn("highly probable IDS/IPS detection: '%s'" % desc)
+    if payload:
+        for rule, desc in rules:
+            try:
+                regObj = getCompiledRegex(rule)
+                if regObj.search(payload):
+                    logger.warn("highly probable IDS/IPS detection: '%s: %s'" % (desc, payload))
+            except: # Some issues with some regex expressions in Python 2.5
+                pass

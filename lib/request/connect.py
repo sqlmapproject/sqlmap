@@ -30,6 +30,7 @@ from lib.request.basic import parseResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
+from lib.utils.detection import checkPayload
 
 
 class Connect:
@@ -308,6 +309,9 @@ class Connect:
         if kb.tamperFunctions:
             for function in kb.tamperFunctions:
                 value = function(place, value)
+
+        if conf.checkPayload:
+            checkPayload(value)
 
         if "GET" in conf.parameters:
             get = conf.parameters["GET"] if place != "GET" or not value else value

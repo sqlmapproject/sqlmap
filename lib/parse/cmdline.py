@@ -488,6 +488,10 @@ def cmdLineParser():
                                  action="store_true", default=False,
                                  help="Replicate dumped data into a sqlite3 database")
 
+        miscellaneous.add_option("--check-payload", dest="checkPayload",
+                                 action="store_true", default=False,
+                                 help="IDS detection testing of injection payload")
+
         miscellaneous.add_option("--beep", dest="beep",
                                  action="store_true", default=False,
                                  help="Alert with audio beep when sql injection found")
