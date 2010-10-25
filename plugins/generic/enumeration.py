@@ -20,6 +20,7 @@ from lib.core.common import getUnicode
 from lib.core.common import parsePasswordHash
 from lib.core.common import popValue
 from lib.core.common import pushValue
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.convert import urlencode
@@ -165,7 +166,9 @@ class Enumeration:
             indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
-                if condition:
+                if kb.dbms == "Sybase":
+                    query = rootQuery.blind.query % (','.join(map(lambda x: "'%s'" % x, kb.data.cachedUsers)) if kb.data.cachedUsers else "'%s'" % randomStr())
+                elif condition:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index

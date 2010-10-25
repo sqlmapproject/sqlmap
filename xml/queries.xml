@@ -473,7 +473,7 @@
         <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0"/>
         <users>
             <inband query="SELECT name FROM master..syslogins ORDER BY 1"/>
-            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins"/>
+            <blind query="SELECT MIN(name) FROM master..syslogins WHERE name NOT IN (%s)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins"/>
         </users>
         <passwords>
             <inband query="SELECT name, password FROM master..syslogins" condition="name"/>
