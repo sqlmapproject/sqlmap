@@ -64,7 +64,7 @@ def action():
     if conf.timeTest:
         conf.dumper.technic("time based blind sql injection payload", timeTest())
 
-    if ( conf.unionUse or conf.unionTest ) and not kb.unionPosition:
+    if conf.unionTest and not kb.unionPosition:
         conf.dumper.technic("valid union", unionTest())
 
     # Enumeration options

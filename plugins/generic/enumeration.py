@@ -73,7 +73,7 @@ class Enumeration:
         logger.info(infoMsg)
 
         if not kb.data.banner:
-            if conf.unionUse or conf.unionTest:
+            if conf.unionTest:
                 conf.dumper.technic("valid union", unionTest())
 
             query          = queries[kb.dbms].banner.query
