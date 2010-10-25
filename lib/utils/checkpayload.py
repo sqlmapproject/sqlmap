@@ -40,7 +40,7 @@ def checkPayload(payload):
     payload = urldecode(payload)
 
     if not rules:
-        xmlrules = readXmlFile(paths.DETECTION_RULES_XML)
+        xmlrules = readXmlFile(paths.PHPIDS_RULES_XML)
         rules = []
 
         for xmlrule in xmlrules.getElementsByTagName("filter"):

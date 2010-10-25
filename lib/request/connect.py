@@ -30,7 +30,7 @@ from lib.request.basic import parseResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
-from lib.utils.detection import checkPayload
+from lib.utils.checkpayload import checkPayload
 
 
 class Connect:
