@@ -1005,6 +1005,8 @@ def __setConfAttributes():
     conf.dbmsConnector    = None
     conf.dbmsHandler      = None
     conf.dumpPath         = None
+    conf.minMatchBlock    = 8
+    conf.dynMarkLength    = 32
     conf.httpHeaders      = []
     conf.hostname         = None
     conf.loggedToOut      = None
@@ -1058,7 +1060,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.dep             = None
     kb.docRoot         = None
-    kb.dynamicContent  = []
+    kb.dynamicMarkings = []
     kb.errorTest       = None
     kb.headersCount    = 0
     kb.headersFp       = {}

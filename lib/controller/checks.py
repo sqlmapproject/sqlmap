@@ -147,65 +147,41 @@ def checkDynParam(place, parameter, value):
 
     return condition
 
-def checkDynamicContent(*pages):
+def checkDynamicContent(firstPage, secondPage):
     """
     This function checks if the provided pages have dynamic content. If they
-    are dynamic, their content differs at specific lines.
+    are dynamic, proper markings will be made.
     """
 
     infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
 
-    for i in xrange(len(pages)):
-        firstPage = pages[i]
-        linesFirst = preparePageForLineComparison(firstPage)
-        pageLinesNumber = len(linesFirst)
+    blocks = SequenceMatcher(None, firstPage, secondPage).get_matching_blocks()
+    kb.dynamicMarkings = []
 
-        for j in xrange(i+1, len(pages)):
-            secondPage = pages[j]
-            linesSecond = preparePageForLineComparison(secondPage)
+    i = 0
+    while i < len(blocks):
+        block = blocks[i]
+        (_, _, length) = block
+        if length <= conf.minMatchBlock:
+            blocks.remove(block)
+        else:
+            i += 1
 
-            if pageLinesNumber == len(linesSecond):
-                for k in xrange(0, pageLinesNumber):
-                    if (linesFirst[k] != linesSecond[k]):
-                        item = DynamicContentItem(k, pageLinesNumber, \
-                            linesFirst[k-1] if k > 0 else None, \
-                            linesFirst[k+1] if k < pageLinesNumber - 1 else None)
+    if len(blocks) > 0:
+        blocks.insert(0, None)
+        blocks.append(None)
+        for i in xrange(len(blocks) - 1):
+            prefix = firstPage[blocks[i][0]:blocks[i][0] + blocks[i][2]] if blocks[i] else None
+            postfix = firstPage[blocks[i + 1][0]:blocks[i + 1][0] + blocks[i + 1][2]] if blocks[i + 1] else None
+            if prefix is None and blocks[i + 1][0] == 0:
+                continue
+            if postfix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
+                continue
+            kb.dynamicMarkings.append((prefix[-conf.dynMarkLength:] if prefix else None, postfix[:conf.dynMarkLength] if postfix else None))
 
-                        found = None
-
-                        for other in kb.dynamicContent:
-                            found = True
-
-                            if other.pageTotal == item.pageTotal:
-                                if isinstance(other.lineNumber, int):
-                                    if other.lineNumber == item.lineNumber - 1:
-                                        other.lineNumber = [other.lineNumber, item.lineNumber]
-                                        other.lineContentAfter = item.lineContentAfter
-                                        break
-
-                                    elif other.lineNumber == item.lineNumber + 1:
-                                        other.lineNumber = [item.lineNumber, other.lineNumber]
-                                        other.lineContentBefore = item.lineContentBefore
-                                        break
-
-                                elif item.lineNumber - 1 == other.lineNumber[-1]:
-                                    other.lineNumber.append(item.lineNumber)
-                                    other.lineContentAfter = item.lineContentAfter
-                                    break
-
-                                elif item.lineNumber + 1 == other.lineNumber[0]:
-                                    other.lineNumber.insert(0, item.lineNumber)
-                                    other.lineContentBefore = item.lineContentBefore
-                                    break
-
-                            found = False
-
-                        if not found:
-                            kb.dynamicContent.append(item)
-
-    if kb.dynamicContent:
-        infoMsg = "found probably removable dynamic lines"
+    if len(kb.dynamicMarkings) > 0:
+        infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
         logger.info(infoMsg)
 
 def checkStability():

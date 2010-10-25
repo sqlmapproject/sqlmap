@@ -1079,8 +1079,6 @@ def safeStringFormat(formatStr, params):
                 if count < len(params):
                     retVal = retVal[:index] + getUnicode(params[count]) + retVal[index+2:]
                 else:
-                    import pdb
-                    pdb.set_trace()
                     raise sqlmapNoneDataException, "wrong number of parameters during string formatting"
                 count += 1
 

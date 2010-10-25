@@ -48,19 +48,14 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         return re.search(conf.regexp, page, re.I | re.M) is not None
 
     # Dynamic content lines to be excluded before calculating page hash
-    if kb.dynamicContent:
-        lines = preparePageForLineComparison(page)
-        for item in kb.dynamicContent:
-            if len(lines) == item.pageTotal:
-                before = item.lineNumber - 1 if isinstance(item.lineNumber, int) else item.lineNumber[0] - 1
-                after = item.lineNumber + 1 if isinstance(item.lineNumber, int) else item.lineNumber[-1] + 1
-                if (item.lineContentBefore and lines[before] != item.lineContentBefore) or (item.lineContentAfter and lines[after] != item.lineContentAfter):
-                    continue
-                if isinstance(item.lineNumber, int):
-                    page = page.replace(lines[item.lineNumber], '')
-                else:
-                    for i in item.lineNumber:
-                        page = page.replace(lines[i], '')
+    for item in kb.dynamicMarkings:
+        prefix, postfix = item
+        if prefix is None:
+            page = re.sub('(?s)^.+%s' % postfix, postfix, page)
+        elif postfix is None:
+            page = re.sub('(?s)%s.+$' % prefix, prefix, page)
+        else:
+            page = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), page)
 
     if conf.seqLock:
         conf.seqLock.acquire()
