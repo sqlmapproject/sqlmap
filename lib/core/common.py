@@ -1494,3 +1494,24 @@ def wasLastRequestError():
     Returns True if the last web request resulted in a (recognized) DBMS error page
     """
     return kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
+
+def beep():
+    """
+    Does an audible beep sound
+    Reference: http://de3.aminet.net/dev/src/clr.py.txt
+    """
+    if sys.platform=='linux2':
+        try:
+            audio=file('/dev/audio', 'wb')
+            count=0
+            while count < 250:
+                beep=chr(32) * 4
+                audio.write(beep)
+                beep=chr(0) * 4
+                audio.write(beep)
+                count=count + 1
+            audio.close()
+        except:
+            print '\a'
+    else:
+        print '\a'

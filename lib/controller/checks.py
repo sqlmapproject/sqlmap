@@ -14,6 +14,7 @@ import time
 from difflib import SequenceMatcher
 
 from lib.core.agent import agent
+from lib.core.common import beep
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import preparePageForLineComparison
@@ -81,8 +82,12 @@ def checkSqlInjection(place, parameter, value, parenthesis):
 
             if not falseResult:
                 infoMsg  = "%s parameter '%s' is %s (%s) injectable " % (place, parameter, case.desc, logic)
-                infoMsg += "with %d parenthesis%s" % (parenthesis, "\a" if conf.beep else "")
+                infoMsg += "with %d parenthesis" % parenthesis
                 logger.info(infoMsg)
+
+                if conf.beep:
+                    beep()
+
                 return case.name
 
     return None
