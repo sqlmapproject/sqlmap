@@ -100,6 +100,10 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     #elif conf.md5hash is not None:
     #    return conf.md5hash == md5hash(page)
 
+    # In case of an DBMS error page return False
+    elif conf.errorComparison and kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID:
+        return False
+
     # If the url is not stable it returns sequence matcher between the
     # first untouched HTTP response page content and this content
     else:
