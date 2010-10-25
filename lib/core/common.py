@@ -641,8 +641,8 @@ def setPaths():
     paths.SQLMAP_CONFIG          = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
     paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
-    paths.SQL_KEYWORDS            = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
-    paths.PHPIDS_RULES_XML    = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
+    paths.SQL_KEYWORDS           = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
+    paths.PHPIDS_RULES_XML       = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
     paths.INJECTIONS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
     paths.LIVE_TESTS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
@@ -1500,12 +1500,15 @@ def beep():
     Does an audible beep sound
     Reference: http://de3.aminet.net/dev/src/clr.py.txt
     """
-    if sys.platform=='linux2':
+
+    if sys.platform == 'linux2':
         try:
-            audio=file('/dev/audio', 'wb')
+            audio = file('/dev/audio', 'wb')
+
             for i in xrange(250):
                 audio.write(chr(32) * 4)
                 audio.write(chr(0) * 4)
+
             audio.close()
         except:
             print '\a'
