@@ -254,7 +254,7 @@
         </users>
         <passwords>
             <inband query="SELECT name, master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins" query2="SELECT name, master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins" condition="name"/>
-            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..sysxlogins WHERE name='%s')" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
+            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM master..sysxlogins WHERE name='%s')" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
         </passwords>
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
         <privileges/>
@@ -473,21 +473,21 @@
         <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0"/>
         <users>
             <inband query="SELECT name FROM master..syslogins ORDER BY 1"/>
-            <blind query="SELECT MIN(name) FROM master..syslogins WHERE name NOT IN (%s)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins"/>
+            <blind query="SELECT MIN(name) FROM master..syslogins WHERE name > '%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins"/>
         </users>
         <passwords>
             <inband query="SELECT name, password FROM master..syslogins" condition="name"/>
-            <blind query="SELECT TOP 1 password FROM master..syslogins WHERE name='%s' AND name NOT IN (SELECT TOP %d name FROM master..syslogins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'"/>
+            <blind query="SELECT MIN(password) FROM master..syslogins WHERE name='%s' AND password > '%s'" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'"/>
         </passwords>
         <privileges/>
         <roles/>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases ORDER BY 1"/>
-            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
+            <blind query="SELECT MIN(name) FROM master..sysdatabases WHERE name > '%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
             <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') ORDER BY 1"/>
-            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE type IN ('U') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE type IN ('U'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE type IN ('U')"/>
+            <blind query="SELECT MIN(name) FROM %s..sysobjects WHERE type IN ('U') AND name > '%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE type IN ('U')"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>

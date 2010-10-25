@@ -167,7 +167,7 @@ class Enumeration:
 
             for index in indexRange:
                 if kb.dbms == "Sybase":
-                    query = rootQuery.blind.query % (','.join(map(lambda x: "'%s'" % x, kb.data.cachedUsers)) if kb.data.cachedUsers else "'%s'" % randomStr())
+                    query = rootQuery.blind.query % (kb.data.cachedUsers[-1] if kb.data.cachedUsers else " ")
                 elif condition:
                     query = rootQuery.blind.query2 % index
                 else:
@@ -282,7 +282,9 @@ class Enumeration:
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if kb.dbms == "Microsoft SQL Server":
+                    if kb.dbms == "Sybase":
+                        query = rootQuery.blind.query % (user, (kb.data.cachedUsersPasswords[-1] if kb.data.cachedUsersPasswords else " "))
+                    elif kb.dbms == "Microsoft SQL Server":
                         if kb.dbmsVersion[0] in ( "2005", "2008" ):
                             query = rootQuery.blind.query2 % (user, index, user)
                         else:
@@ -664,7 +666,9 @@ class Enumeration:
             indexRange = getRange(count)
 
             for index in indexRange:
-                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                if kb.dbms == "Sybase":
+                    query = rootQuery.blind.query % (kb.data.cachedDbs[-1] if kb.data.cachedDbs else " ")
+                elif kb.dbms == "MySQL" and not kb.data.has_information_schema:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index
@@ -785,7 +789,9 @@ class Enumeration:
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if kb.dbms in ("SQLite", "Firebird"):
+                    if kb.dbms == "Sybase":
+                        query = rootQuery.blind.query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
+                    elif kb.dbms in ("SQLite", "Firebird"):
                         query = rootQuery.blind.query % index
                     else:
                         query = rootQuery.blind.query % (db, index)

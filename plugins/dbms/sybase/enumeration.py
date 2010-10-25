@@ -16,9 +16,3 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 class Enumeration(GenericEnumeration):
     def __init__(self):
         GenericEnumeration.__init__(self, "Sybase")
-
-    def getPasswordHashes(self):
-        warnMsg = "on Sybase it is not possible to enumerate the user password hashes"
-        logger.warn(warnMsg)
-
-        return {}
