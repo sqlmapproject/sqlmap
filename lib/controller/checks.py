@@ -168,21 +168,27 @@ def checkDynamicContent(firstPage, secondPage):
     while i < len(blocks):
         block = blocks[i]
         (_, _, length) = block
+
         if length <= conf.minMatchBlock:
             blocks.remove(block)
+
         else:
             i += 1
 
     if len(blocks) > 0:
         blocks.insert(0, None)
         blocks.append(None)
+
         for i in xrange(len(blocks) - 1):
             prefix = firstPage[blocks[i][0]:blocks[i][0] + blocks[i][2]] if blocks[i] else None
             postfix = firstPage[blocks[i + 1][0]:blocks[i + 1][0] + blocks[i + 1][2]] if blocks[i + 1] else None
+
             if prefix is None and blocks[i + 1][0] == 0:
                 continue
+
             if postfix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
                 continue
+
             kb.dynamicMarkings.append((prefix[-conf.dynMarkLength:] if prefix else None, postfix[:conf.dynMarkLength] if postfix else None))
 
     if len(kb.dynamicMarkings) > 0:

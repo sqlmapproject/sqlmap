@@ -1503,13 +1503,9 @@ def beep():
     if sys.platform=='linux2':
         try:
             audio=file('/dev/audio', 'wb')
-            count=0
-            while count < 250:
-                beep=chr(32) * 4
-                audio.write(beep)
-                beep=chr(0) * 4
-                audio.write(beep)
-                count=count + 1
+            for i in xrange(250):
+                audio.write(chr(32) * 4)
+                audio.write(chr(0) * 4)
             audio.close()
         except:
             print '\a'
