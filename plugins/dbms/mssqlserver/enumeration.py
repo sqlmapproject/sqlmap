@@ -57,7 +57,7 @@ class Enumeration(GenericEnumeration):
                     continue
 
                 query = rootQuery.inband.query % db
-                value = inject.getValue(query, blind=False)
+                value = inject.getValue(query, blind=False, error=False)
 
                 if value:
                     kb.data.cachedTables[db] = value
@@ -141,7 +141,7 @@ class Enumeration(GenericEnumeration):
                 if kb.unionPosition or conf.direct:
                     query = rootQuery["inband"]["query"] % db
                     query += tblQuery
-                    values = inject.getValue(query, blind=False)
+                    values = inject.getValue(query, blind=False, error=False)
 
                     if values:
                         if isinstance(values, basestring):
@@ -226,7 +226,7 @@ class Enumeration(GenericEnumeration):
                 if kb.unionPosition or conf.direct:
                     query = rootQuery["inband"]["query"] % (db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
-                    values = inject.getValue(query, blind=False)
+                    values = inject.getValue(query, blind=False, error=False)
 
                     if values:
                         if isinstance(values, basestring):

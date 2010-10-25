@@ -49,7 +49,7 @@ class Enumeration(GenericEnumeration):
                 query += " WHERE "
                 query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
-            values = inject.getValue(query, blind=False)
+            values = inject.getValue(query, blind=False, error=False)
 
             if not values and not query2:
                 infoMsg = "trying with table USER_ROLE_PRIVS"
@@ -199,7 +199,7 @@ class Enumeration(GenericEnumeration):
                 if kb.unionPosition or conf.direct:
                     query = rootQuery.inband.query
                     query += colQuery
-                    values = inject.getValue(query, blind=False)
+                    values = inject.getValue(query, blind=False, error=False)
 
                     if values:
                         if isinstance(values, basestring):

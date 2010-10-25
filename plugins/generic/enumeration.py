@@ -139,7 +139,7 @@ class Enumeration:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = inject.getValue(query, blind=False)
+            value = inject.getValue(query, blind=False, error=False)
 
             if value:
                 kb.data.cachedUsers = value
@@ -213,7 +213,7 @@ class Enumeration:
 
                     query += " WHERE %s = '%s'" % (condition, conf.user)
 
-            value = inject.getValue(query, blind=False)
+            value = inject.getValue(query, blind=False, error=False)
 
             if value:
                 for user, password in value:
@@ -410,7 +410,7 @@ class Enumeration:
                 else:
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
-            values = inject.getValue(query, blind=False)
+            values = inject.getValue(query, blind=False, error=False)
 
             if not values and kb.dbms == "Oracle" and not query2:
                 infoMsg = "trying with table USER_SYS_PRIVS"
@@ -639,7 +639,7 @@ class Enumeration:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = inject.getValue(query, blind=False)
+            value = inject.getValue(query, blind=False, error=False)
 
             if value:
                 kb.data.cachedDbs = value
@@ -718,7 +718,7 @@ class Enumeration:
                 infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
                 logger.info(infoMsg)
 
-            value = inject.getValue(query, blind=False)
+            value = inject.getValue(query, blind=False, error=False)
 
             if value:
                 if kb.dbms == "SQLite":
@@ -913,7 +913,7 @@ class Enumeration:
             elif kb.dbms == "SQLite":
                 query = rootQuery.inband.query % conf.tbl
 
-            value = inject.getValue(query, blind=False)
+            value = inject.getValue(query, blind=False, error=False)
 
             if value:
                 table = {}
@@ -1083,7 +1083,7 @@ class Enumeration:
                 query = rootQuery.inband.query % (colString, conf.tbl)
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
-            entries = inject.getValue(query, blind=False, dump=True)
+            entries = inject.getValue(query, blind=False, error=False, dump=True)
 
             if entries:
                 if isinstance(entries, basestring):
@@ -1341,7 +1341,7 @@ class Enumeration:
                     query = rootQuery.inband.query
                 query += dbQuery
                 query += exclDbsQuery
-                values = inject.getValue(query, blind=False)
+                values = inject.getValue(query, blind=False, error=False)
 
                 if values:
                     if isinstance(values, basestring):
@@ -1426,7 +1426,7 @@ class Enumeration:
                 query = rootQuery.inband.query
                 query += tblQuery
                 query += exclDbsQuery
-                values = inject.getValue(query, blind=False)
+                values = inject.getValue(query, blind=False, error=False)
 
                 if values:
                     if isinstance(values, basestring):
@@ -1547,7 +1547,7 @@ class Enumeration:
                 query = rootQuery.inband.query
                 query += colQuery
                 query += exclDbsQuery
-                values = inject.getValue(query, blind=False)
+                values = inject.getValue(query, blind=False, error=False)
 
                 if values:
                     if isinstance(values, basestring):

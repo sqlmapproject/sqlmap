@@ -93,7 +93,7 @@ class Filesystem(GenericFilesystem):
         inject.goStacked(binToHexQuery)
 
         if kb.unionPosition:
-            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), sort=False, resumeValue=False, blind=False)
+            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), sort=False, resumeValue=False, blind=False, error=False)
 
         if not result:
             result = []

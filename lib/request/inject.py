@@ -355,7 +355,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
             value = errorUse(expression)
 
             if not value:
-                warnMsg  = "for some reasons it was not possible to retrieve "
+                warnMsg  = "for some reason(s) it was not possible to retrieve "
                 warnMsg += "the query output through error SQL injection "
                 warnMsg += "technique, sqlmap is going %s" % ("inband" if inband and kb.unionPosition else "blind")
                 logger.warn(warnMsg)
@@ -364,7 +364,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
             value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
             if not value:
-                warnMsg  = "for some reasons it was not possible to retrieve "
+                warnMsg  = "for some reason(s) it was not possible to retrieve "
                 warnMsg += "the query output through inband SQL injection "
                 warnMsg += "technique, sqlmap is going blind"
                 logger.warn(warnMsg)

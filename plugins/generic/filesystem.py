@@ -38,7 +38,7 @@ class Filesystem:
 
     def __unhexString(self, hexStr):
         if len(hexStr) % 2 != 0:
-            errMsg  = "for some reasons sqlmap retrieved an odd-length "
+            errMsg  = "for some reason(s) sqlmap retrieved an odd-length "
             errMsg += "hexadecimal string which it is not able to convert "
             errMsg += "to raw string"
             logger.error(errMsg)
