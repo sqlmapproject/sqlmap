@@ -101,7 +101,7 @@ class Takeover(GenericTakeover):
 
     def uncPathRequest(self):
         if not kb.stackedTest:
-            query   = agent.prefixQuery(" AND LOAD_FILE('%s')" % self.uncPath)
+            query   = agent.prefixQuery("AND LOAD_FILE('%s')" % self.uncPath)
             query   = agent.postfixQuery(query)
             payload = agent.payload(newValue=query)
 

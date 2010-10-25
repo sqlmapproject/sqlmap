@@ -446,7 +446,7 @@ class Agent:
         @rtype: C{str}
         """
 
-        inbandQuery = self.prefixQuery(" UNION ALL SELECT ")
+        inbandQuery = self.prefixQuery("UNION ALL SELECT ")
 
         if query.startswith("TOP"):
             topNum       = re.search("\ATOP\s+([\d]+)\s+", query, re.I).group(1)

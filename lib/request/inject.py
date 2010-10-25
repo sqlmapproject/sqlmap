@@ -96,7 +96,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     advantage of an blind SQL injection vulnerability on the affected
     parameter through a bisection algorithm.
     """
-    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].inference.query)
+
+    query          = agent.prefixQuery(queries[kb.misc.testedDbms].inference.query)
     query          = agent.postfixQuery(query)
     payload        = agent.payload(newValue=query)
     count          = None
@@ -394,12 +395,13 @@ def goStacked(expression, silent=False):
     if conf.direct:
         return direct(expression), None
 
-    debugMsg = "query: %s" % expression
-    logger.debug(debugMsg)
-
     comment = queries[kb.dbms].comment.query
     query   = agent.prefixQuery("; %s" % expression)
     query   = agent.postfixQuery("%s;%s" % (query, comment))
+
+    debugMsg = "query: %s" % query
+    logger.debug(debugMsg)
+
     payload = agent.payload(newValue=query)
     page, _ = Request.queryPage(payload, content=True, silent=silent)
 

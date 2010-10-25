@@ -33,7 +33,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "executing MySQL comment injection fingerprint"
         logger.info(infoMsg)
 
-        query   = agent.prefixQuery(" /* NoValue */")
+        query   = agent.prefixQuery("/* NoValue */")
         query   = agent.postfixQuery(query)
         payload = agent.payload(newValue=query)
         result  = Request.queryPage(payload)
@@ -63,7 +63,7 @@ class Fingerprint(GenericFingerprint):
             for version in range(element[0], element[1] + 1):
                 randInt = randomInt()
                 version = getUnicode(version)
-                query   = agent.prefixQuery(" /*!%s AND %d=%d*/" % (version, randInt, randInt + 1))
+                query   = agent.prefixQuery("/*!%s AND %d=%d*/" % (version, randInt, randInt + 1))
                 query   = agent.postfixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)

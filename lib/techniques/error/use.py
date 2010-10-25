@@ -35,12 +35,12 @@ def errorUse(expression):
     Retrieve the output of a SQL query taking advantage of an error SQL
     injection vulnerability on the affected parameter.
     """
+
     output         = None
     logic          = conf.logic
     randInt        = randomInt(1)
-    query          = agent.prefixQuery(" %s" % queries[kb.misc.testedDbms].error.query)
+    query          = agent.prefixQuery(queries[kb.misc.testedDbms].error.query)
     query          = agent.postfixQuery(query)
-    payload        = agent.payload(newValue=query)
     startLimiter   = ""
     endLimiter     = ""
 
@@ -62,11 +62,13 @@ def errorUse(expression):
         startLimiter                     = kb.misc.handler.unescape("'%s'" % ERROR_START_CHAR)
         endLimiter                       = kb.misc.handler.unescape("'%s'" % ERROR_END_CHAR)
 
-    debugMsg = "query: %s" % expressionUnescaped
+    forgedQuery = safeStringFormat(query, (logic, randInt, startLimiter, expressionUnescaped, endLimiter))
+
+    debugMsg = "query: %s" % forgedQuery
     logger.debug(debugMsg)
 
-    forgedPayload = safeStringFormat(payload, (logic, randInt, startLimiter, expressionUnescaped, endLimiter))
-    result = Request.queryPage(urlencode(forgedPayload), content=True)
+    payload = agent.payload(newValue=forgedQuery)
+    result = Request.queryPage(urlencode(payload), content=True)
 
     match = re.search('%s(?P<result>.*?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
     if match:

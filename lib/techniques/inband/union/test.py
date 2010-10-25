@@ -136,7 +136,7 @@ def __unionTestByNULLBruteforce(comment):
     """
 
     columns = None
-    query   = agent.prefixQuery(" UNION ALL SELECT NULL")
+    query   = agent.prefixQuery("UNION ALL SELECT NULL")
 
     for count in range(0, 50):
         if kb.dbms == "Oracle" and query.endswith(" FROM DUAL"):
@@ -164,7 +164,7 @@ def __unionTestByOrderBy(comment):
     prevPayload = ""
 
     for count in range(1, 51):
-        query        = agent.prefixQuery(" ORDER BY %d" % count)
+        query        = agent.prefixQuery("ORDER BY %d" % count)
         orderByQuery = agent.postfixQuery(query, comment)
         payload      = agent.payload(newValue=orderByQuery)
         seqMatcher   = Request.queryPage(payload, getSeqMatcher=True)

@@ -37,7 +37,7 @@ class Fingerprint(GenericFingerprint):
             elif kb.dbmsVersion[0] in ("2002-2003", "2007"):
                 table = "MSysAccessStorage"
             if table:
-                query   = agent.prefixQuery(" AND EXISTS(SELECT CURDIR() FROM %s)" % table)
+                query   = agent.prefixQuery("AND EXISTS(SELECT CURDIR() FROM %s)" % table)
                 query   = agent.postfixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
@@ -67,7 +67,7 @@ class Fingerprint(GenericFingerprint):
                     negate = True
                     table = table[1:]
                 randInt = randomInt()
-                query   = agent.prefixQuery(" AND EXISTS(SELECT * FROM %s WHERE %d=%d) FROM %s" % (table, randInt, randInt, table))
+                query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s WHERE %d=%d) FROM %s" % (table, randInt, randInt, table))
                 query   = agent.postfixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)

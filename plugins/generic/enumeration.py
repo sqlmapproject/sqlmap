@@ -815,7 +815,7 @@ class Enumeration:
         length = len(tables)
 
         for table in tables:
-            query = agent.prefixQuery(" %s" % safeStringFormat("AND EXISTS(SELECT 1 FROM %s)", table))
+            query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT 1 FROM %s)", table))
             query = agent.postfixQuery(query)
             result = Request.queryPage(urlencode(agent.payload(newValue=query)))
 

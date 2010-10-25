@@ -33,7 +33,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "executing SAP MaxDB SYSINFO version check"
         logger.info(infoMsg)
 
-        query   = agent.prefixQuery(" /* NoValue */")
+        query   = agent.prefixQuery("/* NoValue */")
         query   = agent.postfixQuery(query)
         payload = agent.payload(newValue=query)
         result  = Request.queryPage(payload)
@@ -47,7 +47,7 @@ class Fingerprint(GenericFingerprint):
         minor, major = None, None
 
         for version in [6, 7]:
-            query   = agent.prefixQuery(" AND (SELECT MAJORVERSION FROM SYSINFO.VERSION)=%d" % version)
+            query   = agent.prefixQuery("AND (SELECT MAJORVERSION FROM SYSINFO.VERSION)=%d" % version)
             query   = agent.postfixQuery(query)
             payload = agent.payload(newValue=query)
             result  = Request.queryPage(payload)
@@ -56,7 +56,7 @@ class Fingerprint(GenericFingerprint):
                 major = version
 
         for version in xrange(0, 10):
-            query   = agent.prefixQuery(" AND (SELECT MINORVERSION FROM SYSINFO.VERSION)=%d" % version)
+            query   = agent.prefixQuery("AND (SELECT MINORVERSION FROM SYSINFO.VERSION)=%d" % version)
             query   = agent.postfixQuery(query)
             payload = agent.payload(newValue=query)
             result  = Request.queryPage(payload)

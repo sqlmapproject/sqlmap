@@ -24,7 +24,7 @@ def timeTest():
     logger.info(infoMsg)
 
     timeQuery = getDelayQuery(andCond=True)
-    query     = agent.prefixQuery(" AND %s" % timeQuery)
+    query     = agent.prefixQuery("AND %s" % timeQuery)
     query     = agent.postfixQuery(query)
     payload   = agent.payload(newValue=query)
     start     = time.time()
