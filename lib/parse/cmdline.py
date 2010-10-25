@@ -147,7 +147,7 @@ def cmdLineParser():
                           default=False, help="Retrieve page length without actual HTTP response body")
 
         optimization.add_option("--threads", dest="threads", type="int", default=1,
-                           help="Max. number of concurrent HTTP(s) "
+                           help="Max number of concurrent HTTP(s) "
                                 "requests (default 1)")
 
         # Injection options
