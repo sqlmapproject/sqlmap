@@ -987,7 +987,8 @@ def __cleanupOptions():
         conf.multipleTargets = True
 
     if conf.optimize:
-        conf.predictOutput = conf.keepAlive = True
+        #conf.predictOutput = True
+        conf.keepAlive = True
         conf.nullConnection = not conf.textOnly
         conf.threads = 4 if conf.threads < 2 else conf.threads
 
@@ -1227,6 +1228,10 @@ def __basicOptionValidation():
 
     if conf.data and conf.nullConnection:
         errMsg = "switch --data is incompatible with switch --null-connection"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.predictOutput and conf.threads > 1:
+        errMsg = "switch --predict-output is incompatible with switch --threads"
         raise sqlmapSyntaxException, errMsg
 
 def init(inputOptions=advancedDict()):
