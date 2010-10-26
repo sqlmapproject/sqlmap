@@ -9,6 +9,10 @@
 <root>
     <!-- Microsoft IIS -->
 
+    <regexp value="Microsoft-IIS/(7\.5)">
+        <info technology="Microsoft IIS" tech_version="1"/>
+    </regexp>
+
     <regexp value="Microsoft-IIS/(7\.0)">
         <info technology="Microsoft IIS" tech_version="1"/>
     </regexp>
@@ -402,5 +406,21 @@
 
     <regexp value="Apache/2\.2\.9 \(Ubuntu\)">
         <info type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid Ibex"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.11 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="9.04" codename="Jaunty Jackalope"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.12 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="9.10" codename="Karmic Koala"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.14 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="10.04" codename="Lucid Lynx"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.16 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="10.10" codename="Maverick Meerkat"/>
     </regexp>
 </root>
