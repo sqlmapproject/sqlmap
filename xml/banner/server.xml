@@ -4,6 +4,7 @@
      References:
      * http://www.http-stats.com/Server
      * http://en.wikipedia.org
+     * http://distrowatch.com/table.php
 -->
 
 <root>
@@ -56,22 +57,20 @@
     </regexp>
 
     <!-- Apache: CentOS -->
-    <!-- TODO: add Centos 4.6, 4.7, 5.1 and 5.2 -->
 
     <regexp value="Apache/2\.0\.46 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="3.7"/>
+        <info type="Linux" distrib="CentOS" release="3"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.52 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="4.3|4.4"/>
+        <info type="Linux" distrib="CentOS" release="4"/>
     </regexp>
 
-    <regexp value="Apache/2\.0\.46 \(CentOS\)">
+    <regexp value="Apache/2\.2\.3 \(CentOS\)">
         <info type="Linux" distrib="CentOS" release="5"/>
     </regexp>
 
     <!-- Apache: Debian -->
-    <!-- TODO: add Debian testing, unstable and experimental -->
 
     <regexp value="Apache/1\.0\.5 \(Unix\) Debian/GNU">
         <info type="Linux" distrib="Debian" release="1.1" codename="buzz"/>
@@ -117,8 +116,15 @@
         <info type="Linux" distrib="Debian" release="4.0" codename="etch" updated="True"/>
     </regexp>
 
+    <regexp value="Apache/2\.2\.9 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="5.0" codename="lenny"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.16 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="6.0" codename="testing squeeze|unstable sid"/>
+    </regexp>
+
     <!-- Apache: Fedora -->
-    <!-- TODO: add Fedora 8, 9 and 10 -->
 
     <regexp value="Apache/2\.0\.47 \(Fedora\)">
         <info type="Linux" distrib="Fedora" release="1" codename="Yarrow"/>
@@ -168,8 +174,31 @@
         <info type="Linux" distrib="Fedora" release="6|7" codename="Zod|Moonshine" updated="True"/>
     </regexp>
 
+    <regexp value="Apache/2\.2\.6 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="8" codename="Werewolf"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.8 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="9" codename="Sulphur"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.10 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="10" codename="Cambridge"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.11 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="11" codename="Leonidas"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.13 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="12" codename="Constantine"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.15 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="13" codename="Goddard"/>
+    </regexp>
+
     <!-- Apache: Mandrake / Mandriva -->
-    <!-- TODO: add Mandriva 2007.1, 2008.0, 2008.1 and 2009.0 -->
 
     <regexp value="Apache/1\.3\.6 \(Unix\)\s+\(Mandrake/Linux\)">
         <info type="Linux" distrib="Mandrake" release="6.0" codename="Venus"/>
@@ -247,6 +276,34 @@
         <info type="Linux" distrib="Mandriva" release="2007"/>
     </regexp>
 
+    <regexp value="Apache/2\.2\.4 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="2007.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.6 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="2008"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.8 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="2008.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.9 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="2009"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.11 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="2009.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.14 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="2010"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.15 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="2010.1"/>
+    </regexp>
+
     <!-- Apache: Red Hat -->
     <!-- TODO: add Red Hat 5, 5.1, 5.2 and 5.3 -->
 
@@ -302,8 +359,11 @@
         <info type="Linux" distrib="Red Hat" release="Enterprise 4" codename="Nahant"/>
     </regexp>
 
+    <regexp value="Apache/2\.2\.3 \(Red Hat\)">
+        <info type="Linux" distrib="Red Hat" release="Enterprise 5" codename="Tikanga"/>
+    </regexp>
+
     <!-- Apache: SuSE -->
-    <!-- TODO: add SuSE 10.1, 10.2, 10.3 and 11.0 -->
 
     <regexp value="Apache/1\.3\.6 \(Unix\) \(SuSE/Linux\)">
         <info type="Linux" distrib="SuSE" release="6.1"/>
@@ -372,6 +432,34 @@
 
     <regexp value="Apache/2\.0\.54 \(Linux/SuSE\)">
         <info type="Linux" distrib="SuSE" release="10.0"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.0 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="10.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.3 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="10.2"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.4 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="10.3"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.8 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="11.0"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.10 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="11.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.13 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="11.2"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.15 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="11.3"/>
     </regexp>
 
     <!-- Apache: Ubuntu -->
