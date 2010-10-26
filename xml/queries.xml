@@ -477,7 +477,7 @@
         </users>
         <passwords>
             <inband query="SELECT name, password FROM master..syslogins" condition="name"/>
-            <blind query="SELECT MIN(password) FROM master..syslogins WHERE name='%s' AND password > '%s'" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'"/>
+            <blind query="SELECT MIN(password) FROM master..syslogins WHERE name='%s'" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'"/>
         </passwords>
         <privileges/>
         <roles/>

@@ -23,6 +23,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
+from lib.core.common import strToHex
 from lib.core.convert import urlencode
 from lib.core.convert import utf8decode
 from lib.core.data import conf
@@ -283,7 +284,15 @@ class Enumeration:
 
                 for index in indexRange:
                     if kb.dbms == "Sybase":
-                        query = rootQuery.blind.query % (user, (kb.data.cachedUsersPasswords[-1] if kb.data.cachedUsersPasswords else " "))
+                        if index > 0:
+                            warnMsg  = "unable to retrieve other password "
+                            warnMsg += "hashes for user '%s'" % user
+                            logger.warn(warnMsg)
+                            break
+                        else:
+                            query = rootQuery.blind.query % user
+                            pushValue(conf.verbose)
+                            conf.verbose = 0
                     elif kb.dbms == "Microsoft SQL Server":
                         if kb.dbmsVersion[0] in ( "2005", "2008" ):
                             query = rootQuery.blind.query2 % (user, index, user)
@@ -292,6 +301,11 @@ class Enumeration:
                     else:
                         query = rootQuery.blind.query % (user, index)
                     password = inject.getValue(query, inband=False)
+                    if kb.dbms == "Sybase":
+                        conf.verbose = popValue()
+                        password = "0x%s" % strToHex(password)
+                        infoMsg = "retrieved: %s" % password
+                        logger.info(infoMsg)
                     password = parsePasswordHash(password)
                     passwords.append(password)
 
