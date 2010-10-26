@@ -51,7 +51,7 @@ def errorUse(expression):
         nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
 
         if kb.dbms == "MySQL":
-            nulledCastedField            = nulledCastedField.replace("AS CHAR)", "AS CHAR(255))") #fix for that 'Subquery returns more than 1 row'
+            nulledCastedField            = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
 
         expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
         expressionUnescaped              = unescaper.unescape(expressionReplaced)
@@ -69,8 +69,8 @@ def errorUse(expression):
 
     payload = agent.payload(newValue=forgedQuery)
     result = Request.queryPage(urlencode(payload), content=True)
-
     match = re.search('%s(?P<result>.*?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
+
     if match:
         output = match.group('result')
         if output:
