@@ -51,7 +51,7 @@ def errorUse(expression):
         nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
 
         if kb.dbms == "MySQL":
-            nulledCastedField            = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
+            nulledCastedField            = nulledCastedField.replace("AS CHAR)", "AS CHAR(147))") # fix for that 'Subquery returns more than 1 row'
 
         expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
         expressionUnescaped              = unescaper.unescape(expressionReplaced)
