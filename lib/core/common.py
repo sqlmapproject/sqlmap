@@ -1506,13 +1506,20 @@ def beep():
 
     if sys.platform == 'linux2':
         try:
-            audio = file('/dev/audio', 'wb')
+            if os.path.exists('/dev/audio'):
+                audio = file('/dev/audio', 'wb')
 
-            for i in xrange(250):
-                audio.write(chr(32) * 4)
-                audio.write(chr(0) * 4)
+                for i in xrange(250):
+                    audio.write(chr(32) * 4)
+                    audio.write(chr(0) * 4)
 
-            audio.close()
+                audio.close()
+            else:
+                import curses
+
+                curses.initscr()
+                curses.beep()
+                curses.endwin()
         except:
             dataToStdout('\a', True)
     else:
