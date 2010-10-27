@@ -11,6 +11,10 @@
         <info sp="1"/>
     </regexp>
 
+    <regexp value="Windows.*7\.5">
+        <info type="Windows" distrib="2008"/>
+    </regexp>
+
     <regexp value="Windows.*7\.0">
         <info type="Windows" distrib="Vista"/>
     </regexp>
