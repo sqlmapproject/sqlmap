@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
+import ctypes
 import inspect
 import os
 import random
@@ -1531,3 +1532,28 @@ def beep():
 
     else:
         dataToStdout('\a', True)
+
+def runningAsAdmin():
+    isAdmin = False
+
+    if PLATFORM in ( "posix", "mac" ):
+        isAdmin = os.geteuid()
+
+        if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
+            isAdmin = True
+    elif IS_WIN:
+        isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
+
+        if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
+            isAdmin = True
+    else:
+        errMsg  = "sqlmap is not able to check if you are running it "
+        errMsg += "as an administrator accout on this platform. "
+        errMsg += "sqlmap will assume that you are an administrator "
+        errMsg += "which is mandatory for the requested takeover attack "
+        errMsg += "to work properly"
+        logger.error(errMsg)
+
+        isAdmin = True
+
+    return isAdmin

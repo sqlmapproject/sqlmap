@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import codecs
 import cookielib
-import ctypes
 import difflib
 import inspect
 import logging
@@ -31,6 +30,7 @@ from lib.core.common import parseTargetDirect
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
+from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
@@ -340,12 +340,10 @@ def __setMetasploit():
     msfEnvPathExists = False
 
     if IS_WIN:
-        warnMsg  = "Metasploit's msfconsole and msfcli are not supported "
-        warnMsg += "on the native Windows Ruby interpreter. Please "
-        warnMsg += "install Metasploit, Python interpreter and sqlmap on "
-        warnMsg += "Cygwin or use Linux in VMWare to use sqlmap takeover "
-        warnMsg += "out-of-band features. sqlmap will now continue "
-        warnMsg += "without calling any takeover feature"
+        warnMsg  = "some sqlmap takeover functionalities are not yet "
+        warnMsg += "supported on Windows. Please use Linux in a virtual "
+        warnMsg += "machine for out-of-band features. sqlmap will now "
+        warnMsg += "carry on ignoring out-of-band switches"
         logger.warn(warnMsg)
 
         conf.osPwn = None
@@ -355,35 +353,13 @@ def __setMetasploit():
         return
 
     if conf.osSmb:
-        isAdmin = False
-
-        if PLATFORM in ( "posix", "mac" ):
-            isAdmin = os.geteuid()
-
-            if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
-                isAdmin = True
-
-        elif IS_WIN:
-            isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
-
-            if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
-                isAdmin = True
-
-        else:
-            warnMsg  = "sqlmap is not able to check if you are running it "
-            warnMsg += "as an Administrator accout on this platform. "
-            warnMsg += "sqlmap will assume that you are an Administrator "
-            warnMsg += "which is mandatory for the SMB relay attack to "
-            warnMsg += "work properly"
-            logger.warn(warnMsg)
-
-            isAdmin = True
+        isAdmin = runningAsAdmin()
 
         if isAdmin is not True:
-            errMsg  = "you need to run sqlmap as an Administrator/root "
-            errMsg += "user if you want to perform a SMB relay attack "
-            errMsg += "because it will need to listen on a user-specified "
-            errMsg += "SMB TCP port for incoming connection attempts"
+            errMsg  = "you need to run sqlmap as an administrator "
+            errMsg += "if you want to perform a SMB relay attack because "
+            errMsg += "it will need to listen on a user-specified SMB "
+            errMsg += "TCP port for incoming connection attempts"
             raise sqlmapMissingPrivileges, errMsg
 
     if conf.msfPath:
