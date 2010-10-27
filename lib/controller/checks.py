@@ -104,10 +104,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
             postfix = conf.postfix
 
     payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
-
-    if place == "URI":
-        payload = conf.paramDict[place][parameter].replace('*', payload)
-
+    payload = agent.payload(place, parameter, value, payload)
     Request.queryPage(payload, place)
     result = wasLastRequestError()
 
