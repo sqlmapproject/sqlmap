@@ -7,6 +7,8 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
+
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.data import conf
@@ -109,7 +111,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 warnMsg = "invalid value, valid values are 1 and 2"
                 logger.warn(warnMsg)
 
-        if tunnel == 2 and kb.dbms != "Windows":
+        if tunnel == 2 and kb.os != "Windows":
                 errMsg = "icmpsh slave is only supported on Windows at "
                 errMsg += "the moment. The back-end database server is "
                 errMsg += "not. sqlmap will fallback to TCP (Metasploit)"
@@ -135,6 +137,21 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "in order to run icmpsh master. Download from "
                 errMsg += "http://oss.coresecurity.com/projects/impacket.html"
                 raise sqlmapMissingDependence, errMsg
+
+            sysIgnoreIcmp = "/proc/sys/net/ipv4/icmp_echo_ignore_all"
+
+            if os.path.exists(sysIgnoreIcmp):
+                fp = open(sysIgnoreIcmp, "wb")
+                fp.write("1")
+                fp.close()
+            else:
+                errMsg = "you need to disable ICMP replies by your machine "
+                errMsg += "system-wide. For example run on Linux/Unix:\n"
+                errMsg += "# sysctl -w net.ipv4.icmp_echo_ignore_all=1\n"
+                errMsg += "If you miss doing that, you will receive "
+                errMsg += "information from the database server and it "
+                errMsg += "is unlikely to receive commands send from you"
+                logger.error(errMsg)
 
         if kb.stackedTest or conf.direct:
             web = False

