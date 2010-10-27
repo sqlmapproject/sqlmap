@@ -25,8 +25,11 @@ import select
 import socket
 import sys
 
-from impacket import ImpactDecoder
-from impacket import ImpactPacket
+try:
+    from impacket import ImpactDecoder
+    from impacket import ImpactPacket
+except ImportError, _:
+    pass
 
 def main(src, dst):
     # Make standard input a non-blocking file

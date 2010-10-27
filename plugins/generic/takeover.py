@@ -12,6 +12,7 @@ from lib.core.common import runningAsAdmin
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapMissingPrivileges
 from lib.core.exception import sqlmapNotVulnerableException
@@ -125,6 +126,15 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "tunnel because icmpsh uses raw sockets to "
                 errMsg += "sniff and craft ICMP packets"
                 raise sqlmapMissingPrivileges, errMsg
+
+            try:
+                from impacket import ImpactDecoder
+                from impacket import ImpactPacket
+            except ImportError, _:
+                errMsg  = "sqlmap requires 'impacket' third-party library "
+                errMsg += "in order to run icmpsh master. Download from "
+                errMsg += "http://oss.coresecurity.com/projects/impacket.html"
+                raise sqlmapMissingDependence, errMsg
 
         if kb.stackedTest or conf.direct:
             web = False
