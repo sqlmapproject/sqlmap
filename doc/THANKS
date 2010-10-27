@@ -199,6 +199,9 @@ John J. Lee <jjl@pobox.com> & others
 Nico Leidecker <nico@leidecker.info>
     for providing me with feedback on a few features
     for reporting a couple of bugs
+    for their great tool icmpsh included in sqlmap tree for future
+    enhancements to the takeover functionalities,
+    http://leidecker.info/downloads/icmpsh.zip
 
 Gabriel Lima <pato@bugnet.com.br>
     for reporting a couple of bugs
