@@ -138,11 +138,6 @@ class Connect:
             else:
                 req = urllib2.Request(url, post, headers)
 
-            if not req.has_header("Accept-Encoding"):
-                requestHeaders += "Accept-Encoding: identity\n"
-
-            requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
-
             if not conf.dropSetCookie and conf.cj:
                 for _, cookie in enumerate(conf.cj):
                     if not cookieStr:
@@ -153,12 +148,10 @@ class Connect:
 
                     cookieStr += "%s; " % cookie[8:index]
 
-            if not req.has_header("Cookie") and cookieStr:
-                requestHeaders += "\n%s" % cookieStr[:-2]
-
-            if not req.has_header("Connection"):
-                requestHeaders += "\nConnection: close"
-
+            conn = urllib2.urlopen(req)
+            
+            requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
+            
             requestMsg += "\n%s" % requestHeaders
 
             if post:
@@ -167,8 +160,6 @@ class Connect:
             requestMsg += "\n"
 
             logger.log(9, requestMsg)
-
-            conn = urllib2.urlopen(req)
 
             if not kb.authHeader and req.has_header("Authorization"):
                 kb.authHeader = req.get_header("Authorization")
