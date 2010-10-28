@@ -122,14 +122,14 @@ class HTTPHandler(urllib2.HTTPHandler):
                 data = req.get_data()
                 h.putrequest('POST', req.get_selector())
                 if not req.headers.has_key('Content-type'):
-                    h.putheader('Content-type', 'application/x-www-form-urlencoded')
+                    req.headers['Content-type'] = 'application/x-www-form-urlencoded'
                 if not req.headers.has_key('Content-length'):
-                    h.putheader('Content-length', '%d' % len(data))
+                    req.headers['Content-length'] = '%d' % len(data)
             else:
                 h.putrequest('GET', req.get_selector())
 
             if not req.headers.has_key('Connection'):
-                h.putheader('Connection', 'keep-alive')
+                req.headers['Connection'] = 'keep-alive'
 
             for args in self.parent.addheaders:
                 h.putheader(*args)
