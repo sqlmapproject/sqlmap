@@ -146,13 +146,10 @@ class Filesystem(GenericFilesystem):
 
             logger.debug("moving binary file %s to %s" % (sFile, dFile))
 
-            commands   = ("cd \"%s\"" % tmpPath,
-                          "ren %s %s" % (chunkName, dFileName),
-                          "move /Y %s %s" % (dFileName, dFile))
-            complComm  = " & ".join(command for command in commands)
-            forgedCmd  = self.xpCmdshellForgeCmd(complComm)
+            commands = ("cd \"%s\"" % tmpPath, "ren %s %s" % (chunkName, dFileName), "move /Y %s %s" % (dFileName, dFile))
+            complComm = " & ".join(command for command in commands)
 
-            self.execCmd(forgedCmd)
+            self.execCmd(complComm)
 
         else:
             infoMsg  = "the %s file is bigger than %d " % (fileType, debugSize)
@@ -177,13 +174,10 @@ class Filesystem(GenericFilesystem):
                 infoMsg += "%s\%s to %s\%s" % (tmpPath, chunkName, tmpPath, dFileName)
                 logger.debug(infoMsg)
 
-                commands   = ("cd %s" % tmpPath,
-                               copyCmd,
-                               "del /F %s" % chunkName)
-                complComm  = " & ".join(command for command in commands)
-                forgedCmd  = self.xpCmdshellForgeCmd(complComm)
+                commands = ("cd %s" % tmpPath, copyCmd, "del /F %s" % chunkName)
+                complComm = " & ".join(command for command in commands)
 
-                self.execCmd(forgedCmd)
+                self.execCmd(complComm)
 
                 logger.info("file chunk %d written" % counter)
 
@@ -193,12 +187,10 @@ class Filesystem(GenericFilesystem):
 
             logger.debug("moving binary file %s to %s" % (sFile, dFile))
 
-            commands  = ("cd %s" % tmpPath,
-                         "move /Y %s %s" % (dFileName, dFile))
+            commands = ("cd %s" % tmpPath, "move /Y %s %s" % (dFileName, dFile))
             complComm = " & ".join(command for command in commands)
-            forgedCmd = self.xpCmdshellForgeCmd(complComm)
 
-            self.execCmd(forgedCmd)
+            self.execCmd(complComm)
 
         if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)

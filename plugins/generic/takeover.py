@@ -153,6 +153,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "is unlikely to receive commands send from you"
                 logger.error(errMsg)
 
+            self.sysUdfs.pop("sys_bineval")
+
         if kb.stackedTest or conf.direct:
             web = False
 
@@ -207,7 +209,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             elif tunnel == 2:
                 self.uploadIcmpshSlave(web=web)
                 self.icmpPwn()
-                
+
         elif not kb.stackedTest and kb.dbms == "MySQL":
             web = True
 
@@ -244,8 +246,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             if not web or (web and self.webBackdoorUrl is not None):
                 self.pwn(goUdf)
 
-            if not conf.cleanup:
-                self.cleanup()
+        if not conf.cleanup:
+            self.cleanup()
 
     def osSmb(self):
         stackedTest()

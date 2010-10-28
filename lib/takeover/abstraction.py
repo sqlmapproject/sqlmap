@@ -32,7 +32,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
         Web.__init__(self)
         xp_cmdshell.__init__(self)
 
-    def execCmd(self, cmd, silent=False, forgeCmd=False):
+    def execCmd(self, cmd, silent=False):
         if self.webBackdoorUrl and not kb.stackedTest:
             self.webBackdoorRunCmd(cmd)
 
@@ -40,7 +40,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             self.udfExecCmd(cmd, silent=silent)
 
         elif kb.dbms == "Microsoft SQL Server":
-            self.xpCmdshellExecCmd(cmd, silent, forgeCmd)
+            self.xpCmdshellExecCmd(cmd, silent)
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
@@ -79,7 +79,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             else:
                 dataToStdout("No output\n")
         else:
-            self.execCmd(cmd, forgeCmd=True)
+            self.execCmd(cmd)
 
     def shell(self):
         if self.webBackdoorUrl and not kb.stackedTest:

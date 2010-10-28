@@ -87,7 +87,7 @@ class Registry:
             if index != -1:
                 data = data[index + len(pattern):]
 
-        self.delRemoteFile(self.__batPathRemote, doubleslash=True)
+        self.delRemoteFile(self.__batPathRemote)
 
         return data
 
@@ -101,8 +101,8 @@ class Registry:
         debugMsg += "to registry key '%s'" % self.__regKey
         logger.debug(debugMsg)
 
-        self.execCmd(cmd=self.__batPathRemote, forgeCmd=True)
-        self.delRemoteFile(self.__batPathRemote, doubleslash=True)
+        self.execCmd(cmd=self.__batPathRemote)
+        self.delRemoteFile(self.__batPathRemote)
 
     def delRegKey(self, regKey, regValue):
         self.__operation = "delete"
@@ -114,5 +114,5 @@ class Registry:
         debugMsg += "from registry key '%s'" % self.__regKey
         logger.debug(debugMsg)
 
-        self.execCmd(cmd=self.__batPathRemote, forgeCmd=True)
-        self.delRemoteFile(self.__batPathRemote, doubleslash=True)
+        self.execCmd(cmd=self.__batPathRemote)
+        self.delRemoteFile(self.__batPathRemote)

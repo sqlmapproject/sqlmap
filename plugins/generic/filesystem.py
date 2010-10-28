@@ -205,26 +205,18 @@ class Filesystem:
             charCounter += len(forgedScrLine)
 
             if charCounter >= maxLen:
-                forgedCmd = self.xpCmdshellForgeCmd(cmd)
-                self.execCmd(forgedCmd)
+                self.execCmd(cmd)
 
-                cmd         = ""
+                cmd = ""
                 charCounter = 0
 
         if cmd:
-            forgedCmd = self.xpCmdshellForgeCmd(cmd)
-            self.execCmd(forgedCmd)
+            self.execCmd(cmd)
 
-        commands = (
-                     "cd %s" % tmpPath,
-                     "debug < %s" % randScr,
-                     "del /F /Q %s" % randScr
-                   )
-
+        commands = ( "cd %s" % tmpPath, "debug < %s" % randScr, "del /F /Q %s" % randScr )
         complComm = " & ".join(command for command in commands)
-        forgedCmd = self.xpCmdshellForgeCmd(complComm)
 
-        self.execCmd(forgedCmd, silent=True)
+        self.execCmd(complComm, silent=True)
 
         return chunkName
 

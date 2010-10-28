@@ -397,9 +397,6 @@ class Metasploit:
 
         cmd = "%s &" % self.exeFilePathRemote
 
-        if kb.dbms == "Microsoft SQL Server" and (kb.stackedTest or conf.direct):
-            cmd = self.xpCmdshellForgeCmd(cmd)
-
         self.execCmd(cmd, silent=True)
 
     def __loadMetExtensions(self, proc, metSess):
@@ -648,7 +645,8 @@ class Metasploit:
         logger.debug(debugMsg)
 
         if not goUdf:
-            self.delRemoteFile(self.exeFilePathRemote, doubleslash=True)
+            time.sleep(1)
+            self.delRemoteFile(self.exeFilePathRemote)
 
     def smb(self):
         self.__initVars()

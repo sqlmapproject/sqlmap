@@ -93,7 +93,7 @@ def main(src, dst):
                 except:
                     pass
 
-                if cmd == 'exit':
+                if cmd == 'exit\n':
                     return
 
                 # Set sequence number and identifier
