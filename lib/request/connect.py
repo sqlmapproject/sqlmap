@@ -150,8 +150,17 @@ class Connect:
 
             conn = urllib2.urlopen(req)
             
+            if not req.has_header("Accept-Encoding"):
+                requestHeaders += "Accept-Encoding: identity\n"
+
             requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
-            
+
+            if not req.has_header("Cookie") and cookieStr:
+                requestHeaders += "\n%s" % cookieStr[:-2]
+
+            if not req.has_header("Connection"):
+                requestHeaders += "\nConnection: close"
+
             requestMsg += "\n%s" % requestHeaders
 
             if post:
