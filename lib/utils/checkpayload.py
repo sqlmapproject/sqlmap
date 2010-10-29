@@ -50,9 +50,6 @@ def checkPayload(payload):
 
     if payload:
         for rule, desc in rules:
-            try:
-                regObj = getCompiledRegex(rule)
-                if regObj.search(payload):
-                    logger.warn("highly probable IDS/IPS detection: '%s: %s'" % (desc, payload))
-            except: # Some issues with some regex expressions in Python 2.5
-                pass
+            regObj = getCompiledRegex(rule)
+            if regObj.search(payload):
+                logger.warn("highly probable IDS/IPS detection: '%s: %s'" % (desc, payload))
