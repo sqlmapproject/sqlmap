@@ -702,7 +702,7 @@ class Enumeration:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             logger.error(errMsg)
-            
+
             message = "do you want to use common table existance check? [Y/n/q]"
             test = readInput(message, default="Y")
 
@@ -710,7 +710,7 @@ class Enumeration:
                 return
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
-            else:    
+            else:
                 return self.tableExists(paths.COMMON_TABLES)
 
         self.forceDbmsEnum()
@@ -827,7 +827,7 @@ class Enumeration:
         return kb.data.cachedTables
 
     def tableExists(self, tableFile):
-        tables = getFileItems(tableFile)
+        tables = getFileItems(tableFile, None)
         retVal = []
         infoMsg = "checking tables existence using items from '%s'" % tableFile
         logger.info(infoMsg)

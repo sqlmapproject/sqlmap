@@ -1309,15 +1309,16 @@ def initCommonOutputs():
 
     cfile.close()
 
-def getFileItems(filename):
+def getFileItems(filename, commentPrefix='#'):
     retVal = []
 
     checkFile(filename)
     ifile = codecs.open(filename, 'r', conf.dataEncoding)
 
     for line in ifile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
-        if line.find('#') != -1:
-            line = line[:line.find('#')]
+        if commentPrefix:
+            if line.find(commentPrefix) != -1:
+                line = line[:line.find(commentPrefix)]
         line = line.strip()
         if line:
             retVal.append(line)
