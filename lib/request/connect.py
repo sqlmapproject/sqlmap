@@ -315,12 +315,16 @@ class Connect:
 
         if place == "GET":
             value = agent.removePayloadDelimiters(value, True)
+
         elif place == "POST":
-            value = agent.removePayloadDelimiters(value, False)
+            value = agent.removePayloadDelimiters(value, True)
+
         elif place == "Cookie":
             value = agent.removePayloadDelimiters(value, conf.cookieUrlencode)
+
         elif place == "User-Agent":
             value = agent.removePayloadDelimiters(value, True)
+
         elif place == "URI":
             value = agent.removePayloadDelimiters(value, False)
 
