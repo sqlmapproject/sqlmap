@@ -153,7 +153,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "is unlikely to receive commands send from you"
                 logger.error(errMsg)
 
-            self.sysUdfs.pop("sys_bineval")
+            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                self.sysUdfs.pop("sys_bineval")
 
         if kb.stackedTest or conf.direct:
             web = False

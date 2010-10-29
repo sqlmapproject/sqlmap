@@ -40,7 +40,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             self.udfExecCmd(cmd, silent=silent)
 
         elif kb.dbms == "Microsoft SQL Server":
-            self.xpCmdshellExecCmd(cmd, silent)
+            self.xpCmdshellExecCmd(cmd, silent=silent)
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"

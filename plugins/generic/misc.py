@@ -84,10 +84,10 @@ class Miscellaneous:
         else:
             cmd = "rm -f %s" % tempFile
 
-        self.execCmd(cmd)
+        self.execCmd(cmd, silent=True)
 
     def createSupportTbl(self, tblName, tblField, tblType):
-        inject.goStacked("DROP TABLE %s" % tblName)
+        inject.goStacked("DROP TABLE %s" % tblName, silent=True)
         inject.goStacked("CREATE TABLE %s(%s %s)" % (tblName, tblField, tblType))
 
     def cleanup(self, onlyFileTbl=False, udfDict=None):
@@ -115,10 +115,10 @@ class Miscellaneous:
             logger.info("cleaning up the database management system")
 
         logger.debug("removing support tables")
-        inject.goStacked("DROP TABLE %s" % self.fileTblName)
+        inject.goStacked("DROP TABLE %s" % self.fileTblName, silent=True)
 
         if not onlyFileTbl:
-            inject.goStacked("DROP TABLE %s" % self.cmdTblName)
+            inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
 
             if kb.dbms == "Microsoft SQL Server":
                 return
@@ -138,7 +138,7 @@ class Miscellaneous:
                         dropStr += "(%s)" % inp
 
                     logger.debug("removing UDF '%s'" % udf)
-                    inject.goStacked(dropStr)
+                    inject.goStacked(dropStr, silent=True)
 
             logger.info("database management system cleanup finished")
 
