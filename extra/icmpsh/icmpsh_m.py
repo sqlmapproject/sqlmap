@@ -19,23 +19,41 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import fcntl
 import os
 import select
 import socket
+import subprocess
 import sys
 
-try:
-    from impacket import ImpactDecoder
-    from impacket import ImpactPacket
-except ImportError, _:
-    pass
+def checkImpacketLibs():
+    try:
+        from impacket import ImpactDecoder
+        from impacket import ImpactPacket
+    except ImportError:
+        sys.stderr.write('You need to install Python Impacket library first\n')
+        sys.exit(255)
+
+def setNonBlocking(fd):
+    """
+    Make a file descriptor non-blocking
+    """
+
+    import fcntl
+
+    flags = fcntl.fcntl(fd, fcntl.F_GETFL)
+    flags = flags | os.O_NONBLOCK
+    fcntl.fcntl(fd, fcntl.F_SETFL, flags)
 
 def main(src, dst):
+    if subprocess.mswindows:
+        sys.stderr.write('ERROR: icmpsh master can only be run on Posix systems\n')
+        sys.exit(255)
+
+    checkImpacketLibs()
+
     # Make standard input a non-blocking file
-    fd = sys.stdin.fileno()
-    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+    stdin_fd = sys.stdin.fileno()
+    setNonBlocking(stdin_fd)
 
     # Open one socket for ICMP protocol
     # A special option is set on the socket so that IP headers are included
@@ -114,8 +132,12 @@ def main(src, dst):
                 sock.sendto(ip.get_packet(), (dst, 0))
 
 if __name__ == '__main__':
+    if subprocess.mswindows:
+        print 'ERROR: this icmpsh master can only be run on Posix systems'
+        sys.exit(1)
+
     if len(sys.argv) < 3:
-        print 'missing mandatory options. Execute as root:'
+        print 'ERROR: missing mandatory options. Execute as root:'
         print './icmpsh-m.py <source IP address> <destination IP address>'
         sys.exit(1)
 
