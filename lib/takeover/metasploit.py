@@ -24,7 +24,6 @@ from lib.core.common import getRemoteIP
 from lib.core.common import getUnicode
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
-from lib.core.common import pollProcess
 from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -35,6 +34,7 @@ from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
+from lib.core.subprocessng import pollProcess
 from lib.core.subprocessng import setNonBlocking
 from lib.request.connect import Connect as Request
 from lib.takeover.upx import upx

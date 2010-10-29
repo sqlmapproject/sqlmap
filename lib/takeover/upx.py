@@ -17,10 +17,10 @@ from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
 from lib.core.common import decloakToMkstemp
-from lib.core.common import pollProcess
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.settings import PLATFORM
+from lib.core.subprocessng import pollProcess
 
 class UPX:
     """

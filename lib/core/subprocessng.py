@@ -12,6 +12,7 @@ import os
 import sys
 import time
 
+from lib.core.common import dataToStdout
 from lib.core.settings import IS_WIN
 
 if not IS_WIN:
@@ -71,3 +72,20 @@ def setNonBlocking(fd):
         flags = fcntl.fcntl(fd, FCNTL.F_GETFL)
         flags = flags | os.O_NONBLOCK
         fcntl.fcntl(fd, FCNTL.F_SETFL, flags)
+
+def pollProcess(process):
+    while True:
+        dataToStdout(".")
+        time.sleep(1)
+
+        returncode = process.poll()
+
+        if returncode is not None:
+            if returncode == 0:
+                dataToStdout(" done\n")
+            elif returncode < 0:
+                dataToStdout(" process terminated by signal %d\n" % returncode)
+            elif returncode > 0:
+                dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
+
+            break

@@ -949,23 +949,6 @@ def getFileType(filePath):
     else:
         return "binary"
 
-def pollProcess(process):
-    while True:
-        dataToStdout(".")
-        time.sleep(1)
-
-        returncode = process.poll()
-
-        if returncode is not None:
-            if returncode == 0:
-                dataToStdout(" done\n")
-            elif returncode < 0:
-                dataToStdout(" process terminated by signal %d\n" % returncode)
-            elif returncode > 0:
-                dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
-
-            break
-
 def getCharset(charsetType=None):
     asciiTbl = []
 

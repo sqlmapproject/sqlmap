@@ -26,7 +26,6 @@ from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
-from lib.core.common import pollProcess
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
@@ -34,6 +33,7 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.settings import MSSQL_VERSIONS_URL
+from lib.core.subprocessng import pollProcess
 from lib.request.connect import Connect as Request
 
 def __updateMSSQLXML():
