@@ -25,14 +25,6 @@ import socket
 import subprocess
 import sys
 
-def checkLibs():
-    try:
-        from impacket import ImpactDecoder
-        from impacket import ImpactPacket
-    except ImportError:
-        sys.stderr.write('You need to install Python Impacket library first\n')
-        sys.exit(255)
-
 def setNonBlocking(fd):
     """
     Make a file descriptor non-blocking
@@ -49,7 +41,12 @@ def main(src, dst):
         sys.stderr.write('icmpsh master can only run on Posix systems\n')
         sys.exit(255)
 
-    checkLibs()
+    try:
+        from impacket import ImpactDecoder
+        from impacket import ImpactPacket
+    except ImportError:
+        sys.stderr.write('You need to install Python Impacket library first\n')
+        sys.exit(255)
 
     # Make standard input a non-blocking file
     stdin_fd = sys.stdin.fileno()
