@@ -19,6 +19,7 @@ from operator import itemgetter
 
 def main():
 
+    TIMEOUT         = 10
     CONFIG_FILE     = 'sqlharvest.cfg'
     TABLES_FILE     = 'tables.txt'
     USER_AGENT      = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; AskTB5.3)'
@@ -60,8 +61,7 @@ def main():
     except:
         pass
 
-    timeout = 10
-    socket.setdefaulttimeout(timeout)
+    socket.setdefaulttimeout(TIMEOUT)
 
     files, oldFiles = None, None
     try:
