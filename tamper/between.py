@@ -17,15 +17,12 @@ def tamper(value):
 
     if value:
         retVal = ""
-        quote, doublequote, firstspace = False, False, False
+        quote, doublequote = False, False
 
         for i in xrange(len(value)):
-            if not firstspace:
-
-                if value[i].isspace():
-                    firstspace = True
-                    retVal += " "
-                    continue
+            if value[i].isspace():
+                retVal += " "
+                continue
 
             elif value[i] == '\'':
                 quote = not quote
