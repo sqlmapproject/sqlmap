@@ -308,9 +308,11 @@ class Connect:
 
         if kb.tamperFunctions:
             payload = agent.extractPayload(value)
+
             if payload:
                 for function in kb.tamperFunctions:
                     payload = function(payload)
+
                 value = agent.replacePayload(value, payload)
 
         if place == "GET":
