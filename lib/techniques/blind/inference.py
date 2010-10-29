@@ -22,7 +22,6 @@ from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
-from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -122,7 +121,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, posValue))
             queriesCount[0] += 1
-            result = Request.queryPage(urlencode(forgedPayload))
+            result = Request.queryPage(forgedPayload)
 
             if result:
                 return hintValue[idx-1]
@@ -153,7 +152,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if len(charTbl) == 1:
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
             queriesCount[0] += 1
-            result = Request.queryPage(urlencode(forgedPayload))
+            result = Request.queryPage(forgedPayload)
 
             if result:
                 return chr(charTbl[0]) if charTbl[0] < 128 else unichr(charTbl[0])
@@ -174,7 +173,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
 
             queriesCount[0] += 1
-            result = Request.queryPage(urlencode(forgedPayload))
+            result = Request.queryPage(forgedPayload)
 
             if kb.dbms in ("SQLite", "Microsoft Access", "SAP MaxDB"):
                 posValue = popValue()
@@ -226,7 +225,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
                         forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
                         queriesCount[0] += 1
-                        result = Request.queryPage(urlencode(forgedPayload))
+                        result = Request.queryPage(forgedPayload)
 
                         if result:
                             return chr(retVal) if retVal < 128 else unichr(retVal)
@@ -444,7 +443,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
                     query = agent.postfixQuery(query)
                     queriesCount[0] += 1
-                    result = Request.queryPage(urlencode(agent.payload(newValue=query)))
+                    result = Request.queryPage(agent.payload(newValue=query))
 
                     # Did we have luck?
                     if result:
@@ -468,7 +467,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                     query = agent.postfixQuery(query)
                     queriesCount[0] += 1
-                    result = Request.queryPage(urlencode(agent.payload(newValue=query)))
+                    result = Request.queryPage(agent.payload(newValue=query))
 
                     # Did we have luck?
                     if result:

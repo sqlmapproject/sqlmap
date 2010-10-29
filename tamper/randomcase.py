@@ -10,8 +10,6 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.common import randomRange
-from lib.core.convert import urldecode
-from lib.core.convert import urlencode
 from lib.core.data import kb
 
 def tamper(place, value):
@@ -23,9 +21,6 @@ def tamper(place, value):
     retVal = value
 
     if value:
-        if place != "URI":
-            retVal = urldecode(retVal)
-
         for match in re.finditer(r"[A-Za-z_]+", retVal):
             word = match.group()
 
@@ -36,8 +31,5 @@ def tamper(place, value):
                     newWord += word[i].upper() if randomRange(0, 1) else word[i].lower()
 
                 retVal = retVal.replace(word, newWord)
-
-        if place != "URI":
-            retVal = urlencode(retVal)
 
     return retVal

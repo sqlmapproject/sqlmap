@@ -35,9 +35,6 @@ def forgeHeaders(cookie, ua):
 
     for header, value in conf.httpHeaders:
         if cookie and header == "Cookie":
-            if conf.cookieUrlencode:
-                cookie = urlEncodeCookieValues(cookie)
-
             headers[header] = cookie
         elif ua and header == "User-Agent":
             headers[header] = ua

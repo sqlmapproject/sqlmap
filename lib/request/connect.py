@@ -16,6 +16,7 @@ import urlparse
 import traceback
 
 from lib.contrib import multipartpost
+from lib.core.agent import agent
 from lib.core.common import readInput
 from lib.core.common import getUnicode
 from lib.core.convert import urlencode
@@ -107,7 +108,6 @@ class Connect:
                     get = conf.parameters["GET"]
 
                 if get:
-                    get = urlencode(get)
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
 
@@ -149,7 +149,7 @@ class Connect:
                     cookieStr += "%s; " % cookie[8:index]
 
             conn = urllib2.urlopen(req)
-            
+
             if not req.has_header("Accept-Encoding"):
                 requestHeaders += "Accept-Encoding: identity\n"
 
@@ -307,8 +307,22 @@ class Connect:
             place = kb.injPlace
 
         if kb.tamperFunctions:
-            for function in kb.tamperFunctions:
-                value = function(place, value)
+            payload = agent.extractPayload(value)
+            if payload:
+                for function in kb.tamperFunctions:
+                    payload = function(payload)
+                value = agent.replacePayload(value, payload)
+
+        if place == "GET":
+            value = agent.removePayloadDelimiters(value, True)
+        elif place == "POST":
+            value = agent.removePayloadDelimiters(value, False)
+        elif place == "Cookie":
+            value = agent.removePayloadDelimiters(value, conf.cookieUrlencode)
+        elif place == "User-Agent":
+            value = agent.removePayloadDelimiters(value, True)
+        elif place == "URI":
+            value = agent.removePayloadDelimiters(value, False)
 
         if conf.checkPayload:
             checkPayload(value)

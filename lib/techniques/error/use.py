@@ -15,7 +15,6 @@ from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
-from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -68,7 +67,7 @@ def errorUse(expression):
     logger.debug(debugMsg)
 
     payload = agent.payload(newValue=forgedQuery)
-    result = Request.queryPage(urlencode(payload), content=True)
+    result = Request.queryPage(payload, content=True)
     match = re.search('%s(?P<result>.*?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
 
     if match:

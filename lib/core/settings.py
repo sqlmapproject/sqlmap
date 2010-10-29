@@ -46,6 +46,8 @@ ERROR_EMPTY_CHAR   = ":x:"
 ERROR_START_CHAR   = ":s:"
 ERROR_END_CHAR     = ":e:"
 
+PAYLOAD_DELIMITER  = "\x00"
+
 # System variables
 IS_WIN             = subprocess.mswindows
 # The name of the operating system dependent module imported. The following

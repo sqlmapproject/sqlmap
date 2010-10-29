@@ -11,6 +11,7 @@ import re
 
 from xml.etree import ElementTree as ET
 
+from lib.core.common import getCompiledRegex
 from lib.core.common import getInjectionCase
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -20,6 +21,7 @@ from lib.core.data import kb
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import PAYLOAD_DELIMITER
 
 class Agent:
     """
@@ -54,18 +56,17 @@ class Agent:
         falseValue = ""
         negValue   = ""
         retValue   = ""
-        newValue   = urlencode(newValue) if place != "URI" else newValue
 
         if negative or kb.unionNegative:
             negValue = "-"
         elif falseCond or kb.unionFalseCond:
             randInt = randomInt()
-            falseValue = urlencode(" AND %d=%d" % (randInt, randInt + 1))
+            falseValue = " AND %d=%d" % (randInt, randInt + 1)
 
         # After identifing the injectable parameter
         if kb.injPlace == "User-Agent":
             retValue = kb.injParameter.replace(kb.injParameter,
-                                               "%s%s" % (negValue, kb.injParameter + falseValue + newValue))
+                                               self.addPayloadDelimiters("%s%s" % (negValue, kb.injParameter + falseValue + newValue)))
         elif kb.injParameter:
             paramString = conf.parameters[kb.injPlace]
             paramDict = conf.paramDict[kb.injPlace]
@@ -76,21 +77,21 @@ class Agent:
                 iterator = root.getiterator(kb.injParameter)
 
                 for child in iterator:
-                    child.text = "%s%s" % (negValue, value + falseValue + newValue)
+                    child.text = self.addPayloadDelimiters(negValue + value + falseValue + newValue)
 
                 retValue = ET.tostring(root)
             elif kb.injPlace == "URI":
                 retValue = paramString.replace("*",
-                                               "%s%s" % (negValue, falseValue + newValue))
+                                               self.addPayloadDelimiters("%s%s" % (negValue, falseValue + newValue)))
             else:
                 retValue = paramString.replace("%s=%s" % (kb.injParameter, value),
-                                               "%s=%s%s" % (kb.injParameter, negValue, value + falseValue + newValue))
+                                               "%s=%s" % (kb.injParameter, self.addPayloadDelimiters(negValue + value + falseValue + newValue)))
 
         # Before identifing the injectable parameter
         elif parameter == "User-Agent":
-            retValue = value.replace(value, newValue)
+            retValue = value.replace(value, self.addPayloadDelimiters(newValue))
         elif place == "URI":
-            retValue = value.replace("*", "%s" % newValue.replace(value, str()))
+            retValue = value.replace("*", self.addPayloadDelimiters("%s" % newValue.replace(value, str())))
         else:
             paramString = conf.parameters[place]
 
@@ -99,12 +100,12 @@ class Agent:
                 iterator = root.getiterator(parameter)
 
                 for child in iterator:
-                    child.text = newValue
+                    child.text = self.addPayloadDelimiters(newValue)
 
                 retValue = ET.tostring(root)
             else:
                 retValue = paramString.replace("%s=%s" % (parameter, value),
-                                               "%s=%s" % (parameter, newValue))
+                                               "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
 
         return retValue
 
@@ -603,6 +604,61 @@ class Agent:
         """
 
         return queries[kb.dbms].case.query % expression
+
+    def addPayloadDelimiters(self, inpStr):
+        """
+        Adds payload delimiters around the input string
+        """
+        retVal = inpStr
+
+        if inpStr:
+            retVal = "%s%s%s" % (PAYLOAD_DELIMITER, inpStr, PAYLOAD_DELIMITER)
+
+        return retVal
+
+    def removePayloadDelimiters(self, inpStr, urlencode_=True):
+        """
+        Removes payload delimiters from inside the input string
+        """
+        retVal = inpStr
+
+        if inpStr:
+            if urlencode_:
+                regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
+
+                for match in regObj.finditer(inpStr):
+                    retVal = retVal.replace(match.group("result"), urlencode(match.group("result")[1:-1]))
+            else:
+                retVal = retVal.replace(PAYLOAD_DELIMITER, '')
+
+        return retVal
+
+    def extractPayload(self, inpStr):
+        """
+        Extracts payload from inside of the input string
+        """
+        retVal = None
+
+        if inpStr:
+            regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
+            match = regObj.search(inpStr)
+
+            if match:
+                retVal = match.group("result")[1:-1]
+
+        return retVal
+
+    def replacePayload(self, inpStr, payload):
+        """
+        Replaces payload inside the input string with a given payload
+        """
+        retVal = inpStr
+
+        if inpStr:
+            regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
+            retVal = regObj.sub("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr)
+
+        return retVal
 
 # SQL agent
 agent = Agent()

@@ -92,7 +92,7 @@ def bannerParser(banner):
     """
 
     xmlfile = None
-    
+
     if kb.dbms == "Microsoft SQL Server":
         xmlfile = paths.MSSQL_XML
     elif kb.dbms == "MySQL":
@@ -104,7 +104,7 @@ def bannerParser(banner):
 
     if not xmlfile:
         return
-        
+
     checkFile(xmlfile)
 
     if kb.dbms == "Microsoft SQL Server":

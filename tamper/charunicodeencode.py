@@ -11,7 +11,7 @@ import string
 
 from lib.core.exception import sqlmapUnsupportedFeatureException
 
-def tamper(place, value):
+def tamper(value):
     """
     Replaces value with unicode-urlencode of non-encoded chars in value
     Example: 'SELECT%20FIELD%20FROM%20TABLE' becomes '%u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
@@ -20,18 +20,15 @@ def tamper(place, value):
     retVal = value
 
     if value:
-        if place != "URI":
-            retVal = ""
-            i = 0
+        retVal = ""
+        i = 0
 
-            while i < len(value):
-                if value[i] == '%' and (i < len(value) - 2) and value[i+1] in string.hexdigits and value[i+2] in string.hexdigits:
-                    retVal += "%%u00%s" % value[i+1:i+3]
-                    i += 3
-                else:
-                    retVal += '%%u00%X' % ord(value[i])
-                    i += 1
-        else:
-            raise sqlmapUnsupportedFeatureException, "can't use tamper script '%s' with 'URI' type injections" % __name__
+        while i < len(value):
+            if value[i] == '%' and (i < len(value) - 2) and value[i+1] in string.hexdigits and value[i+2] in string.hexdigits:
+                retVal += "%%u00%s" % value[i+1:i+3]
+                i += 3
+            else:
+                retVal += '%%u00%X' % ord(value[i])
+                i += 1
 
     return retVal

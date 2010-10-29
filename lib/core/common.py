@@ -1532,7 +1532,7 @@ def runningAsAdmin():
             isAdmin = True
     else:
         errMsg  = "sqlmap is not able to check if you are running it "
-        errMsg += "as an administrator accout on this platform. "
+        errMsg += "as an administrator account on this platform. "
         errMsg += "sqlmap will assume that you are an administrator "
         errMsg += "which is mandatory for the requested takeover attack "
         errMsg += "to work properly"

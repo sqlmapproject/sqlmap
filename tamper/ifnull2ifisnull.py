@@ -7,18 +7,13 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.convert import urldecode
-from lib.core.convert import urlencode
-
-def tamper(place, value):
+def tamper(value):
     """
     Replaces 'IFNULL(A, B)' with 'IF(ISNULL(A), B, A)'
     Example: 'IFNULL(1, 2)' becomes 'IF(ISNULL(1), 2, 1)'
     """
 
     if value and value.find("IFNULL") > -1:
-        if place != "URI":
-            value = urldecode(value)
 
         while value.find("IFNULL(") > -1:
             index = value.find("IFNULL(")
@@ -28,11 +23,14 @@ def tamper(place, value):
             for i in xrange(index + len("IFNULL("), len(value)):
                 if deepness == 1 and value[i] == ',':
                     comma = i
+
                 elif deepness == 1 and value[i] == ')':
                     end = i
                     break
+
                 elif value[i] == '(':
                     deepness += 1
+
                 elif value[i] == ')':
                     deepness -= 1
 
@@ -43,8 +41,5 @@ def tamper(place, value):
                 value = value[:index] + newVal + value[end+1:]
             else:
                 break
-
-        if place != "URI":
-            value = urlencode(value)
 
     return value

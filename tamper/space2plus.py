@@ -7,10 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.convert import urldecode
-from lib.core.convert import urlencode
-
-def tamper(place, value):
+def tamper(value):
     """
     Replaces ' ' with '/**/'
     Example: 'SELECT id FROM users' becomes 'SELECT+id+FROM+users'
@@ -19,9 +16,6 @@ def tamper(place, value):
     retVal = value
 
     if value:
-        if place != "URI":
-            value = urldecode(value)
-
         retVal = ""
         quote, doublequote, firstspace = False, False, False
 
@@ -43,9 +37,6 @@ def tamper(place, value):
                 continue
 
             retVal += value[i]
-
-        if place != "URI":
-            retVal = urlencode(retVal)
 
     return retVal
 

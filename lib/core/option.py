@@ -556,14 +556,14 @@ def __setTamperingFunctions():
                 raise sqlmapSyntaxException, "can not import tamper script '%s' (%s)" % (filename[:-3], msg)
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "tamper" and function.func_code.co_argcount == 2:
+                if name == "tamper" and function.func_code.co_argcount == 1:
                     kb.tamperFunctions.append(function)
                     found = True
 
                     break
 
             if not found:
-                raise sqlmapGenericException, "missing function 'tamper(place, value)' in tamper script '%s'" % tfile
+                raise sqlmapGenericException, "missing function 'tamper(value)' in tamper script '%s'" % tfile
 
 def __setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
