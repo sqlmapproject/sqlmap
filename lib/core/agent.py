@@ -627,7 +627,7 @@ class Agent:
                 regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
 
                 for match in regObj.finditer(inpStr):
-                    retVal = retVal.replace(match.group("result"), urlencode(match.group("result")[1:-1]))
+                    retVal = retVal.replace(match.group("result"), urlencode(match.group("result")[1:-1], convall=True))
             else:
                 retVal = retVal.replace(PAYLOAD_DELIMITER, '')
 
