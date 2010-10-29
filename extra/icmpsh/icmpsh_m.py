@@ -25,7 +25,7 @@ import socket
 import subprocess
 import sys
 
-def checkImpacketLibs():
+def checkLibs():
     try:
         from impacket import ImpactDecoder
         from impacket import ImpactPacket
@@ -46,10 +46,10 @@ def setNonBlocking(fd):
 
 def main(src, dst):
     if subprocess.mswindows:
-        sys.stderr.write('ERROR: icmpsh master can only be run on Posix systems\n')
+        sys.stderr.write('icmpsh master can only run on Posix systems\n')
         sys.exit(255)
 
-    checkImpacketLibs()
+    checkLibs()
 
     # Make standard input a non-blocking file
     stdin_fd = sys.stdin.fileno()
@@ -61,7 +61,7 @@ def main(src, dst):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     except socket.error, e:
-        print 'You need to run icmpsh master with administrator privileges'
+        sys.stderr.write('You need to run icmpsh master with administrator privileges\n')
         sys.exit(1)
 
     sock.setblocking(0)
@@ -132,13 +132,10 @@ def main(src, dst):
                 sock.sendto(ip.get_packet(), (dst, 0))
 
 if __name__ == '__main__':
-    if subprocess.mswindows:
-        print 'ERROR: this icmpsh master can only be run on Posix systems'
-        sys.exit(1)
-
     if len(sys.argv) < 3:
-        print 'ERROR: missing mandatory options. Execute as root:'
-        print './icmpsh-m.py <source IP address> <destination IP address>'
+        msg = 'missing mandatory options. Execute as root:\n'
+        msg += './icmpsh-m.py <source IP address> <destination IP address>\n'
+        sys.stderr.write(msg)
         sys.exit(1)
 
     main(sys.argv[1], sys.argv[2])
