@@ -81,8 +81,8 @@ class Enumeration:
             kb.data.banner = inject.getValue(query)
             bannerParser(kb.data.banner)
 
-            kb.bannerFp["dbmsVersion"] = kb.data.banner
-            kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
+            if kb.data.banner:
+                kb.bannerFp["dbmsVersion"] = kb.data.banner.replace(",", "").replace("-", "").replace(" ", "")
 
         if conf.os and conf.os == "windows":
             kb.bannerFp["type"] = set([ "Windows" ])
