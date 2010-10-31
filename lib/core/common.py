@@ -1008,8 +1008,10 @@ def searchEnvPath(fileName):
 def urlEncodeCookieValues(cookieStr):
     if cookieStr:
         result = ""
+
         for part in cookieStr.split(';'):
             index = part.find('=') + 1
+
             if index > 0:
                 name = part[:index - 1].strip()
                 value = urlencode(part[index:], convall=True)
@@ -1018,10 +1020,12 @@ def urlEncodeCookieValues(cookieStr):
                 result += "%s%s" % ("%3B", urlencode(part, convall=True))
             else:
                 result += "; secure"
+
         if result.startswith('; '):
             result = result[2:]
         elif result.startswith('%3B'):
             result = result[3:]
+
         return result
     else:
         return None
