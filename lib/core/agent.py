@@ -42,6 +42,10 @@ class Agent:
         elif query.startswith("; "):
             query = query.replace("; ", "", 1)
 
+        if kb.tamperFunctions:
+            for function in kb.tamperFunctions:
+                query = function(query)
+
         return query
 
     def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False, falseCond=False):
