@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import cookielib
+import httplib
 import re
 import socket
 import urllib2
@@ -96,9 +97,8 @@ class Google:
         try:
             conn = self.opener.open(url)
 
-            requestMsg = "HTTP request:\nGET %s HTTP/1.1\n" % url
-            requestMsg += "\n".join(["%s: %s" % (header, value) for header, value in conn.headers.items()])
-            requestMsg += "\n"
+            requestMsg = "HTTP request:\nGET %s" % url
+            requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
             logger.log(9, requestMsg)
 
             page = conn.read()
