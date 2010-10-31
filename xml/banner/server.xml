@@ -11,35 +11,39 @@
     <!-- Microsoft IIS -->
 
     <regexp value="Microsoft-IIS/(7\.5)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2008"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(7\.0)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="Vista"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(6\.0)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2003"/>
+    </regexp>
+
+    <regexp value="Microsoft-IIS/(5\.2)">
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2003"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(5\.1)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="XP"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(5\.0)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2000"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(4\.0)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="NT 4.0"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(3\.0)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="NT 4.0"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(2\.0)">
-        <info technology="Microsoft IIS" tech_version="1"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="NT 4.0"/>
     </regexp>
 
     <!-- Apache -->
@@ -106,6 +110,10 @@
 
     <regexp value="Apache/2\.0\.54 \(Debian GNU\/Linux\)">
         <info type="Linux" distrib="Debian" release="3.1" codename="sarge"/>
+    </regexp>
+
+    <regexp value="Apache/1\.3\.34 \(Debian GNU\/Linux\)">
+        <info type="Linux" distrib="Debian" release="4.0" codename="etch"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.3 \(Debian\)">
@@ -391,7 +399,14 @@
     </regexp>
 
     <!-- Apache: Red Hat -->
-    <!-- TODO: add Red Hat 5, 5.1, 5.2 and 5.3 -->
+
+    <regexp value="Apache/1\.1\.3 Red Hat">
+        <info type="Linux" distrib="Red Hat" release="4.2" codename="Biltmore"/>
+    </regexp>
+
+    <regexp value="Apache/1\.2\.4 Red Hat">
+        <info type="Linux" distrib="Red Hat" release="5.0" codename="Hurricane"/>
+    </regexp>
 
     <regexp value="Apache/1\.2\.6 Red Hat">
         <info type="Linux" distrib="Red Hat" release="5.1" codename="Manhattan"/>
@@ -410,7 +425,7 @@
     </regexp>
     
     <regexp value="Apache/1\.3\.12 \(Unix\)  \(Red Hat/Linux\)">
-        <info type="Linux" distrib="Red Hat" release="7.0" codename="Guinness"/>
+        <info type="Linux" distrib="Red Hat" release="6.2|7.0" codename="Zoot|Guinness"/>
     </regexp>
 	
     <regexp value="Apache/1\.3\.19 \(Unix\)  \(Red-Hat/Linux\)">
