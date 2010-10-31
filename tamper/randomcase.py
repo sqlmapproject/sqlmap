@@ -12,7 +12,7 @@ import re
 from lib.core.common import randomRange
 from lib.core.data import kb
 
-def tamper(place, value):
+def tamper(value):
     """
     Replaces each character with random case value
     Example: 'INSERT' might become 'InsERt'
