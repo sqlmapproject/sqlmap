@@ -843,7 +843,7 @@ class Enumeration:
         for table in tables:
             query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT 1 FROM %s)", table))
             query = agent.postfixQuery(query)
-            result = Request.queryPage(urlencode(agent.payload(newValue=query)))
+            result = Request.queryPage(agent.payload(newValue=query))
 
             if result:
                 infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), table)
