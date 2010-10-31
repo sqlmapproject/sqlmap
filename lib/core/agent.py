@@ -637,11 +637,11 @@ class Agent:
         retVal = None
 
         if inpStr:
-            regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
+            regObj = getCompiledRegex("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
             match = regObj.search(inpStr)
 
             if match:
-                retVal = match.group("result")[1:-1]
+                retVal = match.group("result")
 
         return retVal
 
