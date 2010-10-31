@@ -631,8 +631,6 @@ class Agent:
             else:
                 retVal = retVal.replace(PAYLOAD_DELIMITER, '')
 
-        print retVal
-
         return retVal
 
     def extractPayload(self, inpStr):
