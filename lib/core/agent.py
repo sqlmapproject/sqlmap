@@ -623,8 +623,6 @@ class Agent:
         retVal = inpStr
 
         if inpStr:
-            retVal = retVal.replace(PAYLOAD_DELIMITER, '')
-
             if urlencode_:
                 regObj = getCompiledRegex("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
 
