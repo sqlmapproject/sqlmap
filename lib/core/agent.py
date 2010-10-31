@@ -658,7 +658,7 @@ class Agent:
 
         if inpStr:
             regObj = getCompiledRegex("%s(.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
-            retVal = regObj.sub(payload, inpStr)
+            retVal = regObj.sub("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr)
 
         return retVal
 
