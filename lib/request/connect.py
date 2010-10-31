@@ -302,6 +302,7 @@ class Connect:
         pageLength  = None
         uri         = None
         raise404    = place != "URI"
+        toUrlencode = { "GET": True, "POST": True, "Cookie": conf.cookieUrlencode, "User-Agent": True, "URI": False }
 
         if not place:
             place = kb.injPlace
@@ -315,20 +316,8 @@ class Connect:
 
                 value = agent.replacePayload(value, payload)
 
-        if place == "GET":
-            value = agent.removePayloadDelimiters(value, True)
-
-        elif place == "POST":
-            value = agent.removePayloadDelimiters(value, True)
-
-        elif place == "Cookie":
-            value = agent.removePayloadDelimiters(value, conf.cookieUrlencode)
-
-        elif place == "User-Agent":
-            value = agent.removePayloadDelimiters(value, True)
-
-        elif place == "URI":
-            value = agent.removePayloadDelimiters(value, False)
+        if place:
+            value = agent.removePayloadDelimiters(value, toUrlencode[place])
 
         if conf.checkPayload:
             checkPayload(value)
