@@ -20,6 +20,7 @@ from lib.core.agent import agent
 from lib.core.common import readInput
 from lib.core.common import getUnicode
 from lib.core.convert import urlencode
+from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -316,7 +317,10 @@ class Connect:
 
                 value = agent.replacePayload(value, payload)
 
-        if place:
+        if place == "Cookie" and conf.cookieUrlencode:
+            value = agent.removePayloadDelimiters(value, False)
+            value = urlEncodeCookieValues(value)
+        elif place:
             value = agent.removePayloadDelimiters(value, toUrlencode[place])
 
         if conf.checkPayload:

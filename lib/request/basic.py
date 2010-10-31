@@ -18,7 +18,6 @@ from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
-from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
