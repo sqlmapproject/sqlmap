@@ -626,7 +626,12 @@ class Agent:
             retVal = retVal.replace(PAYLOAD_DELIMITER, '')
 
             if urlencode_:
-                retVal = urlencode(retVal)
+                regObj = getCompiledRegex("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
+
+                for match in regObj.finditer(inpStr):
+                    retVal = retVal.replace(match.group("result"), urlencode(match.group("result"), convall=True))
+            else:
+                retVal = retVal.replace(PAYLOAD_DELIMITER, '')
 
         return retVal
 
@@ -652,8 +657,8 @@ class Agent:
         retVal = inpStr
 
         if inpStr:
-            regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
-            retVal = regObj.sub("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr)
+            regObj = getCompiledRegex("%s(.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
+            retVal = regObj.sub(payload, inpStr)
 
         return retVal
 
