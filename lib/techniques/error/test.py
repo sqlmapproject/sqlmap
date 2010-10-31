@@ -25,27 +25,30 @@ def errorTest():
     if kb.errorTest is not None:
         return kb.errorTest
 
-    infoMsg  = "testing error based sql injection on parameter "
+    infoMsg  = "testing error-based sql injection on parameter "
     infoMsg += "'%s' with %s condition syntax" % (kb.injParameter, conf.logic)
     logger.info(infoMsg)
 
     randInt = getUnicode(randomInt(1))
     query = queries[kb.dbms].case.query % ("%s=%s" % (randInt, randInt))
-    result = inject.goError(query, True)
+    result, usedPayload = inject.goError(query, suppressOutput=True, returnPayload=True)
 
     if result:
-        infoMsg  = "the web application supports error based injection "
-        infoMsg += "on parameter '%s'" % kb.injParameter
+        infoMsg  = "the target url is affected by an error-based sql "
+        infoMsg += "injection on parameter '%s'" % kb.injParameter
         logger.info(infoMsg)
 
         kb.errorTest = True
     else:
-        warnMsg  = "the web application does not support error based injection "
-        warnMsg += "on parameter '%s'" % kb.injParameter
+        warnMsg  = "the target url is not affected by an error-based sql "
+        warnMsg += "injection on parameter '%s'" % kb.injParameter
         logger.warn(warnMsg)
 
         kb.errorTest = False
 
     setError()
 
-    return kb.errorTest
+    if kb.errorTest:
+        return usedPayload
+    else:
+        return False

@@ -75,7 +75,7 @@ class Enumeration:
 
         if not kb.data.banner:
             if conf.unionTest:
-                conf.dumper.technic("valid union", unionTest())
+                conf.dumper.technic("inband injection payload", unionTest())
 
             query          = queries[kb.dbms].banner.query
             kb.data.banner = inject.getValue(query)

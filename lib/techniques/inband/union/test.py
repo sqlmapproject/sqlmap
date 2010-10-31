@@ -18,25 +18,8 @@ from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
 
-def __forgeUserFriendlyValue(payload):
-    value = ""
-
-    if kb.injPlace == "GET":
-        value = "%s?%s" % (conf.url, payload)
-    elif kb.injPlace == "POST":
-        value  = "URL:\t'%s'" % conf.url
-        value += "\nPOST:\t'%s'\n" % payload
-    elif kb.injPlace == "Cookie":
-        value  = "URL:\t'%s'" % conf.url
-        value += "\nCookie:\t'%s'\n" % payload
-    elif kb.injPlace == "User-Agent":
-        value  = "URL:\t\t'%s'" % conf.url
-        value += "\nUser-Agent:\t'%s'\n" % payload
-
-    return value
-
 def __unionPosition(negative=False, falseCond=False):
-    value = None
+    validPayload = None
 
     if negative or falseCond:
         negLogMsg = "partial (single entry)"
@@ -77,17 +60,19 @@ def __unionPosition(negative=False, falseCond=False):
 
         if resultPage and randQuery in resultPage and not htmlParsed:
             setUnion(position=exprPosition)
-            value = __forgeUserFriendlyValue(payload)
+            validPayload = payload
 
             break
 
     if isinstance(kb.unionPosition, int):
         infoMsg  = "the target url is affected by an exploitable "
-        infoMsg += "%s inband sql injection vulnerability" % negLogMsg
+        infoMsg += "%s inband sql injection vulnerability " % negLogMsg
+        infoMsg += "on parameter '%s'" % kb.injParameter
         logger.info(infoMsg)
     else:
         warnMsg  = "the target url is not affected by an exploitable "
-        warnMsg += "%s inband sql injection vulnerability" % negLogMsg
+        warnMsg += "%s inband sql injection vulnerability " % negLogMsg
+        warnMsg += "on parameter '%s'" % kb.injParameter
 
         if negLogMsg == "partial":
             warnMsg += ", sqlmap will retrieve the query output "
@@ -95,30 +80,30 @@ def __unionPosition(negative=False, falseCond=False):
 
         logger.warn(warnMsg)
 
-    return value
+    return validPayload
 
 def __unionConfirm():
-    value = None
+    validPayload = None
 
     # Confirm the inband SQL injection and get the exact column
     # position
     if not isinstance(kb.unionPosition, int):
-        value = __unionPosition()
+        validPayload = __unionPosition()
 
         # Assure that the above function found the exploitable full inband
         # SQL injection position
         if not isinstance(kb.unionPosition, int):
-            value = __unionPosition(negative=True)
+            validPayload = __unionPosition(negative=True)
 
             # Assure that the above function found the exploitable partial
             # (single entry) inband SQL injection position with negative
-            # parameter value
+            # parameter validPayload
             if not isinstance(kb.unionPosition, int):
-                value = __unionPosition(falseCond=True)
+                validPayload = __unionPosition(falseCond=True)
 
                 # Assure that the above function found the exploitable partial
                 # (single entry) inband SQL injection position by appending
-                # a false condition after the parameter value
+                # a false condition after the parameter validPayload
                 if not isinstance(kb.unionPosition, int):
                     return
                 else:
@@ -126,7 +111,7 @@ def __unionConfirm():
             else:
                 setUnion(negative=True)
 
-    return value
+    return validPayload
 
 def __unionTestByNULLBruteforce(comment):
     """
@@ -200,7 +185,7 @@ def unionTest():
     infoMsg += "'%s' with %s technique" % (kb.injParameter, technique)
     logger.info(infoMsg)
 
-    value   = None
+    validPayload = None
     columns = None
 
     for comment in (queries[kb.dbms].comment.query, ""):
@@ -215,13 +200,13 @@ def unionTest():
             break
 
     if kb.unionCount:
-        value = __unionConfirm()
+        validPayload = __unionConfirm()
     else:
         warnMsg  = "the target url is not affected by an "
         warnMsg += "inband sql injection vulnerability"
         logger.warn(warnMsg)
 
-    if value is None:
-        value = ""
+    if validPayload is None:
+        validPayload = ""
 
-    return value
+    return validPayload

@@ -19,7 +19,7 @@ from lib.request import inject
 from lib.request.connect import Connect as Request
 
 def timeTest():
-    infoMsg  = "testing time based blind sql injection on parameter "
+    infoMsg  = "testing time-based blind sql injection on parameter "
     infoMsg += "'%s' with %s condition syntax" % (kb.injParameter, conf.logic)
     logger.info(infoMsg)
 
@@ -32,19 +32,20 @@ def timeTest():
     duration  = calculateDeltaSeconds(start)
 
     if duration >= conf.timeSec:
-        infoMsg  = "the parameter '%s' is affected by a time " % kb.injParameter
-        infoMsg += "based blind sql injection with AND condition syntax"
+        infoMsg  = "the target url is affected by a time-based blind "
+        infoMsg += "sql injection with AND condition syntax on parameter "
+        infoMsg += "'%s'" % kb.injParameter
         logger.info(infoMsg)
 
         kb.timeTest = payload
-
     else:
-        warnMsg  = "the parameter '%s' is not affected by a time " % kb.injParameter
-        warnMsg += "based blind sql injection with AND condition syntax"
+        warnMsg  = "the target url is not affected by a time-based blind "
+        warnMsg += "sql injection with AND condition syntax on parameter "
+        warnMsg += "'%s'" % kb.injParameter
         logger.warn(warnMsg)
 
-        infoMsg  = "testing time based blind sql injection on parameter "
-        infoMsg += "'%s' with stacked query syntax" % kb.injParameter
+        infoMsg  = "testing time-based blind sql injection on parameter "
+        infoMsg += "'%s' with stacked queries syntax" % kb.injParameter
         logger.info(infoMsg)
 
         timeQuery  = getDelayQuery(andCond=True)
@@ -53,14 +54,16 @@ def timeTest():
         duration   = calculateDeltaSeconds(start)
 
         if duration >= conf.timeSec:
-            infoMsg  = "the parameter '%s' is affected by a time " % kb.injParameter
-            infoMsg += "based blind sql injection with stacked query syntax"
+            infoMsg  = "the target url is affected by a time-based blind sql "
+            infoMsg += "injection with stacked queries syntax on parameter "
+            infoMsg += "'%s'" % kb.injParameter
             logger.info(infoMsg)
 
             kb.timeTest = payload
         else:
-            warnMsg  = "the parameter '%s' is not affected by a time " % kb.injParameter
-            warnMsg += "based blind sql injection with stacked query syntax"
+            warnMsg  = "the target url is not affected by a time-based blind "
+            warnMsg += "sql injection with stacked queries syntax on parameter "
+            warnMsg += "'%s'" % kb.injParameter
             logger.warn(warnMsg)
 
             kb.timeTest = False

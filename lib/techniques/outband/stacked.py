@@ -24,7 +24,7 @@ def stackedTest():
     if kb.stackedTest is not None:
         return kb.stackedTest
 
-    infoMsg  = "testing stacked queries support on parameter "
+    infoMsg  = "testing stacked queries sql injection on parameter "
     infoMsg += "'%s'" % kb.injParameter
     logger.info(infoMsg)
 
@@ -34,14 +34,14 @@ def stackedTest():
     duration   = calculateDeltaSeconds(start)
 
     if duration >= conf.timeSec:
-        infoMsg  = "the web application supports stacked queries "
-        infoMsg += "on parameter '%s'" % kb.injParameter
+        infoMsg  = "the target url is affected by a stacked queries "
+        infoMsg += "sql injection on parameter '%s'" % kb.injParameter
         logger.info(infoMsg)
 
         kb.stackedTest = payload
     else:
-        warnMsg  = "the web application does not support stacked queries "
-        warnMsg += "on parameter '%s'" % kb.injParameter
+        warnMsg  = "the target url is not affected by a stacked queries "
+        warnMsg += "sql injection on parameter '%s'" % kb.injParameter
         logger.warn(warnMsg)
 
         kb.stackedTest = False

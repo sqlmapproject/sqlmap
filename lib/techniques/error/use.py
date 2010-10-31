@@ -29,7 +29,7 @@ from lib.core.settings import ERROR_EMPTY_CHAR
 from lib.core.settings import ERROR_START_CHAR
 from lib.core.settings import ERROR_END_CHAR
 
-def errorUse(expression):
+def errorUse(expression, returnPayload=False):
     """
     Retrieve the output of a SQL query taking advantage of an error SQL
     injection vulnerability on the affected parameter.
@@ -79,4 +79,7 @@ def errorUse(expression):
                 infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
                 logger.info(infoMsg)
 
-    return output
+    if returnPayload:
+        return output, payload
+    else:
+        return output

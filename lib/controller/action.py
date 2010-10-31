@@ -56,16 +56,16 @@ def action():
 
     # Techniques options
     if conf.stackedTest:
-        conf.dumper.technic("stacked queries support", stackedTest())
+        conf.dumper.technic("stacked queries injection payload", stackedTest())
 
     if conf.errorTest:
-        conf.dumper.technic("error based injection support", errorTest())
+        conf.dumper.technic("error-based injection payload", errorTest())
 
     if conf.timeTest:
-        conf.dumper.technic("time based blind sql injection payload", timeTest())
+        conf.dumper.technic("time-based blind injection payload", timeTest())
 
     if conf.unionTest and kb.unionPosition is None:
-        conf.dumper.technic("valid union", unionTest())
+        conf.dumper.technic("inband injection payload", unionTest())
 
     # Enumeration options
     if conf.getBanner:
