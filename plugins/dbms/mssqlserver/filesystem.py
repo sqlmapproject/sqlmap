@@ -14,7 +14,6 @@ import os
 from lib.core.common import getRange
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
-from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -89,7 +88,6 @@ class Filesystem(GenericFilesystem):
         """ % (self.tblField, txtTbl, self.tblField, txtTbl, hexTbl, self.tblField, hexTbl, self.tblField)
 
         binToHexQuery = binToHexQuery.replace("    ", "").replace("\n", " ")
-        binToHexQuery = urlencode(binToHexQuery, convall=True)
         inject.goStacked(binToHexQuery)
 
         if kb.unionPosition is not None:

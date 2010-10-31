@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import binascii
 
-from lib.core.convert import urlencode
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -143,7 +142,6 @@ class Takeover(GenericTakeover):
         """ % (addrs[0], addrs[1], addrs[2], addrs[3], addrs[4], addrs[5], addrs[6], addrs[7], shellcodeChar)
 
         self.spExploit = self.spExploit.replace("    ", "").replace("\n", " ")
-        self.spExploit = urlencode(self.spExploit, convall=True)
 
         logger.info("triggering the buffer overflow vulnerability, wait..")
         inject.goStacked(self.spExploit, silent=True)

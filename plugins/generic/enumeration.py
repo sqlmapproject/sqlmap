@@ -24,7 +24,6 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import strToHex
-from lib.core.convert import urlencode
 from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -1731,8 +1730,6 @@ class Enumeration:
 
             return output
         else:
-            query = urlencode(query, convall=True)
-
             if kb.stackedTest is None:
                 stackedTest()
 
