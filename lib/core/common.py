@@ -1239,13 +1239,20 @@ def getConsoleWidth(default=80):
     return width if width else default
 
 def parseXmlFile(xmlFile, handler):
-    checkFile(xmlFile)  
-    xfile = codecs.open(xmlFile, 'rb', conf.dataEncoding)
-    content = xfile.read()
-    stream = StringIO(content)
+    if xmlFile not in kb.cache.content:
+        if conf.parseLock:
+            conf.parseLock.acquire()
+        if xmlFile not in kb.cache.content:
+            checkFile(xmlFile)
+            xfile = codecs.open(xmlFile, 'rb', conf.dataEncoding)
+            content = xfile.read()
+            kb.cache.content[xmlFile] = content
+            xfile.close()
+        if conf.parseLock:
+            conf.parseLock.release()
+    stream = StringIO(kb.cache.content[xmlFile])
     parse(stream, handler)
     stream.close()
-    xfile.close()
 
 def readXmlFile(xmlFile):
     checkFile(xmlFile)  

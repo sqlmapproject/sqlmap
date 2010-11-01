@@ -252,6 +252,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         iolock  = threading.Lock()
         valuelock  = threading.Lock()
         conf.seqLock = threading.Lock()
+        conf.parseLock = threading.Lock()
         conf.threadContinue = True
 
         def downloadThread():
@@ -416,6 +417,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             dataToStdout(infoMsg)
 
         conf.seqLock = None
+        conf.parseLock = None
 
     # No multi-threading (--threads = 1)
     else:

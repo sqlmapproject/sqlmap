@@ -993,6 +993,7 @@ def __setConfAttributes():
     conf.outputPath       = None
     conf.paramDict        = {}
     conf.parameters       = {}
+    conf.parseLock        = None
     conf.path             = None
     conf.port             = None
     conf.redirectHandled  = False
@@ -1022,6 +1023,7 @@ def __setKnowledgeBaseAttributes():
     kb.bannerFp        = advancedDict()
 
     kb.cache           = advancedDict()
+    kb.cache.content   = {}
     kb.cache.regex     = {}
 
     kb.commonOutputs   = None
