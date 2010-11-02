@@ -87,7 +87,7 @@ class Fingerprint(GenericFingerprint):
         value  += "back-end DBMS: "
 
         if not conf.extensiveFp:
-            value += "SAP MaxDB"
+            value += DBMS.MAXDB
             return value
 
         actVer = formatDBMSfp() + " (%s)" % self.__versionCheck()

@@ -43,7 +43,7 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
 
         if not conf.extensiveFp:
-            value += "Sybase"
+            value += DBMS.SYBASE
             return value
 
         actVer = formatDBMSfp()

@@ -711,18 +711,18 @@ def parseTargetDirect():
         errMsg += "or 'access://DATABASE_FILEPATH'"
         raise sqlmapSyntaxException, errMsg
 
-    dbmsDict = { "Microsoft SQL Server": [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
-                 "MySQL": [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
-                 "PostgreSQL": [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
-                 "Oracle": [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
-                 "SQLite": [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
-                 "Access": [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
-                 "Firebird": [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"] }
+    dbmsDict = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
+                 DBMS.MYSQL: [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
+                 DBMS.POSTGRESQL: [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
+                 DBMS.ORACLE: [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
+                 DBMS.SQLITE: [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
+                 DBMS.ACCESS: [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
+                 DBMS.FIREBIRD: [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"] }
 
     for dbmsName, data in dbmsDict.items():
         if conf.dbms in data[0]:
             try:
-                if dbmsName in ('Access', 'SQLite', 'Firebird'):
+                if dbmsName in (DBMS.ACCESS, DBMS.SQLITE, DBMS.FIREBIRD):
                     if remote:
                         warnMsg = "direct connection over the network for "
                         warnMsg += "%s DBMS is not supported" % dbmsName
@@ -734,7 +734,7 @@ def parseTargetDirect():
                         errMsg = "missing remote connection details"
                         raise sqlmapSyntaxException, errMsg
 
-                if dbmsName == "Microsoft SQL Server":
+                if dbmsName == DBMS.MSSQL:
                     import _mssql
                     import pymssql
 
@@ -744,17 +744,17 @@ def parseTargetDirect():
                         errMsg += "http://sourceforge.net/projects/pymssql/files/pymssql/1.0.2/"
                         raise sqlmapMissingDependence, errMsg
 
-                elif dbmsName == "MySQL":
+                elif dbmsName == DBMS.MYSQL:
                     import MySQLdb
-                elif dbmsName == "PostgreSQL":
+                elif dbmsName == DBMS.POSTGRESQL:
                     import psycopg2
-                elif dbmsName == "Oracle":
+                elif dbmsName == DBMS.ORACLE:
                     import cx_Oracle
-                elif dbmsName == "SQLite":
+                elif dbmsName == DBMS.SQLITE:
                     import sqlite3
-                elif dbmsName == "Access":
+                elif dbmsName == DBMS.ACCESS:
                     import pyodbc
-                elif dbmsName == "Firebird":
+                elif dbmsName == DBMS.FIREBIRD:
                     import kinterbasdb
             except ImportError, _:
                 errMsg  = "sqlmap requires '%s' third-party library " % data[1]
@@ -904,7 +904,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 def getDelayQuery(andCond=False):
     query = None
 
-    if kb.dbms in ("MySQL", "PostgreSQL"):
+    if kb.dbms in (DBMS.MYSQL, DBMS.POSTGRESQL):
         if not kb.data.banner:
             conf.dbmsHandler.getVersionFromBanner()
 

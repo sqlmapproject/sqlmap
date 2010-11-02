@@ -44,7 +44,7 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
 
         if not conf.extensiveFp:
-            value += "Oracle"
+            value += DBMS.ORACLE
             return value
 
         actVer      = formatDBMSfp()

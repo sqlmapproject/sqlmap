@@ -44,11 +44,11 @@ class Fingerprint(GenericFingerprint):
                 value += "%s\n" % dbmsOsFp
 
         value  += "back-end DBMS: "
-        
+
         if not conf.extensiveFp:
-            value += "Firebird"
+            value += DBMS.FIREBIRD
             return value
-              
+
         actVer  = formatDBMSfp() + " (%s)" % (self.__dialectCheck())
         blank       = " " * 15
         value      += "active fingerprint: %s" % actVer

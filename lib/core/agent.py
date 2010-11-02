@@ -528,7 +528,7 @@ class Agent:
         fromFrom = limitedQuery[fromIndex+1:]
         orderBy = False
 
-        if kb.dbms in ( "MySQL", "PostgreSQL", "SQLite" ):
+        if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL, DBMS.SQLITE ):
             limitStr = queries[kb.dbms].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
             

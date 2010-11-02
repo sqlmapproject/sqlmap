@@ -42,7 +42,7 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
 
         if not conf.extensiveFp:
-            value += "SQLite"
+            value += DBMS.SQLITE
             return value
 
         actVer = formatDBMSfp()
