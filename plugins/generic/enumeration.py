@@ -700,11 +700,21 @@ class Enumeration:
         return kb.data.cachedDbs
 
     def getTables(self):
+        bruteForce = False
+
         if kb.dbms == "MySQL" and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             logger.error(errMsg)
+            bruteForce = True
 
+        elif kb.dbms == "Microsoft Access":
+            errMsg  = "cannot retrieve table names, "
+            errMsg += "back-end DBMS is Access"
+            logger.error(errMsg)
+            bruteForce = True
+
+        if bruteForce:
             message = "do you want to use common table existance check? [Y/n/q]"
             test = readInput(message, default="Y")
 
