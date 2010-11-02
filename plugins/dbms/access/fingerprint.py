@@ -67,7 +67,7 @@ class Fingerprint(GenericFingerprint):
                     negate = True
                     table = table[1:]
                 randInt = randomInt()
-                query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s WHERE %d=%d) FROM %s" % (table, randInt, randInt, table))
+                query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
                 query   = agent.postfixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
@@ -148,12 +148,12 @@ class Fingerprint(GenericFingerprint):
                 return False
 
             setDbms("Microsoft Access")
-            
+
             if not conf.extensiveFp:
                 return True
-            
+
             kb.dbmsVersion = [self.__sysTablesCheck()]
-            
+
             return True
         else:
             warnMsg = "the back-end DMBS is not Microsoft Access"

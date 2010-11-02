@@ -20,7 +20,7 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
-        
+
     def getBanner(self):
         warnMsg = "on Microsoft Access it is not possible to get a banner"
         logger.warn(warnMsg)
