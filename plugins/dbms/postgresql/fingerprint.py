@@ -19,6 +19,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.request import inject
@@ -73,7 +74,7 @@ class Fingerprint(GenericFingerprint):
         """
 
         if conf.dbms in PGSQL_ALIASES:
-            setDbms("PostgreSQL")
+            setDbms(DBMS.POSTGRESQL)
 
             self.getBanner()
 
@@ -101,7 +102,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            setDbms("PostgreSQL")
+            setDbms(DBMS.POSTGRESQL)
 
             self.getBanner()
 

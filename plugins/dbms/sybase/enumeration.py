@@ -10,9 +10,10 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.settings import DBMS
 
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def __init__(self):
-        GenericEnumeration.__init__(self, "Sybase")
+        GenericEnumeration.__init__(self, DBMS.SYBASE)

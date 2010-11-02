@@ -13,10 +13,12 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.settings import DBMS
 from lib.core.shell import autoCompletion
 from lib.takeover.udf import UDF
 from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import xp_cmdshell
+
 
 class Abstraction(Web, UDF, xp_cmdshell):
     """
@@ -36,10 +38,10 @@ class Abstraction(Web, UDF, xp_cmdshell):
         if self.webBackdoorUrl and not kb.stackedTest:
             self.webBackdoorRunCmd(cmd)
 
-        elif kb.dbms in ( "MySQL", "PostgreSQL" ):
+        elif kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
             self.udfExecCmd(cmd, silent=silent)
 
-        elif kb.dbms == "Microsoft SQL Server":
+        elif kb.dbms == DBMS.MSSQL:
             self.xpCmdshellExecCmd(cmd, silent=silent)
 
         else:
@@ -50,10 +52,10 @@ class Abstraction(Web, UDF, xp_cmdshell):
         if self.webBackdoorUrl and not kb.stackedTest:
             return self.webBackdoorRunCmd(cmd)
 
-        elif kb.dbms in ( "MySQL", "PostgreSQL" ):
+        elif kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
             return self.udfEvalCmd(cmd, first, last)
 
-        elif kb.dbms == "Microsoft SQL Server":
+        elif kb.dbms == DBMS.MSSQL:
             return self.xpCmdshellEvalCmd(cmd, first, last)
 
         else:
@@ -88,13 +90,13 @@ class Abstraction(Web, UDF, xp_cmdshell):
             logger.info(infoMsg)
 
         else:
-            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                 infoMsg  = "going to use injected sys_eval and sys_exec "
                 infoMsg += "user-defined functions for operating system "
                 infoMsg += "command execution"
                 logger.info(infoMsg)
 
-            elif kb.dbms == "Microsoft SQL Server":
+            elif kb.dbms == DBMS.MSSQL:
                 infoMsg  = "going to use xp_cmdshell extended procedure for "
                 infoMsg += "operating system command execution"
                 logger.info(infoMsg)
@@ -146,9 +148,9 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 warnMsg += "the session user is not a database administrator"
                 logger.warn(warnMsg)
 
-            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                 self.udfInjectSys()
-            elif kb.dbms == "Microsoft SQL Server":
+            elif kb.dbms == DBMS.MSSQL:
                 if mandatory:
                     self.xpCmdshellInit()
             else:

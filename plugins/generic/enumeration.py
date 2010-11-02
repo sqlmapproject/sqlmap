@@ -35,6 +35,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
+from lib.core.settings import DBMS
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
@@ -135,8 +136,8 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].users
 
-        condition  = ( kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ) )
-        condition |= ( kb.dbms == "MySQL" and not kb.data.has_information_schema )
+        condition  = ( kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ) )
+        condition |= ( kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema )
 
         if kb.unionPosition is not None or conf.direct:
             if condition:
@@ -162,14 +163,14 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of database users"
                 raise sqlmapNoneDataException, errMsg
 
-            if kb.dbms == "Oracle":
+            if kb.dbms == DBMS.ORACLE:
                 plusOne = True
             else:
                 plusOne = False
             indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
-                if kb.dbms == "Sybase":
+                if kb.dbms == DBMS.SYBASE:
                     query = rootQuery.blind.query % (kb.data.cachedUsers[-1] if kb.data.cachedUsers else " ")
                 elif condition:
                     query = rootQuery.blind.query2 % index
@@ -198,7 +199,7 @@ class Enumeration:
         logger.info(infoMsg)
 
         if kb.unionPosition is not None or conf.direct:
-            if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
+            if kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
@@ -211,7 +212,7 @@ class Enumeration:
                     query += " WHERE "
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
                 else:
-                    if kb.dbms == "MySQL":
+                    if kb.dbms == DBMS.MYSQL:
                         parsedUser = re.search("[\047]*(.*?)[\047]*\@", conf.user)
 
                         if parsedUser:
@@ -248,7 +249,7 @@ class Enumeration:
             retrievedUsers = set()
 
             for user in users:
-                if kb.dbms == "MySQL":
+                if kb.dbms == DBMS.MYSQL:
                     parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
 
                     if parsedUser:
@@ -261,7 +262,7 @@ class Enumeration:
                 infoMsg += "for user '%s'" % user
                 logger.info(infoMsg)
 
-                if kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
+                if kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
                     query = rootQuery.blind.count2 % user
                 else:
                     query = rootQuery.blind.count % user
@@ -278,14 +279,14 @@ class Enumeration:
 
                 passwords  = []
 
-                if kb.dbms == "Oracle":
+                if kb.dbms == DBMS.ORACLE:
                     plusOne = True
                 else:
                     plusOne = False
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if kb.dbms == "Sybase":
+                    if kb.dbms == DBMS.SYBASE:
                         if index > 0:
                             warnMsg  = "unable to retrieve other password "
                             warnMsg += "hashes for user '%s'" % user
@@ -295,7 +296,7 @@ class Enumeration:
                             query = rootQuery.blind.query % user
                             pushValue(conf.verbose)
                             conf.verbose = 0
-                    elif kb.dbms == "Microsoft SQL Server":
+                    elif kb.dbms == DBMS.MSSQL:
                         if kb.dbmsVersion[0] in ( "2005", "2008" ):
                             query = rootQuery.blind.query2 % (user, index, user)
                         else:
@@ -303,7 +304,7 @@ class Enumeration:
                     else:
                         query = rootQuery.blind.query % (user, index)
                     password = inject.getValue(query, inband=False)
-                    if kb.dbms == "Sybase":
+                    if kb.dbms == DBMS.SYBASE:
                         conf.verbose = popValue()
                         password = "0x%s" % strToHex(password)
                         infoMsg = "retrieved: %s" % password
@@ -330,24 +331,24 @@ class Enumeration:
     def __isAdminFromPrivileges(self, privileges):
         # In PostgreSQL the usesuper privilege means that the
         # user is DBA
-        dbaCondition  = ( kb.dbms == "PostgreSQL" and "super" in privileges )
+        dbaCondition  = ( kb.dbms == DBMS.POSTGRESQL and "super" in privileges )
 
         # In Oracle the DBA privilege means that the
         # user is DBA
-        dbaCondition |= ( kb.dbms == "Oracle" and "DBA" in privileges )
+        dbaCondition |= ( kb.dbms == DBMS.ORACLE and "DBA" in privileges )
 
         # In MySQL >= 5.0 the SUPER privilege means
         # that the user is DBA
-        dbaCondition |= ( kb.dbms == "MySQL" and kb.data.has_information_schema and "SUPER" in privileges )
+        dbaCondition |= ( kb.dbms == DBMS.MYSQL and kb.data.has_information_schema and "SUPER" in privileges )
 
         # In MySQL < 5.0 the super_priv privilege means
         # that the user is DBA
-        dbaCondition |= ( kb.dbms == "MySQL" and not kb.data.has_information_schema and "super_priv" in privileges )
+        dbaCondition |= ( kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema and "super_priv" in privileges )
 
         # In Firebird there is no specific privilege that means
         # that the user is DBA
         # TODO: confirm
-        dbaCondition |= ( kb.dbms == "Firebird" and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges )
+        dbaCondition |= ( kb.dbms == DBMS.FIREBIRD and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges )
 
         return dbaCondition
 
@@ -410,10 +411,10 @@ class Enumeration:
                      }
 
         if kb.unionPosition is not None or conf.direct:
-            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                 query     = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
-            elif kb.dbms == "Oracle" and query2:
+            elif kb.dbms == DBMS.ORACLE and query2:
                 query     = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
             else:
@@ -425,7 +426,7 @@ class Enumeration:
                 query += " WHERE "
                 # NOTE: I assume that the user provided is not in
                 # MySQL >= 5.0 syntax 'user'@'host'
-                if kb.dbms == "MySQL" and kb.data.has_information_schema:
+                if kb.dbms == DBMS.MYSQL and kb.data.has_information_schema:
                     queryUser = "%" + conf.user + "%"
                     query += " OR ".join("%s LIKE '%s'" % (condition, "%" + user + "%") for user in users)
                 else:
@@ -433,7 +434,7 @@ class Enumeration:
 
             values = inject.getValue(query, blind=False, error=False)
 
-            if not values and kb.dbms == "Oracle" and not query2:
+            if not values and kb.dbms == DBMS.ORACLE and not query2:
                 infoMsg = "trying with table USER_SYS_PRIVS"
                 logger.info(infoMsg)
 
@@ -455,19 +456,19 @@ class Enumeration:
 
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
-                            if kb.dbms == "PostgreSQL" and getUnicode(privilege).isdigit():
+                            if kb.dbms == DBMS.POSTGRESQL and getUnicode(privilege).isdigit():
                                 for position, pgsqlPriv in pgsqlPrivs:
                                     if count == position and int(privilege) == 1:
                                         privileges.add(pgsqlPriv)
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
-                            elif kb.dbms == "Oracle" or ( kb.dbms == "MySQL" and kb.data.has_information_schema ):
+                            elif kb.dbms == DBMS.ORACLE or ( kb.dbms == DBMS.MYSQL and kb.data.has_information_schema ):
                                 privileges.add(privilege)
 
                             # In MySQL < 5.0 we get Y if the privilege is 
                             # True, N otherwise
-                            elif kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                            elif kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                                 for position, mysqlPriv in mysqlPrivs:
                                     if count == position and privilege.upper() == "Y":
                                         privileges.add(mysqlPriv)
@@ -484,7 +485,7 @@ class Enumeration:
             conditionChar = "="
 
             if conf.user:
-                if kb.dbms == "MySQL" and kb.data.has_information_schema:
+                if kb.dbms == DBMS.MYSQL and kb.data.has_information_schema:
                     conditionChar = " LIKE "
 
                     if "," in conf.user:
@@ -511,7 +512,7 @@ class Enumeration:
             for user in users:
                 unescapedUser = None
 
-                if kb.dbms == "MySQL" and kb.data.has_information_schema:
+                if kb.dbms == DBMS.MYSQL and kb.data.has_information_schema:
                     unescapedUser = unescaper.unescape(user, quote=False)
 
                 if user in retrievedUsers:
@@ -526,18 +527,18 @@ class Enumeration:
                 else:
                     queryUser = user
 
-                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                     query = rootQuery.blind.count2 % queryUser
-                elif kb.dbms == "MySQL" and kb.data.has_information_schema:
+                elif kb.dbms == DBMS.MYSQL and kb.data.has_information_schema:
                     query = rootQuery.blind.count % (conditionChar, queryUser)
-                elif kb.dbms == "Oracle" and query2:
+                elif kb.dbms == DBMS.ORACLE and query2:
                     query = rootQuery.blind.count2 % queryUser
                 else:
                     query = rootQuery.blind.count % queryUser
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
-                    if not count.isdigit() and kb.dbms == "Oracle" and not query2:
+                    if not count.isdigit() and kb.dbms == DBMS.ORACLE and not query2:
                         infoMsg = "trying with table USER_SYS_PRIVS"
                         logger.info(infoMsg)
 
@@ -553,20 +554,20 @@ class Enumeration:
 
                 privileges = set()
 
-                if kb.dbms == "Oracle":
+                if kb.dbms == DBMS.ORACLE:
                     plusOne = True
                 else:
                     plusOne = False
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                    if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                         query = rootQuery.blind.query2 % (queryUser, index)
-                    elif kb.dbms == "MySQL" and kb.data.has_information_schema:
+                    elif kb.dbms == DBMS.MYSQL and kb.data.has_information_schema:
                         query = rootQuery.blind.query % (conditionChar, queryUser, index)
-                    elif kb.dbms == "Oracle" and query2:
+                    elif kb.dbms == DBMS.ORACLE and query2:
                         query = rootQuery.blind.query2 % (queryUser, index)
-                    elif kb.dbms == "Firebird":
+                    elif kb.dbms == DBMS.FIREBIRD:
                         query = rootQuery.blind.query % (index, queryUser)
                     else:
                         query = rootQuery.blind.query % (queryUser, index)
@@ -574,7 +575,7 @@ class Enumeration:
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise
-                    if kb.dbms == "PostgreSQL" and ", " in privilege:
+                    if kb.dbms == DBMS.POSTGRESQL and ", " in privilege:
                         privilege = privilege.replace(", ", ",")
                         privs = privilege.split(",")
                         i = 1
@@ -589,12 +590,12 @@ class Enumeration:
 
                     # In MySQL >= 5.0 and Oracle we get the list
                     # of privileges as string
-                    elif kb.dbms == "Oracle" or ( kb.dbms == "MySQL" and kb.data.has_information_schema ):
+                    elif kb.dbms == DBMS.ORACLE or ( kb.dbms == DBMS.MYSQL and kb.data.has_information_schema ):
                         privileges.add(privilege)
 
                     # In MySQL < 5.0 we get Y if the privilege is 
                     # True, N otherwise
-                    elif kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                    elif kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                         privilege = privilege.replace(", ", ",")
                         privs = privilege.split(",")
                         i = 1
@@ -608,7 +609,7 @@ class Enumeration:
                             i += 1
 
                     # In Firebird we get one letter for each privilege
-                    elif kb.dbms == "Firebird":
+                    elif kb.dbms == DBMS.FIREBIRD:
                         privileges.add(firebirdPrivs[privilege.strip()])
 
                     if self.__isAdminFromPrivileges(privileges):
@@ -617,7 +618,7 @@ class Enumeration:
                     # In MySQL < 5.0 we break the cycle after the first
                     # time we get the user's privileges otherwise we
                     # duplicate the same query
-                    if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                    if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                         break
 
                 if privileges:
@@ -644,7 +645,7 @@ class Enumeration:
         return self.getPrivileges(query2)
 
     def getDbs(self):
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+        if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             warnMsg  = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
             warnMsg += "names will be fetched from 'mysql' database"
@@ -656,7 +657,7 @@ class Enumeration:
         rootQuery = queries[kb.dbms].dbs
 
         if kb.unionPosition is not None or conf.direct:
-            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
@@ -669,7 +670,7 @@ class Enumeration:
             infoMsg = "fetching number of databases"
             logger.info(infoMsg)
 
-            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
@@ -682,9 +683,9 @@ class Enumeration:
             indexRange = getRange(count)
 
             for index in indexRange:
-                if kb.dbms == "Sybase":
+                if kb.dbms == DBMS.SYBASE:
                     query = rootQuery.blind.query % (kb.data.cachedDbs[-1] if kb.data.cachedDbs else " ")
-                elif kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                elif kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index
@@ -702,13 +703,13 @@ class Enumeration:
     def getTables(self):
         bruteForce = False
 
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+        if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             logger.error(errMsg)
             bruteForce = True
 
-        elif kb.dbms == "Microsoft Access":
+        elif kb.dbms == DBMS.ACCESS:
             errMsg  = "cannot retrieve table names, "
             errMsg += "back-end DBMS is Access"
             logger.error(errMsg)
@@ -738,7 +739,7 @@ class Enumeration:
             query = rootQuery.inband.query
             condition = rootQuery.inband.condition
 
-            if conf.db and kb.dbms != "SQLite":
+            if conf.db and kb.dbms != DBMS.SQLITE:
                 if "," in conf.db:
                     dbs = conf.db.split(",")
                     query += " WHERE "
@@ -754,14 +755,14 @@ class Enumeration:
             value = inject.getValue(query, blind=False, error=False)
 
             if value:
-                if kb.dbms == "SQLite":
+                if kb.dbms == DBMS.SQLITE:
                     if isinstance(value, basestring):
-                        value = [[ "SQLite", value ]]
+                        value = [[ DBMS.SQLITE, value ]]
                     elif isinstance(value, (list, tuple, set)):
                         newValue = []
 
                         for v in value:
-                            newValue.append([ "SQLite", v])
+                            newValue.append([ DBMS.SQLITE, v])
 
                         value = newValue
 
@@ -794,7 +795,7 @@ class Enumeration:
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
-                if kb.dbms in ("SQLite", "Firebird"):
+                if kb.dbms in (DBMS.SQLITE, DBMS.FIREBIRD):
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % db
@@ -808,16 +809,16 @@ class Enumeration:
 
                 tables = []
 
-                if kb.dbms in ( "Microsoft SQL Server", "Oracle" ):
+                if kb.dbms in ( DBMS.MSSQL, DBMS.ORACLE ):
                     plusOne = True
                 else:
                     plusOne = False
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if kb.dbms == "Sybase":
+                    if kb.dbms == DBMS.SYBASE:
                         query = rootQuery.blind.query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
-                    elif kb.dbms in ("SQLite", "Firebird"):
+                    elif kb.dbms in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
                     else:
                         query = rootQuery.blind.query % (db, index)
@@ -875,7 +876,7 @@ class Enumeration:
         return retVal
 
     def getColumns(self, onlyColNames=False):
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+        if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
@@ -920,7 +921,7 @@ class Enumeration:
         infoMsg = "fetching columns "
 
         if conf.col:
-            if kb.dbms == "Oracle":
+            if kb.dbms == DBMS.ORACLE:
                 conf.col = conf.col.upper()
             colList = conf.col.split(",")
             condQuery = " AND (" + " OR ".join("%s LIKE '%s'" % (condition, "%" + col + "%") for col in colList) + ")"
@@ -933,19 +934,19 @@ class Enumeration:
         logger.info(infoMsg)
 
         if kb.unionPosition is not None or conf.direct:
-            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                 query = rootQuery.inband.query % (conf.tbl, conf.db)
                 query += condQuery
-            elif kb.dbms == "Oracle":
+            elif kb.dbms == DBMS.ORACLE:
                 query = rootQuery.inband.query % conf.tbl.upper()
                 query += condQuery
-            elif kb.dbms == "Microsoft SQL Server":
+            elif kb.dbms == DBMS.MSSQL:
                 query = rootQuery.inband.query % (conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
-            elif kb.dbms == "SQLite":
+            elif kb.dbms == DBMS.SQLITE:
                 query = rootQuery.inband.query % conf.tbl
 
             value = inject.getValue(query, blind=False, error=False)
@@ -954,7 +955,7 @@ class Enumeration:
                 table = {}
                 columns = {}
 
-                if kb.dbms == "SQLite":
+                if kb.dbms == DBMS.SQLITE:
                     for match in re.finditer(getCompiledRegex(r"(\w+) ([A-Z]+)[,\r\n]"), value):
                         columns[match.group(1)] = match.group(2)
                 else:
@@ -970,16 +971,16 @@ class Enumeration:
             infoMsg += " on database '%s'" % conf.db
             logger.info(infoMsg)
 
-            if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                 query = rootQuery.blind.count % (conf.tbl, conf.db)
                 query += condQuery
-            elif kb.dbms == "Oracle":
+            elif kb.dbms == DBMS.ORACLE:
                 query = rootQuery.blind.count % conf.tbl.upper()
                 query += condQuery
-            elif kb.dbms == "Microsoft SQL Server":
+            elif kb.dbms == DBMS.MSSQL:
                 query = rootQuery.blind.count % (conf.db, conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
-            elif kb.dbms == "Firebird":
+            elif kb.dbms == DBMS.FIREBIRD:
                 query = rootQuery.blind.count % (conf.tbl)
                 query += condQuery
 
@@ -997,22 +998,22 @@ class Enumeration:
             indexRange = getRange(count)
 
             for index in indexRange:
-                if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                     query = rootQuery.blind.query % (conf.tbl, conf.db)
                     query += condQuery
                     field = None
-                elif kb.dbms == "Oracle":
+                elif kb.dbms == DBMS.ORACLE:
                     query = rootQuery.blind.query % (conf.tbl.upper())
                     query += condQuery
                     field = None
-                elif kb.dbms == "Microsoft SQL Server":
+                elif kb.dbms == DBMS.MSSQL:
                     query = rootQuery.blind.query % (conf.db, conf.db,
                                                            conf.db, conf.db,
                                                            conf.db, conf.db,
                                                            conf.tbl)
                     query += condQuery.replace("[DB]", conf.db)
                     field = condition.replace("[DB]", conf.db)
-                elif kb.dbms == "Firebird":
+                elif kb.dbms == DBMS.FIREBIRD:
                     query = rootQuery.blind.query % (conf.tbl)
                     query += condQuery
                     field = None
@@ -1021,20 +1022,20 @@ class Enumeration:
                 column = inject.getValue(query, inband=False)
 
                 if not onlyColNames:
-                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                         query = rootQuery.blind.query2 % (conf.tbl, column, conf.db)
-                    elif kb.dbms == "Oracle":
+                    elif kb.dbms == DBMS.ORACLE:
                         query = rootQuery.blind.query2 % (conf.tbl.upper(), column)
-                    elif kb.dbms == "Microsoft SQL Server":
+                    elif kb.dbms == DBMS.MSSQL:
                         query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db,
                                                                 conf.db, column, conf.db,
                                                                 conf.db, conf.db, conf.tbl)
-                    elif kb.dbms == "Firebird":
+                    elif kb.dbms == DBMS.FIREBIRD:
                         query = rootQuery.blind.query2 % (conf.tbl, column)
 
                     colType = inject.getValue(query, inband=False)
 
-                    if kb.dbms == "Firebird":
+                    if kb.dbms == DBMS.FIREBIRD:
                         colType = firebirdTypes[colType] if colType in firebirdTypes else colType
 
                     columns[column] = colType
@@ -1091,7 +1092,7 @@ class Enumeration:
                 kb.data.cachedColumns[conf.db][conf.tbl][column] = None
 
         elif not kb.data.cachedColumns:
-            if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+            if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                 errMsg  = "information_schema not available, "
                 errMsg += "back-end DBMS is MySQL < 5.0"
                 raise sqlmapUnsupportedFeatureException, errMsg
@@ -1112,9 +1113,9 @@ class Enumeration:
         entriesCount = 0
 
         if kb.unionPosition is not None or conf.direct:
-            if kb.dbms == "Oracle":
+            if kb.dbms == DBMS.ORACLE:
                 query = rootQuery.inband.query % (colString, conf.tbl.upper())
-            elif kb.dbms == "SQLite":
+            elif kb.dbms == DBMS.SQLITE:
                 query = rootQuery.inband.query % (colString, conf.tbl)
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
@@ -1160,9 +1161,9 @@ class Enumeration:
             infoMsg += "on database '%s'" % conf.db
             logger.info(infoMsg)
 
-            if kb.dbms == "Oracle":
+            if kb.dbms == DBMS.ORACLE:
                 query = rootQuery.blind.count % conf.tbl.upper()
-            elif kb.dbms == "SQLite":
+            elif kb.dbms == DBMS.SQLITE:
                 query = rootQuery.blind.count % conf.tbl
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
@@ -1182,7 +1183,7 @@ class Enumeration:
             lengths = {}
             entries = {}
 
-            if kb.dbms in ("Oracle", "Microsoft SQL Server", "Sybase"):
+            if kb.dbms in (DBMS.ORACLE, DBMS.MSSQL, DBMS.SYBASE):
                 plusOne = True
             else:
                 plusOne = False
@@ -1196,19 +1197,19 @@ class Enumeration:
                     if column not in entries:
                         entries[column] = []
 
-                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                         query = rootQuery.blind.query % (column, conf.db,
                                                                conf.tbl, index)
-                    elif kb.dbms == "Oracle":
+                    elif kb.dbms == DBMS.ORACLE:
                         query = rootQuery.blind.query % (column, column,
                                                                conf.tbl.upper(),
                                                                index)
-                    elif kb.dbms in ("Microsoft SQL Server", "Sybase"):
+                    elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
                         query = rootQuery.blind.query % (column, index, conf.db,
                                                                conf.tbl, colList[0],
                                                                colList[0], colList[0])
 
-                    elif kb.dbms == "SQLite":
+                    elif kb.dbms == DBMS.SQLITE:
                         query = rootQuery.blind.query % (column, conf.tbl, index)
 
                     value = inject.getValue(query, inband=False)
@@ -1245,7 +1246,7 @@ class Enumeration:
         return kb.data.dumpedTable
 
     def dumpAll(self):
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+        if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
@@ -1345,7 +1346,7 @@ class Enumeration:
         rootQuery = queries[kb.dbms].search_db
         dbList = conf.db.split(",")
 
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+        if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             dbCond = rootQuery.inband.condition2
         else:
             dbCond = rootQuery.inband.condition
@@ -1370,7 +1371,7 @@ class Enumeration:
             dbQuery = dbQuery % db
 
             if kb.unionPosition is not None or conf.direct:
-                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                     query = rootQuery.inband.query2
                 else:
                     query = rootQuery.inband.query
@@ -1391,7 +1392,7 @@ class Enumeration:
                 infoMsg += " '%s'" % db
                 logger.info(infoMsg)
 
-                if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                     query = rootQuery.blind.count2
                 else:
                     query = rootQuery.blind.count
@@ -1411,7 +1412,7 @@ class Enumeration:
                 indexRange = getRange(count)
 
                 for index in indexRange:
-                    if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+                    if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                         query = rootQuery.blind.query2
                     else:
                         query = rootQuery.blind.query
@@ -1424,7 +1425,7 @@ class Enumeration:
         return foundDbs
 
     def searchTable(self):
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+        if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
@@ -1438,7 +1439,7 @@ class Enumeration:
         tblConsider, tblCondParam = self.likeOrExact("table")
 
         for tbl in tblList:
-            if kb.dbms == "Oracle":
+            if kb.dbms == DBMS.ORACLE:
                 tbl = tbl.upper()
 
             infoMsg = "searching table"
@@ -1545,7 +1546,7 @@ class Enumeration:
         return foundTbls
 
     def searchColumn(self):
-        if kb.dbms == "MySQL" and not kb.data.has_information_schema:
+        if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg

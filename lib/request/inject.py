@@ -26,6 +26,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.settings import DBMS
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -122,7 +123,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(expression)
 
         rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
-        if rdbRegExp and kb.dbms == "Firebird":
+        if rdbRegExp and kb.dbms == DBMS.FIREBIRD:
             expressionFieldsList = [expressionFields]
 
         if len(expressionFieldsList) > 1:
@@ -141,8 +142,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
             limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
             topLimit    = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-            if limitRegExp or ( kb.dbms == "Microsoft SQL Server" and topLimit ):
-                if kb.dbms in ( "MySQL", "PostgreSQL" ):
+            if limitRegExp or ( kb.dbms == DBMS.MSSQL and topLimit ):
+                if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                     limitGroupStart = queries[kb.dbms].limitgroupstart.query
                     limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
@@ -152,7 +153,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms == "Microsoft SQL Server":
+                elif kb.dbms == DBMS.MSSQL:
                     if limitRegExp:
                         limitGroupStart = queries[kb.dbms].limitgroupstart.query
                         limitGroupStop  = queries[kb.dbms].limitgroupstop.query
@@ -167,7 +168,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         stopLimit  = int(topLimit.group(1))
                         limitCond  = int(stopLimit) > 1
 
-                elif kb.dbms == "Oracle":
+                elif kb.dbms == DBMS.ORACLE:
                     limitCond = False
             else:
                 limitCond = True
@@ -181,16 +182,16 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                         stopLimit += startLimit
                         untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
                         expression = expression[:untilLimitChar]
 
-                    elif kb.dbms == "Microsoft SQL Server":
+                    elif kb.dbms == DBMS.MSSQL:
                         stopLimit += startLimit
 
                 if not stopLimit or stopLimit <= 1:
-                    if kb.dbms == "Oracle" and expression.endswith("FROM DUAL"):
+                    if kb.dbms == DBMS.ORACLE and expression.endswith("FROM DUAL"):
                         test = "n"
                     elif batch:
                         test = "y"
@@ -289,7 +290,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     return outputs
 
-        elif kb.dbms == "Oracle" and expression.startswith("SELECT ") and " FROM " not in expression:
+        elif kb.dbms == DBMS.ORACLE and expression.startswith("SELECT ") and " FROM " not in expression:
             expression = "%s FROM DUAL" % expression
 
         outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)

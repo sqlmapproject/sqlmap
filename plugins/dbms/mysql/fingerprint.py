@@ -19,6 +19,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import MYSQL_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -141,7 +142,7 @@ class Fingerprint(GenericFingerprint):
         """
 
         if conf.dbms in MYSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
-            setDbms("MySQL %s" % kb.dbmsVersion[0])
+            setDbms("%s %s" % (DBMS.MYSQL, kb.dbmsVersion[0]))
 
             if int(kb.dbmsVersion[0]) >= 5:
                 kb.data.has_information_schema = True
@@ -176,7 +177,7 @@ class Fingerprint(GenericFingerprint):
                 kb.data.has_information_schema = True
                 kb.dbmsVersion = [">= 5.0.0"]
 
-                setDbms("MySQL 5")
+                setDbms("%s 5" % DBMS.MYSQL)
 
                 self.getBanner()
 
@@ -214,7 +215,7 @@ class Fingerprint(GenericFingerprint):
             else:
                 kb.dbmsVersion = ["< 5.0.0"]
 
-                setDbms("MySQL 4")
+                setDbms("%s 4" % DBMS.MYSQL)
 
                 self.getBanner()
 

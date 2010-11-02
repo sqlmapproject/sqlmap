@@ -124,13 +124,13 @@ def __unionTestByNULLBruteforce(comment):
     query   = agent.prefixQuery("UNION ALL SELECT NULL")
 
     for count in range(0, 50):
-        if kb.dbms == "Oracle" and query.endswith(" FROM DUAL"):
+        if kb.dbms == DBMS.ORACLE and query.endswith(" FROM DUAL"):
             query = query[:-len(" FROM DUAL")]
 
         if count:
             query += ", NULL"
 
-        if kb.dbms == "Oracle":
+        if kb.dbms == DBMS.ORACLE:
             query += " FROM DUAL"
 
         commentedQuery = agent.postfixQuery(query, comment)

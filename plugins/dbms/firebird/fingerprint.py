@@ -20,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.request.connect import Connect as Request
 
@@ -103,7 +104,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if conf.dbms in FIREBIRD_ALIASES:
-            setDbms("Firebird")
+            setDbms(DBMS.FIREBIRD)
 
             self.getBanner()
 
@@ -131,7 +132,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            setDbms("Firebird")
+            setDbms(DBMS.FIREBIRD)
 
             self.getBanner()
 

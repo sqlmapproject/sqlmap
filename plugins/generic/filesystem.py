@@ -19,6 +19,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.settings import DBMS
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
 
@@ -84,13 +85,13 @@ class Filesystem:
         return fileLines
 
     def __checkWrittenFile(self, wFile, dFile, fileType):
-        if kb.dbms == "MySQL":
+        if kb.dbms == DBMS.MYSQL:
             lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % dFile
 
-        elif kb.dbms == "PostgreSQL":
+        elif kb.dbms == DBMS.POSTGRESQL:
             lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
 
-        elif kb.dbms == "Microsoft SQL Server":
+        elif kb.dbms == DBMS.MSSQL:
             self.createSupportTbl(self.fileTblName, self.tblField, "text")
 
             # Reference: http://msdn.microsoft.com/en-us/library/ms188365.aspx

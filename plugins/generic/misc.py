@@ -21,6 +21,7 @@ from lib.core.data import queries
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setRemoteTempPath
+from lib.core.settings import DBMS
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
 
@@ -55,13 +56,13 @@ class Miscellaneous:
         infoMsg = "detecting back-end DBMS version from its banner"
         logger.info(infoMsg)
 
-        if kb.dbms == "MySQL":
+        if kb.dbms == DBMS.MYSQL:
             first, last = 1, 6
 
-        elif kb.dbms == "PostgreSQL":
+        elif kb.dbms == DBMS.POSTGRESQL:
             first, last = 12, 6
 
-        elif kb.dbms == "Microsoft SQL Server":
+        elif kb.dbms == DBMS.MSSQL:
             first, last = 29, 9
 
         else:
@@ -120,7 +121,7 @@ class Miscellaneous:
         if not onlyFileTbl:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
 
-            if kb.dbms == "Microsoft SQL Server":
+            if kb.dbms == DBMS.MSSQL:
                 return
 
             if udfDict is None:
@@ -133,7 +134,7 @@ class Miscellaneous:
                 if not output or output in ("y", "Y"):
                     dropStr = "DROP FUNCTION %s" % udf
 
-                    if kb.dbms == "PostgreSQL":
+                    if kb.dbms == DBMS.POSTGRESQL:
                         inp      = ", ".join(i for i in inpRet["input"])
                         dropStr += "(%s)" % inp
 

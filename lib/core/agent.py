@@ -21,6 +21,7 @@ from lib.core.data import kb
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import DBMS
 from lib.core.settings import PAYLOAD_DELIMITER
 
 class Agent:
@@ -219,7 +220,7 @@ class Agent:
 
         # SQLite version 2 does not support neither CAST() nor IFNULL(),
         # introduced only in SQLite version 3
-        if kb.dbms == "SQLite":
+        if kb.dbms == DBMS.SQLITE:
             return field
 
         if field.startswith("(CASE"):
@@ -324,13 +325,13 @@ class Agent:
     def simpleConcatQuery(self, query1, query2):
         concatenatedQuery = ""
 
-        if kb.dbms == "MySQL":
+        if kb.dbms == DBMS.MYSQL:
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
-        elif kb.dbms in ( "PostgreSQL", "Oracle", "SQLite" ):
+        elif kb.dbms in ( DBMS.POSTGRESQL, DBMS.ORACLE, DBMS.SQLITE ):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
-        elif kb.dbms == "Microsoft SQL Server":
+        elif kb.dbms == DBMS.MSSQL:
             concatenatedQuery = "%s+%s" % (query1, query2)
 
         return concatenatedQuery
@@ -372,7 +373,7 @@ class Agent:
             concatenatedQuery = query
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr = self.getFields(query)
 
-        if kb.dbms == "MySQL":
+        if kb.dbms == DBMS.MYSQL:
             if fieldsSelectCase:
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery += ",'%s')" % kb.misc.stop
@@ -385,7 +386,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-        elif kb.dbms in ( "PostgreSQL", "Oracle", "SQLite" ):
+        elif kb.dbms in ( DBMS.POSTGRESQL, DBMS.ORACLE, DBMS.SQLITE ):
             if fieldsSelectCase:
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
@@ -398,10 +399,10 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'||%s||'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-            if kb.dbms == "Oracle" and " FROM " not in concatenatedQuery and ( fieldsSelect or fieldsNoSelect ):
+            if kb.dbms == DBMS.ORACLE and " FROM " not in concatenatedQuery and ( fieldsSelect or fieldsNoSelect ):
                 concatenatedQuery += " FROM DUAL"
 
-        elif kb.dbms == "Microsoft SQL Server":
+        elif kb.dbms == DBMS.MSSQL:
             if fieldsSelectTop:
                 topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatenatedQuery, re.I).group(1)
                 concatenatedQuery = concatenatedQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, kb.misc.start), 1)
@@ -467,7 +468,7 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if kb.dbms == "Oracle" and inbandQuery.endswith(" FROM DUAL"):
+        if kb.dbms == DBMS.ORACLE and inbandQuery.endswith(" FROM DUAL"):
             inbandQuery = inbandQuery[:-len(" FROM DUAL")]
 
         for element in range(kb.unionCount):
@@ -487,7 +488,7 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if kb.dbms == "Oracle":
+        if kb.dbms == DBMS.ORACLE:
             if " FROM " not in inbandQuery:
                 inbandQuery += " FROM DUAL"
 
@@ -531,11 +532,11 @@ class Agent:
             limitStr = queries[kb.dbms].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
             
-        elif kb.dbms == "Firebird":
+        elif kb.dbms == DBMS.FIREBIRD:
             limitStr = queries[kb.dbms].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
-        elif kb.dbms == "Oracle":
+        elif kb.dbms == DMBS.ORACLE:
             if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
@@ -547,7 +548,7 @@ class Agent:
             limitedQuery  = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
-        elif kb.dbms == "Microsoft SQL Server":
+        elif kb.dbms == DBMS.MSSQL:
             forgeNotIn = True
 
             if " ORDER BY " in limitedQuery:

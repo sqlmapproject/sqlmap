@@ -8,12 +8,13 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.data import logger
+from lib.core.settings import DBMS
 
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def __init__(self):
-        GenericEnumeration.__init__(self, "Firebird")
+        GenericEnumeration.__init__(self, DBMS.FIREBIRD)
 
     def getDbs(self):
         warnMsg = "on Firebird it is not possible to enumerate databases"

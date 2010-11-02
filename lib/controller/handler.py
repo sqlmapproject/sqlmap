@@ -12,6 +12,7 @@ from lib.core.common import pushValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.settings import DBMS
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES

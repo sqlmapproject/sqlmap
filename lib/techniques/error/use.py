@@ -20,6 +20,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.session import setError
+from lib.core.settings import DBMS
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -49,7 +50,7 @@ def errorUse(expression, returnPayload=False):
         _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
         nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
 
-        if kb.dbms == "MySQL":
+        if kb.dbms == DBMS.MYSQL:
             nulledCastedField            = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
 
         expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)

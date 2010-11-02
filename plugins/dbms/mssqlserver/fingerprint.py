@@ -17,6 +17,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import MSSQL_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -71,7 +72,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if conf.dbms in MSSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
-            setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
+            setDbms("%s %s" % (DBMS.MSSQL, kb.dbmsVersion[0]))
 
             self.getBanner()
 
@@ -133,9 +134,9 @@ class Fingerprint(GenericFingerprint):
                         break
 
             if kb.dbmsVersion:
-                setDbms("Microsoft SQL Server %s" % kb.dbmsVersion[0])
+                setDbms("%s %s" % (DBMS.MSSQL, kb.dbmsVersion[0]))
             else:
-                setDbms("Microsoft SQL Server")
+                setDbms(DBMS.MSSQL)
 
             self.getBanner()
 

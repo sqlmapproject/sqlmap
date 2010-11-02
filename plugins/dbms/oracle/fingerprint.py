@@ -17,6 +17,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import ORACLE_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -64,7 +65,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if conf.dbms in ORACLE_ALIASES:
-            setDbms("Oracle")
+            setDbms(DBMS.ORACLE)
 
             self.getBanner()
 
@@ -100,7 +101,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            setDbms("Oracle")
+            setDbms(DBMS.ORACLE)
 
             self.getBanner()
 

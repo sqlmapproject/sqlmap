@@ -20,6 +20,7 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
+from lib.core.settings import DBMS
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
@@ -102,7 +103,7 @@ class UDF:
         return output
 
     def udfCheckNeeded(self):
-        if ( not conf.rFile or ( conf.rFile and kb.dbms != "PostgreSQL" ) ) and "sys_fileread" in self.sysUdfs:
+        if ( not conf.rFile or ( conf.rFile and kb.dbms != DBMS.POSTGRESQL ) ) and "sys_fileread" in self.sysUdfs:
             self.sysUdfs.pop("sys_fileread")
 
         if not conf.osPwn:
@@ -141,9 +142,9 @@ class UDF:
             if udf in self.udfToCreate and udf not in self.createdUdf:
                 self.udfCreateFromSharedLib(udf, inpRet)
 
-        if kb.dbms == "MySQL":
+        if kb.dbms == DBMS.MYSQL:
             supportTblType = "longtext"
-        elif kb.dbms == "PostgreSQL":
+        elif kb.dbms == DBMS.POSTGRESQL:
             supportTblType = "text"
 
         self.udfCreateSupportTbl(supportTblType)
@@ -154,7 +155,7 @@ class UDF:
         self.udfInjectCore(self.sysUdfs)
 
     def udfInjectCustom(self):
-        if kb.dbms not in ( "MySQL", "PostgreSQL" ):
+        if kb.dbms not in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
             errMsg = "UDF injection feature is not yet implemented on %s" % kb.dbms
             raise sqlmapUnsupportedFeatureException(errMsg)
 
@@ -236,9 +237,9 @@ class UDF:
                 else:
                     logger.warn("you need to specify the name of the UDF")
 
-            if kb.dbms == "MySQL":
+            if kb.dbms == DBMS.MYSQL:
                 defaultType = "string"
-            elif kb.dbms == "PostgreSQL":
+            elif kb.dbms == DBMS.POSTGRESQL:
                 defaultType = "text"
 
             self.udfs[udfName]["input"] = []

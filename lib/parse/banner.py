@@ -17,6 +17,7 @@ from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
+from lib.core.settings import DBMS
 from lib.parse.handler import FingerprintHandler
 
 class MSSQLBannerHandler(ContentHandler):
@@ -93,13 +94,13 @@ def bannerParser(banner):
 
     xmlfile = None
 
-    if kb.dbms == "Microsoft SQL Server":
+    if kb.dbms == DBMS.MSSQL:
         xmlfile = paths.MSSQL_XML
-    elif kb.dbms == "MySQL":
+    elif kb.dbms == DBMS.MYSQL:
         xmlfile = paths.MYSQL_XML
-    elif kb.dbms == "Oracle":
+    elif kb.dbms == DBMS.ORACLE:
         xmlfile = paths.ORACLE_XML
-    elif kb.dbms == "PostgreSQL":
+    elif kb.dbms == DBMS.POSTGRESQL:
         xmlfile = paths.PGSQL_XML
 
     if not xmlfile:
@@ -107,7 +108,7 @@ def bannerParser(banner):
 
     checkFile(xmlfile)
 
-    if kb.dbms == "Microsoft SQL Server":
+    if kb.dbms == DBMS.MSSQL:
         handler = MSSQLBannerHandler(banner, kb.bannerFp)
         parseXmlFile(xmlfile, handler)
 

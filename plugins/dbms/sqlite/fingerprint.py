@@ -15,6 +15,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import SQLITE_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -69,7 +70,7 @@ class Fingerprint(GenericFingerprint):
         """
 
         if conf.dbms in SQLITE_ALIASES:
-            setDbms("SQLite")
+            setDbms(DBMS.SQLITE)
 
             self.getBanner()
 
@@ -95,7 +96,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            setDbms("SQLite")
+            setDbms(DBMS.SQLITE)
 
             self.getBanner()
 

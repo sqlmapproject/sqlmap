@@ -20,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import MAXDB_ALIASES
 from lib.request.connect import Connect as Request
 
@@ -105,7 +106,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if conf.dbms in MAXDB_ALIASES:
-            setDbms("SAP MaxDB")
+            setDbms(DBMS.MAXDB)
 
             self.getBanner()
 
@@ -133,7 +134,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            setDbms("SAP MaxDB")
+            setDbms(DBMS.MAXDB)
 
             self.getBanner()
 

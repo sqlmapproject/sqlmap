@@ -20,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import ACCESS_ALIASES
 from lib.request.connect import Connect as Request
 
@@ -152,7 +153,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if conf.dbms in ACCESS_ALIASES:
-            setDbms("Microsoft Access")
+            setDbms(DBMS.ACCESS)
 
             if not conf.extensiveFp:
                 return True

@@ -18,6 +18,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.settings import DBMS
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
@@ -68,7 +69,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
             limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
 
             if limitRegExp:
-                if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                     limitGroupStart = queries[kb.dbms].limitgroupstart.query
                     limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
@@ -78,7 +79,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms == "Microsoft SQL Server":
+                elif kb.dbms == DBMS.MSSQL:
                     limitGroupStart = queries[kb.dbms].limitgroupstart.query
                     limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
@@ -88,7 +89,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms == "Oracle":
+                elif kb.dbms == DBMS.ORACLE:
                     limitCond = False
             else:
                 limitCond = True
@@ -102,12 +103,12 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if kb.dbms in ( "MySQL", "PostgreSQL" ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
                         stopLimit += startLimit
                         untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
                         expression = expression[:untilLimitChar]
 
-                    elif kb.dbms == "Microsoft SQL Server":
+                    elif kb.dbms == DBMS.MSSQL:
                         stopLimit += startLimit
                 elif dump:
                     if conf.limitStart:
@@ -116,7 +117,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                         stopLimit = conf.limitStop
 
                 if not stopLimit or stopLimit <= 1:
-                    if kb.dbms == "Oracle" and expression.endswith("FROM DUAL"):
+                    if kb.dbms == DBMS.ORACLE and expression.endswith("FROM DUAL"):
                         test = False
                     else:
                         test = True
@@ -170,9 +171,9 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                         return
 
                     for num in xrange(startLimit, stopLimit):
-                        if kb.dbms == "Microsoft SQL Server":
+                        if kb.dbms == DBMS.MSSQL:
                             field = expressionFieldsList[0]
-                        elif kb.dbms == "Oracle":
+                        elif kb.dbms == DBMS.ORACLE:
                             field = expressionFieldsList
                         else:
                             field = None

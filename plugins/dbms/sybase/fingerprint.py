@@ -16,6 +16,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.session import setDbms
+from lib.core.settings import DBMS
 from lib.core.settings import SYBASE_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -63,7 +64,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if conf.dbms in SYBASE_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
-            setDbms("Sybase %s" % kb.dbmsVersion[0])
+            setDbms("%s %s" % (DBMS.SYBASE, kb.dbmsVersion[0]))
 
             self.getBanner()
 
@@ -94,7 +95,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            setDbms("Sybase")
+            setDbms(DBMS.SYBASE)
 
             self.getBanner()
 
