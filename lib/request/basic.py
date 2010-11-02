@@ -81,8 +81,9 @@ def checkCharEncoding(encoding):
     #http://www.destructor.de/charsets/index.htm
     translate = { 'windows-874':'iso-8859-11' }
 
-    if ';' in encoding:
-        encoding = encoding[:encoding.find(';')]
+    for delimiter in (';', ','):
+        if delimiter in encoding:
+            encoding = encoding[:encoding.find(delimiter)]
 
     # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
@@ -97,9 +98,9 @@ def checkCharEncoding(encoding):
     except LookupError:
         warnMsg  = "unknown charset '%s'. " % encoding
         warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
-
         logger.warn(warnMsg)
         encoding = conf.dataEncoding
+
     return encoding
 
 def decodePage(page, contentEncoding, contentType):
