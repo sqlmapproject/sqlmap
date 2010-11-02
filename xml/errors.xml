@@ -53,11 +53,6 @@
         <error regexp="Exception.*Informix"/>
     </dbms>
 
-    <!-- Sybase -->
-    <dbms value="Sybase">
-        <error regexp="Sybase message"/>
-    </dbms>
-
     <!-- Interbase/Firebird -->
     <dbms value="Firebird">
         <error regexp="Dynamic SQL Error"/>
@@ -81,6 +76,7 @@
     <!-- Sybase -->
     <dbms value="Sybase">
         <error regexp="Warning.*sybase.*"/>
+        <error regexp="Sybase message"/>
         <error regexp="Sybase.*Server message.*"/>
     </dbms>
 
