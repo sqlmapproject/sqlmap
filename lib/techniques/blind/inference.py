@@ -31,6 +31,7 @@ from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapThreadException
 from lib.core.exception import unhandledException
 from lib.core.progress import ProgressBar
+from lib.core.settings import DBMS
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -114,7 +115,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         hintlock.release()
 
         if hintValue is not None and len(hintValue) >= idx:
-            if kb.dbms in ("SQLite", "Microsoft Access", "SAP MaxDB"):
+            if kb.dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
                 posValue = hintValue[idx-1]
             else:
                 posValue = ord(hintValue[idx-1])
@@ -166,7 +167,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             position = (len(charTbl) >> 1)
             posValue = charTbl[position]
 
-            if kb.dbms in ("SQLite", "Microsoft Access", "SAP MaxDB"):
+            if kb.dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
                 pushValue(posValue)
                 posValue = chr(posValue) if posValue < 128 else unichr(posValue)
 
@@ -175,7 +176,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload)
 
-            if kb.dbms in ("SQLite", "Microsoft Access", "SAP MaxDB"):
+            if kb.dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
                 posValue = popValue()
 
             if result:
@@ -490,6 +491,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if val is None or ( lastChar > 0 and index > lastChar ):
                 break
+
+            if kb.data.processChar:
+                val = kb.data.processChar(val)
 
             finalValue += val
             dataToSessionFile(replaceNewlineTabs(val))

@@ -479,6 +479,9 @@ class XMLNode:
         else:
             raise IndexError(idx)
 
+    def __contains__(self, k):
+        return self._has_key(k)
+
     def _addNode(self, child):
         """
         Tries to append a child node to the tree, and returns it

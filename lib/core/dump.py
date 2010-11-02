@@ -148,7 +148,7 @@ class Dump:
 
             dbTables.sort(key=lambda x: x.lower())
 
-            self.__write("Brute-forced databases:")
+            self.__write("Brute-forced tables:")
 
             if len(dbTables) == 1:
                 self.__write("[1 table]")

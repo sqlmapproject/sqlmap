@@ -63,6 +63,7 @@ class Enumeration:
         kb.data.cachedTables           = {}
         kb.data.cachedColumns          = {}
         kb.data.dumpedTable            = {}
+        kb.data.processChar            = None
         kb.misc.testedDbms             = dbms
 
     def getBanner(self):

@@ -420,13 +420,13 @@
    <!-- SAP MaxDB -->
    <dbms value="SAP MaxDB">
         <length query="LENGTH(%s)"/>
-        <inference/>
         <timedelay/>
         <banner query="SELECT ID FROM SYSINFO.VERSION"/>
         <isnull query="VALUE(%s,' ')" query2="IFNULL(%s, ' ')"/>
         <comment query="--" query2="#"/>
         <count query="COUNT(%s)"/>
-        <cast query="CHR(%s)"/>
+        <!-- No real cast on SAP MaxDB -->
+        <cast query="REPLACE(%s, ' ', '_')"/>
         <current_user query="SELECT USER() FROM DUAL"/>
         <current_db query="SELECT DATABASE() FROM DUAL"/>
         <order query="ORDER BY %s ASC"/>
