@@ -251,8 +251,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         idxlock = threading.Lock()
         iolock  = threading.Lock()
         valuelock  = threading.Lock()
-        conf.seqLock = threading.Lock()
-        conf.parseLock = threading.Lock()
+        kb.data.seqLock = threading.Lock()
         conf.threadContinue = True
 
         def downloadThread():
@@ -416,8 +415,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if conf.verbose >= 1 and not showEta and infoMsg:
             dataToStdout(infoMsg)
 
-        conf.seqLock = None
-        conf.parseLock = None
+        kb.data.seqLock = None
 
     # No multi-threading (--threads = 1)
     else:

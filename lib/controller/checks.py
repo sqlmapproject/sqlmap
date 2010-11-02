@@ -185,7 +185,7 @@ def checkDynamicContent(firstPage, secondPage):
             if postfix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
                 continue
 
-            kb.dynamicMarkings.append((prefix[-conf.dynMarkLength:] if prefix else None, postfix[:conf.dynMarkLength] if postfix else None))
+            kb.dynamicMarkings.append((re.escape(prefix[-conf.dynMarkLength:]) if prefix else None, re.escape(postfix[:conf.dynMarkLength]) if postfix else None))
 
     if len(kb.dynamicMarkings) > 0:
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')

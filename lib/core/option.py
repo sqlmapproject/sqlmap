@@ -16,6 +16,7 @@ import os
 import re
 import socket
 import sys
+import threading
 import urllib2
 import urlparse
 
@@ -993,7 +994,6 @@ def __setConfAttributes():
     conf.outputPath       = None
     conf.paramDict        = {}
     conf.parameters       = {}
-    conf.parseLock        = None
     conf.path             = None
     conf.port             = None
     conf.redirectHandled  = False
@@ -1001,7 +1001,6 @@ def __setConfAttributes():
     conf.scheme           = None
     #conf.seqMatcher       = difflib.SequenceMatcher(lambda x: x in " \t")
     conf.seqMatcher       = difflib.SequenceMatcher(None)
-    conf.seqLock          = None
     conf.sessionFP        = None
     conf.start            = True
     conf.threadContinue   = True
@@ -1027,7 +1026,10 @@ def __setKnowledgeBaseAttributes():
     kb.cache.regex     = {}
 
     kb.commonOutputs   = None
+
     kb.data            = advancedDict()
+    kb.data.cacheLock  = threading.Lock()
+    kb.data.seqLock    = None
 
     # Basic back-end DBMS fingerprint
     kb.dbms            = None

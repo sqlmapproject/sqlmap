@@ -58,8 +58,8 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         else:
             page = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), page)
 
-    if conf.seqLock:
-        conf.seqLock.acquire()
+    if kb.data.seqLock:
+        kb.data.seqLock.acquire()
 
     if not conf.eRegexp and not conf.eString and kb.nullConnection:
         ratio = 1. * pageLength / len(conf.seqMatcher.a)
@@ -69,8 +69,8 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         conf.seqMatcher.set_seq2(page if not conf.textOnly else getFilteredPageContent(page))
         ratio = round(conf.seqMatcher.ratio(), 3)
 
-    if conf.seqLock:
-        conf.seqLock.release()
+    if kb.data.seqLock:
+        kb.data.seqLock.release()
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
