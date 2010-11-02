@@ -14,6 +14,8 @@ from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
+from lib.core.common import randomStr
+from lib.core.common import wasLastRequestError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -42,13 +44,13 @@ class Fingerprint(GenericFingerprint):
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
                 retVal = "not sandboxed" if result else "sandboxed"
-        
+
         return retVal
 
     def __sysTablesCheck(self):
         infoMsg = "executing system table(s) existance fingerprint"
         logger.info(infoMsg)
-        
+
         # Microsoft Access table reference updated on 01/2010
         sysTables = { 
                         "97":           ("MSysModules2", "MSysAccessObjects"),
@@ -82,6 +84,30 @@ class Fingerprint(GenericFingerprint):
                 return version
 
         return None
+
+    def __getDatabaseDir(self):
+        retVal = None
+
+        infoMsg = "searching for database directory"
+        logger.info(infoMsg)
+
+        randInt = randomInt()
+        randStr = randomStr()
+        query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
+        query   = agent.postfixQuery(query)
+        payload = agent.payload(newValue=query)
+        page  = Request.queryPage(payload, content=True)
+
+        if wasLastRequestError():
+            match = re.search("Could not find file\s+'([^']+?)'", page[0])
+
+            if match:
+                retVal = match.group(1).rstrip("%s.mdb" % randStr)
+
+                if retVal.endswith('\\'):
+                    retVal = retVal[:-1]
+
+        return retVal
 
     def getFingerprint(self):
         value  = ""
@@ -119,6 +145,8 @@ class Fingerprint(GenericFingerprint):
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+
+        value += "\ndatabase directory: '%s'" % self.__getDatabaseDir()
 
         return value
 
