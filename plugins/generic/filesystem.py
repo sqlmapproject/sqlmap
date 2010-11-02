@@ -192,7 +192,7 @@ class Filesystem:
         forgedScrLines = []
         cmd            = ""
         charCounter    = 0
-        maxLen         = 4096
+        maxLen         = 512
 
         logger.debug("generating binary file %s\%s, wait.." % (tmpPath, chunkName))
 

