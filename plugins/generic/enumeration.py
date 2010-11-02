@@ -796,7 +796,7 @@ class Enumeration:
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
-                if kb.dbms in (DBMS.SQLITE, DBMS.FIREBIRD):
+                if kb.dbms in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB):
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % db
@@ -819,6 +819,8 @@ class Enumeration:
                 for index in indexRange:
                     if kb.dbms == DBMS.SYBASE:
                         query = rootQuery.blind.query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
+                    elif kb.dbms == DBMS.MAXDB:
+                        query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                     elif kb.dbms in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
                     else:
