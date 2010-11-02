@@ -1028,8 +1028,6 @@ def __setKnowledgeBaseAttributes():
     kb.commonOutputs   = None
 
     kb.data            = advancedDict()
-    kb.data.cacheLock  = threading.Lock()
-    kb.data.seqLock    = None
 
     # Basic back-end DBMS fingerprint
     kb.dbms            = None
@@ -1053,6 +1051,11 @@ def __setKnowledgeBaseAttributes():
     kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
     kb.lastErrorPage   = None
     kb.lastRequestUID  = 0
+
+    kb.locks           = advancedDict()
+    kb.locks.cacheLock = threading.Lock()
+    kb.locks.seqLock   = None
+
     kb.nullConnection  = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)

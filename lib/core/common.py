@@ -1245,7 +1245,7 @@ def parseXmlFile(xmlFile, handler):
 
 def readCachedFileContent(filename, mode='rb'):
     if filename not in kb.cache.content:
-        kb.data.cacheLock.acquire()
+        kb.locks.cacheLock.acquire()
 
         if filename not in kb.cache.content:
             checkFile(filename)
@@ -1254,7 +1254,7 @@ def readCachedFileContent(filename, mode='rb'):
             kb.cache.content[filename] = content
             xfile.close()
 
-        kb.data.cacheLock.release()
+        kb.locks.cacheLock.release()
     
     return kb.cache.content[filename]
 
