@@ -171,7 +171,7 @@ class Enumeration:
             indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
-                if kb.dbms == DBMS.SYBASE:
+                if kb.dbms in (DBMS.SYBASE, DBMS.MAXDB):
                     query = rootQuery.blind.query % (kb.data.cachedUsers[-1] if kb.data.cachedUsers else " ")
                 elif condition:
                     query = rootQuery.blind.query2 % index

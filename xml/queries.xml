@@ -436,6 +436,7 @@
         <substring query="SUBSTR((%s), %d, %d)"/>
         <users>
             <inband query="SELECT username FROM domain.users ORDER BY 1"/>
+            <blind query="SELECT MIN(username) FROM domain.users WHERE username > '%s'" count="SELECT CHR(COUNT(*)) FROM domain.users"/>
         </users>
         <tables>
             <inband query="SELECT tablename FROM domain.tables WHERE schemaname='%s' AND type='TABLE'"/>
