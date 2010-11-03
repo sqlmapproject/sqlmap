@@ -214,10 +214,10 @@ class Connect:
         except urllib2.HTTPError, e:
             if e.code == 401:
                 errMsg  = "not authorized, try to provide right HTTP "
-                errMsg += "authentication type and valid credentials"
+                errMsg += "authentication type and valid credentials (%d)" % e.code
                 raise sqlmapConnectionException, errMsg
             elif e.code == 404 and raise404:
-                errMsg = "page not found"
+                errMsg = "page not found (%d)" % e.code
                 raise sqlmapConnectionException, errMsg
             else:
                 try:
@@ -285,7 +285,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False, raise404 = None):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -302,7 +302,7 @@ class Connect:
         page        = None
         pageLength  = None
         uri         = None
-        raise404    = place != "URI"
+        raise404    = place != "URI" if raise404 is None else raise404
         toUrlencode = { "GET": True, "POST": True, "Cookie": conf.cookieUrlencode, "User-Agent": True, "URI": False }
 
         if not place:

@@ -18,48 +18,53 @@ from lib.core.data import logger
 from lib.core.session import setMatchRatio
 
 def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
+    if page is None and pageLength is None:
+        return None
+
     regExpResults = None
 
-    # String to be excluded before calculating page hash
-    if conf.eString and conf.eString in page:
-        index              = page.index(conf.eString)
-        length             = len(conf.eString)
-        pageWithoutString  = page[:index]
-        pageWithoutString += page[index+length:]
-        page               = pageWithoutString
+    if page:
+        # String to be excluded before calculating page hash
+        if conf.eString and conf.eString in page:
+            index              = page.index(conf.eString)
+            length             = len(conf.eString)
+            pageWithoutString  = page[:index]
+            pageWithoutString += page[index+length:]
+            page               = pageWithoutString
 
-    # Regular expression matches to be excluded before calculating page hash
-    if conf.eRegexp:
-        regExpResults = re.findall(conf.eRegexp, page, re.I | re.M)
+        # Regular expression matches to be excluded before calculating page hash
+        if conf.eRegexp:
+            regExpResults = re.findall(conf.eRegexp, page, re.I | re.M)
 
-        if regExpResults:
-            for regExpResult in regExpResults:
-                index              = page.index(regExpResult)
-                length             = len(regExpResult)
-                pageWithoutRegExp  = page[:index]
-                pageWithoutRegExp += page[index+length:]
-                page               = pageWithoutRegExp
+            if regExpResults:
+                for regExpResult in regExpResults:
+                    index              = page.index(regExpResult)
+                    length             = len(regExpResult)
+                    pageWithoutRegExp  = page[:index]
+                    pageWithoutRegExp += page[index+length:]
+                    page               = pageWithoutRegExp
 
-    # String to match in page when the query is valid
-    if conf.string:
-        return conf.string in page
+        # String to match in page when the query is valid
+        if conf.string:
+            return conf.string in page
 
-    # Regular expression to match in page when the query is valid
-    if conf.regexp:
-        return re.search(conf.regexp, page, re.I | re.M) is not None
+        # Regular expression to match in page when the query is valid
+        if conf.regexp:
+            return re.search(conf.regexp, page, re.I | re.M) is not None
 
-    # Dynamic content lines to be excluded before calculating page hash
-    for item in kb.dynamicMarkings:
-        prefix, postfix = item
-        if prefix is None:
-            page = re.sub('(?s)^.+%s' % postfix, postfix, page)
-        elif postfix is None:
-            page = re.sub('(?s)%s.+$' % prefix, prefix, page)
-        else:
-            page = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), page)
+        # Dynamic content lines to be excluded before calculating page hash
+        if not kb.nullConnection:
+            for item in kb.dynamicMarkings:
+                prefix, postfix = item
+                if prefix is None:
+                    page = re.sub('(?s)^.+%s' % postfix, postfix, page)
+                elif postfix is None:
+                    page = re.sub('(?s)%s.+$' % prefix, prefix, page)
+                else:
+                    page = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), page)
 
-    if not pageLength and page:
-        pageLength = len(page)
+        if not pageLength:
+            pageLength = len(page)
 
     if kb.locks.seqLock:
         kb.locks.seqLock.acquire()

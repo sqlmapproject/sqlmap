@@ -104,7 +104,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
 
     payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
     payload = agent.payload(place, parameter, value, payload)
-    Request.queryPage(payload, place)
+    Request.queryPage(payload, place, raise404=False)
     result = wasLastRequestError()
 
     infoMsg  = "(error based) heuristics shows that %s " % place
@@ -153,6 +153,9 @@ def checkDynamicContent(firstPage, secondPage):
     This function checks if the provided pages have dynamic content. If they
     are dynamic, proper markings will be made.
     """
+    
+    if kb.nullConnection:
+        return
 
     infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
@@ -245,6 +248,7 @@ def checkStability():
 
             if test:
                 conf.string = test
+                kb.nullConnection = None
             else:
                 raise sqlmapSilentQuitException
 
@@ -254,6 +258,7 @@ def checkStability():
 
             if test:
                 conf.regex = test
+                kb.nullConnection = None
             else:
                 raise sqlmapSilentQuitException
         else:
