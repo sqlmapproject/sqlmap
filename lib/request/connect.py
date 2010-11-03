@@ -212,12 +212,15 @@ class Connect:
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
         except urllib2.HTTPError, e:
+            code = e.code
+            status = e.msg
+
             if e.code == 401:
                 errMsg  = "not authorized, try to provide right HTTP "
-                errMsg += "authentication type and valid credentials (%d)" % e.code
+                errMsg += "authentication type and valid credentials (%d)" % code
                 raise sqlmapConnectionException, errMsg
             elif e.code == 404 and raise404:
-                errMsg = "page not found (%d)" % e.code
+                errMsg = "page not found (%d)" % code
                 raise sqlmapConnectionException, errMsg
             else:
                 try:
@@ -225,12 +228,9 @@ class Connect:
                     responseHeaders = e.info()
                 except socket.timeout:
                     warnMsg  = "connection timed out while trying "
-                    warnMsg += "to get error page information (%d)" % e.code
+                    warnMsg += "to get error page information (%d)" % code
                     logger.warn(warnMsg)
                     return None, None
-
-                code = e.code
-                status = e.msg
 
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)

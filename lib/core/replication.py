@@ -15,6 +15,13 @@ class Replication:
     replication purposes.
     """
 
+    # sqlite data types
+    NULL    = DataType('NULL')
+    INTEGER = DataType('INTEGER')
+    REAL    = DataType('REAL')
+    TEXT    = DataType('TEXT')
+    BLOB    = DataType('BLOB')
+
     def __init__(self, dbpath):
         self.dbpath = dbpath
         self.connection = sqlite3.connect(dbpath)
@@ -66,13 +73,6 @@ class Replication:
             if condition:
                 stmt += 'WHERE %s' % condition
             return self.parent.cursor.execute(stmt)
-
-    # sqlite data types
-    NULL    = DataType('NULL')
-    INTEGER = DataType('INTEGER')
-    REAL    = DataType('REAL')
-    TEXT    = DataType('TEXT')
-    BLOB    = DataType('BLOB')
 
     def createTable(self, tblname, columns=None, typeless=False):
         """
