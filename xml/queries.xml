@@ -438,6 +438,10 @@
             <inband query="SELECT username FROM domain.users ORDER BY 1"/>
             <blind query="SELECT MIN(username) FROM domain.users WHERE username > '%s'" count="SELECT CHR(COUNT(*)) FROM domain.users"/>
         </users>
+        <columns>
+            <inband query="SELECT columnname, datatype, len FROM DOMAIN.COLUMNS WHERE tablename = '%s' AND schemaname=user ORDER BY pos"/>
+            <blind query="SELECT columnname FROM DOMAIN.COLUMNS WHERE tablename = '%s' AND schemaname=user ORDER BY pos" query2="SELECT datatype FROM DOMAIN.COLUMNS WHERE tablename = '%s' AND schemaname=user ORDER BY pos"/>
+        </columns>
         <tables>
             <inband query="SELECT tablename FROM domain.tables WHERE schemaname='%s' AND type='TABLE'"/>
             <blind query="SELECT MIN(tablename) FROM domain.tables WHERE schemaname=user AND type='TABLE' AND name > '%s'" count="SELECT CHR(COUNT(*)) FROM domain.tables WHERE schemaname=user AND type='TABLE'"/>
@@ -447,6 +451,7 @@
         </roles>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE %s > '%s'" count="SELECT CHR(COUNT(*)) FROM %s"/>
         </dump_table>
    </dbms>
 
