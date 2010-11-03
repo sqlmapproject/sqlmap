@@ -58,10 +58,13 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         else:
             page = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), page)
 
+    if not pageLength and page:
+        pageLength = len(page)
+
     if kb.locks.seqLock:
         kb.locks.seqLock.acquire()
 
-    if not conf.eRegexp and not conf.eString and kb.nullConnection:
+    if not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
         ratio = 1. * pageLength / len(conf.seqMatcher.a)
         if ratio > 1.:
             ratio = 1. / ratio
