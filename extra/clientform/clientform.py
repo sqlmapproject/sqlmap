@@ -1279,7 +1279,7 @@ class Control:
 
     def get_labels(self):
         """Return all labels (Label instances) for this control.
-        
+
         If the control was surrounded by a <label> tag, that will be the first
         label; all other labels, connected by 'for' and 'id', are in the order
         that appear in the HTML.
@@ -1622,12 +1622,12 @@ class Item:
 
     def get_labels(self):
         """Return all labels (Label instances) for this item.
-        
+
         For items that represent radio buttons or checkboxes, if the item was
         surrounded by a <label> tag, that will be the first label; all other
         labels, connected by 'for' and 'id', are in the order that appear in
         the HTML.
-        
+
         For items that represent select options, if the option had a label
         attribute, that will be the first label.  If the option has contents
         (text within the option tags) and it is not the same as the label
@@ -1936,9 +1936,9 @@ class ListControl(Control):
 
     def toggle_single(self, by_label=None):
         """Deprecated: toggle the selection of the single item in this control.
-        
+
         Raises ItemCountError if the control does not contain only one item.
-        
+
         by_label argument is ignored, and included only for backwards
         compatibility.
 
@@ -1953,9 +1953,9 @@ class ListControl(Control):
 
     def set_single(self, selected, by_label=None):
         """Deprecated: set the selection of the single item in this control.
-        
+
         Raises ItemCountError if the control does not contain only one item.
-        
+
         by_label argument is ignored, and included only for backwards
         compatibility.
 
@@ -2067,7 +2067,7 @@ class ListControl(Control):
         # RFC 1866 if the _select_default attribute is set, and Netscape and IE
         # otherwise.  RFC 1866 and HTML 4 are always violated insofar as you
         # can deselect all items in a RadioControl.
-        
+
         for o in self.items: 
             # set items' controls to self, now that we've merged
             o.__dict__["_control"] = self

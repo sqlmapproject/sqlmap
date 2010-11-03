@@ -138,7 +138,7 @@ class Fingerprint(GenericFingerprint):
 
             if not conf.extensiveFp:
                 return True
-            
+
             kb.dbmsVersion = [self.__sysTablesCheck()]
 
             return True

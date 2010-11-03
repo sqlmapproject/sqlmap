@@ -89,4 +89,3 @@ class Replication:
     def __del__(self):
         self.cursor.close()
         self.connection.close()
-        

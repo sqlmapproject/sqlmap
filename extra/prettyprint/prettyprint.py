@@ -42,7 +42,7 @@ def _patch_minidom():
         minidom.Text.writexml = _writexml_text
         minidom.Element.writexml = _writexml_element
         minidom.Node.toprettyxml = _toprettyxml_node
-        
+
 def _collapse(node):
         for child in node.childNodes:
                 if child.nodeType == Node.TEXT_NODE and len(child.data.strip()) == 0:
@@ -52,17 +52,17 @@ def _collapse(node):
 
 def _writexml_text(self, writer, indent="", addindent="", newl=""):
         minidom._write_data(writer, "%s"%(self.data.strip()))
-        
+
 def _writexml_element(self, writer, indent="", addindent="", newl=""):
         # indent = current indentation
         # addindent = indentation to add to higher levels
         # newl = newline string
         writer.write(indent+"<" + self.tagName)
-        
+
         attrs = self._get_attributes()
         a_names = attrs.keys()
         a_names.sort()
-        
+
         for a_name in a_names:
                 writer.write(" %s=\"" % a_name)
                 minidom._write_data(writer, attrs[a_name].value)
@@ -80,7 +80,7 @@ def _writexml_element(self, writer, indent="", addindent="", newl=""):
                         writer.write("%s</%s>%s" % (indent,self.tagName,newl))
         else:
                 writer.write("/>%s"%(newl))
-                
+
 def _toprettyxml_node(self, indent="\t", newl="\n", encoding = None):
         _collapse(self)
         # indent = the indentation string to prepend, per level

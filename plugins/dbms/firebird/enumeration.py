@@ -21,7 +21,7 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
-    
+
     def getPasswordHashes(self):
         warnMsg = "on Firebird it is not possible to enumerate the user password hashes"
         logger.warn(warnMsg)

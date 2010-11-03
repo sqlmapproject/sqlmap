@@ -34,7 +34,7 @@ class Connector:
         infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
         infoMsg += ":%d established" % self.port
         logger.info(infoMsg)
-        
+
     def closed(self):
         infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
         infoMsg += ":%d closed" % self.port

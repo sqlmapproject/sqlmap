@@ -23,7 +23,7 @@
   keepalive_handler = HTTPHandler()
   opener = urllib2.build_opener(keepalive_handler)
   urllib2.install_opener(opener)
- 
+
   fo = urllib2.urlopen('http://www.python.org')
 
 To remove the handler, simply re-run build_opener with no arguments, and
@@ -84,7 +84,7 @@ HANDLE_ERRORS = 1
 class HTTPHandler(urllib2.HTTPHandler):
     def __init__(self):
         self._connections = {}
-        
+
     def close_connection(self, host):
         """close connection to <host>
         host is the host:port spec, as in 'www.cnn.com:8080' as passed in.
@@ -105,16 +105,16 @@ class HTTPHandler(urllib2.HTTPHandler):
         for _, conn in self._connections.items():
             conn.close()
         self._connections = {}
-        
+
     def _remove_connection(self, host, close=0):
         key = self._get_connection_key(host)
         if self._connections.has_key(key):
             if close: self._connections[key].close()
             del self._connections[key]
-    
+
     def _get_connection_key(self, host):
         return (threading.currentThread(), host)
-    
+
     def _start_connection(self, h, req):
         h.clearheaders()
         try:
@@ -160,7 +160,7 @@ class HTTPHandler(urllib2.HTTPHandler):
                 else:
                     try: r = h.getresponse()
                     except httplib.ResponseNotReady, e: r = None
-                    
+
                 if r is None or r.version == 9:
                     # httplib falls back to assuming HTTP 0.9 if it gets a
                     # bad header back.  This is most likely to happen if
@@ -180,7 +180,7 @@ class HTTPHandler(urllib2.HTTPHandler):
         except socket.error, err:
             if h: h.close()
             raise urllib2.URLError(err)
-            
+
         # if not a persistent connection, don't try to reuse it
         if r.will_close: self._remove_connection(host)
 
@@ -225,7 +225,7 @@ class HTTPResponse(httplib.HTTPResponse):
     # although read() never adds to the buffer.
     # Both readline and readlines have been stolen with almost no
     # modification from socket.py
-    
+
 
     def __init__(self, sock, debuglevel=0, strict=0, method=None):
         if method: # the httplib in python 2.3 uses the method arg
@@ -244,7 +244,7 @@ class HTTPResponse(httplib.HTTPResponse):
     def close_connection(self):
         self.close()
         self._handler._remove_connection(self._host, close=1)
-        
+
     def info(self):
         return self.msg
 
@@ -367,7 +367,7 @@ def error_handler(url):
 def continuity(url):
     import md5
     format = '%25s: %s'
-    
+
     # first fetch the file with the normal http handler
     opener = urllib2.build_opener()
     urllib2.install_opener(opener)
@@ -414,7 +414,7 @@ def comp(N, url):
     t2 = fetch(N, url)
     print '  TIME: %.3f s' % t2
     print '  improvement factor: %.2f' % (t1/t2, )
-    
+
 def fetch(N, url, delay=0):
     lens = []
     starttime = time.time()
@@ -446,7 +446,7 @@ def test(url, N=10):
     print
     print "performing speed comparison"
     comp(N, url)
-    
+
 if __name__ == '__main__':
     import time
     import sys

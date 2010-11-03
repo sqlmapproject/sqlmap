@@ -47,11 +47,11 @@ class MultipartPostHandler(urllib2.BaseHandler):
 
     def http_request(self, request):
         data = request.get_data()
-        
+
         if data is not None and type(data) != str:
             v_files = []
             v_vars = []
-            
+
             try:
                 for(key, value) in data.items():
                     if type(value) == file or hasattr(value, 'file'):

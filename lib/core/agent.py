@@ -313,7 +313,7 @@ class Agent:
             fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsNoSelect:
             fieldsToCastStr = fieldsNoSelect
-        
+
         if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I): #function
             fieldsToCastList = [fieldsToCastStr]
         else:
@@ -531,7 +531,7 @@ class Agent:
         if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL, DBMS.SQLITE ):
             limitStr = queries[kb.dbms].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
-            
+
         elif kb.dbms == DBMS.FIREBIRD:
             limitStr = queries[kb.dbms].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr

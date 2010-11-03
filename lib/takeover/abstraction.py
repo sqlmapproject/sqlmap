@@ -69,7 +69,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             message   = "do you want to retrieve the command standard "
             message  += "output? [Y/n/a] "
             getOutput = readInput(message, default="Y")
-            
+
             if getOutput in ("a", "A"):
                 self.alwaysRetrieveCmdOutput = True
 

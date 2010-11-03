@@ -611,7 +611,7 @@ def __setHTTPProxy():
             errMsg  = "Proxy authentication credentials "
             errMsg += "value must be in format username:password"
             raise sqlmapSyntaxException, errMsg
-    
+
         # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
         __proxyString = "%s@" % conf.pCred
 

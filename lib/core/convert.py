@@ -39,7 +39,7 @@ def hexdecode(string):
         string = string[2:]
 
     return string.decode("hex")
-    
+
 def hexencode(string):
     return string.encode("hex")
 

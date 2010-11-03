@@ -116,7 +116,7 @@ def decodePage(page, contentEncoding, contentType):
             data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(page))
 
         page = data.read()
-    
+
     #http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
     if contentType and (contentType.find('charset=') != -1):
         charset = checkCharEncoding(contentType.split('charset=')[-1])

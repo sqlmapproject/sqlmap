@@ -453,7 +453,7 @@ class XDotAttrParser:
         self.parser = parser
         self.buf = self.unescape(buf)
         self.pos = 0
-        
+
         self.pen = Pen()
         self.shapes = []
 
@@ -549,7 +549,7 @@ class XDotAttrParser:
             b = b*s
             a = 1.0
             return r, g, b, a
-                
+
         sys.stderr.write("unknown color '%s'\n" % c)
         return None
 
@@ -615,7 +615,7 @@ class XDotAttrParser:
                 break
 
         return self.shapes
-    
+
     def transform(self, x, y):
         return self.parser.transform(x, y)
 
@@ -677,7 +677,7 @@ class ParseError(Exception):
 
     def __str__(self):
         return ':'.join([str(part) for part in (self.filename, self.line, self.col, self.msg) if part != None])
-        
+
 
 class Scanner:
     """Stateless scanner."""
@@ -921,7 +921,7 @@ class DotLexer(Lexer):
             text = text.replace('\\\r\n', '')
             text = text.replace('\\\r', '')
             text = text.replace('\\\n', '')
-            
+
             text = text.replace('\\r', '\r')
             text = text.replace('\\n', '\n')
             text = text.replace('\\t', '\t')
@@ -1062,7 +1062,7 @@ class XDotParser(DotParser):
     def __init__(self, xdotcode):
         lexer = DotLexer(buf = xdotcode)
         DotParser.__init__(self, lexer)
-        
+
         self.nodes = []
         self.edges = []
         self.shapes = []
@@ -1091,7 +1091,7 @@ class XDotParser(DotParser):
             self.height = ymax - ymin
 
             self.top_graph = False
-        
+
         for attr in ("_draw_", "_ldraw_", "_hdraw_", "_tdraw_", "_hldraw_", "_tldraw_"):
             if attr in attrs:
                 parser = XDotAttrParser(self, attrs[attr])
@@ -1122,7 +1122,7 @@ class XDotParser(DotParser):
             pos = attrs['pos']
         except KeyError:
             return
-        
+
         points = self.parse_edge_pos(pos)
         shapes = []
         for attr in ("_draw_", "_ldraw_", "_hdraw_", "_tdraw_", "_hldraw_", "_tldraw_"):

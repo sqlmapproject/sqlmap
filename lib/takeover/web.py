@@ -236,7 +236,7 @@ class Web:
 
                 self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
                 self.webDirectory = directory
-                    
+
             infoMsg  = "the backdoor has probably been successfully "
             infoMsg += "uploaded on '%s', go with your browser " % self.webDirectory
             infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl

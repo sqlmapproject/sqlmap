@@ -311,5 +311,5 @@ def start():
 
     if conf.loggedToOut:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
-    
+
     return True

@@ -101,7 +101,7 @@ class Fingerprint(GenericFingerprint):
 
             if not conf.extensiveFp:
                 return True
-            
+
             for version in range(12, 16):
                 randInt = randomInt()
                 query   = " AND @@VERSION_NUMBER/1000=%d" % version

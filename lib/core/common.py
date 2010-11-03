@@ -1256,7 +1256,7 @@ def readCachedFileContent(filename, mode='rb'):
             xfile.close()
 
         kb.locks.cacheLock.release()
-    
+
     return kb.cache.content[filename]
 
 def readXmlFile(xmlFile):

@@ -21,7 +21,7 @@ class MagicException(Exception): pass
 class Magic:
     """
     Magic is a wrapper around the libmagic C library.  
-    
+
     """
 
     def __init__(self, mime=False, magic_file=None):
@@ -30,12 +30,12 @@ class Magic:
 
         mime - if True, mimetypes are returned instead of textual descriptions
         magic_file - use a mime database other than the system default
-        
+
         """
         flags = MAGIC_NONE
         if mime:
             flags |= MAGIC_MIME
-            
+
         self.cookie = magic_open(flags)
 
         magic_load(self.cookie, magic_file)
@@ -54,7 +54,7 @@ class Magic:
 
         if not os.path.exists(filename):
             raise IOError("File does not exist: " + filename)
-        
+
         return magic_file(self.cookie, filename)
 
     def __del__(self):

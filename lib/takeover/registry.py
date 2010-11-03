@@ -80,7 +80,7 @@ class Registry:
         logger.debug("reading registry key '%s' value '%s'" % (regKey, regValue))
 
         data = self.evalCmd(self.__batPathRemote)
-        
+
         if data and not parse:
             pattern = '    '
             index = data.find(pattern)

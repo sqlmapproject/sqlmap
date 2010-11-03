@@ -16,7 +16,7 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 class Enumeration(GenericEnumeration):
     def __init__(self):
         GenericEnumeration.__init__(self, DBMS.MAXDB)
-        
+
         kb.data.processChar = lambda x: x.replace('_', ' ') if x else x
 
     def getDbs(self):

@@ -180,13 +180,13 @@ def __setOutputResume():
                         continue
 
                     url, _, _, expression, value = line
-    
+
                     if not value:
                         continue
-    
+
                     if url[0] == "[":
                         url = url[1:]
-    
+
                     value = value.rstrip('\r\n') # Strips both chars independently
 
                     if url not in ( conf.url, conf.hostname ):
@@ -197,9 +197,9 @@ def __setOutputResume():
                         kb.resumedQueries[url][expression] = value
                         __url_cache.add(url)
                         __expression_cache[url] = set(expression)
-    
+
                     resumeConfKb(expression, url, value)
-    
+
                     if expression not in __expression_cache[url]:
                         kb.resumedQueries[url][expression] = value
                         __expression_cache[url].add(value)

@@ -22,7 +22,7 @@ class _Getch:
                 self.impl = _GetchUnix()
 
     def __call__(self): return self.impl()
-    
+
 
 class _GetchUnix:
     def __init__(self):

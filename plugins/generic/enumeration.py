@@ -900,7 +900,7 @@ class Enumeration:
             logger.warn(warnMsg)
 
             conf.db = self.getCurrentDb()
-        
+
         firebirdTypes = {
                             "261":"BLOB",
                             "14":"CHAR",

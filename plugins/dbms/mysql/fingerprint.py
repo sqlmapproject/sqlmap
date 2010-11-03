@@ -251,7 +251,7 @@ class Fingerprint(GenericFingerprint):
             logger.warn(warnMsg)
 
             return False
-        
+
     def checkDbmsOs(self, detailed=False):
         if kb.os:
             return
