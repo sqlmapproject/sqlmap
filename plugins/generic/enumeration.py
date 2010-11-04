@@ -1260,21 +1260,22 @@ class Enumeration:
         kb.data.cachedDbs    = []
         kb.data.cachedTables = self.getTables()
         
-        if isinstance(kb.data.cachedTables, list):
-            kb.data.cachedTables = { None : kb.data.cachedTables }
+        if kb.data.cachedTables:
+            if isinstance(kb.data.cachedTables, list):
+                kb.data.cachedTables = { None : kb.data.cachedTables }
 
-        for db, tables in kb.data.cachedTables.items():
-            conf.db = db
+            for db, tables in kb.data.cachedTables.items():
+                conf.db = db
 
-            for table in tables:
-                conf.tbl = table
-                kb.data.cachedColumns = {}
-                kb.data.dumpedTable = {}
+                for table in tables:
+                    conf.tbl = table
+                    kb.data.cachedColumns = {}
+                    kb.data.dumpedTable = {}
 
-                data = self.dumpTable()
+                    data = self.dumpTable()
 
-                if data:
-                    conf.dumper.dbTableValues(data)
+                    if data:
+                        conf.dumper.dbTableValues(data)
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
         if not dbs:
