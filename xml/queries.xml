@@ -341,7 +341,7 @@
     <dbms value="Microsoft Access">
         <cast query="CVAR(%s)"/>
         <length query="LEN(%s)"/>
-        <isnull query="ISNULL(%s)"/>
+        <isnull query="IIF(ISNULL(%s), ' ', %s)"/>
         <delimiter query=","/>
         <limit query="TOP %d"/>
         <limitregexp query="\s+TOP\s+([\d]+)"/>
@@ -354,7 +354,6 @@
         <timedelay/>
         <substring query="MID((%s), %d, %d)"/>
         <case query="IIF(%s,1,0)"/>
-        <inference query="AND MID((%s), %d, 1) > '%s'"/>
         <banner/>
         <current_user query="SELECT CURRENTUSER()"/>
         <current_db/>
@@ -363,6 +362,7 @@
         <dbs/>
         <tables>
             <inband query="SELECT Name FROM MSysObjects WHERE (Left([Name],1) &lt;&gt; '~') AND (Left([Name],4) &lt;&gt; 'MSys') AND ([Type] In (1, 4, 6))"/>
+            <blind query="SELECT MIN(Name) FROM MSysObjects WHERE Type = 1 AND name > '%s'" count="SELECT COUNT(*) FROM MSysObjects WHERE Type = 1"/>
         </tables>
    </dbms>
 

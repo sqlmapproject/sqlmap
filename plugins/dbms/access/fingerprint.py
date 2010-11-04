@@ -189,3 +189,6 @@ class Fingerprint(GenericFingerprint):
             logger.warn(warnMsg)
 
             return False
+
+    def forceDbmsEnum(self):
+        conf.db = "Access"

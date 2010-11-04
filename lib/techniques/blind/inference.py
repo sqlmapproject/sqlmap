@@ -138,7 +138,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         continuousOrder means that distance between each two neighbour's
         numerical values is exactly 1
         """
-
+        
         result = tryHint(idx)
 
         if result:
@@ -167,7 +167,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             position = (len(charTbl) >> 1)
             posValue = charTbl[position]
 
-            if kb.dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
+            if kb.dbms in (DBMS.SQLITE, DBMS.MAXDB):
                 pushValue(posValue)
                 posValue = chr(posValue) if posValue < 128 else unichr(posValue)
 
@@ -176,7 +176,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload)
 
-            if kb.dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
+            if kb.dbms in (DBMS.SQLITE, DBMS.MAXDB):
                 posValue = popValue()
 
             if result:

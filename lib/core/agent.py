@@ -227,7 +227,10 @@ class Agent:
             nulledCastedField = field
         else:
             nulledCastedField = queries[kb.dbms].cast.query % field
-            nulledCastedField = queries[kb.dbms].isnull.query % nulledCastedField
+            if kb.dbms == DBMS.ACCESS:
+                nulledCastedField = queries[kb.dbms].isnull.query % (nulledCastedField, nulledCastedField)
+            else:
+                nulledCastedField = queries[kb.dbms].isnull.query % nulledCastedField
 
         return nulledCastedField
 
