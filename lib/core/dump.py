@@ -303,31 +303,38 @@ class Dump:
         separator += "+"
         self.__write("Database: %s\nTable: %s" % (db, table))
 
-
         if conf.replicate:
             cols = []
+
             for column in columns:
                 if column != "__infos__":
                     colType = Replication.INTEGER
+
                     for value in tableValues[column]['values']:
                         try:
                             if re.search("^[\ *]*$", value): #NULL
                                 continue
+
                             temp = int(value)
                         except ValueError:
                             colType = None
                             break
+
                     if colType is None:
                         colType = Replication.REAL
+
                         for value in tableValues[column]['values']:
                             try:
                                 if re.search("^[\ *]*$", value): #NULL
                                     continue
+
                                 temp = float(value)
                             except ValueError:
                                 colType = None
                                 break
+
                     cols.append((column, colType if colType else Replication.TEXT))
+
             rtable = replication.createTable(table, cols)
 
         if count == 1:
