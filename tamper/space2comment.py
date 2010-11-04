@@ -10,7 +10,7 @@ See the file 'doc/COPYING' for copying permission
 def tamper(value):
     """
     Replaces ' ' with '/**/'
-    Example: 'SELECT id FROM users' becomes 'SELECT/**/id/**/FROM users'
+    Example: 'SELECT id FROM users' becomes 'SELECT/**/id/**/FROM/**/users'
     """
 
     retVal = value

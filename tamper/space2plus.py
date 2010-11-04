@@ -9,7 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 def tamper(value):
     """
-    Replaces ' ' with '/**/'
+    Replaces ' ' with '+'
     Example: 'SELECT id FROM users' becomes 'SELECT+id+FROM+users'
     """
 

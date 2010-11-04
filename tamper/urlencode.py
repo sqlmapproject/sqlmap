@@ -13,7 +13,7 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 def tamper(value):
     """
     Replaces value with urlencode(value)
-    Example: 'SELECT%20FIELD%20FROM%20TABLE' becomes 'SELECT%25%20FIELD%25%20FROM%25%20TABLE'
+    Example: 'SELECT FIELD FROM TABLE' becomes 'SELECT%20FIELD%20FROM%20TABLE'
     """
 
     if value:

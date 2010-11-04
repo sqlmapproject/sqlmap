@@ -14,7 +14,7 @@ from lib.core.data import kb
 
 def tamper(value):
     """
-    Add random comments to value
+    Add random comments to SQL keywords in value
     Example: 'INSERT' becomes 'IN/**/S/**/ERT'
     """
 
