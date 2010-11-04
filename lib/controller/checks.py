@@ -153,8 +153,11 @@ def checkDynamicContent(firstPage, secondPage):
     This function checks if the provided pages have dynamic content. If they
     are dynamic, proper markings will be made.
     """
-    
+
     if kb.nullConnection:
+        debugMsg  = "dynamic content checking skipped "
+        debugMsg += "because NULL connection used"
+        logger.debug(debugMsg)
         return
 
     infoMsg = "searching for dynamic content"
@@ -248,7 +251,13 @@ def checkStability():
 
             if test:
                 conf.string = test
-                kb.nullConnection = None
+
+                if kb.nullConnection:
+                    debugMsg  = "turning off NULL connection "
+                    debugMsg += "support because of string checking"
+                    logger.debug(debugMsg)
+
+                    kb.nullConnection = None
             else:
                 raise sqlmapSilentQuitException
 
@@ -258,7 +267,13 @@ def checkStability():
 
             if test:
                 conf.regex = test
-                kb.nullConnection = None
+
+                if kb.nullConnection:
+                    debugMsg  = "turning off NULL connection "
+                    debugMsg += "support because of regex checking"
+                    logger.debug(debugMsg)
+
+                    kb.nullConnection = None
             else:
                 raise sqlmapSilentQuitException
         else:
