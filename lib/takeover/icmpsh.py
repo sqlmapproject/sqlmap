@@ -29,7 +29,7 @@ class ICMPsh:
     This class defines methods to call icmpsh for plugins.
     """
 
-    def __init__(self):
+    def __initVars(self):
         self.lhostStr       = None
         self.rhostStr       = None
         self.localIP        = getLocalIP()
@@ -67,6 +67,7 @@ class ICMPsh:
         self.execCmd(cmd, silent=True)
 
     def uploadIcmpshSlave(self, web=False):
+        self.__initVars()
         self.__randStr = randomStr(lowercase=True)
         self.__icmpslaveRemoteBase = "tmpi%s.exe" % self.__randStr
 
