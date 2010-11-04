@@ -300,6 +300,7 @@ def initTargetEnv():
         kb.nullConnection  = None
         kb.pageStable      = None
         kb.parenthesis     = None
+        kb.paramMatchRatio = {}
         kb.proxyAuthHeader = None
         kb.stackedTest     = None
         kb.timeTest        = None

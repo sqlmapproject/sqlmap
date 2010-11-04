@@ -30,6 +30,7 @@ from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
+from lib.core.session import setMatchRatio
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from lib.core.target import findPageForms
@@ -290,6 +291,8 @@ def start():
                     condition = True
 
                 if condition:
+                    conf.matchRatio = kb.paramMatchRatio[(kb.injPlace, kb.injParameter)]
+                    setMatchRatio()
                     checkForParenthesis()
                     action()
 

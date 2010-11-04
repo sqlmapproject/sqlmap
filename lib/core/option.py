@@ -1098,6 +1098,7 @@ def __setKnowledgeBaseAttributes():
     kb.osSP            = None
 
     kb.pageStable      = None
+    kb.paramMatchRatio = {}
     kb.parenthesis     = None
     kb.partRun         = None
     kb.proxyAuthHeader = None

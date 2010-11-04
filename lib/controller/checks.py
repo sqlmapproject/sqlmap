@@ -52,6 +52,9 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     randStr = randomStr()
     prefix = ""
     postfix = ""
+    retVal = None
+
+    conf.matchRatio = None
 
     if conf.prefix or conf.postfix:
         if conf.prefix:
@@ -87,9 +90,12 @@ def checkSqlInjection(place, parameter, value, parenthesis):
                 if conf.beep:
                     beep()
 
-                return case.name
+                retVal = case.name
+                break
 
-    return None
+    kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
+
+    return retVal
 
 def heuristicCheckSqlInjection(place, parameter, value):
     prefix = ""
