@@ -15,13 +15,6 @@ class Replication:
     replication purposes.
     """
 
-    # sqlite data types
-    NULL    = DataType('NULL')
-    INTEGER = DataType('INTEGER')
-    REAL    = DataType('REAL')
-    TEXT    = DataType('TEXT')
-    BLOB    = DataType('BLOB')
-
     def __init__(self, dbpath):
         self.dbpath = dbpath
         self.connection = sqlite3.connect(dbpath)
@@ -89,3 +82,10 @@ class Replication:
     def __del__(self):
         self.cursor.close()
         self.connection.close()
+
+    # sqlite data types
+    NULL    = DataType('NULL')
+    INTEGER = DataType('INTEGER')
+    REAL    = DataType('REAL')
+    TEXT    = DataType('TEXT')
+    BLOB    = DataType('BLOB')
