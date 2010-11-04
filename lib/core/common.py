@@ -110,7 +110,6 @@ class DynamicContentItem:
         self.lineContentBefore = lineContentBefore
         self.lineContentAfter = lineContentAfter
 
-
 def paramToDict(place, parameters=None):
     """
     Split the parameters into names and values, check if these parameters

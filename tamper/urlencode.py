@@ -9,6 +9,9 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.convert import urlencode
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.priority import PRIORITY
+
+__priority__ = PRIORITY.LOWER
 
 def tamper(value):
     """

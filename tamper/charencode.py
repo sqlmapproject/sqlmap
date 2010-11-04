@@ -10,6 +10,9 @@ See the file 'doc/COPYING' for copying permission
 import string
 
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.priority import PRIORITY
+
+__priority__ = PRIORITY.LOWEST
 
 def tamper(value):
     """

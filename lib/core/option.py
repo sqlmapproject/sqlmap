@@ -31,6 +31,7 @@ from lib.core.common import parseTargetDirect
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
+from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
 from lib.core.common import UnicodeRawConfigParser
@@ -47,7 +48,9 @@ from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapMissingPrivileges
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
+from lib.core.priority import PRIORITY
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
@@ -521,6 +524,11 @@ def __setTamperingFunctions():
     """
 
     if conf.tamper:
+        last_priority = PRIORITY.LOWEST
+        check_priority = True
+        resolve_priorities = False
+        priorities = []
+
         for tfile in conf.tamper.split(','):
             found = False
 
@@ -556,15 +564,40 @@ def __setTamperingFunctions():
             except ImportError, msg:
                 raise sqlmapSyntaxException, "can not import tamper script '%s' (%s)" % (filename[:-3], msg)
 
+            priority = PRIORITY.NORMAL if not hasattr(module, '__priority__') else module.__priority__
+
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name == "tamper" and function.func_code.co_argcount == 1:
                     kb.tamperFunctions.append(function)
                     found = True
 
+                    if check_priority and priority < last_priority:
+                        message  = "it seems that you've probably "
+                        message += "mixed order of tamper scripts.\n"
+                        message += "do you want to auto resolve this? [Y/n/q]"
+                        test = readInput(message, default="Y")
+
+                        if not test or test[0] in ("y", "Y"):
+                            resolve_priorities = True
+                        elif test[0] in ("n", "N"):
+                            resolve_priorities = False
+                        elif test[0] in ("q", "Q"):
+                            raise sqlmapUserQuitException
+
+                        check_priority = False
+
+                    priorities.append((priority, function))
+                    last_priority = priority
                     break
 
             if not found:
                 raise sqlmapGenericException, "missing function 'tamper(value)' in tamper script '%s'" % tfile
+
+        if resolve_priorities and priorities:
+            priorities.sort()
+            kb.tamperFunctions = []
+            for _, function in priorities:
+                kb.tamperFunctions.append(function)
 
 def __setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:

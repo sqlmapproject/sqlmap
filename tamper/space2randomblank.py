@@ -9,6 +9,10 @@ See the file 'doc/COPYING' for copying permission
 
 import random
 
+from lib.core.priority import PRIORITY
+
+__priority__ = PRIORITY.LOW
+
 def tamper(value):
     """
     Replaces ' ' with a random blank char from a set ('\r', '\n', '\t')

@@ -11,6 +11,9 @@ import re
 
 from lib.core.common import randomRange
 from lib.core.data import kb
+from lib.core.priority import PRIORITY
+
+__priority__ = PRIORITY.LOW
 
 def tamper(value):
     """
