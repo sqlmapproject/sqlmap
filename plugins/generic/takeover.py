@@ -39,7 +39,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self.tblField = "data"
 
         Abstraction.__init__(self)
-        ICMPsh.__init__(self)
 
     def osCmd(self):
         stackedTest()
