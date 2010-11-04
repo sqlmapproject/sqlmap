@@ -291,8 +291,9 @@ def start():
                     condition = True
 
                 if condition:
-                    conf.matchRatio = kb.paramMatchRatio[(kb.injPlace, kb.injParameter)]
-                    setMatchRatio()
+                    if kb.paramMatchRatio:
+                        conf.matchRatio = kb.paramMatchRatio[(kb.injPlace, kb.injParameter)]
+                        setMatchRatio()
                     checkForParenthesis()
                     action()
 
