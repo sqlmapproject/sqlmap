@@ -23,7 +23,7 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
     def getCurrentDb(self):
-        warnMsg = "on SQLite it is not possible to enumerate the current database"
+        warnMsg = "on SQLite it is not possible to get name of the current database"
         logger.warn(warnMsg)
 
     def isDba(self):

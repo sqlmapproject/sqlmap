@@ -1259,6 +1259,9 @@ class Enumeration:
         conf.col             = None
         kb.data.cachedDbs    = []
         kb.data.cachedTables = self.getTables()
+        
+        if isinstance(kb.data.cachedTables, list):
+            kb.data.cachedTables = { None : kb.data.cachedTables }
 
         for db, tables in kb.data.cachedTables.items():
             conf.db = db

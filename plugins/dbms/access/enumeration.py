@@ -28,6 +28,10 @@ class Enumeration(GenericEnumeration):
 
         return None
 
+    def getCurrentDb(self):
+        warnMsg = "on Microsoft Access it is not possible to get name of the current database"
+        logger.warn(warnMsg)
+        
     def getPasswordHashes(self):
         warnMsg = "on Microsoft Access it is not possible to enumerate the user password hashes"
         logger.warn(warnMsg)
@@ -39,3 +43,9 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
+
+    def dumpTable(self):
+        warnMsg = "on Microsoft Access it is not yet implemented dumping of tables"
+        logger.warn(warnMsg)
+
+        return None
