@@ -475,6 +475,8 @@ def readInput(message, default=None):
 
     if "\n" in message:
         message += "\n> "
+    elif message[-1] == ']':
+        message += " "
 
     if conf.batch and default:
         infoMsg = "%s%s" % (message, getUnicode(default))
