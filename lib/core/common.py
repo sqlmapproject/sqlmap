@@ -812,7 +812,7 @@ def expandAsteriskForColumns(expression):
         dbTbl = asterisk.group(1)
 
         if dbTbl and "." in dbTbl:
-            conf.db, conf.tbl = dbTbl.split(".")
+            conf.db, conf.tbl = dbTbl.split(".", 1)
         else:
             conf.tbl = dbTbl
 
