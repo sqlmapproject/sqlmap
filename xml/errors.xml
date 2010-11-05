@@ -84,6 +84,7 @@
     <dbms value="Ingres">
         <error regexp="Warning.*ingres.*"/>
         <error regexp="Ingres SQLSTATE"/>
+        <error regexp="Ingres.*Driver"/>
     </dbms>
 
 </root>
