@@ -303,18 +303,21 @@ def start():
             raise
 
         except KeyboardInterrupt:
-            warnMsg = "Ctrl+C detected"
-            logger.warn(warnMsg)
+            if conf.multipleTargets:
+                warnMsg = "Ctrl+C detected"
+                logger.warn(warnMsg)
 
-            message = "\ndo you want to skip to the next target in list [Y/n/q]"
-            test = readInput(message, default="Y")
+                message = "\ndo you want to skip to the next target in list [Y/n/q]"
+                test = readInput(message, default="Y")
 
-            if not test or test[0] in ("y", "Y"):
-                pass
-            elif test[0] in ("n", "N"):
-                return False
-            elif test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                if not test or test[0] in ("y", "Y"):
+                    pass
+                elif test[0] in ("n", "N"):
+                    return False
+                elif test[0] in ("q", "Q"):
+                    raise sqlmapUserQuitException
+            else:
+                raise
 
         except sqlmapUserQuitException:
             raise
