@@ -160,6 +160,7 @@ class HTTPHandler(urllib2.HTTPHandler):
                 else:
                     try: r = h.getresponse()
                     except httplib.ResponseNotReady, e: r = None
+                    except httplib.BadStatusLine, e: r = None
 
                 if r is None or r.version == 9:
                     # httplib falls back to assuming HTTP 0.9 if it gets a

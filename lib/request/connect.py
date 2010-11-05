@@ -243,9 +243,6 @@ class Connect:
             elif "timeout" in tbMsg:
                 warnMsg = "connection timed out to the target url"
             elif "BadStatusLine" in tbMsg:
-                debugMsg  = "BadStatusLine: %s || %s || %s" % (tbMsg, e, e.line)
-                logger.debug(debugMsg)
-
                 warnMsg  = "the target url responded with an unknown HTTP "
                 warnMsg += "status code, try to force the HTTP User-Agent "
                 warnMsg += "header with option --user-agent or -a"
