@@ -102,6 +102,9 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     elif wasLastRequestError():
         return False
 
+    elif ratio == 1:
+        return True
+
     # If the url is not stable it returns sequence matcher between the
     # first untouched HTTP response page content and this content
     else:

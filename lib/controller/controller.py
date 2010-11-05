@@ -209,6 +209,8 @@ def start():
                     checkStability()
 
                 for place in conf.parameters.keys():
+                    conf.matchRatio = None
+
                     if not conf.paramDict.has_key(place):
                         continue
 

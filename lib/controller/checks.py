@@ -54,8 +54,6 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     postfix = ""
     retVal = None
 
-    conf.matchRatio = None
-
     if conf.prefix or conf.postfix:
         if conf.prefix:
             prefix = conf.prefix
@@ -98,6 +96,12 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     return retVal
 
 def heuristicCheckSqlInjection(place, parameter, value):
+    if kb.nullConnection:
+        debugMsg  = "heuristic checking skipped "
+        debugMsg += "because NULL connection used"
+        logger.debug(debugMsg)
+        return
+
     prefix = ""
     postfix = ""
 
@@ -135,24 +139,19 @@ def checkDynParam(place, parameter, value):
 
     randInt = randomInt()
     payload = agent.payload(place, parameter, value, getUnicode(randInt))
-    dynResult1 = Request.queryPage(payload, place)
+    dynResult = Request.queryPage(payload, place)
 
-    if True == dynResult1:
+    if True == dynResult:
         return False
 
     infoMsg = "confirming that %s parameter '%s' is dynamic" % (place, parameter)
     logger.info(infoMsg)
 
-    payload = agent.payload(place, parameter, value, "'%s" % randomStr())
-    dynResult2 = Request.queryPage(payload, place)
+    randInt = randomInt()
+    payload = agent.payload(place, parameter, value, getUnicode(randInt))
+    dynResult = Request.queryPage(payload, place)
 
-    payload = agent.payload(place, parameter, value, "\"%s" % randomStr())
-    dynResult3 = Request.queryPage(payload, place)
-
-    condition  = True != dynResult2
-    condition |= True != dynResult3
-
-    return condition
+    return not dynResult
 
 def checkDynamicContent(firstPage, secondPage):
     """
