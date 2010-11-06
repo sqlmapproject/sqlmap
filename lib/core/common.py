@@ -1093,14 +1093,6 @@ def sanitizeAsciiString(subject):
     else:
         return None
 
-def preparePageForLineComparison(page):
-    retVal = page
-
-    if isinstance(page, basestring):
-        return page.replace("><", ">\n<").replace("<br>", "\n").splitlines()
-
-    return retVal
-
 def getFilteredPageContent(page):
     retVal = page
 

@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.common import getFilteredPageContent
-from lib.core.common import preparePageForLineComparison
 from lib.core.common import wasLastRequestError
 from lib.core.data import conf
 from lib.core.data import kb
@@ -98,9 +97,9 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if getSeqMatcher:
         return ratio
 
-    # In case of an DBMS error page return False
+    # In case of an DBMS error page return None
     elif wasLastRequestError():
-        return False
+        return None
 
     elif ratio == 1:
         return True

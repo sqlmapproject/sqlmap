@@ -17,7 +17,6 @@ from lib.core.agent import agent
 from lib.core.common import beep
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
-from lib.core.common import preparePageForLineComparison
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
