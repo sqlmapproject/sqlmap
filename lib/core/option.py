@@ -989,7 +989,7 @@ def __cleanupOptions():
     if conf.optimize:
         #conf.predictOutput = True
         conf.keepAlive = True
-        conf.nullConnection = not conf.textOnly
+        conf.nullConnection = not (conf.textOnly or conf.longestCommon)
         conf.threads = 4 if conf.threads < 2 else conf.threads
 
 def __setConfAttributes():
