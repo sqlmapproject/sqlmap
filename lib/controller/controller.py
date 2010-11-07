@@ -308,7 +308,7 @@ def start():
                 warnMsg = "Ctrl+C detected in multiple target mode"
                 logger.warn(warnMsg)
 
-                message = "do you want to skip to the next target in list [Y/n/q]"
+                message = "do you want to skip to the next target in list? [Y/n/q]"
                 test = readInput(message, default="Y")
 
                 if not test or test[0] in ("y", "Y"):

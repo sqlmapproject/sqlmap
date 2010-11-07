@@ -55,6 +55,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         if not kb.nullConnection and not conf.longestCommon:
             for item in kb.dynamicMarkings:
                 prefix, postfix = item
+
                 if prefix is None:
                     page = re.sub('(?s)^.+%s' % postfix, postfix, page)
                 elif postfix is None:
@@ -75,6 +76,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
 
     elif not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
         ratio = 1. * pageLength / len(conf.seqMatcher.a)
+
         if ratio > 1.:
             ratio = 1. / ratio
     else:

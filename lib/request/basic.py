@@ -78,8 +78,8 @@ def checkCharEncoding(encoding):
     else:
         return encoding
 
-    #http://www.destructor.de/charsets/index.htm
-    translate = { 'windows-874':'iso-8859-11', 'en_us':'utf8' }
+    # http://www.destructor.de/charsets/index.htm
+    translate = { 'windows-874': 'iso-8859-11', 'en_us': 'utf8' }
 
     for delimiter in (';', ','):
         if delimiter in encoding:
@@ -117,9 +117,10 @@ def decodePage(page, contentEncoding, contentType):
 
         page = data.read()
 
-    #http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
+    # http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
     if contentType and (contentType.find('charset=') != -1):
         charset = checkCharEncoding(contentType.split('charset=')[-1])
+
         if charset:
             page = getUnicode(page, charset)
 
