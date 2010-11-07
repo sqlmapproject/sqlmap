@@ -1238,6 +1238,10 @@ def __basicOptionValidation():
         errMsg = "switch --text-only is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.longestCommon and conf.nullConnection:
+        errMsg = "switch --longest-common is incompatible with switch --null-connection"
+        raise sqlmapSyntaxException, errMsg
+
     if conf.data and conf.nullConnection:
         errMsg = "switch --data is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg

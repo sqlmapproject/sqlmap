@@ -292,7 +292,7 @@ def checkStability():
             checkDynamicContent(firstPage, secondPage)
 
             if not Request.queryPage():
-                errMsg  = "target url is too dynamic. unable to continue. consider using other methods"
+                errMsg  = "target url is too dynamic. unable to continue. consider using other switches (e.g. --longest-common, --string, --text-only, etc.)"
                 logger.error(errMsg)
                 raise sqlmapSilentQuitException
 
