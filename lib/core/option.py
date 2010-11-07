@@ -525,7 +525,7 @@ def __setTamperingFunctions():
     """
 
     if conf.tamper:
-        last_priority = PRIORITY.LOWEST
+        last_priority = PRIORITY.HIGHEST
         check_priority = True
         resolve_priorities = False
         priorities = []
@@ -569,13 +569,13 @@ def __setTamperingFunctions():
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name == "tamper" and function.func_code.co_argcount == 1:
-                    kb.tamperFunctions.append(function)
                     found = True
+                    kb.tamperFunctions.append(function)
 
-                    if check_priority and priority < last_priority:
-                        message  = "it seems that you've probably "
-                        message += "mixed order of tamper scripts.\n"
-                        message += "do you want to auto resolve this? [Y/n/q]"
+                    if check_priority and priority > last_priority:
+                        message  = "it seems that you might have mixed "
+                        message += "the order of tamper scripts.\n"
+                        message += "Do you want to auto resolve this? [Y/n/q]"
                         test = readInput(message, default="Y")
 
                         if not test or test[0] in ("y", "Y"):
@@ -589,14 +589,16 @@ def __setTamperingFunctions():
 
                     priorities.append((priority, function))
                     last_priority = priority
+
                     break
 
             if not found:
                 raise sqlmapGenericException, "missing function 'tamper(value)' in tamper script '%s'" % tfile
 
         if resolve_priorities and priorities:
-            priorities.sort()
+            priorities.sort(reverse=True)
             kb.tamperFunctions = []
+
             for _, function in priorities:
                 kb.tamperFunctions.append(function)
 
