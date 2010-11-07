@@ -836,6 +836,7 @@ def __setHTTPUserAgent():
         * A random value read from a list of User-Agent headers from a
           file choosed as user option
     """
+
     if conf.agent:
         debugMsg = "setting the HTTP User-Agent header"
         logger.debug(debugMsg)
