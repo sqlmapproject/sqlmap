@@ -20,6 +20,10 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 
+    # In case of an DBMS error page return None
+    if wasLastRequestError():
+        return None
+
     regExpResults = None
 
     if page:
@@ -104,10 +108,6 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     # response
     if getSeqMatcher:
         return ratio
-
-    # In case of an DBMS error page return None
-    elif wasLastRequestError():
-        return None
 
     elif ratio == 1:
         return True

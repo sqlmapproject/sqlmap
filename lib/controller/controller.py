@@ -217,6 +217,8 @@ def start():
                         testSqlInj = True
                         paramKey = (conf.hostname, conf.path, place, parameter)
 
+                        conf.matchRatio = None
+
                         if paramKey in kb.testedParams:
                             testSqlInj = False
 
@@ -242,13 +244,13 @@ def start():
                         if testSqlInj:
                             heuristicCheckSqlInjection(place, parameter, value)
 
+                            conf.matchRatio = None
+
                             for parenthesis in range(0, 4):
                                 logMsg  = "testing sql injection on %s " % place
                                 logMsg += "parameter '%s' with " % parameter
                                 logMsg += "%d parenthesis" % parenthesis
                                 logger.info(logMsg)
-
-                                conf.matchRatio = None
 
                                 injType = checkSqlInjection(place, parameter, value, parenthesis)
 
