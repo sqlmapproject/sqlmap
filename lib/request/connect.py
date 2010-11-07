@@ -309,17 +309,15 @@ class Connect:
         if not place:
             place = kb.injPlace
 
-        if kb.tamperFunctions:
-            payload = agent.extractPayload(value)
+        payload = agent.extractPayload(value)
 
-            if payload:
+        if payload:
+            if kb.tamperFunctions:
                 for function in kb.tamperFunctions:
                     payload = function(payload)
 
                 value = agent.replacePayload(value, payload)
 
-        payload = agent.extractPayload(value)
-        if payload:
             debugMsg = "payload: %s" % payload
             logger.debug(debugMsg)
 
