@@ -21,6 +21,8 @@ from lib.controller.checks import checkNullConnection
 from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -208,7 +210,14 @@ def start():
                     # a warning message to the user in case the page is not stable
                     checkStability()
 
-                for place in conf.parameters.keys():
+                # Do a little prioritization reorder of a testable parameter list 
+                parameters = conf.parameters.keys()
+                for place in ('POST', 'GET'):
+                    if place in parameters:
+                        parameters.remove(place)
+                        parameters.insert(0, place)
+
+                for place in parameters:
                     if not conf.paramDict.has_key(place):
                         continue
 
