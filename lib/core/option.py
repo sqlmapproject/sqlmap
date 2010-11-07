@@ -31,6 +31,7 @@ from lib.core.common import parseTargetDirect
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
+from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
@@ -835,7 +836,6 @@ def __setHTTPUserAgent():
         * A random value read from a list of User-Agent headers from a
           file choosed as user option
     """
-
     if conf.agent:
         debugMsg = "setting the HTTP User-Agent header"
         logger.debug(debugMsg)
@@ -856,39 +856,28 @@ def __setHTTPUserAgent():
 
         return
 
-    debugMsg  = "fetching random HTTP User-Agent header from "
-    debugMsg += "file '%s'" % conf.userAgentsFile
-    logger.debug(debugMsg)
+    if not kb.userAgents:
+        debugMsg  = "loading random HTTP User-Agent header(s) from "
+        debugMsg += "file '%s'" % conf.userAgentsFile
+        logger.debug(debugMsg)
 
-    try:
-        fd = codecs.open(conf.userAgentsFile, "r", conf.dataEncoding)
-    except IOError:
-        warnMsg  = "unable to read HTTP User-Agent header "
-        warnMsg += "file '%s'" % conf.userAgentsFile
-        logger.warn(warnMsg)
+        try:
+            kb.userAgents = getFileItems(conf.userAgentsFile)
+        except IOError:
+            warnMsg  = "unable to read HTTP User-Agent header "
+            warnMsg += "file '%s'" % conf.userAgentsFile
+            logger.warn(warnMsg)
 
-        conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
+            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
 
-        return
+            return
 
-    __count = 0
-    __userAgents = []
-
-    while True:
-        line = fd.readline()
-
-        if not line:
-            break
-
-        __userAgents.append(line)
-        __count += 1
-
-    fd.close()
+    __count = len(kb.userAgents)
 
     if __count == 1:
-        __userAgent = __userAgents[0]
+        __userAgent = kb.userAgents[0]
     else:
-        __userAgent = __userAgents[randomRange(stop=__count)]
+        __userAgent = kb.userAgents[randomRange(stop=__count)]
 
     __userAgent = sanitizeStr(__userAgent)
     conf.httpHeaders.append(("User-Agent", __userAgent))
@@ -1114,6 +1103,7 @@ def __setKnowledgeBaseAttributes():
     kb.unionPosition   = None
     kb.unionNegative   = False
     kb.unionFalseCond  = False
+    kb.userAgents      = None
     kb.valueStack      = []
 
 def __saveCmdline():
