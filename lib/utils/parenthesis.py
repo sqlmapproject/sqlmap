@@ -45,8 +45,8 @@ def checkForParenthesis():
         randInt = randomInt()
         randStr = randomStr()
 
-        query  = case.usage.prefix.format % eval(case.usage.prefix.params) +\
-            case.usage.postfix.format % eval(case.usage.postfix.params)
+        query = case.usage.prefix.format % eval(case.usage.prefix.params)
+        query = query[:-1] + case.usage.postfix.format % eval(case.usage.postfix.params)
 
         payload = agent.payload(newValue=query)
         result = Request.queryPage(payload)

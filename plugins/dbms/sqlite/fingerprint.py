@@ -80,14 +80,14 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing SQLite"
         logger.info(logMsg)
 
-        payload = agent.fullPayload(" AND LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
+        payload = agent.fullPayload("AND LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
         result  = Request.queryPage(payload)
 
         if result:
             logMsg = "confirming SQLite"
             logger.info(logMsg)
 
-            payload = agent.fullPayload(" AND SQLITE_VERSION()=SQLITE_VERSION()")
+            payload = agent.fullPayload("AND SQLITE_VERSION()=SQLITE_VERSION()")
             result  = Request.queryPage(payload)
 
             if not result:

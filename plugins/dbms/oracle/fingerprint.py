@@ -80,7 +80,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            payload = agent.fullPayload(" AND ROWNUM=ROWNUM")
+            payload = agent.fullPayload("AND ROWNUM=ROWNUM")
             result  = Request.queryPage(payload)
 
         if result:
@@ -92,7 +92,7 @@ class Fingerprint(GenericFingerprint):
             if conf.direct:
                 result = True
             else:
-                payload = agent.fullPayload(" AND LENGTH(SYSDATE)=LENGTH(SYSDATE)")
+                payload = agent.fullPayload("AND LENGTH(SYSDATE)=LENGTH(SYSDATE)")
                 result  = Request.queryPage(payload)
 
             if not result:

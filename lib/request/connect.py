@@ -318,6 +318,11 @@ class Connect:
 
                 value = agent.replacePayload(value, payload)
 
+        payload = agent.extractPayload(value)
+        if payload:
+            debugMsg = "payload: %s" % payload
+            logger.debug(debugMsg)
+
         if place == "Cookie" and conf.cookieUrlencode:
             value = agent.removePayloadDelimiters(value, False)
             value = urlEncodeCookieValues(value)

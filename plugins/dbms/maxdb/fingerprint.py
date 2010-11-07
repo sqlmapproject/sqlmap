@@ -118,14 +118,14 @@ class Fingerprint(GenericFingerprint):
 
         randInt = randomInt()
 
-        payload = agent.fullPayload(" AND NOROUND(%d)=%d" % (randInt, randInt))
+        payload = agent.fullPayload("AND NOROUND(%d)=%d" % (randInt, randInt))
         result  = Request.queryPage(payload)
 
         if result:
             logMsg = "confirming SAP MaxDB"
             logger.info(logMsg)
 
-            payload = agent.fullPayload(" AND MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
+            payload = agent.fullPayload("AND MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
             result  = Request.queryPage(payload)
 
             if not result:

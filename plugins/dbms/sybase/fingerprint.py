@@ -79,14 +79,14 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            payload = agent.fullPayload(" AND tempdb_id()=tempdb_id()")
+            payload = agent.fullPayload("AND tempdb_id()=tempdb_id()")
             result  = Request.queryPage(payload)
 
         if result:
             logMsg = "confirming Sybase"
             logger.info(logMsg)
 
-            payload = agent.fullPayload(" AND suser_id()=suser_id()")
+            payload = agent.fullPayload("AND suser_id()=suser_id()")
             result  = Request.queryPage(payload)
 
             if not result:
@@ -104,7 +104,7 @@ class Fingerprint(GenericFingerprint):
 
             for version in range(12, 16):
                 randInt = randomInt()
-                query   = " AND @@VERSION_NUMBER/1000=%d" % version
+                query   = "AND @@VERSION_NUMBER/1000=%d" % version
                 payload = agent.fullPayload(query)
                 result  = Request.queryPage(payload)
                 if result:

@@ -161,14 +161,14 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing Microsoft Access"
         logger.info(logMsg)
 
-        payload = agent.fullPayload(" AND VAL(CVAR(1))=1")
+        payload = agent.fullPayload("AND VAL(CVAR(1))=1")
         result  = Request.queryPage(payload)
 
         if result:
             logMsg = "confirming Microsoft Access"
             logger.info(logMsg)
 
-            payload = agent.fullPayload(" AND IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
+            payload = agent.fullPayload("AND IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
             result  = Request.queryPage(payload)
 
             if not result:

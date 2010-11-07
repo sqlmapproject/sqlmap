@@ -156,14 +156,14 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         randInt = getUnicode(randomInt(1))
-        payload = agent.fullPayload(" AND CONNECTION_ID()=CONNECTION_ID()")
+        payload = agent.fullPayload("AND CONNECTION_ID()=CONNECTION_ID()")
         result  = Request.queryPage(payload)
 
         if result:
             infoMsg = "confirming MySQL"
             logger.info(infoMsg)
 
-            payload = agent.fullPayload(" AND ISNULL(1/0)" if kb.injPlace != "URI" else " AND ISNULL(1 DIV 0)")
+            payload = agent.fullPayload("AND ISNULL(1/0)" if kb.injPlace != "URI" else "AND ISNULL(1 DIV 0)")
             result  = Request.queryPage(payload)
 
             if not result:

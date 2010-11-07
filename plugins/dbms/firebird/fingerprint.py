@@ -72,10 +72,10 @@ class Fingerprint(GenericFingerprint):
     def __sysTablesCheck(self):
         retVal = None
         table = (
-                    ("1.0", [" AND EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)"]),
-                    ("1.5", [" AND NULLIF(%d,%d) IS NULL", " AND EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)"]),
-                    ("2.0", [" AND EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", " AND BIT_LENGTH(%d)>0", " AND CHAR_LENGTH(%d)>0"]),
-                    ("2.1", [" AND BIN_XOR(%d,%d)=0", " AND PI()>0.%d", " AND RAND()<1.%d", " AND FLOOR(1.%d)>=0"])
+                    ("1.0", ["AND EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)"]),
+                    ("1.5", ["AND NULLIF(%d,%d) IS NULL", "AND EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)"]),
+                    ("2.0", ["AND EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "AND BIT_LENGTH(%d)>0", "AND CHAR_LENGTH(%d)>0"]),
+                    ("2.1", ["AND BIN_XOR(%d,%d)=0", "AND PI()>0.%d", "AND RAND()<1.%d", "AND FLOOR(1.%d)>=0"])
                  )
 
         for i in xrange(len(table)):
@@ -97,7 +97,7 @@ class Fingerprint(GenericFingerprint):
     def __dialectCheck(self):
         retVal = None
         if kb.dbms:
-            payload = agent.fullPayload(" AND EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
+            payload = agent.fullPayload("AND EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
             result  = Request.queryPage(payload)
             retVal = "dialect 3" if result else "dialect 1"
         return retVal
@@ -116,14 +116,14 @@ class Fingerprint(GenericFingerprint):
 
         randInt = randomInt()
 
-        payload = agent.fullPayload(" AND EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
+        payload = agent.fullPayload("AND EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
         result  = Request.queryPage(payload)
 
         if result:
             logMsg = "confirming Firebird"
             logger.info(logMsg)
 
-            payload = agent.fullPayload(" AND EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
+            payload = agent.fullPayload("AND EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
             result  = Request.queryPage(payload)
 
             if not result:

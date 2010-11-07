@@ -64,9 +64,6 @@ def errorUse(expression, returnPayload=False):
 
     forgedQuery = safeStringFormat(query, (logic, randInt, startLimiter, expressionUnescaped, endLimiter))
 
-    debugMsg = "query: %s" % forgedQuery
-    logger.debug(debugMsg)
-
     payload = agent.payload(newValue=forgedQuery)
     result = Request.queryPage(payload, content=True)
     match = re.search('%s(?P<result>.*?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
