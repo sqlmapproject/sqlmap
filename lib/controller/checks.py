@@ -164,6 +164,12 @@ def checkDynamicContent(firstPage, secondPage):
         logger.debug(debugMsg)
         return
 
+    if conf.longestCommon:
+        debugMsg  = "dynamic content checking skipped "
+        debugMsg += "because longest common comparison used"
+        logger.debug(debugMsg)
+        return
+
     infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
 

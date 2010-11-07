@@ -9,6 +9,8 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
+from difflib import SequenceMatcher
+
 from lib.core.common import wasLastRequestError
 from lib.core.data import conf
 from lib.core.data import kb
@@ -50,7 +52,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
             return re.search(conf.regexp, page, re.I | re.M) is not None
 
         # Dynamic content lines to be excluded before comparison
-        if not kb.nullConnection:
+        if not kb.nullConnection and not conf.longestCommon:
             for item in kb.dynamicMarkings:
                 prefix, postfix = item
                 if prefix is None:
@@ -66,7 +68,12 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if kb.locks.seqLock:
         kb.locks.seqLock.acquire()
 
-    if not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
+    if conf.longestCommon:
+        (firstPage, secondPage) = (conf.seqMatcher.a, page)
+        match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
+        ratio = round(SequenceMatcher(None, firstPage[match[0]:match[0]+match[2]], secondPage[match[1]:match[1]+match[2]]).ratio(), 3)
+
+    elif not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
         ratio = 1. * pageLength / len(conf.seqMatcher.a)
         if ratio > 1.:
             ratio = 1. / ratio

@@ -197,6 +197,10 @@ def cmdLineParser():
                              action="store_true", default=False,
                              help="Compare pages based only on their textual content")
 
+        injection.add_option("--longest-common", dest="longestCommon",
+                             action="store_true", default=False,
+                             help="Compare pages based on their longest common match")
+
         injection.add_option("--tamper", dest="tamper",
                              help="Use given script(s) for tampering injection data")
 
