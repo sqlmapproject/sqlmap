@@ -296,6 +296,7 @@ def start():
                     if kb.paramMatchRatio:
                         conf.matchRatio = kb.paramMatchRatio[(kb.injPlace, kb.injParameter)]
                         setMatchRatio()
+
                     checkForParenthesis()
                     action()
 

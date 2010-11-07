@@ -65,6 +65,7 @@ optDict = {
                                "eRegexp":           "string",
                                "thold":             "float",
                                "textOnly":          "boolean",
+                               "longestCommon":     "boolean",
                                "tamper":            "string"
                              },
 
