@@ -22,8 +22,9 @@ DESCRIPTION        = "automatic SQL injection and database takeover tool"
 SITE               = "http://sqlmap.sourceforge.net"
 
 # sqlmap logger
-logging.addLevelName(9, "TRAFFIC OUT")
-logging.addLevelName(8, "TRAFFIC IN")
+logging.addLevelName(9, "PAYLOAD")
+logging.addLevelName(8, "TRAFFIC OUT")
+logging.addLevelName(7, "TRAFFIC IN")
 
 LOGGER             = logging.getLogger("sqlmapLog")
 LOGGER_HANDLER     = logging.StreamHandler(sys.stdout)

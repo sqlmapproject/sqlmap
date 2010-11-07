@@ -170,7 +170,7 @@ class Connect:
 
             requestMsg += "\n"
 
-            logger.log(9, requestMsg)
+            logger.log(8, requestMsg)
 
             if not kb.authHeader and req.has_header("Authorization"):
                 kb.authHeader = req.get_header("Authorization")
@@ -276,12 +276,12 @@ class Connect:
 
         responseMsg += "(%s - %d):\n" % (status, code)
 
-        if conf.verbose <= 4:
+        if conf.verbose <= 5:
             responseMsg += getUnicode(responseHeaders.__str__())
-        elif conf.verbose > 4:
+        elif conf.verbose > 5:
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
-        logger.log(8, responseMsg)
+        logger.log(7, responseMsg)
 
         return page, responseHeaders
 
@@ -318,8 +318,7 @@ class Connect:
 
                 value = agent.replacePayload(value, payload)
 
-            debugMsg = "payload: %s" % payload
-            logger.debug(debugMsg)
+            logger.log(9, payload)
 
         if place == "Cookie" and conf.cookieUrlencode:
             value = agent.removePayloadDelimiters(value, False)

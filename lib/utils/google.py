@@ -99,7 +99,7 @@ class Google:
 
             requestMsg = "HTTP request:\nGET %s" % url
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
-            logger.log(9, requestMsg)
+            logger.log(8, requestMsg)
 
             page = conn.read()
             code = conn.code
@@ -114,7 +114,7 @@ class Google:
             elif conf.verbose > 4:
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
-            logger.log(8, responseMsg)
+            logger.log(7, responseMsg)
         except urllib2.HTTPError, e:
             try:
                 page = e.read()

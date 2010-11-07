@@ -28,7 +28,7 @@ def cmdLineParser():
 
     try:
         parser.add_option("-v", dest="verbose", type="int", default=1,
-                          help="Verbosity level: 0-5 (default 1)")
+                          help="Verbosity level: 0-6 (default 1)")
 
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "

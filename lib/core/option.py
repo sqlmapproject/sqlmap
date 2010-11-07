@@ -1186,8 +1186,10 @@ def __setVerbosity():
         logger.setLevel(logging.DEBUG)
     elif conf.verbose == 3:
         logger.setLevel(9)
-    elif conf.verbose >= 4:
+    elif conf.verbose == 4:
         logger.setLevel(8)
+    elif conf.verbose >= 5:
+        logger.setLevel(7)
 
 def __mergeOptions(inputOptions):
     """

@@ -21,7 +21,7 @@ def timeout(func, args=(), kwargs={}, duration=1, default=None):
             try:
                 self.result = func(*args, **kwargs)
             except Exception, msg:
-                logger.log(8, msg)
+                logger.log(7, msg)
                 self.result = default
 
     thread = InterruptableThread()

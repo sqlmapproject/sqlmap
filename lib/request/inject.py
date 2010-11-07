@@ -399,6 +399,9 @@ def goStacked(expression, silent=False):
     query   = agent.prefixQuery("; %s" % expression)
     query   = agent.postfixQuery("%s;%s" % (query, comment))
 
+    debugMsg = "query: %s" % query
+    logger.debug(debugMsg)
+
     payload = agent.payload(newValue=query)
     page, _ = Request.queryPage(payload, content=True, silent=silent)
 
