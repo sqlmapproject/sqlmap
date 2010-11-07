@@ -51,14 +51,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except psycopg2.ProgrammingError, msg:
-            logger.log(8, msg)
+            logger.warn(msg)
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
         except (psycopg2.OperationalError, psycopg2.ProgrammingError), msg:
-            logger.log(8, msg)
+            logger.warn(msg)
         except psycopg2.InternalError, msg:
             raise sqlmapConnectionException, msg
 

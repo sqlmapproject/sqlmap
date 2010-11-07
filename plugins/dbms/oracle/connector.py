@@ -56,14 +56,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except cx_Oracle.InterfaceError, msg:
-            logger.log(8, msg)
+            logger.warn(msg)
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(utf8encode(query))
         except (cx_Oracle.DatabaseError), msg:
-            logger.log(8, msg)
+            logger.warn(msg)
         except cx_Oracle.InternalError, msg:
             raise sqlmapConnectionException, msg
 

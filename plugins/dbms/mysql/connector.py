@@ -47,14 +47,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except MySQLdb.ProgrammingError, msg:
-            logger.log(8, msg[1])
+            logger.warn(msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
         except (MySQLdb.OperationalError, MySQLdb.ProgrammingError), msg:
-            logger.log(8, msg[1])
+            logger.warn(msg[1])
         except MySQLdb.InternalError, msg:
             raise sqlmapConnectionException, msg[1]
 
