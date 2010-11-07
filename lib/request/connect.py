@@ -18,6 +18,7 @@ import traceback
 from lib.contrib import multipartpost
 from lib.core.agent import agent
 from lib.core.common import readInput
+from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.convert import urlencode
 from lib.core.common import urlEncodeCookieValues
@@ -366,6 +367,9 @@ class Connect:
 
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404)
+            
+        if conf.textOnly:
+            page = getFilteredPageContent(page)
 
         if content or response:
             return page, headers

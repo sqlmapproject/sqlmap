@@ -15,7 +15,6 @@ from difflib import SequenceMatcher
 
 from lib.core.agent import agent
 from lib.core.common import beep
-from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -28,6 +27,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.exception import sqlmapSilentQuitException
@@ -219,6 +219,8 @@ def checkStability():
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True)
 
+    conf.seqMatcher.set_seq1(firstPage)
+
     kb.pageStable = (firstPage == secondPage)
 
     if kb.pageStable:
@@ -282,6 +284,11 @@ def checkStability():
                 raise sqlmapSilentQuitException
         else:
             checkDynamicContent(firstPage, secondPage)
+
+            if not Request.queryPage():
+                errMsg  = "target url is too dynamic. unable to continue. consider using other methods"
+                logger.error(errMsg)
+                raise sqlmapSilentQuitException
 
     return kb.pageStable
 
@@ -386,8 +393,7 @@ def checkConnection():
     logger.info(infoMsg)
 
     try:
-        page, _ = Request.getPage()
-        conf.seqMatcher.set_seq1(page if not conf.textOnly else getFilteredPageContent(page))
+        Request.getPage()
 
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)

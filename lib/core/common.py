@@ -41,6 +41,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.convert import htmlunescape
 from lib.core.convert import urlencode
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -1101,6 +1102,8 @@ def getFilteredPageContent(page):
 
         while retVal.find("  ") != -1:
             retVal = retVal.replace("  ", " ")
+
+        retVal = htmlunescape(retVal)
 
     return retVal
 

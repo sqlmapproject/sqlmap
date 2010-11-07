@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import getFilteredPageContent
 from lib.core.common import wasLastRequestError
 from lib.core.data import conf
 from lib.core.data import kb
@@ -50,7 +49,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         if conf.regexp:
             return re.search(conf.regexp, page, re.I | re.M) is not None
 
-        # Dynamic content lines to be excluded before calculating page hash
+        # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection:
             for item in kb.dynamicMarkings:
                 prefix, postfix = item
@@ -72,7 +71,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         if ratio > 1.:
             ratio = 1. / ratio
     else:
-        conf.seqMatcher.set_seq2(page if not conf.textOnly else getFilteredPageContent(page))
+        conf.seqMatcher.set_seq2(page)
         ratio = round(conf.seqMatcher.ratio(), 3)
 
     if kb.locks.seqLock:
