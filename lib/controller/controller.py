@@ -209,8 +209,6 @@ def start():
                     checkStability()
 
                 for place in conf.parameters.keys():
-                    conf.matchRatio = None
-
                     if not conf.paramDict.has_key(place):
                         continue
 
@@ -249,6 +247,8 @@ def start():
                                 logMsg += "parameter '%s' with " % parameter
                                 logMsg += "%d parenthesis" % parenthesis
                                 logger.info(logMsg)
+
+                                conf.matchRatio = None
 
                                 injType = checkSqlInjection(place, parameter, value, parenthesis)
 
