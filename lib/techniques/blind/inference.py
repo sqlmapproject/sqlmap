@@ -99,7 +99,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
         logger.debug(debugMsg)
 
-    if conf.verbose >= 1 and not showEta:
+    if conf.verbose in (1, 2) and not showEta:
         if isinstance(length, int) and conf.threads > 1:
             dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
             dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
@@ -413,7 +413,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if isinstance(finalValue, basestring) and len(finalValue) > 0:
             dataToSessionFile(replaceNewlineTabs(finalValue))
 
-        if conf.verbose >= 1 and not showEta and infoMsg:
+        if conf.verbose in (1, 2) and not showEta and infoMsg:
             dataToStdout(infoMsg)
 
         kb.locks.seqLock = None
@@ -452,7 +452,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         if showEta:
                             etaProgressUpdate(time.time() - charStart, len(commonValue))
-                        elif conf.verbose >= 1:
+                        elif conf.verbose in (1, 2):
                             dataToStdout(commonValue[index-1:])
 
                         finalValue = commonValue
@@ -500,10 +500,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if showEta:
                 etaProgressUpdate(time.time() - charStart, index)
-            elif conf.verbose >= 1:
+            elif conf.verbose in (1, 2):
                 dataToStdout(val)
 
-    if conf.verbose >= 1 or showEta:
+    if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
 
     if ( conf.verbose in ( 1, 2 ) and showEta ) or conf.verbose >= 3:
