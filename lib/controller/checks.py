@@ -221,11 +221,9 @@ def checkStability():
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
 
-    firstPage, _ = Request.queryPage(content=True)
+    firstPage = conf.seqMatcher.a # set inside checkConnection()
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True)
-
-    conf.seqMatcher.set_seq1(firstPage)
 
     kb.pageStable = (firstPage == secondPage)
 
@@ -401,7 +399,8 @@ def checkConnection():
     logger.info(infoMsg)
 
     try:
-        Request.getPage()
+        page, _ = Request.queryPage(content=True)
+        conf.seqMatcher.set_seq1(page)
 
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
