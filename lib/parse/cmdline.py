@@ -154,9 +154,7 @@ def cmdLineParser():
         injection = OptionGroup(parser, "Injection", "These options can be "
                                 "used to specify which parameters to test "
                                 "for, provide custom injection payloads and "
-                                "how to parse and compare HTTP responses "
-                                "page content when using the blind SQL "
-                                "injection technique.")
+                                "optional tampering scripts.")
 
         injection.add_option("-p", dest="testParameter",
                              help="Testable parameter(s)")
@@ -174,35 +172,44 @@ def cmdLineParser():
         injection.add_option("--postfix", dest="postfix",
                              help="Injection payload postfix string")
 
-        injection.add_option("--string", dest="string",
+        injection.add_option("--tamper", dest="tamper",
+                             help="Use given script(s) for tampering injection data")
+
+
+        # Detection options
+        detection = OptionGroup(parser, "Detection", "These options can be "
+                                "used to specify how to parse "
+                                "and compare page content from "
+                                "HTTP responses when using blind SQL "
+                                "injection technique.")
+
+        detection.add_option("--string", dest="string",
                              help="String to match in page when the "
                                   "query is valid")
 
-        injection.add_option("--regexp", dest="regexp",
+        detection.add_option("--regexp", dest="regexp",
                              help="Regexp to match in page when the "
                                   "query is valid")
 
-        injection.add_option("--excl-str", dest="eString",
+        detection.add_option("--excl-str", dest="eString",
                              help="String to be excluded before comparing "
                                   "page contents")
 
-        injection.add_option("--excl-reg", dest="eRegexp",
+        detection.add_option("--excl-reg", dest="eRegexp",
                              help="Matches to be excluded before "
                                   "comparing page contents")
 
-        injection.add_option("--threshold", dest="thold", type="float",
+        detection.add_option("--threshold", dest="thold", type="float",
                              help="Page comparison threshold value (0.0-1.0)")
 
-        injection.add_option("--text-only", dest="textOnly",
+        detection.add_option("--text-only", dest="textOnly",
                              action="store_true", default=False,
                              help="Compare pages based only on their textual content")
 
-        injection.add_option("--longest-common", dest="longestCommon",
+        detection.add_option("--longest-common", dest="longestCommon",
                              action="store_true", default=False,
                              help="Compare pages based on their longest common match")
 
-        injection.add_option("--tamper", dest="tamper",
-                             help="Use given script(s) for tampering injection data")
 
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
@@ -511,6 +518,7 @@ def cmdLineParser():
         parser.add_option_group(request)
         parser.add_option_group(optimization)
         parser.add_option_group(injection)
+        parser.add_option_group(detection)
         parser.add_option_group(techniques)
         parser.add_option_group(fingerprint)
         parser.add_option_group(enumeration)
