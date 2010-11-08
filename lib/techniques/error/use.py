@@ -73,6 +73,7 @@ def errorUse(expression, returnPayload=False):
 
     if match:
         output = match.group('result')
+
         if output:
             output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
 

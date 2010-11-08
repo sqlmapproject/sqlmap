@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import time
 
+from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getDelayQuery
 from lib.core.data import conf
@@ -38,7 +39,7 @@ def stackedTest():
         infoMsg += "sql injection on parameter '%s'" % kb.injParameter
         logger.info(infoMsg)
 
-        kb.stackedTest = payload
+        kb.stackedTest = agent.removePayloadDelimiters(payload, False)
     else:
         warnMsg  = "the target url is not affected by a stacked queries "
         warnMsg += "sql injection on parameter '%s'" % kb.injParameter

@@ -19,6 +19,9 @@ from lib.request import inject
 from lib.request.connect import Connect as Request
 
 def timeTest():
+    if kb.timeTest is not None:
+        return kb.timeTest
+
     infoMsg  = "testing time-based blind sql injection on parameter "
     infoMsg += "'%s' with %s condition syntax" % (kb.injParameter, conf.logic)
     logger.info(infoMsg)
@@ -37,7 +40,7 @@ def timeTest():
         infoMsg += "'%s'" % kb.injParameter
         logger.info(infoMsg)
 
-        kb.timeTest = payload
+        kb.timeTest = agent.removePayloadDelimiters(payload, False)
     else:
         warnMsg  = "the target url is not affected by a time-based blind "
         warnMsg += "sql injection with AND condition syntax on parameter "
@@ -59,7 +62,7 @@ def timeTest():
             infoMsg += "'%s'" % kb.injParameter
             logger.info(infoMsg)
 
-            kb.timeTest = payload
+            kb.timeTest = agent.removePayloadDelimiters(payload, False)
         else:
             warnMsg  = "the target url is not affected by a time-based blind "
             warnMsg += "sql injection with stacked queries syntax on parameter "

@@ -1112,6 +1112,7 @@ def __setKnowledgeBaseAttributes():
     kb.unionPosition   = None
     kb.unionNegative   = False
     kb.unionFalseCond  = False
+    kb.unionTest       = None
     kb.userAgents      = None
     kb.valueStack      = []
 

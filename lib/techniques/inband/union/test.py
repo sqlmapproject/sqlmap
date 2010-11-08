@@ -174,8 +174,8 @@ def unionTest():
     if conf.direct:
         return
 
-    if kb.unionCount is not None and kb.unionPosition is not None:
-        return
+    if kb.unionTest is not None:
+        return kb.unionTest
 
     if conf.uTech == "orderby":
         technique = "ORDER BY clause bruteforcing"
@@ -209,5 +209,7 @@ def unionTest():
 
     if validPayload is None:
         validPayload = ""
+    elif isinstance(validPayload, basestring):
+        kb.unionTest = agent.removePayloadDelimiters(validPayload, False)
 
-    return validPayload
+    return kb.unionTest

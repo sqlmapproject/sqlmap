@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import time
 
+from lib.core.agent import agent
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -38,7 +39,7 @@ def errorTest():
         infoMsg += "injection on parameter '%s'" % kb.injParameter
         logger.info(infoMsg)
 
-        kb.errorTest = True
+        kb.errorTest = agent.removePayloadDelimiters(usedPayload, False)
     else:
         warnMsg  = "the target url is not affected by an error-based sql "
         warnMsg += "injection on parameter '%s'" % kb.injParameter
@@ -48,7 +49,4 @@ def errorTest():
 
     setError()
 
-    if kb.errorTest:
-        return usedPayload
-    else:
-        return False
+    return kb.errorTest

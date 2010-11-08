@@ -353,7 +353,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
         expression = expression.replace("DISTINCT ", "")
 
         if error and conf.errorTest:
-            value = errorUse(expression)
+            value = goError(expression)
 
             if not value:
                 warnMsg  = "for some reason(s) it was not possible to retrieve "
@@ -408,7 +408,12 @@ def goStacked(expression, silent=False):
     return payload, page
 
 def goError(expression, suppressOutput=False, returnPayload=False):
-    #expression = cleanQuery(expression)
+    """
+    Retrieve the output of a SQL query taking advantage of an error-based
+    SQL injection vulnerability on the affected parameter.
+    """
+
+    result = None
 
     if suppressOutput:
         pushValue(conf.verbose)
@@ -417,9 +422,21 @@ def goError(expression, suppressOutput=False, returnPayload=False):
     if conf.direct:
         return direct(expression), None
 
-    result, payload = errorUse(expression, returnPayload)
+    condition = (
+                  kb.resumedQueries and conf.url in kb.resumedQueries.keys()
+                  and expression in kb.resumedQueries[conf.url].keys()
+                )
+
+    if condition:
+        result = resume(expression, None)
+
+    if not result:
+        result = errorUse(expression, returnPayload)
+
+        if not returnPayload:
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, result))
 
     if suppressOutput:
         conf.verbose = popValue()
 
-    return result, payload
+    return result
