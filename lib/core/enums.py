@@ -33,3 +33,8 @@ class PLACE:
     URI     = "URI"
     COOKIE  = "Cookie"
     UA      = "User-Agent"
+
+class HTTPMETHOD:
+    GET     = "GET"
+    POST    = "POST"
+    HEAD    = "HEAD"

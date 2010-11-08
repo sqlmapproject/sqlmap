@@ -27,6 +27,8 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import HTTPMETHOD
+from lib.core.enums import PLACE
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapSilentQuitException
@@ -126,9 +128,9 @@ def start():
             parseTargetUrl()
 
             testSqlInj = False
-            if "GET" in conf.parameters:
-                for parameter in re.findall(r"([^=]+)=[^&]+&?", conf.parameters["GET"]):
-                    paramKey = (conf.hostname, conf.path, "GET", parameter)
+            if PLACE.GET in conf.parameters:
+                for parameter in re.findall(r"([^=]+)=[^&]+&?", conf.parameters[PLACE.GET]):
+                    paramKey = (conf.hostname, conf.path, PLACE.GET, parameter)
                     if paramKey not in kb.testedParams:
                         testSqlInj = True
                         break
@@ -144,7 +146,7 @@ def start():
 
             if conf.multipleTargets:
                 hostCount += 1
-                message = "url %d:\n%s %s" % (hostCount, conf.method or "GET", targetUrl)
+                message = "url %d:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
@@ -183,7 +185,7 @@ def start():
                 if cookieStr:
                     cookieStr = cookieStr[:-1]
 
-                    if "Cookie" in conf.parameters:
+                    if PLACE.COOKIE in conf.parameters:
                         message  = "you provided an HTTP Cookie header value. "
                         message += "The target url provided its own Cookie within "
                         message += "the HTTP Set-Cookie header. Do you want to "
@@ -196,11 +198,11 @@ def start():
 
                     if setCookieAsInjectable:
                         conf.httpHeaders.append(("Cookie", cookieStr))
-                        conf.parameters["Cookie"] = cookieStr
-                        __paramDict = paramToDict("Cookie", cookieStr)
+                        conf.parameters[PLACE.COOKIE] = cookieStr
+                        __paramDict = paramToDict(PLACE.COOKIE, cookieStr)
 
                         if __paramDict:
-                            conf.paramDict["Cookie"] = __paramDict
+                            conf.paramDict[PLACE.COOKIE] = __paramDict
                             # TODO: consider the following line in __setRequestParams()
                             __testableParameters = True
 
@@ -212,7 +214,7 @@ def start():
 
                 # Do a little prioritization reorder of a testable parameter list 
                 parameters = conf.parameters.keys()
-                for place in ('POST', 'GET'):
+                for place in (PLACE.URI, PLACE.POST, PLACE.GET):
                     if place in parameters:
                         parameters.remove(place)
                         parameters.insert(0, place)

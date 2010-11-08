@@ -19,6 +19,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import PLACE
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
 from lib.request import inject
@@ -163,7 +164,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming MySQL"
             logger.info(infoMsg)
 
-            payload = agent.fullPayload("AND ISNULL(1/0)" if kb.injPlace != "URI" else "AND ISNULL(1 DIV 0)")
+            payload = agent.fullPayload("AND ISNULL(1/0)" if kb.injPlace != PLACE.URI else "AND ISNULL(1 DIV 0)")
             result  = Request.queryPage(payload)
 
             if not result:

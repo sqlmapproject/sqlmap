@@ -26,6 +26,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import sanitizeAsciiString
+from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.request.basic import decodePage
@@ -114,7 +115,7 @@ class Connect:
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
 
-                if conf.method == "POST":
+                if conf.method == HTTPMETHOD.POST:
                     if conf.parameters.has_key(PLACE.POST) and not post:
                         post = conf.parameters[PLACE.POST]
 
@@ -354,7 +355,7 @@ class Connect:
 
         if not content and not response and kb.nullConnection:
             if kb.nullConnection == "HEAD":
-                method = "HEAD"
+                method = HTTPMETHOD.HEAD
             elif kb.nullConnection == "Range":
                 if not auxHeaders:
                     auxHeaders = {}
@@ -370,7 +371,7 @@ class Connect:
 
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404)
-            
+
         if conf.textOnly:
             page = getFilteredPageContent(page)
 

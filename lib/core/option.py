@@ -42,6 +42,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
+from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PRIORITY
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -780,15 +781,15 @@ def __setHTTPMethod():
     if conf.method:
         conf.method = conf.method.upper()
 
-        if conf.method not in ("GET", "POST"):
+        if conf.method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
             warnMsg  = "'%s' " % conf.method
             warnMsg += "is an unsupported HTTP method, "
-            warnMsg += "setting to default method, GET"
+            warnMsg += "setting to default method, %s" % HTTPMETHOD.GET
             logger.warn(warnMsg)
 
-            conf.method = "GET"
+            conf.method = HTTPMETHOD.GET
     else:
-        conf.method = "GET"
+        conf.method = HTTPMETHOD.GET
 
     debugMsg = "setting the HTTP method to %s" % conf.method
     logger.debug(debugMsg)

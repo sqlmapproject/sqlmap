@@ -21,6 +21,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.dump import dumper
+from lib.core.enums import HTTPMETHOD
+from lib.core.enums import PLACE
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
@@ -41,39 +43,39 @@ def __setRequestParams():
     __testableParameters = False
 
     # Perform checks on GET parameters
-    if conf.parameters.has_key("GET") and conf.parameters["GET"]:
-        parameters = conf.parameters["GET"]
-        __paramDict = paramToDict("GET", parameters)
+    if conf.parameters.has_key(PLACE.GET) and conf.parameters[PLACE.GET]:
+        parameters = conf.parameters[PLACE.GET]
+        __paramDict = paramToDict(PLACE.GET, parameters)
 
         if __paramDict:
-            conf.paramDict["GET"] = __paramDict
+            conf.paramDict[PLACE.GET] = __paramDict
             __testableParameters = True
 
     # Perform checks on POST parameters
-    if conf.method == "POST" and not conf.data:
+    if conf.method == HTTPMETHOD.POST and not conf.data:
         errMsg = "HTTP POST method depends on HTTP data value to be posted"
         raise sqlmapSyntaxException, errMsg
 
     if conf.data:
         conf.data = conf.data.replace("\n", " ")
-        conf.parameters["POST"] = conf.data
+        conf.parameters[PLACE.POST] = conf.data
 
         # Check if POST data is in xml syntax
         if re.match("[\n]*<(\?xml |soap\:|ns).*>", conf.data):
             conf.paramDict["POSTxml"] = True
             __paramDict = paramToDict("POSTxml", conf.data)
         else:
-            __paramDict = paramToDict("POST", conf.data)
+            __paramDict = paramToDict(PLACE.POST, conf.data)
 
         if __paramDict:
-            conf.paramDict["POST"] = __paramDict
+            conf.paramDict[PLACE.POST] = __paramDict
             __testableParameters = True
 
-        conf.method = "POST"
+        conf.method = HTTPMETHOD.POST
 
     if "*" in conf.url:
-        conf.parameters["URI"] = conf.url
-        conf.paramDict["URI"] = {}
+        conf.parameters[PLACE.URI] = conf.url
+        conf.paramDict[PLACE.URI] = {}
         parts = conf.url.split("*")
         for i in range(len(parts)-1):
             result = str()
@@ -81,17 +83,17 @@ def __setRequestParams():
                 result += parts[j]
                 if i == j:
                     result += "*"
-            conf.paramDict["URI"]["#%d*" % (i+1)] = result
+            conf.paramDict[PLACE.URI]["#%d*" % (i+1)] = result
         conf.url = conf.url.replace("*", str())
         __testableParameters = True
 
     # Perform checks on Cookie parameters
     if conf.cookie:
-        conf.parameters["Cookie"] = conf.cookie
-        __paramDict = paramToDict("Cookie", conf.cookie)
+        conf.parameters[PLACE.COOKIE] = conf.cookie
+        __paramDict = paramToDict(PLACE.COOKIE, conf.cookie)
 
         if __paramDict:
-            conf.paramDict["Cookie"] = __paramDict
+            conf.paramDict[PLACE.COOKIE] = __paramDict
             __testableParameters = True
 
     # Perform checks on User-Agent header value
@@ -99,7 +101,7 @@ def __setRequestParams():
         for httpHeader, headerValue in conf.httpHeaders:
             if httpHeader == "User-Agent":
                 # No need for url encoding/decoding the user agent
-                conf.parameters["User-Agent"] = headerValue
+                conf.parameters[PLACE.UA] = headerValue
 
                 condition  = not conf.testParameter
                 condition |= "User-Agent" in conf.testParameter
@@ -108,7 +110,7 @@ def __setRequestParams():
                 condition |= "ua" in conf.testParameter
 
                 if condition:
-                    conf.paramDict["User-Agent"] = { "User-Agent": headerValue }
+                    conf.paramDict[PLACE.UA] = { PLACE.UA: headerValue }
                     __testableParameters = True
 
     if not conf.parameters:
@@ -140,11 +142,11 @@ def findPageForms():
         test = readInput(message, default="Y")
 
         if not test or test[0] in ("y", "Y"):
-            if method == "POST":
+            if method == HTTPMETHOD.POST:
                 message = " Edit POST data [default: %s]: " % (data if data else "")
                 test = readInput(message, default=data)
 
-            elif method == "GET":
+            elif method == HTTPMETHOD.GET:
                 if url.find("?") > -1:
                     firstPart = url[:url.find("?")]
                     secondPart = url[url.find("?")+1:]
