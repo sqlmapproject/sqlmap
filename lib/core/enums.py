@@ -38,3 +38,7 @@ class HTTPMETHOD:
     GET     = "GET"
     POST    = "POST"
     HEAD    = "HEAD"
+
+class NULLCONNECTION:
+    HEAD    = "HEAD"
+    RANGE   = "Range"

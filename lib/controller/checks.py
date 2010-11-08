@@ -26,6 +26,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import HTTPMETHOD
+from lib.core.enums import NULLCONNECTION
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
@@ -368,16 +370,16 @@ def checkNullConnection():
     logger.info(infoMsg)
 
     try:
-        page, headers = Request.getPage(method="HEAD")
+        page, headers = Request.getPage(method=HTTPMETHOD.HEAD)
         if not page and 'Content-Length' in headers:
-            kb.nullConnection = "HEAD"
+            kb.nullConnection = NULLCONNECTION.HEAD
 
             infoMsg = "NULL connection is supported with HEAD header"
             logger.info(infoMsg)
         else:
             page, headers = Request.getPage(auxHeaders={"Range":"bytes=-1"})
             if page and len(page) == 1 and 'Content-Range' in headers:
-                kb.nullConnection = "Range"
+                kb.nullConnection = NULLCONNECTION.RANGE
 
                 infoMsg = "NULL connection is supported with GET header "
                 infoMsg += "'%s'" % kb.nullConnection

@@ -27,6 +27,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import sanitizeAsciiString
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.request.basic import decodePage
@@ -354,9 +355,9 @@ class Connect:
                 Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
 
         if not content and not response and kb.nullConnection:
-            if kb.nullConnection == "HEAD":
+            if kb.nullConnection == NULLCONNECTION.HEAD:
                 method = HTTPMETHOD.HEAD
-            elif kb.nullConnection == "Range":
+            elif kb.nullConnection == NULLCONNECTION.RANGE:
                 if not auxHeaders:
                     auxHeaders = {}
 
@@ -364,9 +365,9 @@ class Connect:
 
             _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
-            if kb.nullConnection == "HEAD" and 'Content-Length' in headers:
+            if kb.nullConnection == NULLCONNECTION.HEAD and 'Content-Length' in headers:
                 pageLength = int(headers['Content-Length'])
-            elif kb.nullConnection == "Range" and 'Content-Range' in headers:
+            elif kb.nullConnection == NULLCONNECTION.RANGE and 'Content-Range' in headers:
                 pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
 
         if not pageLength:
