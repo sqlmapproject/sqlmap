@@ -195,7 +195,7 @@ def start():
                             setCookieAsInjectable = False
 
                     if setCookieAsInjectable:
-                        conf.httpHeaders.append((PLACE.COOKIE, cookieStr))
+                        conf.httpHeaders.append(("Cookie", cookieStr))
                         conf.parameters[PLACE.COOKIE] = cookieStr
                         __paramDict = paramToDict(PLACE.COOKIE, cookieStr)
 

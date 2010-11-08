@@ -43,7 +43,6 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.enums import HTTPMETHOD
-from lib.core.enums import PLACE
 from lib.core.enums import PRIORITY
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -848,19 +847,19 @@ def __setHTTPUserAgent():
         debugMsg = "setting the HTTP User-Agent header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append((PLACE.UA, conf.agent))
+        conf.httpHeaders.append(("User-Agent", conf.agent))
         return
 
     if not conf.userAgentsFile:
         addDefaultUserAgent = True
 
         for header, _ in conf.httpHeaders:
-            if header == PLACE.UA:
+            if header == "User-Agent":
                 addDefaultUserAgent = False
                 break
 
         if addDefaultUserAgent:
-            conf.httpHeaders.append((PLACE.UA, __defaultHTTPUserAgent()))
+            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
 
         return
 
@@ -876,7 +875,7 @@ def __setHTTPUserAgent():
             warnMsg += "file '%s'" % conf.userAgentsFile
             logger.warn(warnMsg)
 
-            conf.httpHeaders.append((PLACE.UA, __defaultHTTPUserAgent()))
+            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
 
             return
 
@@ -888,7 +887,7 @@ def __setHTTPUserAgent():
         __userAgent = kb.userAgents[randomRange(stop=__count)]
 
     __userAgent = sanitizeStr(__userAgent)
-    conf.httpHeaders.append((PLACE.UA, __userAgent))
+    conf.httpHeaders.append(("User-Agent", __userAgent))
 
     logMsg  = "fetched random HTTP User-Agent header from "
     logMsg += "file '%s': %s" % (conf.userAgentsFile, __userAgent)
@@ -915,7 +914,7 @@ def __setHTTPCookies():
         logger.debug(debugMsg)
 
         conf.httpHeaders.append(("Connection", "Keep-Alive"))
-        conf.httpHeaders.append((PLACE.COOKIE, conf.cookie))
+        conf.httpHeaders.append(("Cookie", conf.cookie))
 
 def __setHTTPTimeout():
     """

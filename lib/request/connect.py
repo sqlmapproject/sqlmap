@@ -166,7 +166,7 @@ class Connect:
 
             requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
 
-            if not req.has_header(PLACE.COOKIE) and cookieStr:
+            if not req.has_header("Cookie") and cookieStr:
                 requestHeaders += "\n%s" % cookieStr[:-2]
 
             if not req.has_header("Connection"):
@@ -370,7 +370,7 @@ class Connect:
                 if not auxHeaders:
                     auxHeaders = {}
 
-                auxHeaders[NULLCONNECTION.RANGE] = "bytes=-1"
+                auxHeaders["Range"] = "bytes=-1"
 
             _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
