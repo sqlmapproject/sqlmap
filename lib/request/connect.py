@@ -284,13 +284,14 @@ class Connect:
         parseResponse(page, responseHeaders)
 
         responseMsg += "[#%d] (%s - %d):\n" % (requestID, status, code)
+        responseHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
 
-        logHTTPTraffic(requestMsg, "%s%s\n%s" % (responseMsg, headers, page))
+        logHTTPTraffic(requestMsg, "%s%s\n%s" % (responseMsg, responseHeaders, page))
 
         if conf.verbose <= 5:
-            responseMsg += getUnicode(headers.__str__())
+            responseMsg += getUnicode(responseHeaders)
         elif conf.verbose > 5:
-            responseMsg += "%s\n%s\n" % (headers, page)
+            responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
         logger.log(7, responseMsg)
 
