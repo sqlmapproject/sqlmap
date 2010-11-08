@@ -377,7 +377,7 @@ def checkNullConnection():
             infoMsg = "NULL connection is supported with HEAD header"
             logger.info(infoMsg)
         else:
-            page, headers = Request.getPage(auxHeaders={"Range":"bytes=-1"})
+            page, headers = Request.getPage(auxHeaders={NULLCONNECTION.RANGE: "bytes=-1"})
             if page and len(page) == 1 and 'Content-Range' in headers:
                 kb.nullConnection = NULLCONNECTION.RANGE
 

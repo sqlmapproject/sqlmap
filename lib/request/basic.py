@@ -21,6 +21,7 @@ from lib.core.common import posixToNtSlashes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import PLACE
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -33,9 +34,9 @@ def forgeHeaders(cookie, ua):
     headers = {}
 
     for header, value in conf.httpHeaders:
-        if cookie and header == "Cookie":
+        if cookie and header == PLACE.COOKIE:
             headers[header] = cookie
-        elif ua and header == "User-Agent":
+        elif ua and header == PLACE.UA:
             headers[header] = ua
         else:
             headers[header] = value

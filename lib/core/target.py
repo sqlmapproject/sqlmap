@@ -99,12 +99,12 @@ def __setRequestParams():
     # Perform checks on User-Agent header value
     if conf.httpHeaders:
         for httpHeader, headerValue in conf.httpHeaders:
-            if httpHeader == "User-Agent":
+            if httpHeader == PLACE.UA:
                 # No need for url encoding/decoding the user agent
                 conf.parameters[PLACE.UA] = headerValue
 
                 condition  = not conf.testParameter
-                condition |= "User-Agent" in conf.testParameter
+                condition |= PLACE.UA in conf.testParameter
                 condition |= "user-agent" in conf.testParameter
                 condition |= "useragent" in conf.testParameter
                 condition |= "ua" in conf.testParameter

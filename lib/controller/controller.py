@@ -21,8 +21,6 @@ from lib.controller.checks import checkNullConnection
 from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
-from lib.core.common import popValue
-from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -197,7 +195,7 @@ def start():
                             setCookieAsInjectable = False
 
                     if setCookieAsInjectable:
-                        conf.httpHeaders.append(("Cookie", cookieStr))
+                        conf.httpHeaders.append((PLACE.COOKIE, cookieStr))
                         conf.parameters[PLACE.COOKIE] = cookieStr
                         __paramDict = paramToDict(PLACE.COOKIE, cookieStr)
 
@@ -214,6 +212,7 @@ def start():
 
                 # Do a little prioritization reorder of a testable parameter list 
                 parameters = conf.parameters.keys()
+
                 for place in (PLACE.URI, PLACE.POST, PLACE.GET):
                     if place in parameters:
                         parameters.remove(place)

@@ -1570,7 +1570,9 @@ def runningAsAdmin():
 
 def logHTTPTraffic(requestLogMsg, responseLogMsg):
     kb.locks.reqLock.acquire()
+
     dataToTrafficFile("%s\n" % requestLogMsg)
     dataToTrafficFile("%s\n" % responseLogMsg)
-    dataToTrafficFile("%s\n" % (160*'#'))
+    dataToTrafficFile("\n%s\n\n" % (76 * '#'))
+
     kb.locks.reqLock.release()

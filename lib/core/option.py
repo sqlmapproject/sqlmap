@@ -43,6 +43,7 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import PLACE
 from lib.core.enums import PRIORITY
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -765,7 +766,7 @@ def __setHTTPAuthentication():
             errMsg += "must be in format key_file,cert_file"
             raise sqlmapSyntaxException, errMsg
 
-        #os.path.expanduser for support of paths with ~
+        # os.path.expanduser for support of paths with ~
         key_file = os.path.expanduser(aCertRegExp.group(1))
         cert_file = os.path.expanduser(aCertRegExp.group(2))
 
@@ -847,19 +848,19 @@ def __setHTTPUserAgent():
         debugMsg = "setting the HTTP User-Agent header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append(("User-Agent", conf.agent))
+        conf.httpHeaders.append((PLACE.UA, conf.agent))
         return
 
     if not conf.userAgentsFile:
         addDefaultUserAgent = True
 
         for header, _ in conf.httpHeaders:
-            if header == "User-Agent":
+            if header == PLACE.UA:
                 addDefaultUserAgent = False
                 break
 
         if addDefaultUserAgent:
-            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
+            conf.httpHeaders.append((PLACE.UA, __defaultHTTPUserAgent()))
 
         return
 
@@ -875,7 +876,7 @@ def __setHTTPUserAgent():
             warnMsg += "file '%s'" % conf.userAgentsFile
             logger.warn(warnMsg)
 
-            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
+            conf.httpHeaders.append((PLACE.UA, __defaultHTTPUserAgent()))
 
             return
 
@@ -887,7 +888,7 @@ def __setHTTPUserAgent():
         __userAgent = kb.userAgents[randomRange(stop=__count)]
 
     __userAgent = sanitizeStr(__userAgent)
-    conf.httpHeaders.append(("User-Agent", __userAgent))
+    conf.httpHeaders.append((PLACE.UA, __userAgent))
 
     logMsg  = "fetched random HTTP User-Agent header from "
     logMsg += "file '%s': %s" % (conf.userAgentsFile, __userAgent)
@@ -914,7 +915,7 @@ def __setHTTPCookies():
         logger.debug(debugMsg)
 
         conf.httpHeaders.append(("Connection", "Keep-Alive"))
-        conf.httpHeaders.append(("Cookie", conf.cookie))
+        conf.httpHeaders.append((PLACE.COOKIE, conf.cookie))
 
 def __setHTTPTimeout():
     """

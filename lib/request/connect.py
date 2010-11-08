@@ -166,7 +166,7 @@ class Connect:
 
             requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
 
-            if not req.has_header("Cookie") and cookieStr:
+            if not req.has_header(PLACE.COOKIE) and cookieStr:
                 requestHeaders += "\n%s" % cookieStr[:-2]
 
             if not req.has_header("Connection"):
@@ -283,7 +283,7 @@ class Connect:
         page = sanitizeAsciiString(page)
         parseResponse(page, responseHeaders)
 
-        responseMsg += "[#%d] (%s - %d):\n" % (requestID, status, code)
+        responseMsg += "[#%d] (%d %s):\n" % (requestID, code, status)
         logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
 
         logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
@@ -370,7 +370,7 @@ class Connect:
                 if not auxHeaders:
                     auxHeaders = {}
 
-                auxHeaders["Range"] = "bytes=-1"
+                auxHeaders[NULLCONNECTION.RANGE] = "bytes=-1"
 
             _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 

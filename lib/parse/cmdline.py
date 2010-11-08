@@ -457,8 +457,8 @@ def cmdLineParser():
                                       "on a session file")
 
         miscellaneous.add_option("-t", dest="trafficFile",
-                                 help="Save all HTTP traffic data "
-                                      "into a textual file")
+                                 help="Log all HTTP traffic into a "
+                                      "textual file")
 
         miscellaneous.add_option("--flush-session", dest="flushSession",
                                  action="store_true", default=False,

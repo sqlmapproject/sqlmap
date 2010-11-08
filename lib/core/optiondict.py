@@ -59,14 +59,17 @@ optDict = {
                                "os":                "string",
                                "prefix":            "string",
                                "postfix":           "string",
+                               "tamper":            "string"
+                             },
+
+            "Detection":     {
                                "string":            "string",
                                "regexp":            "string",
                                "eString":           "string",
                                "eRegexp":           "string",
                                "thold":             "float",
                                "textOnly":          "boolean",
-                               "longestCommon":     "boolean",
-                               "tamper":            "string"
+                               "longestCommon":     "boolean"
                              },
 
             "Techniques":    {
@@ -147,6 +150,7 @@ optDict = {
             "Miscellaneous": {
                                "xmlFile":           "string",
                                "sessionFile":       "string",
+                               "trafficFile":       "string",
                                "flushSession":      "boolean",
                                "forms":             "boolean",
                                "eta":               "boolean",
@@ -155,6 +159,8 @@ optDict = {
                                "batch":             "boolean",
                                "cleanup":           "boolean",
                                "replicate":         "boolean",
+                               "checkPayload":      "boolean",
+                               "beep":              "boolean",
                                "verbose":           "integer"
                              },
           }
