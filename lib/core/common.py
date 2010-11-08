@@ -49,6 +49,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
+from lib.core.place import PLACE
 from lib.core.settings import DBMS
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
@@ -135,7 +136,7 @@ def paramToDict(place, parameters=None):
     if place is not "POSTxml":
         parameters = parameters.replace(", ", ",")
 
-        if place == "Cookie":
+        if place == PLACE.COOKIE:
             splitParams = parameters.split(";")
         else:
             splitParams = parameters.split("&")
@@ -797,7 +798,7 @@ def parseTargetUrl():
         conf.port = 80
 
     if __urlSplit[3]:
-        conf.parameters["GET"] = __urlSplit[3]
+        conf.parameters[PLACE.GET] = __urlSplit[3]
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
 

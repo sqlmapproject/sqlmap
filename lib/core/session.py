@@ -15,6 +15,7 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.place import PLACE
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import PGSQL_ALIASES
@@ -74,7 +75,7 @@ def setInjection():
     session file.
     """
 
-    if kb.injPlace == "User-Agent":
+    if kb.injPlace == PLACE.UA:
         kb.injParameter = conf.agent
 
     condition = (

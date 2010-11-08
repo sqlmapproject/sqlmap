@@ -21,6 +21,7 @@ from lib.core.data import kb
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.place import PLACE
 from lib.core.settings import DBMS
 from lib.core.settings import PAYLOAD_DELIMITER
 
@@ -69,7 +70,7 @@ class Agent:
             falseValue = " AND %d=%d" % (randInt, randInt + 1)
 
         # After identifing the injectable parameter
-        if kb.injPlace == "User-Agent":
+        if kb.injPlace == PLACE.UA:
             retValue = kb.injParameter.replace(kb.injParameter,
                                                self.addPayloadDelimiters("%s%s" % (negValue, kb.injParameter + falseValue + newValue)))
         elif kb.injParameter:
@@ -77,7 +78,7 @@ class Agent:
             paramDict = conf.paramDict[kb.injPlace]
             value = paramDict[kb.injParameter]
 
-            if "POSTxml" in conf.paramDict and kb.injPlace == "POST":
+            if "POSTxml" in conf.paramDict and kb.injPlace == PLACE.POST:
                 root = ET.XML(paramString)
                 iterator = root.getiterator(kb.injParameter)
 
@@ -85,7 +86,7 @@ class Agent:
                     child.text = self.addPayloadDelimiters(negValue + value + falseValue + newValue)
 
                 retValue = ET.tostring(root)
-            elif kb.injPlace == "URI":
+            elif kb.injPlace == PLACE.URI:
                 retValue = paramString.replace("*",
                                                self.addPayloadDelimiters("%s%s" % (negValue, falseValue + newValue)))
             else:
@@ -93,14 +94,14 @@ class Agent:
                                                "%s=%s" % (kb.injParameter, self.addPayloadDelimiters(negValue + value + falseValue + newValue)))
 
         # Before identifing the injectable parameter
-        elif parameter == "User-Agent":
+        elif parameter == PLACE.UA:
             retValue = value.replace(value, self.addPayloadDelimiters(newValue))
-        elif place == "URI":
+        elif place == PLACE.URI:
             retValue = value.replace("*", self.addPayloadDelimiters("%s" % newValue.replace(value, str())))
         else:
             paramString = conf.parameters[place]
 
-            if "POSTxml" in conf.paramDict and place == "POST":
+            if "POSTxml" in conf.paramDict and place == PLACE.POST:
                 root = ET.XML(paramString)
                 iterator = root.getiterator(parameter)
 

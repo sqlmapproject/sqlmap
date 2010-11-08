@@ -27,6 +27,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import sanitizeAsciiString
 from lib.core.exception import sqlmapConnectionException
+from lib.core.place import PLACE
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
@@ -106,16 +107,16 @@ class Connect:
                 return page
 
             else:
-                if conf.parameters.has_key("GET") and not get:
-                    get = conf.parameters["GET"]
+                if conf.parameters.has_key(PLACE.GET) and not get:
+                    get = conf.parameters[PLACE.GET]
 
                 if get:
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
 
                 if conf.method == "POST":
-                    if conf.parameters.has_key("POST") and not post:
-                        post = conf.parameters["POST"]
+                    if conf.parameters.has_key(PLACE.POST) and not post:
+                        post = conf.parameters[PLACE.POST]
 
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
@@ -303,8 +304,8 @@ class Connect:
         page        = None
         pageLength  = None
         uri         = None
-        raise404    = place != "URI" if raise404 is None else raise404
-        toUrlencode = { "GET": True, "POST": True, "Cookie": conf.cookieUrlencode, "User-Agent": True, "URI": False }
+        raise404    = place != PLACE.URI if raise404 is None else raise404
+        toUrlencode = { PLACE.GET: True, PLACE.POST: True, PLACE.COOKIE: conf.cookieUrlencode, PLACE.UA: True, PLACE.URI: False }
 
         if not place:
             place = kb.injPlace
@@ -320,7 +321,7 @@ class Connect:
 
             logger.log(9, payload)
 
-        if place == "Cookie" and conf.cookieUrlencode:
+        if place == PLACE.COOKIE and conf.cookieUrlencode:
             value = agent.removePayloadDelimiters(value, False)
             value = urlEncodeCookieValues(value)
         elif place:
@@ -329,20 +330,20 @@ class Connect:
         if conf.checkPayload:
             checkPayload(value)
 
-        if "GET" in conf.parameters:
-            get = conf.parameters["GET"] if place != "GET" or not value else value
+        if PLACE.GET in conf.parameters:
+            get = conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value
 
-        if "POST" in conf.parameters:
-            post = conf.parameters["POST"] if place != "POST" or not value else value
+        if PLACE.POST in conf.parameters:
+            post = conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value
 
-        if "Cookie" in conf.parameters:
-            cookie = conf.parameters["Cookie"] if place != "Cookie" or not value else value
+        if PLACE.COOKIE in conf.parameters:
+            cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
 
-        if "User-Agent" in conf.parameters:
-            ua = conf.parameters["User-Agent"] if place != "User-Agent" or not value else value
+        if PLACE.UA in conf.parameters:
+            ua = conf.parameters[PLACE.UA] if place != PLACE.UA or not value else value
 
-        if "URI" in conf.parameters:
-            uri = conf.url if place != "URI" or not value else value
+        if PLACE.URI in conf.parameters:
+            uri = conf.url if place != PLACE.URI or not value else value
         else:
             uri = conf.url
 

@@ -12,6 +12,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.place import PLACE
 from lib.request import inject
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.inband.union.use import unionUse
@@ -78,7 +79,7 @@ class Filesystem(GenericFilesystem):
         fcEncodedStr    = fcEncodedList[0]
         fcEncodedStrLen = len(fcEncodedStr)
 
-        if kb.injPlace == "GET" and fcEncodedStrLen > 8000:
+        if kb.injPlace == PLACE.GET and fcEncodedStrLen > 8000:
             warnMsg  = "the injection is on a GET parameter and the file "
             warnMsg += "to be written hexadecimal value is %d " % fcEncodedStrLen
             warnMsg += "bytes, this might cause errors in the file "
