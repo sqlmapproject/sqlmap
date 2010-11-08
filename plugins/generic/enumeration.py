@@ -42,6 +42,7 @@ from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
 
@@ -76,7 +77,9 @@ class Enumeration:
         logger.info(infoMsg)
 
         if not kb.data.banner:
-            if conf.unionTest:
+            if conf.errorTest:
+                conf.dumper.technic("error-based injection payload", errorTest())
+            elif conf.unionTest:
                 conf.dumper.technic("inband injection payload", unionTest())
 
             query          = queries[kb.dbms].banner.query
