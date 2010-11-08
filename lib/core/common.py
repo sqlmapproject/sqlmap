@@ -425,6 +425,13 @@ def dataToSessionFile(data):
     conf.sessionFP.write(data)
     conf.sessionFP.flush()
 
+def dataToTrafficFile(data):
+    if not conf.trafficFile:
+        return
+
+    conf.trafficFP.write(data)
+    conf.trafficFP.flush()
+
 def dataToDumpFile(dumpFile, data):
     dumpFile.write(data)
     dumpFile.flush()
@@ -1560,3 +1567,10 @@ def runningAsAdmin():
         isAdmin = True
 
     return isAdmin
+
+def logHTTPTraffic(requestLogMsg, responseLogMsg):
+    kb.locks.reqLock.acquire()
+    dataToTrafficFile("%s\n" % requestLogMsg)
+    dataToTrafficFile("%s\n" % responseLogMsg)
+    dataToTrafficFile("%s\n" % (160*'#'))
+    kb.locks.reqLock.release()

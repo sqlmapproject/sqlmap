@@ -20,6 +20,7 @@ from lib.core.agent import agent
 from lib.core.common import readInput
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
+from lib.core.common import logHTTPTraffic
 from lib.core.convert import urlencode
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
@@ -61,6 +62,13 @@ class Connect:
             delay = 0.00001 * (conf.cpuThrottle ** 2)
             time.sleep(delay)
 
+        kb.locks.reqLock.acquire()
+
+        kb.lastRequestUID += 1
+        requestID = kb.lastRequestUID
+
+        kb.locks.reqLock.release()
+
         url             = kwargs.get('url',        conf.url).replace(" ", "%20")
         get             = kwargs.get('get',        None)
         post            = kwargs.get('post',       None)
@@ -76,13 +84,11 @@ class Connect:
 
         page            = ""
         cookieStr       = ""
-        requestMsg      = "HTTP request:\n%s " % conf.method
+        requestMsg      = "HTTP request [#%d]:\n%s " % (requestID, conf.method)
         requestMsg     += "%s" % urlparse.urlsplit(url)[2] or "/"
         responseMsg     = "HTTP response "
         requestHeaders  = ""
         responseHeaders = ""
-
-        kb.lastRequestUID  += 1
 
         try:
             if silent:
@@ -277,12 +283,14 @@ class Connect:
         page = sanitizeAsciiString(page)
         parseResponse(page, responseHeaders)
 
-        responseMsg += "(%s - %d):\n" % (status, code)
+        responseMsg += "[#%d] (%s - %d):\n" % (requestID, status, code)
+
+        logHTTPTraffic(requestMsg, "%s%s\n%s" % (responseMsg, headers, page))
 
         if conf.verbose <= 5:
-            responseMsg += getUnicode(responseHeaders.__str__())
+            responseMsg += getUnicode(headers.__str__())
         elif conf.verbose > 5:
-            responseMsg += "%s\n%s\n" % (responseHeaders, page)
+            responseMsg += "%s\n%s\n" % (headers, page)
 
         logger.log(7, responseMsg)
 

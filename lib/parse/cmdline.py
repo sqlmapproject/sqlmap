@@ -456,6 +456,10 @@ def cmdLineParser():
                                  help="Save and resume all data retrieved "
                                       "on a session file")
 
+        miscellaneous.add_option("-t", dest="trafficFile",
+                                 help="Save all HTTP traffic data "
+                                      "into a textual file")
+
         miscellaneous.add_option("--flush-session", dest="flushSession",
                                  action="store_true", default=False,
                                  help="Flush session file for current target")

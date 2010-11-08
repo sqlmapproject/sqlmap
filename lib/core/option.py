@@ -1031,6 +1031,7 @@ def __setConfAttributes():
     conf.start            = True
     conf.threadContinue   = True
     conf.threadException  = False
+    conf.trafficFP        = None
     conf.wFileType        = None
 
 def __setKnowledgeBaseAttributes():
@@ -1080,6 +1081,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.locks           = advancedDict()
     kb.locks.cacheLock = threading.Lock()
+    kb.locks.reqLock   = threading.Lock()
     kb.locks.seqLock   = None
 
     kb.nullConnection  = None
@@ -1212,6 +1214,10 @@ def __mergeOptions(inputOptions):
         if not conf.has_key(key) or conf[key] is None or value is not None:
             conf[key] = value
 
+def __setTrafficOutputFP():
+    if conf.trafficFile:
+        conf.trafficFP = codecs.open(conf.trafficFile, "w+", conf.dataEncoding)
+
 def __basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
         errMsg = "value for --start (limitStart) option must be an integer value greater than zero (>0)"
@@ -1271,6 +1277,7 @@ def init(inputOptions=advancedDict()):
     __setRequestFromFile()
     __setMultipleTargets()
     __setTamperingFunctions()
+    __setTrafficOutputFP()
 
     parseTargetUrl()
     parseTargetDirect()
