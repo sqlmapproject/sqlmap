@@ -13,8 +13,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import DBMS
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.settings import DBMS
 from lib.request import inject
 
 from plugins.generic.enumeration import Enumeration as GenericEnumeration

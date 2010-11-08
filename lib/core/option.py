@@ -42,6 +42,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
+from lib.core.enums import PRIORITY
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapMissingDependence
@@ -51,7 +52,6 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
-from lib.core.priority import PRIORITY
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION

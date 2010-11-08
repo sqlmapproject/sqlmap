@@ -7,7 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.priority import PRIORITY
+from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 

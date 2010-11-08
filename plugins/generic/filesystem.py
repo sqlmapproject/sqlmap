@@ -18,8 +18,8 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import DBMS
 from lib.core.exception import sqlmapUndefinedMethod
-from lib.core.settings import DBMS
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest
 

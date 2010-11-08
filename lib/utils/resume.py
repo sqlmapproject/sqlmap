@@ -20,9 +20,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import DBMS
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
-from lib.core.settings import DBMS
 from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import DUMP_DEL_MARKER

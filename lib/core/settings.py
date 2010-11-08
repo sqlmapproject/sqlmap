@@ -90,17 +90,6 @@ SYBASE_ALIASES      = [ "sybase", "sybase sql server" ]
 SUPPORTED_DBMS      = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES
 SUPPORTED_OS        = ( "linux", "windows" )
 
-class DBMS:
-    MYSQL       = "MySQL"
-    ORACLE      = "Oracle"
-    POSTGRESQL  = "PostgreSQL"
-    MSSQL       = "Microsoft SQL Server"
-    SQLITE      = "SQLite"
-    ACCESS      = "Microsoft Access"
-    FIREBIRD    = "Firebird"
-    MAXDB       = "SAP MaxDB"
-    SYBASE      = "Sybase"
-
 SQL_STATEMENTS      = {
                        "SQL SELECT statement":  (
                              "select ",

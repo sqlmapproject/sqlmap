@@ -43,14 +43,14 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.convert import htmlunescape
 from lib.core.convert import urlencode
+from lib.core.enums import DBMS
+from lib.core.enums import PLACE
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
-from lib.core.place import PLACE
-from lib.core.settings import DBMS
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM

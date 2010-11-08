@@ -26,8 +26,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import sanitizeAsciiString
+from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
-from lib.core.place import PLACE
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse

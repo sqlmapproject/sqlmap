@@ -30,12 +30,12 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.enums import DBMS
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
-from lib.core.settings import DBMS
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper

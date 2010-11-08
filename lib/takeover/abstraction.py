@@ -12,8 +12,8 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import DBMS
 from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.settings import DBMS
 from lib.core.shell import autoCompletion
 from lib.takeover.udf import UDF
 from lib.takeover.web import Web

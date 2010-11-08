@@ -11,8 +11,8 @@ from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.place import PLACE
 from lib.request import inject
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.inband.union.use import unionUse

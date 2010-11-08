@@ -16,7 +16,7 @@ from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.settings import DBMS
+from lib.core.enums import DBMS
 from lib.core.settings import SQL_STATEMENTS
 from lib.utils.timeout import timeout
 

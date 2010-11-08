@@ -13,8 +13,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import DBMS
 from lib.core.session import setUnion
-from lib.core.settings import DBMS
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request

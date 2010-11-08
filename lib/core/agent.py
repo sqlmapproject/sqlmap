@@ -20,9 +20,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
+from lib.core.enums import DBMS
+from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.place import PLACE
-from lib.core.settings import DBMS
 from lib.core.settings import PAYLOAD_DELIMITER
 
 class Agent:

@@ -16,11 +16,11 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import DBMS
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import DBMS
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.techniques.outband.stacked import stackedTest

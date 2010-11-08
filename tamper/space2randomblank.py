@@ -9,7 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import random
 
-from lib.core.priority import PRIORITY
+from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 

@@ -17,7 +17,7 @@ from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
-from lib.core.settings import DBMS
+from lib.core.enums import DBMS
 from lib.parse.handler import FingerprintHandler
 
 class MSSQLBannerHandler(ContentHandler):
