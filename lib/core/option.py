@@ -64,6 +64,7 @@ from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
+from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.utils.google import Google
 
@@ -71,6 +72,7 @@ authHandler = urllib2.BaseHandler()
 keepAliveHandler = keepalive.HTTPHandler()
 proxyHandler = urllib2.BaseHandler()
 redirectHandler = SmartRedirectHandler()
+rangeHandler = HTTPRangeHandler()
 
 def __urllib2Opener():
     """
@@ -80,12 +82,13 @@ def __urllib2Opener():
     global authHandler
     global keepAliveHandler
     global proxyHandler
+    global rangeHandler
     global redirectHandler
 
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
 
-    handlers = [proxyHandler, authHandler, redirectHandler]
+    handlers = [proxyHandler, authHandler, redirectHandler, rangeHandler]
 
     if not conf.dropSetCookie:
         conf.cj = cookielib.LWPCookieJar()
