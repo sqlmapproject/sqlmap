@@ -42,6 +42,7 @@ from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.techniques.brute.use import tableExists
 from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
@@ -728,7 +729,7 @@ class Enumeration:
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
             else:
-                return self.tableExists(paths.COMMON_TABLES)
+                return tableExists(paths.COMMON_TABLES)
 
         self.forceDbmsEnum()
 
@@ -844,42 +845,6 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedTables
-
-    def tableExists(self, tableFile):
-        tables = getFileItems(tableFile, None)
-        retVal = []
-        infoMsg = "checking tables existence using items from '%s'" % tableFile
-        logger.info(infoMsg)
-
-        pushValue(conf.verbose)
-        conf.verbose = 0
-        count = 0
-        length = len(tables)
-
-        for table in tables:
-            query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT 1 FROM %s)", table))
-            query = agent.postfixQuery(query)
-            result = Request.queryPage(agent.payload(newValue=query))
-
-            if result:
-                infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), table)
-                infoMsg = "%s%s\n" % (infoMsg, " "*(getConsoleWidth()-1-len(infoMsg)))
-                dataToStdout(infoMsg, True)
-                retVal.append(table)
-
-            count += 1
-            status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
-            dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
-
-        conf.verbose = popValue()
-
-        dataToStdout("\n", True)
-
-        if not retVal:
-            warnMsg = "no table found"
-            logger.warn(warnMsg)
-
-        return retVal
 
     def getColumns(self, onlyColNames=False):
         if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:

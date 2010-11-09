@@ -16,6 +16,7 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.blind.timebased import timeTest
+from lib.techniques.brute.use import tableExists
 from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
@@ -105,10 +106,10 @@ def action():
         conf.dumper.dbTables(conf.dbmsHandler.getTables())
 
     if conf.cExists:
-        conf.dumper.dbTables(conf.dbmsHandler.tableExists(paths.COMMON_TABLES))
+        conf.dumper.dbTables(tableExists(paths.COMMON_TABLES))
 
     if conf.tableFile:
-        conf.dumper.dbTables(conf.dbmsHandler.tableExists(conf.tableFile))
+        conf.dumper.dbTables(tableExists(conf.tableFile))
 
     if conf.getColumns:
         conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns())
