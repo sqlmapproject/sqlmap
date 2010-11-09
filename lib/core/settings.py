@@ -23,6 +23,7 @@ SITE               = "http://sqlmap.sourceforge.net"
 
 # minimum distance of ratio from conf.matchRatio to result in True
 DIFF_TOLERANCE     = 0.05
+CONSTANT_RATIO     = 0.9
 
 # sqlmap logger
 logging.addLevelName(9, "PAYLOAD")
