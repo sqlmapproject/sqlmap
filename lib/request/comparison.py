@@ -15,6 +15,7 @@ from lib.core.common import wasLastRequestError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.settings import ETA
 
 def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if page is None and pageLength is None:
@@ -97,7 +98,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
             conf.matchRatio = conf.thold
 
         elif kb.pageStable and ratio > 0.6 and ratio < 1:
-            conf.matchRatio = min(ratio, 0.950)
+            conf.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % conf.matchRatio)
 
         elif not kb.pageStable or ( kb.pageStable and ratio < 0.6 ):
@@ -115,4 +116,4 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     # If the url is not stable it returns sequence matcher between the
     # first untouched HTTP response page content and this content
     else:
-        return ratio > conf.matchRatio
+        return (ratio - conf.matchRatio) > ETA

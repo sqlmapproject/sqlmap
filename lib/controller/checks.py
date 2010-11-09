@@ -63,6 +63,8 @@ def checkSqlInjection(place, parameter, value, parenthesis):
             postfix = conf.postfix
 
     for case in kb.injections.root.case:
+        conf.matchRatio = None
+
         positive = case.test.positive
         negative = case.test.negative
 
@@ -73,11 +75,21 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         infoMsg += "on %s parameter '%s'" % (place, parameter)
         logger.info(infoMsg)
 
+        payload = agent.payload(place, parameter, value, negative.format % eval(negative.params))
+        _ = Request.queryPage(payload, place)
+
         payload = agent.payload(place, parameter, value, positive.format % eval(positive.params))
         trueResult = Request.queryPage(payload, place)
 
         if trueResult is True:
+            infoMsg  = "confirming %s (%s) injection " % (case.desc, logic)
+            infoMsg += "on %s parameter '%s'" % (place, parameter)
+            logger.info(infoMsg)
+
             payload = agent.payload(place, parameter, value, negative.format % eval(negative.params))
+
+            randInt = randomInt()
+            randStr = randomStr()
 
             falseResult = Request.queryPage(payload, place)
 
