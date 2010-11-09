@@ -111,8 +111,11 @@ optDict = {
                                "lastChar":          "integer",
                                "query":             "string",
                                "sqlShell":          "boolean",
-                               "cExists":           "boolean",
-                               "tableFile":         "string"
+                             },
+
+            "Brute":         {
+                               "bruteTables":       "boolean",
+                               "bruteColumns":      "boolean",
                              },
 
             "User-defined function": {
