@@ -651,8 +651,9 @@ def setPaths():
     # sqlmap files
     paths.SQLMAP_HISTORY         = os.path.join(paths.SQLMAP_ROOT_PATH, ".sqlmap_history")
     paths.SQLMAP_CONFIG          = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
-    paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
+    paths.COMMON_COLUMNS         = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
+    paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.SQL_KEYWORDS           = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
     paths.PHPIDS_RULES_XML       = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
