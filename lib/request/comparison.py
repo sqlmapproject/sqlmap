@@ -116,4 +116,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     # If the url is not stable it returns sequence matcher between the
     # first untouched HTTP response page content and this content
     else:
-        return (ratio - conf.matchRatio) > DIFF_TOLERANCE
+        if kb.pageStable:
+            return (ratio - conf.matchRatio) > DIFF_TOLERANCE
+        else:
+            return ratio > conf.matchRatio
