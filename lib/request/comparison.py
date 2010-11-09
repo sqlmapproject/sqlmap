@@ -114,8 +114,9 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     elif ratio == 1:
         return True
 
-    # If the url is not stable it returns sequence matcher between the
-    # first untouched HTTP response page content and this content
+    elif conf.matchRatio is None:
+        return None
+
     else:
         if conf.matchRatio == CONSTANT_RATIO or conf.thold:
             return ratio > conf.matchRatio
