@@ -19,6 +19,7 @@ from lib.core.common import randomInt
 from lib.core.common import safeStringFormat
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.request.connect import Connect as Request
 
 def tableExists(tableFile):
@@ -57,19 +58,23 @@ def tableExists(tableFile):
 
     return retVal
 
-def columnExists(table, columnFile):
-    tables = getFileItems(columnFile, None)
+def columnExists(columnFile):
+    if not conf.tbl:
+        errMsg = "missing table parameter"
+        raise sqlmapMissingMandatoryOptionException, errMsg
+
+    columns = getFileItems(columnFile, None)
     retVal = []
-    infoMsg = "checking column existence for table '%s' using items from '%s'" % (table, columnFile)
+    infoMsg = "checking column existence for table '%s' using items from '%s'" % (conf.tbl, columnFile)
     logger.info(infoMsg)
 
     pushValue(conf.verbose)
     conf.verbose = 0
     count = 0
-    length = len(tables)
+    length = len(columns)
 
     for column in columns:
-        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s)", (column, table)))
+        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s)", (column, conf.tbl)))
         query = agent.postfixQuery(query)
         result = Request.queryPage(agent.payload(newValue=query))
 

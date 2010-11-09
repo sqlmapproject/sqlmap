@@ -341,11 +341,16 @@ def cmdLineParser():
                                action="store_true", default=False,
                                help="Prompt for an interactive SQL shell")
 
-        enumeration.add_option("--common-exists", dest="cExists", action="store_true",
+        # User-defined function options
+        brute = OptionGroup(parser, "Brute force", "These "
+                          "options can be used to run brute force "
+                          "checks.")
+
+        brute.add_option("--brute-tables", dest="bruteTables", action="store_true",
                                default=False, help="Check existence of common tables")
 
-        enumeration.add_option("--exists", dest="tableFile",
-                               help="Check existence of user specified tables")
+        brute.add_option("--brute-columns", dest="bruteColumns", action="store_true",
+                               default=False, help="Check existence of common columns")
 
         # User-defined function options
         udf = OptionGroup(parser, "User-defined function injection", "These "
@@ -526,6 +531,7 @@ def cmdLineParser():
         parser.add_option_group(techniques)
         parser.add_option_group(fingerprint)
         parser.add_option_group(enumeration)
+        parser.add_option_group(brute)
         parser.add_option_group(udf)
         parser.add_option_group(filesystem)
         parser.add_option_group(takeover)
