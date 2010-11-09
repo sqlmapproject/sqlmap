@@ -1516,7 +1516,7 @@ def beep():
     """
 
     if sys.platform == 'linux2':
-        for dev in ('/dev/audio', '/dev/dsp', '/dev/sound'):
+        for dev in ('/dev/audio', '/dev/oss', '/dev/dsp', '/dev/sound'):
             if os.path.exists(dev):
                 try:
                     audio = file(dev, 'wb')
