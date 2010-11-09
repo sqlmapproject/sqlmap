@@ -147,6 +147,8 @@ def checkDynParam(place, parameter, value):
     dynamicity might depend on another parameter.
     """
 
+    conf.matchRatio = None
+
     infoMsg = "testing if %s parameter '%s' is dynamic" % (place, parameter)
     logger.info(infoMsg)
 

@@ -227,8 +227,6 @@ def start():
                         testSqlInj = True
                         paramKey = (conf.hostname, conf.path, place, parameter)
 
-                        conf.matchRatio = None
-
                         if paramKey in kb.testedParams:
                             testSqlInj = False
 
