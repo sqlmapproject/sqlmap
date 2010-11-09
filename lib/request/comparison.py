@@ -15,7 +15,7 @@ from lib.core.common import wasLastRequestError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.settings import TOLERANCE
+from lib.core.settings import DIFF_TOLERANCE
 
 def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if page is None and pageLength is None:
@@ -116,4 +116,4 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     # If the url is not stable it returns sequence matcher between the
     # first untouched HTTP response page content and this content
     else:
-        return (ratio - conf.matchRatio) > TOLERANCE
+        return (ratio - conf.matchRatio) > DIFF_TOLERANCE

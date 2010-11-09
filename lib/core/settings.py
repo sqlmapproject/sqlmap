@@ -22,7 +22,7 @@ DESCRIPTION        = "automatic SQL injection and database takeover tool"
 SITE               = "http://sqlmap.sourceforge.net"
 
 # minimum distance of ratio from conf.matchRatio to result in True
-TOLERANCE          = 0.05
+DIFF_TOLERANCE     = 0.05
 
 # sqlmap logger
 logging.addLevelName(9, "PAYLOAD")
