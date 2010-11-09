@@ -148,7 +148,7 @@ class Dump:
 
             dbTables.sort(key=lambda x: x.lower())
 
-            self.__write("Brute-forced table names:")
+            self.__write("Database: %s" % conf.db)
 
             if len(dbTables) == 1:
                 self.__write("[1 table]")
@@ -209,7 +209,7 @@ class Dump:
 
             tableColumns.sort(key=lambda x: x.lower())
 
-            self.__write("Brute-forced column names for table '%s':" % conf.tbl)
+            self.__write("Database: %s\nTable: %s" % (conf.db if conf.db else 'All', conf.tbl))
 
             if len(tableColumns) == 1:
                 self.__write("[1 column]")

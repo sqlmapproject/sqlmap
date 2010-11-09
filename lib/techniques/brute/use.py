@@ -23,9 +23,9 @@ from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.request.connect import Connect as Request
 
 def tableExists(tableFile):
-    tables = getFileItems(tableFile, None)
+    tables = getFileItems(tableFile)
     retVal = []
-    infoMsg = "checking tables existence using items from '%s'" % tableFile
+    infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
 
     pushValue(conf.verbose)
@@ -34,7 +34,7 @@ def tableExists(tableFile):
     length = len(tables)
 
     for table in tables:
-        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
+        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %d FROM %s)", (randomInt(1), table if not conf.db else "%s.%s" % (conf.db, table))))
         query = agent.postfixQuery(query)
         result = Request.queryPage(agent.payload(newValue=query))
 
@@ -63,9 +63,10 @@ def columnExists(columnFile):
         errMsg = "missing table parameter"
         raise sqlmapMissingMandatoryOptionException, errMsg
 
-    columns = getFileItems(columnFile, None)
+    columns = getFileItems(columnFile)
+    table = conf.tbl if not conf.db else ("%s.%s" % (conf.db, conf.tbl))
     retVal = []
-    infoMsg = "checking column existence for table '%s' using items from '%s'" % (conf.tbl, columnFile)
+    infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
 
     pushValue(conf.verbose)
@@ -74,7 +75,7 @@ def columnExists(columnFile):
     length = len(columns)
 
     for column in columns:
-        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s)", (column, conf.tbl)))
+        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s)", (column, table)))
         query = agent.postfixQuery(query)
         result = Request.queryPage(agent.payload(newValue=query))
 
