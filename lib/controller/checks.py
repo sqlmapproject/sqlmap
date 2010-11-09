@@ -76,12 +76,12 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         payload = agent.payload(place, parameter, value, positive.format % eval(positive.params))
         trueResult = Request.queryPage(payload, place)
 
-        if trueResult:
+        if trueResult == True:
             payload = agent.payload(place, parameter, value, negative.format % eval(negative.params))
 
             falseResult = Request.queryPage(payload, place)
 
-            if not falseResult:
+            if falseResult == False:
                 infoMsg  = "%s parameter '%s' is %s (%s) injectable " % (place, parameter, case.desc, logic)
                 infoMsg += "with %d parenthesis" % parenthesis
                 logger.info(infoMsg)
@@ -122,7 +122,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
     infoMsg += "parameter '%s' is " % parameter
 
     if result:
-        infoMsg += "injectable (possible DBMS: %s)" % kb.htmlFp[-1]
+        infoMsg += "injectable (possible DBMS: %s)" % (kb.htmlFp[-1] if kb.htmlFp else 'Unknown')
         logger.info(infoMsg)
     else:
         infoMsg += "not injectable"
