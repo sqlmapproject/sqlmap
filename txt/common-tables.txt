@@ -79,7 +79,6 @@ attributeCategory
 db
 PS_DMK
 study
-a
 event
 invoice
 order_source
@@ -173,10 +172,8 @@ jiveID
 domain
 promotion
 CPG_filetypes
-S
 assembly
 business
-#__vm_tax_rate
 orderitems
 locale
 gl
@@ -193,7 +190,6 @@ encompasses
 borders
 profiles
 salesorder
-#__vm_product_discount
 mailbox
 contacts
 tables_priv
@@ -214,11 +210,9 @@ poll
 makemodel
 partstax
 catalog
-c
 question
 vendors
 departments
-P
 notes
 delivery_quality
 queries
@@ -345,7 +339,6 @@ vcd_UserLoans
 media
 vcd_SourceSites
 conducts
-J
 sales
 CurrentUsers
 Country
@@ -430,7 +423,6 @@ action_attribute
 Thumbnail
 jiveGroupUser
 computers
-b
 QRTZ_LOCKS
 vcd_PropertiesToUser
 customertax
@@ -443,7 +435,6 @@ Widgets
 TERM
 salgrade
 div_passport
-#__vm_product_price
 vcd_UserRoles
 mucMember
 imagelinks
@@ -498,15 +489,14 @@ SUPPLIER
 div_aa_annotation
 song
 imageAttribute
-db_prefix]views_track
+views_track
 extremes
-#__vm_product
 vcd_VcdToSources
 jiveRosterGroups
 webcal_config
 phpbb_ranks
 triggers_template
-opuscollege.appVersions
+appVersions
 vcd_RssFeeds
 DUMMY
 ROLE
@@ -598,10 +588,10 @@ site_map_ge
 Factory_Output
 geo_Estuary
 phpbb_themes
-db_prefix]forum
+forum
 ClientsTable
 mushroom_trainset
-db_prefix]rating_track
+rating_track
 iplinks
 maxcodevento
 reciprocal_admin
@@ -650,7 +640,7 @@ work_orders
 SELLER
 cv_soil
 taxon
-RS_Backup_DB.bkp_ItemResource
+bkp_ItemResource
 ezcontentobject_trash
 webcal_view
 pagecontent
@@ -671,13 +661,12 @@ Parameter
 jforum_privmsgs
 tbl_works_categories
 help_category
-RS_Backup_DB.bkp_String
+bkp_String
 Class_Display_Sequence
 EPIXEIRISI
-db_prefix]sounds
+sounds
 phpbb_groups
 dtb_campaign
-#Temp2
 produit
 adblocks
 vendor_seq
@@ -732,16 +721,15 @@ DEMO_PROJECTS
 ORDERSTATUS
 site_iwis
 MountainOnIsland
-RS_Backup_DB.bkp_ItemReference
+bkp_ItemReference
 Category
 Mountain
-#__vm_product_attribute
 INSTITUTE
 POINT
-db_prefix]forum_vote
+forum_vote
 THOT_TYPE
-db_prefix]cmts_track
-RS_Backup_DB.bkp_ItemReplication
+cmts_track
+bkp_ItemReplication
 User
 hostbenchmarks
 filearchive
@@ -853,7 +841,7 @@ ligneDeFacture
 PZ_Data
 tf_cookies
 archtypes
-db_prefix]cmts
+cmts
 photo
 dtb_bloc
 user_preferences
@@ -869,7 +857,7 @@ gearing
 credenziali
 abstract
 evidence
-db_prefix]files
+files
 test
 intUsers
 div_treatment
@@ -877,17 +865,15 @@ tblblogentries
 cocktail_person
 cdv_curated_allele
 REORDER
-#Temp
 Religion
 turns
 MetadataValue
 curso
-#__vm_category
 redirect
 accountuser
 qrtz_cron_triggers
 StateType
-db_prefix]forum_user_stat
+forum_user_stat
 Descriptions_Languages
 m_users_profile
 Booked_On
@@ -915,7 +901,6 @@ cart
 size
 pg_ts_cfgmap
 LimitTest2
-#__vm_product_mf_xref
 QUESTION
 DC_Data
 webcal_group_user
@@ -933,7 +918,7 @@ Service
 PART
 cell_line
 dtb_bat_order_daily_age
-db_prefix]images
+images
 apartments
 THOT_ALPHA
 ippaths
@@ -955,7 +940,7 @@ webcal_asst
 ostypes
 POINT_SET
 R2IDF
-db_prefix]forum_flag
+forum_flag
 bugs
 taxonomy
 UM_ROLES
@@ -965,7 +950,7 @@ tf_log
 job_title
 ask
 wp_options
-db_prefix]forum_user_activity
+forum_user_activity
 trackbacks
 wp_pod_fields
 cmAvailableServiceBindingSiteNodeTypeDefinition
@@ -985,7 +970,7 @@ product_font
 Departure
 mushroom_test_results
 routerbenchmarks
-RS_Backup_DB.bkp_Item
+bkp_Item
 Channel_Data
 realtable
 mushroom_NBC_class
@@ -1009,7 +994,7 @@ tmp
 reservation
 geo_Desert
 dtb_payment
-db_prefix]forum_topic
+forum_topic
 ezsearch_search_phrase_new
 jforum_attach
 sazog_urtiertoba_ge
@@ -1042,7 +1027,7 @@ Administrator
 phpbb_users
 ezin_authors
 SpecificationLink
-db_prefix]videos
+videos
 sf_guard_remember_key
 employer
 monitoringi_ge
@@ -1074,7 +1059,7 @@ stories
 dtb_table_comment
 jforum_quota_limit
 Lake
-SQLBOOK.SQLDATES
+SQLDATES
 phpbb_search_wordmatch
 friend2
 functions
@@ -1100,7 +1085,7 @@ domain_info
 SALES
 DWE_Tasks
 profession1
-SQLBOOK.SUPPORT_INCIDENTS
+SUPPORT_INCIDENTS
 PERMISSION
 Defect
 DWE_Task_Attributes
@@ -1142,7 +1127,7 @@ my_street
 osvendors
 softwares
 Session
-db_prefix]admins
+admins
 TIL_IDIOTON
 EthnicGroup
 reviews
@@ -1152,7 +1137,7 @@ GRouteDetail
 cdv_reason
 nulltest
 membership
-RS_Backup_DB.bkp_RS_Servers
+bkp_RS_Servers
 vrls_listing_images
 schema_info
 entity
@@ -1190,7 +1175,7 @@ ERDESIGNER_VERSION_ID
 calendar
 cmEvent
 ruletest
-db_prefix]forum_user
+forum_user
 SalesReps
 ew_gruppi
 vrls_xref_state_province
@@ -1210,7 +1195,7 @@ manufacturer
 Tasks
 island
 coupon
-SQLBOOK.SALES
+SALES
 webcal_report
 RegistryPackage
 sysmaps_links
@@ -1235,7 +1220,7 @@ THOT_CONCEPT
 publisher
 dtb_mailmaga_template
 DSObject_table
-db_prefix]forum_post
+forum_post
 sf_guard_permission
 Prefixes
 dtb_update
@@ -1284,7 +1269,7 @@ cmRole
 PREFIX_search_engine
 my_poi
 Channel_Comment
-db_prefix]forum_cat
+forum_cat
 invite
 PREFIX_order_return_state
 experimental_data_set
@@ -1315,8 +1300,7 @@ QRTZ_JOB_LISTENERS
 ANSWER
 tbl_categories
 yearend
-#__vm_payment_method
-SQLBOOK.DEPARTMENTS
+DEPARTMENTS
 account_level
 ref
 help_relation
@@ -1364,7 +1348,6 @@ neuf
 school
 wp_term_taxonomy
 m_plans
-#tmpErrors
 ligneDeCommande
 FORM_QUESTION
 history_str
@@ -1372,7 +1355,7 @@ f_classtype
 endpoints
 R2Length
 zoph_albums
-RS_Backup_DB.bkp_ItemPresentation
+bkp_ItemPresentation
 tblblogcategories
 div_taxonomy
 traffic_selectors
@@ -1382,7 +1365,6 @@ creditcards
 people_reg
 country_partner
 jforum_users
-#__vm_product_category_xref
 array_test
 dtb_mail_history
 priorities
@@ -1411,7 +1393,6 @@ RECORD
 Room
 alarms
 ew_temi
-#__vm_product_attribute_sku
 clubs
 net_pm
 tbl_state
@@ -1492,9 +1473,8 @@ geo_desert
 politics
 hourlyEmployees
 D_Comment
-SQLBOOK.EMPLOYEES
+EMPLOYEES
 individual
-#__vm_category_xref
 m_with
 program
 combustible
@@ -1524,7 +1504,7 @@ Descriptions_Variants
 trigger_depends
 guava_role_assignments
 ExternalLink
-RS_Backup_DB.bkp_RS_Clusters
+bkp_RS_Clusters
 PN_Data
 users_sessions
 webcal_nonuser_cals
@@ -1544,7 +1524,7 @@ webcal_report_template
 service_request
 resource_types
 THOT_SUB_MENU
-RS_Backup_DB.bkp_ResourceFolder
+bkp_ResourceFolder
 PREFIX_tab
 province
 dtb_bat_relate_products
@@ -1573,7 +1553,6 @@ sf_guard_group_permission
 sys_acl_matrix
 R2ODTMAP
 mushroom_NBC
-#__vm_calc
 country_diseases
 dtb_order_detail
 sic
@@ -1582,12 +1561,12 @@ log_fake_referers
 ROLE_PERM
 isDeleted_table
 vrls_listings
-Schema.Table
+Table
 sf_guard_user
 Subject
 cdv_curation
 dictionary
-db_prefix]forum_report
+forum_report
 institution
 cmQualifyer
 jforum_categories
@@ -1630,7 +1609,7 @@ Population
 Country
 shipping
 guava_preferences
-db_prefix]rating
+rating
 UserCapability
 Priority
 rec_jobs
