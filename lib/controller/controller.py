@@ -308,9 +308,6 @@ def start():
                     checkForParenthesis()
                     action()
 
-        except sqlmapSilentQuitException:
-            raise
-
         except KeyboardInterrupt:
             if conf.multipleTargets:
                 warnMsg = "Ctrl+C detected in multiple target mode"
@@ -329,6 +326,9 @@ def start():
                 raise
 
         except sqlmapUserQuitException:
+            raise
+
+        except sqlmapSilentQuitException:
             raise
 
         except exceptionsTuple, e:

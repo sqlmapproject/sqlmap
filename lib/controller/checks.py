@@ -31,8 +31,8 @@ from lib.core.enums import NULLCONNECTION
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.exception import sqlmapSilentQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.request.connect import Connect as Request
@@ -285,7 +285,8 @@ def checkStability():
 
                     kb.nullConnection = None
             else:
-                raise sqlmapSilentQuitException
+                errMsg = "Empty value supplied"
+                raise sqlmapNoneDataException, errMsg
 
         elif test and test[0] in ("r", "R"):
             message = "please enter value for parameter 'regex': "
@@ -301,7 +302,8 @@ def checkStability():
 
                     kb.nullConnection = None
             else:
-                raise sqlmapSilentQuitException
+                errMsg = "Empty value supplied"
+                raise sqlmapNoneDataException, errMsg
         else:
             checkDynamicContent(firstPage, secondPage)
 
@@ -309,8 +311,7 @@ def checkStability():
                 errMsg = "target url is too dynamic. unable to continue. "
                 errMsg += "consider using other switches (e.g. "
                 errMsg += "--longest-common, --string, --text-only, etc.)"
-                logger.error(errMsg)
-                raise sqlmapSilentQuitException
+                raise sqlmapSiteTooDynamic, errMsg
 
     return kb.pageStable
 
