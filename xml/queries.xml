@@ -364,6 +364,10 @@
             <inband query="SELECT Name FROM MSysObjects WHERE (Left([Name],1) &lt;&gt; '~') AND (Left([Name],4) &lt;&gt; 'MSys') AND ([Type] In (1, 4, 6))"/>
             <blind query="SELECT MIN(Name) FROM MSysObjects WHERE Type = 1 AND name > '%s'" count="SELECT COUNT(*) FROM MSysObjects WHERE Type = 1"/>
         </tables>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE %s > '%s'" count="SELECT COUNT(*) FROM %s"/>
+        </dump_table>
    </dbms>
 
    <!-- Firebird -->

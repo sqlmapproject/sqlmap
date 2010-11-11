@@ -151,4 +151,4 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "SAP MaxDB"
+        conf.db = "SAP MaxDB (*)"

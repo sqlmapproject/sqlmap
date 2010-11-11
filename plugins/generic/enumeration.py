@@ -1155,7 +1155,7 @@ class Enumeration:
 
             if kb.dbms == DBMS.ORACLE:
                 query = rootQuery.blind.count % conf.tbl.upper()
-            elif kb.dbms == DBMS.SQLITE:
+            elif kb.dbms in (DBMS.SQLITE, DBMS.ACCESS):
                 query = rootQuery.blind.count % conf.tbl
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)

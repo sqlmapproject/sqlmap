@@ -35,7 +35,9 @@ def tableExists(tableFile):
     length = len(tables)
 
     for table in tables:
-        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %d FROM %s)", (randomInt(1), table if not conf.db else "%s.%s" % (conf.db, table))))
+        if conf.db and '(*)' not in conf.db:
+            table = "%s.%s" % (conf.db, table)
+        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
         query = agent.postfixQuery(query)
         result = Request.queryPage(agent.payload(newValue=query))
 
@@ -71,7 +73,11 @@ def columnExists(columnFile):
         raise sqlmapMissingMandatoryOptionException, errMsg
 
     columns = getFileItems(columnFile)
-    table = conf.tbl if not conf.db else ("%s.%s" % (conf.db, conf.tbl))
+    if conf.db and '(*)' not in conf.db:
+        table = "%s.%s" % (conf.db, conf.tbl)
+    else:
+        table = conf.tbl
+
     retVal = []
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)

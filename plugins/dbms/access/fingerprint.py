@@ -191,4 +191,4 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "Access"
+        conf.db = "Access (*)"

@@ -114,4 +114,4 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "SQLite"
+        conf.db = "SQLite (*)"
