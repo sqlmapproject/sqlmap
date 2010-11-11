@@ -112,7 +112,7 @@ def action():
     if conf.getColumns:
         conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns())
 
-    if conf.commonTables:
+    if conf.commonColumns:
         conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS))
 
     if conf.dumpTable:
