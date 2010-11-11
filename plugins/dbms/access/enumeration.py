@@ -31,7 +31,7 @@ class Enumeration(GenericEnumeration):
     def getCurrentDb(self):
         warnMsg = "on Microsoft Access it is not possible to get name of the current database"
         logger.warn(warnMsg)
-        
+
     def getPasswordHashes(self):
         warnMsg = "on Microsoft Access it is not possible to enumerate the user password hashes"
         logger.warn(warnMsg)

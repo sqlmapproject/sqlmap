@@ -42,6 +42,7 @@ from lib.core.unescaper import unescaper
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
 from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
@@ -847,10 +848,30 @@ class Enumeration:
         return kb.data.cachedTables
 
     def getColumns(self, onlyColNames=False):
+        bruteForce = False
+
         if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            logger.error(errMsg)
+            bruteForce = True
+
+        elif kb.dbms == DBMS.ACCESS:
+            errMsg  = "cannot retrieve column names, "
+            errMsg += "back-end DBMS is Access"
+            logger.error(errMsg)
+            bruteForce = True
+
+        if bruteForce:
+            message = "do you want to use common columns existance check? [Y/n/q]"
+            test = readInput(message, default="Y")
+
+            if test[0] in ("n", "N"):
+                return
+            elif test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+            else:
+                return columnExists(paths.COMMON_COLUMNS)
 
         if not conf.tbl:
             errMsg = "missing table parameter"
