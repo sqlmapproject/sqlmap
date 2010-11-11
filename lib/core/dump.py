@@ -138,32 +138,7 @@ class Dump:
         self.lister("available databases", dbs)
 
     def dbTables(self, dbTables):
-        if isinstance(dbTables, list) and len(dbTables) > 0:
-            maxlength = 0
-
-            for table in dbTables:
-                maxlength = max(maxlength, len(table))
-
-            lines = "-" * (int(maxlength) + 2)
-
-            dbTables.sort(key=lambda x: x.lower())
-
-            self.__write("Database: %s" % conf.db)
-
-            if len(dbTables) == 1:
-                self.__write("[1 table]")
-            else:
-                self.__write("[%d tables]" % len(dbTables))
-
-            self.__write("+%s+" % lines)
-
-            for table in dbTables:
-                blank = " " * (maxlength - len(table))
-                self.__write("| %s%s |" % (table, blank))
-
-            self.__write("+%s+\n" % lines)
-
-        elif isinstance(dbTables, dict) and len(dbTables) > 0:
+        if isinstance(dbTables, dict) and len(dbTables) > 0:
             maxlength = 0
 
             for tables in dbTables.values():
@@ -197,98 +172,71 @@ class Dump:
                 self.__write("+%s+\n" % lines)
         else:
             self.string("tables", dbTables)
-
+        
     def dbTableColumns(self, tableColumns):
-        if isinstance(tableColumns, list) and len(tableColumns) > 0:
-            maxlength = 0
+        for db, tables in tableColumns.items():
+            if not db:
+                db = "All"
 
-            for table in tableColumns:
-                maxlength = max(maxlength, len(table))
+            for table, columns in tables.items():
+                maxlength1 = 0
+                maxlength2 = 0
 
-            lines = "-" * (int(maxlength) + 2)
+                colList = columns.keys()
+                colList.sort(key=lambda x: x.lower())
 
-            tableColumns.sort(key=lambda x: x.lower())
-
-            self.__write("Database: %s\nTable: %s" % (conf.db if conf.db else 'All', conf.tbl))
-
-            if len(tableColumns) == 1:
-                self.__write("[1 column]")
-            else:
-                self.__write("[%d columns]" % len(tableColumns))
-
-            self.__write("+%s+" % lines)
-
-            for table in tableColumns:
-                blank = " " * (maxlength - len(table))
-                self.__write("| %s%s |" % (table, blank))
-
-            self.__write("+%s+\n" % lines)
-
-        elif isinstance(tableColumns, dict) and len(tableColumns) > 0:
-
-            for db, tables in tableColumns.items():
-                if not db:
-                    db = "All"
-
-                for table, columns in tables.items():
-                    maxlength1 = 0
-                    maxlength2 = 0
-
-                    colList = columns.keys()
-                    colList.sort(key=lambda x: x.lower())
-
-                    for column in colList:
-                        colType = columns[column]
-                        maxlength1 = max(maxlength1, len(column))
-
-                        if colType is not None:
-                            maxlength2 = max(maxlength2, len(colType))
-
-                    maxlength1 = max(maxlength1, len("COLUMN"))
-                    lines1 = "-" * (int(maxlength1) + 2)
+                for column in colList:
+                    colType = columns[column]
+                    maxlength1 = max(maxlength1, len(column))
 
                     if colType is not None:
-                        maxlength2 = max(maxlength2, len("TYPE"))
-                        lines2 = "-" * (int(maxlength2) + 2)
+                        maxlength2 = max(maxlength2, len(colType))
 
-                    self.__write("Database: %s\nTable: %s" % (db, table))
+                maxlength1 = max(maxlength1, len("COLUMN"))
+                lines1 = "-" * (int(maxlength1) + 2)
 
-                    if len(columns) == 1:
-                        self.__write("[1 column]")
+                if colType is not None:
+                    maxlength2 = max(maxlength2, len("TYPE"))
+                    lines2 = "-" * (int(maxlength2) + 2)
+
+                self.__write("Database: %s\nTable: %s" % (db, table))
+
+                if len(columns) == 1:
+                    self.__write("[1 column]")
+                else:
+                    self.__write("[%d columns]" % len(columns))
+
+                if colType is not None:
+                    self.__write("+%s+%s+" % (lines1, lines2))
+                else:
+                    self.__write("+%s+" % lines1)
+
+                blank1 = " " * (maxlength1 - len("COLUMN"))
+
+                if colType is not None:
+                    blank2 = " " * (maxlength2 - len("TYPE"))
+
+                if colType is not None:
+                    self.__write("| Column%s | Type%s |" % (blank1, blank2))
+                    self.__write("+%s+%s+" % (lines1, lines2))
+                else:
+                    self.__write("| Column%s |" % blank1)
+                    self.__write("+%s+" % lines1)
+
+                for column in colList:
+                    colType = columns[column]
+                    blank1 = " " * (maxlength1 - len(column))
+
+                    if colType is not None:
+                        blank2 = " " * (maxlength2 - len(colType))
+                        self.__write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
                     else:
-                        self.__write("[%d columns]" % len(columns))
+                        self.__write("| %s%s |" % (column, blank1))
 
-                    if colType is not None:
-                        self.__write("+%s+%s+" % (lines1, lines2))
-                    else:
-                        self.__write("+%s+" % lines1)
-
-                    blank1 = " " * (maxlength1 - len("COLUMN"))
-
-                    if colType is not None:
-                        blank2 = " " * (maxlength2 - len("TYPE"))
-
-                    if colType is not None:
-                        self.__write("| Column%s | Type%s |" % (blank1, blank2))
-                        self.__write("+%s+%s+" % (lines1, lines2))
-                    else:
-                        self.__write("| Column%s |" % blank1)
-                        self.__write("+%s+" % lines1)
-
-                    for column in colList:
-                        colType = columns[column]
-                        blank1 = " " * (maxlength1 - len(column))
-
-                        if colType is not None:
-                            blank2 = " " * (maxlength2 - len(colType))
-                            self.__write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
-                        else:
-                            self.__write("| %s%s |" % (column, blank1))
-
-                    if colType is not None:
-                        self.__write("+%s+%s+\n" % (lines1, lines2))
-                    else:
-                        self.__write("+%s+\n" % lines1)
+                if colType is not None:
+                    self.__write("+%s+%s+\n" % (lines1, lines2))
+                else:
+                    self.__write("+%s+\n" % lines1)
 
     def dbTableValues(self, tableValues):
         replication = None

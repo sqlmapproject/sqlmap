@@ -18,6 +18,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import safeStringFormat
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.request.connect import Connect as Request
@@ -55,8 +56,14 @@ def tableExists(tableFile):
     if not retVal:
         warnMsg = "no table found"
         logger.warn(warnMsg)
+    else:
+        for item in retVal:
+            if not kb.data.cachedTables.has_key(conf.db):
+                kb.data.cachedTables[conf.db] = [item]
+            else:
+                kb.data.cachedTables[conf.db].append(item)
 
-    return retVal
+    return kb.data.cachedTables
 
 def columnExists(columnFile):
     if not conf.tbl:
@@ -96,5 +103,19 @@ def columnExists(columnFile):
     if not retVal:
         warnMsg = "no column found"
         logger.warn(warnMsg)
+    else:
+        columns = {}
 
-    return retVal
+        for column in retVal:
+            query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)))
+            query = agent.postfixQuery(query)
+            result = Request.queryPage(agent.payload(newValue=query))
+
+            if result:
+                columns[column] = 'numeric'
+            else:
+                columns[column] = 'non-numeric'
+
+        kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
+
+    return kb.data.cachedColumns
