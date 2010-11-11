@@ -114,8 +114,8 @@ optDict = {
                              },
 
             "Brute":         {
-                               "bruteTables":       "boolean",
-                               "bruteColumns":      "boolean",
+                               "commonTables":       "boolean",
+                               "commonColumns":      "boolean",
                              },
 
             "User-defined function": {

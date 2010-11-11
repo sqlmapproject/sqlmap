@@ -106,13 +106,13 @@ def action():
     if conf.getTables:
         conf.dumper.dbTables(conf.dbmsHandler.getTables())
 
-    if conf.bruteTables:
+    if conf.commonTables:
         conf.dumper.dbTables(tableExists(paths.COMMON_TABLES))
 
     if conf.getColumns:
         conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns())
 
-    if conf.bruteColumns:
+    if conf.commonTables:
         conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS))
 
     if conf.dumpTable:

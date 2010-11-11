@@ -346,10 +346,10 @@ def cmdLineParser():
                           "options can be used to run brute force "
                           "checks.")
 
-        brute.add_option("--brute-tables", dest="bruteTables", action="store_true",
+        brute.add_option("--common-tables", dest="commonTables", action="store_true",
                                default=False, help="Check existence of common tables")
 
-        brute.add_option("--brute-columns", dest="bruteColumns", action="store_true",
+        brute.add_option("--common-columns", dest="commonColumns", action="store_true",
                                default=False, help="Check existence of common columns")
 
         # User-defined function options
