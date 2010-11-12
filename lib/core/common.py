@@ -1095,7 +1095,7 @@ def sanitizeAsciiString(subject):
             if ord(subject[i]) >= 128:
                 index = i
                 break
-        if not index:
+        if index is None:
             return subject
         else:
             return subject[:index] + "".join(subject[i] if ord(subject[i]) < 128 else '?' for i in xrange(index, len(subject)))

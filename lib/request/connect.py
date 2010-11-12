@@ -279,6 +279,7 @@ class Connect:
         socket.setdefaulttimeout(conf.timeout)
 
         page = sanitizeAsciiString(page)
+        page = getUnicode(page)
         parseResponse(page, responseHeaders)
 
         responseMsg += "[#%d] (%d %s):\n" % (requestID, code, status)
