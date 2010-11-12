@@ -919,11 +919,10 @@ def getDelayQuery(andCond=False):
         if not kb.data.banner:
             conf.dbmsHandler.getVersionFromBanner()
 
-        banVer = kb.bannerFp["dbmsVersion"]
+        banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
 
-        if (kb.dbms == DBMS.MYSQL and banVer >= "5.0.12") or (kb.dbms == DBMS.POSTGRESQL and banVer >= "8.2"):
+        if banVer is None or (kb.dbms == DBMS.MYSQL and banVer >= "5.0.12") or (kb.dbms == DBMS.POSTGRESQL and banVer >= "8.2"):
             query = queries[kb.dbms].timedelay.query % conf.timeSec
-
         else:
             query = queries[kb.dbms].timedelay.query2 % conf.timeSec
     elif kb.dbms == DBMS.FIREBIRD:
