@@ -61,13 +61,14 @@ def setRegexp():
 
 def setMatchRatio():
     condition = (
-                  not kb.resumedQueries
-                  or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Match ratio") )
+                  isinstance(conf.matchRatio, (int, float))
+                  and ( not kb.resumedQueries
+                  or ( kb.resumedQueries.has_key(conf.url) and not
+                  kb.resumedQueries[conf.url].has_key("Match ratio") ) )
                 )
 
     if condition:
-        dataToSessionFile("[%s][None][None][Match ratio][%s]\n" % (conf.url, conf.matchRatio))
+        dataToSessionFile("[%s][%s][%s][Match ratio][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), conf.matchRatio))
 
 def setInjection():
     """
