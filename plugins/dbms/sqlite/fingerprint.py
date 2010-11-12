@@ -91,7 +91,7 @@ class Fingerprint(GenericFingerprint):
             result  = Request.queryPage(payload)
 
             if not result:
-                warnMsg = "the back-end DMBS is not SQLite"
+                warnMsg = "the back-end DBMS is not SQLite"
                 logger.warn(warnMsg)
 
                 return False
@@ -108,7 +108,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DMBS is not SQLite"
+            warnMsg = "the back-end DBMS is not SQLite"
             logger.warn(warnMsg)
 
             return False

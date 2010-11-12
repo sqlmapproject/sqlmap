@@ -127,7 +127,7 @@ class Fingerprint(GenericFingerprint):
             result  = Request.queryPage(payload)
 
             if not result:
-                warnMsg = "the back-end DMBS is not Firebird"
+                warnMsg = "the back-end DBMS is not Firebird"
                 logger.warn(warnMsg)
 
                 return False
@@ -143,7 +143,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DMBS is not Firebird"
+            warnMsg = "the back-end DBMS is not Firebird"
             logger.warn(warnMsg)
 
             return False

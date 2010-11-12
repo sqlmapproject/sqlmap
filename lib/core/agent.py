@@ -540,7 +540,7 @@ class Agent:
             limitStr = queries[kb.dbms].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
-        elif kb.dbms == DMBS.ORACLE:
+        elif kb.dbms == DBMS.ORACLE:
             if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]

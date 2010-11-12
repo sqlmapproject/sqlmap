@@ -96,7 +96,7 @@ class Fingerprint(GenericFingerprint):
                 result  = Request.queryPage(payload)
 
             if not result:
-                warnMsg = "the back-end DMBS is not Oracle"
+                warnMsg = "the back-end DBMS is not Oracle"
                 logger.warn(warnMsg)
 
                 return False
@@ -122,7 +122,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DMBS is not Oracle"
+            warnMsg = "the back-end DBMS is not Oracle"
             logger.warn(warnMsg)
 
             return False

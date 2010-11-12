@@ -1420,7 +1420,7 @@ def getCompiledRegex(regex, *args):
 
 def getPartRun():
     """
-    Goes through call stack and finds constructs matching conf.dmbsHandler.*.
+    Goes through call stack and finds constructs matching conf.dbmsHandler.*.
     Returns it or its alias used in txt/common-outputs.txt
     """
 

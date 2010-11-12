@@ -144,7 +144,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DMBS is not Microsoft SQL Server"
+            warnMsg = "the back-end DBMS is not Microsoft SQL Server"
             logger.warn(warnMsg)
 
             return False
