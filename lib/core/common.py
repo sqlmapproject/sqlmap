@@ -571,6 +571,9 @@ def checkFile(filename):
         raise sqlmapFilePathException, "unable to read file '%s'" % filename
 
 def replaceNewlineTabs(inpStr, stdout=False):
+    if inpStr is None:
+        return
+
     if stdout:
         replacedString = inpStr.replace("\n", " ").replace("\t", " ")
     else:
