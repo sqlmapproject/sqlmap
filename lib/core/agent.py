@@ -148,7 +148,7 @@ class Agent:
             raise sqlmapNoneDataException, "unsupported injection type"
 
         if conf.prefix:
-            query = conf.prefix
+            query = "%s " % conf.prefix.strip()
         else:
             query = case.usage.prefix.format % eval(case.usage.prefix.params)
 
