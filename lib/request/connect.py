@@ -243,7 +243,7 @@ class Connect:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
             tbMsg = traceback.format_exc()
 
             if "URLError" in tbMsg or "error" in tbMsg:
@@ -254,6 +254,9 @@ class Connect:
                 warnMsg  = "the target url responded with an unknown HTTP "
                 warnMsg += "status code, try to force the HTTP User-Agent "
                 warnMsg += "header with option --user-agent or -a"
+            elif "IncompleteRead" in tbMsg:
+                warnMsg = "there was an incomplete read error while retrieving data "
+                warnMsg += "from the target url"
             else:
                 warnMsg = "unable to connect to the target url"
 
