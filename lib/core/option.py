@@ -668,11 +668,10 @@ def __setHTTPProxy():
     # HTTPS over (Squid) Proxy fails) as long as HTTP over SSL requests
     # can't be tunneled over an HTTP proxy natively by Python (<= 2.5)
     # urllib2 standard library
-    if conf.scheme == "https":
-        if PYVERSION >= "2.6":
-            proxyHandler = urllib2.ProxyHandler({"https": __proxyString})
-        else:
-            proxyHandler = ProxyHTTPSHandler(__proxyString)
+    if PYVERSION >= "2.6":
+        proxyHandler = urllib2.ProxyHandler({"http": __proxyString, "https": __proxyString})
+    elif conf.scheme == "https":
+        proxyHandler = ProxyHTTPSHandler(__proxyString)
     else:
         proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
 
