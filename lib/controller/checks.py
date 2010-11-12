@@ -125,7 +125,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
         if conf.postfix:
             postfix = conf.postfix
 
-    payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
+    payload = "%s%s%s%s" % (value, prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
     payload = agent.payload(place, parameter, value, payload)
     Request.queryPage(payload, place, raise404=False)
     result = wasLastRequestError()
