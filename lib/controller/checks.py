@@ -81,7 +81,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         payload = agent.payload(place, parameter, value, positive.format % eval(positive.params))
         trueResult = Request.queryPage(payload, place)
 
-        if trueResult is True:
+        if trueResult:
             infoMsg  = "confirming %s (%s) injection " % (case.desc, logic)
             infoMsg += "on %s parameter '%s'" % (place, parameter)
             logger.info(infoMsg)
@@ -93,7 +93,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
 
             falseResult = Request.queryPage(payload, place)
 
-            if falseResult is False:
+            if not falseResult:
                 infoMsg  = "%s parameter '%s' is %s (%s) injectable " % (place, parameter, case.desc, logic)
                 infoMsg += "with %d parenthesis" % parenthesis
                 logger.info(infoMsg)
