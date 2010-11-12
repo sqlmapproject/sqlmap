@@ -178,7 +178,14 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 if key.lower() == "cookie":
                     cookie = value
                 elif key.lower() == "host":
-                    host = value
+                    splitValue = value.split(":")
+                    host = splitValue[0]
+
+                    if len(splitValue) > 1:
+                        port = splitValue[1]
+
+                        if not scheme and port == "443":
+                            scheme = "https"
 
                 # Avoid to add a static content length header to
                 # conf.httpHeaders and consider the following lines as
