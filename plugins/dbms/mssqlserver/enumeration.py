@@ -140,7 +140,7 @@ class Enumeration(GenericEnumeration):
                     continue
 
                 if kb.unionPosition is not None or conf.direct:
-                    query = rootQuery["inband"]["query"] % db
+                    query = rootQuery.inband.query % db
                     query += tblQuery
                     values = inject.getValue(query, blind=False, error=False)
 
@@ -157,7 +157,7 @@ class Enumeration(GenericEnumeration):
                     infoMsg += " '%s' in database '%s'" % (tbl, db)
                     logger.info(infoMsg)
 
-                    query = rootQuery["blind"]["count2"]
+                    query = rootQuery.blind.count2
                     query = query % db
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -175,7 +175,7 @@ class Enumeration(GenericEnumeration):
                     indexRange = getRange(count)
 
                     for index in indexRange:
-                        query = rootQuery["blind"]["query2"]
+                        query = rootQuery.blind.query2
                         query = query % db
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query, tblCond)
@@ -225,7 +225,7 @@ class Enumeration(GenericEnumeration):
                     continue
 
                 if kb.unionPosition is not None or conf.direct:
-                    query = rootQuery["inband"]["query"] % (db, db, db, db, db)
+                    query = rootQuery.inband.query % (db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     values = inject.getValue(query, blind=False, error=False)
 
@@ -262,7 +262,7 @@ class Enumeration(GenericEnumeration):
                     infoMsg += " '%s' in database '%s'" % (column, db)
                     logger.info(infoMsg)
 
-                    query = rootQuery["blind"]["count2"]
+                    query = rootQuery.blind.count2
                     query = query % (db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     count = inject.getValue(query, inband=False, expected="int", charsetType=2)
@@ -280,7 +280,7 @@ class Enumeration(GenericEnumeration):
                     indexRange = getRange(count)
 
                     for index in indexRange:
-                        query = rootQuery["blind"]["query2"]
+                        query = rootQuery.blind.query2
                         query = query % (db, db, db, db, db)
                         query += " AND %s" % colQuery.replace("[DB]", db)
                         query = agent.limitQuery(index, query, colCond.replace("[DB]", db))
