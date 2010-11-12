@@ -22,10 +22,6 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 
-    # In case of an DBMS error page return None
-    if wasLastRequestError():
-        return None
-
     regExpResults = None
 
     if page:
@@ -56,6 +52,10 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         # Regular expression to match in page when the query is valid
         if conf.regexp:
             return re.search(conf.regexp, page, re.I | re.M) is not None
+
+        # In case of an DBMS error page return None
+        if wasLastRequestError():
+            return None
 
         # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection and not conf.longestCommon:
