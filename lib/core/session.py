@@ -207,7 +207,7 @@ def setError():
     if condition:
         dataToSessionFile("[%s][%s][%s][Error based injection][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
 
-def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False):
+def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False, payload=None):
     """
     @param comment: union comment to save in session file
     @type comment: C{str}
@@ -269,6 +269,18 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
             dataToSessionFile("[%s][%s][%s][Union false condition][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
 
         kb.unionFalseCond = True
+
+    if payload:
+        condition = (
+                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                      ( not kb.resumedQueries[conf.url].has_key("Union payload")
+                      ) )
+                    )
+
+        if condition:
+            dataToSessionFile("[%s][%s][%s][Union payload][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), payload))
+
+        kb.unionTest = payload
 
 def setRemoteTempPath():
     condition = (
@@ -481,6 +493,13 @@ def resumeConfKb(expression, url, value):
 
         logMsg  = "resuming union false condition "
         logMsg += "%s from session file" % kb.unionPosition
+        logger.info(logMsg)
+
+    elif expression == "Union payload" and url == conf.url:
+        kb.unionTest = value[:-1]
+
+        logMsg  = "resuming union payload "
+        logMsg += "%s from session file" % kb.unionTest
         logger.info(logMsg)
 
     elif expression == "Remote temp path" and url == conf.url:

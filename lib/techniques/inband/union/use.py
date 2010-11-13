@@ -46,7 +46,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
     if resetCounter:
         reqCount = 0
 
-    if not kb.unionCount:
+    if not kb.unionTest:
         unionTest()
 
     if not kb.unionCount:

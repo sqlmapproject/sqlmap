@@ -78,7 +78,8 @@ optDict = {
                                "timeTest":          "boolean",
                                "timeSec":           "integer",
                                "unionTest":         "boolean",
-                               "uTech":             "string"
+                               "uTech":             "string",
+                               "uCols":             "integer"
                              },
 
             "Fingerprint":   {
@@ -115,7 +116,7 @@ optDict = {
 
             "Brute":         {
                                "commonTables":       "boolean",
-                               "commonColumns":      "boolean",
+                               "commonColumns":      "boolean"
                              },
 
             "User-defined function": {

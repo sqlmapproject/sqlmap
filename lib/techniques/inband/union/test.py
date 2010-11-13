@@ -124,7 +124,7 @@ def __unionTestByNULLBruteforce(comment, negative=False, falseCond=False):
     columns = None
     query   = agent.prefixQuery("UNION ALL SELECT NULL")
 
-    for count in range(0, 50):
+    for count in range(0, conf.uCols+1):
         if kb.dbms == DBMS.ORACLE and query.endswith(" FROM DUAL"):
             query = query[:-len(" FROM DUAL")]
 
@@ -149,7 +149,7 @@ def __unionTestByOrderBy(comment, negative=False, falseCond=False):
     columns     = None
     prevPayload = ""
 
-    for count in range(1, 51):
+    for count in range(1, conf.uCols+2):
         query        = agent.prefixQuery("ORDER BY %d" % count)
         orderByQuery = agent.postfixQuery(query, comment)
         payload      = agent.payload(newValue=orderByQuery, negative=negative, falseCond=falseCond)
@@ -224,9 +224,7 @@ def unionTest():
         warnMsg += "inband sql injection vulnerability"
         logger.warn(warnMsg)
 
-    if validPayload is None:
-        validPayload = ""
-    elif isinstance(validPayload, basestring):
-        kb.unionTest = agent.removePayloadDelimiters(validPayload, False)
+    validPayload = agent.removePayloadDelimiters(validPayload, False)
+    setUnion(payload=validPayload)
 
     return kb.unionTest
