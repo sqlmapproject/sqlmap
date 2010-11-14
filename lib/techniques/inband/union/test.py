@@ -53,13 +53,7 @@ def __unionPosition(negative=False, falseCond=False):
         # Perform the request
         resultPage, _ = Request.queryPage(payload, content=True)
 
-        # We have to assure that the randQuery value is not within the
-        # HTML code of the result page because, for instance, it is there
-        # when the query is wrong and the back-end DBMS is Microsoft SQL
-        # server
-        htmlParsed = htmlParser(resultPage)
-
-        if resultPage and randQuery in resultPage and not htmlParsed:
+        if resultPage and randQuery in resultPage:
             setUnion(position=exprPosition)
             validPayload = payload
 
