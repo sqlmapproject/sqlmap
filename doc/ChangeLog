@@ -21,7 +21,7 @@ sqlmap (0.9-1) stable; urgency=low
   * Support for customizable HTTP redirections (Bernardo).
   * Support to replicate the back-end DBMS tables structure and entries
     in a local SQLite 3 database (Miroslav). IN PROGRESS
-  * Support to parse and test forms on target url (Miroslav). IN PROGRESS
+  * Support to parse and test forms on target url (Miroslav).
   * Added switches to brute-force table names with a dictionary attack,
     --common-exists and --exists. Useful for instance when system table
     'information_schema' is not available on MySQL (Miroslav).
