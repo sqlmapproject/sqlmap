@@ -223,6 +223,17 @@ def checkDynamicContent(firstPage, secondPage):
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
         logger.info(infoMsg)
 
+        if conf.seqMatcher.a:
+            for item in kb.dynamicMarkings:
+                prefix, postfix = item
+
+                if prefix is None:
+                    conf.seqMatcher.a = re.sub('(?s)^.+%s' % postfix, postfix, conf.seqMatcher.a)
+                elif postfix is None:
+                    conf.seqMatcher.a = re.sub('(?s)%s.+$' % prefix, prefix, conf.seqMatcher.a)
+                else:
+                    conf.seqMatcher.a = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), conf.seqMatcher.a)
+
 def checkStability():
     """
     This function checks if the URL content is stable requesting the
