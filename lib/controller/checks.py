@@ -405,15 +405,16 @@ def checkNullConnection():
 
     return kb.nullConnection is not None
 
-def checkConnection():
+def checkConnection(suppressOutput=False):
     try:
         socket.gethostbyname(conf.hostname)
     except socket.gaierror:
         errMsg = "host '%s' does not exist" % conf.hostname
         raise sqlmapConnectionException, errMsg
 
-    infoMsg = "testing connection to the target url"
-    logger.info(infoMsg)
+    if not suppressOutput:
+        infoMsg = "testing connection to the target url"
+        logger.info(infoMsg)
 
     try:
         page, _ = Request.queryPage(content=True)

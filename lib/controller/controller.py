@@ -193,7 +193,7 @@ def start():
 
             setupTargetEnv()
 
-            if not checkConnection() or not checkString() or not checkRegexp():
+            if not checkConnection(conf.forms) or not checkString() or not checkRegexp():
                 continue
 
             if conf.nullConnection:
@@ -361,7 +361,7 @@ def start():
             e = getUnicode(e)
 
             if conf.multipleTargets:
-                e += ", skipping to next url"
+                e += ", skipping to the next %s" % ("form" if conf.forms else "url")
                 logger.error(e)
             else:
                 logger.critical(e)
