@@ -1327,7 +1327,7 @@ def init(inputOptions=advancedDict()):
     parseTargetUrl()
     parseTargetDirect()
 
-    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest or conf.forms:
+    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest:
         __setHTTPTimeout()
         __setHTTPExtraHeaders()
         __setHTTPCookies()
