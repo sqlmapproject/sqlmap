@@ -23,6 +23,7 @@ import urlparse
 from extra.clientform.clientform import ParseResponse
 from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
+from lib.controller.checks import checkConnection
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
@@ -349,6 +350,12 @@ def __setGoogleDorking():
         raise sqlmapGenericException, errMsg
 
 def __findPageForms():
+    if not conf.forms:
+        return
+
+    if not checkConnection():
+        return
+
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
@@ -1332,8 +1339,8 @@ def init(inputOptions=advancedDict()):
         __setSafeUrl()
         __setUnionTech()
         __setGoogleDorking()
-        __findPageForms()
         __urllib2Opener()
+        __findPageForms()
         __setDBMS()
 
     __setThreads()
