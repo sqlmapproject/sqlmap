@@ -362,15 +362,19 @@ def __findPageForms():
     response, _ = Request.queryPage(response=True)
     forms = ParseResponse(response, backwards_compat=False)
 
-    for form in forms:
-        request = form.click()
-        url = request.get_full_url()
-        method = request.get_method()
-        data = request.get_data() if request.has_data() else None
+    if forms:
+        for form in forms:
+            request = form.click()
+            url = request.get_full_url()
+            method = request.get_method()
+            data = request.get_data() if request.has_data() else None
 
-        target = (url, method, data, conf.cookie)
-        kb.targetUrls.add(target)
-        kb.formNames[target] = form.name
+            target = (url, method, data, conf.cookie)
+            kb.targetUrls.add(target)
+            kb.formNames[target] = form.name
+    else:
+        errMsg  = "there were no forms found at a given target url"
+        raise sqlmapGenericException, errMsg
 
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
