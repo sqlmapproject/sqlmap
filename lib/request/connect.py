@@ -389,6 +389,8 @@ class Connect:
 
         if content or response:
             return page, headers
+        elif getSeqMatcher:
+            return comparison(page, headers, getSeqMatcher=False, pageLength=pageLength), comparison(page, headers, getSeqMatcher=True, pageLength=pageLength)
         elif pageLength or page:
             return comparison(page, headers, getSeqMatcher, pageLength)
         else:

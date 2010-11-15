@@ -129,10 +129,10 @@ def __unionTestByNULLBruteforce(comment, negative=False, falseCond=False):
             query += " FROM DUAL"
 
         commentedQuery = agent.postfixQuery(query, comment)
-        payload        = agent.payload(newValue=commentedQuery, negative=negative, falseCond=falseCond)
-        seqMatcher     = Request.queryPage(payload, getSeqMatcher=True)
+        payload = agent.payload(newValue=commentedQuery, negative=negative, falseCond=falseCond)
+        test, seqMatcher = Request.queryPage(payload, getSeqMatcher=True)
 
-        if seqMatcher >= 0.6:
+        if test or seqMatcher >= 0.6:
             columns = count + 1
 
             break
@@ -144,14 +144,13 @@ def __unionTestByOrderBy(comment, negative=False, falseCond=False):
     prevPayload = ""
 
     for count in range(1, conf.uCols+2):
-        query        = agent.prefixQuery("ORDER BY %d" % count)
+        query = agent.prefixQuery("ORDER BY %d" % count)
         orderByQuery = agent.postfixQuery(query, comment)
-        payload      = agent.payload(newValue=orderByQuery, negative=negative, falseCond=falseCond)
-        seqMatcher   = Request.queryPage(payload, getSeqMatcher=True)
+        payload = agent.payload(newValue=orderByQuery, negative=negative, falseCond=falseCond)
+        _, seqMatcher = Request.queryPage(payload, getSeqMatcher=True)
 
         if seqMatcher >= 0.6:
             columns = count
-
         elif columns:
             break
 
