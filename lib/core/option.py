@@ -20,6 +20,7 @@ import threading
 import urllib2
 import urlparse
 
+from extra.clientform.clientform import ParseResponse
 from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
 from lib.core.common import getConsoleWidth
@@ -62,6 +63,7 @@ from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
+from lib.request.connect import Connect as Request
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
@@ -345,6 +347,21 @@ def __setGoogleDorking():
         errMsg += "for your Google dork expression, but none of them "
         errMsg += "have GET parameters to test for SQL injection"
         raise sqlmapGenericException, errMsg
+
+def __findPageForms():
+    infoMsg = "searching for forms"
+    logger.info(infoMsg)
+
+    response, _ = Request.queryPage(response=True)
+    forms = ParseResponse(response, backwards_compat=False)
+
+    for form in forms:
+        request = form.click()
+        url = request.get_full_url()
+        method = request.get_method()
+        data = request.get_data() if request.has_data() else None
+
+        kb.targetUrls.add((url, method, data, conf.cookie))
 
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
@@ -995,7 +1012,7 @@ def __cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if conf.googleDork or conf.list:
+    if conf.googleDork or conf.list or conf.forms:
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1271,6 +1288,14 @@ def __basicOptionValidation():
         errMsg = "switch --predict-output is incompatible with switch --threads"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.forms and not conf.url:
+        errMsg = "switch --forms requires usage of -u (--url) switch"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.forms and (conf.list or conf.direct or conf.requestFile or conf.googleDork):
+        errMsg = "switch --forms is compatible only with -u (--url) target switch"
+        raise sqlmapSyntaxException, errMsg
+
 def init(inputOptions=advancedDict()):
     """
     Set attributes into both configuration and knowledge base singletons
@@ -1292,7 +1317,7 @@ def init(inputOptions=advancedDict()):
     parseTargetUrl()
     parseTargetDirect()
 
-    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest:
+    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest or conf.forms:
         __setHTTPTimeout()
         __setHTTPExtraHeaders()
         __setHTTPCookies()
@@ -1304,6 +1329,7 @@ def init(inputOptions=advancedDict()):
         __setSafeUrl()
         __setUnionTech()
         __setGoogleDorking()
+        __findPageForms()
         __urllib2Opener()
         __setDBMS()
 

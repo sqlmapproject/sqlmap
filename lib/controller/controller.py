@@ -35,7 +35,6 @@ from lib.core.session import setInjection
 from lib.core.session import setMatchRatio
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
-from lib.core.target import findPageForms
 from lib.utils.parenthesis import checkForParenthesis
 
 def __selectInjection(injData):
@@ -94,11 +93,8 @@ def start():
         action()
         return True
 
-    if conf.url:
-        if conf.forms:
-            findPageForms()
-        else:
-            kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
+    if conf.url and not conf.forms:
+        kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
     if conf.configFile and not kb.targetUrls:
         errMsg  = "you did not edit the configuration file properly, set "
@@ -144,26 +140,52 @@ def start():
 
             if conf.multipleTargets:
                 hostCount += 1
-                message = "url %d:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
+                message = "%s %d:\n%s %s" % ("form" if conf.forms else "url", hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
 
                 if conf.data:
-                    message += "\nPOST data: %s" % conf.data
+                    message += "\nPOST data: %s" % repr(conf.data) if conf.data else ""
 
-                message += "\ndo you want to test this url? [Y/n/q]"
-                test = readInput(message, default="Y")
+                if conf.forms:
+                    if conf.method == HTTPMETHOD.GET and targetUrl.find("?") == -1:
+                        continue
 
-                if not test:
-                    pass
-                elif test[0] in ("n", "N"):
-                    continue
-                elif test[0] in ("q", "Q"):
-                    break
+                    message += "\ndo you want to test this form? [Y/n/q] "
+                    test = readInput(message, default="Y")
 
-                logMsg = "testing url %s" % targetUrl
-                logger.info(logMsg)
+                    if not test or test[0] in ("y", "Y"):
+                        if conf.method == HTTPMETHOD.POST:
+                            message = "Edit POST data [default: %s]: " % (conf.data if conf.data else "")
+                            conf.data = readInput(message, default=conf.data)
+
+                        elif conf.method == HTTPMETHOD.GET:
+                            if conf.url.find("?") > -1:
+                                firstPart = conf.url[:conf.url.find("?")]
+                                secondPart = conf.url[conf.url.find("?")+1:]
+                                message = "Edit GET data [default: %s]: " % secondPart
+                                test = readInput(message, default=secondPart)
+                                conf.url = "%s?%s" % (firstPart, test)
+
+                    elif test[0] in ("n", "N"):
+                        continue
+                    elif test[0] in ("q", "Q"):
+                        break
+
+                else:
+                    message += "\ndo you want to test this url? [Y/n/q]"
+                    test = readInput(message, default="Y")
+
+                    if not test or test[0] in ("y", "Y"):
+                        pass
+                    elif test[0] in ("n", "N"):
+                        continue
+                    elif test[0] in ("q", "Q"):
+                        break
+
+                    logMsg = "testing url %s" % targetUrl
+                    logger.info(logMsg)
 
             setupTargetEnv()
 

@@ -12,7 +12,6 @@ import os
 import re
 import time
 
-from extra.clientform.clientform import ParseResponse
 from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
 from lib.core.common import readInput
@@ -122,45 +121,6 @@ def __setRequestParams():
         errMsg  = "all testable parameters you provided are not present "
         errMsg += "within the GET, POST and Cookie parameters"
         raise sqlmapGenericException, errMsg
-
-def findPageForms():
-    infoMsg = "searching for forms"
-    logger.info(infoMsg)
-
-    response, _ = Request.queryPage(response=True)
-    forms = ParseResponse(response, backwards_compat=False)
-
-    count = 1
-    for form in forms:
-        request = form.click()
-        url = request.get_full_url()
-        method = request.get_method()
-        data = request.get_data() if request.has_data() else None
-
-        if form.name is None:
-            name = ""
-        else:
-            name = " '%s'" % form.name
-
-        message = "[#%d] Do you want to test form%s (%s, %s%s) [Y/n] " % (count, name, method, url, ", %s" % repr(data) if data else "")
-        test = readInput(message, default="Y")
-
-        if not test or test[0] in ("y", "Y"):
-            if method == HTTPMETHOD.POST:
-                message = "Edit POST data [default: %s]: " % (data if data else "")
-                test = readInput(message, default=data)
-
-            elif method == HTTPMETHOD.GET:
-                if url.find("?") > -1:
-                    firstPart = url[:url.find("?")]
-                    secondPart = url[url.find("?")+1:]
-                    message = "Edit GET data [default: %s]: " % secondPart
-                    test = readInput(message, default=secondPart)
-                    url = "%s?%s" % (firstPart, test)
-
-            kb.targetUrls.add((url, method, data, conf.cookie))
-
-        count +=1
 
 def __setOutputResume():
     """
