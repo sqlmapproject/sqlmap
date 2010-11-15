@@ -361,7 +361,9 @@ def __findPageForms():
         method = request.get_method()
         data = request.get_data() if request.has_data() else None
 
-        kb.targetUrls.add((url, method, data, conf.cookie))
+        target = (url, method, data, conf.cookie)
+        kb.targetUrls.add(target)
+        kb.formNames[target] = form.name
 
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
@@ -1093,6 +1095,7 @@ def __setKnowledgeBaseAttributes():
     kb.docRoot         = None
     kb.dynamicMarkings = []
     kb.errorTest       = None
+    kb.formNames       = advancedDict()
     kb.headersCount    = 0
     kb.headersFp       = {}
     kb.hintValue       = None
