@@ -76,7 +76,7 @@ class Web:
     def __webFileStreamUpload(self, stream, destFileName, directory):
         stream.seek(0) # Rewind
 
-        if self.webApi in ("php", "asp"):
+        if self.webApi in ("php", "asp", "aspx", "jsp"):
             multipartParams = {
                                 "upload":    "1",
                                 "file":      stream,
@@ -92,9 +92,6 @@ class Web:
                 return False
             else:
                 return True
-
-        elif self.webApi == "jsp":
-            return False
 
     def __webFileInject(self, fileContent, fileName, directory):
         outFile     = posixpath.normpath("%s/%s" % (directory, fileName))
@@ -124,30 +121,34 @@ class Web:
         message  = "which web application language does the web server "
         message += "support?\n"
         message += "[1] ASP%s\n" % (" (default)" if kb.os == "Windows" else "")
-        message += "[2] PHP%s\n" % ("" if kb.os == "Windows" else " (default)")
-        message += "[3] JSP"
+        message += "[2] ASPX\n"
+        message += "[3] PHP%s\n" % ("" if kb.os == "Windows" else " (default)")
+        message += "[4] JSP"
 
         while True:
             choice = readInput(message, default="1" if kb.os == "Windows" else "2")
 
-            if not choice or choice == "2":
-                self.webApi = "php"
-                break
-
-            elif choice == "1":
+            if choice == "1":
                 self.webApi = "asp"
                 break
 
+            elif choice == "2":
+                self.webApi = "aspx"
+                break
+
             elif choice == "3":
-                errMsg  = "JSP web backdoor functionality is not yet "
-                errMsg += "implemented"
-                raise sqlmapUnsupportedDBMSException(errMsg)
+                self.webApi = "php"
+                break
+
+            elif choice == "4":
+                self.webApi = "jsp"
+                break
 
             elif not choice.isdigit():
                 logger.warn("invalid value, only digits are allowed")
 
-            elif int(choice) < 1 or int(choice) > 3:
-                logger.warn("invalid value, it must be 1 or 3")
+            elif int(choice) < 1 or int(choice) > 4:
+                logger.warn("invalid value, it must be between 1 and 4")
 
         kb.docRoot  = getDocRoot(self.webApi)
         directories = getDirs(self.webApi)
@@ -188,7 +189,12 @@ class Web:
                 warnMsg  = "unable to upload the file stager "
                 warnMsg += "on '%s'" % directory
                 logger.warn(warnMsg)
+                continue
 
+            elif "<%" in uplPage or "<?" in uplPage:
+                warnMsg  = "file stager uploaded "
+                warnMsg += "on '%s' but not dynamically interpreted" % directory
+                logger.warn(warnMsg)
                 continue
 
             infoMsg  = "the file stager has been successfully uploaded "

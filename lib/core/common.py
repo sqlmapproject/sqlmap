@@ -304,7 +304,7 @@ def getDocRoot(webApi=None):
     pagePath = directoryPath(conf.path)
 
     if kb.os == "Windows":
-        if webApi == "php":
+        if webApi in ("php", "jsp"):
             defaultDocRoot = "C:/xampp/htdocs/"
         else:
             defaultDocRoot = "C:/Inetpub/wwwroot/"
@@ -361,7 +361,7 @@ def getDirs(webApi=None):
     directories = set()
 
     if kb.os == "Windows":
-        if webApi == "php":
+        if webApi in ("php", "jsp"):
             defaultDirs = ["C:/xampp/htdocs/"]
         else:
             defaultDirs = ["C:/Inetpub/wwwroot/"]
