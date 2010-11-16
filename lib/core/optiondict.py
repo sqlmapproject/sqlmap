@@ -21,17 +21,6 @@ optDict = {
                                "configFile":        "string"
                              },
 
-            "General":       {
-                               "xmlFile":           "string",
-                               "sessionFile":       "string",
-                               "trafficFile":       "string",
-                               "flushSession":      "boolean",
-                               "forms":             "boolean",
-                               "eta":               "boolean",
-                               "updateAll":         "boolean",
-                               "batch":             "boolean"
-                             },
-
             "Request":       {
                                "method":            "string",
                                "data":              "string",
@@ -160,6 +149,17 @@ optDict = {
                                "regVal":            "string",
                                "regData":           "string",
                                "regType":           "string"
+                             },
+
+            "General":       {
+                               "xmlFile":           "string",
+                               "sessionFile":       "string",
+                               "trafficFile":       "string",
+                               "flushSession":      "boolean",
+                               "forms":             "boolean",
+                               "eta":               "boolean",
+                               "updateAll":         "boolean",
+                               "batch":             "boolean"
                              },
 
             "Miscellaneous": {
