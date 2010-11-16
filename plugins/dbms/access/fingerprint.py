@@ -15,7 +15,7 @@ from lib.core.common import formatFingerprint
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import wasLastRequestError
+from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -99,7 +99,7 @@ class Fingerprint(GenericFingerprint):
         payload = agent.payload(newValue=query)
         page  = Request.queryPage(payload, content=True)
 
-        if wasLastRequestError():
+        if wasLastRequestDBMSError():
             match = re.search("Could not find file\s+'([^']+?)'", page[0])
 
             if match:

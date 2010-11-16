@@ -17,10 +17,11 @@ import traceback
 
 from lib.contrib import multipartpost
 from lib.core.agent import agent
-from lib.core.common import readInput
+from lib.core.common import extractErrorMessage
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
+from lib.core.common import readInput
 from lib.core.convert import urlencode
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
@@ -218,6 +219,10 @@ class Connect:
             status = conn.msg
             responseHeaders = conn.info()
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+
+            msg = extractErrorMessage(page)
+            if msg and conf.parseErrors:
+                logger.error("error message: '%s'" % msg)
 
         except urllib2.HTTPError, e:
             code = e.code

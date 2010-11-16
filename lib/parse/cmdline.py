@@ -513,6 +513,10 @@ def cmdLineParser():
                                  action="store_true", default=False,
                                  help="Alert with audio beep when sql injection found")
 
+        miscellaneous.add_option("--parse-errors", dest="parseErrors",
+                             action="store_true", default=False,
+                             help="Try to parse and report error messages")
+
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
                           default=False, help=SUPPRESS_HELP)

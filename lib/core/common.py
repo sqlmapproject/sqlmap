@@ -1505,12 +1505,27 @@ def popValue():
 
     return kb.valueStack.pop()
 
-def wasLastRequestError():
+def wasLastRequestDBMSError():
     """
     Returns True if the last web request resulted in a (recognized) DBMS error page
     """
 
     return kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
+
+def extractErrorMessage(page):
+    """
+    Returns reported error message from page if it founds one
+    """
+
+    retVal = None
+
+    for regex in (r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s+(?P<result>.+)<br\s*/?\s*>", r"<li>Error Type:<br>(?P<result>.+?)</li>"):
+        match = re.search(regex, page, re.DOTALL | re.IGNORECASE)
+        if match:
+            retVal = htmlunescape(match.group("result"))
+            break
+
+    return retVal
 
 def beep():
     """

@@ -11,7 +11,7 @@ import re
 
 from difflib import SequenceMatcher
 
-from lib.core.common import wasLastRequestError
+from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -54,7 +54,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
             return re.search(conf.regexp, page, re.I | re.M) is not None
 
         # In case of an DBMS error page return None
-        if wasLastRequestError():
+        if wasLastRequestDBMSError():
             return None
 
         # Dynamic content lines to be excluded before comparison
