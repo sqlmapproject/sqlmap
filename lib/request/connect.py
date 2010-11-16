@@ -220,11 +220,6 @@ class Connect:
             responseHeaders = conn.info()
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
-            if conf.parseErrors:
-                msg = extractErrorMessage(page)
-                if msg:
-                    logger.info("parsed error message: '%s'" % msg)
-
         except urllib2.HTTPError, e:
             code = e.code
             status = e.msg
@@ -240,12 +235,6 @@ class Connect:
                 try:
                     page = e.read()
                     responseHeaders = e.info()
-
-                    if conf.parseErrors:
-                        msg = extractErrorMessage(page)
-                        if msg:
-                            logger.info("parsed error message: '%s'" % msg)
-
                 except socket.timeout:
                     warnMsg  = "connection timed out while trying "
                     warnMsg += "to get error page information (%d)" % code
@@ -308,6 +297,11 @@ class Connect:
             responseMsg += "%s\n%s\n" % (logHeaders, page)
 
         logger.log(7, responseMsg)
+
+        if conf.parseErrors:
+            msg = extractErrorMessage(page)
+            if msg:
+                logger.info("parsed error message: '%s'" % msg)
 
         return page, responseHeaders
 
