@@ -575,9 +575,9 @@ def replaceNewlineTabs(inpStr, stdout=False):
         return
 
     if stdout:
-        replacedString = inpStr.replace("\n", " ").replace("\t", " ")
+        replacedString = inpStr.replace("\n", " ").replace("\r", " ").replace("\t", " ")
     else:
-        replacedString = inpStr.replace("\n", DUMP_NEWLINE_MARKER).replace("\t", DUMP_TAB_MARKER)
+        replacedString = inpStr.replace("\n", DUMP_NEWLINE_MARKER).replace("\r", " ").replace("\t", DUMP_TAB_MARKER)
 
     replacedString = replacedString.replace(kb.misc.delimiter, DUMP_DEL_MARKER)
 
