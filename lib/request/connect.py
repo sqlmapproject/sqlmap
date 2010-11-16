@@ -220,9 +220,10 @@ class Connect:
             responseHeaders = conn.info()
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
-            msg = extractErrorMessage(page)
-            if msg and conf.parseErrors:
-                logger.error("error message: '%s'" % msg)
+            if conf.parseErrors:
+                msg = extractErrorMessage(page)
+                if msg:
+                    logger.info("parsed error message: '%s'" % msg)
 
         except urllib2.HTTPError, e:
             code = e.code

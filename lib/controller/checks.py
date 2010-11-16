@@ -130,14 +130,14 @@ def heuristicCheckSqlInjection(place, parameter, value):
     Request.queryPage(payload, place, raise404=False)
     result = wasLastRequestDBMSError()
 
-    infoMsg  = "(error based) heuristics shows that %s " % place
-    infoMsg += "parameter '%s' is " % parameter
+    infoMsg  = "heuristics shows that %s " % place
+    infoMsg += "parameter '%s' might " % parameter
 
     if result:
-        infoMsg += "injectable (possible DBMS: %s)" % (kb.htmlFp[-1] if kb.htmlFp else 'Unknown')
+        infoMsg += "be injectable (possible DBMS: %s)" % (kb.htmlFp[-1] if kb.htmlFp else 'Unknown')
         logger.info(infoMsg)
     else:
-        infoMsg += "not injectable"
+        infoMsg += "not be injectable"
         logger.warning(infoMsg)
 
 def checkDynParam(place, parameter, value):
