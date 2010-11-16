@@ -240,6 +240,12 @@ class Connect:
                 try:
                     page = e.read()
                     responseHeaders = e.info()
+
+                    if conf.parseErrors:
+                        msg = extractErrorMessage(page)
+                        if msg:
+                            logger.info("parsed error message: '%s'" % msg)
+
                 except socket.timeout:
                     warnMsg  = "connection timed out while trying "
                     warnMsg += "to get error page information (%d)" % code
