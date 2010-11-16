@@ -40,6 +40,7 @@ LOGGER.setLevel(logging.WARN)
 
 # dump markers
 DUMP_NEWLINE_MARKER = "__NEWLINE__"
+DUMP_CR_MARKER      = "__CARRIAGE_RETURN__"
 DUMP_DEL_MARKER     = "__DEL__"
 DUMP_TAB_MARKER     = "__TAB__"
 DUMP_START_MARKER   = "__START__"

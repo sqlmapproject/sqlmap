@@ -66,6 +66,7 @@ from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import DUMP_NEWLINE_MARKER
+from lib.core.settings import DUMP_CR_MARKER
 from lib.core.settings import DUMP_DEL_MARKER
 from lib.core.settings import DUMP_TAB_MARKER
 from lib.core.settings import DUMP_START_MARKER
@@ -577,7 +578,7 @@ def replaceNewlineTabs(inpStr, stdout=False):
     if stdout:
         replacedString = inpStr.replace("\n", " ").replace("\r", " ").replace("\t", " ")
     else:
-        replacedString = inpStr.replace("\n", DUMP_NEWLINE_MARKER).replace("\r", " ").replace("\t", DUMP_TAB_MARKER)
+        replacedString = inpStr.replace("\n", DUMP_NEWLINE_MARKER).replace("\r", DUMP_CR_MARKER).replace("\t", DUMP_TAB_MARKER)
 
     replacedString = replacedString.replace(kb.misc.delimiter, DUMP_DEL_MARKER)
 
@@ -587,7 +588,7 @@ def restoreDumpMarkedChars(inpStr, onlyNewlineTab=False):
     replacedString = inpStr
 
     if isinstance(replacedString, basestring):
-        replacedString = replacedString.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_TAB_MARKER, "\t")
+        replacedString = replacedString.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_CR_MARKER, "\r").replace(DUMP_TAB_MARKER, "\t")
 
         if not onlyNewlineTab:
             replacedString = replacedString.replace(DUMP_START_MARKER, "").replace(DUMP_STOP_MARKER, "")
