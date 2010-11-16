@@ -21,6 +21,17 @@ optDict = {
                                "configFile":        "string"
                              },
 
+            "General":       {
+                               "xmlFile":           "string",
+                               "sessionFile":       "string",
+                               "trafficFile":       "string",
+                               "flushSession":      "boolean",
+                               "forms":             "boolean",
+                               "eta":               "boolean",
+                               "updateAll":         "boolean",
+                               "batch":             "boolean"
+                             },
+
             "Request":       {
                                "method":            "string",
                                "data":              "string",
@@ -152,19 +163,11 @@ optDict = {
                              },
 
             "Miscellaneous": {
-                               "xmlFile":           "string",
-                               "sessionFile":       "string",
-                               "trafficFile":       "string",
-                               "flushSession":      "boolean",
-                               "forms":             "boolean",
-                               "eta":               "boolean",
-                               "googlePage":        "integer",
-                               "updateAll":         "boolean",
-                               "batch":             "boolean",
-                               "cleanup":           "boolean",
-                               "replicate":         "boolean",
-                               "checkPayload":      "boolean",
                                "beep":              "boolean",
+                               "checkPayload":      "boolean",
+                               "cleanup":           "boolean",
+                               "googlePage":        "integer",
+                               "replicate":         "boolean",
                                "verbose":           "integer"
                              },
           }

@@ -52,6 +52,42 @@ def cmdLineParser():
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
 
+        # General options
+        general = OptionGroup(parser, "General", "These options can be used "
+                             "to set some general working parameters. " )
+
+        general.add_option("-x", dest="xmlFile",
+                            help="Dump the data into an XML file")
+
+        general.add_option("-s", dest="sessionFile",
+                            help="Save and resume all data retrieved "
+                            "on a session file")
+
+        general.add_option("-t", dest="trafficFile",
+                            help="Log all HTTP traffic into a "
+                            "textual file")
+
+        general.add_option("--flush-session", dest="flushSession",
+                            action="store_true", default=False,
+                            help="Flush session file for current target")
+
+        general.add_option("--eta", dest="eta",
+                            action="store_true", default=False,
+                            help="Display for each output the "
+                                      "estimated time of arrival")
+
+        general.add_option("--update", dest="updateAll",
+                            action="store_true", default=False,
+                            help="Update sqlmap")
+
+        general.add_option("--save", dest="saveCmdline",
+                            action="store_true", default=False,
+                            help="Save options on a configuration INI file")
+
+        general.add_option("--batch", dest="batch",
+                            action="store_true", default=False,
+                            help="Never ask for user input, use the default behaviour")
+
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target url.")
@@ -457,65 +493,33 @@ def cmdLineParser():
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
-        miscellaneous.add_option("-x", dest="xmlFile",
-                                 help="Dump the data into an XML file")
-
-        miscellaneous.add_option("-s", dest="sessionFile",
-                                 help="Save and resume all data retrieved "
-                                      "on a session file")
-
-        miscellaneous.add_option("-t", dest="trafficFile",
-                                 help="Log all HTTP traffic into a "
-                                      "textual file")
-
-        miscellaneous.add_option("--flush-session", dest="flushSession",
-                                 action="store_true", default=False,
-                                 help="Flush session file for current target")
-
-        miscellaneous.add_option("--forms", dest="forms",
-                                 action="store_true", default=False,
-                                 help="Parse and test forms on target url")
-
-        miscellaneous.add_option("--eta", dest="eta",
-                                 action="store_true", default=False,
-                                 help="Display for each output the "
-                                      "estimated time of arrival")
-
-        miscellaneous.add_option("--gpage", dest="googlePage", type="int",
-                                 help="Use google dork results from specified page number")
-
-        miscellaneous.add_option("--update", dest="updateAll",
+        miscellaneous.add_option("--beep", dest="beep",
                                   action="store_true", default=False,
-                                  help="Update sqlmap")
-
-        miscellaneous.add_option("--save", dest="saveCmdline",
-                                 action="store_true", default=False,
-                                 help="Save options on a configuration INI file")
-
-        miscellaneous.add_option("--batch", dest="batch",
-                                 action="store_true", default=False,
-                                 help="Never ask for user input, use the default behaviour")
-
-        miscellaneous.add_option("--cleanup", dest="cleanup",
-                                 action="store_true", default=False,
-                                 help="Clean up the DBMS by sqlmap specific "
-                                      "UDF and tables")
-
-        miscellaneous.add_option("--replicate", dest="replicate",
-                                 action="store_true", default=False,
-                                 help="Replicate dumped data into a sqlite3 database")
+                                  help="Alert when sql injection found")
 
         miscellaneous.add_option("--check-payload", dest="checkPayload",
-                                 action="store_true", default=False,
-                                 help="IDS detection testing of injection payload")
+                                  action="store_true", default=False,
+                                  help="IDS detection testing of injection payload")
 
-        miscellaneous.add_option("--beep", dest="beep",
-                                 action="store_true", default=False,
-                                 help="Alert with audio beep when sql injection found")
+        miscellaneous.add_option("--cleanup", dest="cleanup",
+                                  action="store_true", default=False,
+                                  help="Clean up the DBMS by sqlmap specific "
+                                  "UDF and tables")
+
+        miscellaneous.add_option("--forms", dest="forms",
+                                  action="store_true", default=False,
+                                  help="Parse and test forms on target url")
+
+        miscellaneous.add_option("--gpage", dest="googlePage", type="int",
+                                  help="Use google dork results from specified page number")
 
         miscellaneous.add_option("--parse-errors", dest="parseErrors",
-                             action="store_true", default=False,
-                             help="Try to parse and report error messages")
+                                  action="store_true", default=False,
+                                  help="Try to parse and report error messages")
+
+        miscellaneous.add_option("--replicate", dest="replicate",
+                                  action="store_true", default=False,
+                                  help="Replicate dumped data into a sqlite3 database")
 
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
@@ -531,6 +535,7 @@ def cmdLineParser():
                           default=False, help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
+        parser.add_option_group(general)
         parser.add_option_group(request)
         parser.add_option_group(optimization)
         parser.add_option_group(injection)
