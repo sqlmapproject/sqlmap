@@ -369,6 +369,9 @@ def getDirs(webApi=None):
     else:
         defaultDirs = ["/var/www/"]
 
+    if kb.docRoot and kb.docRoot not in defaultDirs:
+        defaultDirs.append(kb.docRoot)
+
     if kb.absFilePaths:
         infoMsg  = "retrieved web server full paths: "
         infoMsg += "'%s'" % ", ".join(path for path in kb.absFilePaths)
