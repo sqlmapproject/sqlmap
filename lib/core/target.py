@@ -25,6 +25,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
 from lib.core.xmldump import dumper as xmldumper
 from lib.request.connect import Connect as Request
@@ -252,27 +253,7 @@ def initTargetEnv():
         conf.parameters    = {}
         conf.sessionFile   = None
 
-        kb.authHeader      = None
-        kb.dbms            = None
-        kb.dbmsDetected    = False
-        kb.dbmsVersion     = [ "Unknown" ]
-        kb.dynamicMarkings = []
-        kb.errorTest       = None
-        kb.htmlFp          = []
-        kb.lastErrorPage   = None
-        kb.injParameter    = None
-        kb.injPlace        = None
-        kb.injType         = None
-        kb.nullConnection  = None
-        kb.pageStable      = None
-        kb.parenthesis     = None
-        kb.paramMatchRatio = {}
-        kb.proxyAuthHeader = None
-        kb.stackedTest     = None
-        kb.timeTest        = None
-        kb.unionComment    = ""
-        kb.unionCount      = None
-        kb.unionPosition   = None
+        __setKnowledgeBaseAttributes()
 
 def setupTargetEnv():
     __createTargetDirs()
