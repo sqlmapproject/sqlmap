@@ -224,6 +224,9 @@ class Connect:
             code = e.code
             status = e.msg
 
+            responseMsg = "\n%s[#%d] (%d %s)\n" % (responseMsg, requestID, code, status)
+            logHTTPTraffic(requestMsg, responseMsg)
+
             if e.code == 401:
                 errMsg  = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
