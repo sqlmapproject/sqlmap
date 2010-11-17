@@ -515,7 +515,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--parse-errors", dest="parseErrors",
                                   action="store_true", default=False,
-                                  help="Try to parse and report error messages")
+                                  help="Parse DBMS error messages from response pages")
 
         miscellaneous.add_option("--replicate", dest="replicate",
                                   action="store_true", default=False,
