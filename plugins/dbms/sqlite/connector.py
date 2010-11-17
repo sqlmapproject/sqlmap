@@ -7,7 +7,10 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import sqlite3
+try:
+    import sqlite3
+except ImportError, _:
+    pass
 
 from lib.core.convert import utf8encode
 from lib.core.data import conf
