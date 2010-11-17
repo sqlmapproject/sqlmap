@@ -92,6 +92,8 @@ def checkCharEncoding(encoding):
         encoding = 'cp%s' % encoding[3:]
     elif encoding.startswith('windows') and not encoding.startswith('windows-'):
         encoding = 'windows-%s' % encoding[7:]
+    elif encoding == 'null':
+        return None
 
     try:
         codecs.lookup(encoding)
