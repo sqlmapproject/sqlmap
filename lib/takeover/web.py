@@ -173,6 +173,9 @@ class Web:
             self.__webFileInject(stagerContent, stagerName, directory)
             requestDir  = ntToPosixSlashes(directory)
 
+            if not requestDir:
+                continue
+
             if requestDir[-1] != '/':
                 requestDir += '/'
 
