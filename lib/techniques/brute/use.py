@@ -38,7 +38,7 @@ def tableExists(tableFile):
         if conf.db and '(*)' not in conf.db:
             table = "%s.%s" % (conf.db, table)
         query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
-        query = agent.postfixQuery(query)
+        query = agent.suffixQuery(query)
         result = Request.queryPage(agent.payload(newValue=query))
 
         if result:
@@ -89,7 +89,7 @@ def columnExists(columnFile):
 
     for column in columns:
         query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s)", (column, table)))
-        query = agent.postfixQuery(query)
+        query = agent.suffixQuery(query)
         result = Request.queryPage(agent.payload(newValue=query))
 
         if result:
@@ -114,7 +114,7 @@ def columnExists(columnFile):
 
         for column in retVal:
             query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)))
-            query = agent.postfixQuery(query)
+            query = agent.suffixQuery(query)
             result = Request.queryPage(agent.payload(newValue=query))
 
             if result:

@@ -120,7 +120,7 @@ class Agent:
             return self.payloadDirect(query)
 
         query   = self.prefixQuery(query)
-        query   = self.postfixQuery(query)
+        query   = self.suffixQuery(query)
         payload = self.payload(newValue=query)
 
         return payload
@@ -156,7 +156,7 @@ class Agent:
 
         return query
 
-    def postfixQuery(self, string, comment=None):
+    def suffixQuery(self, string, comment=None):
         """
         This method appends the DBMS comment to the
         SQL injection request
@@ -182,10 +182,10 @@ class Agent:
         if comment:
             string += comment
 
-        if conf.postfix:
-            string += " %s" % conf.postfix
+        if conf.suffix:
+            string += " %s" % conf.suffix
         else:
-            string += case.usage.postfix.format % eval(case.usage.postfix.params)
+            string += case.usage.suffix.format % eval(case.usage.suffix.params)
 
         return string
 
@@ -499,7 +499,7 @@ class Agent:
         if intoRegExp:
             inbandQuery += intoRegExp
 
-        inbandQuery = self.postfixQuery(inbandQuery, kb.unionComment)
+        inbandQuery = self.suffixQuery(inbandQuery, kb.unionComment)
 
         return inbandQuery
 
@@ -636,7 +636,7 @@ class Agent:
                 regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
 
                 for match in regObj.finditer(inpStr):
-                    retVal = retVal.replace(match.group("result"), urlencode(match.group("result").strip(PAYLOAD_DELIMITER), convall=True))
+                    retVal = retVal.replace(match.group("result"), match.group("result").strip(PAYLOAD_DELIMITER))
             else:
                 retVal = retVal.replace(PAYLOAD_DELIMITER, '')
 

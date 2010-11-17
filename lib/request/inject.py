@@ -99,7 +99,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     """
 
     query          = agent.prefixQuery(queries[kb.misc.testedDbms].inference.query)
-    query          = agent.postfixQuery(query)
+    query          = agent.suffixQuery(query)
     payload        = agent.payload(newValue=query)
     count          = None
     startLimit     = 0
@@ -398,7 +398,7 @@ def goStacked(expression, silent=False):
 
     comment = queries[kb.dbms].comment.query
     query   = agent.prefixQuery("; %s" % expression)
-    query   = agent.postfixQuery("%s;%s" % (query, comment))
+    query   = agent.suffixQuery("%s;%s" % (query, comment))
 
     debugMsg = "query: %s" % query
     logger.debug(debugMsg)

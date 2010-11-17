@@ -41,7 +41,7 @@ class Fingerprint(GenericFingerprint):
                 table = "MSysAccessStorage"
             if table:
                 query   = agent.prefixQuery("AND EXISTS(SELECT CURDIR() FROM %s)" % table)
-                query   = agent.postfixQuery(query)
+                query   = agent.suffixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
                 retVal = "not sandboxed" if result else "sandboxed"
@@ -71,7 +71,7 @@ class Fingerprint(GenericFingerprint):
                     table = table[1:]
                 randInt = randomInt()
                 query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
-                query   = agent.postfixQuery(query)
+                query   = agent.suffixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
                 if result is None:
@@ -95,7 +95,7 @@ class Fingerprint(GenericFingerprint):
         randInt = randomInt()
         randStr = randomStr()
         query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
-        query   = agent.postfixQuery(query)
+        query   = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
         page  = Request.queryPage(payload, content=True)
 

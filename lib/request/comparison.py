@@ -60,14 +60,14 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection and not conf.longestCommon:
             for item in kb.dynamicMarkings:
-                prefix, postfix = item
+                prefix, suffix = item
 
                 if prefix is None:
-                    page = re.sub('(?s)^.+%s' % postfix, postfix, page)
-                elif postfix is None:
+                    page = re.sub('(?s)^.+%s' % suffix, suffix, page)
+                elif suffix is None:
                     page = re.sub('(?s)%s.+$' % prefix, prefix, page)
                 else:
-                    page = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), page)
+                    page = re.sub('(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), page)
 
         if not pageLength:
             pageLength = len(page)

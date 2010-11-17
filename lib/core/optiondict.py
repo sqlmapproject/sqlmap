@@ -58,7 +58,7 @@ optDict = {
                                "dbms":              "string",
                                "os":                "string",
                                "prefix":            "string",
-                               "postfix":           "string",
+                               "suffix":            "string",
                                "tamper":            "string"
                              },
 

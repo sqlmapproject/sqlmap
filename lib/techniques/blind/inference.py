@@ -442,7 +442,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     # One-shot query containing equals commonValue
                     testValue = unescaper.unescape("'%s'" % commonValue) if "'" not in commonValue else unescaper.unescape("%s" % commonValue, quote=False)
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
-                    query = agent.postfixQuery(query)
+                    query = agent.suffixQuery(query)
                     queriesCount[0] += 1
                     result = Request.queryPage(agent.payload(newValue=query))
 
@@ -466,7 +466,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     subquery = queries[kb.dbms].substring.query % (expressionUnescaped, 1, len(commonPattern))
                     testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
-                    query = agent.postfixQuery(query)
+                    query = agent.suffixQuery(query)
                     queriesCount[0] += 1
                     result = Request.queryPage(agent.payload(newValue=query))
 

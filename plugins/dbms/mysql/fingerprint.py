@@ -36,7 +36,7 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         query   = agent.prefixQuery("/* NoValue */")
-        query   = agent.postfixQuery(query)
+        query   = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
         result  = Request.queryPage(payload)
 
@@ -66,7 +66,7 @@ class Fingerprint(GenericFingerprint):
                 randInt = randomInt()
                 version = getUnicode(version)
                 query   = agent.prefixQuery("/*!%s AND %d=%d*/" % (version, randInt, randInt + 1))
-                query   = agent.postfixQuery(query)
+                query   = agent.suffixQuery(query)
                 payload = agent.payload(newValue=query)
                 result  = Request.queryPage(payload)
 

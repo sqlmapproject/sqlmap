@@ -99,7 +99,7 @@ class Web:
         query       = "LIMIT 1 INTO OUTFILE '%s' " % outFile
         query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
         query       = agent.prefixQuery(query)
-        query       = agent.postfixQuery(query)
+        query       = agent.suffixQuery(query)
         payload     = agent.payload(newValue=query)
         page        = Request.queryPage(payload)
         return page

@@ -40,7 +40,7 @@ def errorUse(expression, returnPayload=False):
     logic          = conf.logic
     randInt        = randomInt(1)
     query          = agent.prefixQuery(queries[kb.misc.testedDbms].error.query)
-    query          = agent.postfixQuery(query)
+    query          = agent.suffixQuery(query)
     startLimiter   = ""
     endLimiter     = ""
 

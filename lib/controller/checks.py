@@ -52,15 +52,15 @@ def checkSqlInjection(place, parameter, value, parenthesis):
     randInt = randomInt()
     randStr = randomStr()
     prefix = ""
-    postfix = ""
+    suffix = ""
     retVal = None
 
-    if conf.prefix or conf.postfix:
+    if conf.prefix or conf.suffix:
         if conf.prefix:
             prefix = conf.prefix
 
-        if conf.postfix:
-            postfix = conf.postfix
+        if conf.suffix:
+            suffix = conf.suffix
 
     for case in kb.injections.root.case:
         conf.matchRatio = None
@@ -68,7 +68,7 @@ def checkSqlInjection(place, parameter, value, parenthesis):
         positive = case.test.positive
         negative = case.test.negative
 
-        if not prefix and not postfix and case.name == "custom":
+        if not prefix and not suffix and case.name == "custom":
             continue
 
         infoMsg  = "testing %s (%s) injection " % (case.desc, logic)
@@ -116,16 +116,16 @@ def heuristicCheckSqlInjection(place, parameter, value):
         return
 
     prefix = ""
-    postfix = ""
+    suffix = ""
 
-    if conf.prefix or conf.postfix:
+    if conf.prefix or conf.suffix:
         if conf.prefix:
             prefix = conf.prefix
 
-        if conf.postfix:
-            postfix = conf.postfix
+        if conf.suffix:
+            suffix = conf.suffix
 
-    payload = "%s%s%s%s" % (value, prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), postfix)
+    payload = "%s%s%s%s" % (value, prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
     payload = agent.payload(place, parameter, value, payload)
     Request.queryPage(payload, place, raise404=False)
     result = wasLastRequestDBMSError()
@@ -209,15 +209,15 @@ def checkDynamicContent(firstPage, secondPage):
 
         for i in xrange(len(blocks) - 1):
             prefix = firstPage[blocks[i][0]:blocks[i][0] + blocks[i][2]] if blocks[i] else None
-            postfix = firstPage[blocks[i + 1][0]:blocks[i + 1][0] + blocks[i + 1][2]] if blocks[i + 1] else None
+            suffix = firstPage[blocks[i + 1][0]:blocks[i + 1][0] + blocks[i + 1][2]] if blocks[i + 1] else None
 
             if prefix is None and blocks[i + 1][0] == 0:
                 continue
 
-            if postfix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
+            if suffix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
                 continue
 
-            kb.dynamicMarkings.append((re.escape(prefix[-conf.dynMarkLength:]) if prefix else None, re.escape(postfix[:conf.dynMarkLength]) if postfix else None))
+            kb.dynamicMarkings.append((re.escape(prefix[-conf.dynMarkLength:]) if prefix else None, re.escape(suffix[:conf.dynMarkLength]) if suffix else None))
 
     if len(kb.dynamicMarkings) > 0:
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
@@ -225,14 +225,14 @@ def checkDynamicContent(firstPage, secondPage):
 
         if conf.seqMatcher.a:
             for item in kb.dynamicMarkings:
-                prefix, postfix = item
+                prefix, suffix = item
 
                 if prefix is None:
-                    conf.seqMatcher.a = re.sub('(?s)^.+%s' % postfix, postfix, conf.seqMatcher.a)
-                elif postfix is None:
+                    conf.seqMatcher.a = re.sub('(?s)^.+%s' % suffix, suffix, conf.seqMatcher.a)
+                elif suffix is None:
                     conf.seqMatcher.a = re.sub('(?s)%s.+$' % prefix, prefix, conf.seqMatcher.a)
                 else:
-                    conf.seqMatcher.a = re.sub('(?s)%s.+%s' % (prefix, postfix), '%s%s' % (prefix, postfix), conf.seqMatcher.a)
+                    conf.seqMatcher.a = re.sub('(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), conf.seqMatcher.a)
 
 def checkStability():
     """
@@ -347,14 +347,14 @@ def checkString():
 
     if conf.string in page:
         setString()
-        return True
     else:
-        errMsg  = "you provided '%s' as the string to " % conf.string
-        errMsg += "match, but such a string is not within the target "
-        errMsg += "URL page content, please provide another string."
-        logger.error(errMsg)
+        warnMsg  = "you provided '%s' as the string to " % conf.string
+        warnMsg += "match, but such a string is not within the target "
+        warnMsg += "URL page content original request, sqlmap will "
+        warnMsg += "keep going anyway"
+        logger.warn(warnMsg)
 
-        return False
+    return True
 
 def checkRegexp():
     if not conf.regexp:
@@ -377,15 +377,14 @@ def checkRegexp():
 
     if re.search(conf.regexp, page, re.I | re.M):
         setRegexp()
-        return True
     else:
-        errMsg  = "you provided '%s' as the regular expression to " % conf.regexp
-        errMsg += "match, but such a regular expression does not have any "
-        errMsg += "match within the target URL page content, please provide "
-        errMsg += "another regular expression."
-        logger.error(errMsg)
+        warnMsg  = "you provided '%s' as the regular expression to " % conf.regexp
+        warnMsg += "match, but such a regular expression does not have any "
+        warnMsg += "match within the target URL page content, sqlmap "
+        warnMsg += "will keep going anyway"
+        logger.warn(warnMsg)
 
-        return False
+    return True
 
 def checkNullConnection():
     """

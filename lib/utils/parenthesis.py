@@ -37,7 +37,7 @@ def checkForParenthesis():
     if kb.parenthesis is not None:
         return
 
-    if conf.prefix or conf.postfix:
+    if conf.prefix or conf.suffix:
         kb.parenthesis = 0
         return
 
@@ -46,7 +46,7 @@ def checkForParenthesis():
         randStr = randomStr()
 
         query = case.usage.prefix.format % eval(case.usage.prefix.params)
-        query = query[:-1] + case.usage.postfix.format % eval(case.usage.postfix.params)
+        query = query[:-1] + case.usage.suffix.format % eval(case.usage.suffix.params)
 
         payload = agent.payload(newValue=query)
         result = Request.queryPage(payload)

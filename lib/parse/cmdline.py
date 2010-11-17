@@ -169,8 +169,8 @@ def cmdLineParser():
         injection.add_option("--prefix", dest="prefix",
                              help="Injection payload prefix string")
 
-        injection.add_option("--postfix", dest="postfix",
-                             help="Injection payload postfix string")
+        injection.add_option("--suffix", dest="suffix",
+                             help="Injection payload suffix string")
 
         injection.add_option("--tamper", dest="tamper",
                              help="Use given script(s) for tampering injection data")

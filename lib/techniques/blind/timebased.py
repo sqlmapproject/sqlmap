@@ -28,7 +28,7 @@ def timeTest():
 
     timeQuery = getDelayQuery(andCond=True)
     query     = agent.prefixQuery("AND %s" % timeQuery)
-    query     = agent.postfixQuery(query)
+    query     = agent.suffixQuery(query)
     payload   = agent.payload(newValue=query)
     start     = time.time()
     _         = Request.queryPage(payload)
