@@ -118,37 +118,43 @@ class Web:
         infoMsg = "trying to upload the file stager"
         logger.info(infoMsg)
 
+        default = None
+        choices = ['asp', 'aspx', 'php', 'jsp']
+
+        for ext in choices:
+            if conf.url.endswith(ext):
+                default = ext
+                break
+
+        if not default:
+            if kb.os == "Windows":
+                default = "asp"
+            else:
+                default = "php"
+
         message  = "which web application language does the web server "
         message += "support?\n"
-        message += "[1] ASP%s\n" % (" (default)" if kb.os == "Windows" else "")
-        message += "[2] ASPX\n"
-        message += "[3] PHP%s\n" % ("" if kb.os == "Windows" else " (default)")
-        message += "[4] JSP"
+
+        for count in xrange(len(choices)):
+            ext = choices[count]
+            message += "[%d] %s%s\n" % (count + 1, ext.upper(), (" (default)" if default == ext else ""))
+            if default == ext:
+                default = count + 1
+
+        message = message[:-1]
 
         while True:
-            choice = readInput(message, default="1" if kb.os == "Windows" else "2")
+            choice = readInput(message, default=str(default))
 
-            if choice == "1":
-                self.webApi = "asp"
-                break
-
-            elif choice == "2":
-                self.webApi = "aspx"
-                break
-
-            elif choice == "3":
-                self.webApi = "php"
-                break
-
-            elif choice == "4":
-                self.webApi = "jsp"
-                break
-
-            elif not choice.isdigit():
+            if not choice.isdigit():
                 logger.warn("invalid value, only digits are allowed")
 
-            elif int(choice) < 1 or int(choice) > 4:
-                logger.warn("invalid value, it must be between 1 and 4")
+            elif int(choice) < 1 or int(choice) > len(choices):
+                logger.warn("invalid value, it must be between 1 and %d" % len(choices))
+
+            else:
+                self.webApi = choices[int(choice) - 1]
+                break
 
         kb.docRoot  = getDocRoot(self.webApi)
         directories = getDirs(self.webApi)
