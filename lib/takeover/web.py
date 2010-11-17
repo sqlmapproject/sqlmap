@@ -95,7 +95,7 @@ class Web:
 
     def __webFileInject(self, fileContent, fileName, directory):
         outFile     = posixpath.normpath("%s/%s" % (directory, fileName))
-        uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\') if kb.os == "Windows" else directory)
+        uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
         query       = "LIMIT 1 INTO OUTFILE '%s' " % outFile
         query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
         query       = agent.prefixQuery(query)
@@ -193,7 +193,7 @@ class Web:
 
             elif "<%" in uplPage or "<?" in uplPage:
                 warnMsg  = "file stager uploaded "
-                warnMsg += "on '%s' but not dynamically interpreted" % directory
+                warnMsg += "on '%s' but not dynamically interpreted ('%s')" % (directory, self.webStagerUrl)
                 logger.warn(warnMsg)
                 continue
 
