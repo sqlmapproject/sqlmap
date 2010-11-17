@@ -90,6 +90,7 @@ class Connect:
         responseMsg     = "HTTP response "
         requestHeaders  = ""
         responseHeaders = ""
+        logHeaders      = ""
 
         try:
             if silent:
@@ -224,8 +225,23 @@ class Connect:
             code = e.code
             status = e.msg
 
-            responseMsg = "\n%s[#%d] (%d %s)\n" % (responseMsg, requestID, code, status)
-            logHTTPTraffic(requestMsg, responseMsg)
+            try:
+                page = e.read()
+                responseHeaders = e.info()
+            except socket.timeout:
+                warnMsg  = "connection timed out while trying "
+                warnMsg += "to get error page information (%d)" % code
+                logger.warn(warnMsg)
+                return None, None
+            except:
+                pass
+
+            responseMsg = "\n%s[#%d] (%d %s):\n" % (responseMsg, requestID, code, status)
+
+            if responseHeaders:
+                logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
+
+            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
             if e.code == 401:
                 errMsg  = "not authorized, try to provide right HTTP "
@@ -235,15 +251,6 @@ class Connect:
                 errMsg = "page not found (%d)" % code
                 raise sqlmapConnectionException, errMsg
             else:
-                try:
-                    page = e.read()
-                    responseHeaders = e.info()
-                except socket.timeout:
-                    warnMsg  = "connection timed out while trying "
-                    warnMsg += "to get error page information (%d)" % code
-                    logger.warn(warnMsg)
-                    return None, None
-
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
