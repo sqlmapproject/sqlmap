@@ -7,10 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-try:
-    import sqlite3
-except ImportError, _:
-    pass
+from lib.core.exception import sqlmapMissingDependence
 
 class Replication:
     """
@@ -19,6 +16,12 @@ class Replication:
     """
 
     def __init__(self, dbpath):
+        try:
+            import sqlite3
+        except ImportError, _:
+            errMsg = "missing module 'sqlite3' needed by --replicate switch"
+            raise sqlmapMissingDependence, errMsg
+
         self.dbpath = dbpath
         self.connection = sqlite3.connect(dbpath)
         self.connection.isolation_level = None
