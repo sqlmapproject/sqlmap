@@ -425,7 +425,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, exprPosition=None, nullChar="NULL"):
+    def forgeInbandQuery(self, query, exprPosition=None, nullChar="NULL", count=None, comment=None):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -456,6 +456,12 @@ class Agent:
         @rtype: C{str}
         """
 
+        if count is None:
+            count = kb.unionCount
+
+        if comment is None:
+            comment = kb.unionComment
+
         inbandQuery = self.prefixQuery("UNION ALL SELECT ")
 
         if query.startswith("TOP"):
@@ -475,7 +481,7 @@ class Agent:
         if kb.dbms == DBMS.ORACLE and inbandQuery.endswith(" FROM DUAL"):
             inbandQuery = inbandQuery[:-len(" FROM DUAL")]
 
-        for element in range(kb.unionCount):
+        for element in range(count):
             if element > 0:
                 inbandQuery += ", "
 
@@ -499,7 +505,7 @@ class Agent:
         if intoRegExp:
             inbandQuery += intoRegExp
 
-        inbandQuery = self.suffixQuery(inbandQuery, kb.unionComment)
+        inbandQuery = self.suffixQuery(inbandQuery, comment)
 
         return inbandQuery
 

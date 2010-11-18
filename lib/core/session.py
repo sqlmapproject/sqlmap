@@ -219,26 +219,32 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
     @type position: C{str}
     """
 
-    if comment and count:
+    if comment:
         condition = (
                       not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      ( not kb.resumedQueries[conf.url].has_key("Union comment") 
-                      or not kb.resumedQueries[conf.url].has_key("Union count")
-                      ) )
+                      not kb.resumedQueries[conf.url].has_key("Union comment") )
                     )
 
         if condition:
             dataToSessionFile("[%s][%s][%s][Union comment][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(comment)))
-            dataToSessionFile("[%s][%s][%s][Union count][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), count))
 
         kb.unionComment = comment
+
+    if count:
+        condition = (
+                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                      not kb.resumedQueries[conf.url].has_key("Union count") )
+                    )
+
+        if condition:
+            dataToSessionFile("[%s][%s][%s][Union count][%d]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), count))
+
         kb.unionCount = count
 
     if position is not None:
         condition = (
                       not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      ( not kb.resumedQueries[conf.url].has_key("Union position")
-                      ) )
+                      not kb.resumedQueries[conf.url].has_key("Union position") )
                     )
 
         if condition:
@@ -485,15 +491,13 @@ def resumeConfKb(expression, url, value):
     elif expression == "Union negative" and url == conf.url:
         kb.unionNegative = True if value[:-1] == "Yes" else False
 
-        logMsg  = "resuming union negative "
-        logMsg += "%s from session file" % kb.unionPosition
+        logMsg = "resuming union negative from session file"
         logger.info(logMsg)
 
     elif expression == "Union false condition" and url == conf.url:
         kb.unionFalseCond = True if value[:-1] == "Yes" else False
 
-        logMsg  = "resuming union false condition "
-        logMsg += "%s from session file" % kb.unionPosition
+        logMsg = "resuming union false condition from session file"
         logger.info(logMsg)
 
     elif expression == "Union payload" and url == conf.url:
