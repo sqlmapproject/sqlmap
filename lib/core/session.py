@@ -341,7 +341,8 @@ def resumeConfKb(expression, url, value):
         logMsg  = "resuming match ratio '%s' from session file" % matchRatio
         logger.info(logMsg)
 
-        conf.matchRatio = round(float(matchRatio), 3)
+        if matchRatio not in ( "None", None ):
+            conf.matchRatio = round(float(matchRatio), 3)
 
     elif expression == "Injection point" and url == conf.url:
         injPlace = value[:-1]
