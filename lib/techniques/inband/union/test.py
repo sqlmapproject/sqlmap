@@ -99,7 +99,7 @@ def __unionTestByCharBruteforce(comment):
 
     query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
 
-    for count in range(1, conf.uCols+1):
+    for count in range(conf.uColsStart, conf.uColsStop+1):
         if kb.dbms == DBMS.ORACLE and query.endswith(" FROM DUAL"):
             query = query[:-len(" FROM DUAL")]
 
@@ -121,7 +121,7 @@ def __unionTestByOrderBy(comment):
     columns = None
     prevPayload = ""
 
-    for count in range(1, conf.uCols+2):
+    for count in range(conf.uColsStart, conf.uColsStop+1):
         query = agent.prefixQuery("ORDER BY %d" % count)
         orderByQuery = agent.suffixQuery(query, comment)
         payload = agent.payload(newValue=orderByQuery, negative=negative, falseCond=falseCond)
@@ -161,17 +161,15 @@ def unionTest():
     logger.info(infoMsg)
 
     validPayload = None
+    comment = queries[kb.dbms].comment.query
 
-    for comment in (queries[kb.dbms].comment.query, ""):
-        if conf.uTech == "orderby":
-            validPayload = __unionTestByOrderBy(comment)
-        else:
-            validPayload = __unionTestByCharBruteforce(comment)
+    if conf.uTech == "orderby":
+        validPayload = __unionTestByOrderBy(comment)
+    else:
+        validPayload = __unionTestByCharBruteforce(comment)
 
-        if validPayload:
-            setUnion(comment=comment)
-
-            break
+    if validPayload:
+        setUnion(comment=comment)
 
     if isinstance(kb.unionPosition, int):
         infoMsg  = "the target url is affected by an exploitable "

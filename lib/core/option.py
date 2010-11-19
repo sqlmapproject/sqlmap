@@ -488,35 +488,49 @@ def __setWriteFile():
     conf.wFileType = getFileType(conf.wFile)
 
 def __setUnion():
-    if isinstance(conf.uChar, basestring) and conf.uChar != "NULL" and not conf.uChar.isdigit():
-        if not conf.uChar.startswith("'") or not conf.uChar.endswith("'"):
-            debugMsg = "setting the UNION query SQL injection character to '%s'" % conf.uChar
+    if isinstance(conf.uTech, basestring):
+        debugMsg = "setting the UNION query SQL injection detection technique"
+        logger.debug(debugMsg)
+
+        uTechOriginal = conf.uTech
+        conf.uTech = conf.uTech.lower()
+
+        if conf.uTech and conf.uTech not in ( "char", "orderby" ):
+            infoMsg  = "resetting the UNION query detection technique to "
+            infoMsg += "'char', '%s' is not a valid technique" % uTechOriginal
+            logger.info(infoMsg)
+
+            conf.uTech = "char"
+        else:
+            debugMsg  = "setting UNION query detection technique to "
+            debugMsg += "'%s'" % uTechOriginal
+            logger.debug(debugMsg)
+
+    if isinstance(conf.uCols, basestring) and conf.uChar != "1-20":
+        debugMsg = "setting the UNION query SQL injection range of columns"
+        logger.debug(debugMsg)
+
+        if "-" not in conf.uCols:
+            raise sqlmapSyntaxException, "--union-cols must be a range with hyphon"
+
+        conf.uCols = conf.uCols.replace(" ", "")
+        conf.uColsStart, conf.uColsStop = conf.uCols.split("-")
+
+        if not conf.uColsStart.isdigit() or not conf.uColsStop.isdigit():
+            raise sqlmapSyntaxException, "--union-cols must be a range of integers"
+
+        conf.uColsStart = int(conf.uColsStart)
+        conf.uColsStop = int(conf.uColsStop)
+
+    if isinstance(conf.uChar, basestring) and conf.uChar != "NULL":
+        debugMsg = "setting the UNION query SQL injection character to '%s'" % conf.uChar
+        logger.debug(debugMsg)
+
+        if not conf.uChar.isdigit() and ( not conf.uChar.startswith("'") or not conf.uChar.endswith("'") ):
+            debugMsg = "forcing the UNION query SQL injection character to '%s'" % conf.uChar
             logger.debug(debugMsg)
 
             conf.uChar = "'%s'" % conf.uChar
-
-    if conf.uTech is None:
-        conf.uTech = "NULL"
-
-        return
-
-    debugMsg = "setting the UNION query SQL injection detection technique"
-    logger.debug(debugMsg)
-
-    uTechOriginal = conf.uTech
-    conf.uTech    = conf.uTech.lower()
-
-    if conf.uTech and conf.uTech not in ( "null", "orderby" ):
-        infoMsg  = "resetting the UNION query detection technique to "
-        infoMsg += "'NULL', '%s' is not a valid technique" % uTechOriginal
-        logger.info(infoMsg)
-
-        conf.uTech = "NULL"
-
-    else:
-        debugMsg  = "setting UNION query detection technique to "
-        debugMsg += "'%s'" % uTechOriginal
-        logger.debug(debugMsg)
 
 def __setOS():
     """
