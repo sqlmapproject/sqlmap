@@ -45,7 +45,7 @@ class Google:
 
         matches = []
 
-        regExpr = r'h3 class="?r"?><a href="(http[s]*://.+?)"\sclass="?l"?'
+        regExpr = r'h3 class="?r"?><a href="(http[s]?://.+?)"\sclass="?l"?'
         matches = re.findall(regExpr, page, re.I | re.M)
 
         return matches
