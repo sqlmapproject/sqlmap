@@ -425,7 +425,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, exprPosition=None, nullChar="NULL", count=None, comment=None):
+    def forgeInbandQuery(self, query, exprPosition=None, nullChar=None, count=None, comment=None):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -455,6 +455,9 @@ class Agent:
         @return: UNION ALL SELECT query string forged
         @rtype: C{str}
         """
+
+        if nullChar is None:
+            nullChar = conf.uChar
 
         if count is None:
             count = kb.unionCount

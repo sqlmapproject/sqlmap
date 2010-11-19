@@ -243,8 +243,11 @@ def cmdLineParser():
         techniques.add_option("--union-tech", dest="uTech",
                               help="Technique to test for UNION query SQL injection")
 
-        techniques.add_option("--union-cols", dest="uCols", type="int", default=50,
+        techniques.add_option("--union-cols", dest="uCols", type="int", default=20,
                               help="Maximum number of columns to test for")
+
+        techniques.add_option("--union-char", dest="uChar", default="NULL",
+                              help="Character to use to bruteforce number of columns")
 
         # Fingerprint options
         fingerprint = OptionGroup(parser, "Fingerprint")

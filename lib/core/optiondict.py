@@ -79,7 +79,8 @@ optDict = {
                                "timeSec":           "integer",
                                "unionTest":         "boolean",
                                "uTech":             "string",
-                               "uCols":             "integer"
+                               "uCols":             "integer",
+                               "uChar":             "string"
                              },
 
             "Fingerprint":   {

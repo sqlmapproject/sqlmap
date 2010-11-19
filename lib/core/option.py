@@ -487,7 +487,14 @@ def __setWriteFile():
 
     conf.wFileType = getFileType(conf.wFile)
 
-def __setUnionTech():
+def __setUnion():
+    if isinstance(conf.uChar, basestring) and conf.uChar != "NULL" and not conf.uChar.isdigit():
+        if not conf.uChar.startswith("'") or not conf.uChar.endswith("'"):
+            debugMsg = "setting the UNION query SQL injection character to '%s'" % conf.uChar
+            logger.debug(debugMsg)
+
+            conf.uChar = "'%s'" % conf.uChar
+
     if conf.uTech is None:
         conf.uTech = "NULL"
 
@@ -1341,7 +1348,7 @@ def init(inputOptions=advancedDict()):
         __setHTTPAuthentication()
         __setHTTPProxy()
         __setSafeUrl()
-        __setUnionTech()
+        __setUnion()
         __setGoogleDorking()
         __urllib2Opener()
         __findPageForms()

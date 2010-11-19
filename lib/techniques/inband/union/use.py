@@ -26,7 +26,7 @@ from lib.utils.resume import resume
 
 reqCount = 0
 
-def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullChar="NULL", unpack=True, dump=False):
+def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullChar=None, unpack=True, dump=False):
     """
     This function tests for an inband SQL injection on the target
     url then call its subsidiary function to effectively perform an
