@@ -522,6 +522,11 @@ def __setUnion():
         conf.uColsStart = int(conf.uColsStart)
         conf.uColsStop = int(conf.uColsStop)
 
+        if conf.uColsStart > conf.uColsStop:
+            errMsg = "--union-cols range has to be from lower to "
+            errMsg += "higher number of columns"
+            raise sqlmapSyntaxException, errMsg
+
     if isinstance(conf.uChar, basestring) and conf.uChar != "NULL":
         debugMsg = "setting the UNION query SQL injection character to '%s'" % conf.uChar
         logger.debug(debugMsg)
