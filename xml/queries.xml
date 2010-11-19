@@ -254,7 +254,7 @@
         </users>
         <passwords>
             <inband query="SELECT name, master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins" query2="SELECT name, master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins" condition="name"/>
-            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM master..sysxlogins WHERE name='%s')" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
+            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM master..sysxlogins WHERE name='%s')" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND password_hash NOT IN (SELECT TOP %d password_hash FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
         </passwords>
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
         <privileges/>
