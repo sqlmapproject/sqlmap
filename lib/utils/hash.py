@@ -15,12 +15,12 @@ from extra.pydes.pyDes import CBC
 from lib.core.convert import hexdecode
 from lib.core.convert import hexencode
 
-def mysql_hash(password, uppercase=True):
+def mysql_passwd(password, uppercase=True):
     """
     Reference(s):
         http://csl.sublevel3.org/mysql-password-function/
 
-    >>> mysql_hash(password='testpass', uppercase=True)
+    >>> mysql_passwd(password='testpass', uppercase=True)
     '*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'
     """
 
@@ -28,13 +28,13 @@ def mysql_hash(password, uppercase=True):
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def mysql_old_hash(password, uppercase=True): # prior to version '4.1'
+def mysql_old_passwd(password, uppercase=True): # prior to version '4.1'
     """
     Reference(s):
         http://www.sfr-fresh.com/unix/privat/tpop3d-1.5.5.tar.gz:a/tpop3d-1.5.5/password.c
         http://voidnetwork.org/5ynL0rd/darkc0de/python_script/darkMySQLi.html
 
-    >>> mysql_old_hash(password='testpass', uppercase=True)
+    >>> mysql_old_passwd(password='testpass', uppercase=True)
     '7DCDA0D57290B453'
     """
 
@@ -53,12 +53,12 @@ def mysql_old_hash(password, uppercase=True): # prior to version '4.1'
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def postgres_hash(password, username, uppercase=False):
+def postgres_passwd(password, username, uppercase=False):
     """
     Reference(s):
         http://pentestmonkey.net/blog/cracking-postgres-hashes/
 
-    >>> postgres_hash(password='testpass', username='testuser', uppercase=False)
+    >>> postgres_passwd(password='testpass', username='testuser', uppercase=False)
     'md599e5ea7a6f7c3269995cba3927fd0093'
     """
 
@@ -66,13 +66,13 @@ def postgres_hash(password, username, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def mssql_hash(password, salt, uppercase=False):
+def mssql_passwd(password, salt, uppercase=False):
     """
     Reference(s):
         http://www.leidecker.info/projects/phrasendrescher/mssql.c
         https://www.evilfingers.com/tools/GSAuditor.php
 
-    >>> mssql_hash(password='testpass', salt='4086ceb6', uppercase=False)
+    >>> mssql_passwd(password='testpass', salt='4086ceb6', uppercase=False)
     '0x01004086ceb60c90646a8ab9889fe3ed8e5c150b5460ece8425a'
     """
 
@@ -83,14 +83,14 @@ def mssql_hash(password, salt, uppercase=False):
 
     return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
 
-def mssql_old_hash(password, salt, uppercase=True): # prior to version '2005'
+def mssql_old_passwd(password, salt, uppercase=True): # prior to version '2005'
     """
     Reference(s):
         www.exploit-db.com/download_pdf/15537/
         http://www.leidecker.info/projects/phrasendrescher/mssql.c
         https://www.evilfingers.com/tools/GSAuditor.php
 
-    >>> mssql_old_hash(password='testpass', salt='4086ceb6', uppercase=True)
+    >>> mssql_old_passwd(password='testpass', salt='4086ceb6', uppercase=True)
     '0x01004086CEB60C90646A8AB9889FE3ED8E5C150B5460ECE8425AC7BB7255C0C81D79AA5D0E93D4BB077FB9A51DA0'
     """
 
@@ -101,14 +101,14 @@ def mssql_old_hash(password, salt, uppercase=True): # prior to version '2005'
 
     return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
 
-def oracle_hash(password, salt, uppercase=True):
+def oracle_passwd(password, salt, uppercase=True):
     """
     Reference(s):
         https://www.evilfingers.com/tools/GSAuditor.php
         http://www.notesbit.com/index.php/scripts-oracle/oracle-11g-new-password-algorithm-is-revealed-by-seclistsorg/
         http://seclists.org/bugtraq/2007/Sep/304
 
-    >>> oracle_hash(password='SHAlala', salt='1B7B5F82B7235E9E182C', uppercase=True)
+    >>> oracle_passwd(password='SHAlala', salt='1B7B5F82B7235E9E182C', uppercase=True)
     'S:2BFCFDF5895014EE9BB2B9BA067B01E0389BB5711B7B5F82B7235E9E182C'
     """
 
@@ -118,12 +118,12 @@ def oracle_hash(password, salt, uppercase=True):
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def oracle_old_hash(password, username, uppercase=True): # prior to version '11g'
+def oracle_old_passwd(password, username, uppercase=True): # prior to version '11g'
     """
     Reference(s):
         http://www.notesbit.com/index.php/scripts-oracle/oracle-11g-new-password-algorithm-is-revealed-by-seclistsorg/
 
-    >>> oracle_old_hash(password='tiger', username='scott', uppercase=True)
+    >>> oracle_old_passwd(password='tiger', username='scott', uppercase=True)
     'F894844C34402B67'
     """
 
