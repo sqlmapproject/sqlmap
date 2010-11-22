@@ -946,7 +946,7 @@ def __setHTTPUserAgent():
     if __count == 1:
         __userAgent = kb.userAgents[0]
     else:
-        __userAgent = kb.userAgents[randomRange(stop=__count)]
+        __userAgent = kb.userAgents[randomRange(stop=__count-1)]
 
     __userAgent = sanitizeStr(__userAgent)
     conf.httpHeaders.append(("User-Agent", __userAgent))
