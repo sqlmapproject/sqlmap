@@ -222,10 +222,13 @@ def dictionaryAttack():
 
                     if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
                         attack_info.append([(user, hash_), {}])
+
                     elif rehash in (HASH.ORACLE_OLD, HASH.POSTGRES):
                         attack_info.append([(user, hash_), {'username': user}])
+
                     elif rehash in (HASH.ORACLE):
                         attack_info.append([(user, hash_), {'salt': hash_[-20:]}])
+
                     elif rehash in (HASH.MSSQL, HASH.MSSQL_OLD):
                         attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
 
@@ -243,52 +246,57 @@ def dictionaryAttack():
         logger.info(infoMsg)
         wordlist = getFileItems(dictpath, None, False)
 
-        infoMsg = "running dictionary attack"
+        infoMsg = "starting dictionary attack"
         logger.info(infoMsg)
 
         length = len(wordlist)
 
         if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
+
             for word in wordlist:
                 count += 1
                 current = __functions__[rehash](password = word, uppercase = False)
+
                 for item in attack_info:
                     ((user, hash_), _) = item
 
-                    if count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
+                    if hash_ == current:
+                        results.append((user, hash_, word))
+                        dataToStdout("\r[%s] [INFO] found: %s%s\n" % (time.strftime("%X"), word, 40*' '), True)
+                        attack_info.remove(item)
+
+                    elif count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
                         status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
 
-                    if hash_ == current:
-                        results.append((user, hash_, word))
-                        #dataToStdout("\r[%s] [INFO] found: %s:%s\n" % (time.strftime("%X"), user, word), True)
-                        attack_info.remove(item)
-
             dataToStdout("\n", True)
+
         else:
+
             for ((user, hash_), kwargs) in attack_info:
                 count = 0
+
                 for word in wordlist:
                     current = __functions__[rehash](password = word, uppercase = False, **kwargs)
-
                     count += 1
-                    if count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
+
+                    if hash_ == current:
+                        results.append((user, hash_, word))
+                        dataToStdout("\r[%s] [INFO] found: %s%s" % (time.strftime("%X"), word, 40*' '), True)
+                        break
+
+                    elif count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
                         status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
 
-                    if hash_ == current:
-                        results.append((user, hash_, word))
-                        #dataToStdout("\r[%s] [INFO] found: %s:%s\n" % (time.strftime("%X"), user, word), True)
-                        break
-
                 dataToStdout("\n", True)
 
-        blank = "    "
         for (user, hash_, password) in results:
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
                 if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
-                    kb.data.cachedUsersPasswords[user][i] += "%s%spassword: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', blank, password)
+                    kb.data.cachedUsersPasswords[user][i] += "%s    password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
+
     else:
         warnMsg  = "unknown hash format. "
         warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
