@@ -1345,7 +1345,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True):
         line = line.strip()
         if not unicode_:
             try:
-                str.encode(line)
+                line = str.encode(line)
             except UnicodeDecodeError:
                 continue
         if line:
