@@ -277,7 +277,7 @@ def dictionaryAttack():
                     if hash_ == current:
                         results.append((user, hash_, word))
                         clearConsoleLine()
-                        dataToStdout("[%s] [INFO] found: %s\n" % (time.strftime("%X"), word), True)
+                        dataToStdout("[%s] [INFO] found: '%s' for user: '%s'\n" % (time.strftime("%X"), word, user), True)
                         attack_info.remove(item)
 
                     elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
@@ -297,7 +297,7 @@ def dictionaryAttack():
                     if hash_ == current:
                         results.append((user, hash_, word))
                         clearConsoleLine()
-                        dataToStdout("[%s] [INFO] found: %s\n" % (time.strftime("%X"), word), True)
+                        dataToStdout("[%s] [INFO] found: '%s' for user: '%s'\n" % (time.strftime("%X"), word, user), True)
                         break
 
                     elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
@@ -309,7 +309,7 @@ def dictionaryAttack():
         for (user, hash_, password) in results:
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
                 if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
-                    kb.data.cachedUsersPasswords[user][i] += "%s    password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
+                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
     else:
         warnMsg  = "unknown hash format. "
