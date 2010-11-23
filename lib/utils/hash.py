@@ -295,6 +295,8 @@ def dictionaryAttack():
                     count += 1
 
                     if hash_ == current:
+                        if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
+                            word = word.upper()
                         results.append((user, hash_, word))
                         clearConsoleLine()
                         dataToStdout("[%s] [INFO] found: '%s' for user: '%s'\n" % (time.strftime("%X"), word, user), True)
