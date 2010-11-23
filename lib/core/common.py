@@ -1259,8 +1259,8 @@ def getConsoleWidth(default=80):
 
     return width if width else default
 
-def clearConsoleLine():
-    dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)))
+def clearConsoleLine(forceOutput=False):
+    dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
 
 def parseXmlFile(xmlFile, handler):
     stream = StringIO(readCachedFileContent(xmlFile))

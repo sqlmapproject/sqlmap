@@ -17,9 +17,9 @@ import tempfile
 import time
 
 from lib.controller.controller import start
+from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
-from lib.core.common import getConsoleWidth
 from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import logger
@@ -65,7 +65,7 @@ def smokeTest():
             status = '%d/%d (%d%s) ' % (count, length, round(100.0*count/length), '%')
             dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-    dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
+    clearConsoleLine()
     if retVal:
         logger.info("smoke test final result: PASSED")
     else:

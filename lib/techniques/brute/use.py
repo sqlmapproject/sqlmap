@@ -10,8 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import time
 
 from lib.core.agent import agent
+from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -42,8 +42,8 @@ def tableExists(tableFile):
         result = Request.queryPage(agent.payload(newValue=query))
 
         if result:
-            infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), table)
-            infoMsg = "%s%s\n" % (infoMsg, " "*(getConsoleWidth()-1-len(infoMsg)))
+            clearConsoleLine(True)
+            infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), table)
             dataToStdout(infoMsg, True)
             retVal.append(table)
 
@@ -53,7 +53,7 @@ def tableExists(tableFile):
 
     conf.verbose = popValue()
 
-    dataToStdout("\n", True)
+    clearConsoleLine(True)
 
     if not retVal:
         warnMsg = "no table found"
@@ -93,8 +93,8 @@ def columnExists(columnFile):
         result = Request.queryPage(agent.payload(newValue=query))
 
         if result:
-            infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), column)
-            infoMsg = "%s%s\n" % (infoMsg, " "*(getConsoleWidth()-1-len(infoMsg)))
+            clearConsoleLine(True)
+            infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), column)
             dataToStdout(infoMsg, True)
             retVal.append(column)
 
@@ -104,7 +104,7 @@ def columnExists(columnFile):
 
     conf.verbose = popValue()
 
-    dataToStdout("\n", True)
+    clearConsoleLine(True)
 
     if not retVal:
         warnMsg = "no column found"
