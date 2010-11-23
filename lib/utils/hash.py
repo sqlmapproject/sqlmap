@@ -212,7 +212,7 @@ def dictionaryAttack():
 
                 elif re.match(regex, hash_):
                     hash_regex = regex
-                    infoMsg = "using hash method: '%s'" % name
+                    infoMsg = "using hash method: '%s'" % __functions__[hash_regex].func_name
                     logger.info(infoMsg)
                     break
 
