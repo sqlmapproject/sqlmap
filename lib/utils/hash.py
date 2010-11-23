@@ -176,9 +176,15 @@ def sha1_generic_passwd(password, uppercase=False):
     return retVal.upper() if uppercase else retVal.lower()
 
 __functions__ = {
-                    HASH.MYSQL: mysql_passwd, HASH.MYSQL_OLD: mysql_old_passwd, HASH.POSTGRES: postgres_passwd,
-                    HASH.MSSQL: mssql_passwd, HASH.MSSQL_OLD: mssql_old_passwd, HASH.ORACLE: oracle_passwd,
-                    HASH.ORACLE_OLD: oracle_old_passwd, HASH.MD5_GENERIC: md5_generic_passwd, HASH.SHA1_GENERIC: sha1_generic_passwd
+                    HASH.MYSQL: mysql_passwd, 
+                    HASH.MYSQL_OLD: mysql_old_passwd,
+                    HASH.POSTGRES: postgres_passwd, 
+                    HASH.MSSQL: mssql_passwd, 
+                    HASH.MSSQL_OLD: mssql_old_passwd, 
+                    HASH.ORACLE: oracle_passwd,
+                    HASH.ORACLE_OLD: oracle_old_passwd, 
+                    HASH.MD5_GENERIC: md5_generic_passwd, 
+                    HASH.SHA1_GENERIC: sha1_generic_passwd
                 }
 
 def dictionaryAttack():
@@ -194,10 +200,13 @@ def dictionaryAttack():
             hash_ = hash_.split()[0]
 
             for name, regex in getPublicTypeMembers(HASH):
+                #hashes for Oracle and old MySQL look the same hence these checks
                 if kb.dbms == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
                     continue
+
                 elif kb.dbms == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
                     continue
+
                 elif re.match(regex, hash_):
                     rehash = regex
                     infoMsg = "using hash method: '%s'" % name
