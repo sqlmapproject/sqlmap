@@ -19,6 +19,7 @@ from extra.pydes.pyDes import CBC
 from lib.core.common import checkFile
 from lib.core.common import conf
 from lib.core.common import dataToStdout
+from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import paths
@@ -268,12 +269,11 @@ def dictionaryAttack():
 
                     elif count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
                         status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
-                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
-            dataToStdout("\n", True)
+            dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
 
         else:
-
             for ((user, hash_), kwargs) in attack_info:
                 count = 0
 
@@ -283,14 +283,14 @@ def dictionaryAttack():
 
                     if hash_ == current:
                         results.append((user, hash_, word))
-                        dataToStdout("\r[%s] [INFO] found: %s%s" % (time.strftime("%X"), word, 40*' '), True)
+                        dataToStdout("\r[%s] [INFO] found: %s%s\n" % (time.strftime("%X"), word, 40*' '), True)
                         break
 
                     elif count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
                         status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
-                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
-                dataToStdout("\n", True)
+                dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
 
         for (user, hash_, password) in results:
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
