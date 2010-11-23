@@ -1343,6 +1343,11 @@ def getFileItems(filename, commentPrefix='#', unicode_=True):
             if line.find(commentPrefix) != -1:
                 line = line[:line.find(commentPrefix)]
         line = line.strip()
+        if not unicode_:
+            try:
+                str.encode(line)
+            except UnicodeDecodeError:
+                continue
         if line:
             retVal.append(line)
 
