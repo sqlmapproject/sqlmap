@@ -143,7 +143,10 @@ def oracle_old_passwd(password, username, uppercase=True): # prior to version '1
     'F894844C34402B67'
     """
     IV, pad = "\0"*8, "\0"
-    username = unicode.encode(username, conf.dataEncoding) #pyDes has issues with unicode strings
+
+    if isinstance(username, unicode):
+        username = unicode.encode(username, conf.dataEncoding) #pyDes has issues with unicode strings
+
     unistr = "".join("\0%s" % c for c in (username + password).upper())
 
     cipher = des(hexdecode("0123456789ABCDEF"), CBC, IV, pad)
