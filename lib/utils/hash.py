@@ -16,6 +16,7 @@ from zipfile import ZipFile
 
 from extra.pydes.pyDes import des
 from extra.pydes.pyDes import CBC
+from lib.core.common import checkFile
 from lib.core.common import conf
 from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
@@ -191,10 +192,22 @@ def dictionaryAttack():
 
             hash_ = hash_.split()[0]
 
-            for _, regex in getPublicTypeMembers(HASH):
-                if re.match(regex, hash_):
+            for name, regex in getPublicTypeMembers(HASH):
+                if kb.dbms == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
+                    continue
+                elif kb.dbms == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
+                    continue
+                elif re.match(regex, hash_):
                     rehash = regex
+                    infoMsg = "using hash method: '%s'" % name
+                    logger.info(infoMsg)
                     break
+
+            if rehash:
+                break
+
+        if rehash:
+            break
 
     if rehash:
         for (user, hashes) in kb.data.cachedUsersPasswords.items():
@@ -207,7 +220,7 @@ def dictionaryAttack():
                 if re.match(rehash, hash_):
                     hash_ = hash_.lower()
 
-                    if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC) and kb.dbms != DBMS.ORACLE:
+                    if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
                         attack_info.append([(user, hash_), {}])
                     elif rehash in (HASH.ORACLE_OLD, HASH.POSTGRES):
                         attack_info.append([(user, hash_), {'username': user}])
@@ -216,16 +229,26 @@ def dictionaryAttack():
                     elif rehash in (HASH.MSSQL, HASH.MSSQL_OLD):
                         attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
 
-        infoMsg = "loading dictionary from: '%s'" % paths.WORDLIST_TXT
+        if rehash == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
+            message = "what's the dictionary's location? [%s]" % paths.ORACLE_DEFAULT_PASSWD
+            dictpath = readInput(message, default=paths.ORACLE_DEFAULT_PASSWD)
+
+        else:
+            message = "what's the dictionary's location? [%s]" % paths.WORDLIST
+            dictpath = readInput(message, default=paths.WORDLIST)
+
+        checkFile(dictpath)
+
+        infoMsg = "loading dictionary from: '%s'" % dictpath
         logger.info(infoMsg)
-        wordlist = getFileItems(paths.WORDLIST_TXT, None, False)
+        wordlist = getFileItems(dictpath, None, False)
 
         infoMsg = "running dictionary attack"
         logger.info(infoMsg)
 
         length = len(wordlist)
 
-        if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC) and kb.dbms != DBMS.ORACLE:
+        if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
             for word in wordlist:
                 count += 1
@@ -233,7 +256,7 @@ def dictionaryAttack():
                 for item in attack_info:
                     ((user, hash_), _) = item
 
-                    if count % 1117 == 0 or count == length:
+                    if count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
                         status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
 
@@ -242,6 +265,7 @@ def dictionaryAttack():
                         #dataToStdout("\r[%s] [INFO] found: %s:%s\n" % (time.strftime("%X"), user, word), True)
                         attack_info.remove(item)
 
+            dataToStdout("\n", True)
         else:
             for ((user, hash_), kwargs) in attack_info:
                 count = 0
@@ -249,8 +273,8 @@ def dictionaryAttack():
                     current = __functions__[rehash](password = word, uppercase = False, **kwargs)
 
                     count += 1
-                    if count % 1117 == 0 or count == length:
-                        status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                    if count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
+                        status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
 
                     if hash_ == current:
@@ -258,9 +282,13 @@ def dictionaryAttack():
                         #dataToStdout("\r[%s] [INFO] found: %s:%s\n" % (time.strftime("%X"), user, word), True)
                         break
 
-        dataToStdout("\n", True)
+                dataToStdout("\n", True)
+
         blank = "    "
         for (user, hash_, password) in results:
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
                 if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
                     kb.data.cachedUsersPasswords[user][i] += "%s%spassword: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', blank, password)
+    else:
+        errMsg = "hash format unrecognized"
+        logger.error(errMsg)

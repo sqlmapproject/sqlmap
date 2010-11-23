@@ -663,7 +663,8 @@ def setPaths():
     paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.SQL_KEYWORDS           = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
-    paths.WORDLIST_TXT           = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
+    paths.ORACLE_DEFAULT_PASSWD  = os.path.join(paths.SQLMAP_TXT_PATH, "oracle-default-passwords.txt")
+    paths.WORDLIST               = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
     paths.PHPIDS_RULES_XML       = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
     paths.INJECTIONS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
@@ -1607,6 +1608,9 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
     kb.locks.reqLock.release()
 
 def getPublicTypeMembers(type_):
+    """
+    Useful for getting members from types (e.g. in enums)
+    """
     retVal = []
 
     for name, value in getmembers(type_):
