@@ -53,4 +53,3 @@ class HASH:
     ORACLE_OLD   = r'(?i)\A[0-9a-f]{16}\Z'
     MD5_GENERIC  = r'(?i)\A[0-9a-f]{32}\Z'
     SHA1_GENERIC = r'(?i)\A[0-9a-f]{40}\Z'
-    __all__      = (MYSQL, MYSQL_OLD, POSTGRES, MSSQL, MSSQL_OLD, ORACLE, ORACLE_OLD, MD5_GENERIC, SHA1_GENERIC)

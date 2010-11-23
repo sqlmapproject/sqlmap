@@ -26,6 +26,7 @@ from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
 from StringIO import StringIO
 from difflib import SequenceMatcher
+from inspect import getmembers
 from subprocess import PIPE
 from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
@@ -1604,3 +1605,12 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
     dataToTrafficFile("\n%s\n\n" % (76 * '#'))
 
     kb.locks.reqLock.release()
+
+def getPublicTypeMembers(type_):
+    retVal = []
+
+    for name, value in getmembers(type_):
+        if not name.startswith('__'):
+            retVal.append((name, value))
+
+    return retVal

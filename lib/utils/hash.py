@@ -12,13 +12,14 @@ import time
 
 from hashlib import md5
 from hashlib import sha1
-from zipfile import ZipFile
+from zipfile import ZipFile
 
 from extra.pydes.pyDes import des
 from extra.pydes.pyDes import CBC
 from lib.core.common import conf
 from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
+from lib.core.common import getPublicTypeMembers
 from lib.core.common import paths
 from lib.core.common import readInput
 from lib.core.convert import hexdecode
@@ -190,7 +191,7 @@ def dictionaryAttack():
 
             hash_ = hash_.split()[0]
 
-            for regex in HASH.__all__:
+            for _, regex in getPublicTypeMembers(HASH):
                 if re.match(regex, hash_):
                     rehash = regex
                     break
