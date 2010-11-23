@@ -18,8 +18,8 @@ from extra.pydes.pyDes import des
 from extra.pydes.pyDes import CBC
 from lib.core.common import checkFile
 from lib.core.common import conf
+from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import paths
@@ -188,7 +188,7 @@ __functions__ = {
                 }
 
 def dictionaryAttack():
-    rehash = None
+    hash_regex = None
     attack_info = []
     results = []
 
@@ -208,18 +208,18 @@ def dictionaryAttack():
                     continue
 
                 elif re.match(regex, hash_):
-                    rehash = regex
+                    hash_regex = regex
                     infoMsg = "using hash method: '%s'" % name
                     logger.info(infoMsg)
                     break
 
-            if rehash:
+            if hash_regex:
                 break
 
-        if rehash:
+        if hash_regex:
             break
 
-    if rehash:
+    if hash_regex:
         for (user, hashes) in kb.data.cachedUsersPasswords.items():
             for hash_ in hashes:
                 if not hash_:
@@ -227,22 +227,22 @@ def dictionaryAttack():
 
                 hash_ = hash_.split()[0]
 
-                if re.match(rehash, hash_):
+                if re.match(hash_regex, hash_):
                     hash_ = hash_.lower()
 
-                    if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
+                    if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
                         attack_info.append([(user, hash_), {}])
 
-                    elif rehash in (HASH.ORACLE_OLD, HASH.POSTGRES):
+                    elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
                         attack_info.append([(user, hash_), {'username': user}])
 
-                    elif rehash in (HASH.ORACLE):
+                    elif hash_regex in (HASH.ORACLE):
                         attack_info.append([(user, hash_), {'salt': hash_[-20:]}])
 
-                    elif rehash in (HASH.MSSQL, HASH.MSSQL_OLD):
+                    elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD):
                         attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
 
-        if rehash == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
+        if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
             message = "what's the dictionary's location? [%s]" % paths.ORACLE_DEFAULT_PASSWD
             dictpath = readInput(message, default=paths.ORACLE_DEFAULT_PASSWD)
 
@@ -261,45 +261,47 @@ def dictionaryAttack():
 
         length = len(wordlist)
 
-        if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
+        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
 
             for word in wordlist:
                 count += 1
-                current = __functions__[rehash](password = word, uppercase = False)
+                current = __functions__[hash_regex](password = word, uppercase = False)
 
                 for item in attack_info:
                     ((user, hash_), _) = item
 
                     if hash_ == current:
                         results.append((user, hash_, word))
-                        dataToStdout("\r[%s] [INFO] found: %s%s\n" % (time.strftime("%X"), word, 40*' '), True)
+                        clearConsoleLine()
+                        dataToStdout("[%s] [INFO] found: %s\n" % (time.strftime("%X"), word), True)
                         attack_info.remove(item)
 
-                    elif count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
+                    elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
                         status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
-            dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
+            clearConsoleLine()
 
         else:
             for ((user, hash_), kwargs) in attack_info:
                 count = 0
 
                 for word in wordlist:
-                    current = __functions__[rehash](password = word, uppercase = False, **kwargs)
+                    current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
                     count += 1
 
                     if hash_ == current:
                         results.append((user, hash_, word))
-                        dataToStdout("\r[%s] [INFO] found: %s%s\n" % (time.strftime("%X"), word, 40*' '), True)
+                        clearConsoleLine()
+                        dataToStdout("[%s] [INFO] found: %s\n" % (time.strftime("%X"), word), True)
                         break
 
-                    elif count % 1117 == 0 or count == length or rehash in (HASH.ORACLE_OLD):
+                    elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
                         status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
-                dataToStdout("\r%s\r" % (" "*(getConsoleWidth()-1)))
+                clearConsoleLine()
 
         for (user, hash_, password) in results:
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
