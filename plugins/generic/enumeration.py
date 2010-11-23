@@ -47,6 +47,7 @@ from lib.techniques.brute.use import tableExists
 from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.outband.stacked import stackedTest
+from lib.utils.hash import dictionaryAttack
 
 class Enumeration:
     """
@@ -328,6 +329,16 @@ class Enumeration:
             errMsg  = "unable to retrieve the password "
             errMsg += "hashes for the database users"
             raise sqlmapNoneDataException, errMsg
+
+        message = "do you want to use dictionary attack on retrieved password hashes? [Y/n/q]"
+        test = readInput(message, default="Y")
+
+        if test[0] in ("n", "N"):
+            pass
+        elif test[0] in ("q", "Q"):
+            raise sqlmapUserQuitException
+        else:
+            dictionaryAttack()
 
         return kb.data.cachedUsersPasswords
 

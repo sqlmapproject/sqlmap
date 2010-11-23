@@ -662,6 +662,7 @@ def setPaths():
     paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.SQL_KEYWORDS           = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
+    paths.WORDLIST_TXT           = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
     paths.PHPIDS_RULES_XML       = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
     paths.INJECTIONS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
@@ -1325,11 +1326,15 @@ def initCommonOutputs():
 
     cfile.close()
 
-def getFileItems(filename, commentPrefix='#'):
+def getFileItems(filename, commentPrefix='#', unicode_=True):
     retVal = []
 
     checkFile(filename)
-    ifile = codecs.open(filename, 'r', conf.dataEncoding)
+
+    if unicode_:
+        ifile = codecs.open(filename, 'r', conf.dataEncoding)
+    else:
+        ifile = open(filename, 'r')
 
     for line in ifile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
         if commentPrefix:

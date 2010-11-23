@@ -42,3 +42,15 @@ class HTTPMETHOD:
 class NULLCONNECTION:
     HEAD    = "HEAD"
     RANGE   = "Range"
+
+class HASH:
+    MYSQL        = r'(?i)\A\*[0-9a-f]{40}\Z'
+    MYSQL_OLD    = r'(?i)\A[0-9a-f]{16}\Z'
+    POSTGRES     = r'(?i)\Amd5[0-9a-f]{32}\Z'
+    MSSQL        = r'(?i)\A0x0100[0-9a-f]{8}[0-9a-f]{40}\Z'
+    MSSQL_OLD    = r'(?i)\A0x0100[0-9a-f]{8}[0-9a-f]{80}\Z'
+    ORACLE       = r'(?i)\As:[0-9a-f]{60}\Z'
+    ORACLE_OLD   = r'(?i)\A[0-9a-f]{16}\Z'
+    MD5_GENERIC  = r'(?i)\A[0-9a-f]{32}\Z'
+    SHA1_GENERIC = r'(?i)\A[0-9a-f]{40}\Z'
+    __all__      = (MYSQL, MYSQL_OLD, POSTGRES, MSSQL, MSSQL_OLD, ORACLE, ORACLE_OLD, MD5_GENERIC, SHA1_GENERIC)

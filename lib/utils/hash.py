@@ -7,13 +7,26 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
+import time
+
 from hashlib import md5
 from hashlib import sha1
+from zipfile import ZipFile
 
 from extra.pydes.pyDes import des
 from extra.pydes.pyDes import CBC
+from lib.core.common import conf
+from lib.core.common import dataToStdout
+from lib.core.common import getFileItems
+from lib.core.common import paths
+from lib.core.common import readInput
 from lib.core.convert import hexdecode
 from lib.core.convert import hexencode
+from lib.core.data import kb
+from lib.core.data import logger
+from lib.core.enums import DBMS
+from lib.core.enums import HASH
 
 def mysql_passwd(password, uppercase=True):
     """
@@ -126,8 +139,8 @@ def oracle_old_passwd(password, username, uppercase=True): # prior to version '1
     >>> oracle_old_passwd(password='tiger', username='scott', uppercase=True)
     'F894844C34402B67'
     """
-
     IV, pad = "\0"*8, "\0"
+    username = unicode.encode(username, conf.dataEncoding) #pyDes has issues with unicode strings
     unistr = "".join("\0%s" % c for c in (username + password).upper())
 
     cipher = des(hexdecode("0123456789ABCDEF"), CBC, IV, pad)
@@ -138,3 +151,115 @@ def oracle_old_passwd(password, username, uppercase=True): # prior to version '1
     retVal = hexencode(encrypted[-8:])
 
     return retVal.upper() if uppercase else retVal.lower()
+
+def md5_generic_passwd(password, uppercase=False):
+    """
+    >>> md5_generic_passwd(password='testpass', uppercase=False)
+    '179ad45c6ce2cb97cf1029e212046e81'
+    """
+
+    retVal = md5(password).hexdigest()
+
+    return retVal.upper() if uppercase else retVal.lower()
+
+def sha1_generic_passwd(password, uppercase=False):
+    """
+    >>> sha1_generic_passwd(password='testpass', uppercase=False)
+    '206c80413b9a96c1312cc346b7d2517b84463edd'
+    """
+
+    retVal = sha1(password).hexdigest()
+
+    return retVal.upper() if uppercase else retVal.lower()
+
+__functions__ = {
+                    HASH.MYSQL: mysql_passwd, HASH.MYSQL_OLD: mysql_old_passwd, HASH.POSTGRES: postgres_passwd,
+                    HASH.MSSQL: mssql_passwd, HASH.MSSQL_OLD: mssql_old_passwd, HASH.ORACLE: oracle_passwd,
+                    HASH.ORACLE_OLD: oracle_old_passwd, HASH.MD5_GENERIC: md5_generic_passwd, HASH.SHA1_GENERIC: sha1_generic_passwd
+                }
+
+def dictionaryAttack():
+    rehash = None
+    attack_info = []
+    results = []
+
+    for (_, hashes) in kb.data.cachedUsersPasswords.items():
+        for hash_ in hashes:
+            if not hash_:
+                continue
+
+            hash_ = hash_.split()[0]
+
+            for regex in HASH.__all__:
+                if re.match(regex, hash_):
+                    rehash = regex
+                    break
+
+    if rehash:
+        for (user, hashes) in kb.data.cachedUsersPasswords.items():
+            for hash_ in hashes:
+                if not hash_:
+                    continue
+
+                hash_ = hash_.split()[0]
+
+                if re.match(rehash, hash_):
+                    hash_ = hash_.lower()
+
+                    if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC) and kb.dbms != DBMS.ORACLE:
+                        attack_info.append([(user, hash_), {}])
+                    elif rehash in (HASH.ORACLE_OLD, HASH.POSTGRES):
+                        attack_info.append([(user, hash_), {'username': user}])
+                    elif rehash in (HASH.ORACLE):
+                        attack_info.append([(user, hash_), {'salt': hash_[-20:]}])
+                    elif rehash in (HASH.MSSQL, HASH.MSSQL_OLD):
+                        attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
+
+        infoMsg = "loading dictionary from: '%s'" % paths.WORDLIST_TXT
+        logger.info(infoMsg)
+        wordlist = getFileItems(paths.WORDLIST_TXT, None, False)
+
+        infoMsg = "running dictionary attack"
+        logger.info(infoMsg)
+
+        length = len(wordlist)
+
+        if rehash in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC) and kb.dbms != DBMS.ORACLE:
+            count = 0
+            for word in wordlist:
+                count += 1
+                current = __functions__[rehash](password = word, uppercase = False)
+                for item in attack_info:
+                    ((user, hash_), _) = item
+
+                    if count % 1117 == 0 or count == length:
+                        status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+
+                    if hash_ == current:
+                        results.append((user, hash_, word))
+                        #dataToStdout("\r[%s] [INFO] found: %s:%s\n" % (time.strftime("%X"), user, word), True)
+                        attack_info.remove(item)
+
+        else:
+            for ((user, hash_), kwargs) in attack_info:
+                count = 0
+                for word in wordlist:
+                    current = __functions__[rehash](password = word, uppercase = False, **kwargs)
+
+                    count += 1
+                    if count % 1117 == 0 or count == length:
+                        status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+
+                    if hash_ == current:
+                        results.append((user, hash_, word))
+                        #dataToStdout("\r[%s] [INFO] found: %s:%s\n" % (time.strftime("%X"), user, word), True)
+                        break
+
+        dataToStdout("\n", True)
+        blank = "    "
+        for (user, hash_, password) in results:
+            for i in xrange(len(kb.data.cachedUsersPasswords[user])):
+                if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
+                    kb.data.cachedUsersPasswords[user][i] += "%s%spassword: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', blank, password)
