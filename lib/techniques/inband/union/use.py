@@ -143,13 +143,13 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                         if count and count.isdigit() and int(count) > 0:
                             stopLimit = int(count)
 
-                            infoMsg  = "the SQL query provided returns "
+                            infoMsg  = "the SQL query used returns "
                             infoMsg += "%d entries" % stopLimit
                             logger.info(infoMsg)
 
                         elif count and not count.isdigit():
                             warnMsg  = "it was not possible to count the number "
-                            warnMsg += "of entries for the SQL query provided. "
+                            warnMsg += "of entries for the used SQL query. "
                             warnMsg += "sqlmap will assume that it returns only "
                             warnMsg += "one entry"
                             logger.warn(warnMsg)
@@ -157,14 +157,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                             stopLimit = 1
 
                         elif ( not count or int(count) == 0 ):
-                            warnMsg  = "the SQL query provided does not "
+                            warnMsg  = "the SQL query used does not "
                             warnMsg += "return any output"
                             logger.warn(warnMsg)
 
                             return
 
                     elif ( not count or int(count) == 0 ) and ( not stopLimit or stopLimit == 0 ):
-                        warnMsg  = "the SQL query provided does not "
+                        warnMsg  = "the SQL query used does not "
                         warnMsg += "return any output"
                         logger.warn(warnMsg)
 
