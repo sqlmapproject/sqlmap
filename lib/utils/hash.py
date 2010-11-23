@@ -290,5 +290,6 @@ def dictionaryAttack():
                 if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
                     kb.data.cachedUsersPasswords[user][i] += "%s%spassword: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', blank, password)
     else:
-        errMsg = "hash format unrecognized"
-        logger.error(errMsg)
+        warnMsg  = "unknown hash format. "
+        warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+        logger.warn(warnMsg)
