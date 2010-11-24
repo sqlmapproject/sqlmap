@@ -310,6 +310,7 @@ class Connect:
 
         if conf.parseErrors:
             msg = extractErrorMessage(page)
+
             if msg:
                 logger.info("parsed error message: '%s'" % msg)
 

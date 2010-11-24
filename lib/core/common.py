@@ -1541,6 +1541,7 @@ def extractErrorMessage(page):
     if isinstance(page, basestring):
         for regex in (r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s+(?P<result>.+?)<br\s*/?\s*>", r"<li>Error Type:<br>(?P<result>.+?)</li>"):
             match = re.search(regex, page, re.DOTALL | re.IGNORECASE)
+
             if match:
                 retVal = htmlunescape(match.group("result")).replace("<br>", "\n").strip()
                 break
