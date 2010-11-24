@@ -1424,7 +1424,7 @@ def goGoodSamaritan(prevValue, originalCharset):
     else:
         return None, None, None, originalCharset
 
-def getCompiledRegex(regex, *args):
+def getCompiledRegex(regex, flags=0):
     """
     Returns compiled regular expression and stores it in cache for further
     usage
@@ -1432,11 +1432,11 @@ def getCompiledRegex(regex, *args):
     <_sre.SRE_Pattern object at...
     """
 
-    if (regex, args) in kb.cache.regex:
-        return kb.cache.regex[(regex, args)]
+    if (regex, flags) in kb.cache.regex:
+        return kb.cache.regex[(regex, flags)]
     else:
-        retVal = re.compile(regex, *args)
-        kb.cache.regex[(regex, args)] = retVal
+        retVal = re.compile(regex, flags)
+        kb.cache.regex[(regex, flags)] = retVal
         return retVal
 
 def getPartRun():
@@ -1628,11 +1628,11 @@ def getPublicTypeMembers(type_):
 
     return retVal
 
-def extractRegexResult(regex, content):
+def extractRegexResult(regex, content, flags=0):
     retVal = None
 
     if regex and content and '?P<result>' in regex:
-        match = re.search(regex, content)
+        match = re.search(regex, content, flags)
         if match:
             retVal = match.group("result")
 

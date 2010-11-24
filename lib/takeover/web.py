@@ -85,9 +85,8 @@ class Web:
                               }
 
             if self.webApi == "aspx":
-                page = Request.getPage(url=self.webStagerUrl, content=True, raise404=False)
-                multipartParams['__EVENTVALIDATION'] = extractRegexResult(r"__EVENTVALIDATION[^>]+value=\"(?P<result>[^\"]+)\"", page[0])
-                multipartParams['__VIEWSTATE'] = extractRegexResult(r"__VIEWSTATE[^>]+value=\"(?P<result>[^\"]+)\"", page[0])
+                multipartParams['__EVENTVALIDATION'] = kb.data.__EVENTVALIDATION
+                multipartParams['__VIEWSTATE'] = kb.data.__VIEWSTATE
 
             page = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
@@ -211,6 +210,10 @@ class Web:
                 warnMsg += "on '%s' but not dynamically interpreted ('%s')" % (directory, self.webStagerUrl)
                 logger.warn(warnMsg)
                 continue
+
+            elif self.webApi == "aspx":
+                kb.data.__EVENTVALIDATION = extractRegexResult(r"__EVENTVALIDATION[^>]+value=\"(?P<result>[^\"]+)\"", uplPage, re.I)
+                kb.data.__VIEWSTATE = extractRegexResult(r"__VIEWSTATE[^>]+value=\"(?P<result>[^\"]+)\"", uplPage, re.I)
 
             infoMsg  = "the file stager has been successfully uploaded "
             infoMsg += "on '%s' ('%s')" % (directory, self.webStagerUrl)
