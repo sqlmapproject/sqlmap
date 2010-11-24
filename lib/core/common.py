@@ -1626,3 +1626,13 @@ def getPublicTypeMembers(type_):
             retVal.append((name, value))
 
     return retVal
+
+def extractRegexResult(regex, content):
+    retVal = None
+
+    if regex and content and '?P<result>' in regex:
+        match = re.search(regex, content)
+        if match:
+            retVal = match.group("result")
+
+    return retVal

@@ -15,6 +15,7 @@ import re
 from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import decloakToNamedTemporaryFile
+from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
 from lib.core.common import ntToPosixSlashes
@@ -82,6 +83,11 @@ class Web:
                                 "file":      stream,
                                 "uploadDir": directory,
                               }
+
+            if self.webApi == "aspx":
+                page = Request.getPage(url=self.webStagerUrl, content=True, raise404=False)
+                multipartParams['__EVENTVALIDATION'] = extractRegexResult(r"__EVENTVALIDATION[^>]+value=\"(?P<result>[^\"]+)\"", page[0])
+                multipartParams['__VIEWSTATE'] = extractRegexResult(r"__VIEWSTATE[^>]+value=\"(?P<result>[^\"]+)\"", page[0])
 
             page = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
