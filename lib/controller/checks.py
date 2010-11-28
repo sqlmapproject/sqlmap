@@ -306,7 +306,10 @@ def checkSqlInjection(place, parameter, value):
 
                 break
 
-    return injection
+    if injection.place is not None and injection.parameter is not None:
+        return injection
+    else:
+        return None
 
 def heuristicCheckSqlInjection(place, parameter, value):
     if kb.nullConnection:

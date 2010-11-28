@@ -126,22 +126,23 @@ def __selectInjection():
         kb.injection = kb.injections[index]
 
 def __formatInjection(inj):
-    header = "Place: %s\n" % inj.place
-    header += "Parameter: %s\n" % inj.parameter
-    data = ""
+    data = "Place: %s\n" % inj.place
+    data += "Parameter: %s\n" % inj.parameter
 
     for stype, sdata in inj.data.items():
-        data += "Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
-        data += "Payload: %s\n\n" % sdata[3]
+        data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
+        data += "    Payload: %s\n\n" % sdata[3]
 
-    return header, data
+    return data
 
 def __showInjections():
-    dataToStdout("sqlmap identified the following injection points:\n")
+    header = "sqlmap identified the following injection points"
+    data = ""
 
     for inj in kb.injections:
-        header, data = __formatInjection(inj)
-        dumper.technic(header, data)
+        data += __formatInjection(inj)
+
+    dumper.technic(header, data)
 
 def start():
     """
@@ -318,9 +319,6 @@ def start():
                     for parameter, value in paramDict.items():
                         testSqlInj = True
 
-                        # TODO: with the new detection engine, review this
-                        # part. Perhaps dynamicity test will not be of any
-                        # use
                         paramKey = (conf.hostname, conf.path, place, parameter)
 
                         if paramKey in kb.testedParams:
@@ -337,7 +335,6 @@ def start():
                         elif not checkDynParam(place, parameter, value):
                             warnMsg = "%s parameter '%s' is not dynamic" % (place, parameter)
                             logger.warn(warnMsg)
-                            testSqlInj = False
 
                         else:
                             logMsg = "%s parameter '%s' is dynamic" % (place, parameter)

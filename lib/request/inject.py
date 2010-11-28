@@ -28,6 +28,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -346,7 +347,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
 
     if conf.direct:
         value = direct(expression)
-    else:
+    elif kb.booleanTest or kb.errorTest or kb.unionTest:
         expression = cleanQuery(expression)
         expression = expandAsteriskForColumns(expression)
         value      = None
@@ -376,7 +377,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
         kb.unionFalseCond   = False
         kb.unionNegative    = False
 
-        if blind and not value:
+        if blind and kb.booleanTest and not value:
             value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
         kb.unionFalseCond = oldParamFalseCond
@@ -384,6 +385,10 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
 
         if value and isinstance(value, basestring):
             value = value.strip()
+    else:
+        errMsg = "none of the injection types identified can be "
+        errMsg += "leveraged to retrieve queries output"
+        raise sqlmapNotVulnerableException, errMsg
 
     if suppressOutput:
         conf.verbose = popValue()

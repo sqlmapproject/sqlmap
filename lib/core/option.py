@@ -1129,6 +1129,7 @@ def __setKnowledgeBaseAttributes():
     kb.errorTest       = None
     kb.stackedTest     = None
     kb.timeTest        = None
+    kb.unionTest       = None
 
     # Basic back-end DBMS fingerprint
     kb.dbms            = None
@@ -1180,7 +1181,6 @@ def __setKnowledgeBaseAttributes():
     kb.unionPosition   = None
     kb.unionNegative   = False
     kb.unionFalseCond  = False
-    kb.unionTest       = None
     kb.userAgents      = None
     kb.valueStack      = []
 

@@ -63,15 +63,23 @@ def setHandler():
                 ]
 
     if kb.htmlFp:
+        inferencedDbms = kb.htmlFp[-1]
+    elif hasattr(kb.injection, "dbms"):
+        inferencedDbms = kb.injection.dbms
+    else:
+        inferencedDbms = None
+
+    if inferencedDbms is not None:
         for i in xrange(len(dbmsMap)):
             dbmsAliases, _, _ = dbmsMap[i]
-            if kb.htmlFp[-1].lower() in dbmsAliases:
+
+            if inferencedDbms.lower() in dbmsAliases:
                 if i > 0:
                     pushValue(dbmsMap[i])
                     dbmsMap.remove(dbmsMap[i])
                     dbmsMap.insert(0, popValue())
-                break
 
+                break
 
     for dbmsAliases, dbmsMap, dbmsConn in dbmsMap:
         if conf.dbms and conf.dbms not in dbmsAliases:

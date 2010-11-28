@@ -89,7 +89,7 @@ class Dump:
         if elements:
             self.__write("")
 
-    def technic(self,header,data):
+    def technic(self, header, data):
         self.string(header, data)
 
     def banner(self,data):
