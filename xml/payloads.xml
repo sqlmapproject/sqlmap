@@ -482,7 +482,6 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
         </details>
     </test>
 
@@ -574,7 +573,6 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
         </details>
     </test>
 
@@ -668,7 +666,6 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
         </details>
     </test>
 
@@ -749,7 +746,6 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
         </details>
     </test>
 
@@ -823,7 +819,6 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
         </details>
     </test>
 
@@ -974,7 +969,6 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
         </details>
     </test>
 

@@ -121,7 +121,7 @@ def __selectInjection():
             raise sqlmapUserQuitException
         else:
             errMsg = "invalid choice"
-            raise sqlmapValueException, errMsg            
+            raise sqlmapValueException, errMsg
 
         kb.injection = kb.injections[index]
 

@@ -66,12 +66,7 @@ def unescape(string, dbms):
                   "Sybase": Sybase.unescape
                 }
 
-    if isinstance(dbms, list):
-        dbmsunescaper = unescaper[dbms[0]]
-    else:
-        dbmsunescaper = unescaper[dbms]
-
-    return dbmsunescaper(string)
+    return unescaper[dbms](string)
 
 def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to
