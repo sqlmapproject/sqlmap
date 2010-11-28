@@ -667,6 +667,7 @@ def setPaths():
     paths.WORDLIST               = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
     paths.PHPIDS_RULES_XML       = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
     paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
+    paths.PAYLOADS_XML           = os.path.join(paths.SQLMAP_XML_PATH, "payloads.xml")
     paths.INJECTIONS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
     paths.LIVE_TESTS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
     paths.QUERIES_XML            = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
@@ -894,7 +895,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 
         if partial or not condition:
             logOutput = "".join(["%s%s%s" % (DUMP_START_MARKER, replaceNewlineTabs(value), DUMP_STOP_MARKER) for value in output])
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, logOutput))
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, logOutput))
 
         if sort:
             output = set(output)
@@ -1295,17 +1296,6 @@ def calculateDeltaSeconds(start, epsilon=0.05):
     error set by epsilon parameter)
     """
     return int(time.time() - start + epsilon)
-
-def getInjectionCase(name):
-    retVal = None
-
-    for case in kb.injections.root.case:
-        if case.name == name:
-            retVal = case
-
-            break
-
-    return retVal
 
 def initCommonOutputs():
     kb.commonOutputs = {}

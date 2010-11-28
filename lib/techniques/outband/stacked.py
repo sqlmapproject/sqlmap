@@ -26,7 +26,7 @@ def stackedTest():
         return kb.stackedTest
 
     infoMsg  = "testing stacked queries sql injection on parameter "
-    infoMsg += "'%s'" % kb.injParameter
+    infoMsg += "'%s'" % kb.injection.parameter
     logger.info(infoMsg)
 
     query      = getDelayQuery()
@@ -36,13 +36,13 @@ def stackedTest():
 
     if duration >= conf.timeSec:
         infoMsg  = "the target url is affected by a stacked queries "
-        infoMsg += "sql injection on parameter '%s'" % kb.injParameter
+        infoMsg += "sql injection on parameter '%s'" % kb.injection.parameter
         logger.info(infoMsg)
 
         kb.stackedTest = agent.removePayloadDelimiters(payload, False)
     else:
         warnMsg  = "the target url is not affected by a stacked queries "
-        warnMsg += "sql injection on parameter '%s'" % kb.injParameter
+        warnMsg += "sql injection on parameter '%s'" % kb.injection.parameter
         logger.warn(warnMsg)
 
         kb.stackedTest = False

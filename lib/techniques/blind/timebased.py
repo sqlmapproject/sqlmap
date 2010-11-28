@@ -23,7 +23,7 @@ def timeTest():
         return kb.timeTest
 
     infoMsg  = "testing time-based blind sql injection on parameter "
-    infoMsg += "'%s' with %s condition syntax" % (kb.injParameter, conf.logic)
+    infoMsg += "'%s' with %s condition syntax" % (kb.injection.parameter, conf.logic)
     logger.info(infoMsg)
 
     timeQuery = getDelayQuery(andCond=True)
@@ -37,18 +37,18 @@ def timeTest():
     if duration >= conf.timeSec:
         infoMsg  = "the target url is affected by a time-based blind "
         infoMsg += "sql injection with AND condition syntax on parameter "
-        infoMsg += "'%s'" % kb.injParameter
+        infoMsg += "'%s'" % kb.injection.parameter
         logger.info(infoMsg)
 
         kb.timeTest = agent.removePayloadDelimiters(payload, False)
     else:
         warnMsg  = "the target url is not affected by a time-based blind "
         warnMsg += "sql injection with AND condition syntax on parameter "
-        warnMsg += "'%s'" % kb.injParameter
+        warnMsg += "'%s'" % kb.injection.parameter
         logger.warn(warnMsg)
 
         infoMsg  = "testing time-based blind sql injection on parameter "
-        infoMsg += "'%s' with stacked queries syntax" % kb.injParameter
+        infoMsg += "'%s' with stacked queries syntax" % kb.injection.parameter
         logger.info(infoMsg)
 
         timeQuery  = getDelayQuery(andCond=True)
@@ -59,14 +59,14 @@ def timeTest():
         if duration >= conf.timeSec:
             infoMsg  = "the target url is affected by a time-based blind sql "
             infoMsg += "injection with stacked queries syntax on parameter "
-            infoMsg += "'%s'" % kb.injParameter
+            infoMsg += "'%s'" % kb.injection.parameter
             logger.info(infoMsg)
 
             kb.timeTest = agent.removePayloadDelimiters(payload, False)
         else:
             warnMsg  = "the target url is not affected by a time-based blind "
             warnMsg += "sql injection with stacked queries syntax on parameter "
-            warnMsg += "'%s'" % kb.injParameter
+            warnMsg += "'%s'" % kb.injection.parameter
             logger.warn(warnMsg)
 
             kb.timeTest = False

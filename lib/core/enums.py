@@ -17,14 +17,14 @@ class PRIORITY:
     HIGHEST = 100
 
 class DBMS:
-    MYSQL       = "MySQL"
-    ORACLE      = "Oracle"
-    POSTGRESQL  = "PostgreSQL"
-    MSSQL       = "Microsoft SQL Server"
-    SQLITE      = "SQLite"
     ACCESS      = "Microsoft Access"
     FIREBIRD    = "Firebird"
     MAXDB       = "SAP MaxDB"
+    MSSQL       = "Microsoft SQL Server"
+    MYSQL       = "MySQL"
+    ORACLE      = "Oracle"
+    POSTGRESQL  = "PostgreSQL"
+    SQLITE      = "SQLite"
     SYBASE      = "Sybase"
 
 class PLACE:
@@ -53,3 +53,39 @@ class HASH:
     ORACLE_OLD   = r'(?i)\A[01-9a-f]{16}\Z'
     MD5_GENERIC  = r'(?i)\A[0-9a-f]{32}\Z'
     SHA1_GENERIC = r'(?i)\A[0-9a-f]{40}\Z'
+
+class PAYLOAD:
+    SQLINJECTION = {
+                     1: "boolean-based blind",
+                     2: "error-based",
+                     3: "UNION query",
+                     4: "stacked queries",
+                     5: "AND/OR time-based blind"
+                   }
+
+    PARAMETER = {
+                  1: "Unescaped numeric",
+                  2: "Single quoted string",
+                  3: "LIKE single quoted string",
+                  4: "Double quoted string",
+                  5: "LIKE double quoted string"
+                }
+
+    RISK = {
+             0: "No risk",
+             1: "Low risk",
+             2: "Medium risk",
+             3: "High risk"
+           }
+
+    CLAUSE = {
+               0: "Always",
+               1: "WHERE",
+               2: "GROUP BY",
+               3: "ORDER BY",
+               4: "LIMIT",
+               5: "OFFSET",
+               6: "TOP",
+               7: "Table name",
+               8: "Column name"
+             }

@@ -157,7 +157,7 @@ def unionTest():
         technique = "char (%s) bruteforcing" % conf.uChar
 
     infoMsg  = "testing inband sql injection on parameter "
-    infoMsg += "'%s' with %s technique" % (kb.injParameter, technique)
+    infoMsg += "'%s' with %s technique" % (kb.injection.parameter, technique)
     logger.info(infoMsg)
 
     validPayload = None
@@ -174,12 +174,12 @@ def unionTest():
     if isinstance(kb.unionPosition, int):
         infoMsg  = "the target url is affected by an exploitable "
         infoMsg += "inband sql injection vulnerability "
-        infoMsg += "on parameter '%s' with %d columns" % (kb.injParameter, kb.unionCount)
+        infoMsg += "on parameter '%s' with %d columns" % (kb.injection.parameter, kb.unionCount)
         logger.info(infoMsg)
     else:
         infoMsg  = "the target url is not affected by an exploitable "
         infoMsg += "inband sql injection vulnerability "
-        infoMsg += "on parameter '%s'" % kb.injParameter
+        infoMsg += "on parameter '%s'" % kb.injection.parameter
         logger.info(infoMsg)
 
     validPayload = agent.removePayloadDelimiters(validPayload, False)

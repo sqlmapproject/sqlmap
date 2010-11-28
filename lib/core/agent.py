@@ -12,7 +12,6 @@ import re
 from xml.etree import ElementTree as ET
 
 from lib.core.common import getCompiledRegex
-from lib.core.common import getInjectionCase
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import urlencode
@@ -23,6 +22,8 @@ from lib.core.datatype import advancedDict
 from lib.core.enums import DBMS
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import ERROR_START_CHAR
+from lib.core.settings import ERROR_END_CHAR
 from lib.core.settings import PAYLOAD_DELIMITER
 
 class Agent:
@@ -70,28 +71,28 @@ class Agent:
             falseValue = " AND %d=%d" % (randInt, randInt + 1)
 
         # After identifing the injectable parameter
-        if kb.injPlace == PLACE.UA:
-            retValue = kb.injParameter.replace(kb.injParameter,
-                                               self.addPayloadDelimiters("%s%s" % (negValue, kb.injParameter + falseValue + newValue)))
-        elif kb.injParameter:
-            paramString = conf.parameters[kb.injPlace]
-            paramDict = conf.paramDict[kb.injPlace]
-            value = paramDict[kb.injParameter]
+        if kb.injection.place == PLACE.UA:
+            retValue = kb.injection.parameter.replace(kb.injection.parameter,
+                                               self.addPayloadDelimiters("%s%s" % (negValue, kb.injection.parameter + falseValue + newValue)))
+        elif kb.injection.parameter:
+            paramString = conf.parameters[kb.injection.place]
+            paramDict = conf.paramDict[kb.injection.place]
+            value = paramDict[kb.injection.parameter]
 
-            if "POSTxml" in conf.paramDict and kb.injPlace == PLACE.POST:
+            if "POSTxml" in conf.paramDict and kb.injection.place == PLACE.POST:
                 root = ET.XML(paramString)
-                iterator = root.getiterator(kb.injParameter)
+                iterator = root.getiterator(kb.injection.parameter)
 
                 for child in iterator:
                     child.text = self.addPayloadDelimiters(negValue + value + falseValue + newValue)
 
                 retValue = ET.tostring(root)
-            elif kb.injPlace == PLACE.URI:
+            elif kb.injection.place == PLACE.URI:
                 retValue = paramString.replace("*",
                                                self.addPayloadDelimiters("%s%s" % (negValue, falseValue + newValue)))
             else:
-                retValue = paramString.replace("%s=%s" % (kb.injParameter, value),
-                                               "%s=%s" % (kb.injParameter, self.addPayloadDelimiters(negValue + value + falseValue + newValue)))
+                retValue = paramString.replace("%s=%s" % (kb.injection.parameter, value),
+                                               "%s=%s" % (kb.injection.parameter, self.addPayloadDelimiters(negValue + value + falseValue + newValue)))
 
         # Before identifing the injectable parameter
         elif parameter == PLACE.UA:
@@ -125,6 +126,20 @@ class Agent:
 
         return payload
 
+    def cleanupPayload(self, payload):
+        randInt = randomInt()
+        randInt1 = randomInt()
+        randStr = randomStr()
+
+        payload = payload.replace("[RANDNUM]", str(randInt))
+        payload = payload.replace("[RANDNUM1]", str(randInt1))
+        payload = payload.replace("[RANDSTR]", randStr)
+        payload = payload.replace("[ERROR_START_CHAR]", ERROR_START_CHAR)
+        payload = payload.replace("[ERROR_END_CHAR]", ERROR_END_CHAR)
+        payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+
+        return payload
+
     def prefixQuery(self, string):
         """
         This method defines how the input string has to be escaped
@@ -135,24 +150,9 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
-        logic = conf.logic
-        query = str()
-        case = getInjectionCase(kb.injType)
-
-        if kb.parenthesis is not None:
-            parenthesis = kb.parenthesis
-        else:
-            raise sqlmapNoneDataException, "unable to get the number of parenthesis"
-
-        if case is None:
-            raise sqlmapNoneDataException, "unsupported injection type"
-
-        if conf.prefix:
-            query = "%s " % conf.prefix.strip()
-        else:
-            query = case.usage.prefix.format % eval(case.usage.prefix.params)
-
+        query = "%s " % kb.injection.prefix
         query += string
+        query = self.cleanupPayload(query)
 
         return query
 
@@ -165,27 +165,11 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
-        logic = conf.logic
-        case = getInjectionCase(kb.injType)
-
-        if case is None:
-            raise sqlmapNoneDataException, "unsupported injection type"
-
-        randInt = randomInt()
-        randStr = randomStr()
-
-        if kb.parenthesis is not None:
-            parenthesis = kb.parenthesis
-        else:
-            raise sqlmapNoneDataException, "unable to get the number of parenthesis"
-
-        if comment:
+        if comment is not None:
             string += comment
 
-        if conf.suffix:
-            string += " %s" % conf.suffix
-        else:
-            string += case.usage.suffix.format % eval(case.usage.suffix.params)
+        string += " %s" % kb.injection.suffix
+        string = self.cleanupPayload(string)
 
         return string
 

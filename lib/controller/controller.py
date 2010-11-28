@@ -18,6 +18,8 @@ from lib.controller.checks import checkString
 from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.controller.checks import checkNullConnection
+from lib.core.agent import agent
+from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
@@ -25,57 +27,121 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.dump import dumper
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapSilentQuitException
+from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
+from lib.core.session import setBooleanBased
+from lib.core.session import setError
 from lib.core.session import setInjection
 from lib.core.session import setMatchRatio
+from lib.core.session import setStacked
+from lib.core.session import setTimeBased
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
-from lib.utils.parenthesis import checkForParenthesis
 
-def __selectInjection(injData):
+def __saveToSessionFile():
+    for inj in kb.injections:
+        place = inj.place
+        parameter = inj.parameter
+
+        for stype, sdata in inj.data.items():
+            payload = sdata[3]
+
+            if stype == 1:
+                kb.booleanTest = payload
+                setBooleanBased(place, parameter, payload)
+            elif stype == 2:
+                kb.errorTest = payload
+                setError(place, parameter, payload)
+            elif stype == 4:
+                kb.stackedTest = payload
+                setStacked(place, parameter, payload)
+            elif stype == 5:
+                kb.timeTest = payload
+                setTimeBased(place, parameter, payload)
+
+        setInjection(inj)
+
+def __selectInjection():
     """
     Selection function for injection place, parameters and type.
     """
 
-    message  = "there were multiple injection points, please select the "
-    message += "one to use to go ahead:\n"
+    # TODO: when resume from session file, feed kb.injections and call
+    # __selectInjection()
+    points = []
 
-    for i in xrange(0, len(injData)):
-        injPlace     = injData[i][0]
-        injParameter = injData[i][1]
-        injType      = injData[i][2]
+    for i in xrange(0, len(kb.injections)):
+        place = kb.injections[i].place
+        parameter = kb.injections[i].parameter
+        ptype = kb.injections[i].ptype
 
-        message += "[%d] place: %s, parameter: " % (i, injPlace)
-        message += "%s, type: %s" % (injParameter, injType)
+        point = (place, parameter, ptype)
 
-        if i == 0:
-            message += " (default)"
+        if point not in points:
+            points.append(point)
 
-        message += "\n"
+    if len(points) == 1:
+        kb.injection = kb.injections[0]
+    elif len(points) > 1:
+        message = "there were multiple injection points, please select "
+        message += "the one to use for following injections:\n"
 
-    message += "[q] Quit"
-    select   = readInput(message, default="0")
+        points = []
 
-    if not select:
-        index = 0
+        for i in xrange(0, len(kb.injections)):
+            place = kb.injections[i].place
+            parameter = kb.injections[i].parameter
+            ptype = kb.injections[i].ptype
+            point = (place, parameter, ptype)
 
-    elif select.isdigit() and int(select) < len(injData) and int(select) >= 0:
-        index = int(select)
+            if point not in points:
+                points.append(point)
 
-    elif select[0] in ( "Q", "q" ):
-        return "Quit"
+                message += "[%d] place: %s, parameter: " % (i, place)
+                message += "%s, type: %s" % (parameter, PAYLOAD.PARAMETER[ptype])
 
-    else:
-        warnMsg = "invalid choice, retry"
-        logger.warn(warnMsg)
-        __selectInjection(injData)
+                if i == 0:
+                    message += " (default)"
 
-    return injData[index]
+                message += "\n"
+
+        message += "[q] Quit"
+        select = readInput(message, default="0")
+
+        if select.isdigit() and int(select) < len(kb.injections) and int(select) >= 0:
+            index = int(select)
+        elif select[0] in ( "Q", "q" ):
+            raise sqlmapUserQuitException
+        else:
+            errMsg = "invalid choice"
+            raise sqlmapValueException, errMsg            
+
+        kb.injection = kb.injections[index]
+
+def __formatInjection(inj):
+    header = "Place: %s\n" % inj.place
+    header += "Parameter: %s\n" % inj.parameter
+    data = ""
+
+    for stype, sdata in inj.data.items():
+        data += "Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
+        data += "Payload: %s\n\n" % sdata[3]
+
+    return header, data
+
+def __showInjections():
+    dataToStdout("sqlmap identified the following injection points:\n")
+
+    for inj in kb.injections:
+        header, data = __formatInjection(inj)
+        dumper.technic(header, data)
 
 def start():
     """
@@ -230,7 +296,7 @@ def start():
                             # TODO: consider the following line in __setRequestParams()
                             __testableParameters = True
 
-            if not kb.injPlace or not kb.injParameter or not kb.injType:
+            if not kb.injection.place or not kb.injection.parameter:
                 if not conf.string and not conf.regexp and not conf.eRegexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
@@ -251,6 +317,10 @@ def start():
                     paramDict = conf.paramDict[place]
                     for parameter, value in paramDict.items():
                         testSqlInj = True
+
+                        # TODO: with the new detection engine, review this
+                        # part. Perhaps dynamicity test will not be of any
+                        # use
                         paramKey = (conf.hostname, conf.path, place, parameter)
 
                         if paramKey in kb.testedParams:
@@ -276,48 +346,33 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
+                            # TODO: with the new detection engine, review this
+                            # part. This will be moved to payloads.xml as well
                             heuristicCheckSqlInjection(place, parameter, value)
 
-                            for parenthesis in range(0, 4):
-                                logMsg  = "testing sql injection on %s " % place
-                                logMsg += "parameter '%s' with " % parameter
-                                logMsg += "%d parenthesis" % parenthesis
-                                logger.info(logMsg)
+                            logMsg  = "testing sql injection on %s " % place
+                            logMsg += "parameter '%s'" % parameter
+                            logger.info(logMsg)
 
-                                injType = checkSqlInjection(place, parameter, value, parenthesis)
+                            injection = checkSqlInjection(place, parameter, value)
 
-                                if injType:
-                                    injData.append((place, parameter, injType))
-                                    break
-
-                                else:
-                                    infoMsg  = "%s parameter '%s' is not " % (place, parameter)
-                                    infoMsg += "injectable with %d parenthesis" % parenthesis
-                                    logger.info(infoMsg)
-
-                            if not injData:
+                            if injection:
+                                kb.injections.append(injection)
+                            else:
                                 warnMsg  = "%s parameter '%s' is not " % (place, parameter)
                                 warnMsg += "injectable"
                                 logger.warn(warnMsg)
 
-            if not kb.injPlace or not kb.injParameter or not kb.injType:
-                if len(injData) == 1:
-                    injDataSelected = injData[0]
+            if len(kb.injections) == 0 and not kb.injection.place and not kb.injection.parameter:
+                errMsg = "all parameters are not injectable, try "
+                errMsg += "a higher --level"
+                raise sqlmapNotVulnerableException, errMsg
+            else:
+                __saveToSessionFile()
+                __showInjections()
+                __selectInjection()
 
-                elif len(injData) > 1:
-                    injDataSelected = __selectInjection(injData)
-
-                else:
-                    raise sqlmapNotVulnerableException, "all parameters are not injectable"
-
-                if injDataSelected == "Quit":
-                    return
-
-                else:
-                    kb.injPlace, kb.injParameter, kb.injType = injDataSelected
-                    setInjection()
-
-            if kb.injPlace and kb.injParameter and kb.injType:
+            if kb.injection.place and kb.injection.parameter:
                 if conf.multipleTargets:
                     message = "do you want to exploit this SQL injection? [Y/n] "
                     exploit = readInput(message, default="Y")
@@ -328,10 +383,9 @@ def start():
 
                 if condition:
                     if kb.paramMatchRatio:
-                        conf.matchRatio = kb.paramMatchRatio[(kb.injPlace, kb.injParameter)]
+                        conf.matchRatio = kb.paramMatchRatio[(kb.injection.place, kb.injection.parameter)]
                         setMatchRatio()
 
-                    checkForParenthesis()
                     action()
 
         except KeyboardInterrupt:

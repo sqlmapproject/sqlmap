@@ -27,7 +27,7 @@ def errorTest():
         return kb.errorTest
 
     infoMsg  = "testing error-based sql injection on parameter "
-    infoMsg += "'%s' with %s condition syntax" % (kb.injParameter, conf.logic)
+    infoMsg += "'%s' with %s condition syntax" % (kb.injection.parameter, conf.logic)
     logger.info(infoMsg)
 
     randInt = getUnicode(randomInt(1))
@@ -36,13 +36,13 @@ def errorTest():
 
     if result:
         infoMsg  = "the target url is affected by an error-based sql "
-        infoMsg += "injection on parameter '%s'" % kb.injParameter
+        infoMsg += "injection on parameter '%s'" % kb.injection.parameter
         logger.info(infoMsg)
 
         kb.errorTest = agent.removePayloadDelimiters(usedPayload, False)
     else:
         warnMsg  = "the target url is not affected by an error-based sql "
-        warnMsg += "injection on parameter '%s'" % kb.injParameter
+        warnMsg += "injection on parameter '%s'" % kb.injection.parameter
         logger.warn(warnMsg)
 
         kb.errorTest = False

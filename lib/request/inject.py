@@ -45,7 +45,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
     else:
         length = None
 
-    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression))
+    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression))
 
     count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar)
 
@@ -353,7 +353,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
 
         expression = expression.replace("DISTINCT ", "")
 
-        if error and conf.errorTest:
+        if error and kb.errorTest:
             value = goError(expression)
 
             if not value:
@@ -435,7 +435,7 @@ def goError(expression, suppressOutput=False, returnPayload=False):
         result = errorUse(expression, returnPayload)
 
         if not returnPayload:
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, replaceNewlineTabs(result)))
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(result)))
 
     if suppressOutput:
         conf.verbose = popValue()

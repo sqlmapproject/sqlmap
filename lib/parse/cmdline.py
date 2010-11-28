@@ -183,6 +183,14 @@ def cmdLineParser():
                                 "HTTP responses when using blind SQL "
                                 "injection technique.")
 
+        detection.add_option("--level", dest="level", default=1, type="int",
+                             help="Level of tests to perform (1-5, "
+                                  "default 1)")
+
+        detection.add_option("--risk", dest="risk", default=1, type="int",
+                             help="Risk of tests to perform (0-3, "
+                                  "default 1)")
+
         detection.add_option("--string", dest="string",
                              help="String to match in page when the "
                                   "query is valid")

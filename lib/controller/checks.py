@@ -15,6 +15,7 @@ from difflib import SequenceMatcher
 
 from lib.core.agent import agent
 from lib.core.common import beep
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -26,8 +27,11 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.datatype import advancedDict
+from lib.core.datatype import injectionDict
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
@@ -35,78 +39,274 @@ from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
+from lib.core.settings import ERROR_SPACE
+from lib.core.settings import ERROR_EMPTY_CHAR
 from lib.request.connect import Connect as Request
+from plugins.dbms.firebird.syntax import Syntax as Firebird
+from plugins.dbms.postgresql.syntax import Syntax as PostgreSQL
+from plugins.dbms.mssqlserver.syntax import Syntax as MSSQLServer
+from plugins.dbms.oracle.syntax import Syntax as Oracle
+from plugins.dbms.mysql.syntax import Syntax as MySQL
+from plugins.dbms.access.syntax import Syntax as Access
+from plugins.dbms.sybase.syntax import Syntax as Sybase
+from plugins.dbms.sqlite.syntax import Syntax as SQLite
+from plugins.dbms.maxdb.syntax import Syntax as MaxDB
 
-def checkSqlInjection(place, parameter, value, parenthesis):
-    """
-    This function checks if the GET, POST, Cookie, User-Agent
-    parameters are affected by a SQL injection vulnerability and
-    identifies the type of SQL injection:
 
-      * Unescaped numeric injection
-      * Single quoted string injection
-      * Double quoted string injection
-    """
+def unescape(string, dbms):
+    unescaper = {
+                  "Access": Access.unescape,
+                  "Firebird": Firebird.unescape,
+                  "MaxDB": MaxDB.unescape,
+                  "Microsoft SQL Server": MSSQLServer.unescape,
+                  "MySQL": MySQL.unescape,
+                  "Oracle": Oracle.unescape,
+                  "PostgreSQL": PostgreSQL.unescape,
+                  "SQLite": SQLite.unescape,
+                  "Sybase": Sybase.unescape
+                }
 
-    logic = conf.logic
-    randInt = randomInt()
-    randStr = randomStr()
-    prefix = ""
-    suffix = ""
-    retVal = None
+    if isinstance(dbms, list):
+        dbmsunescaper = unescaper[dbms[0]]
+    else:
+        dbmsunescaper = unescaper[dbms]
 
-    if conf.prefix or conf.suffix:
-        if conf.prefix:
-            prefix = conf.prefix
+    return dbmsunescaper(string)
 
-        if conf.suffix:
-            suffix = conf.suffix
+def checkSqlInjection(place, parameter, value):
+    # Store here the details about boundaries and payload used to
+    # successfully inject
+    injection = injectionDict()
 
-    for case in kb.injections.root.case:
-        conf.matchRatio = None
+    for test in conf.tests:
+        title = test.title
+        stype = test.stype
+        proceed = True
 
-        positive = case.test.positive
-        negative = case.test.negative
-
-        if not prefix and not suffix and case.name == "custom":
+        # Parse test's <risk>
+        if test.risk > conf.risk:
+            debugMsg = "skipping test '%s' because the risk " % title
+            debugMsg += "is higher than the provided"
+            logger.debug(debugMsg)
             continue
 
-        infoMsg  = "testing %s (%s) injection " % (case.desc, logic)
-        infoMsg += "on %s parameter '%s'" % (place, parameter)
+        # Parse test's <level>
+        if test.level > conf.level:
+            debugMsg = "skipping test '%s' because the level " % title
+            debugMsg += "is higher than the provided"
+            logger.debug(debugMsg)
+            continue
+
+        if "details" in test and "dbms" in test.details:
+            dbms = test.details.dbms
+        else:
+            dbms = None
+
+        # Skip current test if it is the same SQL injection type
+        # already identified by another test
+        if injection.data and stype in injection.data:
+            debugMsg = "skipping test '%s' because " % title
+            debugMsg += "we have already the payload for %s" % PAYLOAD.SQLINJECTION[stype]
+            logger.debug(debugMsg)
+
+            continue
+
+        # Skip DBMS-specific tests if they do not match the DBMS
+        # identified
+        if injection.dbms is not None and injection.dbms != dbms:
+            debugMsg = "skipping test '%s' because " % title
+            debugMsg += "the back-end DBMS is %s" % injection.dbms
+            logger.debug(debugMsg)
+
+            continue
+
+        infoMsg = "testing '%s'" % title
         logger.info(infoMsg)
 
-        payload = agent.payload(place, parameter, value, negative.format % eval(negative.params))
-        _ = Request.queryPage(payload, place)
+        # Parse test's <request>
+        payload = agent.cleanupPayload(test.request.payload)
 
-        payload = agent.payload(place, parameter, value, positive.format % eval(positive.params))
-        trueResult = Request.queryPage(payload, place)
+        if dbms:
+            payload = unescape(payload, dbms)
 
-        if trueResult:
-            infoMsg  = "confirming %s (%s) injection " % (case.desc, logic)
-            infoMsg += "on %s parameter '%s'" % (place, parameter)
-            logger.info(infoMsg)
+        if "comment" in test.request:
+            comment = test.request.comment
+        else:
+            comment = ""
+        testPayload = "%s%s" % (payload, comment)
 
-            payload = agent.payload(place, parameter, value, negative.format % eval(negative.params))
+        if conf.prefix is not None and conf.suffix is not None:
+            boundary = advancedDict()
 
-            randInt = randomInt()
-            randStr = randomStr()
+            boundary.level = 1
+            boundary.clause = [ 0 ]
+            boundary.where = [ 1, 2, 3 ]
+            # TODO: inspect the conf.prefix and conf.suffix to set
+            # proper ptype
+            boundary.ptype = 1
+            boundary.prefix = conf.prefix
+            boundary.suffix = conf.suffix
 
-            falseResult = Request.queryPage(payload, place)
+            conf.boundaries.insert(0, boundary)
 
-            if not falseResult:
-                infoMsg  = "%s parameter '%s' is %s (%s) injectable " % (place, parameter, case.desc, logic)
-                infoMsg += "with %d parenthesis" % parenthesis
-                logger.info(infoMsg)
+        for boundary in conf.boundaries:
+            # Parse boundary's <level>
+            if boundary.level > conf.level:
+                # NOTE: shall we report every single skipped boundary too?
+                continue
 
-                if conf.beep:
-                    beep()
+            # Parse test's <clause> and boundary's <clause>
+            # Skip boundary if it does not match against test's <clause>
+            clauseMatch = False
 
-                retVal = case.name
+            for clauseTest in test.clause:
+                if clauseTest in boundary.clause:
+                    clauseMatch = True
+                    break
+
+            if test.clause != [ 0 ] and boundary.clause != [ 0 ] and not clauseMatch:
+                continue
+
+            # Parse test's <where> and boundary's <where>
+            # Skip boundary if it does not match against test's <where>
+            whereMatch = False
+
+            for where in test.where:
+                if where in boundary.where:
+                    whereMatch = True
+                    break
+
+            if not whereMatch:
+                continue
+
+            # Parse boundary's <prefix>, <suffix> and <ptype>
+            prefix = boundary.prefix if boundary.prefix else ""
+            suffix = boundary.suffix if boundary.suffix else ""
+            ptype = boundary.ptype
+            injectable = False
+
+            # If the previous injections succeeded, we know which prefix,
+            # postfix and parameter type to use for further tests, no
+            # need to cycle through all of the boundaries anymore
+            condBound = (injection.prefix is not None and injection.suffix is not None)
+            condBound &= (injection.prefix != prefix or injection.suffix != suffix)
+            condType = injection.ptype is not None and injection.ptype != ptype
+
+            if condBound or condType:
+                continue
+
+            # For each test's <where>
+            for where in test.where:
+                # The <where> tag defines where to add our injection
+                # string to the parameter under assessment.
+                if where == 1:
+                    origValue = value
+                elif where == 2:
+                    origValue = "-%s" % value
+                elif where == 3:
+                    origValue = ""
+
+                # Forge payload by prepending with boundary's prefix and
+                # appending with boundary's suffix the test's
+                # ' <payload><command> ' string
+                boundPayload = "%s%s %s %s" % (origValue, prefix, testPayload, suffix)
+                boundPayload = boundPayload.strip()
+                boundPayload = agent.cleanupPayload(boundPayload)
+                reqPayload = agent.payload(place, parameter, value, boundPayload)
+
+                # Parse test's <response>
+                # Check wheather or not the payload was successful
+                for method, check in test.response.items():
+                    check = agent.cleanupPayload(check)
+
+                    # In case of boolean-based blind SQL injection
+                    if method == "comparison":
+                        sndPayload = agent.cleanupPayload(test.response.comparison)
+
+                        if dbms:
+                            sndPayload = unescape(sndPayload, dbms)
+
+                        if "comment" in test.response:
+                            sndComment = test.response.comment
+                        else:
+                            sndComment = ""
+
+                        sndPayload = "%s%s" % (sndPayload, sndComment)
+                        boundPayload = "%s%s %s %s" % (origValue, prefix, sndPayload, suffix)
+                        boundPayload = boundPayload.strip()
+                        boundPayload = agent.cleanupPayload(boundPayload)
+                        cmpPayload = agent.payload(place, parameter, value, boundPayload)
+
+                        # Useful to set conf.matchRatio at first
+                        conf.matchRatio = None
+                        _ = Request.queryPage(cmpPayload, place)
+
+                        trueResult = Request.queryPage(reqPayload, place)
+
+                        if trueResult:
+                            falseResult = Request.queryPage(cmpPayload, place)
+
+                            if not falseResult:
+                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                logger.info(infoMsg)
+
+                                kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
+                                injectable = True
+
+                        kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
+
+                    # In case of error-based or UNION query SQL injections
+                    elif method == "grep":
+                        reqBody, _ = Request.queryPage(reqPayload, place, content=True)
+                        match = re.search(check, reqBody, re.DOTALL | re.IGNORECASE)
+
+                        if not match:
+                            continue
+
+                        output = match.group('result')
+
+                        if output:
+                            output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
+
+                        if output == "1":
+                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                            logger.info(infoMsg)
+
+                            injectable = True
+
+                    # In case of time-based blind or stacked queries SQL injections
+                    elif method == "time":
+                        start = time.time()
+                        _ = Request.queryPage(reqPayload, place)
+                        duration = calculateDeltaSeconds(start)
+
+                        if duration >= conf.timeSec:
+                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                            logger.info(infoMsg)
+
+                            injectable = True
+
+            if injectable is True:
+                injection.place = place
+                injection.parameter = parameter
+                injection.ptype = ptype
+                injection.prefix = prefix
+                injection.suffix = suffix
+
+                injection.data[stype] = (title, where, comment, boundPayload)
+
+                if "details" in test:
+                    for detailKey, detailValue in test.details.items():
+                        if detailKey == "dbms" and injection.dbms is None:
+                            injection.dbms = detailValue
+                        elif detailKey == "dbms_version" and injection.dbms_version is None:
+                            injection.dbms_version = detailValue
+                        elif detailKey == "os" and injection.os is None:
+                            injection.os = detailValue
+
                 break
 
-    kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
-
-    return retVal
+    return injection
 
 def heuristicCheckSqlInjection(place, parameter, value):
     if kb.nullConnection:

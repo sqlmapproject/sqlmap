@@ -56,3 +56,21 @@ class advancedDict(dict):
         else:
             self.__setitem__(item, value)
 
+def injectionDict():
+    injection = advancedDict()
+
+    injection.place = None
+    injection.parameter = None
+    injection.ptype = None
+    injection.prefix = None
+    injection.suffix = None
+
+    # data is a dict with stype as key and a tuple as value with
+    # title, where, comment and reqPayload
+    injection.data = {}
+
+    injection.dbms = None
+    injection.dbms_version = None
+    injection.os = None
+
+    return injection

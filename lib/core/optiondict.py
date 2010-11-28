@@ -63,6 +63,8 @@ optDict = {
                              },
 
             "Detection":     {
+                               "level":             "integer",
+                               "risk":              "integer",
                                "string":            "string",
                                "regexp":            "string",
                                "eString":           "string",

@@ -74,7 +74,7 @@ def queryOutputLength(expression, payload):
     if output:
         return 0, output, regExpr
 
-    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], lengthExpr))
+    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], lengthExpr))
 
     start = time.time()
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
@@ -156,7 +156,7 @@ def resume(expression, payload):
             infoMsg += "%s" % resumedValue.split("\n")[0]
             logger.info(infoMsg)
 
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, replaceNewlineTabs(resumedValue)))
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(resumedValue)))
 
             return resumedValue
         elif len(resumedValue) < int(length):
@@ -164,7 +164,7 @@ def resume(expression, payload):
             infoMsg += "%s..." % resumedValue.split("\n")[0]
             logger.info(infoMsg)
 
-            dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injPlace, conf.parameters[kb.injPlace], expression, replaceNewlineTabs(resumedValue)))
+            dataToSessionFile("[%s][%s][%s][%s][%s" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(resumedValue)))
 
             if select:
                 newExpr = expression.replace(regExpr, safeStringFormat(substringQuery, (regExpr, len(resumedValue) + 1, int(length))), 1)

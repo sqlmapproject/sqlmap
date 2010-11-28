@@ -54,7 +54,7 @@ def direct(query, content=True):
         return None
     elif content:
         if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.hostname, kb.injPlace, conf.parameters[kb.injPlace], query, base64pickle(output)))
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.hostname, kb.injection.place, conf.parameters[kb.injection.place], query, base64pickle(output)))
 
         if len(output) == 1:
             if len(output[0]) == 1:

@@ -338,7 +338,7 @@ class Connect:
         toUrlencode = { PLACE.GET: True, PLACE.POST: True, PLACE.COOKIE: conf.cookieUrlencode, PLACE.UA: True, PLACE.URI: False }
 
         if not place:
-            place = kb.injPlace
+            place = kb.injection.place
 
         payload = agent.extractPayload(value)
 
