@@ -21,6 +21,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import showStaticWords
+from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import DynamicContentItem
 from lib.core.data import conf
@@ -435,11 +436,8 @@ def checkDynamicContent(firstPage, secondPage):
             if suffix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
                 continue
 
-            while prefix and prefix[-1].isalnum():
-                prefix = prefix[:-1]
-
-            while suffix and suffix[0].isalnum():
-                suffix = suffix[1:]
+            prefix = trimAlphaNum(prefix)
+            suffix = trimAlphaNum(suffix)
 
             kb.dynamicMarkings.append((re.escape(prefix[-conf.dynMarkLength:]) if prefix else None, re.escape(suffix[:conf.dynMarkLength]) if suffix else None))
 

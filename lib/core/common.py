@@ -1627,3 +1627,15 @@ def extractRegexResult(regex, content, flags=0):
             retVal = match.group("result")
 
     return retVal
+
+def trimAlphaNum(value):
+    """
+    Trims alpha numeric characters from start and ending of a given value
+    """
+    while value and value[-1].isalnum():
+        value = value[:-1]
+
+    while value and value[0].isalnum():
+        value = value[1:]
+
+    return value
