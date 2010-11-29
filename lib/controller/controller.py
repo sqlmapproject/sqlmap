@@ -342,8 +342,6 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
-                            # TODO: with the new detection engine, review this
-                            # part. This will be moved to payloads.xml as well
                             heuristicCheckSqlInjection(place, parameter, value)
 
                             logMsg  = "testing sql injection on %s " % place

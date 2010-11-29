@@ -149,7 +149,7 @@ def checkSqlInjection(place, parameter, value):
             boundary.prefix = conf.prefix
             boundary.suffix = conf.suffix
 
-            if "like" in boundary.suffix.lower():
+            if " like" in boundary.suffix.lower():
                 if "'" in boundary.suffix.lower():
                     boundary.ptype = 3
                 elif '"' in boundary.suffix.lower():
