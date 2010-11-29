@@ -427,6 +427,12 @@ def checkDynamicContent(firstPage, secondPage):
             if suffix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
                 continue
 
+            while prefix and prefix[-1].isalnum():
+                prefix = prefix[:-1]
+
+            while suffix and suffix[0].isalnum():
+                suffix = suffix[1:]
+
             kb.dynamicMarkings.append((re.escape(prefix[-conf.dynMarkLength:]) if prefix else None, re.escape(suffix[:conf.dynMarkLength]) if suffix else None))
 
     if len(kb.dynamicMarkings) > 0:
