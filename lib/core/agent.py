@@ -71,10 +71,10 @@ class Agent:
             falseValue = " AND %d=%d" % (randInt, randInt + 1)
 
         # After identifing the injectable parameter
-        if kb.injection.place == PLACE.UA:
+        if kb.injection.place == PLACE.UA and kb.injection.parameter:
             retValue = kb.injection.parameter.replace(kb.injection.parameter,
-                                               self.addPayloadDelimiters("%s%s" % (negValue, kb.injection.parameter + falseValue + newValue)))
-        elif kb.injection.parameter:
+                                                      self.addPayloadDelimiters("%s%s" % (negValue, kb.injection.parameter + falseValue + newValue)))
+        elif kb.injection.place and kb.injection.parameter:
             paramString = conf.parameters[kb.injection.place]
             paramDict = conf.paramDict[kb.injection.place]
             value = paramDict[kb.injection.parameter]
