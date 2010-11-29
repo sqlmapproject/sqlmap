@@ -208,8 +208,7 @@ def start():
             if conf.multipleTargets:
                 hostCount += 1
                 if conf.forms:
-                    name = kb.formNames[(targetUrl, targetMethod, targetData, targetCookie)]
-                    message = "[#%d] %s:\n%s %s" % (hostCount, "form%s" % (" '%s'" % name if name else ""), conf.method or HTTPMETHOD.GET, targetUrl)
+                    message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
                 else:
                     message = "%s %d:\n%s %s" % ("url", hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
 

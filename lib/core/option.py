@@ -373,7 +373,7 @@ def __findPageForms():
 
             target = (url, method, data, conf.cookie)
             kb.targetUrls.add(target)
-            kb.formNames[target] = form.name
+            kb.formNames.append(target)
     else:
         errMsg  = "there were no forms found at a given target url"
         raise sqlmapGenericException, errMsg
@@ -1142,7 +1142,7 @@ def __setKnowledgeBaseAttributes():
     kb.dep             = None
     kb.docRoot         = None
     kb.dynamicMarkings = []
-    kb.formNames       = advancedDict()
+    kb.formNames       = []
     kb.headersCount    = 0
     kb.headersFp       = {}
     kb.hintValue       = None
