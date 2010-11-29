@@ -108,12 +108,20 @@ def checkSqlInjection(place, parameter, value):
 
         # Skip DBMS-specific tests if they do not match the DBMS
         # identified
-        if injection.dbms is not None and injection.dbms != dbms:
-            debugMsg = "skipping test '%s' because " % title
-            debugMsg += "the back-end DBMS is %s" % injection.dbms
-            logger.debug(debugMsg)
+        if dbms is not None:
+            if injection.dbms is not None and injection.dbms != dbms:
+                debugMsg = "skipping test '%s' because " % title
+                debugMsg += "the back-end DBMS is %s" % injection.dbms
+                logger.debug(debugMsg)
 
-            continue
+                continue
+
+            if conf.dbms is not None and conf.dbms.lower() != dbms.lower():
+                debugMsg = "skipping test '%s' because " % title
+                debugMsg += "the provided DBMS is %s" % conf.dbms
+                logger.debug(debugMsg)
+
+                continue
 
         infoMsg = "testing '%s'" % title
         logger.info(infoMsg)

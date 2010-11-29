@@ -63,6 +63,15 @@ from lib.core.settings import SITE
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING
+from lib.core.settings import MSSQL_ALIASES
+from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import ORACLE_ALIASES
+from lib.core.settings import SQLITE_ALIASES
+from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import FIREBIRD_ALIASES
+from lib.core.settings import MAXDB_ALIASES
+from lib.core.settings import SYBASE_ALIASES
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
@@ -587,6 +596,14 @@ def __setDBMS():
         errMsg += "the back-end DBMS, do not provide it and sqlmap will "
         errMsg += "fingerprint it for you."
         raise sqlmapUnsupportedDBMSException, errMsg
+
+    for aliases in (MSSQL_ALIASES, MYSQL_ALIASES, PGSQL_ALIASES, \
+                    ORACLE_ALIASES, SQLITE_ALIASES, ACCESS_ALIASES, \
+                    FIREBIRD_ALIASES, MAXDB_ALIASES, SYBASE_ALIASES):
+        if conf.dbms in aliases:
+            conf.dbms = aliases[0]
+
+            break
 
 def __setTamperingFunctions():
     """
