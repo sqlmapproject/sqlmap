@@ -499,24 +499,6 @@ def __setWriteFile():
     conf.wFileType = getFileType(conf.wFile)
 
 def __setUnion():
-    if isinstance(conf.uTech, basestring):
-        debugMsg = "setting the UNION query SQL injection detection technique"
-        logger.debug(debugMsg)
-
-        uTechOriginal = conf.uTech
-        conf.uTech = conf.uTech.lower()
-
-        if conf.uTech and conf.uTech not in ( "char", "orderby" ):
-            infoMsg  = "resetting the UNION query detection technique to "
-            infoMsg += "'char', '%s' is not a valid technique" % uTechOriginal
-            logger.info(infoMsg)
-
-            conf.uTech = "char"
-        else:
-            debugMsg  = "setting UNION query detection technique to "
-            debugMsg += "'%s'" % uTechOriginal
-            logger.debug(debugMsg)
-
     if isinstance(conf.uCols, basestring) and conf.uChar != "1-20":
         debugMsg = "setting the UNION query SQL injection range of columns"
         logger.debug(debugMsg)

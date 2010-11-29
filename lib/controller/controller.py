@@ -45,29 +45,6 @@ from lib.core.session import setTimeBased
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 
-def __saveToSessionFile():
-    for inj in kb.injections:
-        setInjection(inj)
-
-        place = inj.place
-        parameter = inj.parameter
-
-        for stype, sdata in inj.data.items():
-            payload = sdata[0]
-
-            if stype == 1:
-                kb.booleanTest = payload
-                setBooleanBased(place, parameter, payload)
-            elif stype == 2:
-                kb.errorTest = payload
-                setError(place, parameter, payload)
-            elif stype == 4:
-                kb.stackedTest = payload
-                setStacked(place, parameter, payload)
-            elif stype == 5:
-                kb.timeTest = payload
-                setTimeBased(place, parameter, payload)
-
 def __selectInjection():
     """
     Selection function for injection place, parameters and type.
@@ -143,6 +120,29 @@ def __showInjections():
         data += __formatInjection(inj)
 
     dumper.technic(header, data)
+
+def __saveToSessionFile():
+    for inj in kb.injections:
+        setInjection(inj)
+
+        place = inj.place
+        parameter = inj.parameter
+
+        for stype, sdata in inj.data.items():
+            payload = sdata[0]
+
+            if stype == 1:
+                kb.booleanTest = payload
+                setBooleanBased(place, parameter, payload)
+            elif stype == 2:
+                kb.errorTest = payload
+                setError(place, parameter, payload)
+            elif stype == 4:
+                kb.stackedTest = payload
+                setStacked(place, parameter, payload)
+            elif stype == 5:
+                kb.timeTest = payload
+                setTimeBased(place, parameter, payload)
 
 def start():
     """

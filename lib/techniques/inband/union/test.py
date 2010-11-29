@@ -117,26 +117,6 @@ def __unionTestByCharBruteforce(comment):
 
     return validPayload
 
-def __unionTestByOrderBy(comment):
-    columns = None
-    prevPayload = ""
-
-    for count in range(conf.uColsStart, conf.uColsStop+1):
-        query = agent.prefixQuery("ORDER BY %d" % count)
-        orderByQuery = agent.suffixQuery(query, comment)
-        payload = agent.payload(newValue=orderByQuery, negative=negative, falseCond=falseCond)
-        _, seqMatcher = Request.queryPage(payload, getSeqMatcher=True)
-
-        if seqMatcher >= 0.6:
-            columns = count
-            setUnion(count=count)
-        elif columns:
-            break
-
-        prevPayload = payload
-
-    return columns
-
 def unionTest():
     """
     This method tests if the target url is affected by an inband
@@ -149,9 +129,7 @@ def unionTest():
     if kb.unionTest is not None:
         return kb.unionTest
 
-    if conf.uTech == "orderby":
-        technique = "ORDER BY clause bruteforcing"
-    elif conf.uChar == "NULL":
+    if conf.uChar == "NULL":
         technique = "NULL bruteforcing"
     else:
         technique = "char (%s) bruteforcing" % conf.uChar
@@ -163,10 +141,7 @@ def unionTest():
     validPayload = None
     comment = queries[kb.dbms].comment.query
 
-    if conf.uTech == "orderby":
-        validPayload = __unionTestByOrderBy(comment)
-    else:
-        validPayload = __unionTestByCharBruteforce(comment)
+    validPayload = __unionTestByCharBruteforce(comment)
 
     if validPayload:
         setUnion(comment=comment)
