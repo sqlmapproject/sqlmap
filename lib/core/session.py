@@ -15,6 +15,7 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.datatype import injectionDict
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.settings import MSSQL_ALIASES
@@ -83,19 +84,22 @@ def setInjection(inj):
     condition = (
                   ( not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
-                  ( not kb.resumedQueries[conf.url].has_key("Injection point") 
+                  ( not kb.resumedQueries[conf.url].has_key("Injection point")
                   or not kb.resumedQueries[conf.url].has_key("Injection parameter")
                   ) ) )
                 )
 
     if condition:
-        for stype in inj.data.keys():
-            dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.SQLINJECTION[stype]))
         dataToSessionFile("[%s][%s][%s][Injection point][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.place))
         dataToSessionFile("[%s][%s][%s][Injection parameter][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.parameter))
         dataToSessionFile("[%s][%s][%s][Injection parameter type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.PARAMETER[inj.ptype]))
         dataToSessionFile("[%s][%s][%s][Injection prefix][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.prefix))
         dataToSessionFile("[%s][%s][%s][Injection suffix][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.suffix))
+
+        for stype, sdata in inj.data.items():
+            dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.SQLINJECTION[stype]))
+            dataToSessionFile("[%s][%s][%s][Injection payload][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[0]))
+            dataToSessionFile("[%s][%s][%s][Injection comment][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[1]))
 
 def setDbms(dbms):
     """
@@ -303,7 +307,7 @@ def resumeConfKb(expression, url, value):
     if expression == "String" and url == conf.url:
         string = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming string match '%s' from session file" % string
+        logMsg = "resuming string match '%s' from session file" % string
         logger.info(logMsg)
 
         if string and ( not conf.string or string != conf.string ):
@@ -324,7 +328,7 @@ def resumeConfKb(expression, url, value):
     elif expression == "Regular expression" and url == conf.url:
         regexp = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming regular expression match '%s' from session file" % regexp
+        logMsg = "resuming regular expression match '%s' from session file" % regexp
         logger.info(logMsg)
 
         if regexp and ( not conf.regexp or regexp != conf.regexp ):
@@ -346,7 +350,7 @@ def resumeConfKb(expression, url, value):
     elif expression == "Match ratio" and url == conf.url and conf.matchRatio is None:
         matchRatio = value[:-1]
 
-        logMsg  = "resuming match ratio '%s' from session file" % matchRatio
+        logMsg = "resuming match ratio '%s' from session file" % matchRatio
         logger.info(logMsg)
 
         try:
@@ -354,16 +358,10 @@ def resumeConfKb(expression, url, value):
         except ValueError:
             pass
 
-    elif expression == "Injection type" and url == conf.url:
-        kb.injection.stype = unSafeFormatString(value[:-1])
-
-        logMsg  = "resuming injection type '%s' from session file" % kb.injection.stype
-        logger.info(logMsg)
-
     elif expression == "Injection point" and url == conf.url:
         injPlace = value[:-1]
 
-        logMsg  = "resuming injection point '%s' from session file" % injPlace
+        logMsg = "resuming injection point '%s' from session file" % injPlace
         logger.info(logMsg)
 
         if not conf.paramDict.has_key(injPlace):
@@ -373,12 +371,16 @@ def resumeConfKb(expression, url, value):
             warnMsg += "injectable point"
             logger.warn(warnMsg)
         else:
+            if kb.injection.place is not None:
+                kb.injections.append(kb.injection)
+                kb.injection = injectionDict()
+
             kb.injection.place = injPlace
 
     elif expression == "Injection parameter" and url == conf.url:
         injParameter = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming injection parameter '%s' from session file" % injParameter
+        logMsg = "resuming injection parameter '%s' from session file" % injParameter
         logger.info(logMsg)
 
         condition = (
@@ -398,19 +400,68 @@ def resumeConfKb(expression, url, value):
     elif expression == "Injection parameter type" and url == conf.url:
         kb.injection.ptype = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming injection parameter type '%s' from session file" % kb.injection.ptype
+        logMsg = "resuming injection parameter type '%s' from session file" % kb.injection.ptype
         logger.info(logMsg)
 
     elif expression == "Injection prefix" and url == conf.url:
         kb.injection.prefix = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming injection prefix '%s' from session file" % kb.injection.prefix
+        logMsg = "resuming injection prefix '%s' from session file" % kb.injection.prefix
         logger.info(logMsg)
 
     elif expression == "Injection suffix" and url == conf.url:
         kb.injection.suffix = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming injection suffix '%s' from session file" % kb.injection.suffix
+        logMsg = "resuming injection suffix '%s' from session file" % kb.injection.suffix
+        logger.info(logMsg)
+
+    elif expression == "Injection type" and url == conf.url:
+        stype = unSafeFormatString(value[:-1])
+        kb.injection.data[stype] = []
+
+        logMsg = "resuming injection type '%s' from session file" % stype
+        logger.info(logMsg)
+
+    elif expression == "Injection payload" and url == conf.url:
+        payload = unSafeFormatString(value[:-1])
+        kb.injection.data[kb.injection.data.keys()[0]].append(payload)
+
+        logMsg = "resuming injection payload '%s' from session file" % payload
+        logger.info(logMsg)
+
+    elif expression == "Injection comment" and url == conf.url:
+        comment = unSafeFormatString(value[:-1])
+        kb.injection.data[kb.injection.data.keys()[0]].append(comment)
+
+        logMsg = "resuming injection comment '%s' from session file" % comment
+        logger.info(logMsg)
+
+    elif expression == "Boolean-based blind injection" and url == conf.url:
+        kb.booleanTest = unSafeFormatString(value[:-1])
+
+        logMsg = "resuming boolean-based blind injection "
+        logMsg += "'%s' from session file" % kb.booleanTest
+        logger.info(logMsg)
+
+    elif expression == "Error-based injection" and url == conf.url:
+        kb.errorTest = unSafeFormatString(value[:-1])
+
+        logMsg = "resuming error-based injection "
+        logMsg += "'%s' from session file" % kb.errorTest
+        logger.info(logMsg)
+
+    elif expression == "Stacked queries" and url == conf.url:
+        kb.stackedTest = unSafeFormatString(value[:-1])
+
+        logMsg = "resuming stacked queries syntax "
+        logMsg += "'%s' from session file" % kb.stackedTest
+        logger.info(logMsg)
+
+    elif expression == "Time-based blind injection" and url == conf.url:
+        kb.timeTest = unSafeFormatString(value[:-1])
+
+        logMsg = "resuming time-based blind injection "
+        logMsg += "'%s' from session file" % kb.timeTest
         logger.info(logMsg)
 
     elif expression == "DBMS" and url == conf.url:
@@ -418,7 +469,7 @@ def resumeConfKb(expression, url, value):
         dbms        = dbms.lower()
         dbmsVersion = None
 
-        logMsg  = "resuming back-end DBMS '%s' " % dbms
+        logMsg = "resuming back-end DBMS '%s' " % dbms
         logMsg += "from session file"
         logger.info(logMsg)
 
@@ -450,7 +501,7 @@ def resumeConfKb(expression, url, value):
     elif expression == "OS" and url == conf.url:
         os = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming back-end DBMS operating system '%s' " % os
+        logMsg = "resuming back-end DBMS operating system '%s' " % os
         logMsg += "from session file"
         logger.info(logMsg)
 
@@ -468,52 +519,24 @@ def resumeConfKb(expression, url, value):
         else:
             conf.os = os
 
-    elif expression == "Boolean-based blind injection" and url == conf.url:
-        kb.booleanTest = unSafeFormatString(value[:-1])
-
-        logMsg  = "resuming boolean-based blind injection "
-        logMsg += "'%s' from session file" % kb.booleanTest
-        logger.info(logMsg)
-
-    elif expression == "Error-based injection" and url == conf.url:
-        kb.errorTest = unSafeFormatString(value[:-1])
-
-        logMsg  = "resuming error-based injection "
-        logMsg += "'%s' from session file" % kb.errorTest
-        logger.info(logMsg)
-
-    elif expression == "Stacked queries" and url == conf.url:
-        kb.stackedTest = unSafeFormatString(value[:-1])
-
-        logMsg  = "resuming stacked queries syntax "
-        logMsg += "'%s' from session file" % kb.stackedTest
-        logger.info(logMsg)
-
-    elif expression == "Time-based blind injection" and url == conf.url:
-        kb.timeTest = unSafeFormatString(value[:-1])
-
-        logMsg  = "resuming time-based blind injection "
-        logMsg += "'%s' from session file" % kb.timeTest
-        logger.info(logMsg)
-
     elif expression == "Union comment" and url == conf.url:
         kb.unionComment = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming union comment "
+        logMsg = "resuming union comment "
         logMsg += "'%s' from session file" % kb.unionComment
         logger.info(logMsg)
 
     elif expression == "Union count" and url == conf.url:
         kb.unionCount = int(value[:-1])
 
-        logMsg  = "resuming union count "
+        logMsg = "resuming union count "
         logMsg += "%s from session file" % kb.unionCount
         logger.info(logMsg)
 
     elif expression == "Union position" and url == conf.url:
         kb.unionPosition = int(value[:-1])
 
-        logMsg  = "resuming union position "
+        logMsg = "resuming union position "
         logMsg += "%s from session file" % kb.unionPosition
         logger.info(logMsg)
 
@@ -532,13 +555,13 @@ def resumeConfKb(expression, url, value):
     elif expression == "Union payload" and url == conf.url:
         kb.unionTest = value[:-1]
 
-        logMsg  = "resuming union payload "
+        logMsg = "resuming union payload "
         logMsg += "%s from session file" % kb.unionTest
         logger.info(logMsg)
 
     elif expression == "Remote temp path" and url == conf.url:
         conf.tmpPath = unSafeFormatString(value[:-1])
 
-        logMsg  = "resuming remote absolute path of temporary "
+        logMsg = "resuming remote absolute path of temporary "
         logMsg += "files directory '%s' from session file" % conf.tmpPath
         logger.info(logMsg)

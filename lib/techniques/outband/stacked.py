@@ -47,6 +47,7 @@ def stackedTest():
 
         kb.stackedTest = False
 
-    setStacked()
+    if kb.stackedTest:
+        setStacked(kb.injection.place, kb.injection.parameter, payload)
 
     return kb.stackedTest

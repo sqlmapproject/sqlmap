@@ -173,6 +173,7 @@ def __setOutputResume():
                     elif len(value) >= len(kb.resumedQueries[url][expression]):
                         kb.resumedQueries[url][expression] = value
 
+            kb.injections.append(kb.injection)
             readSessionFP.close()
         else:
             try:

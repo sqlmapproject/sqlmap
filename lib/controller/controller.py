@@ -47,11 +47,13 @@ from lib.core.target import setupTargetEnv
 
 def __saveToSessionFile():
     for inj in kb.injections:
+        setInjection(inj)
+
         place = inj.place
         parameter = inj.parameter
 
         for stype, sdata in inj.data.items():
-            payload = sdata[3]
+            payload = sdata[0]
 
             if stype == 1:
                 kb.booleanTest = payload
@@ -66,15 +68,11 @@ def __saveToSessionFile():
                 kb.timeTest = payload
                 setTimeBased(place, parameter, payload)
 
-        setInjection(inj)
-
 def __selectInjection():
     """
     Selection function for injection place, parameters and type.
     """
 
-    # TODO: when resume from session file, feed kb.injections and call
-    # __selectInjection()
     points = []
 
     for i in xrange(0, len(kb.injections)):
@@ -103,9 +101,10 @@ def __selectInjection():
 
             if point not in points:
                 points.append(point)
+                ptype = PAYLOAD.PARAMETER[ptype] if isinstance(ptype, int) else ptype
 
                 message += "[%d] place: %s, parameter: " % (i, place)
-                message += "%s, type: %s" % (parameter, PAYLOAD.PARAMETER[ptype])
+                message += "%s, type: %s" % (parameter, ptype)
 
                 if i == 0:
                     message += " (default)"
@@ -130,8 +129,9 @@ def __formatInjection(inj):
     data += "Parameter: %s\n" % inj.parameter
 
     for stype, sdata in inj.data.items():
-        data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
-        data += "    Payload: %s\n\n" % sdata[3]
+        stype = PAYLOAD.SQLINJECTION[stype] if isinstance(stype, int) else stype
+        data += "    Type: %s\n" % stype
+        data += "    Payload: %s\n\n" % sdata[0]
 
     return data
 

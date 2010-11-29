@@ -288,7 +288,7 @@ def checkSqlInjection(place, parameter, value):
                 injection.prefix = prefix
                 injection.suffix = suffix
 
-                injection.data[stype] = (title, where, comment, boundPayload)
+                injection.data[stype] = (boundPayload, comment)
 
                 if "details" in test:
                     for detailKey, detailValue in test.details.items():

@@ -44,6 +44,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
+from lib.core.datatype import injectionDict
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PRIORITY
 from lib.core.exception import sqlmapFilePathException
@@ -1146,7 +1147,7 @@ def __setKnowledgeBaseAttributes():
     kb.headersFp       = {}
     kb.hintValue       = None
     kb.htmlFp          = []
-    kb.injection       = advancedDict()
+    kb.injection       = injectionDict()
     kb.injection.parameter = None
     kb.injection.place = None
     kb.injections      = []
