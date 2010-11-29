@@ -357,7 +357,8 @@ def start():
                                 warnMsg += "injectable"
                                 logger.warn(warnMsg)
 
-            if len(kb.injections) == 0 and not kb.injection.place and not kb.injection.parameter:
+            if (len(kb.injections) == 0 or len(kb.injections) == 1 and kb.injections[0].parameter is None) \
+                and not kb.injection.place and not kb.injection.parameter:
                 errMsg = "all parameters are not injectable, try "
                 errMsg += "a higher --level"
                 raise sqlmapNotVulnerableException, errMsg
