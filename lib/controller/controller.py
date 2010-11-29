@@ -311,6 +311,14 @@ def start():
                         parameters.insert(0, place)
 
                 for place in parameters:
+                    # Test User-Agent header only if --level >= 4
+                    condition = (place == "User-Agent" and conf.level < 4)
+                    # Test Cookie header only if --level >= 3
+                    condition |= (place == "Cookie" and conf.level < 3)
+
+                    if condition:
+                        continue
+
                     if not conf.paramDict.has_key(place):
                         continue
 
