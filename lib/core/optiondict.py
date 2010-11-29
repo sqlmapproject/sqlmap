@@ -75,9 +75,6 @@ optDict = {
                              },
 
             "Techniques":    {
-                               "errorTest":         "boolean",
-                               "stackedTest":       "boolean",
-                               "timeTest":          "boolean",
                                "timeSec":           "integer",
                                "unionTest":         "boolean",
                                "uTech":             "string",

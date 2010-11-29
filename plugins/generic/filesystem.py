@@ -21,7 +21,6 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.request import inject
-from lib.techniques.outband.stacked import stackedTest
 
 class Filesystem:
     """
@@ -253,8 +252,6 @@ class Filesystem:
     def readFile(self, rFile):
         fileContent = None
 
-        stackedTest()
-
         self.checkDbmsOs()
 
         if conf.direct or kb.stackedTest:
@@ -295,8 +292,6 @@ class Filesystem:
         return rFilePath
 
     def writeFile(self, wFile, dFile, fileType=None, confirm=True):
-        stackedTest()
-
         self.checkDbmsOs()
 
         if conf.direct or kb.stackedTest:

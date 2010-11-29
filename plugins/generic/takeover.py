@@ -25,7 +25,6 @@ from lib.takeover.abstraction import Abstraction
 from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit
 from lib.takeover.registry import Registry
-from lib.techniques.outband.stacked import stackedTest
 
 from plugins.generic.misc import Miscellaneous
 
@@ -41,8 +40,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         Abstraction.__init__(self)
 
     def osCmd(self):
-        stackedTest()
-
         if kb.stackedTest or conf.direct:
             web = False
         elif not kb.stackedTest and kb.dbms == DBMS.MYSQL:
@@ -64,8 +61,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.cleanup()
 
     def osShell(self):
-        stackedTest()
-
         if kb.stackedTest or conf.direct:
             web = False
         elif not kb.stackedTest and kb.dbms == DBMS.MYSQL:
@@ -88,8 +83,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
     def osPwn(self):
         goUdf = False
-
-        stackedTest()
 
         self.checkDbmsOs()
 
@@ -251,8 +244,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.cleanup()
 
     def osSmb(self):
-        stackedTest()
-
         self.checkDbmsOs()
 
         if kb.os != "Windows":
@@ -303,8 +294,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self.smb()
 
     def osBof(self):
-        stackedTest()
-
         if not kb.stackedTest and not conf.direct:
             return
 
@@ -331,8 +320,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         raise sqlmapUndefinedMethod, errMsg
 
     def __regInit(self):
-        stackedTest()
-
         if not kb.stackedTest and not conf.direct:
             return
 

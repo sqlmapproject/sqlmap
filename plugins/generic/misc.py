@@ -23,8 +23,6 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setRemoteTempPath
 from lib.request import inject
-from lib.techniques.outband.stacked import stackedTest
-
 
 class Miscellaneous:
     """
@@ -95,8 +93,6 @@ class Miscellaneous:
         """
         Cleanup database from sqlmap create tables and functions
         """
-
-        stackedTest()
 
         if not kb.stackedTest and not conf.direct:
             return

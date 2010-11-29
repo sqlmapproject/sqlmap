@@ -226,19 +226,6 @@ def cmdLineParser():
                                  "the affected parameter(s) rather than using "
                                  "the default blind SQL injection technique.")
 
-        techniques.add_option("--error-test", dest="errorTest",
-                          action="store_true", default=False,
-                          help="Test for and use error based SQL injection")
-
-        techniques.add_option("--stacked-test", dest="stackedTest",
-                              action="store_true", default=False,
-                              help="Test for and use stacked queries (multiple "
-                                   "statements)")
-
-        techniques.add_option("--time-test", dest="timeTest",
-                              action="store_true", default=False,
-                              help="Test for time based blind SQL injection")
-
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int", default=5,
                               help="Seconds to delay the DBMS response "

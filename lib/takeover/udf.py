@@ -23,8 +23,6 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.unescaper import unescaper
 from lib.request import inject
-from lib.techniques.outband.stacked import stackedTest
-
 
 class UDF:
     """
@@ -158,8 +156,6 @@ class UDF:
         if kb.dbms not in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
             errMsg = "UDF injection feature is not yet implemented on %s" % kb.dbms
             raise sqlmapUnsupportedFeatureException(errMsg)
-
-        stackedTest()
 
         if not kb.stackedTest and not conf.direct:
             return

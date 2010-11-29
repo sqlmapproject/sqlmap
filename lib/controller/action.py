@@ -15,12 +15,9 @@ from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
-from lib.techniques.blind.timebased import timeTest
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
-from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
-from lib.techniques.outband.stacked import stackedTest
 
 def action():
     """
@@ -60,15 +57,6 @@ def action():
     dataToStdout("%s\n" % conf.dbmsHandler.getFingerprint())
 
     # Techniques options
-    if conf.stackedTest:
-        conf.dumper.technic("stacked queries injection payload", stackedTest())
-
-    if conf.errorTest:
-        conf.dumper.technic("error-based injection payload", errorTest())
-
-    if conf.timeTest:
-        conf.dumper.technic("time-based blind injection payload", timeTest())
-
     if conf.unionTest and kb.unionPosition is None:
         conf.dumper.technic("inband injection payload", unionTest())
 

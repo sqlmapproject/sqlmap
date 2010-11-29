@@ -44,9 +44,7 @@ from lib.request import inject
 from lib.request.connect import Connect as Request
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
-from lib.techniques.error.test import errorTest
 from lib.techniques.inband.union.test import unionTest
-from lib.techniques.outband.stacked import stackedTest
 from lib.utils.hash import dictionaryAttack
 
 class Enumeration:
@@ -80,9 +78,7 @@ class Enumeration:
         logger.info(infoMsg)
 
         if not kb.data.banner:
-            if conf.errorTest:
-                conf.dumper.technic("error-based injection payload", errorTest())
-            elif conf.unionTest:
+            if conf.unionTest:
                 conf.dumper.technic("inband injection payload", unionTest())
 
             query          = queries[kb.dbms].banner.query
@@ -1745,9 +1741,6 @@ class Enumeration:
 
             return output
         else:
-            if kb.stackedTest is None:
-                stackedTest()
-
             if not kb.stackedTest and not conf.direct:
                 warnMsg  = "execution of custom SQL queries is only "
                 warnMsg += "available when stacked queries are supported"
