@@ -131,17 +131,29 @@ def checkSqlInjection(place, parameter, value):
         testPayload = "%s%s" % (payload, comment)
 
         if conf.prefix is not None and conf.suffix is not None:
+            # Create a custom boundary object for user's supplied prefix
+            # and suffix
             boundary = advancedDict()
 
             boundary.level = 1
             boundary.clause = [ 0 ]
             boundary.where = [ 1, 2, 3 ]
-            # TODO: inspect the conf.prefix and conf.suffix to set
-            # proper ptype
-            boundary.ptype = 1
             boundary.prefix = conf.prefix
             boundary.suffix = conf.suffix
 
+            if "like" in boundary.suffix.lower():
+                if "'" in boundary.suffix.lower():
+                    boundary.ptype = 3
+                elif '"' in boundary.suffix.lower():
+                    boundary.ptype = 5
+            elif "'" in boundary.suffix.lower():
+                boundary.ptype = 2
+            elif '"' in boundary.suffix.lower():
+                boundary.ptype = 4
+            else:
+                boundary.ptype = 1
+
+            # Prepend user's provided boundaries to all others
             conf.boundaries.insert(0, boundary)
 
         for boundary in conf.boundaries:
