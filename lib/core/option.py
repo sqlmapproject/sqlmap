@@ -1108,7 +1108,6 @@ def __setConfAttributes():
     conf.path             = None
     conf.port             = None
     conf.redirectHandled  = False
-    conf.retriesCount     = 0
     conf.scheme           = None
     #conf.seqMatcher       = difflib.SequenceMatcher(lambda x: x in " \t")
     conf.seqMatcher       = difflib.SequenceMatcher(None)
@@ -1191,6 +1190,7 @@ def __setKnowledgeBaseAttributes():
     kb.proxyAuthHeader = None
     kb.queryCounter    = 0
     kb.resumedQueries  = {}
+    kb.retriesCount    = 0
     kb.tamperFunctions = []
     kb.targetUrls      = set()
     kb.testedParams    = set()

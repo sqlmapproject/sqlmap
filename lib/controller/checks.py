@@ -541,6 +541,12 @@ def checkStability():
             checkDynamicContent(firstPage, secondPage)
 
             if not Request.queryPage():
+                warnMsg = "target url is heavily dynamic. retrying. "
+                logger.warn(warnMsg)
+                secondPage, _ = Request.queryPage(content=True)
+                checkDynamicContent(firstPage, secondPage)
+
+            if not Request.queryPage():
                 errMsg = "target url is too dynamic. unable to continue. "
                 errMsg += "consider using other switches (e.g. "
                 errMsg += "--longest-common, --string, --text-only, etc.)"

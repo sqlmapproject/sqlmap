@@ -208,7 +208,7 @@ class Connect:
                 conf.redirectHandled = True
 
             # Reset the number of connection retries
-            conf.retriesCount = 0
+            kb.retriesCount = 0
 
             # Return response object
             if response:
@@ -276,8 +276,8 @@ class Connect:
 
             if silent:
                 return None, None
-            elif conf.retriesCount < conf.retries:
-                conf.retriesCount += 1
+            elif kb.retriesCount < conf.retries:
+                kb.retriesCount += 1
 
                 warnMsg += ", sqlmap is going to retry the request"
                 logger.critical(warnMsg)
