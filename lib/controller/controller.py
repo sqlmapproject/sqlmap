@@ -109,7 +109,8 @@ def __formatInjection(inj):
     for stype, sdata in inj.data.items():
         stype = PAYLOAD.SQLINJECTION[stype] if isinstance(stype, int) else stype
         data += "    Type: %s\n" % stype
-        data += "    Payload: %s\n\n" % sdata[0]
+        data += "    Title: %s\n" % sdata[0]
+        data += "    Payload: %s\n\n" % sdata[1]
 
     return data
 
@@ -126,13 +127,16 @@ def __showInjections():
 
 def __saveToSessionFile():
     for inj in kb.injections:
+        if inj.place is None or inj.parameter is None:
+            continue
+
         setInjection(inj)
 
         place = inj.place
         parameter = inj.parameter
 
         for stype, sdata in inj.data.items():
-            payload = sdata[0]
+            payload = sdata[1]
 
             if stype == 1:
                 kb.booleanTest = payload
@@ -313,6 +317,8 @@ def start():
                         parameters.remove(place)
                         parameters.insert(0, place)
 
+                proceed = True
+
                 for place in parameters:
                     # Test User-Agent header only if --level >= 4
                     condition = (place == "User-Agent" and conf.level < 4)
@@ -324,6 +330,9 @@ def start():
 
                     if not conf.paramDict.has_key(place):
                         continue
+
+                    if not proceed:
+                        break
 
                     paramDict = conf.paramDict[place]
                     for parameter, value in paramDict.items():
@@ -361,15 +370,22 @@ def start():
 
                             injection = checkSqlInjection(place, parameter, value)
 
-                            if injection:
+                            if injection is not None and injection.place is not None:
                                 kb.injections.append(injection)
+
+                                msg = "%s parameter '%s' " % (injection.place, injection.parameter)
+                                msg += "is vulnerable. Do you want to keep testing the others? [y/N] "
+                                test = readInput(msg, default="N")
+
+                                if test[0] in ("n", "N"):
+                                    proceed = False
+                                    break
                             else:
                                 warnMsg  = "%s parameter '%s' is not " % (place, parameter)
                                 warnMsg += "injectable"
                                 logger.warn(warnMsg)
 
-            if (len(kb.injections) == 0 or len(kb.injections) == 1 and kb.injections[0].parameter is None) \
-                and not kb.injection.place and not kb.injection.parameter:
+            if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 errMsg = "all parameters are not injectable, try "
                 errMsg += "a higher --level"
                 raise sqlmapNotVulnerableException, errMsg

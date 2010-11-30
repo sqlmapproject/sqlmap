@@ -98,8 +98,10 @@ def setInjection(inj):
 
         for stype, sdata in inj.data.items():
             dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.SQLINJECTION[stype]))
-            dataToSessionFile("[%s][%s][%s][Injection payload][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[0]))
-            dataToSessionFile("[%s][%s][%s][Injection comment][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[1]))
+            dataToSessionFile("[%s][%s][%s][Injection title][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[0]))
+            dataToSessionFile("[%s][%s][%s][Injection payload][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[1]))
+            dataToSessionFile("[%s][%s][%s][Injection where][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[2]))
+            dataToSessionFile("[%s][%s][%s][Injection comment][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[3]))
 
 def setDbms(dbms):
     """
@@ -371,7 +373,7 @@ def resumeConfKb(expression, url, value):
             warnMsg += "injectable point"
             logger.warn(warnMsg)
         else:
-            if kb.injection.place is not None:
+            if kb.injection.place is not None and kb.injection.parameter is not None:
                 kb.injections.append(kb.injection)
                 kb.injection = injectionDict()
 
@@ -422,11 +424,25 @@ def resumeConfKb(expression, url, value):
         logMsg = "resuming injection type '%s' from session file" % stype
         logger.info(logMsg)
 
+    elif expression == "Injection title" and url == conf.url:
+        title = unSafeFormatString(value[:-1])
+        kb.injection.data[kb.injection.data.keys()[0]].append(title)
+
+        logMsg = "resuming injection title '%s' from session file" % title
+        logger.info(logMsg)
+
     elif expression == "Injection payload" and url == conf.url:
         payload = unSafeFormatString(value[:-1])
         kb.injection.data[kb.injection.data.keys()[0]].append(payload)
 
         logMsg = "resuming injection payload '%s' from session file" % payload
+        logger.info(logMsg)
+
+    elif expression == "Injection where" and url == conf.url:
+        where = unSafeFormatString(value[:-1])
+        kb.injection.data[kb.injection.data.keys()[0]].append(where)
+
+        logMsg = "resuming injection where '%s' from session file" % where
         logger.info(logMsg)
 
     elif expression == "Injection comment" and url == conf.url:
@@ -492,10 +508,10 @@ def resumeConfKb(expression, url, value):
             test = readInput(message, default="N")
 
             if not test or test[0] in ("n", "N"):
-                conf.dbms      = dbms
+                kb.dbms = dbms
                 kb.dbmsVersion = dbmsVersion
         else:
-            conf.dbms      = dbms
+            kb.dbms = dbms
             kb.dbmsVersion = dbmsVersion
 
     elif expression == "OS" and url == conf.url:

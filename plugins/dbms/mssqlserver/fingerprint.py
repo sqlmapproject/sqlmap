@@ -71,7 +71,9 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if conf.dbms in MSSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
+        if ((kb.dbms is not None and kb.dbms.lower() in MSSQL_ALIASES) \
+           or conf.dbms in MSSQL_ALIASES) and kb.dbmsVersion and \
+           kb.dbmsVersion[0].isdigit():
             setDbms("%s %s" % (DBMS.MSSQL, kb.dbmsVersion[0]))
 
             self.getBanner()

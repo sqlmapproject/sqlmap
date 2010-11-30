@@ -126,20 +126,6 @@ class Agent:
 
         return payload
 
-    def cleanupPayload(self, payload):
-        randInt = randomInt()
-        randInt1 = randomInt()
-        randStr = randomStr()
-
-        payload = payload.replace("[RANDNUM]", str(randInt))
-        payload = payload.replace("[RANDNUM1]", str(randInt1))
-        payload = payload.replace("[RANDSTR]", randStr)
-        payload = payload.replace("[ERROR_START_CHAR]", ERROR_START_CHAR)
-        payload = payload.replace("[ERROR_END_CHAR]", ERROR_END_CHAR)
-        payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
-
-        return payload
-
     def prefixQuery(self, string):
         """
         This method defines how the input string has to be escaped
@@ -172,6 +158,28 @@ class Agent:
         string = self.cleanupPayload(string)
 
         return string
+
+    def cleanupPayload(self, payload):
+        randInt = randomInt()
+        randInt1 = randomInt()
+        randStr = randomStr()
+
+        payload = payload.replace("[RANDNUM]", str(randInt))
+        payload = payload.replace("[RANDNUM1]", str(randInt1))
+        payload = payload.replace("[RANDSTR]", randStr)
+        payload = payload.replace("[ERROR_START_CHAR]", ERROR_START_CHAR)
+        payload = payload.replace("[ERROR_END_CHAR]", ERROR_END_CHAR)
+        payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+
+        return payload
+
+    def getComment(self, reqObj):
+        if "comment" in reqObj:
+            comment = reqObj.comment
+        else:
+            comment = ""
+
+        return comment
 
     def nullAndCastField(self, field):
         """

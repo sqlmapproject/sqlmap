@@ -19,6 +19,8 @@ def cleanupVals(values, tag):
     for value in values:
         if value.isdigit():
             value = int(value)
+        else:
+            value = str(value)
 
         values[count] = value
         count += 1

@@ -142,10 +142,16 @@ class Fingerprint(GenericFingerprint):
         * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
-        if conf.dbms in MYSQL_ALIASES and kb.dbmsVersion and kb.dbmsVersion[0].isdigit():
+        if ((kb.dbms is not None and kb.dbms.lower() in MYSQL_ALIASES) \
+           or conf.dbms in MYSQL_ALIASES) and kb.dbmsVersion and \
+           kb.dbmsVersion[0] != "Unknown":
+            kb.dbmsVersion[0] = kb.dbmsVersion[0].replace(">", "")
+            kb.dbmsVersion[0] = kb.dbmsVersion[0].replace("=", "")
+            kb.dbmsVersion[0] = kb.dbmsVersion[0].replace(" ", "")
+
             setDbms("%s %s" % (DBMS.MYSQL, kb.dbmsVersion[0]))
 
-            if int(kb.dbmsVersion[0]) >= 5:
+            if str(kb.dbmsVersion[0]) >= '5':
                 kb.data.has_information_schema = True
 
             self.getBanner()
@@ -158,14 +164,14 @@ class Fingerprint(GenericFingerprint):
 
         randInt = getUnicode(randomInt(1))
         payload = agent.fullPayload("AND CONNECTION_ID()=CONNECTION_ID()")
-        result  = Request.queryPage(payload)
+        result = Request.queryPage(payload)
 
         if result:
             infoMsg = "confirming MySQL"
             logger.info(infoMsg)
 
             payload = agent.fullPayload("AND ISNULL(1/0)" if kb.injection.place != PLACE.URI else "AND ISNULL(1 DIV 0)")
-            result  = Request.queryPage(payload)
+            result = Request.queryPage(payload)
 
             if not result:
                 warnMsg = "the back-end DBMS is not MySQL"

@@ -69,7 +69,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
         """
 
-        if conf.dbms in SQLITE_ALIASES:
+        if (kb.dbms is not None and kb.dbms.lower() in SQLITE_ALIASES) or conf.dbms in SQLITE_ALIASES:
             setDbms(DBMS.SQLITE)
 
             self.getBanner()

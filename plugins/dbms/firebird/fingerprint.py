@@ -103,7 +103,7 @@ class Fingerprint(GenericFingerprint):
         return retVal
 
     def checkDbms(self):
-        if conf.dbms in FIREBIRD_ALIASES:
+        if (kb.dbms is not None and kb.dbms.lower() in FIREBIRD_ALIASES) or conf.dbms in FIREBIRD_ALIASES:
             setDbms(DBMS.FIREBIRD)
 
             self.getBanner()

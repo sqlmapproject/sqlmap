@@ -64,7 +64,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if conf.dbms in ORACLE_ALIASES:
+        if (kb.dbms is not None and kb.dbms.lower() in ORACLE_ALIASES) or conf.dbms in ORACLE_ALIASES:
             setDbms(DBMS.ORACLE)
 
             self.getBanner()

@@ -67,7 +67,24 @@ def unescape(string, dbms):
                   "Sybase": Sybase.unescape
                 }
 
-    return unescaper[dbms](string)
+    if dbms in unescaper:
+        return unescaper[dbms](string)
+    else:
+        return string
+
+def unescapeDbms(payload, injection, dbms):
+    # If this is a DBMS-specific test (dbms), sqlmap identified the
+    # DBMS during previous a test (injection.dbms) or the user
+    # provided a DBMS (conf.dbms), unescape the strings between single
+    # quotes in the payload
+    if injection.dbms is not None:
+        payload = unescape(payload, injection.dbms)
+    elif dbms is not None:
+        payload = unescape(payload, dbms)
+    elif conf.dbms is not None:
+        payload = unescape(payload, conf.dbms)
+
+    return payload
 
 def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to
@@ -77,8 +94,9 @@ def checkSqlInjection(place, parameter, value):
     for test in conf.tests:
         title = test.title
         stype = test.stype
-        proceed = True
 
+        # Skip test if the risk is higher than the provided (or default)
+        # value
         # Parse test's <risk>
         if test.risk > conf.risk:
             debugMsg = "skipping test '%s' because the risk " % title
@@ -86,6 +104,8 @@ def checkSqlInjection(place, parameter, value):
             logger.debug(debugMsg)
             continue
 
+        # Skip test if the level is higher than the provided (or default)
+        # value
         # Parse test's <level>
         if test.level > conf.level:
             debugMsg = "skipping test '%s' because the level " % title
@@ -93,26 +113,27 @@ def checkSqlInjection(place, parameter, value):
             logger.debug(debugMsg)
             continue
 
+        # Skip test if it is the same SQL injection type already
+        # identified by another test
+        if injection.data and stype in injection.data:
+            debugMsg = "skipping test '%s' because " % title
+            debugMsg += "the payload for %s has " % PAYLOAD.SQLINJECTION[stype]
+            debugMsg += "already been identified"
+            logger.debug(debugMsg)
+            continue
+
+        # Skip DBMS-specific test if it does not match either the
+        # previously identified or the user's provided DBMS
         if "details" in test and "dbms" in test.details:
             dbms = test.details.dbms
         else:
             dbms = None
 
-        # Skip current test if it is the same SQL injection type
-        # already identified by another test
-        if injection.data and stype in injection.data:
-            debugMsg = "skipping test '%s' because " % title
-            debugMsg += "we have already the payload for %s" % PAYLOAD.SQLINJECTION[stype]
-            logger.debug(debugMsg)
-
-            continue
-
-        # Skip DBMS-specific tests if they do not match the DBMS
-        # identified
         if dbms is not None:
             if injection.dbms is not None and injection.dbms != dbms:
                 debugMsg = "skipping test '%s' because " % title
-                debugMsg += "the back-end DBMS is %s" % injection.dbms
+                debugMsg += "the back-end DBMS identified is "
+                debugMsg += "%s" % injection.dbms
                 logger.debug(debugMsg)
 
                 continue
@@ -128,16 +149,10 @@ def checkSqlInjection(place, parameter, value):
         logger.info(infoMsg)
 
         # Parse test's <request>
-        payload = agent.cleanupPayload(test.request.payload)
-
-        if dbms:
-            payload = unescape(payload, dbms)
-
-        if "comment" in test.request:
-            comment = test.request.comment
-        else:
-            comment = ""
-        testPayload = "%s%s" % (payload, comment)
+        comment = agent.getComment(test.request)
+        fstPayload = agent.cleanupPayload(test.request.payload)
+        fstPayload = unescapeDbms(fstPayload, injection, dbms)
+        fstPayload = "%s%s" % (fstPayload, comment)
 
         if conf.prefix is not None and conf.suffix is not None:
             # Create a custom boundary object for user's supplied prefix
@@ -162,17 +177,21 @@ def checkSqlInjection(place, parameter, value):
             else:
                 boundary.ptype = 1
 
-            # Prepend user's provided boundaries to all others
+            # Prepend user's provided boundaries to all others boundaries
             conf.boundaries.insert(0, boundary)
 
         for boundary in conf.boundaries:
+            injectable = False
+
+            # Skip boundary if the level is higher than the provided (or
+            # default) value
             # Parse boundary's <level>
             if boundary.level > conf.level:
                 # NOTE: shall we report every single skipped boundary too?
                 continue
 
-            # Parse test's <clause> and boundary's <clause>
             # Skip boundary if it does not match against test's <clause>
+            # Parse test's <clause> and boundary's <clause>
             clauseMatch = False
 
             for clauseTest in test.clause:
@@ -183,8 +202,8 @@ def checkSqlInjection(place, parameter, value):
             if test.clause != [ 0 ] and boundary.clause != [ 0 ] and not clauseMatch:
                 continue
 
-            # Parse test's <where> and boundary's <where>
             # Skip boundary if it does not match against test's <where>
+            # Parse test's <where> and boundary's <where>
             whereMatch = False
 
             for where in test.where:
@@ -199,11 +218,10 @@ def checkSqlInjection(place, parameter, value):
             prefix = boundary.prefix if boundary.prefix else ""
             suffix = boundary.suffix if boundary.suffix else ""
             ptype = boundary.ptype
-            injectable = False
 
             # If the previous injections succeeded, we know which prefix,
-            # postfix and parameter type to use for further tests, no
-            # need to cycle through all of the boundaries anymore
+            # suffix and parameter type to use for further tests, no
+            # need to cycle through the boundaries for the following tests
             condBound = (injection.prefix is not None and injection.suffix is not None)
             condBound &= (injection.prefix != prefix or injection.suffix != suffix)
             condType = injection.ptype is not None and injection.ptype != ptype
@@ -213,8 +231,8 @@ def checkSqlInjection(place, parameter, value):
 
             # For each test's <where>
             for where in test.where:
-                # The <where> tag defines where to add our injection
-                # string to the parameter under assessment.
+                # Threat the parameter original value according to the
+                # test's <where> tag
                 if where == 1:
                     origValue = value
                 elif where == 2:
@@ -222,41 +240,41 @@ def checkSqlInjection(place, parameter, value):
                 elif where == 3:
                     origValue = ""
 
-                # Forge payload by prepending with boundary's prefix and
-                # appending with boundary's suffix the test's
-                # ' <payload><command> ' string
-                boundPayload = "%s%s %s %s" % (origValue, prefix, testPayload, suffix)
+                # Forge request payload by prepending with boundary's
+                # prefix and appending the boundary's suffix to the
+                # test's ' <payload><comment> ' string
+                boundPayload = "%s%s %s %s" % (origValue, prefix, fstPayload, suffix)
                 boundPayload = boundPayload.strip()
                 boundPayload = agent.cleanupPayload(boundPayload)
                 reqPayload = agent.payload(place, parameter, value, boundPayload)
 
+                # Perform the test's request and check whether or not the
+                # payload was successful
                 # Parse test's <response>
-                # Check wheather or not the payload was successful
                 for method, check in test.response.items():
                     check = agent.cleanupPayload(check)
 
                     # In case of boolean-based blind SQL injection
                     if method == "comparison":
                         sndPayload = agent.cleanupPayload(test.response.comparison)
+                        sndPayload = unescapeDbms(sndPayload, injection, dbms)
+                        sndPayload = "%s%s" % (sndPayload, comment)
 
-                        if dbms:
-                            sndPayload = unescape(sndPayload, dbms)
-
-                        if "comment" in test.response:
-                            sndComment = test.response.comment
-                        else:
-                            sndComment = ""
-
-                        sndPayload = "%s%s" % (sndPayload, sndComment)
+                        # Forge response payload by prepending with
+                        # boundary's prefix and appending the boundary's
+                        # suffix to the test's ' <payload><comment> '
+                        # string
                         boundPayload = "%s%s %s %s" % (origValue, prefix, sndPayload, suffix)
                         boundPayload = boundPayload.strip()
                         boundPayload = agent.cleanupPayload(boundPayload)
                         cmpPayload = agent.payload(place, parameter, value, boundPayload)
 
-                        # Useful to set conf.matchRatio at first
+                        # Useful to set conf.matchRatio at first based on
+                        # the False response content
                         conf.matchRatio = None
                         _ = Request.queryPage(cmpPayload, place)
 
+                        # Compare True and False response contents
                         trueResult = Request.queryPage(reqPayload, place)
 
                         if trueResult:
@@ -273,6 +291,8 @@ def checkSqlInjection(place, parameter, value):
 
                     # In case of error-based or UNION query SQL injections
                     elif method == "grep":
+                        # Perform the test's request and grep the response
+                        # body for the test's <grep> regular expression
                         reqBody, _ = Request.queryPage(reqPayload, place, content=True)
                         match = re.search(check, reqBody, re.DOTALL | re.IGNORECASE)
 
@@ -290,8 +310,11 @@ def checkSqlInjection(place, parameter, value):
 
                             injectable = True
 
-                    # In case of time-based blind or stacked queries SQL injections
+                    # In case of time-based blind or stacked queries
+                    # SQL injections
                     elif method == "time":
+                        # Perform the test's request and check how long
+                        # it takes to get the response back
                         start = time.time()
                         _ = Request.queryPage(reqPayload, place)
                         duration = calculateDeltaSeconds(start)
@@ -302,26 +325,44 @@ def checkSqlInjection(place, parameter, value):
 
                             injectable = True
 
+                # If the injection test was successful feed the injection
+                # object with the test's details
+                if injectable is True:
+                    # Feed with the boundaries details only the first time a
+                    # test has been successful
+                    if injection.place is None or injection.parameter is None:
+                        injection.place = place
+                        injection.parameter = parameter
+                        injection.ptype = ptype
+                        injection.prefix = prefix
+                        injection.suffix = suffix
+
+                    # Feed with test details every time a test is successful
+                    injection.data[stype] = (title, reqPayload, where, comment)
+
+                    if "details" in test:
+                        for detailKey, detailValue in test.details.items():
+                            if detailKey == "dbms" and injection.dbms is None:
+                                injection.dbms = detailValue
+                                kb.dbms = detailValue
+                            elif detailKey == "dbms_version" and injection.dbms_version is None:
+                                injection.dbms_version = detailValue
+                                kb.dbmsVersion = [ detailValue ]
+                            elif detailKey == "os" and injection.os is None:
+                                injection.os = detailValue
+
+                    beep()
+
+                    # There is no need to perform this test for other
+                    # <where> tags
+                    break
+
             if injectable is True:
-                injection.place = place
-                injection.parameter = parameter
-                injection.ptype = ptype
-                injection.prefix = prefix
-                injection.suffix = suffix
-
-                injection.data[stype] = (boundPayload, comment)
-
-                if "details" in test:
-                    for detailKey, detailValue in test.details.items():
-                        if detailKey == "dbms" and injection.dbms is None:
-                            injection.dbms = detailValue
-                        elif detailKey == "dbms_version" and injection.dbms_version is None:
-                            injection.dbms_version = detailValue
-                        elif detailKey == "os" and injection.os is None:
-                            injection.os = detailValue
-
+                # There is no need to perform this test with others
+                # boundaries
                 break
 
+    # Return the injection object
     if injection.place is not None and injection.parameter is not None:
         return injection
     else:

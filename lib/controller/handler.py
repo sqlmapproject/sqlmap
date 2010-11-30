@@ -50,7 +50,7 @@ def setHandler():
 
     count     = 0
     dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird", "SAP MaxDB", "Sybase" )
-    dbmsMap   = [
+    dbmsObj   = [
                   ( MYSQL_ALIASES, MySQLMap, MySQLConn ),
                   ( ORACLE_ALIASES, OracleMap, OracleConn ),
                   ( PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn ),
@@ -64,24 +64,27 @@ def setHandler():
 
     if kb.htmlFp:
         inferencedDbms = kb.htmlFp[-1]
-    elif hasattr(kb.injection, "dbms"):
-        inferencedDbms = kb.injection.dbms
     else:
         inferencedDbms = None
 
+    for injection in kb.injections:
+        if hasattr(injection, "dbms"):
+            inferencedDbms = injection.dbms
+            break
+
     if inferencedDbms is not None:
-        for i in xrange(len(dbmsMap)):
-            dbmsAliases, _, _ = dbmsMap[i]
+        for i in xrange(len(dbmsObj)):
+            dbmsAliases, _, _ = dbmsObj[i]
 
             if inferencedDbms.lower() in dbmsAliases:
                 if i > 0:
-                    pushValue(dbmsMap[i])
-                    dbmsMap.remove(dbmsMap[i])
-                    dbmsMap.insert(0, popValue())
+                    pushValue(dbmsObj[i])
+                    dbmsObj.remove(dbmsObj[i])
+                    dbmsObj.insert(0, popValue())
 
                 break
 
-    for dbmsAliases, dbmsMap, dbmsConn in dbmsMap:
+    for dbmsAliases, dbmsMap, dbmsConn in dbmsObj:
         if conf.dbms and conf.dbms not in dbmsAliases:
             debugMsg  = "skipping test for %s" % dbmsNames[count]
             logger.debug(debugMsg)
@@ -102,7 +105,6 @@ def setHandler():
         if handler.checkDbms():
             if not conf.dbms or conf.dbms in dbmsAliases:
                 kb.dbmsDetected = True
-
                 conf.dbmsHandler = handler
 
                 return

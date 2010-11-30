@@ -73,7 +73,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.postgresql.org/docs/8.4/interactive/release.html (up to 8.4.2)
         """
 
-        if conf.dbms in PGSQL_ALIASES:
+        if (kb.dbms is not None and kb.dbms.lower() in PGSQL_ALIASES) or conf.dbms in PGSQL_ALIASES:
             setDbms(DBMS.POSTGRESQL)
 
             self.getBanner()

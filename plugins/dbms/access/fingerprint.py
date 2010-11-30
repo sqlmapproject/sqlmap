@@ -152,7 +152,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if conf.dbms in ACCESS_ALIASES:
+        if (kb.dbms is not None and kb.dbms.lower() in ACCESS_ALIASES) or conf.dbms in ACCESS_ALIASES:
             setDbms(DBMS.ACCESS)
 
             if not conf.extensiveFp:
