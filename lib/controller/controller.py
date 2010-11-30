@@ -64,6 +64,7 @@ def __selectInjection():
 
     if len(points) == 1:
         kb.injection = kb.injections[0]
+
     elif len(points) > 1:
         message = "there were multiple injection points, please select "
         message += "the one to use for following injections:\n"
@@ -118,6 +119,8 @@ def __showInjections():
 
     for inj in kb.injections:
         data += __formatInjection(inj)
+
+    data = data.rstrip("\n")
 
     dumper.technic(header, data)
 
