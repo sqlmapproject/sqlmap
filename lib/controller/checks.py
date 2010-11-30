@@ -540,17 +540,22 @@ def checkStability():
         else:
             checkDynamicContent(firstPage, secondPage)
 
-            if not Request.queryPage():
-                warnMsg = "target url is heavily dynamic. retrying. "
-                logger.warn(warnMsg)
+            count = 0
+            while not Request.queryPage():
+                count += 1
+
+                if count > conf.retries:
+                    errMsg = "target url is too dynamic. unable to continue. "
+                    errMsg += "consider using other switches (e.g. "
+                    errMsg += "--longest-common, --string, --text-only, etc.)"
+                    raise sqlmapSiteTooDynamic, errMsg
+
+                warnMsg = "target url is heavily dynamic"
+                warnMsg += ", sqlmap is going to retry the request"
+                logger.critical(warnMsg)
+
                 secondPage, _ = Request.queryPage(content=True)
                 checkDynamicContent(firstPage, secondPage)
-
-            if not Request.queryPage():
-                errMsg = "target url is too dynamic. unable to continue. "
-                errMsg += "consider using other switches (e.g. "
-                errMsg += "--longest-common, --string, --text-only, etc.)"
-                raise sqlmapSiteTooDynamic, errMsg
 
     return kb.pageStable
 
