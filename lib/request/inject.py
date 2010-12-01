@@ -347,23 +347,13 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
 
     if conf.direct:
         value = direct(expression)
-    elif kb.booleanTest or kb.errorTest or kb.unionTest:
+    elif kb.booleanTest is not None or kb.errorTest is not None or kb.unionTest is not None:
         expression = cleanQuery(expression)
         expression = expandAsteriskForColumns(expression)
         value      = None
-
         expression = expression.replace("DISTINCT ", "")
 
-        if error and kb.errorTest:
-            value = goError(expression)
-
-            if not value:
-                warnMsg  = "for some reason(s) it was not possible to retrieve "
-                warnMsg += "the query output through error SQL injection "
-                warnMsg += "technique, sqlmap is going %s" % ("inband" if inband and kb.unionPosition is not None else "blind")
-                logger.warn(warnMsg)
-
-        if inband and kb.unionPosition is not None and not value:
+        if inband and kb.unionTest is not None:
             value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
             if not value:
@@ -376,6 +366,15 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
         oldParamNegative    = kb.unionNegative
         kb.unionFalseCond   = False
         kb.unionNegative    = False
+
+        if error and kb.errorTest and not value:
+            value = goError(expression)
+
+            if not value:
+                warnMsg  = "for some reason(s) it was not possible to retrieve "
+                warnMsg += "the query output through error SQL injection "
+                warnMsg += "technique, sqlmap is going %s" % ("inband" if inband and kb.unionPosition is not None else "blind")
+                logger.warn(warnMsg)
 
         if blind and kb.booleanTest and not value:
             value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
