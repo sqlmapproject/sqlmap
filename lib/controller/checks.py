@@ -338,7 +338,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.suffix = suffix
 
                     # Feed with test details every time a test is successful
-                    injection.data[stype] = (title, reqPayload, where, comment)
+                    injection.data[stype] = (title, agent.removePayloadDelimiters(reqPayload, False), where, comment)
 
                     if "details" in test:
                         for detailKey, detailValue in test.details.items():
