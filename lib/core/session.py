@@ -215,7 +215,7 @@ def setTimeBased(place, parameter, payload):
     if condition:
         dataToSessionFile("[%s][%s][%s][Time-based blind injection][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
 
-def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False, payload=None):
+def setUnion(comment=None, count=None, position=None, negative=False, falseCond=False, char=None, payload=None):
     """
     @param comment: union comment to save in session file
     @type comment: C{str}
@@ -283,6 +283,16 @@ def setUnion(comment=None, count=None, position=None, negative=False, falseCond=
             dataToSessionFile("[%s][%s][%s][Union false condition][Yes]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place])))
 
         kb.unionFalseCond = True
+
+    if char:
+        condition = (
+                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                      ( not kb.resumedQueries[conf.url].has_key("Union char")
+                      ) )
+                    )
+
+        if condition:
+            dataToSessionFile("[%s][%s][%s][Union char][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), char))
 
     if payload:
         condition = (
@@ -566,6 +576,12 @@ def resumeConfKb(expression, url, value):
         kb.unionFalseCond = True if value[:-1] == "Yes" else False
 
         logMsg = "resuming union false condition from session file"
+        logger.info(logMsg)
+
+    elif expression == "Union char" and url == conf.url:
+        conf.uChar = value[:-1]
+
+        logMsg = "resuming union char %s from session file" % conf.uChar
         logger.info(logMsg)
 
     elif expression == "Union payload" and url == conf.url:

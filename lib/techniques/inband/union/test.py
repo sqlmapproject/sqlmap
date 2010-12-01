@@ -138,26 +138,24 @@ def unionTest():
     infoMsg += "'%s' with %s technique" % (kb.injection.parameter, technique)
     logger.info(infoMsg)
 
-    validPayload = None
     comment = queries[kb.dbms].comment.query
-
     validPayload = __unionTestByCharBruteforce(comment)
 
     if validPayload:
+        validPayload = agent.removePayloadDelimiters(validPayload, False)
+        setUnion(char=conf.uChar)
         setUnion(comment=comment)
+        setUnion(payload=validPayload)
 
-    if isinstance(kb.unionPosition, int):
-        infoMsg  = "the target url is affected by an exploitable "
+    if kb.unionTest is not None:
+        infoMsg = "the target url is affected by an exploitable "
         infoMsg += "inband sql injection vulnerability "
         infoMsg += "on parameter '%s' with %d columns" % (kb.injection.parameter, kb.unionCount)
         logger.info(infoMsg)
     else:
-        infoMsg  = "the target url is not affected by an exploitable "
+        infoMsg = "the target url is not affected by an exploitable "
         infoMsg += "inband sql injection vulnerability "
         infoMsg += "on parameter '%s'" % kb.injection.parameter
         logger.info(infoMsg)
-
-    validPayload = agent.removePayloadDelimiters(validPayload, False)
-    setUnion(payload=validPayload)
 
     return kb.unionTest
