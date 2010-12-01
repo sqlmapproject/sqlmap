@@ -37,11 +37,10 @@ def errorUse(expression):
     output = None
     randInt = randomInt(1)
     query = agent.cleanupPayload(kb.injection.data[2].epayload)
+    query = unescaper.unescape(query)
     query = agent.prefixQuery(query)
     query = agent.suffixQuery(query)
     check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
-
-    expressionUnescaped = expression
 
     _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
     nulledCastedField = agent.nullAndCastField(fieldToCastStr)
@@ -50,8 +49,8 @@ def errorUse(expression):
         nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
 
     expression = expression.replace(fieldToCastStr, nulledCastedField, 1)
-    expression = safeStringFormat(query, expression)
     expression = unescaper.unescape(expression)
+    expression = safeStringFormat(query, expression)
 
     debugMsg = "query: %s" % expression
     logger.debug(debugMsg)
