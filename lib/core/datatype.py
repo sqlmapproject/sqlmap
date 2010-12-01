@@ -37,7 +37,7 @@ class advancedDict(dict):
         try:
             return self.__getitem__(item)
         except KeyError:
-            raise sqlmapDataException, "Unable to access item '%s'" % item
+            raise sqlmapDataException, "unable to access item '%s'" % item
 
     def __setattr__(self, item, value):
         """
@@ -55,6 +55,12 @@ class advancedDict(dict):
 
         else:
             self.__setitem__(item, value)
+
+    def __getstate__(self):
+        return self.__dict__
+
+    def __setstate__(self, dict):
+        self.__dict__ = dict
 
 def injectionDict():
     injection = advancedDict()

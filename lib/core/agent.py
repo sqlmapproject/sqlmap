@@ -158,6 +158,9 @@ class Agent:
         return string
 
     def cleanupPayload(self, payload):
+        if payload is None:
+            return
+
         randInt = randomInt()
         randInt1 = randomInt()
         randStr = randomStr()

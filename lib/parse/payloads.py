@@ -14,6 +14,9 @@ from lib.core.data import paths
 from lib.core.datatype import advancedDict
 
 def cleanupVals(values, tag):
+    if isinstance(values, basestring):
+        return values
+
     count = 0
 
     for value in values:
@@ -48,7 +51,7 @@ def parseXmlNode(node):
 
         for child in element.getchildren():
             if child.text and child.text.strip():
-                values = cleanupVals(child.text.split(','), child.tag)
+                values = cleanupVals(child.text.split(',') if child.tag != "epayload" else child.text, child.tag)
                 test[child.tag] = values
             else:
                 if len(child.getchildren()) == 0:

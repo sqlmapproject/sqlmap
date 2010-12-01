@@ -33,6 +33,7 @@ from lib.core.datatype import injectionDict
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
+from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
@@ -331,14 +332,28 @@ def checkSqlInjection(place, parameter, value):
                     # Feed with the boundaries details only the first time a
                     # test has been successful
                     if injection.place is None or injection.parameter is None:
+                        if place == PLACE.UA:
+                            injection.parameter = conf.agent
+                        else:
+                            injection.parameter = parameter
+
                         injection.place = place
-                        injection.parameter = parameter
                         injection.ptype = ptype
                         injection.prefix = prefix
                         injection.suffix = suffix
 
+                    if "epayload" in test:
+                        epayload = "%s%s" % (test.epayload, comment)
+                    else:
+                        epayload = None
+
                     # Feed with test details every time a test is successful
-                    injection.data[stype] = (title, agent.removePayloadDelimiters(reqPayload, False), where, comment)
+                    injection.data[stype] = advancedDict()
+                    injection.data[stype].title = title
+                    injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload, False)
+                    injection.data[stype].where = where
+                    injection.data[stype].epayload = epayload
+                    injection.data[stype].comment = comment
 
                     if "details" in test:
                         for detailKey, detailValue in test.details.items():
@@ -351,7 +366,8 @@ def checkSqlInjection(place, parameter, value):
                             elif detailKey == "os" and injection.os is None:
                                 injection.os = detailValue
 
-                    beep()
+                    if conf.beep:
+                        beep()
 
                     # There is no need to perform this test for other
                     # <where> tags
@@ -703,7 +719,6 @@ def checkConnection(suppressOutput=False):
     try:
         page, _ = Request.queryPage(content=True)
         conf.seqMatcher.set_seq1(page)
-
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg

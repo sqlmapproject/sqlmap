@@ -401,8 +401,8 @@ def goStacked(expression, silent=False):
         return direct(expression), None
 
     comment = queries[kb.dbms].comment.query
-    query   = agent.prefixQuery("; %s" % expression)
-    query   = agent.suffixQuery("%s;%s" % (query, comment))
+    query = agent.prefixQuery("; %s" % expression)
+    query = agent.suffixQuery("%s;%s" % (query, comment))
 
     debugMsg = "query: %s" % query
     logger.debug(debugMsg)
@@ -412,7 +412,7 @@ def goStacked(expression, silent=False):
 
     return payload, page
 
-def goError(expression, suppressOutput=False, returnPayload=False):
+def goError(expression, suppressOutput=False):
     """
     Retrieve the output of a SQL query taking advantage of an error-based
     SQL injection vulnerability on the affected parameter.
@@ -436,10 +436,8 @@ def goError(expression, suppressOutput=False, returnPayload=False):
         result = resume(expression, None)
 
     if not result:
-        result = errorUse(expression, returnPayload)
-
-        if not returnPayload:
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(result)))
+        result = errorUse(expression)
+        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(result)))
 
     if suppressOutput:
         conf.verbose = popValue()

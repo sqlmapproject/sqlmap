@@ -107,10 +107,9 @@ def __formatInjection(inj):
     data += "Parameter: %s\n" % inj.parameter
 
     for stype, sdata in inj.data.items():
-        stype = PAYLOAD.SQLINJECTION[stype] if isinstance(stype, int) else stype
         data += "    Type: %s\n" % stype
-        data += "    Title: %s\n" % sdata[0]
-        data += "    Payload: %s\n\n" % sdata[1]
+        data += "    Title: %s\n" % sdata.title
+        data += "    Payload: %s\n\n" % sdata.payload
 
     return data
 
@@ -136,7 +135,7 @@ def __saveToSessionFile():
         parameter = inj.parameter
 
         for stype, sdata in inj.data.items():
-            payload = sdata[1]
+            payload = sdata.payload
 
             if stype == 1:
                 kb.booleanTest = payload
@@ -303,7 +302,8 @@ def start():
                             # TODO: consider the following line in __setRequestParams()
                             __testableParameters = True
 
-            if not kb.injection.place or not kb.injection.parameter:
+            if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
+                and (kb.injection.place is None or kb.injection.parameter is None):
                 if not conf.string and not conf.regexp and not conf.eRegexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
@@ -394,7 +394,7 @@ def start():
                 __showInjections()
                 __selectInjection()
 
-            if kb.injection.place and kb.injection.parameter:
+            if kb.injection.place is not None and kb.injection.parameter is not None:
                 if conf.multipleTargets:
                     message = "do you want to exploit this SQL injection? [Y/n] "
                     exploit = readInput(message, default="Y")

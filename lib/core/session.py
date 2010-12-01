@@ -12,6 +12,8 @@ import re
 from lib.core.common import dataToSessionFile
 from lib.core.common import formatFingerprintString
 from lib.core.common import readInput
+from lib.core.convert import base64pickle
+from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -78,30 +80,15 @@ def setInjection(inj):
     session file.
     """
 
-    if inj.place == PLACE.UA:
-        inj.parameter = conf.agent
-
     condition = (
                   ( not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
-                  ( not kb.resumedQueries[conf.url].has_key("Injection point")
-                  or not kb.resumedQueries[conf.url].has_key("Injection parameter")
-                  ) ) )
+                  not kb.resumedQueries[conf.url].has_key("Injection data")
+                  ) )
                 )
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][Injection point][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.place))
-        dataToSessionFile("[%s][%s][%s][Injection parameter][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.parameter))
-        dataToSessionFile("[%s][%s][%s][Injection parameter type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.PARAMETER[inj.ptype]))
-        dataToSessionFile("[%s][%s][%s][Injection prefix][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.prefix))
-        dataToSessionFile("[%s][%s][%s][Injection suffix][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), inj.suffix))
-
-        for stype, sdata in inj.data.items():
-            dataToSessionFile("[%s][%s][%s][Injection type][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), PAYLOAD.SQLINJECTION[stype]))
-            dataToSessionFile("[%s][%s][%s][Injection title][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[0]))
-            dataToSessionFile("[%s][%s][%s][Injection payload][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[1]))
-            dataToSessionFile("[%s][%s][%s][Injection where][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[2]))
-            dataToSessionFile("[%s][%s][%s][Injection comment][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), sdata[3]))
+        dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
 
 def setDbms(dbms):
     """
@@ -370,96 +357,11 @@ def resumeConfKb(expression, url, value):
         except ValueError:
             pass
 
-    elif expression == "Injection point" and url == conf.url:
-        injPlace = value[:-1]
+    elif expression == "Injection data" and url == conf.url:
+        injection = base64unpickle(value[:-1])
+        kb.injections.append(injection)
 
-        logMsg = "resuming injection point '%s' from session file" % injPlace
-        logger.info(logMsg)
-
-        if not conf.paramDict.has_key(injPlace):
-            warnMsg  = "none of the parameters you provided "
-            warnMsg += "matches the resumable injection point. "
-            warnMsg += "sqlmap is going to reidentify the "
-            warnMsg += "injectable point"
-            logger.warn(warnMsg)
-        else:
-            if kb.injection.place is not None and kb.injection.parameter is not None:
-                kb.injections.append(kb.injection)
-                kb.injection = injectionDict()
-
-            kb.injection.place = injPlace
-
-    elif expression == "Injection parameter" and url == conf.url:
-        injParameter = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming injection parameter '%s' from session file" % injParameter
-        logger.info(logMsg)
-
-        condition = (
-                      not conf.paramDict.has_key(kb.injection.place) or
-                      not conf.paramDict[kb.injection.place].has_key(injParameter)
-                    )
-
-        if condition:
-            warnMsg  = "none of the parameters you provided "
-            warnMsg += "matches the resumable injection parameter. "
-            warnMsg += "sqlmap is going to reidentify the "
-            warnMsg += "injectable point"
-            logger.warn(warnMsg)
-        else:
-            kb.injection.parameter = injParameter
-
-    elif expression == "Injection parameter type" and url == conf.url:
-        kb.injection.ptype = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming injection parameter type '%s' from session file" % kb.injection.ptype
-        logger.info(logMsg)
-
-    elif expression == "Injection prefix" and url == conf.url:
-        kb.injection.prefix = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming injection prefix '%s' from session file" % kb.injection.prefix
-        logger.info(logMsg)
-
-    elif expression == "Injection suffix" and url == conf.url:
-        kb.injection.suffix = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming injection suffix '%s' from session file" % kb.injection.suffix
-        logger.info(logMsg)
-
-    elif expression == "Injection type" and url == conf.url:
-        stype = unSafeFormatString(value[:-1])
-        kb.injection.data[stype] = []
-
-        logMsg = "resuming injection type '%s' from session file" % stype
-        logger.info(logMsg)
-
-    elif expression == "Injection title" and url == conf.url:
-        title = unSafeFormatString(value[:-1])
-        kb.injection.data[kb.injection.data.keys()[0]].append(title)
-
-        logMsg = "resuming injection title '%s' from session file" % title
-        logger.info(logMsg)
-
-    elif expression == "Injection payload" and url == conf.url:
-        payload = unSafeFormatString(value[:-1])
-        kb.injection.data[kb.injection.data.keys()[0]].append(payload)
-
-        logMsg = "resuming injection payload '%s' from session file" % payload
-        logger.info(logMsg)
-
-    elif expression == "Injection where" and url == conf.url:
-        where = unSafeFormatString(value[:-1])
-        kb.injection.data[kb.injection.data.keys()[0]].append(where)
-
-        logMsg = "resuming injection where '%s' from session file" % where
-        logger.info(logMsg)
-
-    elif expression == "Injection comment" and url == conf.url:
-        comment = unSafeFormatString(value[:-1])
-        kb.injection.data[kb.injection.data.keys()[0]].append(comment)
-
-        logMsg = "resuming injection comment '%s' from session file" % comment
+        logMsg = "resuming injection data"
         logger.info(logMsg)
 
     elif expression == "Boolean-based blind injection" and url == conf.url:
