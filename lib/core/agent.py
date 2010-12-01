@@ -22,8 +22,6 @@ from lib.core.datatype import advancedDict
 from lib.core.enums import DBMS
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.settings import ERROR_START_CHAR
-from lib.core.settings import ERROR_END_CHAR
 from lib.core.settings import PAYLOAD_DELIMITER
 
 class Agent:
@@ -33,9 +31,9 @@ class Agent:
 
     def __init__(self):
         kb.misc           = advancedDict()
-        kb.misc.delimiter = randomStr(6)
-        kb.misc.start     = randomStr(6)
-        kb.misc.stop      = randomStr(6)
+        kb.misc.delimiter = randomStr(length=6)
+        kb.misc.start     = ":%s:" % randomStr(length=3, lowercase=True)
+        kb.misc.stop      = ":%s:" % randomStr(length=3, lowercase=True)
 
     def payloadDirect(self, query):
         if query.startswith("AND "):
@@ -163,12 +161,14 @@ class Agent:
         randInt = randomInt()
         randInt1 = randomInt()
         randStr = randomStr()
+        randStr1 = randomStr()
 
         payload = payload.replace("[RANDNUM]", str(randInt))
         payload = payload.replace("[RANDNUM1]", str(randInt1))
         payload = payload.replace("[RANDSTR]", randStr)
-        payload = payload.replace("[ERROR_START_CHAR]", ERROR_START_CHAR)
-        payload = payload.replace("[ERROR_END_CHAR]", ERROR_END_CHAR)
+        payload = payload.replace("[RANDSTR1]", randStr1)
+        payload = payload.replace("[DELIMITER_START]", kb.misc.start)
+        payload = payload.replace("[DELIMITER_STOP]", kb.misc.stop)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
 
         return payload

@@ -27,8 +27,6 @@ from lib.utils.resume import resume
 
 from lib.core.settings import ERROR_SPACE
 from lib.core.settings import ERROR_EMPTY_CHAR
-from lib.core.settings import ERROR_START_CHAR
-from lib.core.settings import ERROR_END_CHAR
 
 def errorUse(expression, returnPayload=False):
     """
@@ -55,21 +53,20 @@ def errorUse(expression, returnPayload=False):
 
         expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
         expressionUnescaped              = unescaper.unescape(expressionReplaced)
-        startLimiter                     = unescaper.unescape("'%s'" % ERROR_START_CHAR)
-        endLimiter                       = unescaper.unescape("'%s'" % ERROR_END_CHAR)
+        startLimiter                     = unescaper.unescape("'%s'" % kb.misc.start)
+        endLimiter                       = unescaper.unescape("'%s'" % kb.misc.stop)
     else:
         expressionUnescaped              = kb.misc.handler.unescape(expression)
-        startLimiter                     = kb.misc.handler.unescape("'%s'" % ERROR_START_CHAR)
-        endLimiter                       = kb.misc.handler.unescape("'%s'" % ERROR_END_CHAR)
+        startLimiter                     = kb.misc.handler.unescape("'%s'" % kb.misc.start)
+        endLimiter                       = kb.misc.handler.unescape("'%s'" % kb.misc.stop)
 
     forgedQuery = safeStringFormat(query, (logic, randInt, startLimiter, expressionUnescaped, endLimiter))
-
     debugMsg = "query: %s" % forgedQuery
     logger.debug(debugMsg)
 
     payload = agent.payload(newValue=forgedQuery)
     result = Request.queryPage(payload, content=True)
-    match = re.search('%s(?P<result>.*?)%s' % (ERROR_START_CHAR, ERROR_END_CHAR), result[0], re.DOTALL | re.IGNORECASE)
+    match = re.search('%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), result[0], re.DOTALL | re.IGNORECASE)
 
     if match:
         output = match.group('result')
