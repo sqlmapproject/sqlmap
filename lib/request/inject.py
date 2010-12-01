@@ -99,7 +99,12 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     parameter through a bisection algorithm.
     """
 
-    query          = agent.prefixQuery(queries[kb.misc.testedDbms].inference.query)
+    if kb.injection.data[1].epayload is not None:
+        vector = agent.cleanupPayload(kb.injection.data[1].epayload)
+    else:
+        vector = queries[kb.misc.testedDbms].inference.query
+
+    query          = agent.prefixQuery(vector)
     query          = agent.suffixQuery(query)
     payload        = agent.payload(newValue=query)
     count          = None

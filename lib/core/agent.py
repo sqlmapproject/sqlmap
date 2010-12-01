@@ -76,6 +76,7 @@ class Agent:
             paramString = conf.parameters[kb.injection.place]
             paramDict = conf.paramDict[kb.injection.place]
             value = paramDict[kb.injection.parameter]
+            newValue = self.cleanupPayload(newValue, value)
 
             if "POSTxml" in conf.paramDict and kb.injection.place == PLACE.POST:
                 root = ET.XML(paramString)
@@ -155,9 +156,9 @@ class Agent:
         string += " %s" % kb.injection.suffix
         string = self.cleanupPayload(string)
 
-        return string
+        return string.rstrip()
 
-    def cleanupPayload(self, payload):
+    def cleanupPayload(self, payload, origvalue=None):
         if payload is None:
             return
 
@@ -173,6 +174,12 @@ class Agent:
         payload = payload.replace("[DELIMITER_START]", kb.misc.start)
         payload = payload.replace("[DELIMITER_STOP]", kb.misc.stop)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+
+        if origvalue is not None:
+            if not origvalue.isdigit():
+                origvalue = "'%s'" % origvalue
+
+            payload = payload.replace("[ORIGVALUE]", origvalue)
 
         return payload
 

@@ -151,7 +151,7 @@ def checkSqlInjection(place, parameter, value):
 
         # Parse test's <request>
         comment = agent.getComment(test.request)
-        fstPayload = agent.cleanupPayload(test.request.payload)
+        fstPayload = agent.cleanupPayload(test.request.payload, value)
         fstPayload = unescapeDbms(fstPayload, injection, dbms)
         fstPayload = "%s%s" % (fstPayload, comment)
 
@@ -246,18 +246,18 @@ def checkSqlInjection(place, parameter, value):
                 # test's ' <payload><comment> ' string
                 boundPayload = "%s%s %s %s" % (origValue, prefix, fstPayload, suffix)
                 boundPayload = boundPayload.strip()
-                boundPayload = agent.cleanupPayload(boundPayload)
+                boundPayload = agent.cleanupPayload(boundPayload, value)
                 reqPayload = agent.payload(place, parameter, value, boundPayload)
 
                 # Perform the test's request and check whether or not the
                 # payload was successful
                 # Parse test's <response>
                 for method, check in test.response.items():
-                    check = agent.cleanupPayload(check)
+                    check = agent.cleanupPayload(check, value)
 
                     # In case of boolean-based blind SQL injection
                     if method == "comparison":
-                        sndPayload = agent.cleanupPayload(test.response.comparison)
+                        sndPayload = agent.cleanupPayload(test.response.comparison, value)
                         sndPayload = unescapeDbms(sndPayload, injection, dbms)
                         sndPayload = "%s%s" % (sndPayload, comment)
 
@@ -267,7 +267,7 @@ def checkSqlInjection(place, parameter, value):
                         # string
                         boundPayload = "%s%s %s %s" % (origValue, prefix, sndPayload, suffix)
                         boundPayload = boundPayload.strip()
-                        boundPayload = agent.cleanupPayload(boundPayload)
+                        boundPayload = agent.cleanupPayload(boundPayload, value)
                         cmpPayload = agent.payload(place, parameter, value, boundPayload)
 
                         # Useful to set conf.matchRatio at first based on

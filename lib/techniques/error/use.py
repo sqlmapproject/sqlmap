@@ -35,7 +35,6 @@ def errorUse(expression):
     """
 
     output = None
-    randInt = randomInt(1)
     query = agent.cleanupPayload(kb.injection.data[2].epayload)
     query = unescaper.unescape(query)
     query = agent.prefixQuery(query)
