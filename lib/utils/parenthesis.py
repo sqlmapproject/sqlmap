@@ -27,7 +27,6 @@ def checkForParenthesis():
     logMsg = "testing for parenthesis on injectable parameter"
     logger.info(logMsg)
 
-    logic = conf.logic
     count = 0
     case = getInjectionCase(kb.injType)
 

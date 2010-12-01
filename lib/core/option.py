@@ -1081,7 +1081,6 @@ def __setConfAttributes():
     conf.httpHeaders      = []
     conf.hostname         = None
     conf.loggedToOut      = None
-    conf.logic            = "AND"
     conf.matchRatio       = None
     conf.multipleTargets  = False
     conf.outputPath       = None
