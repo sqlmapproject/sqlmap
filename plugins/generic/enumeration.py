@@ -17,6 +17,7 @@ from lib.core.common import getCompiledRegex
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getUnicode
+from lib.core.common import isNumPosStrValue
 from lib.core.common import parsePasswordHash
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -159,7 +160,7 @@ class Enumeration:
                 query = rootQuery.blind.count
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-            if not count.isdigit() or not len(count) or count == "0":
+            if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
                 raise sqlmapNoneDataException, errMsg
 
@@ -268,7 +269,7 @@ class Enumeration:
                     query = rootQuery.blind.count % user
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
+                if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of password "
                     warnMsg += "hashes for user '%s'" % user
                     logger.warn(warnMsg)
@@ -547,8 +548,8 @@ class Enumeration:
                     query = rootQuery.blind.count % queryUser
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
-                    if not count.isdigit() and kb.dbms == DBMS.ORACLE and not query2:
+                if not isNumPosStrValue(count):
+                    if not (isinstance(count, basestring) and count.isdigit()) and kb.dbms == DBMS.ORACLE and not query2:
                         infoMsg = "trying with table USER_SYS_PRIVS"
                         logger.info(infoMsg)
 
@@ -686,7 +687,7 @@ class Enumeration:
                 query = rootQuery.blind.count
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-            if not count.isdigit() or not len(count) or count == "0":
+            if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of databases"
                 raise sqlmapNoneDataException, errMsg
 
@@ -811,7 +812,7 @@ class Enumeration:
                     query = rootQuery.blind.count % db
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
+                if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of "
                     warnMsg += "tables for database '%s'" % db
                     logger.warn(warnMsg)
@@ -982,7 +983,7 @@ class Enumeration:
 
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-            if not count.isdigit() or not len(count) or count == "0":
+            if not isNumPosStrValue(count):
                 errMsg  = "unable to retrieve the number of columns "
                 errMsg += "for table '%s' " % conf.tbl
                 errMsg += "on database '%s'" % conf.db
@@ -1165,7 +1166,7 @@ class Enumeration:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
             count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-            if not count.isdigit() or not len(count) or count == "0":
+            if not isNumPosStrValue(count):
                 warnMsg = "unable to retrieve the number of "
                 if conf.col:
                     warnMsg += "columns '%s' " % colString
@@ -1400,7 +1401,7 @@ class Enumeration:
                 query += exclDbsQuery
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
+                if not isNumPosStrValue(count):
                     warnMsg  = "no database"
                     if dbConsider == "1":
                         warnMsg += "s like"
@@ -1485,7 +1486,7 @@ class Enumeration:
                 query += exclDbsQuery
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
+                if not isNumPosStrValue(count):
                     warnMsg  = "no databases have table"
                     if tblConsider == "1":
                         warnMsg += "s like"
@@ -1522,7 +1523,7 @@ class Enumeration:
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                    if not count.isdigit() or not len(count) or count == "0":
+                    if not isNumPosStrValue(count):
                         warnMsg = "no table"
                         if tblConsider == "1":
                             warnMsg += "s like"
@@ -1624,7 +1625,7 @@ class Enumeration:
                 query += exclDbsQuery
                 count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
+                if not isNumPosStrValue(count):
                     warnMsg  = "no databases have tables containing column"
                     if colConsider == "1":
                         warnMsg += "s like"
@@ -1664,7 +1665,7 @@ class Enumeration:
                         query += " AND %s" % colQuery
                         count = inject.getValue(query, inband=False, expected="int", charsetType=2)
 
-                        if not count.isdigit() or not len(count) or count == "0":
+                        if not isNumPosStrValue(count):
                             warnMsg = "no tables contain column"
                             if colConsider == "1":
                                 warnMsg += "s like"

@@ -1639,3 +1639,6 @@ def trimAlphaNum(value):
         value = value[1:]
 
     return value
+
+def isNumPosStrValue(value):
+    return value and isinstance(value, basestring) and value.isdigit() and value != "0"
