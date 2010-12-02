@@ -15,59 +15,63 @@ class Syntax(GenericSyntax):
     def __init__(self):
         GenericSyntax.__init__(self)
 
+    # As ASCII_CHAR is only available from v2.1 we'll need to adapt this one to use the
+    # commented-out part only if detected version>=2.1
+    # Reference: wiki.firebirdsql.org/wiki/index.php?page=ASCII_CHAR
+
     @staticmethod
     def unescape(expression, quote=True):
-        if quote:
-            while True:
-                index = expression.find("'")
-                if index == -1:
-                    break
+        #if quote:
+            #while True:
+                #index = expression.find("'")
+                #if index == -1:
+                    #break
 
-                firstIndex = index + 1
-                index = expression[firstIndex:].find("'")
+                #firstIndex = index + 1
+                #index = expression[firstIndex:].find("'")
 
-                if index == -1:
-                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
+                #if index == -1:
+                    #raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
 
-                lastIndex = firstIndex + index
-                old = "'%s'" % expression[firstIndex:lastIndex]
-                unescaped = ""
+                #lastIndex = firstIndex + index
+                #old = "'%s'" % expression[firstIndex:lastIndex]
+                #unescaped = ""
 
-                for i in range(firstIndex, lastIndex):
-                    unescaped += "ASCII_CHAR(%d)" % (ord(expression[i]))
-                    if i < lastIndex - 1:
-                        unescaped += "||"
+                #for i in range(firstIndex, lastIndex):
+                    #unescaped += "ASCII_CHAR(%d)" % (ord(expression[i]))
+                    #if i < lastIndex - 1:
+                        #unescaped += "||"
 
-                expression = expression.replace(old, unescaped)
-        else:
-            unescaped = "".join("ASCII_CHAR(%d)||" % ord(c) for c in expression)
-            if unescaped[-1] == "||":
-                unescaped = unescaped[:-1]
+                #expression = expression.replace(old, unescaped)
+        #else:
+            #unescaped = "".join("ASCII_CHAR(%d)||" % ord(c) for c in expression)
+            #if unescaped[-1] == "||":
+                #unescaped = unescaped[:-1]
 
-            expression = unescaped
+            #expression = unescaped
 
         return expression
 
     @staticmethod
     def escape(expression):
-        while True:
-            index = expression.find("ASCII_CHAR(")
-            if index == -1:
-                break
+        #while True:
+            #index = expression.find("ASCII_CHAR(")
+            #if index == -1:
+                #break
 
-            firstIndex = index
-            index = expression[firstIndex:].find(")")
+            #firstIndex = index
+            #index = expression[firstIndex:].find(")")
 
-            if index == -1:
-                raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
+            #if index == -1:
+                #raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
 
-            lastIndex = firstIndex + index + 1
-            old = expression[firstIndex:lastIndex]
-            oldUpper = old.upper()
-            oldUpper = oldUpper.lstrip("ASCII_CHAR(").rstrip(")")
-            oldUpper = oldUpper.split("||")
+            #lastIndex = firstIndex + index + 1
+            #old = expression[firstIndex:lastIndex]
+            #oldUpper = old.upper()
+            #oldUpper = oldUpper.lstrip("ASCII_CHAR(").rstrip(")")
+            #oldUpper = oldUpper.split("||")
 
-            escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
-            expression = expression.replace(old, escaped).replace("'||'", "")
+            #escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
+            #expression = expression.replace(old, escaped).replace("'||'", "")
 
         return expression

