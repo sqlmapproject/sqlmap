@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
+from lib.core.common import aliasToDbmsEnum
 from lib.core.common import dataToSessionFile
 from lib.core.common import formatFingerprintString
 from lib.core.common import readInput
@@ -420,10 +421,10 @@ def resumeConfKb(expression, url, value):
             test = readInput(message, default="N")
 
             if not test or test[0] in ("n", "N"):
-                kb.dbms = dbms
+                kb.dbms = aliasToDbmsEnum(dbms)
                 kb.dbmsVersion = dbmsVersion
         else:
-            kb.dbms = dbms
+            kb.dbms = aliasToDbmsEnum(dbms)
             kb.dbmsVersion = dbmsVersion
 
     elif expression == "OS" and url == conf.url:

@@ -38,6 +38,7 @@ from xml.sax import parse
 from extra.cloak.cloak import decloak
 from lib.contrib import magic
 from lib.core.data import conf
+from lib.core.data import dbmsDict
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -59,13 +60,6 @@ from lib.core.settings import SITE
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import VERSION_STRING
-from lib.core.settings import MSSQL_ALIASES
-from lib.core.settings import MYSQL_ALIASES
-from lib.core.settings import PGSQL_ALIASES
-from lib.core.settings import ORACLE_ALIASES
-from lib.core.settings import SQLITE_ALIASES
-from lib.core.settings import ACCESS_ALIASES
-from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
 from lib.core.settings import DUMP_DEL_MARKER
@@ -732,14 +726,6 @@ def parseTargetDirect():
         errMsg += "'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME' "
         errMsg += "or 'access://DATABASE_FILEPATH'"
         raise sqlmapSyntaxException, errMsg
-
-    dbmsDict = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
-                 DBMS.MYSQL: [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
-                 DBMS.PGSQL: [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
-                 DBMS.ORACLE: [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
-                 DBMS.SQLITE: [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
-                 DBMS.ACCESS: [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
-                 DBMS.FIREBIRD: [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"] }
 
     for dbmsName, data in dbmsDict.items():
         if conf.dbms in data[0]:
@@ -1642,3 +1628,12 @@ def trimAlphaNum(value):
 
 def isNumPosStrValue(value):
     return value and isinstance(value, basestring) and value.isdigit() and value != "0"
+
+def aliasToDbmsEnum(value):
+    retVal = None
+    for key, item in dbmsDict.items():
+        if value in item[0]:
+            retVal = key
+            break
+    return retVal
+
