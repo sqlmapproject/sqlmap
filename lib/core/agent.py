@@ -148,6 +148,9 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
+        # Either if the technique is stacked queries (<stype>) or we are
+        # replacing (<where>) the parameter original value with our
+        # payload, do not put a space after the prefix
         if kb.technique == 4:
             query = kb.injection.prefix
         elif kb.technique and kb.technique in kb.injection.data:
