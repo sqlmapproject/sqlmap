@@ -93,6 +93,7 @@ def resume(expression, payload):
     This function can be called to resume part or entire output of a
     SQL injection query output.
     """
+
     try:
         if "sqlmapfile" in expression or "sqlmapoutput" in expression:
             return None
@@ -132,11 +133,11 @@ def resume(expression, payload):
 
             return resumedValue
 
-        # If we called this function without providing a payload it means that
-        # we have called it from lib/request/inject __goInband() function
-        # in UNION query (inband) SQL injection so we return to the calling
-        # function so that the query output will be retrieved taking advantage
-        # of the inband SQL injection vulnerability.
+        # If we called this function without providing a payload it means
+        # that we have called it from lib/request/inject __goInband() or
+        # from __goError() function so we return to the calling function
+        # so that the query output will be retrieved taking advantage
+        # of either error-based or inband SQL injection vulnerability.
         if not payload:
             return None
 
