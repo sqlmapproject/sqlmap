@@ -265,7 +265,7 @@ def start():
 
             setupTargetEnv()
 
-            if not checkConnection(conf.forms) or not checkString() or not checkRegexp():
+            if not checkConnection(suppressOutput=conf.forms) or not checkString() or not checkRegexp():
                 continue
 
             if conf.nullConnection:

@@ -1170,6 +1170,7 @@ def __setKnowledgeBaseAttributes():
     kb.partRun         = None
     kb.proxyAuthHeader = None
     kb.queryCounter    = 0
+    kb.responseTime    = 0
     kb.resumedQueries  = {}
     kb.retriesCount    = 0
     kb.tamperFunctions = []

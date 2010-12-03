@@ -734,7 +734,9 @@ def checkConnection(suppressOutput=False):
         logger.info(infoMsg)
 
     try:
+        start = time.time()
         page, _ = Request.queryPage(content=True)
+        kb.responseTime = time.time() - start
         conf.seqMatcher.set_seq1(page)
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)

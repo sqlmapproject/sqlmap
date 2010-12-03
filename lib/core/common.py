@@ -1290,12 +1290,12 @@ def readXmlFile(xmlFile):
     xfile.close()
     return retVal
 
-def calculateDeltaSeconds(start, epsilon=0.05):
+def calculateDeltaSeconds(start, epsilon=0.1):
     """
     Returns elapsed time from start till now (including expected
     error set by epsilon parameter)
     """
-    return int(time.time() - start + epsilon)
+    return int(time.time() - start - kb.responseTime + epsilon)
 
 def initCommonOutputs():
     kb.commonOutputs = {}
