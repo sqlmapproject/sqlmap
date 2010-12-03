@@ -107,7 +107,7 @@ def __formatInjection(inj):
     data += "Parameter: %s\n" % inj.parameter
 
     for stype, sdata in inj.data.items():
-        data += "    Type: %s\n" % stype
+        data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % sdata.title
         data += "    Payload: %s\n\n" % sdata.payload
 
