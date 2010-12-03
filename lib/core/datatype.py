@@ -70,6 +70,7 @@ def injectionDict():
     injection.ptype = None
     injection.prefix = None
     injection.suffix = None
+    injection.clause = None
 
     # data is a dict with stype as key and a tuple as value with
     # title, where, comment and reqPayload

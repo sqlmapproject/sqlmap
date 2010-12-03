@@ -94,6 +94,7 @@ def checkSqlInjection(place, parameter, value):
     for test in conf.tests:
         title = test.title
         stype = test.stype
+        clause = test.clause
 
         # Skip test if the risk is higher than the provided (or default)
         # value
@@ -142,6 +143,22 @@ def checkSqlInjection(place, parameter, value):
             debugMsg = "skipping test '%s' because " % title
             debugMsg += "the payload for %s has " % PAYLOAD.SQLINJECTION[stype]
             debugMsg += "already been identified"
+            logger.debug(debugMsg)
+            continue
+
+        # Skip test if it does not match the same SQL injection clause
+        # already identified by another test
+        # Parse test's <clause>
+        clauseMatch = False
+
+        for clauseTest in clause:
+            if injection.clause is not None and clauseTest in injection.clause:
+                clauseMatch = True
+                break
+
+        if clause != [ 0 ] and injection.clause and not clauseMatch:
+            debugMsg = "skipping test '%s' because the clause " % title
+            debugMsg += "differs from the clause already identified"
             logger.debug(debugMsg)
             continue
 
@@ -340,6 +357,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.ptype = ptype
                         injection.prefix = prefix
                         injection.suffix = suffix
+                        injection.clause = clause
 
                     if "epayload" in test:
                         epayload = "%s%s" % (test.epayload, comment)
