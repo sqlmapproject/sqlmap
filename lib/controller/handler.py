@@ -93,7 +93,7 @@ def setHandler():
 
             continue
 
-        kb.misc.handler = handler = dbmsMap()
+        handler = dbmsMap()
         conf.dbmsConnector = dbmsConn()
 
         if conf.direct:
