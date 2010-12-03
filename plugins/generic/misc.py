@@ -57,7 +57,7 @@ class Miscellaneous:
         if kb.dbms == DBMS.MYSQL:
             first, last = 1, 6
 
-        elif kb.dbms == DBMS.POSTGRESQL:
+        elif kb.dbms == DBMS.PGSQL:
             first, last = 12, 6
 
         elif kb.dbms == DBMS.MSSQL:
@@ -130,7 +130,7 @@ class Miscellaneous:
                 if not output or output in ("y", "Y"):
                     dropStr = "DROP FUNCTION %s" % udf
 
-                    if kb.dbms == DBMS.POSTGRESQL:
+                    if kb.dbms == DBMS.PGSQL:
                         inp      = ", ".join(i for i in inpRet["input"])
                         dropStr += "(%s)" % inp
 

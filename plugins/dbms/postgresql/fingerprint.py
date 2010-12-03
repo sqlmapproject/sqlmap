@@ -47,7 +47,7 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
 
         if not conf.extensiveFp:
-            value += DBMS.POSTGRESQL
+            value += DBMS.PGSQL
             return value
 
         actVer      = formatDBMSfp()
@@ -74,7 +74,7 @@ class Fingerprint(GenericFingerprint):
         """
 
         if (kb.dbms is not None and kb.dbms.lower() in PGSQL_ALIASES) or conf.dbms in PGSQL_ALIASES:
-            setDbms(DBMS.POSTGRESQL)
+            setDbms(DBMS.PGSQL)
 
             self.getBanner()
 
@@ -102,7 +102,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            setDbms(DBMS.POSTGRESQL)
+            setDbms(DBMS.PGSQL)
 
             self.getBanner()
 

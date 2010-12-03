@@ -146,7 +146,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "is unlikely to receive commands send from you"
                 logger.error(errMsg)
 
-            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                 self.sysUdfs.pop("sys_bineval")
 
         if kb.stackedTest or conf.direct:
@@ -156,7 +156,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.initEnv(web=web)
 
             if tunnel == 1:
-                if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                     msg  = "how do you want to execute the Metasploit shellcode "
                     msg += "on the back-end database underlying operating system?"
                     msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
@@ -253,7 +253,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             raise sqlmapUnsupportedDBMSException(errMsg)
 
         if not kb.stackedTest and not conf.direct:
-            if kb.dbms in ( DBMS.POSTGRESQL, DBMS.MSSQL ):
+            if kb.dbms in ( DBMS.PGSQL, DBMS.MSSQL ):
                 errMsg  = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
                 errMsg += "queries are supported"
@@ -274,7 +274,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             warnMsg += "not send the NTLM session hash when connecting to "
             warnMsg += "a SMB service"
 
-        elif kb.dbms == DBMS.POSTGRESQL:
+        elif kb.dbms == DBMS.PGSQL:
             warnMsg += "because by default PostgreSQL on Windows runs "
             warnMsg += "as postgres user which is a real user of the "
             warnMsg += "system, but not within the Administrators group"

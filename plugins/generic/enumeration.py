@@ -342,7 +342,7 @@ class Enumeration:
     def __isAdminFromPrivileges(self, privileges):
         # In PostgreSQL the usesuper privilege means that the
         # user is DBA
-        dbaCondition  = ( kb.dbms == DBMS.POSTGRESQL and "super" in privileges )
+        dbaCondition  = ( kb.dbms == DBMS.PGSQL and "super" in privileges )
 
         # In Oracle the DBA privilege means that the
         # user is DBA
@@ -467,7 +467,7 @@ class Enumeration:
 
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
-                            if kb.dbms == DBMS.POSTGRESQL and getUnicode(privilege).isdigit():
+                            if kb.dbms == DBMS.PGSQL and getUnicode(privilege).isdigit():
                                 for position, pgsqlPriv in pgsqlPrivs:
                                     if count == position and int(privilege) == 1:
                                         privileges.add(pgsqlPriv)
@@ -586,7 +586,7 @@ class Enumeration:
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise
-                    if kb.dbms == DBMS.POSTGRESQL and ", " in privilege:
+                    if kb.dbms == DBMS.PGSQL and ", " in privilege:
                         privilege = privilege.replace(", ", ",")
                         privs = privilege.split(",")
                         i = 1
@@ -931,7 +931,7 @@ class Enumeration:
         logger.info(infoMsg)
 
         if kb.unionPosition is not None or conf.direct:
-            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                 query = rootQuery.inband.query % (conf.tbl, conf.db)
                 query += condQuery
             elif kb.dbms == DBMS.ORACLE:
@@ -968,7 +968,7 @@ class Enumeration:
             infoMsg += " on database '%s'" % conf.db
             logger.info(infoMsg)
 
-            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                 query = rootQuery.blind.count % (conf.tbl, conf.db)
                 query += condQuery
             elif kb.dbms == DBMS.ORACLE:
@@ -995,7 +995,7 @@ class Enumeration:
             indexRange = getRange(count)
 
             for index in indexRange:
-                if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                     query = rootQuery.blind.query % (conf.tbl, conf.db)
                     query += condQuery
                     field = None
@@ -1019,7 +1019,7 @@ class Enumeration:
                 column = inject.getValue(query, inband=False)
 
                 if not onlyColNames:
-                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                         query = rootQuery.blind.query2 % (conf.tbl, column, conf.db)
                     elif kb.dbms == DBMS.ORACLE:
                         query = rootQuery.blind.query2 % (conf.tbl.upper(), column)
@@ -1194,7 +1194,7 @@ class Enumeration:
                     if column not in entries:
                         entries[column] = []
 
-                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                         query = rootQuery.blind.query % (column, conf.db,
                                                                conf.tbl, index)
                     elif kb.dbms == DBMS.ORACLE:

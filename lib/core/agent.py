@@ -371,7 +371,7 @@ class Agent:
         if kb.dbms == DBMS.MYSQL:
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
-        elif kb.dbms in ( DBMS.POSTGRESQL, DBMS.ORACLE, DBMS.SQLITE ):
+        elif kb.dbms in ( DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE ):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
         elif kb.dbms == DBMS.MSSQL:
@@ -429,7 +429,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-        elif kb.dbms in ( DBMS.POSTGRESQL, DBMS.ORACLE, DBMS.SQLITE ):
+        elif kb.dbms in ( DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE ):
             if fieldsSelectCase:
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
@@ -580,7 +580,7 @@ class Agent:
         fromFrom = limitedQuery[fromIndex+1:]
         orderBy = False
 
-        if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL, DBMS.SQLITE ):
+        if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE ):
             limitStr = queries[kb.dbms].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 

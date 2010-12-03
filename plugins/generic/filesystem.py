@@ -87,7 +87,7 @@ class Filesystem:
         if kb.dbms == DBMS.MYSQL:
             lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % dFile
 
-        elif kb.dbms == DBMS.POSTGRESQL:
+        elif kb.dbms == DBMS.PGSQL:
             lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
 
         elif kb.dbms == DBMS.MSSQL:

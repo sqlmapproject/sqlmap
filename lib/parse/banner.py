@@ -100,7 +100,7 @@ def bannerParser(banner):
         xmlfile = paths.MYSQL_XML
     elif kb.dbms == DBMS.ORACLE:
         xmlfile = paths.ORACLE_XML
-    elif kb.dbms == DBMS.POSTGRESQL:
+    elif kb.dbms == DBMS.PGSQL:
         xmlfile = paths.PGSQL_XML
 
     if not xmlfile:

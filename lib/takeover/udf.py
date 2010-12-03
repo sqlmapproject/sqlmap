@@ -101,7 +101,7 @@ class UDF:
         return output
 
     def udfCheckNeeded(self):
-        if ( not conf.rFile or ( conf.rFile and kb.dbms != DBMS.POSTGRESQL ) ) and "sys_fileread" in self.sysUdfs:
+        if ( not conf.rFile or ( conf.rFile and kb.dbms != DBMS.PGSQL ) ) and "sys_fileread" in self.sysUdfs:
             self.sysUdfs.pop("sys_fileread")
 
         if not conf.osPwn:
@@ -142,7 +142,7 @@ class UDF:
 
         if kb.dbms == DBMS.MYSQL:
             supportTblType = "longtext"
-        elif kb.dbms == DBMS.POSTGRESQL:
+        elif kb.dbms == DBMS.PGSQL:
             supportTblType = "text"
 
         self.udfCreateSupportTbl(supportTblType)
@@ -153,7 +153,7 @@ class UDF:
         self.udfInjectCore(self.sysUdfs)
 
     def udfInjectCustom(self):
-        if kb.dbms not in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+        if kb.dbms not in ( DBMS.MYSQL, DBMS.PGSQL ):
             errMsg = "UDF injection feature is not yet implemented on %s" % kb.dbms
             raise sqlmapUnsupportedFeatureException(errMsg)
 
@@ -235,7 +235,7 @@ class UDF:
 
             if kb.dbms == DBMS.MYSQL:
                 defaultType = "string"
-            elif kb.dbms == DBMS.POSTGRESQL:
+            elif kb.dbms == DBMS.PGSQL:
                 defaultType = "text"
 
             self.udfs[udfName]["input"] = []

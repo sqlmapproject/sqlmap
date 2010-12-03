@@ -38,7 +38,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
         if self.webBackdoorUrl and not kb.stackedTest:
             self.webBackdoorRunCmd(cmd)
 
-        elif kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+        elif kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
             self.udfExecCmd(cmd, silent=silent)
 
         elif kb.dbms == DBMS.MSSQL:
@@ -52,7 +52,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
         if self.webBackdoorUrl and not kb.stackedTest:
             return self.webBackdoorRunCmd(cmd)
 
-        elif kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+        elif kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
             return self.udfEvalCmd(cmd, first, last)
 
         elif kb.dbms == DBMS.MSSQL:
@@ -90,7 +90,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             logger.info(infoMsg)
 
         else:
-            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                 infoMsg  = "going to use injected sys_eval and sys_exec "
                 infoMsg += "user-defined functions for operating system "
                 infoMsg += "command execution"
@@ -148,7 +148,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 warnMsg += "the session user is not a database administrator"
                 logger.warn(warnMsg)
 
-            if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                 self.udfInjectSys()
             elif kb.dbms == DBMS.MSSQL:
                 if mandatory:

@@ -735,7 +735,7 @@ def parseTargetDirect():
 
     dbmsDict = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
                  DBMS.MYSQL: [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
-                 DBMS.POSTGRESQL: [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
+                 DBMS.PGSQL: [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
                  DBMS.ORACLE: [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
                  DBMS.SQLITE: [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
                  DBMS.ACCESS: [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
@@ -768,7 +768,7 @@ def parseTargetDirect():
 
                 elif dbmsName == DBMS.MYSQL:
                     import MySQLdb
-                elif dbmsName == DBMS.POSTGRESQL:
+                elif dbmsName == DBMS.PGSQL:
                     import psycopg2
                 elif dbmsName == DBMS.ORACLE:
                     import cx_Oracle
@@ -926,13 +926,13 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 def getDelayQuery(andCond=False):
     query = None
 
-    if kb.dbms in (DBMS.MYSQL, DBMS.POSTGRESQL):
+    if kb.dbms in (DBMS.MYSQL, DBMS.PGSQL):
         if not kb.data.banner:
             conf.dbmsHandler.getVersionFromBanner()
 
         banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
 
-        if banVer is None or (kb.dbms == DBMS.MYSQL and banVer >= "5.0.12") or (kb.dbms == DBMS.POSTGRESQL and banVer >= "8.2"):
+        if banVer is None or (kb.dbms == DBMS.MYSQL and banVer >= "5.0.12") or (kb.dbms == DBMS.PGSQL and banVer >= "8.2"):
             query = queries[kb.dbms].timedelay.query % conf.timeSec
         else:
             query = queries[kb.dbms].timedelay.query2 % conf.timeSec

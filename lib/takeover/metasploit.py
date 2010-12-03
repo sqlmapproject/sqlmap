@@ -192,7 +192,7 @@ class Metasploit:
                 debugMsg += "injection will be successful"
                 logger.debug(debugMsg)
 
-            elif kb.dbms == DBMS.POSTGRESQL:
+            elif kb.dbms == DBMS.PGSQL:
                 choose = True
 
                 warnMsg  = "by default PostgreSQL on Windows runs as "
@@ -229,7 +229,7 @@ class Metasploit:
                         break
 
                     elif choice == "1":
-                        if kb.dbms == DBMS.POSTGRESQL:
+                        if kb.dbms == DBMS.PGSQL:
                             logger.warn("beware that the VNC injection might not work")
 
                             break
@@ -554,7 +554,7 @@ class Metasploit:
             # This is useful for sqlmap because on PostgreSQL it is not
             # possible to write files bigger than 8192 bytes abusing the
             # lo_export() feature implemented in sqlmap.
-            if kb.dbms == DBMS.POSTGRESQL:
+            if kb.dbms == DBMS.PGSQL:
                 self.__fileFormat = "exe-small"
             else:
                 self.__fileFormat = "exe"
@@ -656,7 +656,7 @@ class Metasploit:
         self.__forgeMsfConsoleResource()
         self.__forgeMsfConsoleCmd()
 
-        if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+        if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
             self.uncPath = "\\\\\\\\%s\\\\%s" % (self.lhostStr, self.__randFile)
         else:
             self.uncPath = "\\\\%s\\%s" % (self.lhostStr, self.__randFile)

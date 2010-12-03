@@ -69,7 +69,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
             limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
 
             if limitRegExp:
-                if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                     limitGroupStart = queries[kb.dbms].limitgroupstart.query
                     limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
@@ -103,7 +103,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                         stopLimit += startLimit
                         untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
                         expression = expression[:untilLimitChar]

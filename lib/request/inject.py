@@ -149,7 +149,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
             topLimit    = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
             if limitRegExp or ( kb.dbms == DBMS.MSSQL and topLimit ):
-                if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                     limitGroupStart = queries[kb.dbms].limitgroupstart.query
                     limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
@@ -188,7 +188,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if kb.dbms in ( DBMS.MYSQL, DBMS.POSTGRESQL ):
+                    if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                         stopLimit += startLimit
                         untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
                         expression = expression[:untilLimitChar]
