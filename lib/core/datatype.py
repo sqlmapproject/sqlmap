@@ -74,7 +74,7 @@ def injectionDict():
 
     # data is a dict with stype as key and a tuple as value with
     # title, where, comment and reqPayload
-    injection.data = {}
+    injection.data = advancedDict()
 
     injection.dbms = None
     injection.dbms_version = None
