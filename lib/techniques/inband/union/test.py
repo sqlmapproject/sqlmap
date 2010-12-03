@@ -129,6 +129,9 @@ def unionTest():
     if kb.unionTest is not None:
         return kb.unionTest
 
+    oldTechnique = kb.technique
+    kb.technique = 3
+
     if conf.uChar == "NULL":
         technique = "NULL bruteforcing"
     else:
@@ -157,5 +160,6 @@ def unionTest():
         infoMsg += "inband sql injection vulnerability "
         infoMsg += "on parameter '%s'" % kb.injection.parameter
         logger.info(infoMsg)
+        kb.technique = oldTechnique
 
     return kb.unionTest
