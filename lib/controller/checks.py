@@ -54,7 +54,6 @@ from plugins.dbms.sybase.syntax import Syntax as Sybase
 from plugins.dbms.sqlite.syntax import Syntax as SQLite
 from plugins.dbms.maxdb.syntax import Syntax as MaxDB
 
-
 def unescape(string, dbms):
     unescaper = {
                   "Access": Access.unescape,
@@ -244,7 +243,7 @@ def checkSqlInjection(place, parameter, value):
                 # Forge request payload by prepending with boundary's
                 # prefix and appending the boundary's suffix to the
                 # test's ' <payload><comment> ' string
-                boundPayload = "%s%s %s %s" % (origValue, prefix, fstPayload, suffix)
+                boundPayload = "%s%s%s%s %s" % (origValue, prefix, (" " if stype != 4 else ""), fstPayload, suffix)
                 boundPayload = boundPayload.strip()
                 boundPayload = agent.cleanupPayload(boundPayload, value)
                 reqPayload = agent.payload(place, parameter, value, boundPayload)
@@ -265,7 +264,7 @@ def checkSqlInjection(place, parameter, value):
                         # boundary's prefix and appending the boundary's
                         # suffix to the test's ' <payload><comment> '
                         # string
-                        boundPayload = "%s%s %s %s" % (origValue, prefix, sndPayload, suffix)
+                        boundPayload = "%s%s%s%s %s" % (origValue, prefix, (" " if stype != 4 else ""), sndPayload, suffix)
                         boundPayload = boundPayload.strip()
                         boundPayload = agent.cleanupPayload(boundPayload, value)
                         cmpPayload = agent.payload(place, parameter, value, boundPayload)
