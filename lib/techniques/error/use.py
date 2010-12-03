@@ -23,7 +23,6 @@ from lib.core.enums import DBMS
 from lib.core.session import setError
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
-from lib.utils.resume import resume
 
 from lib.core.settings import ERROR_SPACE
 from lib.core.settings import ERROR_EMPTY_CHAR

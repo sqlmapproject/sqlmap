@@ -13,25 +13,32 @@ from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.datatype import advancedDict
 
-def cleanupVals(values, tag):
-    if isinstance(values, basestring):
-        return values
+def cleanupVals(text, tag):
+    if tag in ("clause", "where"):
+        text = text.split(',')
 
-    count = 0
-
-    for value in values:
-        if value.isdigit():
-            value = int(value)
+    if isinstance(text, basestring):
+        if text.isdigit():
+            text = int(text)
         else:
-            value = str(value)
+            text = str(text)
 
-        values[count] = value
-        count += 1
+    elif isinstance(text, list):
+        count = 0
 
-    if len(values) == 1 and tag not in ("clause", "where"):
-        values = values[0]
+        for t in text:
+            if t.isdigit():
+                t = int(t)
+            else:
+                t = str(t)
 
-    return values
+            text[count] = t
+            count += 1
+
+        if len(text) == 1 and tag not in ("clause", "where"):
+            text = text[0]
+
+    return text
 
 def parseXmlNode(node):
     for element in node.getiterator('boundary'):
@@ -39,7 +46,7 @@ def parseXmlNode(node):
 
         for child in element.getchildren():
             if child.text:
-                values = cleanupVals(child.text.split(','), child.tag)
+                values = cleanupVals(child.text, child.tag)
                 boundary[child.tag] = values
             else:
                 boundary[child.tag] = None
@@ -51,7 +58,7 @@ def parseXmlNode(node):
 
         for child in element.getchildren():
             if child.text and child.text.strip():
-                values = cleanupVals(child.text.split(',') if child.tag != "epayload" else child.text, child.tag)
+                values = cleanupVals(child.text, child.tag)
                 test[child.tag] = values
             else:
                 if len(child.getchildren()) == 0:

@@ -361,7 +361,7 @@ def resumeConfKb(expression, url, value):
         injection = base64unpickle(value[:-1])
         kb.injections.append(injection)
 
-        logMsg = "resuming injection data"
+        logMsg = "resuming injection data from session file"
         logger.info(logMsg)
 
     elif expression == "Boolean-based blind injection" and url == conf.url:
