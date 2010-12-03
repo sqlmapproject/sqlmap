@@ -148,7 +148,6 @@ def checkSqlInjection(place, parameter, value):
 
         # Skip test if it does not match the same SQL injection clause
         # already identified by another test
-        # Parse test's <clause>
         clauseMatch = False
 
         for clauseTest in clause:
@@ -157,7 +156,7 @@ def checkSqlInjection(place, parameter, value):
                 break
 
         if clause != [ 0 ] and injection.clause and not clauseMatch:
-            debugMsg = "skipping test '%s' because the clause " % title
+            debugMsg = "skipping test '%s' because the clauses " % title
             debugMsg += "differs from the clause already identified"
             logger.debug(debugMsg)
             continue
@@ -170,6 +169,11 @@ def checkSqlInjection(place, parameter, value):
         fstPayload = agent.cleanupPayload(test.request.payload, value)
         fstPayload = unescapeDbms(fstPayload, injection, dbms)
         fstPayload = "%s%s" % (fstPayload, comment)
+
+        if stype != 4 and clause != [2, 3] and clause != [ 2 ]:
+            space = " "
+        else:
+            space = ""
 
         if conf.prefix is not None and conf.suffix is not None:
             # Create a custom boundary object for user's supplied prefix
@@ -260,7 +264,7 @@ def checkSqlInjection(place, parameter, value):
                 # Forge request payload by prepending with boundary's
                 # prefix and appending the boundary's suffix to the
                 # test's ' <payload><comment> ' string
-                boundPayload = "%s%s%s%s %s" % (origValue, prefix, (" " if stype != 4 else ""), fstPayload, suffix)
+                boundPayload = "%s%s%s%s %s" % (origValue, prefix, space, fstPayload, suffix)
                 boundPayload = boundPayload.strip()
                 boundPayload = agent.cleanupPayload(boundPayload, value)
                 reqPayload = agent.payload(place, parameter, value, boundPayload)
@@ -281,7 +285,7 @@ def checkSqlInjection(place, parameter, value):
                         # boundary's prefix and appending the boundary's
                         # suffix to the test's ' <payload><comment> '
                         # string
-                        boundPayload = "%s%s%s%s %s" % (origValue, prefix, (" " if stype != 4 else ""), sndPayload, suffix)
+                        boundPayload = "%s%s%s%s %s" % (origValue, prefix, space, sndPayload, suffix)
                         boundPayload = boundPayload.strip()
                         boundPayload = agent.cleanupPayload(boundPayload, value)
                         cmpPayload = agent.payload(place, parameter, value, boundPayload)
@@ -359,7 +363,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.suffix = suffix
                         injection.clause = clause
 
-                    if "epayload" in test:
+                    if "epayload" in test and test.epayload is not None:
                         epayload = "%s%s" % (test.epayload, comment)
                     else:
                         epayload = None
