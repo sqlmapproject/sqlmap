@@ -34,8 +34,8 @@ def errorUse(expression):
     """
 
     output = None
-    query = agent.cleanupPayload(kb.injection.data[2].epayload)
-    query = unescaper.unescape(query)
+    vector = agent.cleanupPayload(kb.injection.data[2].vector)
+    query = unescaper.unescape(vector)
     query = agent.prefixQuery(query)
     query = agent.suffixQuery(query)
     check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)

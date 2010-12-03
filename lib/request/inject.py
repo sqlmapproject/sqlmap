@@ -98,8 +98,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     parameter through a bisection algorithm.
     """
 
-    if kb.injection.data[1].epayload is not None:
-        vector = agent.cleanupPayload(kb.injection.data[1].epayload)
+    if kb.injection.data[1].vector is not None:
+        vector = agent.cleanupPayload(kb.injection.data[1].vector)
     else:
         vector = queries[kb.misc.testedDbms].inference.query
 

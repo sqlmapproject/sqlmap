@@ -363,17 +363,17 @@ def checkSqlInjection(place, parameter, value):
                         injection.suffix = suffix
                         injection.clause = clause
 
-                    if "epayload" in test and test.epayload is not None:
-                        epayload = "%s%s" % (test.epayload, comment)
+                    if "vector" in test and test.vector is not None:
+                        vector = "%s%s" % (test.vector, comment)
                     else:
-                        epayload = None
+                        vector = None
 
                     # Feed with test details every time a test is successful
                     injection.data[stype] = advancedDict()
                     injection.data[stype].title = title
                     injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload, False)
                     injection.data[stype].where = where
-                    injection.data[stype].epayload = epayload
+                    injection.data[stype].vector = vector
                     injection.data[stype].comment = comment
 
                     if "details" in test:
