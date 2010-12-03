@@ -187,6 +187,9 @@ class Connect:
             if not kb.proxyAuthHeader and req.has_header("Proxy-authorization"):
                 kb.proxyAuthHeader = req.get_header("Proxy-authorization")
 
+            if hasattr(conn, "setcookie"):
+                kb.redirectSetCookie = conn.setcookie
+
             if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled:
                 msg  = "sqlmap got a %d redirect to " % conn.redcode
                 msg += "%s - What target address do you " % conn.redurl

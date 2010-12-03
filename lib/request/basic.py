@@ -40,6 +40,12 @@ def forgeHeaders(cookie, ua):
         else:
             headers[header] = value
 
+    if kb.redirectSetCookie:
+        if "Cookie" in headers:
+            headers["Cookie"] = "%s; %s" % (headers["Cookie"], kb.redirectSetCookie)
+        else:
+            headers["Cookie"] = kb.redirectSetCookie
+
     return headers
 
 def parseResponse(page, headers):
