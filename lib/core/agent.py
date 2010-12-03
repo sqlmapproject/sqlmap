@@ -83,7 +83,7 @@ class Agent:
                 if where == 1:
                     value = origValue
                 elif where == 2:
-                    value = "-%s" % origValue
+                    value = "-%s" % randomInt()
                 elif where == 3:
                     value = ""
             else:
@@ -155,10 +155,12 @@ class Agent:
         # payload, do not put a space after the prefix
         if kb.technique == 4:
             query = kb.injection.prefix
-        elif kb.technique and kb.technique in kb.injection.data:
+        elif (kb.technique and kb.technique in kb.injection.data) or \
+             (kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ]):
             where = kb.injection.data[kb.technique].where
 
-            if where == 3:
+            if where == 3 or (kb.injection.clause == [2, 3] or \
+               kb.injection.clause == [ 2 ]):
                 query = kb.injection.prefix
 
         if query is None:

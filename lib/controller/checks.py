@@ -257,7 +257,7 @@ def checkSqlInjection(place, parameter, value):
                 if where == 1:
                     origValue = value
                 elif where == 2:
-                    origValue = "-%s" % value
+                    origValue = "-%s" % randomInt()
                 elif where == 3:
                     origValue = ""
 
