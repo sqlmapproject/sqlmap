@@ -29,7 +29,6 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.techniques.inband.union.use import unionUse
@@ -309,6 +308,31 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
     return returnValue
 
+def __goError(expression, resumeValue=True):
+    """
+    Retrieve the output of a SQL query taking advantage of an error-based
+    SQL injection vulnerability on the affected parameter.
+    """
+
+    result = None
+
+    if conf.direct:
+        return direct(expression), None
+
+    condition = (
+                  kb.resumedQueries and conf.url in kb.resumedQueries.keys()
+                  and expression in kb.resumedQueries[conf.url].keys()
+                )
+
+    if condition and resumeValue:
+        result = resume(expression, None)
+
+    if not result:
+        result = errorUse(expression)
+        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(result)))
+
+    return result
+
 def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
@@ -359,6 +383,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
         expression = expression.replace("DISTINCT ", "")
 
         if inband and kb.unionTest is not None:
+            kb.technique = 3
             value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
             if not value:
@@ -373,7 +398,8 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
         kb.unionNegative    = False
 
         if error and kb.errorTest and not value:
-            value = goError(expression)
+            kb.technique = 2
+            value = __goError(expression, resumeValue)
 
             if not value:
                 warnMsg  = "for some reason(s) it was not possible to retrieve "
@@ -382,6 +408,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
                 logger.warn(warnMsg)
 
         if blind and kb.booleanTest and not value:
+            kb.technique = 1
             value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
         kb.unionFalseCond = oldParamFalseCond
@@ -400,6 +427,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
     return value
 
 def goStacked(expression, silent=False):
+    kb.technique = 4
     expression = cleanQuery(expression)
 
     if conf.direct:
@@ -416,35 +444,3 @@ def goStacked(expression, silent=False):
     page, _ = Request.queryPage(payload, content=True, silent=silent)
 
     return payload, page
-
-def goError(expression, suppressOutput=False):
-    """
-    Retrieve the output of a SQL query taking advantage of an error-based
-    SQL injection vulnerability on the affected parameter.
-    """
-
-    result = None
-
-    if suppressOutput:
-        pushValue(conf.verbose)
-        conf.verbose = 0
-
-    if conf.direct:
-        return direct(expression), None
-
-    condition = (
-                  kb.resumedQueries and conf.url in kb.resumedQueries.keys()
-                  and expression in kb.resumedQueries[conf.url].keys()
-                )
-
-    if condition:
-        result = resume(expression, None)
-
-    if not result:
-        result = errorUse(expression)
-        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(result)))
-
-    if suppressOutput:
-        conf.verbose = popValue()
-
-    return result

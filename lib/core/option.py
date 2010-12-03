@@ -1175,6 +1175,7 @@ def __setKnowledgeBaseAttributes():
     kb.tamperFunctions = []
     kb.targetUrls      = set()
     kb.testedParams    = set()
+    kb.technique       = None
     kb.unionComment    = ""
     kb.unionCount      = None
     kb.unionPosition   = None

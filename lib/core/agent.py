@@ -75,8 +75,21 @@ class Agent:
         elif kb.injection.place and kb.injection.parameter:
             paramString = conf.parameters[kb.injection.place]
             paramDict = conf.paramDict[kb.injection.place]
-            value = paramDict[kb.injection.parameter]
-            newValue = self.cleanupPayload(newValue, value)
+            origValue = paramDict[kb.injection.parameter]
+
+            if kb.technique and kb.technique in kb.injection.data:
+                where = kb.injection.data[kb.technique].where
+
+                if where == 1:
+                    value = origValue
+                elif where == 2:
+                    value = "-%s" % origValue
+                elif where == 3:
+                    value = ""
+            else:
+                value = origValue
+
+            newValue = self.cleanupPayload(newValue, origValue)
 
             if "POSTxml" in conf.paramDict and kb.injection.place == PLACE.POST:
                 root = ET.XML(paramString)
@@ -90,7 +103,7 @@ class Agent:
                 retValue = paramString.replace("*",
                                                self.addPayloadDelimiters("%s%s" % (negValue, falseValue + newValue)))
             else:
-                retValue = paramString.replace("%s=%s" % (kb.injection.parameter, value),
+                retValue = paramString.replace("%s=%s" % (kb.injection.parameter, origValue),
                                                "%s=%s" % (kb.injection.parameter, self.addPayloadDelimiters(negValue + value + falseValue + newValue)))
 
         # Before identifing the injectable parameter
@@ -135,8 +148,17 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
-        query = "%s " % kb.injection.prefix
-        query += string
+        if kb.technique == 4:
+            query = kb.injection.prefix
+        elif kb.technique and kb.technique in kb.injection.data:
+            where = kb.injection.data[kb.technique].where
+
+            if where == 3:
+                query = kb.injection.prefix
+        else:
+            query = "%s " % kb.injection.prefix
+
+        query = "%s%s" % (query, string)
         query = self.cleanupPayload(query)
 
         return query
