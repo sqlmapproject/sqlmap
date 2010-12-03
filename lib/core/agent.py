@@ -148,6 +148,8 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(string)
 
+        query = None
+
         # Either if the technique is stacked queries (<stype>) or we are
         # replacing (<where>) the parameter original value with our
         # payload, do not put a space after the prefix
@@ -158,7 +160,8 @@ class Agent:
 
             if where == 3:
                 query = kb.injection.prefix
-        else:
+
+        if query is None:
             query = "%s " % kb.injection.prefix
 
         query = "%s%s" % (query, string)
