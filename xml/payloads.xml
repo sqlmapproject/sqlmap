@@ -1501,7 +1501,7 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>AND (COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
+            <payload>AND (SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1589,7 +1589,7 @@ Formats:
         <where>1</where>
         <epayload></epayload>
         <request>
-            <payload>OR (COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
+            <payload>OR (SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
