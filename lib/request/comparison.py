@@ -11,6 +11,7 @@ import re
 
 from difflib import SequenceMatcher
 
+from lib.core.common import removeDynamicContent
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
@@ -60,15 +61,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
 
         # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection and not conf.longestCommon:
-            for item in kb.dynamicMarkings:
-                prefix, suffix = item
-
-                if prefix is None:
-                    page = re.sub('(?s)^.+%s' % suffix, suffix, page)
-                elif suffix is None:
-                    page = re.sub('(?s)%s.+$' % prefix, prefix, page)
-                else:
-                    page = re.sub('(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), page)
+            page = removeDynamicContent(page)
 
         if not pageLength:
             pageLength = len(page)

@@ -20,6 +20,7 @@ from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import removeDynamicContent
 from lib.core.common import showStaticWords
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
@@ -523,16 +524,7 @@ def checkDynamicContent(firstPage, secondPage):
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
         logger.info(infoMsg)
 
-        if kb.pageTemplate:
-            for item in kb.dynamicMarkings:
-                prefix, suffix = item
-
-                if prefix is None:
-                    kb.pageTemplate = re.sub('(?s)^.+%s' % suffix, suffix, kb.pageTemplate)
-                elif suffix is None:
-                    kb.pageTemplate = re.sub('(?s)%s.+$' % prefix, prefix, kb.pageTemplate)
-                else:
-                    kb.pageTemplate = re.sub('(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), kb.pageTemplate)
+        kb.pageTemplate = removeDynamicContent(kb.pageTemplate)
 
 def checkStability():
     """

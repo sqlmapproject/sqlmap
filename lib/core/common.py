@@ -1637,3 +1637,15 @@ def aliasToDbmsEnum(value):
             break
     return retVal
 
+def removeDynamicContent(page):
+    if page:
+        for item in kb.dynamicMarkings:
+            prefix, suffix = item
+            if prefix is None:
+                page = re.sub('(?s)^.+%s' % suffix, suffix, page)
+            elif suffix is None:
+                page = re.sub('(?s)%s.+$' % prefix, prefix, page)
+            else:
+                page = re.sub('(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), page)
+
+    return page
