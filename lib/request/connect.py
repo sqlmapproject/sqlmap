@@ -407,6 +407,9 @@ class Connect:
         if conf.textOnly:
             page = getFilteredPageContent(page)
 
+        if kb.flushCookies and conf.cj:
+            conf.cj.clear()
+
         if content or response:
             return page, headers
         elif getSeqMatcher:

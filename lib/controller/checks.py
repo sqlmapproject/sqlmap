@@ -17,6 +17,8 @@ from lib.core.agent import agent
 from lib.core.common import beep
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getUnicode
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -91,6 +93,9 @@ def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to
     # successfully inject
     injection = injectionDict()
+
+    # Clear cookies after each query page attempt
+    kb.flushCookies = True
 
     for test in conf.tests:
         title = test.title
@@ -259,6 +264,10 @@ def checkSqlInjection(place, parameter, value):
                     origValue = value
                 elif where == 2:
                     origValue = "-%s" % randomInt()
+
+                    # Save old page template and replace with new one
+                    pushValue(kb.pageTemplate)
+                    kb.pageTemplate = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)[0]
                 elif where == 3:
                     origValue = ""
 
@@ -347,6 +356,10 @@ def checkSqlInjection(place, parameter, value):
 
                             injectable = True
 
+                # Restore page template
+                if where == 2:
+                    kb.pageTemplate = popValue()
+
                 # If the injection test was successful feed the injection
                 # object with the test's details
                 if injectable is True:
@@ -399,6 +412,9 @@ def checkSqlInjection(place, parameter, value):
                 # There is no need to perform this test with others
                 # boundaries
                 break
+
+    # Flush the flag
+    kb.flushCookies = False
 
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:

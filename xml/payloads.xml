@@ -416,12 +416,12 @@ Formats:
         <level>4</level>
         <risk>3</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <request>
-            <payload>OR [RANDNUM]=[RANDNUM]</payload>
+            <payload>OR [RANDNUM]=[RANDNUM1]</payload>
         </request>
         <response>
-            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+            <comparison>OR [RANDNUM]=[RANDNUM]</comparison>
         </response>
     </test>
 

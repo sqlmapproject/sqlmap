@@ -1117,6 +1117,7 @@ def __setKnowledgeBaseAttributes():
     kb.cache.content   = {}
     kb.cache.regex     = {}
 
+    kb.flushCookies    = False
     kb.commonOutputs   = None
 
     kb.data            = advancedDict()
