@@ -23,6 +23,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         return None
 
     regExpResults = None
+    conf.seqMatcher.set_seq1(kb.pageTemplate)
 
     if page:
         # String to be excluded before calculating page hash

@@ -523,16 +523,16 @@ def checkDynamicContent(firstPage, secondPage):
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
         logger.info(infoMsg)
 
-        if conf.seqMatcher.a:
+        if kb.pageTemplate:
             for item in kb.dynamicMarkings:
                 prefix, suffix = item
 
                 if prefix is None:
-                    conf.seqMatcher.a = re.sub('(?s)^.+%s' % suffix, suffix, conf.seqMatcher.a)
+                    kb.pageTemplate = re.sub('(?s)^.+%s' % suffix, suffix, kb.pageTemplate)
                 elif suffix is None:
-                    conf.seqMatcher.a = re.sub('(?s)%s.+$' % prefix, prefix, conf.seqMatcher.a)
+                    kb.pageTemplate = re.sub('(?s)%s.+$' % prefix, prefix, kb.pageTemplate)
                 else:
-                    conf.seqMatcher.a = re.sub('(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), conf.seqMatcher.a)
+                    kb.pageTemplate = re.sub('(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), kb.pageTemplate)
 
 def checkStability():
     """
@@ -548,7 +548,7 @@ def checkStability():
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
 
-    firstPage = conf.seqMatcher.a # set inside checkConnection()
+    firstPage = kb.pageTemplate # set inside checkConnection()
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True)
 
@@ -741,7 +741,7 @@ def checkConnection(suppressOutput=False):
         start = time.time()
         page, _ = Request.queryPage(content=True)
         kb.responseTime = time.time() - start
-        conf.seqMatcher.set_seq1(page)
+        kb.pageTemplate = page
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg

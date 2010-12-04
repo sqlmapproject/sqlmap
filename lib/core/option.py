@@ -1158,6 +1158,7 @@ def __setKnowledgeBaseAttributes():
     kb.locks.seqLock   = None
 
     kb.nullConnection  = None
+    kb.pageTemplate    = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing
