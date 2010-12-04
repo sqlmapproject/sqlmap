@@ -62,6 +62,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection and not conf.longestCommon:
             page = removeDynamicContent(page)
+            conf.seqMatcher.set_seq1(removeDynamicContent(kb.pageTemplate))
 
         if not pageLength:
             pageLength = len(page)

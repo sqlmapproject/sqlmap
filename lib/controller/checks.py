@@ -524,8 +524,6 @@ def checkDynamicContent(firstPage, secondPage):
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
         logger.info(infoMsg)
 
-        kb.pageTemplate = removeDynamicContent(kb.pageTemplate)
-
 def checkStability():
     """
     This function checks if the URL content is stable requesting the
