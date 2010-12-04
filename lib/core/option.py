@@ -1076,7 +1076,6 @@ def __setConfAttributes():
     conf.dbmsConnector    = None
     conf.dbmsHandler      = None
     conf.dumpPath         = None
-    conf.minMatchBlock    = 8
     conf.dynMarkLength    = 32
     conf.httpHeaders      = []
     conf.hostname         = None

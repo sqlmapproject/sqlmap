@@ -490,17 +490,19 @@ def checkDynamicContent(firstPage, secondPage):
     blocks = SequenceMatcher(None, firstPage, secondPage).get_matching_blocks()
     kb.dynamicMarkings = []
 
+    # Removing too small matching blocks
     i = 0
     while i < len(blocks):
         block = blocks[i]
         (_, _, length) = block
 
-        if length <= conf.minMatchBlock:
+        if length <= conf.dynMarkLength:
             blocks.remove(block)
 
         else:
             i += 1
 
+    # Making of dynamic markings based on prefix/suffix principle
     if len(blocks) > 0:
         blocks.insert(0, None)
         blocks.append(None)
@@ -518,7 +520,7 @@ def checkDynamicContent(firstPage, secondPage):
             prefix = trimAlphaNum(prefix)
             suffix = trimAlphaNum(suffix)
 
-            kb.dynamicMarkings.append((re.escape(prefix[-conf.dynMarkLength:]) if prefix else None, re.escape(suffix[:conf.dynMarkLength]) if suffix else None))
+            kb.dynamicMarkings.append((re.escape(prefix[-conf.dynMarkLength/2:]) if prefix else None, re.escape(suffix[:conf.dynMarkLength/2]) if suffix else None))
 
     if len(kb.dynamicMarkings) > 0:
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
