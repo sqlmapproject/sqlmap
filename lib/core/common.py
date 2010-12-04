@@ -1642,10 +1642,10 @@ def removeDynamicContent(page):
         for item in kb.dynamicMarkings:
             prefix, suffix = item
             if prefix is None:
-                getCompiledRegex('(?s)^.+%s' % suffix).sub(suffix, page)
+                page = getCompiledRegex('(?s)^.+%s' % suffix).sub(suffix, page)
             elif suffix is None:
-                getCompiledRegex('(?s)%s.+$' % prefix).sub(prefix, page)
+                page = getCompiledRegex('(?s)%s.+$' % prefix).sub(prefix, page)
             else:
-                getCompiledRegex('(?s)%s.+%s' % (prefix, suffix)).sub('%s%s' % (prefix, suffix), page)
+                page = getCompiledRegex('(?s)%s.+%s' % (prefix, suffix)).sub('%s%s' % (prefix, suffix), page)
 
     return page
