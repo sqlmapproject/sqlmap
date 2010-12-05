@@ -464,7 +464,7 @@ Formats:
     <test>
         <title>OR boolean-based blind - WHERE clause (MySQL comment)</title>
         <stype>1</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
