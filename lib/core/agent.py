@@ -213,9 +213,7 @@ class Agent:
             payload = payload.replace("[ORIGVALUE]", origvalue)
 
         if kb.dbms is not None:
-            # NOTE: ugly hack due to queries.xml's <inference> tag
-            # starting with 'AND ' string
-            inferenceQuery = queries[kb.dbms].inference.query[4:]
+            inferenceQuery = queries[kb.dbms].inference.query
             payload = payload.replace("[INFERENCE]", inferenceQuery)
 
         return payload
