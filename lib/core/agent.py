@@ -49,7 +49,7 @@ class Agent:
 
         return query
 
-    def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False, falseCond=False):
+    def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False):
         """
         This method replaces the affected parameter with the SQL
         injection statement to request
@@ -64,9 +64,6 @@ class Agent:
 
         if negative or kb.unionNegative:
             negValue = "-"
-        elif falseCond or kb.unionFalseCond:
-            randInt = randomInt()
-            falseValue = " AND %d=%d" % (randInt, randInt + 1)
 
         # After identifing the injectable parameter
         if kb.injection.place == PLACE.UA and kb.injection.parameter:

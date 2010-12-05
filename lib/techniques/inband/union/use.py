@@ -57,7 +57,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         expression = agent.concatQuery(expression, unpack)
         expression = unescaper.unescape(expression)
 
-    if ( kb.unionNegative or kb.unionFalseCond ) and not direct:
+    if kb.unionNegative and not direct:
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
 
         # We have to check if the SQL query might return multiple entries

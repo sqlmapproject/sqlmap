@@ -1182,7 +1182,6 @@ def __setKnowledgeBaseAttributes():
     kb.unionCount      = None
     kb.unionPosition   = None
     kb.unionNegative   = False
-    kb.unionFalseCond  = False
     kb.userAgents      = None
     kb.valueStack      = []
     kb.redirectSetCookie = None

@@ -88,16 +88,11 @@ class Filesystem(GenericFilesystem):
 
         unionTest()
 
-        oldParamFalseCond = kb.unionFalseCond
-        kb.unionFalseCond = True
-
         debugMsg = "exporting the %s file content to file '%s'" % (fileType, dFile)
         logger.debug(debugMsg)
 
         sqlQuery = "%s INTO DUMPFILE '%s'" % (fcEncodedStr, dFile)
         unionUse(sqlQuery, direct=True, unescape=False, nullChar="''")
-
-        kb.unionFalseCond = oldParamFalseCond
 
         if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)

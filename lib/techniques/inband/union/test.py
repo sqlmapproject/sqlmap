@@ -19,7 +19,7 @@ from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
 
-def __unionPosition(negative=False, falseCond=False, count=None, comment=None):
+def __unionPosition(negative=False, count=None, comment=None):
     validPayload = None
 
     if count is None:
@@ -36,7 +36,7 @@ def __unionPosition(negative=False, falseCond=False, count=None, comment=None):
 
         # Forge the inband SQL injection request
         query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition, count=count, comment=comment)
-        payload = agent.payload(newValue=query, negative=negative, falseCond=falseCond)
+        payload = agent.payload(newValue=query, negative=negative)
 
         # Perform the request
         resultPage, _ = Request.queryPage(payload, content=True)
@@ -72,18 +72,6 @@ def __unionConfirm(count=None, comment=None):
             # (single entry) inband SQL injection position with negative
             # parameter validPayload
             if not isinstance(kb.unionPosition, int):
-                # NOTE: disable false condition for the time being, in the
-                # end it produces the same as prepending the original
-                #  parameter value with a minus (negative)
-                #validPayload = __unionPosition(falseCond=True, count=count, comment=comment)
-                #
-                # Assure that the above function found the exploitable partial
-                # (single entry) inband SQL injection position by appending
-                # a false condition after the parameter validPayload
-                #if not isinstance(kb.unionPosition, int):
-                #    return None
-                #else:
-                #    setUnion(falseCond=True)
                 return None
             else:
                 setUnion(negative=True)
