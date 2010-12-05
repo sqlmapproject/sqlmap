@@ -265,7 +265,10 @@ def checkSqlInjection(place, parameter, value):
                 elif where == 2:
                     origValue = "-%s" % randomInt()
 
-                    # Save old page template and replace with new one
+                    # Save original page template and replace with current one
+                    # as we are changing parameters value, which will result
+                    # most definitely with a different "page template" used by the
+                    # comparison engine
                     pushValue(kb.pageTemplate)
                     kb.pageTemplate, _ = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)
                 elif where == 3:
