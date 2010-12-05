@@ -267,7 +267,7 @@ def checkSqlInjection(place, parameter, value):
 
                     # Save old page template and replace with new one
                     pushValue(kb.pageTemplate)
-                    kb.pageTemplate = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)[0]
+                    kb.pageTemplate, _ = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)
                 elif where == 3:
                     origValue = ""
 
