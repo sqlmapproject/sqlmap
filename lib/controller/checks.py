@@ -347,6 +347,11 @@ def checkSqlInjection(place, parameter, value):
                     # In case of time-based blind or stacked queries
                     # SQL injections
                     elif method == "time":
+                        # Store old value of socket timeout
+                        pushValue(socket.getdefaulttimeout())
+                        # Set socket timeout to 2 minutes as some
+                        # time based checks can take awhile
+                        socket.setdefaulttimeout(120)
                         # Perform the test's request and check how long
                         # it takes to get the response back
                         start = time.time()
@@ -358,6 +363,8 @@ def checkSqlInjection(place, parameter, value):
                             logger.info(infoMsg)
 
                             injectable = True
+                        # Restore old value of socket timeout
+                        socket.setdefaulttimeout(popValue())
 
                 # Restore page template
                 if where == 2:
