@@ -446,7 +446,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
     Request.queryPage(payload, place, raise404=False)
     result = wasLastRequestDBMSError()
 
-    infoMsg  = "heuristics shows that %s " % place
+    infoMsg  = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
     if result:
