@@ -272,6 +272,7 @@ def checkSqlInjection(place, parameter, value):
                     kb.pageTemplate, _ = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)
                 elif where == 3:
                     origValue = ""
+                    kb.pageTemplate = kb.originalPage
 
                 # Forge request payload by prepending with boundary's
                 # prefix and appending the boundary's suffix to the
@@ -330,9 +331,9 @@ def checkSqlInjection(place, parameter, value):
                         output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
                         if output:
-                            output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
+                            result = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "") == "1"
 
-                            if output == "1":
+                            if result:
                                 infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
                                 logger.info(infoMsg)
 
