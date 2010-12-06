@@ -452,12 +452,12 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [INFERENCE]</vector>
+        <vector>OR NOT [INFERENCE]</vector>
         <request>
-            <payload>OR [RANDNUM]=[RANDNUM1]</payload>
+            <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
         </request>
         <response>
-            <comparison>OR [RANDNUM]=[RANDNUM]</comparison>
+            <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
     </test>
 
@@ -468,13 +468,13 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [INFERENCE]</vector>
+        <vector>OR NOT [INFERENCE]</vector>
         <request>
-            <payload>OR [RANDNUM]=[RANDNUM1]</payload>
+            <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
             <comment>#</comment>
         </request>
         <response>
-            <comparison>OR [RANDNUM]=[RANDNUM]</comparison>
+            <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -488,13 +488,13 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [INFERENCE]</vector>
+        <vector>OR NOT [INFERENCE]</vector>
         <request>
-            <payload>OR [RANDNUM]=[RANDNUM1]</payload>
+            <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
             <comment>--</comment>
         </request>
         <response>
-            <comparison>OR [RANDNUM]=[RANDNUM]</comparison>
+            <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
     </test>
     <!-- End of boolean-based blind tests - WHERE clause -->
