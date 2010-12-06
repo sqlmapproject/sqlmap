@@ -80,8 +80,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            payload = agent.fullPayload("AND ROWNUM=ROWNUM")
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("ROWNUM=ROWNUM")
 
         if result:
             logMsg = "confirming Oracle"
@@ -92,8 +91,7 @@ class Fingerprint(GenericFingerprint):
             if conf.direct:
                 result = True
             else:
-                payload = agent.fullPayload("AND LENGTH(SYSDATE)=LENGTH(SYSDATE)")
-                result  = Request.queryPage(payload)
+                result = inject.checkBooleanExpression("LENGTH(SYSDATE)=LENGTH(SYSDATE)")
 
             if not result:
                 warnMsg = "the back-end DBMS is not Oracle"

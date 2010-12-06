@@ -100,8 +100,10 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
     if kb.injection.data[1].vector is not None:
         vector = agent.cleanupPayload(kb.injection.data[1].vector)
+        kb.pageTemplate = kb.injection.data[1].pageTemplate
     else:
         vector = queries[kb.misc.testedDbms].inference.query
+        kb.pageTemplate = kb.originalPage
 
     query          = agent.prefixQuery(vector)
     query          = agent.suffixQuery(query)
@@ -441,3 +443,6 @@ def goStacked(expression, silent=False):
     page, _ = Request.queryPage(payload, content=True, silent=silent)
 
     return payload, page
+
+def checkBooleanExpression(expression):
+    return getValue(agent.forgeCaseStatement(expression), expected="int", charsetType=1) == "1"

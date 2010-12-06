@@ -263,14 +263,12 @@ def checkSqlInjection(place, parameter, value):
                 # test's <where> tag
                 if where == 1:
                     origValue = value
+                    kb.pageTemplate = kb.originalPage
                 elif where == 2:
                     origValue = "-%s" % randomInt()
-
-                    # Save original page template and replace with current one
+                    # Use different page template than the original one
                     # as we are changing parameters value, which will result
-                    # most definitely with a different "page template" used by the
-                    # comparison engine
-                    pushValue(kb.pageTemplate)
+                    # most definitely with a different content
                     kb.pageTemplate, _ = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)
                 elif where == 3:
                     origValue = ""
@@ -362,10 +360,6 @@ def checkSqlInjection(place, parameter, value):
                         # Restore old value of socket timeout
                         socket.setdefaulttimeout(popValue())
 
-                # Restore page template
-                if where == 2:
-                    kb.pageTemplate = popValue()
-
                 # If the injection test was successful feed the injection
                 # object with the test's details
                 if injectable is True:
@@ -395,6 +389,7 @@ def checkSqlInjection(place, parameter, value):
                     injection.data[stype].where = where
                     injection.data[stype].vector = vector
                     injection.data[stype].comment = comment
+                    injection.data[stype].pageTemplate = kb.pageTemplate
 
                     if "details" in test:
                         for detailKey, detailValue in test.details.items():
@@ -562,7 +557,7 @@ def checkStability():
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
 
-    firstPage = kb.pageTemplate # set inside checkConnection()
+    firstPage = kb.originalPage # set inside checkConnection()
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True)
 
@@ -758,7 +753,7 @@ def checkConnection(suppressOutput=False):
         start = time.time()
         page, _ = Request.queryPage(content=True)
         kb.responseTime = time.time() - start
-        kb.pageTemplate = page
+        kb.originalPage = kb.pageTemplate = page
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg

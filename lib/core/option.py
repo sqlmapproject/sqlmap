@@ -1159,6 +1159,7 @@ def __setKnowledgeBaseAttributes():
 
     kb.nullConnection  = None
     kb.pageTemplate    = None
+    kb.originalPage    = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing

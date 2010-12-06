@@ -163,15 +163,13 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         randInt = getUnicode(randomInt(1))
-        payload = agent.fullPayload("AND CONNECTION_ID()=CONNECTION_ID()")
-        result = Request.queryPage(payload)
+        result = inject.checkBooleanExpression("CONNECTION_ID()=CONNECTION_ID()")
 
         if result:
             infoMsg = "confirming MySQL"
             logger.info(infoMsg)
 
-            payload = agent.fullPayload("AND ISNULL(1/0)" if kb.injection.place != PLACE.URI else "AND ISNULL(1 DIV 0)")
-            result = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("ISNULL(1/0)" if kb.injection.place != PLACE.URI else "ISNULL(1 DIV 0)")
 
             if not result:
                 warnMsg = "the back-end DBMS is not MySQL"

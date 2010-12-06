@@ -209,13 +209,17 @@ class Agent:
 
             payload = payload.replace("[ORIGVALUE]", origvalue)
 
-        if kb.dbms is not None:
-            inferenceQuery = queries[kb.dbms].inference.query
-            payload = payload.replace("[INFERENCE]", inferenceQuery)
-        elif "[INFERENCE]" in payload:
-            errMsg = "invalid usage of inference payload without knowledge "
-            errMsg += "of underlying DBMS"
-            raise sqlmapNoneDataException, errMsg
+        if "[INFERENCE]" in payload:
+            if kb.dbms is not None:
+                inferenceQuery = queries[kb.dbms].inference.query
+                payload = payload.replace("[INFERENCE]", inferenceQuery)
+            elif kb.misc.testedDbms is not None:
+                inferenceQuery = queries[kb.misc.testedDbms].inference.query
+                payload = payload.replace("[INFERENCE]", inferenceQuery)
+            else:
+                errMsg = "invalid usage of inference payload without knowledge "
+                errMsg += "of underlying DBMS"
+                raise sqlmapNoneDataException, errMsg
 
         return payload
 
@@ -659,7 +663,7 @@ class Agent:
         @rtype: C{str}
         """
 
-        return queries[kb.dbms].case.query % expression
+        return queries[kb.dbms if kb.dbms else kb.misc.testedDbms].case.query % expression
 
     def addPayloadDelimiters(self, inpStr):
         """
