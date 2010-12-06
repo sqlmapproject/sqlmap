@@ -697,7 +697,7 @@ Formats:
 
     <!-- Error-based tests - WHERE clause -->
     <test>
-        <title>MySQL &gt;= 5.0 error-based - WHERE clause (AND)</title>
+        <title>MySQL &gt;= 5.0 AND error-based - WHERE clause</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -717,7 +717,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL error-based - WHERE clause (AND)</title>
+        <title>PostgreSQL AND error-based - WHERE clause</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -736,7 +736,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase error-based - WHERE clause (AND)</title>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE clause</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -755,7 +755,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle error-based - WHERE clause (AND)</title>
+        <title>Oracle AND error-based - WHERE clause</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -774,7 +774,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird error-based - WHERE clause (AND)</title>
+        <title>Firebird AND error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -793,7 +793,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 error-based - WHERE clause (OR)</title>
+        <title>MySQL &gt;= 5.0 OR error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -813,7 +813,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL error-based - WHERE clause (OR)</title>
+        <title>PostgreSQL OR error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -832,7 +832,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase error-based - WHERE clause (OR)</title>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -851,7 +851,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle error-based - WHERE clause (OR)</title>
+        <title>Oracle OR error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -870,7 +870,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird error-based - WHERE clause (OR)</title>
+        <title>Firebird OR error-based - WHERE clause</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
