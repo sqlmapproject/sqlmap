@@ -789,6 +789,7 @@ Formats:
         </response>
         <details>
             <dbms>Oracle</dbms>
+            <dbms_version>&gt;= 8.1.6</dbms_version>
         </details>
     </test>
 
@@ -808,6 +809,7 @@ Formats:
         </response>
         <details>
             <dbms>Oracle</dbms>
+            <dbms_version>&gt;= 11g</dbms_version>
         </details>
     </test>
 
@@ -923,6 +925,7 @@ Formats:
         </response>
         <details>
             <dbms>Oracle</dbms>
+            <dbms_version>&gt;= 8.1.6</dbms_version>
         </details>
     </test>
 
@@ -942,6 +945,7 @@ Formats:
         </response>
         <details>
             <dbms>Oracle</dbms>
+            <dbms_version>&gt;= 11g</dbms_version>
         </details>
     </test>
 
