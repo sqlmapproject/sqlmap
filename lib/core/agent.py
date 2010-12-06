@@ -212,6 +212,10 @@ class Agent:
         if kb.dbms is not None:
             inferenceQuery = queries[kb.dbms].inference.query
             payload = payload.replace("[INFERENCE]", inferenceQuery)
+        elif "[INFERENCE]" in payload:
+            errMsg = "invalid usage of inference payload without knowledge "
+            errMsg += "of underlying DBMS"
+            raise sqlmapNoneDataException, errMsg
 
         return payload
 
