@@ -11,6 +11,7 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs
@@ -55,16 +56,13 @@ def errorUse(expression):
 
     payload = agent.payload(newValue=expression)
     reqBody, _ = Request.queryPage(payload, content=True)
-    match = re.search(check, reqBody, re.DOTALL | re.IGNORECASE)
+    output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
-    if match:
-        output = match.group('result')
+    if output:
+        output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
 
-        if output:
-            output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
-
-            if conf.verbose > 0:
-                infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
-                logger.info(infoMsg)
+        if conf.verbose > 0:
+            infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
+            logger.info(infoMsg)
 
     return output
