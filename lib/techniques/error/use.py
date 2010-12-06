@@ -25,9 +25,6 @@ from lib.core.session import setError
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
-from lib.core.settings import ERROR_SPACE
-from lib.core.settings import ERROR_EMPTY_CHAR
-
 def errorUse(expression):
     """
     Retrieve the output of a SQL query taking advantage of an error SQL
@@ -59,7 +56,7 @@ def errorUse(expression):
     output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
     if output:
-        output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
+        output = output.replace(kb.misc.space, " ")
 
         if conf.verbose > 0:
             infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)

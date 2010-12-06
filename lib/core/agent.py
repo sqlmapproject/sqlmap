@@ -34,6 +34,7 @@ class Agent:
         kb.misc.delimiter = randomStr(length=6)
         kb.misc.start     = ":%s:" % randomStr(length=3, lowercase=True)
         kb.misc.stop      = ":%s:" % randomStr(length=3, lowercase=True)
+        kb.misc.space     = ":%s:" % randomStr(length=1, lowercase=True)
 
     def payloadDirect(self, query):
         if query.startswith("AND "):
@@ -201,6 +202,7 @@ class Agent:
         payload = payload.replace("[RANDSTR1]", randStr1)
         payload = payload.replace("[DELIMITER_START]", kb.misc.start)
         payload = payload.replace("[DELIMITER_STOP]", kb.misc.stop)
+        payload = payload.replace("[SPACE_REPLACE]", kb.misc.space)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
 
         if origvalue is not None:

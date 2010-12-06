@@ -46,10 +46,6 @@ DUMP_TAB_MARKER     = "__TAB__"
 DUMP_START_MARKER   = "__START__"
 DUMP_STOP_MARKER    = "__STOP__"
 
-# error-based injection markers
-ERROR_SPACE        = ":_:"
-ERROR_EMPTY_CHAR   = ":x:"
-
 PAYLOAD_DELIMITER  = "\x00"
 
 # System variables

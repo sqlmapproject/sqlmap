@@ -45,8 +45,6 @@ from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
-from lib.core.settings import ERROR_SPACE
-from lib.core.settings import ERROR_EMPTY_CHAR
 from lib.request.connect import Connect as Request
 from plugins.dbms.firebird.syntax import Syntax as Firebird
 from plugins.dbms.postgresql.syntax import Syntax as PostgreSQL
@@ -331,7 +329,7 @@ def checkSqlInjection(place, parameter, value):
                         output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
                         if output:
-                            result = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "") == "1"
+                            result = output.replace(kb.misc.space, " ") == "1"
 
                             if result:
                                 infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)

