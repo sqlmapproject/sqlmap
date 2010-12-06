@@ -221,6 +221,42 @@ Formats:
         <prefix></prefix>
         <suffix></suffix>
     </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>'</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>')</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>"</prefix>
+        <suffix></suffix>
+    </boundary>
     <!-- End of generic boundaries -->
 
     <!-- WHERE clause boundaries -->
