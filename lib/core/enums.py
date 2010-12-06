@@ -89,3 +89,8 @@ class PAYLOAD:
                7: "Table name",
                8: "Column name"
              }
+
+    class METHOD:
+        COMPARISON  = "comparison"
+        GREP        = "grep"
+        TIME        = "time"

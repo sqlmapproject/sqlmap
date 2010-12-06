@@ -16,6 +16,7 @@ from difflib import SequenceMatcher
 from lib.core.agent import agent
 from lib.core.common import beep
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -197,9 +198,9 @@ def checkSqlInjection(place, parameter, value):
                     boundary.ptype = 3
                 elif '"' in boundary.suffix.lower():
                     boundary.ptype = 5
-            elif "'" in boundary.suffix.lower():
+            elif "'" in boundary.suffix:
                 boundary.ptype = 2
-            elif '"' in boundary.suffix.lower():
+            elif '"' in boundary.suffix:
                 boundary.ptype = 4
             else:
                 boundary.ptype = 1
@@ -289,7 +290,7 @@ def checkSqlInjection(place, parameter, value):
                     check = agent.cleanupPayload(check, value)
 
                     # In case of boolean-based blind SQL injection
-                    if method == "comparison":
+                    if method == PAYLOAD.METHOD.COMPARISON:
                         sndPayload = agent.cleanupPayload(test.response.comparison, value)
                         sndPayload = unescapeDbms(sndPayload, injection, dbms)
                         sndPayload = "%s%s" % (sndPayload, comment)
@@ -324,29 +325,24 @@ def checkSqlInjection(place, parameter, value):
                         kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
 
                     # In case of error-based or UNION query SQL injections
-                    elif method == "grep":
+                    elif method == PAYLOAD.METHOD.GREP:
                         # Perform the test's request and grep the response
                         # body for the test's <grep> regular expression
                         reqBody, _ = Request.queryPage(reqPayload, place, content=True)
-                        match = re.search(check, reqBody, re.DOTALL | re.IGNORECASE)
-
-                        if not match:
-                            continue
-
-                        output = match.group('result')
+                        output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
                         if output:
                             output = output.replace(ERROR_SPACE, " ").replace(ERROR_EMPTY_CHAR, "")
 
-                        if output == "1":
-                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                            logger.info(infoMsg)
+                            if output == "1":
+                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                logger.info(infoMsg)
 
-                            injectable = True
+                                injectable = True
 
                     # In case of time-based blind or stacked queries
                     # SQL injections
-                    elif method == "time":
+                    elif method == PAYLOAD.METHOD.TIME:
                         # Store old value of socket timeout
                         pushValue(socket.getdefaulttimeout())
                         # Set socket timeout to 2 minutes as some
@@ -725,6 +721,7 @@ def checkNullConnection():
 
     try:
         page, headers = Request.getPage(method=HTTPMETHOD.HEAD)
+
         if not page and 'Content-Length' in headers:
             kb.nullConnection = NULLCONNECTION.HEAD
 
@@ -732,12 +729,14 @@ def checkNullConnection():
             logger.info(infoMsg)
         else:
             page, headers = Request.getPage(auxHeaders={"Range": "bytes=-1"})
+
             if page and len(page) == 1 and 'Content-Range' in headers:
                 kb.nullConnection = NULLCONNECTION.RANGE
 
                 infoMsg = "NULL connection is supported with GET header "
                 infoMsg += "'%s'" % kb.nullConnection
                 logger.info(infoMsg)
+
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg
