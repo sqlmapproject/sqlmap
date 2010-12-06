@@ -160,6 +160,9 @@ Tag: <test>
             NOTE: useful to test for time-based blind and stacked queries
             SQL injections.
 
+        Sub-tag: <out-of-band>
+            #TODO
+
     Sub-tag: <details>
         Which details can be infered if the payload succeed.
 
