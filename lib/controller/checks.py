@@ -279,7 +279,6 @@ def checkSqlInjection(place, parameter, value):
                     origValue = ""
 
                 kb.pageTemplate = getPageTemplate(templatePayload, place)
-                print "kb.originalPage:", kb.originalPage
 
                 # Forge request payload by prepending with boundary's
                 # prefix and appending the boundary's suffix to the
