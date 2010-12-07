@@ -361,8 +361,6 @@ def checkSqlInjection(place, parameter, value):
                                 injectable = True
                         elif check == "[DELAYED]":
                             if duration >= max(TIME_MIN_DELTA, TIME_N_RESPONSE * kb.responseTime):
-                                import pdb
-                                pdb.set_trace()
                                 infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
                                 logger.info(infoMsg)
 
