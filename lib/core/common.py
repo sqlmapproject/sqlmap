@@ -1280,20 +1280,29 @@ def readXmlFile(xmlFile):
 def stdev(values):
     """
     Computes standard deviation of a list of numbers.
+    Reference: http://www.goldb.org/corestats.html
     """
+    if not values or len(values) < 2:
+        return None
+
     sum = 0.0
     avg = average(values)
 
     for value in values:
         sum += pow(value - avg, 2)
 
-    return sqrt(sum/len(values))
+    return sqrt(sum/(len(values) - 1))
 
 def average(values):
     """
     Computes the arithmetic mean of a list of numbers.
     """
-    return sum(values, 0.0) / len(values)
+    retVal = None
+
+    if values:
+        retVal = sum(values) / len(values)
+
+    return retVal
 
 def calculateDeltaSeconds(start):
     """
