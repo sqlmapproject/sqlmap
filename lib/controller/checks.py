@@ -45,6 +45,8 @@ from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
+from lib.core.settings import TIME_MIN_DELTA
+from lib.core.settings import TIME_N_RESPONSE
 from lib.request.connect import Connect as Request
 from plugins.dbms.firebird.syntax import Syntax as Firebird
 from plugins.dbms.postgresql.syntax import Syntax as PostgreSQL
@@ -351,11 +353,23 @@ def checkSqlInjection(place, parameter, value):
                         _ = Request.queryPage(reqPayload, place)
                         duration = calculateDeltaSeconds(start)
 
-                        if duration >= conf.timeSec:
-                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                            logger.info(infoMsg)
+                        if check.isdigit():
+                            if duration >= int(check):
+                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                logger.info(infoMsg)
 
-                            injectable = True
+                                injectable = True
+                        elif check == "[DELAYED]":
+                            if duration >= max(TIME_MIN_DELTA, TIME_N_RESPONSE * kb.responseTime):
+                                import pdb
+                                pdb.set_trace()
+                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                logger.info(infoMsg)
+
+                                injectable = True
+                            else:
+                                import pdb
+                                pdb.set_trace()
                         # Restore old value of socket timeout
                         socket.setdefaulttimeout(popValue())
 
