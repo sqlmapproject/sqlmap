@@ -181,7 +181,7 @@ def checkSqlInjection(place, parameter, value):
         fstPayload = unescapeDbms(fstPayload, injection, dbms)
         fstPayload = "%s%s" % (fstPayload, comment)
 
-        if stype != 4 and clause != [2, 3] and clause != [ 2 ]:
+        if stype != 4 and clause != [2, 3] and clause != [ 3 ]:
             space = " "
         else:
             space = ""
@@ -279,6 +279,7 @@ def checkSqlInjection(place, parameter, value):
                     origValue = ""
 
                 kb.pageTemplate = getPageTemplate(templatePayload, place)
+                print "kb.originalPage:", kb.originalPage
 
                 # Forge request payload by prepending with boundary's
                 # prefix and appending the boundary's suffix to the

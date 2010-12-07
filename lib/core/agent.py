@@ -153,7 +153,7 @@ class Agent:
         # payload, do not put a space after the prefix
         if kb.technique == 4:
             query = kb.injection.prefix
-        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ]:
+        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 3 ]:
             if kb.technique != 3:
                 query = kb.injection.prefix
         elif kb.technique and kb.technique in kb.injection.data:
