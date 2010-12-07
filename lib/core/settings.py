@@ -48,10 +48,8 @@ DUMP_STOP_MARKER    = "__STOP__"
 
 PAYLOAD_DELIMITER  = "\x00"
 
-# settings used for delayed time payloads
-TIME_MIN_DELTA     = 1 # minimum difference of loading time in seconds
-TIME_N_RESPONSE    = 3 # minimum multiplicant of response time
-
+# minimum difference of loading time in seconds for delayed time payloads
+TIME_MIN_DELTA     = 2
 
 # System variables
 IS_WIN             = subprocess.mswindows
