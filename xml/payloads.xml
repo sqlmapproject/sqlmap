@@ -1524,7 +1524,7 @@ Formats:
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)>0</payload>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
