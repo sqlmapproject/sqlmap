@@ -82,7 +82,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
             ratio = 1. / ratio
     else:
         conf.seqMatcher.set_seq2(page)
-        ratio = round(conf.seqMatcher.ratio(), 3)
+        ratio = round(conf.seqMatcher.real_quick_ratio(), 3)
 
     if kb.locks.seqLock:
         kb.locks.seqLock.release()
