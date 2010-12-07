@@ -356,7 +356,9 @@ def checkSqlInjection(place, parameter, value):
                         _ = Request.queryPage(reqPayload, place, noteResponseTime = False)
                         duration = calculateDeltaSeconds(start)
 
-                        # Reference: http://www.answers.com/topic/standard-deviation
+                        # 99.9999999997440% of all non-time affected durations
+                        # should be inside 7*stdev(durations)
+                        # (Reference: http://www.answers.com/topic/standard-deviation)
                         trueResult = (duration >= 7 * stdev(kb.responseTimes))
 
                         if trueResult:
