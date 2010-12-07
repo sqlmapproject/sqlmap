@@ -269,6 +269,7 @@ def checkSqlInjection(place, parameter, value):
                     # as we are changing parameters value, which will result
                     # most definitely with a different content
                     kb.pageTemplate, _ = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)
+                    kb.testCount += 1
                 elif where == 3:
                     origValue = ""
                     kb.pageTemplate = kb.originalPage
@@ -306,12 +307,15 @@ def checkSqlInjection(place, parameter, value):
                         # the False response content
                         conf.matchRatio = None
                         _ = Request.queryPage(cmpPayload, place)
+                        kb.testCount += 1
 
                         # Compare True and False response contents
                         trueResult = Request.queryPage(reqPayload, place)
+                        kb.testCount += 1
 
                         if trueResult:
                             falseResult = Request.queryPage(cmpPayload, place)
+                            kb.testCount += 1
 
                             if not falseResult:
                                 infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
@@ -320,13 +324,12 @@ def checkSqlInjection(place, parameter, value):
                                 kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
                                 injectable = True
 
-                        kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
-
                     # In case of error-based or UNION query SQL injections
                     elif method == PAYLOAD.METHOD.GREP:
                         # Perform the test's request and grep the response
                         # body for the test's <grep> regular expression
                         reqBody, _ = Request.queryPage(reqPayload, place, content=True)
+                        kb.testCount += 1
                         output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
                         if output:
@@ -343,28 +346,32 @@ def checkSqlInjection(place, parameter, value):
                     elif method == PAYLOAD.METHOD.TIME:
                         # Store old value of socket timeout
                         pushValue(socket.getdefaulttimeout())
+
                         # Set socket timeout to 2 minutes as some
                         # time based checks can take awhile
                         socket.setdefaulttimeout(120)
+
                         # Perform the test's request and check how long
                         # it takes to get the response back
                         start = time.time()
+
                         _ = Request.queryPage(reqPayload, place)
+                        kb.testCount += 1
                         duration = calculateDeltaSeconds(start)
 
-                        if check.isdigit():
-                            if duration >= int(check):
-                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                                logger.info(infoMsg)
+                        # Threat sleep and delayed (heavy query) differently
+                        if check.isdigit() and duration >= int(check):
+                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                            logger.info(infoMsg)
 
-                                injectable = True
-                        elif check == "[DELAYED]":
-                            if duration >= max(TIME_MIN_DELTA, kb.responseTime):
-                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                                logger.info(infoMsg)
+                            injectable = True
+                        elif check == "[DELAYED]" and duration >= max(TIME_MIN_DELTA, kb.responseTime):
+                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                            logger.info(infoMsg)
 
-                                injectable = True
-                        # Restore old value of socket timeout
+                            injectable = True
+
+                        # Restore value of socket timeout
                         socket.setdefaulttimeout(popValue())
 
                 # If the injection test was successful feed the injection
@@ -398,7 +405,7 @@ def checkSqlInjection(place, parameter, value):
                     injection.data[stype].comment = comment
                     injection.data[stype].pageTemplate = kb.pageTemplate
 
-                    if "details" in test:
+                    if hasattr(test, "details"):
                         for detailKey, detailValue in test.details.items():
                             if detailKey == "dbms" and injection.dbms is None:
                                 injection.dbms = detailValue

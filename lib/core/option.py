@@ -1186,6 +1186,7 @@ def __setKnowledgeBaseAttributes():
     kb.userAgents      = None
     kb.valueStack      = []
     kb.redirectSetCookie = None
+    kb.testCount       = 0
 
 def __saveCmdline():
     """
