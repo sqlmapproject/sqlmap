@@ -1117,7 +1117,6 @@ def __setKnowledgeBaseAttributes():
     kb.cache.content   = {}
     kb.cache.regex     = {}
 
-    kb.flushCookies    = False
     kb.commonOutputs   = None
 
     kb.data            = advancedDict()
@@ -1172,6 +1171,7 @@ def __setKnowledgeBaseAttributes():
     kb.partRun         = None
     kb.proxyAuthHeader = None
     kb.queryCounter    = 0
+    kb.redirectSetCookie = None
     kb.responseTime    = 0
     kb.resumedQueries  = {}
     kb.retriesCount    = 0
@@ -1179,14 +1179,14 @@ def __setKnowledgeBaseAttributes():
     kb.targetUrls      = set()
     kb.testedParams    = set()
     kb.technique       = None
+    kb.testMode        = False
+    kb.testQueryCount  = 0
     kb.unionComment    = ""
     kb.unionCount      = None
     kb.unionPosition   = None
     kb.unionNegative   = False
     kb.userAgents      = None
     kb.valueStack      = []
-    kb.redirectSetCookie = None
-    kb.testCount       = 0
 
 def __saveCmdline():
     """

@@ -95,7 +95,7 @@ def checkSqlInjection(place, parameter, value):
     injection = injectionDict()
 
     # Clear cookies after each query page attempt
-    kb.flushCookies = True
+    kb.testMode = True
 
     for test in conf.tests:
         title = test.title
@@ -269,7 +269,6 @@ def checkSqlInjection(place, parameter, value):
                     # as we are changing parameters value, which will result
                     # most definitely with a different content
                     kb.pageTemplate, _ = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)
-                    kb.testCount += 1
                 elif where == 3:
                     origValue = ""
                     kb.pageTemplate = kb.originalPage
@@ -307,15 +306,12 @@ def checkSqlInjection(place, parameter, value):
                         # the False response content
                         conf.matchRatio = None
                         _ = Request.queryPage(cmpPayload, place)
-                        kb.testCount += 1
 
                         # Compare True and False response contents
                         trueResult = Request.queryPage(reqPayload, place)
-                        kb.testCount += 1
 
                         if trueResult:
                             falseResult = Request.queryPage(cmpPayload, place)
-                            kb.testCount += 1
 
                             if not falseResult:
                                 infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
@@ -329,7 +325,6 @@ def checkSqlInjection(place, parameter, value):
                         # Perform the test's request and grep the response
                         # body for the test's <grep> regular expression
                         reqBody, _ = Request.queryPage(reqPayload, place, content=True)
-                        kb.testCount += 1
                         output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
                         if output:
@@ -354,9 +349,7 @@ def checkSqlInjection(place, parameter, value):
                         # Perform the test's request and check how long
                         # it takes to get the response back
                         start = time.time()
-
                         _ = Request.queryPage(reqPayload, place)
-                        kb.testCount += 1
                         duration = calculateDeltaSeconds(start)
 
                         # Threat sleep and delayed (heavy query) differently
@@ -429,7 +422,7 @@ def checkSqlInjection(place, parameter, value):
                 break
 
     # Flush the flag
-    kb.flushCookies = False
+    kb.testMode = False
 
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:

@@ -407,8 +407,10 @@ class Connect:
         if conf.textOnly:
             page = getFilteredPageContent(page)
 
-        if kb.flushCookies and conf.cj:
-            conf.cj.clear()
+        if kb.testMode:
+            kb.testQueryCount += 1
+            if conf.cj:
+                conf.cj.clear()
 
         if content or response:
             return page, headers

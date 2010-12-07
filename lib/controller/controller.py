@@ -115,7 +115,7 @@ def __formatInjection(inj):
 
 def __showInjections():
     header = "sqlmap identified the following injection points "
-    header += "with %d HTTP(s) requests" % kb.testCount
+    header += "with %d HTTP(s) requests" % kb.testQueryCount
     data = ""
 
     for inj in kb.injections:
