@@ -101,7 +101,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
     if kb.injection.data[1].vector is not None:
         vector = agent.cleanupPayload(kb.injection.data[1].vector)
-        kb.pageTemplate = getPageTemplate(kb.injection.data[1].payload, kb.injection.place)
+        kb.pageTemplate = getPageTemplate(kb.injection.data[1].templatePayload, kb.injection.place)
     else:
         vector = queries[kb.misc.testedDbms].inference.query
         kb.pageTemplate = kb.originalPage

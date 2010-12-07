@@ -47,6 +47,7 @@ from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.core.settings import TIME_MIN_DELTA
 from lib.request.connect import Connect as Request
+from lib.request.templates import getPageTemplate
 from plugins.dbms.firebird.syntax import Syntax as Firebird
 from plugins.dbms.postgresql.syntax import Syntax as PostgreSQL
 from plugins.dbms.mssqlserver.syntax import Syntax as MSSQLServer
@@ -258,20 +259,22 @@ def checkSqlInjection(place, parameter, value):
 
             # For each test's <where>
             for where in test.where:
+                templatePayload = None
+
                 # Threat the parameter original value according to the
                 # test's <where> tag
                 if where == 1:
                     origValue = value
-                    kb.pageTemplate = kb.originalPage
                 elif where == 2:
                     origValue = "-%s" % randomInt()
                     # Use different page template than the original one
                     # as we are changing parameters value, which will result
                     # most definitely with a different content
-                    kb.pageTemplate, _ = Request.queryPage(agent.payload(place, parameter, value, origValue), place, content=True)
+                    templatePayload = agent.payload(place, parameter, value, origValue)
                 elif where == 3:
                     origValue = ""
-                    kb.pageTemplate = kb.originalPage
+
+                kb.pageTemplate = getPageTemplate(templatePayload, place)
 
                 # Forge request payload by prepending with boundary's
                 # prefix and appending the boundary's suffix to the
@@ -396,6 +399,7 @@ def checkSqlInjection(place, parameter, value):
                     injection.data[stype].where = where
                     injection.data[stype].vector = vector
                     injection.data[stype].comment = comment
+                    injection.data[stype].templatePayload = templatePayload
 
                     if hasattr(test, "details"):
                         for detailKey, detailValue in test.details.items():
