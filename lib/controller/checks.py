@@ -14,6 +14,7 @@ import time
 from difflib import SequenceMatcher
 
 from lib.core.agent import agent
+from lib.core.common import average
 from lib.core.common import beep
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import extractRegexResult
@@ -45,7 +46,8 @@ from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
-from lib.core.settings import TIME_MIN_DELTA
+from lib.core.settings import MIN_DURATION_RATIO
+from lib.core.settings import TIME_TOLERANCE
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
 from plugins.dbms.firebird.syntax import Syntax as Firebird
@@ -352,23 +354,17 @@ def checkSqlInjection(place, parameter, value):
                         # Perform the test's request and check how long
                         # it takes to get the response back
                         start = time.time()
-                        _ = Request.queryPage(reqPayload, place)
+                        _ = Request.queryPage(reqPayload, place, noteResponseTime = False)
                         duration = calculateDeltaSeconds(start)
-
-                        trueResult = (check.isdigit() and duration >= int(check)) or (check == "[DELAYED]" and duration >= max(TIME_MIN_DELTA, kb.responseTime))
+ 
+                        trueResult = (check.isdigit() and abs(duration - int(check) - average(kb.responseTimes)) < TIME_TOLERANCE)\
+                            or (check == "[DELAYED]" and duration >= MIN_DURATION_RATIO * max(kb.responseTimes))
 
                         if trueResult:
-                            start = time.time()
-                            _ = Request.queryPage(reqPayload, place)
-                            duration = calculateDeltaSeconds(start)
+                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                            logger.info(infoMsg)
 
-                            trueResult = (check.isdigit() and duration >= int(check)) or (check == "[DELAYED]" and duration >= max(TIME_MIN_DELTA, kb.responseTime))
-
-                            if trueResult:
-                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                                logger.info(infoMsg)
-
-                                injectable = True
+                            injectable = True
 
                         # Restore value of socket timeout
                         socket.setdefaulttimeout(popValue())
@@ -763,9 +759,7 @@ def checkConnection(suppressOutput=False):
         logger.info(infoMsg)
 
     try:
-        start = time.time()
         page, _ = Request.queryPage(content=True)
-        kb.responseTime = time.time() - start
         kb.originalPage = kb.pageTemplate = page
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)

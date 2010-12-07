@@ -1173,7 +1173,7 @@ def __setKnowledgeBaseAttributes():
     kb.proxyAuthHeader = None
     kb.queryCounter    = 0
     kb.redirectSetCookie = None
-    kb.responseTime    = 0
+    kb.responseTimes   = []
     kb.resumedQueries  = {}
     kb.retriesCount    = 0
     kb.tamperFunctions = []

@@ -320,7 +320,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False, raise404 = None):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False, raise404 = None, noteResponseTime = True):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -339,6 +339,7 @@ class Connect:
         uri         = None
         raise404    = place != PLACE.URI if raise404 is None else raise404
         toUrlencode = { PLACE.GET: True, PLACE.POST: True, PLACE.COOKIE: conf.cookieUrlencode, PLACE.UA: True, PLACE.URI: False }
+        start       = time.time()
 
         if not place:
             place = kb.injection.place
@@ -411,6 +412,9 @@ class Connect:
             kb.testQueryCount += 1
             if conf.cj:
                 conf.cj.clear()
+
+        if noteResponseTime:
+            kb.responseTimes.append(time.time() - start)
 
         if content or response:
             return page, headers

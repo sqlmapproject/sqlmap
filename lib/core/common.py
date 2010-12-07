@@ -1276,12 +1276,17 @@ def readXmlFile(xmlFile):
     xfile.close()
     return retVal
 
-def calculateDeltaSeconds(start, epsilon=0.1):
+def average(values):
     """
-    Returns elapsed time from start till now (including expected
-    error set by epsilon parameter)
+    Computes the arithmetic mean of a list of numbers.
     """
-    return time.time() - start - kb.responseTime + epsilon
+    return sum(values, 0.0) / len(values)
+
+def calculateDeltaSeconds(start):
+    """
+    Returns elapsed time from start till now
+    """
+    return time.time() - start
 
 def initCommonOutputs():
     kb.commonOutputs = {}
