@@ -348,10 +348,15 @@ def resumeConfKb(expression, url, value):
 
     elif expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
-        kb.injections.append(injection)
-
         logMsg = "resuming injection data from session file"
         logger.info(logMsg)
+
+        if injection.parameter in conf.paramDict[injection.place]:
+            kb.injections.append(injection)
+        else:
+            warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
+            warnMsg += "but you did not provided it this time"
+            logger.warn(warnMsg)
 
     elif expression == "Boolean-based blind injection" and url == conf.url:
         kb.booleanTest = unSafeFormatString(value[:-1])
