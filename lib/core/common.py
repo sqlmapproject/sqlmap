@@ -1609,6 +1609,7 @@ def extractRegexResult(regex, content, flags=0):
 
     if regex and content and '?P<result>' in regex:
         match = re.search(regex, content, flags)
+
         if match:
             retVal = match.group("result")
 
