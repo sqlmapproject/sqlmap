@@ -48,11 +48,6 @@ DUMP_STOP_MARKER    = "__STOP__"
 
 PAYLOAD_DELIMITER  = "\x00"
 
-# time testing settings
-TIME_TOLERANCE     = 0.5
-MIN_DURATION_RATIO = 1.5
-MAX_TIME_STDEV     = 1
-
 # System variables
 IS_WIN             = subprocess.mswindows
 # The name of the operating system dependent module imported. The following

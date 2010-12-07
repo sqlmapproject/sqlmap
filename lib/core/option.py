@@ -1182,7 +1182,6 @@ def __setKnowledgeBaseAttributes():
     kb.technique       = None
     kb.testMode        = False
     kb.testQueryCount  = 0
-    kb.timeTests       = True
     kb.unionComment    = ""
     kb.unionCount      = None
     kb.unionPosition   = None

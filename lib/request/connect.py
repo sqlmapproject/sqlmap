@@ -17,6 +17,7 @@ import traceback
 
 from lib.contrib import multipartpost
 from lib.core.agent import agent
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import extractErrorMessage
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
@@ -414,7 +415,7 @@ class Connect:
                 conf.cj.clear()
 
         if noteResponseTime:
-            kb.responseTimes.append(time.time() - start)
+            kb.responseTimes.append(calculateDeltaSeconds(start))
 
         if content or response:
             return page, headers
