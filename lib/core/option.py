@@ -1149,6 +1149,7 @@ def __setKnowledgeBaseAttributes():
     kb.injections      = []
     kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
     kb.lastErrorPage   = None
+    kb.lastQueryDuration = 0
     kb.lastRequestUID  = 0
 
     kb.locks           = advancedDict()

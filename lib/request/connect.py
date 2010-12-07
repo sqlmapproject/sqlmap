@@ -340,7 +340,6 @@ class Connect:
         uri         = None
         raise404    = place != PLACE.URI if raise404 is None else raise404
         toUrlencode = { PLACE.GET: True, PLACE.POST: True, PLACE.COOKIE: conf.cookieUrlencode, PLACE.UA: True, PLACE.URI: False }
-        start       = time.time()
 
         if not place:
             place = kb.injection.place
@@ -387,6 +386,7 @@ class Connect:
             if kb.queryCounter % conf.saFreq == 0:
                 Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
 
+        start = time.time()
         if not content and not response and kb.nullConnection:
             if kb.nullConnection == NULLCONNECTION.HEAD:
                 method = HTTPMETHOD.HEAD
@@ -405,6 +405,7 @@ class Connect:
 
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404)
+        kb.lastQueryDuration = calculateDeltaSeconds(start)
 
         if conf.textOnly:
             page = getFilteredPageContent(page)
@@ -415,7 +416,7 @@ class Connect:
                 conf.cj.clear()
 
         if noteResponseTime:
-            kb.responseTimes.append(calculateDeltaSeconds(start))
+            kb.responseTimes.append(kb.lastQueryDuration)
 
         if content or response:
             return page, headers

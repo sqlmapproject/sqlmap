@@ -350,16 +350,13 @@ def checkSqlInjection(place, parameter, value):
                         # time based checks can take awhile
                         socket.setdefaulttimeout(120)
 
-                        # Perform the test's request and check how long
-                        # it takes to get the response back
-                        start = time.time()
+                        # Perform the test's request
                         _ = Request.queryPage(reqPayload, place, noteResponseTime = False)
-                        duration = calculateDeltaSeconds(start)
 
                         # 99.9999999997440% of all non time-based sql injection 
-                        # affected durations should be inside 7*stdev(durations)
+                        # affected durations should be inside +-7*stdev(durations)
                         # (Reference: http://www.answers.com/topic/standard-deviation)
-                        trueResult = (duration >= 7 * stdev(kb.responseTimes))
+                        trueResult = (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
 
                         if trueResult:
                             infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
