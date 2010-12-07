@@ -31,6 +31,7 @@ from lib.core.enums import DBMS
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
+from lib.request.templates import getPageTemplate
 from lib.techniques.inband.union.use import unionUse
 from lib.techniques.blind.inference import bisection
 from lib.techniques.error.use import errorUse
@@ -100,7 +101,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
     if kb.injection.data[1].vector is not None:
         vector = agent.cleanupPayload(kb.injection.data[1].vector)
-        kb.pageTemplate = kb.injection.data[1].pageTemplate
+        kb.pageTemplate = getPageTemplate(kb.injection.data[1].payload, kb.injection.place)
     else:
         vector = queries[kb.misc.testedDbms].inference.query
         kb.pageTemplate = kb.originalPage

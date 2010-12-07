@@ -396,7 +396,6 @@ def checkSqlInjection(place, parameter, value):
                     injection.data[stype].where = where
                     injection.data[stype].vector = vector
                     injection.data[stype].comment = comment
-                    injection.data[stype].pageTemplate = kb.pageTemplate
 
                     if hasattr(test, "details"):
                         for detailKey, detailValue in test.details.items():
