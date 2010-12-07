@@ -351,7 +351,7 @@ def checkSqlInjection(place, parameter, value):
                         socket.setdefaulttimeout(120)
 
                         # Perform the test's request
-                        _ = Request.queryPage(reqPayload, place, noteResponseTime = False)
+                        _ = Request.queryPage(reqPayload, place, content=True, noteResponseTime=False)
 
                         # 99.9999999997440% of all non time-based sql injection 
                         # affected durations should be inside +-7*stdev(durations)

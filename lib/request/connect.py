@@ -387,6 +387,7 @@ class Connect:
                 Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua)
 
         start = time.time()
+
         if not content and not response and kb.nullConnection:
             if kb.nullConnection == NULLCONNECTION.HEAD:
                 method = HTTPMETHOD.HEAD
@@ -405,6 +406,7 @@ class Connect:
 
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404)
+
         kb.lastQueryDuration = calculateDeltaSeconds(start)
 
         if conf.textOnly:
