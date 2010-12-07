@@ -27,6 +27,7 @@ from ConfigParser import RawConfigParser
 from StringIO import StringIO
 from difflib import SequenceMatcher
 from inspect import getmembers
+from math import sqrt
 from subprocess import PIPE
 from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
@@ -1275,6 +1276,18 @@ def readXmlFile(xmlFile):
     retVal = minidom.parse(xfile).documentElement
     xfile.close()
     return retVal
+
+def stdev(values):
+    """
+    Computes standard deviation of a list of numbers.
+    """
+    sum = 0.0
+    avg = average(values)
+
+    for value in values:
+        sum += pow(value - avg, 2)
+
+    return sqrt(sum/len(values))
 
 def average(values):
     """

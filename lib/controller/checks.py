@@ -26,6 +26,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removeDynamicContent
 from lib.core.common import showStaticWords
+from lib.core.common import stdev
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import DynamicContentItem
@@ -47,6 +48,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.core.settings import MIN_DURATION_RATIO
+from lib.core.settings import MAX_TIME_STDEV
 from lib.core.settings import TIME_TOLERANCE
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
@@ -343,31 +345,42 @@ def checkSqlInjection(place, parameter, value):
 
                     # In case of time-based blind or stacked queries
                     # SQL injections
-                    elif method == PAYLOAD.METHOD.TIME:
-                        # Store old value of socket timeout
-                        pushValue(socket.getdefaulttimeout())
+                    elif method == PAYLOAD.METHOD.TIME and kb.timeTests:
+                        if stdev(kb.responseTimes) > MAX_TIME_STDEV:
+                            # the standard deviation tells us how far from the mean
+                            # the data points tend to be. It will have the same units
+                            # as the data points themselves
+                            warnMsg = "loading time(s) of the target url is too "
+                            warnMsg += "chaotic. skipping further time-based tests."
+                            logger.critical(warnMsg)
 
-                        # Set socket timeout to 2 minutes as some
-                        # time based checks can take awhile
-                        socket.setdefaulttimeout(120)
+                            kb.timeTests = False
+                        else:
+                            # Store old value of socket timeout
+                            pushValue(socket.getdefaulttimeout())
 
-                        # Perform the test's request and check how long
-                        # it takes to get the response back
-                        start = time.time()
-                        _ = Request.queryPage(reqPayload, place, noteResponseTime = False)
-                        duration = calculateDeltaSeconds(start)
- 
-                        trueResult = (check.isdigit() and abs(duration - int(check) - average(kb.responseTimes)) < TIME_TOLERANCE)\
-                            or (check == "[DELAYED]" and duration >= MIN_DURATION_RATIO * max(kb.responseTimes))
+                            # Set socket timeout to 2 minutes as some
+                            # time based checks can take awhile
+                            socket.setdefaulttimeout(120)
 
-                        if trueResult:
-                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                            logger.info(infoMsg)
+                            # Perform the test's request and check how long
+                            # it takes to get the response back
+                            start = time.time()
+                            _ = Request.queryPage(reqPayload, place, noteResponseTime = False)
+                            duration = calculateDeltaSeconds(start)
+    
+                            trueResult = duration > max(kb.responseTimes) and ((check.isdigit()\
+                                and abs(duration - int(check) - average(kb.responseTimes)) < TIME_TOLERANCE)\
+                                or (check == "[DELAYED]" and duration >= MIN_DURATION_RATIO * max(kb.responseTimes)))
 
-                            injectable = True
+                            if trueResult:
+                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                logger.info(infoMsg)
 
-                        # Restore value of socket timeout
-                        socket.setdefaulttimeout(popValue())
+                                injectable = True
+
+                            # Restore value of socket timeout
+                            socket.setdefaulttimeout(popValue())
 
                 # If the injection test was successful feed the injection
                 # object with the test's details
