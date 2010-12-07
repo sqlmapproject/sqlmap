@@ -355,17 +355,20 @@ def checkSqlInjection(place, parameter, value):
                         _ = Request.queryPage(reqPayload, place)
                         duration = calculateDeltaSeconds(start)
 
-                        # Threat sleep and delayed (heavy query) differently
-                        if check.isdigit() and duration >= int(check):
-                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                            logger.info(infoMsg)
+                        trueResult = (check.isdigit() and duration >= int(check)) or (check == "[DELAYED]" and duration >= max(TIME_MIN_DELTA, kb.responseTime))
 
-                            injectable = True
-                        elif check == "[DELAYED]" and duration >= max(TIME_MIN_DELTA, kb.responseTime):
-                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                            logger.info(infoMsg)
+                        if trueResult:
+                            start = time.time()
+                            _ = Request.queryPage(reqPayload, place)
+                            duration = calculateDeltaSeconds(start)
 
-                            injectable = True
+                            trueResult = (check.isdigit() and duration >= int(check)) or (check == "[DELAYED]" and duration >= max(TIME_MIN_DELTA, kb.responseTime))
+
+                            if trueResult:
+                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                logger.info(infoMsg)
+
+                                injectable = True
 
                         # Restore value of socket timeout
                         socket.setdefaulttimeout(popValue())
