@@ -1540,7 +1540,7 @@ def wasLastRequestDelayed():
     """
 
     # 99.9999999997440% of all non time-based sql injection
-    # affected durations should be inside +-7*stdev(durations)
+    # affected response times should be inside +-7*stdev([normal response times])
     # (Math reference: http://www.answers.com/topic/standard-deviation)
     return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
 
