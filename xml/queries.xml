@@ -288,10 +288,8 @@
 
     <!-- SQLite -->
     <dbms value="SQLite">
-        <!-- Not supported on SQLite 2 -->
-        <cast query="CAST(%s AS VARCHAR(8000))"/>
+        <cast query="CAST(%s AS VARCHAR(8000))" dbms_version="&gt;=3.0"/>
         <length query="LENGTH(%s)"/>
-        <!-- Not supported on SQLite 2 -->
         <isnull query="IFNULL(%s, ' ')"/>
         <delimiter query="||"/>
         <limit query="LIMIT %d, %d"/>
@@ -302,8 +300,7 @@
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
-        <!-- Not supported on SQLite 2 -->
-        <timedelay query="SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(1000000%d))))"/>
+        <timedelay query="SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(1000000%d))))" dbms_version="&gt;=3.0"/>
         <substring query="SUBSTR((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="SUBSTR((%s), %d, 1) > '%s'"/>
@@ -382,14 +379,14 @@
         <timedelay query="SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6"/>
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
         <case query="SELECT IIF(%s,1,0) FROM RDB$DATABASE"/>
-        <banner query="SELECT RDB$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB$DATABASE"/>
+        <banner query="SELECT RDB$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM', 'DB_NAME') FROM RDB$DATABASE"/>
         <users>
             <inband query="SELECT DISTINCT RDB$USER FROM RDB$USER_PRIVILEGES"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
         </users>
-        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d"/>
+        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1"/>
         <is_dba query="CURRENT_USER='SYSDBA'"/>
         <tables>
             <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
