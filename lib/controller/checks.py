@@ -14,7 +14,6 @@ import time
 from difflib import SequenceMatcher
 
 from lib.core.agent import agent
-from lib.core.common import average
 from lib.core.common import beep
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import extractRegexResult
@@ -26,7 +25,6 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removeDynamicContent
 from lib.core.common import showStaticWords
-from lib.core.common import stdev
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import DynamicContentItem
@@ -351,12 +349,7 @@ def checkSqlInjection(place, parameter, value):
                         socket.setdefaulttimeout(120)
 
                         # Perform the test's request
-                        _ = Request.queryPage(reqPayload, place, content=True, noteResponseTime=False)
-
-                        # 99.9999999997440% of all non time-based sql injection 
-                        # affected durations should be inside +-7*stdev(durations)
-                        # (Reference: http://www.answers.com/topic/standard-deviation)
-                        trueResult = (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
+                        trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True)
 
                         if trueResult:
                             infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)

@@ -17,12 +17,14 @@ import traceback
 
 from lib.contrib import multipartpost
 from lib.core.agent import agent
+from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import extractErrorMessage
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
+from lib.core.common import stdev
 from lib.core.convert import urlencode
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
@@ -321,7 +323,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False, raise404 = None, noteResponseTime = True):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False, raise404 = None, noteResponseTime = True, timeBasedCompare = False):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -417,7 +419,12 @@ class Connect:
             if conf.cj:
                 conf.cj.clear()
 
-        if noteResponseTime:
+        if timeBasedCompare:
+            # 99.9999999997440% of all non time-based sql injection
+            # affected durations should be inside +-7*stdev(durations)
+            # (Reference: http://www.answers.com/topic/standard-deviation)
+            return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
+        elif noteResponseTime:
             kb.responseTimes.append(kb.lastQueryDuration)
 
         if content or response:
