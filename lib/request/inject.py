@@ -29,6 +29,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapNotVulnerableException
+from lib.core.settings import MIN_TIME_RESPONSES
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.request.templates import getPageTemplate
@@ -414,6 +415,10 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
         if time and kb.timeTest and not value:
             kb.technique = 5
+
+            while len(kb.responseTimes) < MIN_TIME_RESPONSES:
+                _ = Request.queryPage(content=True)
+
             value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
         kb.unionNegative = oldParamNegative

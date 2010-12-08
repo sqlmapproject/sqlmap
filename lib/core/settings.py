@@ -48,6 +48,8 @@ DUMP_STOP_MARKER    = "__STOP__"
 
 PAYLOAD_DELIMITER  = "\x00"
 
+MIN_TIME_RESPONSES = 10
+
 # System variables
 IS_WIN             = subprocess.mswindows
 # The name of the operating system dependent module imported. The following
