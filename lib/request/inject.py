@@ -404,12 +404,6 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             kb.technique = PAYLOAD.TECHNIQUE.ERROR
             value = __goError(expression, resumeValue)
 
-            if not value:
-                warnMsg  = "for some reason(s) it was not possible to retrieve "
-                warnMsg += "the query output through error SQL injection "
-                warnMsg += "technique, sqlmap is going %s" % ("inband" if inband and kb.unionPosition is not None else "blind")
-                logger.warn(warnMsg)
-
         if blind and kb.booleanTest and not value:
             kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
             value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
