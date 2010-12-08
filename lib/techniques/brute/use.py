@@ -37,7 +37,7 @@ def tableExists(tableFile):
     for table in tables:
         if conf.db and '(*)' not in conf.db:
             table = "%s.%s" % (conf.db, table)
-        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
+        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)), expectingNone=True)
 
         if result:
             clearConsoleLine(True)
@@ -86,7 +86,7 @@ def columnExists(columnFile):
     length = len(columns)
 
     for column in columns:
-        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
+        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)), expectingNone=True)
 
         if result:
             clearConsoleLine(True)
@@ -109,7 +109,7 @@ def columnExists(columnFile):
         columns = {}
 
         for column in retVal:
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)))
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)), expectingNone=True)
 
             if result:
                 columns[column] = 'numeric'

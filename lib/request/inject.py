@@ -367,7 +367,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
 
     return data
 
-def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
+def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False, expectingNone=False):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -379,54 +379,59 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         pushValue(conf.verbose)
         conf.verbose = 0
 
-    if conf.direct:
-        value = direct(expression)
-    elif kb.booleanTest is not None or kb.errorTest is not None or kb.unionTest is not None or kb.timeTest is not None:
-        expression = cleanQuery(expression)
-        expression = expandAsteriskForColumns(expression)
-        value      = None
-        expression = expression.replace("DISTINCT ", "")
+    try:
+        if conf.direct:
+            value = direct(expression)
+        elif kb.booleanTest is not None or kb.errorTest is not None or kb.unionTest is not None or kb.timeTest is not None:
+            expression = cleanQuery(expression)
+            expression = expandAsteriskForColumns(expression)
+            value      = None
+            found      = False
+            expression = expression.replace("DISTINCT ", "")
 
-        if inband and kb.unionTest is not None:
-            kb.technique = PAYLOAD.TECHNIQUE.UNION
-            value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
+            if inband and kb.unionTest is not None:
+                kb.technique = PAYLOAD.TECHNIQUE.UNION
+                value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
+                found = value or (value is None and expectingNone)
 
-            if not value:
-                warnMsg  = "for some reason(s) it was not possible to retrieve "
-                warnMsg += "the query output through inband SQL injection "
-                warnMsg += "technique, sqlmap is going blind"
-                logger.warn(warnMsg)
+                if not found:
+                    warnMsg  = "for some reason(s) it was not possible to retrieve "
+                    warnMsg += "the query output through inband SQL injection "
+                    warnMsg += "technique, sqlmap is going blind"
+                    logger.warn(warnMsg)
 
-        oldParamNegative = kb.unionNegative
-        kb.unionNegative = False
+            oldParamNegative = kb.unionNegative
+            kb.unionNegative = False
 
-        if error and kb.errorTest and not value:
-            kb.technique = PAYLOAD.TECHNIQUE.ERROR
-            value = __goError(expression, resumeValue)
+            if error and kb.errorTest and not found:
+                kb.technique = PAYLOAD.TECHNIQUE.ERROR
+                value = __goError(expression, resumeValue)
+                found = value or (value is None and expectingNone)
 
-        if blind and kb.booleanTest and not value:
-            kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
-            value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+            if blind and kb.booleanTest and not found:
+                kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
+                value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                found = value or (value is None and expectingNone)
 
-        if time and kb.timeTest and not value:
-            kb.technique = PAYLOAD.TECHNIQUE.TIME
+            if time and kb.timeTest and not found:
+                kb.technique = PAYLOAD.TECHNIQUE.TIME
 
-            while len(kb.responseTimes) < MIN_TIME_RESPONSES:
-                _ = Request.queryPage(content=True)
+                while len(kb.responseTimes) < MIN_TIME_RESPONSES:
+                    _ = Request.queryPage(content=True)
 
-            value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
-        kb.unionNegative = oldParamNegative
+            kb.unionNegative = oldParamNegative
 
-        if value and isinstance(value, basestring):
-            value = value.strip()
-    else:
-        errMsg = "none of the injection types identified can be "
-        errMsg += "leveraged to retrieve queries output"
-        raise sqlmapNotVulnerableException, errMsg
-
-    if suppressOutput:
-        conf.verbose = popValue()
+            if value and isinstance(value, basestring):
+                value = value.strip()
+        else:
+            errMsg = "none of the injection types identified can be "
+            errMsg += "leveraged to retrieve queries output"
+            raise sqlmapNotVulnerableException, errMsg
+    finally:
+        if suppressOutput:
+            conf.verbose = popValue()
 
     return value
 
@@ -449,5 +454,5 @@ def goStacked(expression, silent=False):
 
     return payload, page
 
-def checkBooleanExpression(expression):
-    return getValue(agent.forgeCaseStatement(expression), expected="int", charsetType=1) == "1"
+def checkBooleanExpression(expression, expectingNone=False):
+    return getValue(agent.forgeCaseStatement(expression), expected="int", charsetType=1, expectingNone=expectingNone) == "1"
