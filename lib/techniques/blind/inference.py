@@ -44,6 +44,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     partialValue = ""
     finalValue = ""
     asciiTbl = getCharset(charsetType)
+    timeBasedCompare = (kb.technique == 5)
 
     # Set kb.partRun in case "common prediction" feature (a.k.a. "good
     # samaritan") is used
@@ -122,7 +123,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, posValue))
             queriesCount[0] += 1
-            result = Request.queryPage(forgedPayload)
+            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare)
 
             if result:
                 return hintValue[idx-1]
@@ -153,7 +154,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if len(charTbl) == 1:
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
             queriesCount[0] += 1
-            result = Request.queryPage(forgedPayload)
+            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare)
 
             if result:
                 return chr(charTbl[0]) if charTbl[0] < 128 else unichr(charTbl[0])
@@ -174,7 +175,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
 
             queriesCount[0] += 1
-            result = Request.queryPage(forgedPayload)
+            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare)
 
             if kb.dbms in (DBMS.SQLITE, DBMS.MAXDB):
                 posValue = popValue()
@@ -226,7 +227,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
                         forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
                         queriesCount[0] += 1
-                        result = Request.queryPage(forgedPayload)
+                        result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare)
 
                         if result:
                             return chr(retVal) if retVal < 128 else unichr(retVal)
@@ -444,7 +445,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
                     query = agent.suffixQuery(query)
                     queriesCount[0] += 1
-                    result = Request.queryPage(agent.payload(newValue=query))
+                    result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare)
 
                     # Did we have luck?
                     if result:
@@ -468,7 +469,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                     query = agent.suffixQuery(query)
                     queriesCount[0] += 1
-                    result = Request.queryPage(agent.payload(newValue=query))
+                    result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare)
 
                     # Did we have luck?
                     if result:

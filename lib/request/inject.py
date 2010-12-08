@@ -99,9 +99,9 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     parameter through a bisection algorithm.
     """
 
-    if kb.injection.data[1].vector is not None:
-        vector = agent.cleanupPayload(kb.injection.data[1].vector)
-        kb.pageTemplate = getPageTemplate(kb.injection.data[1].templatePayload, kb.injection.place)
+    if kb.technique and kb.injection.data[kb.technique].vector is not None:
+        vector = agent.cleanupPayload(kb.injection.data[kb.technique].vector)
+        kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
     else:
         vector = queries[kb.misc.testedDbms].inference.query
         kb.pageTemplate = kb.originalPage
@@ -336,6 +336,72 @@ def __goError(expression, resumeValue=True):
 
     return result
 
+def __goTimeBlind(expression, resumeValue=True):
+    """
+    Retrieve the output of a SQL query taking advantage of an error-based
+    SQL injection vulnerability on the affected parameter.
+    """
+
+    result = None
+
+    if conf.direct:
+        return direct(expression), None
+
+    condition = (
+                  kb.resumedQueries and conf.url in kb.resumedQueries.keys()
+                  and expression in kb.resumedQueries[conf.url].keys()
+                )
+
+    if condition and resumeValue:
+        result = resume(expression, None)
+
+    if not result:
+        result = timeBlindUse(expression)
+        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(result)))
+
+    return result
+
+def timeBlindUse(expression):
+    """
+    Retrieve the output of a SQL query taking advantage of an error SQL
+    injection vulnerability on the affected parameter.
+    """
+
+    output = None
+    import pdb
+    pdb.set_trace()
+    vector = agent.cleanupPayload(kb.injection.data[5].vector)
+    query = unescaper.unescape(vector)
+    query = agent.prefixQuery(query)
+    query = agent.suffixQuery(query)
+    check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
+
+    _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
+    nulledCastedField = agent.nullAndCastField(fieldToCastStr)
+
+    if kb.dbms == DBMS.MYSQL:
+        nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
+
+    expression = expression.replace(fieldToCastStr, nulledCastedField, 1)
+    expression = unescaper.unescape(expression)
+    expression = safeStringFormat(query, expression)
+
+    debugMsg = "query: %s" % expression
+    logger.debug(debugMsg)
+
+    payload = agent.payload(newValue=expression)
+    reqBody, _ = Request.queryPage(payload, content=True)
+    output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
+
+    if output:
+        output = output.replace(kb.misc.space, " ")
+
+        if conf.verbose > 0:
+            infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
+            logger.info(infoMsg)
+
+    return output
+
 def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
@@ -365,7 +431,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
 
     return data
 
-def getValue(expression, blind=True, inband=True, error=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
+def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -379,7 +445,7 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
 
     if conf.direct:
         value = direct(expression)
-    elif kb.booleanTest is not None or kb.errorTest is not None or kb.unionTest is not None:
+    elif kb.booleanTest is not None or kb.errorTest is not None or kb.unionTest is not None or kb.timeTest is not None:
         expression = cleanQuery(expression)
         expression = expandAsteriskForColumns(expression)
         value      = None
@@ -410,6 +476,10 @@ def getValue(expression, blind=True, inband=True, error=True, fromUser=False, ex
 
         if blind and kb.booleanTest and not value:
             kb.technique = 1
+            value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+
+        if time and kb.timeTest and not value:
+            kb.technique = 5
             value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
         kb.unionNegative = oldParamNegative
