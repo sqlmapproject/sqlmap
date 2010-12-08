@@ -323,7 +323,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, auxHeaders=None, response=False, raise404 = None, noteResponseTime = True, timeBasedCompare = False):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, timeBasedCompare=False, auxHeaders=None, response=False, raise404=None):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -424,7 +424,7 @@ class Connect:
             # affected durations should be inside +-7*stdev(durations)
             # (Reference: http://www.answers.com/topic/standard-deviation)
             return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
-        elif noteResponseTime:
+        else:
             kb.responseTimes.append(kb.lastQueryDuration)
 
         if content or response:
