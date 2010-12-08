@@ -451,7 +451,7 @@ def goStacked(expression, silent=False):
     logger.debug(debugMsg)
 
     payload = agent.payload(newValue=query)
-    page, _ = Request.queryPage(payload, content=True, silent=silent)
+    page, _ = Request.queryPage(payload, content=True, silent=silent, noteResponseTime=False)
 
     return payload, page
 

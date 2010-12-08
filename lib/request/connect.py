@@ -324,7 +324,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, timeBasedCompare=False, auxHeaders=None, response=False, raise404=None):
+    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -422,7 +422,7 @@ class Connect:
 
         if timeBasedCompare:
             return wasLastRequestDelayed()
-        else:
+        elif noteResponseTime:
             kb.responseTimes.append(kb.lastQueryDuration)
 
         if content or response:
