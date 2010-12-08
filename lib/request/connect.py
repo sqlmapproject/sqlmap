@@ -25,6 +25,7 @@ from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
 from lib.core.common import stdev
+from lib.core.common import wasLastRequestDelayed
 from lib.core.convert import urlencode
 from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
@@ -420,10 +421,7 @@ class Connect:
                 conf.cj.clear()
 
         if timeBasedCompare:
-            # 99.9999999997440% of all non time-based sql injection
-            # affected durations should be inside +-7*stdev(durations)
-            # (Reference: http://www.answers.com/topic/standard-deviation)
-            return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
+            return wasLastRequestDelayed()
         else:
             kb.responseTimes.append(kb.lastQueryDuration)
 

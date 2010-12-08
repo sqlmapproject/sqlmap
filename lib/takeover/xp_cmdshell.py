@@ -9,13 +9,13 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import wasLastRequestDelayed
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.unescaper import unescaper
 from lib.request import inject
-from lib.techniques.blind.timebased import timeUse
 
 class xp_cmdshell:
     """
@@ -88,13 +88,11 @@ class xp_cmdshell:
         inject.goStacked(cmd)
 
     def __xpCmdshellCheck(self):
-        query = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec * 2))
-        duration = timeUse(query)
+        cmd = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec * 2))
 
-        if duration >= conf.timeSec:
-            return True
-        else:
-            return False
+        inject.goStacked(cmd)
+
+        return wasLastRequestDelayed()
 
     def xpCmdshellForgeCmd(self, cmd):
         self.__randStr = randomStr(lowercase=True)

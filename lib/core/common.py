@@ -1532,7 +1532,17 @@ def wasLastRequestDBMSError():
     Returns True if the last web request resulted in a (recognized) DBMS error page
     """
 
-    return kb.lastErrorPage and kb.lastErrorPage[0]==kb.lastRequestUID
+    return kb.lastErrorPage and kb.lastErrorPage[0] == kb.lastRequestUID
+
+def wasLastRequestDelayed():
+    """
+    Returns True if the last web request resulted in a time-delay
+    """
+
+    # 99.9999999997440% of all non time-based sql injection
+    # affected durations should be inside +-7*stdev(durations)
+    # (Math reference: http://www.answers.com/topic/standard-deviation)
+    return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
 
 def extractErrorMessage(page):
     """
