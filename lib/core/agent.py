@@ -20,6 +20,7 @@ from lib.core.data import kb
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -151,10 +152,10 @@ class Agent:
         # Either if the technique is stacked queries (<stype>) or we are
         # replacing (<where>) the parameter original value with our
         # payload, do not put a space after the prefix
-        if kb.technique == 4:
+        if kb.technique == PAYLOAD.TECHNIQUE.STACKED:
             query = kb.injection.prefix
         elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 3 ]:
-            if kb.technique != 3:
+            if kb.technique != PAYLOAD.TECHNIQUE.UNION:
                 query = kb.injection.prefix
         elif kb.technique and kb.technique in kb.injection.data:
             where = kb.injection.data[kb.technique].where

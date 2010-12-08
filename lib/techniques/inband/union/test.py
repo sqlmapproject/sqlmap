@@ -14,6 +14,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.session import setUnion
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
@@ -118,7 +119,7 @@ def unionTest():
         return kb.unionTest
 
     oldTechnique = kb.technique
-    kb.technique = 3
+    kb.technique = PAYLOAD.TECHNIQUE.UNION
 
     if conf.uChar == "NULL":
         technique = "NULL bruteforcing"
