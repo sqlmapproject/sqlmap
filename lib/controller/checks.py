@@ -15,7 +15,6 @@ from difflib import SequenceMatcher
 
 from lib.core.agent import agent
 from lib.core.common import beep
-from lib.core.common import calculateDeltaSeconds
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import popValue
