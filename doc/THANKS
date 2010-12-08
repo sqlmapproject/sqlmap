@@ -234,6 +234,9 @@ David McNab <david@conscious.co.nz>
     for his XMLObject module that allows XML files to be operated on 
     like Python objects
 
+Spencer J. McIntyre <smcintyre@securestate.com>
+    for reporting a minor bug
+
 Enrico Milanese <enricomilanese@gmail.com>
     for reporting a bugs when using (-a) a single line User-Agent file
     for providing me with some ideas for the PHP backdoor
@@ -433,7 +436,7 @@ Sylphid <sylphid.su@sti.com.tw>
     for suggesting some features
 
 ToR <sstidus@email.it>
-    for reporting several bugs
+    for reporting considerable amount of bugs
     for suggesting a feature
 
 == Organizations ==
