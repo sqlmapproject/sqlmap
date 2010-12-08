@@ -160,7 +160,7 @@ def checkSqlInjection(place, parameter, value):
                 clauseMatch = True
                 break
 
-        if clause != [ 0 ] and injection.clause and not clauseMatch:
+        if clause != [ 0 ] and injection.clause and injection.clause != [ 0 ] and not clauseMatch:
             debugMsg = "skipping test '%s' because the clauses " % title
             debugMsg += "differs from the clause already identified"
             logger.debug(debugMsg)
