@@ -413,8 +413,11 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
                 found = value or (value is None and expectingNone)
 
-            if time and kb.timeTest and not found:
-                kb.technique = PAYLOAD.TECHNIQUE.TIME
+            if time and (kb.timeTest or kb.stackedTest) and not found:
+                if kb.timeTest:
+                    kb.technique = PAYLOAD.TECHNIQUE.TIME
+                elif kb.stackedTest:
+                    kb.technique = PAYLOAD.TECHNIQUE.STACKED
 
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                     _ = Request.queryPage(content=True)

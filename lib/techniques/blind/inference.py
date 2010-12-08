@@ -45,7 +45,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     partialValue = ""
     finalValue = ""
     asciiTbl = getCharset(charsetType)
-    timeBasedCompare = (kb.technique == PAYLOAD.TECHNIQUE.TIME)
+    timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
     # Set kb.partRun in case "common prediction" feature (a.k.a. "good
     # samaritan") is used
