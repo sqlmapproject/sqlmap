@@ -452,7 +452,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
         logger.info(infoMsg)
     else:
         infoMsg += "not be injectable"
-        logger.warning(infoMsg)
+        logger.warn(infoMsg)
 
 def checkDynParam(place, parameter, value):
     """

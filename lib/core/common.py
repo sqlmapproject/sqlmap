@@ -67,6 +67,7 @@ from lib.core.settings import DUMP_DEL_MARKER
 from lib.core.settings import DUMP_TAB_MARKER
 from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
+from lib.core.settings import MIN_TIME_RESPONSES
 
 class UnicodeRawConfigParser(RawConfigParser):
     """
@@ -1542,7 +1543,15 @@ def wasLastRequestDelayed():
     # 99.9999999997440% of all non time-based sql injection
     # affected response times should be inside +-7*stdev([normal response times])
     # (Math reference: http://www.answers.com/topic/standard-deviation)
-    return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * stdev(kb.responseTimes))
+    deviation = stdev(kb.responseTimes)
+    if deviation:
+        if len(kb.responseTimes) < MIN_TIME_RESPONSES:
+            warnMsg = "time based standard deviation method used "
+            warnMsg += "on a model with less than %d response times" % MIN_TIME_RESPONSES
+            logger.warn(warnMsg)
+        return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * deviation)
+    else:
+        return kb.lastQueryDuration - conf.timeSec
 
 def extractErrorMessage(page):
     """
