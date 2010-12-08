@@ -28,6 +28,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.request.connect import Connect as Request
@@ -387,7 +388,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         expression = expression.replace("DISTINCT ", "")
 
         if inband and kb.unionTest is not None:
-            kb.technique = 3
+            kb.technique = PAYLOAD.TECHNIQUE.UNION
             value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
 
             if not value:
@@ -400,7 +401,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         kb.unionNegative = False
 
         if error and kb.errorTest and not value:
-            kb.technique = 2
+            kb.technique = PAYLOAD.TECHNIQUE.ERROR
             value = __goError(expression, resumeValue)
 
             if not value:
@@ -410,11 +411,11 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 logger.warn(warnMsg)
 
         if blind and kb.booleanTest and not value:
-            kb.technique = 1
+            kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
             value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
         if time and kb.timeTest and not value:
-            kb.technique = 5
+            kb.technique = PAYLOAD.TECHNIQUE.TIME
 
             while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                 _ = Request.queryPage(content=True)
@@ -436,7 +437,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     return value
 
 def goStacked(expression, silent=False):
-    kb.technique = 4
+    kb.technique = PAYLOAD.TECHNIQUE.STACKED
     expression = cleanQuery(expression)
 
     if conf.direct:

@@ -94,3 +94,11 @@ class PAYLOAD:
         COMPARISON  = "comparison"
         GREP        = "grep"
         TIME        = "time"
+
+    class TECHNIQUE:
+        HEURISTIC = 0
+        BOOLEAN = 1
+        ERROR = 2
+        UNION = 3
+        STACKED = 4
+        TIME = 5

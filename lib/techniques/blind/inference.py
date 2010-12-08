@@ -27,6 +27,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapThreadException
@@ -44,7 +45,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     partialValue = ""
     finalValue = ""
     asciiTbl = getCharset(charsetType)
-    timeBasedCompare = (kb.technique == 5)
+    timeBasedCompare = (kb.technique == PAYLOAD.TECHNIQUE.TIME)
 
     # Set kb.partRun in case "common prediction" feature (a.k.a. "good
     # samaritan") is used
