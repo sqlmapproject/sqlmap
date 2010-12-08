@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import codecs
 import os
 import re
+import tempfile
 import time
 
 from lib.core.common import dataToSessionFile
@@ -231,13 +232,29 @@ def __createTargetDirs():
     Create the output directory.
     """
 
+    if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
+        try:
+            os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+        except:
+            tempDir = tempfile.mkdtemp(prefix='output')
+            warnMsg = "unable to create default root output directory at "
+            warnMsg += "'%s'. using temporary directory '%s' instead" % (paths.SQLMAP_OUTPUT_PATH, tempDir)
+            logger.warn(warnMsg)
+
+            paths.SQLMAP_OUTPUT_PATH = tempDir
+
     conf.outputPath = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, conf.hostname)
 
-    if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-        os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
-
     if not os.path.isdir(conf.outputPath):
-        os.makedirs(conf.outputPath, 0755)
+        try:
+            os.makedirs(conf.outputPath, 0755)
+        except:
+            tempDir = tempfile.mkdtemp(prefix='output')
+            warnMsg = "unable to create output directory '%s'. " % conf.outputPath
+            warnMsg += "using temporary directory '%s' instead" % tempDir
+            logger.warn(warnMsg)
+
+            conf.outputPath = tempDir
 
     __createDumpDir()
     __createFilesDir()
