@@ -387,8 +387,8 @@ class Connect:
 
         if timeBasedCompare:
             if len(kb.responseTimes) < MIN_TIME_RESPONSES:
-                warnMsg = "time-based comparison requested on a statisical model "
-                warnMsg += "with too small data set. doing few dummy requests."
+                warnMsg = "time-based comparison needs larger statistical model. "
+                warnMsg += "doing few dummy requests."
                 logger.warn(warnMsg)
 
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
