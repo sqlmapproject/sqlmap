@@ -101,6 +101,15 @@ def checkSqlInjection(place, parameter, value):
         stype = test.stype
         clause = test.clause
 
+        # Skip test if the user's wants to test only for a specific
+        # technique
+        if isinstance(conf.technique, int) and stype != conf.technique:
+            debugMsg = "skipping test '%s' because the user " % title
+            debugMsg += "specified to test only for "
+            debugMsg += "%s" % PAYLOAD.SQLINJECTION[conf.technique]
+            logger.debug(debugMsg)
+            continue
+
         # Skip test if the risk is higher than the provided (or default)
         # value
         # Parse test's <risk>

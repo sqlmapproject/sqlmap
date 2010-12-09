@@ -552,6 +552,15 @@ def __setOS():
         errMsg += "you."
         raise sqlmapUnsupportedDBMSException, errMsg
 
+def __setTechnique():
+    if not isinstance(conf.technique, int):
+        return
+
+    if conf.technique < 0 or conf.technique > 5:
+        errMsg = "the value of --technique must be an integer "
+        errMsg += "between 0 and 5"
+        raise sqlmapSyntaxException, errMsg
+
 def __setDBMS():
     """
     Force the back-end DBMS option.
@@ -1383,6 +1392,7 @@ def init(inputOptions=advancedDict()):
         __urllib2Opener()
         __findPageForms()
         __setDBMS()
+        __setTechnique()
 
     __setThreads()
     __setOS()
