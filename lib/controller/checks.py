@@ -308,12 +308,13 @@ def checkSqlInjection(place, parameter, value):
                         conf.matchRatio = None
                         _ = Request.queryPage(cmpPayload, place)
 
-                        # Compare True and False response contents
+                        # Perform the test's True request
                         trueResult = Request.queryPage(reqPayload, place)
 
                         if trueResult:
                             falseResult = Request.queryPage(cmpPayload, place)
 
+                            # Perform the test's False request
                             if not falseResult:
                                 infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
                                 logger.info(infoMsg)

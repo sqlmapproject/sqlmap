@@ -91,9 +91,9 @@ class PAYLOAD:
              }
 
     class METHOD:
-        COMPARISON  = "comparison"
-        GREP        = "grep"
-        TIME        = "time"
+        COMPARISON = "comparison"
+        GREP = "grep"
+        TIME = "time"
 
     class TECHNIQUE:
         HEURISTIC = 0

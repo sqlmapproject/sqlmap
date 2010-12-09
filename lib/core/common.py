@@ -1273,9 +1273,12 @@ def readCachedFileContent(filename, mode='rb'):
 
 def readXmlFile(xmlFile):
     checkFile(xmlFile)  
+
     xfile = codecs.open(xmlFile, 'r', conf.dataEncoding)
     retVal = minidom.parse(xfile).documentElement
+
     xfile.close()
+
     return retVal
 
 def stdev(values):
@@ -1283,16 +1286,17 @@ def stdev(values):
     Computes standard deviation of a list of numbers.
     Reference: http://www.goldb.org/corestats.html
     """
+
     if not values or len(values) < 2:
         return None
 
-    sum = 0.0
+    summa = 0.0
     avg = average(values)
 
     for value in values:
-        sum += pow(value - avg, 2)
+        summa += pow(value - avg, 2)
 
-    return sqrt(sum/(len(values) - 1))
+    return sqrt(summa/(len(values) - 1))
 
 def average(values):
     """
@@ -1544,11 +1548,13 @@ def wasLastRequestDelayed():
     # affected response times should be inside +-7*stdev([normal response times])
     # (Math reference: http://www.answers.com/topic/standard-deviation)
     deviation = stdev(kb.responseTimes)
+
     if deviation:
         if len(kb.responseTimes) < MIN_TIME_RESPONSES:
-            warnMsg = "time based standard deviation method used "
-            warnMsg += "on a model with less than %d response times" % MIN_TIME_RESPONSES
+            warnMsg = "time-based standard deviation method used on a model "
+            warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
             logger.warn(warnMsg)
+
         return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * deviation)
     else:
         return kb.lastQueryDuration - conf.timeSec

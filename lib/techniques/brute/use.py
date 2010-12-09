@@ -21,7 +21,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.request import inject
-from lib.request.connect import Connect as Request
 
 def tableExists(tableFile):
     tables = getFileItems(tableFile)
