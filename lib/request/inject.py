@@ -382,7 +382,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     try:
         if conf.direct:
             value = direct(expression)
-        elif kb.booleanTest is not None or kb.errorTest is not None or kb.unionTest is not None or kb.timeTest is not None or kb.stackedTest is not None:
+        elif any(test is not None for test in [kb.booleanTest, kb.errorTest, kb.unionTest, kb.timeTest, kb.stackedTest]):
             expression = cleanQuery(expression)
             expression = expandAsteriskForColumns(expression)
             value      = None
