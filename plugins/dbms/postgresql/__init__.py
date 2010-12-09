@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.enums import DBMS
 from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 
@@ -39,4 +40,5 @@ class PostgreSQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous,
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
+        unescaper[DBMS.PGSQL] = PostgreSQLMap.unescape
         unescaper.setUnescape(PostgreSQLMap.unescape)

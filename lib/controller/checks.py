@@ -44,31 +44,11 @@ from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
+from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
-from plugins.dbms.firebird.syntax import Syntax as Firebird
-from plugins.dbms.postgresql.syntax import Syntax as PostgreSQL
-from plugins.dbms.mssqlserver.syntax import Syntax as MSSQLServer
-from plugins.dbms.oracle.syntax import Syntax as Oracle
-from plugins.dbms.mysql.syntax import Syntax as MySQL
-from plugins.dbms.access.syntax import Syntax as Access
-from plugins.dbms.sybase.syntax import Syntax as Sybase
-from plugins.dbms.sqlite.syntax import Syntax as SQLite
-from plugins.dbms.maxdb.syntax import Syntax as MaxDB
 
 def unescape(string, dbms):
-    unescaper = {
-                  "Access": Access.unescape,
-                  "Firebird": Firebird.unescape,
-                  "MaxDB": MaxDB.unescape,
-                  "Microsoft SQL Server": MSSQLServer.unescape,
-                  "MySQL": MySQL.unescape,
-                  "Oracle": Oracle.unescape,
-                  "PostgreSQL": PostgreSQL.unescape,
-                  "SQLite": SQLite.unescape,
-                  "Sybase": Sybase.unescape
-                }
-
     if dbms in unescaper and "WAITFOR DELAY " not in string:
         return unescaper[dbms](string)
     else:

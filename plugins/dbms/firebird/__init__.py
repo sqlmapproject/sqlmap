@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.enums import DBMS
 from lib.core.settings import FIREBIRD_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 
@@ -32,4 +33,5 @@ class FirebirdMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, T
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
+        unescaper[DBMS.FIREBIRD] = FirebirdMap.unescape
         unescaper.setUnescape(FirebirdMap.unescape)

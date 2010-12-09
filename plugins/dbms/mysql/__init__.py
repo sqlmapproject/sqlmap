@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.enums import DBMS
 from lib.core.settings import MYSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 
@@ -38,4 +39,5 @@ class MySQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Take
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
+        unescaper[DBMS.MYSQL] = MySQLMap.unescape
         unescaper.setUnescape(MySQLMap.unescape)

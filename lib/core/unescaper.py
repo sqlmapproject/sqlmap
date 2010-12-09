@@ -7,7 +7,9 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-class Unescaper:
+from lib.core.datatype import advancedDict
+
+class Unescaper(advancedDict):
     def __init__(self):
         self.__unescaper = None
 

@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.enums import DBMS
 from lib.core.settings import MSSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
 
@@ -33,4 +34,5 @@ class MSSQLServerMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
+        unescaper[DBMS.MSSQL] = MSSQLServerMap.unescape
         unescaper.setUnescape(MSSQLServerMap.unescape)
