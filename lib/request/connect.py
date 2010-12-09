@@ -36,6 +36,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
+from lib.core.settings import MIN_TIME_RESPONSES
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse
@@ -383,6 +384,15 @@ class Connect:
             uri = conf.url if place != PLACE.URI or not value else value
         else:
             uri = conf.url
+
+        if timeBasedCompare:
+            if len(kb.responseTimes) < MIN_TIME_RESPONSES:
+                warnMsg = "time-based comparison requested on a statisical model "
+                warnMsg += "with too small data set. doing few dummy requests."
+                logger.warn(warnMsg)
+
+                while len(kb.responseTimes) < MIN_TIME_RESPONSES:
+                    _ = Connect.queryPage(content=True)
 
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1

@@ -419,9 +419,6 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 elif kb.stackedTest:
                     kb.technique = PAYLOAD.TECHNIQUE.STACKED
 
-                while len(kb.responseTimes) < MIN_TIME_RESPONSES:
-                    _ = Request.queryPage(content=True)
-
                 value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
             kb.unionNegative = oldParamNegative
