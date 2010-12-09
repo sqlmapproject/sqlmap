@@ -1346,7 +1346,7 @@ Formats:
     <test>
         <title>Oracle stacked queries (BEGIN DBMS_LOCK.SLEEP)</title>
         <stype>4</stype>
-        <level>3</level>
+        <level>5</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
@@ -1366,7 +1366,7 @@ Formats:
     <test>
         <title>Oracle stacked queries (EXEC DBMS_LOCK.SLEEP)</title>
         <stype>4</stype>
-        <level>4</level>
+        <level>5</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
