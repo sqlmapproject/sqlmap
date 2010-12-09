@@ -235,7 +235,7 @@ def __createTargetDirs():
     if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
         try:
             os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
-        except:
+        except OSError:
             tempDir = tempfile.mkdtemp(prefix='output')
             warnMsg = "unable to create default root output directory at "
             warnMsg += "'%s'. using temporary directory '%s' instead" % (paths.SQLMAP_OUTPUT_PATH, tempDir)
@@ -248,7 +248,7 @@ def __createTargetDirs():
     if not os.path.isdir(conf.outputPath):
         try:
             os.makedirs(conf.outputPath, 0755)
-        except:
+        except OSError:
             tempDir = tempfile.mkdtemp(prefix='output')
             warnMsg = "unable to create output directory '%s'. " % conf.outputPath
             warnMsg += "using temporary directory '%s' instead" % tempDir
