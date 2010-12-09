@@ -33,5 +33,4 @@ class OracleMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Tak
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-        unescaper[DBMS.ORACLE] = OracleMap.unescape
-        unescaper.setUnescape(OracleMap.unescape)
+    unescaper[DBMS.ORACLE] = Syntax.unescape

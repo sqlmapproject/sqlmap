@@ -7,16 +7,14 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.data import kb
 from lib.core.datatype import advancedDict
 
 class Unescaper(advancedDict):
     def __init__(self):
-        self.__unescaper = None
-
-    def setUnescape(self, unescapeFunction):
-        self.__unescaper = unescapeFunction
+        pass
 
     def unescape(self, expression, quote=True):
-        return self.__unescaper(expression, quote=quote)
+        return self[kb.dbms if kb.dbms else kb.misc.testedDbms](expression, quote=quote)
 
 unescaper = Unescaper()

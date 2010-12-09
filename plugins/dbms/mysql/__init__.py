@@ -39,5 +39,4 @@ class MySQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Take
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-        unescaper[DBMS.MYSQL] = MySQLMap.unescape
-        unescaper.setUnescape(MySQLMap.unescape)
+    unescaper[DBMS.MYSQL] = Syntax.unescape

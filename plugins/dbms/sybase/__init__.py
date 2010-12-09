@@ -33,5 +33,4 @@ class SybaseMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Tak
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-        unescaper[DBMS.SYBASE] = SybaseMap.unescape
-        unescaper.setUnescape(SybaseMap.unescape)
+    unescaper[DBMS.SYBASE] = Syntax.unescape

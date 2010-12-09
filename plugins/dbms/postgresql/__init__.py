@@ -40,5 +40,4 @@ class PostgreSQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous,
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-        unescaper[DBMS.PGSQL] = PostgreSQLMap.unescape
-        unescaper.setUnescape(PostgreSQLMap.unescape)
+    unescaper[DBMS.PGSQL] = Syntax.unescape

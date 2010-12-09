@@ -34,5 +34,4 @@ class MSSQLServerMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-        unescaper[DBMS.MSSQL] = MSSQLServerMap.unescape
-        unescaper.setUnescape(MSSQLServerMap.unescape)
+    unescaper[DBMS.MSSQL] = Syntax.unescape

@@ -33,5 +33,4 @@ class AccessMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Tak
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-        unescaper[DBMS.ACCESS] = AccessMap.unescape
-        unescaper.setUnescape(AccessMap.unescape)
+    unescaper[DBMS.ACCESS] = Syntax.unescape
