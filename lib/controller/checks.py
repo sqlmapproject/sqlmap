@@ -84,7 +84,6 @@ def checkSqlInjection(place, parameter, value):
         # Skip test if the user's wants to test only for a specific
         # technique
         if conf.technique and isinstance(conf.technique, int) and stype != conf.technique:
-            print "conf.technique:", conf.technique
             debugMsg = "skipping test '%s' because the user " % title
             debugMsg += "specified to test only for "
             debugMsg += "%s" % PAYLOAD.SQLINJECTION[conf.technique]
