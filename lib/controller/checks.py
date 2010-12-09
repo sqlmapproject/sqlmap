@@ -69,7 +69,7 @@ def unescape(string, dbms):
                   "Sybase": Sybase.unescape
                 }
 
-    if dbms in unescaper:
+    if dbms in unescaper and "WAITFOR DELAY " not in string:
         return unescaper[dbms](string)
     else:
         return string
