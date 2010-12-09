@@ -46,6 +46,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     finalValue = ""
     asciiTbl = getCharset(charsetType)
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
+    dbms = kb.dbms if kb.dbms else kb.misc.testedDbms
 
     # Set kb.partRun in case "common prediction" feature (a.k.a. "good
     # samaritan") is used
@@ -117,7 +118,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         hintlock.release()
 
         if hintValue is not None and len(hintValue) >= idx:
-            if kb.dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
+            if dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
                 posValue = hintValue[idx-1]
             else:
                 posValue = ord(hintValue[idx-1])
@@ -169,7 +170,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             position = (len(charTbl) >> 1)
             posValue = charTbl[position]
 
-            if kb.dbms in (DBMS.SQLITE, DBMS.MAXDB):
+            if dbms in (DBMS.SQLITE, DBMS.MAXDB):
                 pushValue(posValue)
                 posValue = chr(posValue) if posValue < 128 else unichr(posValue)
 
@@ -178,7 +179,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare)
 
-            if kb.dbms in (DBMS.SQLITE, DBMS.MAXDB):
+            if dbms in (DBMS.SQLITE, DBMS.MAXDB):
                 posValue = popValue()
 
             if result:
@@ -465,7 +466,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # check it via equal against the substring-query output
                 if commonPattern is not None:
                     # Substring-query containing equals commonPattern
-                    subquery = queries[kb.dbms].substring.query % (expressionUnescaped, 1, len(commonPattern))
+                    subquery = queries[dbms].substring.query % (expressionUnescaped, 1, len(commonPattern))
                     testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                     query = agent.suffixQuery(query)

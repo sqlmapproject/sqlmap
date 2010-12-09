@@ -22,6 +22,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import FIREBIRD_ALIASES
+from lib.request import inject
 from lib.request.connect import Connect as Request
 
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
@@ -72,18 +73,17 @@ class Fingerprint(GenericFingerprint):
     def __sysTablesCheck(self):
         retVal = None
         table = (
-                    ("1.0", ["AND EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)"]),
-                    ("1.5", ["AND NULLIF(%d,%d) IS NULL", "AND EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)"]),
-                    ("2.0", ["AND EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "AND BIT_LENGTH(%d)>0", "AND CHAR_LENGTH(%d)>0"]),
-                    ("2.1", ["AND BIN_XOR(%d,%d)=0", "AND PI()>0.%d", "AND RAND()<1.%d", "AND FLOOR(1.%d)>=0"])
+                    ("1.0", ["EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)"]),
+                    ("1.5", ["NULLIF(%d,%d) IS NULL", "EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)"]),
+                    ("2.0", ["EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "BIT_LENGTH(%d)>0", "CHAR_LENGTH(%d)>0"]),
+                    ("2.1", ["BIN_XOR(%d,%d)=0", "PI()>0.%d", "RAND()<1.%d", "FLOOR(1.%d)>=0"])
                  )
 
         for i in xrange(len(table)):
             version, checks = table[i]
             failed = False
             check = checks[randomRange(0,len(checks)-1)].replace("%d", getUnicode(randomRange(1,100)))
-            payload = agent.fullPayload(check)
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression(check)
             if result:
                 retVal = version
             else:
@@ -97,8 +97,7 @@ class Fingerprint(GenericFingerprint):
     def __dialectCheck(self):
         retVal = None
         if kb.dbms:
-            payload = agent.fullPayload("AND EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
             retVal = "dialect 3" if result else "dialect 1"
         return retVal
 
@@ -115,16 +114,13 @@ class Fingerprint(GenericFingerprint):
         logger.info(logMsg)
 
         randInt = randomInt()
-
-        payload = agent.fullPayload("AND EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
-        result  = Request.queryPage(payload)
+        result = inject.checkBooleanExpression("EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
 
         if result:
             logMsg = "confirming Firebird"
             logger.info(logMsg)
 
-            payload = agent.fullPayload("AND EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
 
             if not result:
                 warnMsg = "the back-end DBMS is not Firebird"

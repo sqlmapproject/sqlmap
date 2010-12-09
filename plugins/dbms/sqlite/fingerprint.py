@@ -80,15 +80,13 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing SQLite"
         logger.info(logMsg)
 
-        payload = agent.fullPayload("AND LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
-        result  = Request.queryPage(payload)
+        result = inject.checkBooleanExpression("LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
 
         if result:
             logMsg = "confirming SQLite"
             logger.info(logMsg)
 
-            payload = agent.fullPayload("AND SQLITE_VERSION()=SQLITE_VERSION()")
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("SQLITE_VERSION()=SQLITE_VERSION()")
 
             if not result:
                 warnMsg = "the back-end DBMS is not SQLite"

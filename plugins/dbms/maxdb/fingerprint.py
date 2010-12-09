@@ -22,6 +22,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import MAXDB_ALIASES
+from lib.request import inject
 from lib.request.connect import Connect as Request
 
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
@@ -48,19 +49,13 @@ class Fingerprint(GenericFingerprint):
         minor, major = None, None
 
         for version in [6, 7]:
-            query   = agent.prefixQuery("AND (SELECT MAJORVERSION FROM SYSINFO.VERSION)=%d" % version)
-            query   = agent.suffixQuery(query)
-            payload = agent.payload(newValue=query)
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("(SELECT MAJORVERSION FROM SYSINFO.VERSION)=%d" % version)
 
             if result:
                 major = version
 
         for version in xrange(0, 10):
-            query   = agent.prefixQuery("AND (SELECT MINORVERSION FROM SYSINFO.VERSION)=%d" % version)
-            query   = agent.suffixQuery(query)
-            payload = agent.payload(newValue=query)
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("(SELECT MINORVERSION FROM SYSINFO.VERSION)=%d" % version)
 
             if result:
                 minor = version
@@ -117,16 +112,13 @@ class Fingerprint(GenericFingerprint):
         logger.info(logMsg)
 
         randInt = randomInt()
-
-        payload = agent.fullPayload("AND NOROUND(%d)=%d" % (randInt, randInt))
-        result  = Request.queryPage(payload)
+        result = inject.checkBooleanExpression("NOROUND(%d)=%d" % (randInt, randInt))
 
         if result:
             logMsg = "confirming SAP MaxDB"
             logger.info(logMsg)
 
-            payload = agent.fullPayload("AND MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
 
             if not result:
                 warnMsg = "the back-end DBMS is not SAP MaxDB"

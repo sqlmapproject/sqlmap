@@ -22,6 +22,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import ACCESS_ALIASES
+from lib.request import inject
 from lib.request.connect import Connect as Request
 
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
@@ -40,10 +41,7 @@ class Fingerprint(GenericFingerprint):
             elif kb.dbmsVersion[0] in ("2002-2003", "2007"):
                 table = "MSysAccessStorage"
             if table:
-                query   = agent.prefixQuery("AND EXISTS(SELECT CURDIR() FROM %s)" % table)
-                query   = agent.suffixQuery(query)
-                payload = agent.payload(newValue=query)
-                result  = Request.queryPage(payload)
+                result = inject.checkBooleanExpression("EXISTS(SELECT CURDIR() FROM %s)" % table)
                 retVal = "not sandboxed" if result else "sandboxed"
 
         return retVal
@@ -70,10 +68,7 @@ class Fingerprint(GenericFingerprint):
                     negate = True
                     table = table[1:]
                 randInt = randomInt()
-                query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
-                query   = agent.suffixQuery(query)
-                payload = agent.payload(newValue=query)
-                result  = Request.queryPage(payload)
+                result = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
                 if result is None:
                     result = False
                 if negate:
@@ -94,13 +89,10 @@ class Fingerprint(GenericFingerprint):
 
         randInt = randomInt()
         randStr = randomStr()
-        query   = agent.prefixQuery("AND EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
-        query   = agent.suffixQuery(query)
-        payload = agent.payload(newValue=query)
-        page  = Request.queryPage(payload, content=True)
+        _ = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
 
         if wasLastRequestDBMSError():
-            match = re.search("Could not find file\s+'([^']+?)'", page[0])
+            match = re.search("Could not find file\s+'([^']+?)'", kb.lastErrorPage[1])
 
             if match:
                 retVal = match.group(1).rstrip("%s.mdb" % randStr)
@@ -161,15 +153,13 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing Microsoft Access"
         logger.info(logMsg)
 
-        payload = agent.fullPayload("AND VAL(CVAR(1))=1")
-        result  = Request.queryPage(payload)
+        result = inject.checkBooleanExpression("VAL(CVAR(1))=1")
 
         if result:
             logMsg = "confirming Microsoft Access"
             logger.info(logMsg)
 
-            payload = agent.fullPayload("AND IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
-            result  = Request.queryPage(payload)
+            result = inject.checkBooleanExpression("IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
 
             if not result:
                 warnMsg = "the back-end DBMS is not Microsoft Access"
