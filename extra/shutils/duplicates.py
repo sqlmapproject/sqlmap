@@ -18,11 +18,18 @@ if len(sys.argv) > 0:
 
     for item in f.readlines():
         item = item.strip()
-        if item in items:
-            if item:
-                print item
-        items.append(item)
+        try:
+            str.encode(item)
+            if item in items:
+                if item:
+                    print item
+            else:
+                items.append(item)
 
+            if not item:
+                items.append('')
+        except:
+            pass
     f.close()
 
     f = open(sys.argv[1], 'w+')
