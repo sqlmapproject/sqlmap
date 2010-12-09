@@ -94,6 +94,27 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
 
     return outputs
 
+def __goBooleanProxy(expression, resumeValue=True):
+    kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
+
+    vector  = kb.injection.data[kb.technique].vector
+    vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
+    vector  = agent.cleanupPayload(vector)
+
+    query   = agent.prefixQuery(vector)
+    query   = agent.suffixQuery(query)
+    payload = agent.payload(newValue=query)
+    if resumeValue:
+        output = resume(expression, payload)
+    else:
+        output = None
+    
+    if not output:
+        output = Request.queryPage(payload)
+
+    return output
+
+
 def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None, firstChar=None, lastChar=None):
     """
     Retrieve the output of a SQL query characted by character taking
@@ -410,7 +431,10 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if blind and kb.booleanTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
-                value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                if expected == "bool":
+                    value = __goBooleanProxy(expression, resumeValue)
+                else:
+                    value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
                 found = value or (value is None and expectingNone)
 
             if time and (kb.timeTest or kb.stackedTest) and not found:
@@ -455,4 +479,4 @@ def goStacked(expression, silent=False):
     return payload, page
 
 def checkBooleanExpression(expression, expectingNone=False):
-    return getValue(agent.forgeCaseStatement(expression), expected="int", charsetType=1, expectingNone=expectingNone) == "1"
+    return getValue(agent.forgeCaseStatement(expression), expected="bool", expectingNone=expectingNone)
