@@ -100,7 +100,12 @@ def __goBooleanProxy(expression, resumeValue=True):
     kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
 
     vector  = kb.injection.data[kb.technique].vector
-    vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
+    if kb.technique != PAYLOAD.TECHNIQUE.ERROR:
+        vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
+    else:
+        if not expression.upper().startswith("SELECT "):
+            expression = agent.forgeCaseStatement(expression)
+        vector  = vector.replace("%s", expression)
     vector  = agent.cleanupPayload(vector)
 
     query   = agent.prefixQuery(vector)
@@ -412,12 +417,17 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             found = False
             query = query.replace("DISTINCT ", "")
 
-            if expected == EXPECTED.BOOL and not query.upper().startswith("SELECT "):
-                query = agent.forgeCaseStatement(query)
+            if expected == EXPECTED.BOOL:
+                booleanExpression = expression
+                if booleanExpression.upper().startswith("SELECT "):
+                    booleanExpression = booleanExpression[len("SELECT "):]
 
             if inband and kb.unionTest is not None:
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
-                value = __goInband(query, expected, sort, resumeValue, unpack, dump)
+                if expected == EXPECTED.BOOL:
+                    value = __goBooleanProxy(booleanExpression, resumeValue)
+                else:
+                    value = __goInband(query, expected, sort, resumeValue, unpack, dump)
                 found = value or (value is None and expectingNone)
 
                 if not found:
@@ -431,15 +441,15 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if error and kb.errorTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
-                value = __goError(query, resumeValue)
+                if expected == EXPECTED.BOOL:
+                    value = __goBooleanProxy(booleanExpression, resumeValue)
+                else:
+                    value = __goError(query, resumeValue)
                 found = value or (value is None and expectingNone)
 
             if blind and kb.booleanTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
                 if expected == EXPECTED.BOOL:
-                    booleanExpression = expression
-                    if booleanExpression.upper().startswith("SELECT "):
-                        booleanExpression = booleanExpression[len("SELECT "):]
                     value = __goBooleanProxy(booleanExpression, resumeValue)
                 else:
                     value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
@@ -451,7 +461,10 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 elif kb.stackedTest:
                     kb.technique = PAYLOAD.TECHNIQUE.STACKED
 
-                value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                if expected == EXPECTED.BOOL:
+                    value = __goBooleanProxy(booleanExpression, resumeValue)
+                else:
+                    value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
             kb.unionNegative = oldParamNegative
 
