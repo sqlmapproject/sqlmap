@@ -54,6 +54,10 @@ class HASH:
     MD5_GENERIC  = r'(?i)\A[0-9a-f]{32}\Z'
     SHA1_GENERIC = r'(?i)\A[0-9a-f]{40}\Z'
 
+class EXPECTED:
+    BOOL         = "bool"
+    INT          = "int"
+
 class PAYLOAD:
     SQLINJECTION = {
                      1: "boolean-based blind",

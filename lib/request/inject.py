@@ -28,6 +28,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.settings import MIN_TIME_RESPONSES
@@ -79,7 +80,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         if resumeValue:
             output = resume(expressionReplaced, payload)
 
-        if not output or ( expected == "int" and not output.isdigit() ):
+        if not output or ( expected == EXPECTED.INT and not output.isdigit() ):
             if output:
                 warnMsg  = "expected value type %s, resumed '%s', " % (expected, output)
                 warnMsg += "sqlmap is going to retrieve the value again"
@@ -145,7 +146,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     else:
         output = None
 
-    if output and ( expected is None or ( expected == "int" and output.isdigit() ) ):
+    if output and ( expected is None or ( expected == EXPECTED.INT and output.isdigit() ) ):
         return output
 
     if not unpack:
@@ -377,7 +378,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     if condition and resumeValue:
         output = resume(expression, None)
 
-        if not output or ( expected == "int" and not output.isdigit() ):
+        if not output or ( expected == EXPECTED.INT and not output.isdigit() ):
             partial = True
 
     if not output:
@@ -431,7 +432,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if blind and kb.booleanTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
-                if expected == "bool":
+                if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(expression, resumeValue)
                 else:
                     value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
@@ -457,6 +458,16 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         if suppressOutput:
             conf.verbose = popValue()
 
+    if expected == EXPECTED.BOOL:
+        if isinstance(value, basestring):
+            value = value.lower()
+            if value in ("true", "false"):
+                value = bool(value)
+            else:
+                value = value != "0"
+        elif isinstance(value, int):
+            value = bool(value)
+
     return value
 
 def goStacked(expression, silent=False):
@@ -479,13 +490,4 @@ def goStacked(expression, silent=False):
     return payload, page
 
 def checkBooleanExpression(expression, expectingNone=False):
-    retVal = getValue(expression, expected="bool", expectingNone=expectingNone)
-    if isinstance(retVal, basestring):
-        retVal = retVal.lower()
-        if retVal in ("true", "false"):
-            retVal = bool(retVal)
-        else:
-            retVal = retVal != "0"
-    elif isinstance(retVal, int):
-        retVal = bool(retVal)
-    return retVal
+    return getValue(expression, expected=EXPECTED.BOOL, expectingNone=expectingNone)
