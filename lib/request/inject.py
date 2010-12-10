@@ -406,15 +406,18 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         if conf.direct:
             value = direct(expression)
         elif any(test is not None for test in [kb.booleanTest, kb.errorTest, kb.unionTest, kb.timeTest, kb.stackedTest]):
-            expression = cleanQuery(expression)
-            expression = expandAsteriskForColumns(expression)
+            query = cleanQuery(expression)
+            query = expandAsteriskForColumns(query)
             value      = None
             found      = False
-            expression = expression.replace("DISTINCT ", "")
+            query = query.replace("DISTINCT ", "")
+
+            if expected == EXPECTED.BOOL:
+                query = agent.forgeCaseStatement(query)
 
             if inband and kb.unionTest is not None:
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
-                value = __goInband(expression, expected, sort, resumeValue, unpack, dump)
+                value = __goInband(query, expected, sort, resumeValue, unpack, dump)
                 found = value or (value is None and expectingNone)
 
                 if not found:
@@ -428,7 +431,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if error and kb.errorTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
-                value = __goError(expression, resumeValue)
+                value = __goError(query, resumeValue)
                 found = value or (value is None and expectingNone)
 
             if blind and kb.booleanTest and not found:
@@ -436,7 +439,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(expression, resumeValue)
                 else:
-                    value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                    value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
                 found = value or (value is None and expectingNone)
 
             if time and (kb.timeTest or kb.stackedTest) and not found:
@@ -445,7 +448,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 elif kb.stackedTest:
                     kb.technique = PAYLOAD.TECHNIQUE.STACKED
 
-                value = __goInferenceProxy(expression, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
             kb.unionNegative = oldParamNegative
 
