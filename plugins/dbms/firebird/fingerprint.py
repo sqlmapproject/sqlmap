@@ -130,12 +130,9 @@ class Fingerprint(GenericFingerprint):
 
             setDbms(DBMS.FIREBIRD)
 
-            self.getBanner()
-
-            if not conf.extensiveFp:
-                return True
-
             kb.dbmsVersion = [self.__sysTablesCheck()]
+
+            self.getBanner()
 
             return True
         else:

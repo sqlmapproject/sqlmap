@@ -1684,10 +1684,12 @@ def isNumPosStrValue(value):
 
 def aliasToDbmsEnum(value):
     retVal = None
+
     for key, item in dbmsDict.items():
         if value in item[0]:
             retVal = key
             break
+
     return retVal
 
 def removeDynamicContent(page):
@@ -1702,3 +1704,15 @@ def removeDynamicContent(page):
                 page = getCompiledRegex('(?s)%s.+%s' % (prefix, suffix)).sub('%s%s' % (prefix, suffix), page)
 
     return page
+
+
+def isDBMSVersionAtLeast(version):
+    retVal = None
+
+    if version:
+        if not isinstance(version, basestring):
+            version = str(version)
+        if kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown" and kb.dbmsVersion[0] != None:
+            retVal = kb.dbmsVersion[0] >= version
+
+    return retVal

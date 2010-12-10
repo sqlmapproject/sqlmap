@@ -93,16 +93,13 @@ class Fingerprint(GenericFingerprint):
                 logger.warn(warnMsg)
 
                 return False
+            else:
+                result = inject.checkBooleanExpression("RANDOMBLOB(-1)>0")
+                kb.dbmsVersion = [ '3' if result else '2' ]
 
             setDbms(DBMS.SQLITE)
 
             self.getBanner()
-
-            if not conf.extensiveFp:
-                return True
-
-            version = inject.getValue("SELECT SUBSTR((SQLITE_VERSION()), 1, 1)", unpack=False, charsetType=2, suppressOutput=True)
-            kb.dbmsVersion = [ version ]
 
             return True
         else:

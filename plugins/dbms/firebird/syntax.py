@@ -7,6 +7,8 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.data import kb
+from lib.core.common import isDBMSVersionAtLeast
 from lib.core.exception import sqlmapSyntaxException
 
 from plugins.generic.syntax import Syntax as GenericSyntax
@@ -21,57 +23,58 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
-        #if quote:
-            #while True:
-                #index = expression.find("'")
-                #if index == -1:
-                    #break
+        if isDBMSVersionAtLeast('2.1'):
+            if quote:
+                while True:
+                    index = expression.find("'")
+                    if index == -1:
+                        break
 
-                #firstIndex = index + 1
-                #index = expression[firstIndex:].find("'")
+                    firstIndex = index + 1
+                    index = expression[firstIndex:].find("'")
 
-                #if index == -1:
-                    #raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
+                    if index == -1:
+                        raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
 
-                #lastIndex = firstIndex + index
-                #old = "'%s'" % expression[firstIndex:lastIndex]
-                #unescaped = ""
+                    lastIndex = firstIndex + index
+                    old = "'%s'" % expression[firstIndex:lastIndex]
+                    unescaped = ""
 
-                #for i in range(firstIndex, lastIndex):
-                    #unescaped += "ASCII_CHAR(%d)" % (ord(expression[i]))
-                    #if i < lastIndex - 1:
-                        #unescaped += "||"
+                    for i in range(firstIndex, lastIndex):
+                        unescaped += "ASCII_CHAR(%d)" % (ord(expression[i]))
+                        if i < lastIndex - 1:
+                            unescaped += "||"
 
-                #expression = expression.replace(old, unescaped)
-        #else:
-            #unescaped = "".join("ASCII_CHAR(%d)||" % ord(c) for c in expression)
-            #if unescaped[-1] == "||":
-                #unescaped = unescaped[:-1]
+                    expression = expression.replace(old, unescaped)
+            else:
+                unescaped = "".join("ASCII_CHAR(%d)||" % ord(c) for c in expression)
+                if unescaped[-1] == "||":
+                    unescaped = unescaped[:-1]
 
-            #expression = unescaped
+                expression = unescaped
 
         return expression
 
     @staticmethod
     def escape(expression):
-        #while True:
-            #index = expression.find("ASCII_CHAR(")
-            #if index == -1:
-                #break
+        while True:
+            index = expression.find("ASCII_CHAR(")
+            if index == -1:
+                break
 
-            #firstIndex = index
-            #index = expression[firstIndex:].find(")")
+            firstIndex = index
+            index = expression[firstIndex:].find(")")
 
-            #if index == -1:
-                #raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
+            if index == -1:
+                raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
 
-            #lastIndex = firstIndex + index + 1
-            #old = expression[firstIndex:lastIndex]
-            #oldUpper = old.upper()
-            #oldUpper = oldUpper.lstrip("ASCII_CHAR(").rstrip(")")
-            #oldUpper = oldUpper.split("||")
+            lastIndex = firstIndex + index + 1
+            old = expression[firstIndex:lastIndex]
+            oldUpper = old.upper()
+            oldUpper = oldUpper.lstrip("ASCII_CHAR(").rstrip(")")
+            oldUpper = oldUpper.split("||")
 
-            #escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
-            #expression = expression.replace(old, escaped).replace("'||'", "")
+            escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
+            expression = expression.replace(old, escaped).replace("'||'", "")
 
         return expression
