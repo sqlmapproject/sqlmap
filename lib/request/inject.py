@@ -32,6 +32,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.request.templates import getPageTemplate
@@ -464,7 +465,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             if value in ("true", "false"):
                 value = bool(value)
             else:
-                value = value != "0"
+                value = value and value != "0"
         elif isinstance(value, int):
             value = bool(value)
 
@@ -490,4 +491,4 @@ def goStacked(expression, silent=False):
     return payload, page
 
 def checkBooleanExpression(expression, expectingNone=False):
-    return getValue(expression, expected=EXPECTED.BOOL, expectingNone=expectingNone)
+    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, expectingNone=expectingNone)
