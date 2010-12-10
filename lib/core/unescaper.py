@@ -11,9 +11,6 @@ from lib.core.data import kb
 from lib.core.datatype import advancedDict
 
 class Unescaper(advancedDict):
-    def __init__(self):
-        pass
-
     def unescape(self, expression, quote=True):
         return self[kb.dbms if kb.dbms else kb.misc.testedDbms](expression, quote=quote)
 
