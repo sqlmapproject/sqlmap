@@ -7,7 +7,6 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.data import kb
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.exception import sqlmapSyntaxException
 

@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import isDBMSVersionAtLeast
 from lib.core.exception import sqlmapSyntaxException
 
 from plugins.generic.syntax import Syntax as GenericSyntax
@@ -17,36 +18,34 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
-        # The following is not supported on SQLite 2
-        return expression
+        if isDBMSVersionAtLeast('3'):
+            if quote:
+                expression = expression.replace("'", "''")
+                while True:
+                    index = expression.find("''")
+                    if index == -1:
+                        break
 
-        if quote:
-            expression = expression.replace("'", "''")
-            while True:
-                index = expression.find("''")
-                if index == -1:
-                    break
+                    firstIndex = index + 2
+                    index = expression[firstIndex:].find("''")
 
-                firstIndex = index + 2
-                index = expression[firstIndex:].find("''")
+                    if index == -1:
+                        raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression.replace("''", "'")
 
-                if index == -1:
-                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression.replace("''", "'")
+                    lastIndex = firstIndex + index
+                    old = "''%s''" % expression[firstIndex:lastIndex]
+                    unescaped = ""
 
-                lastIndex = firstIndex + index
-                old = "''%s''" % expression[firstIndex:lastIndex]
-                unescaped = ""
+                    for i in range(firstIndex, lastIndex):
+                        unescaped += "X'%x'" % ord(expression[i])
+                        if i < lastIndex - 1:
+                            unescaped += "||"
 
-                for i in range(firstIndex, lastIndex):
-                    unescaped += "X'%x'" % ord(expression[i])
-                    if i < lastIndex - 1:
-                        unescaped += "||"
-
-                #unescaped += ")"
-                expression = expression.replace(old, unescaped)
-            expression = expression.replace("''", "'")
-        else:
-            expression = "||".join("X'%x" % ord(c) for c in expression)
+                    #unescaped += ")"
+                    expression = expression.replace(old, unescaped)
+                expression = expression.replace("''", "'")
+            else:
+                expression = "||".join("X'%x" % ord(c) for c in expression)
 
         return expression
 
