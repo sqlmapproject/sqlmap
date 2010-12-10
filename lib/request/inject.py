@@ -98,7 +98,7 @@ def __goBooleanProxy(expression, resumeValue=True):
     kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
 
     vector  = kb.injection.data[kb.technique].vector
-    vector  = vector.replace("[INFERENCE]", "1=(%s)" % expression)
+    vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
     vector  = agent.cleanupPayload(vector)
 
     query   = agent.prefixQuery(vector)
@@ -479,4 +479,4 @@ def goStacked(expression, silent=False):
     return payload, page
 
 def checkBooleanExpression(expression, expectingNone=False):
-    return getValue(agent.forgeCaseStatement(expression), expected="bool", expectingNone=expectingNone)
+    return getValue(expression, expected="bool", expectingNone=expectingNone)
