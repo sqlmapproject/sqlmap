@@ -408,11 +408,11 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         elif any(test is not None for test in [kb.booleanTest, kb.errorTest, kb.unionTest, kb.timeTest, kb.stackedTest]):
             query = cleanQuery(expression)
             query = expandAsteriskForColumns(query)
-            value      = None
-            found      = False
+            value = None
+            found = False
             query = query.replace("DISTINCT ", "")
 
-            if expected == EXPECTED.BOOL and not query.startswith("SELECT "):
+            if expected == EXPECTED.BOOL and not query.upper().startswith("SELECT "):
                 query = agent.forgeCaseStatement(query)
 
             if inband and kb.unionTest is not None:
@@ -438,7 +438,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
                 if expected == EXPECTED.BOOL:
                     booleanExpression = expression
-                    if booleanExpression.startswith("SELECT "):
+                    if booleanExpression.upper().startswith("SELECT "):
                         booleanExpression = booleanExpression[len("SELECT "):]
                     value = __goBooleanProxy(booleanExpression, resumeValue)
                 else:
