@@ -32,6 +32,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import EXPECTED
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -158,7 +159,7 @@ class Enumeration:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
-            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
@@ -267,7 +268,7 @@ class Enumeration:
                     query = rootQuery.blind.count2 % user
                 else:
                     query = rootQuery.blind.count % user
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of password "
@@ -546,7 +547,7 @@ class Enumeration:
                     query = rootQuery.blind.count2 % queryUser
                 else:
                     query = rootQuery.blind.count % queryUser
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     if not (isinstance(count, basestring) and count.isdigit()) and kb.dbms == DBMS.ORACLE and not query2:
@@ -685,7 +686,7 @@ class Enumeration:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
-            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of databases"
@@ -810,7 +811,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % db
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of "
@@ -981,7 +982,7 @@ class Enumeration:
                 query = rootQuery.blind.count % (conf.tbl)
                 query += condQuery
 
-            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 errMsg  = "unable to retrieve the number of columns "
@@ -1164,7 +1165,7 @@ class Enumeration:
                 query = rootQuery.blind.count % conf.tbl
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
-            count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 warnMsg = "unable to retrieve the number of "
@@ -1399,7 +1400,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                 query += dbQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "no database"
@@ -1484,7 +1485,7 @@ class Enumeration:
                 query = rootQuery.blind.count
                 query += tblQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "no databases have table"
@@ -1521,7 +1522,7 @@ class Enumeration:
                     query = rootQuery.blind.count2
                     query = query % db
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                    count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -1623,7 +1624,7 @@ class Enumeration:
                 query = rootQuery.blind.count
                 query += colQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "no databases have tables containing column"
@@ -1663,7 +1664,7 @@ class Enumeration:
                         query = rootQuery.blind.count2
                         query = query % db
                         query += " AND %s" % colQuery
-                        count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                        count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                         if not isNumPosStrValue(count):
                             warnMsg = "no tables contain column"

@@ -14,6 +14,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import EXPECTED
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
 
@@ -115,7 +116,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count2 % queryUser
                 else:
                     query = rootQuery.blind.count % queryUser
-                count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not count.isdigit() or not len(count) or count == "0":
                     if not count.isdigit() and not query2:
@@ -237,7 +238,7 @@ class Enumeration(GenericEnumeration):
 
                     query = rootQuery.blind.count2
                     query += " WHERE %s" % colQuery
-                    count = inject.getValue(query, inband=False, expected="int", charsetType=2)
+                    count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
                     if not count.isdigit() or not len(count) or count == "0":
                         warnMsg = "no tables contain column"
