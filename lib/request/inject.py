@@ -479,4 +479,13 @@ def goStacked(expression, silent=False):
     return payload, page
 
 def checkBooleanExpression(expression, expectingNone=False):
-    return getValue(expression, expected="bool", expectingNone=expectingNone)
+    retVal = getValue(expression, expected="bool", expectingNone=expectingNone)
+    if isinstance(retVal, basestring):
+        retVal = retVal.lower()
+        if retVal in ("true", "false"):
+            retVal = bool(retVal)
+        else:
+            retVal = retVal != "0"
+    elif isinstance(retVal, int):
+        retVal = bool(retVal)
+    return retVal
