@@ -190,7 +190,7 @@ class Fingerprint(GenericFingerprint):
                     return True
 
                 # Check if it is MySQL >= 5.5.0
-                if inject.checkBooleanExpression("6=(SELECT MID(TO_SECONDS(950501), 1, 1))"):
+                if inject.checkBooleanExpression("TO_SECONDS(950501)>0"):
                     kb.dbmsVersion = [">= 5.5.0"]
 
                 # Check if it is MySQL >= 5.1.2 and < 5.5.0
@@ -228,11 +228,9 @@ class Fingerprint(GenericFingerprint):
                     return True
 
                 # Check which version of MySQL < 5.0.0 it is
-                coercibility = inject.getValue("SELECT COERCIBILITY(USER())", suppressOutput=True)
-
-                if coercibility == "3":
+                if inject.checkBooleanExpression("3=(SELECT COERCIBILITY(USER()))"):
                     kb.dbmsVersion = [">= 4.1.11", "< 5.0.0"]
-                elif coercibility == "2":
+                elif inject.checkBooleanExpression("2=(SELECT COERCIBILITY(USER()))"):
                     kb.dbmsVersion = [">= 4.1.1", "< 4.1.11"]
                 elif inject.getValue("SELECT CURRENT_USER()", suppressOutput=True):
                     kb.dbmsVersion = [">= 4.0.6", "< 4.1.1"]
@@ -264,7 +262,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "fingerprinting the back-end DBMS operating system"
         logger.info(infoMsg)
 
-        if inject.checkBooleanExpression("'/'=(SELECT MID(@@datadir, 1, 1))"):
+        if inject.checkBooleanExpression("(SELECT MID(@@datadir, 1, 1))='/'"):
             kb.os = "Linux"
         else:
             kb.os = "Windows"
