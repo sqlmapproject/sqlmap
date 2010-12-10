@@ -460,14 +460,15 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             conf.verbose = popValue()
 
     if expected == EXPECTED.BOOL:
-        if isinstance(value, basestring):
-            value = value.lower()
-            if value in ("true", "false"):
+        if value:
+            if isinstance(value, basestring):
+                value = value.lower()
+                if value in ("true", "false"):
+                    value = bool(value)
+                else:
+                    value = value != "0"
+            elif isinstance(value, int):
                 value = bool(value)
-            else:
-                value = value and value != "0"
-        elif isinstance(value, int):
-            value = bool(value)
 
     return value
 
