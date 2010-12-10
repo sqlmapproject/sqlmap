@@ -368,14 +368,14 @@ class Metasploit:
         self.__forgeMsfCliCmd(exitfunc)
 
         infoMsg  = "running Metasploit Framework 3 command line "
-        infoMsg += "interface locally, wait.."
+        infoMsg += "interface locally, please wait.."
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self.__cliCmd)
         self.__msfCliProc = execute(self.__cliCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def __runMsfConsole(self):
-        infoMsg = "running Metasploit Framework 3 console locally, wait.."
+        infoMsg = "running Metasploit Framework 3 console locally, please wait.."
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self.__consoleCmd)
@@ -383,14 +383,14 @@ class Metasploit:
 
     def __runMsfShellcodeRemote(self):
         infoMsg  = "running Metasploit Framework 3 shellcode "
-        infoMsg += "remotely via UDF 'sys_bineval', wait.."
+        infoMsg += "remotely via UDF 'sys_bineval', please wait.."
         logger.info(infoMsg)
 
         self.udfExecCmd("'%s'" % self.shellcodeString, silent=True, udfName="sys_bineval")
 
     def __runMsfPayloadRemote(self):
         infoMsg  = "running Metasploit Framework 3 payload stager "
-        infoMsg += "remotely, wait.."
+        infoMsg += "remotely, please wait.."
         logger.info(infoMsg)
 
         if kb.os != "Windows":

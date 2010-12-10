@@ -153,7 +153,7 @@ class Filesystem(GenericFilesystem):
             infoMsg  = "the %s file is bigger than %d " % (fileType, debugSize)
             infoMsg += "bytes. sqlmap will split it into chunks, upload "
             infoMsg += "them and recreate the original file out of the "
-            infoMsg += "binary chunks server-side, wait.."
+            infoMsg += "binary chunks server-side, please wait.."
             logger.info(infoMsg)
 
             counter = 1

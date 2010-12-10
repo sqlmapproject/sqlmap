@@ -143,5 +143,5 @@ class Takeover(GenericTakeover):
 
         self.spExploit = self.spExploit.replace("    ", "").replace("\n", " ")
 
-        logger.info("triggering the buffer overflow vulnerability, wait..")
+        logger.info("triggering the buffer overflow vulnerability, please wait..")
         inject.goStacked(self.spExploit, silent=True)

@@ -193,7 +193,7 @@ class Filesystem:
         charCounter    = 0
         maxLen         = 512
 
-        logger.debug("generating binary file %s\%s, wait.." % (tmpPath, chunkName))
+        logger.debug("generating binary file %s\%s, please wait.." % (tmpPath, chunkName))
 
         for scrLine in fileScrLines:
             forgedScrLine  = "echo %s " % scrLine

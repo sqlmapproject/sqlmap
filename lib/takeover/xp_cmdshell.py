@@ -134,7 +134,7 @@ class xp_cmdshell:
         self.__xpCmdshellAvailable = False
 
         infoMsg  = "checking if xp_cmdshell extended procedure is "
-        infoMsg += "available, wait.."
+        infoMsg += "available, please wait.."
         logger.info(infoMsg)
 
         result = self.__xpCmdshellCheck()
