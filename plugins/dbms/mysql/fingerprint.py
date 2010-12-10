@@ -211,7 +211,7 @@ class Fingerprint(GenericFingerprint):
                     kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
                 elif inject.checkBooleanExpression("%s=(SELECT %s FROM DUAL)" % (randInt, randInt)):
                     kb.dbmsVersion = [">= 5.0.11", "< 5.0.38"]
-                elif inject.getValue("SELECT DATABASE() LIKE SCHEMA()", suppressOutput=True):
+                elif inject.checkBooleanExpression("DATABASE() LIKE SCHEMA()"):
                     kb.dbmsVersion = [">= 5.0.2", "< 5.0.11"]
                 else:
                     kb.dbmsVersion = [">= 5.0.0", "<= 5.0.1"]
@@ -264,9 +264,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "fingerprinting the back-end DBMS operating system"
         logger.info(infoMsg)
 
-        datadirSubstr = inject.getValue("SELECT MID(@@datadir, 1, 1)", unpack=False, suppressOutput=True)
-
-        if datadirSubstr == "/":
+        if inject.checkBooleanExpression("'/'=(SELECT MID(@@datadir, 1, 1))"):
             kb.os = "Linux"
         else:
             kb.os = "Windows"
