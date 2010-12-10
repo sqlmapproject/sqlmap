@@ -12,6 +12,7 @@ import re
 from xml.etree import ElementTree as ET
 
 from lib.core.common import getCompiledRegex
+from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import urlencode
@@ -214,7 +215,14 @@ class Agent:
 
         if "[INFERENCE]" in payload:
             if kb.dbms is not None:
-                inferenceQuery = queries[kb.dbms].inference.query
+                inference = queries[kb.dbms].inference
+                if "dbms_version" in inference:
+                    if isDBMSVersionAtLeast(inference.dbms_version):
+                        inferenceQuery = inference.query
+                    else:
+                        inferenceQuery = inference.query2
+                else:
+                    inferenceQuery = inference.query
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
             elif kb.misc.testedDbms is not None:
                 inferenceQuery = queries[kb.misc.testedDbms].inference.query

@@ -46,9 +46,9 @@ DUMP_TAB_MARKER     = "__TAB__"
 DUMP_START_MARKER   = "__START__"
 DUMP_STOP_MARKER    = "__STOP__"
 
-PAYLOAD_DELIMITER  = "\x00"
-
-MIN_TIME_RESPONSES = 10
+PAYLOAD_DELIMITER   = "\x00"
+CHAR_INFERENCE_MARK = "%c"
+MIN_TIME_RESPONSES  = 10
 
 # System variables
 IS_WIN             = subprocess.mswindows

@@ -33,6 +33,7 @@ from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapThreadException
 from lib.core.exception import unhandledException
 from lib.core.progress import ProgressBar
+from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -141,7 +142,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         continuousOrder means that distance between each two neighbour's
         numerical values is exactly 1
         """
-        
+
         result = tryHint(idx)
 
         if result:
@@ -170,17 +171,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             position = (len(charTbl) >> 1)
             posValue = charTbl[position]
 
-            if dbms in (DBMS.SQLITE, DBMS.MAXDB):
-                pushValue(posValue)
-                posValue = chr(posValue) if posValue < 128 else unichr(posValue)
-
-            forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
+            if CHAR_INFERENCE_MARK not in payload:
+                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
+            else:
+                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(CHAR_INFERENCE_MARK, chr(posValue) if posValue < 128 else unichr(posValue))
 
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare)
-
-            if dbms in (DBMS.SQLITE, DBMS.MAXDB):
-                posValue = popValue()
 
             if result:
                 minValue = posValue

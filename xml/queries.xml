@@ -303,7 +303,7 @@
         <timedelay query="SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(1000000%d))))" dbms_version="&gt;=3.0"/>
         <substring query="SUBSTR((%s), %d, %d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <inference query="SUBSTR((%s), %d, 1) > '%s'"/>
+        <inference query="SUBSTR((%s), %d, 1) > '%c'"/>
         <banner query="SELECT SQLITE_VERSION()"/>
         <current_user/>
         <current_db/>
@@ -386,7 +386,7 @@
             <inband query="SELECT DISTINCT RDB$USER FROM RDB$USER_PRIVILEGES"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
         </users>
-        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1"/>
+        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1) > '%c'"/>
         <is_dba query="CURRENT_USER='SYSDBA'"/>
         <tables>
             <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
@@ -429,7 +429,7 @@
         <current_db query="SELECT DATABASE() FROM DUAL"/>
         <order query="ORDER BY %s ASC"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <inference query="SUBSTR((%s), %d, 1) > '%s'"/>
+        <inference query="SUBSTR((%s), %d, 1) > '%c'"/>
         <delimiter query=","/>
         <substring query="SUBSTR((%s), %d, %d)"/>
         <users>
