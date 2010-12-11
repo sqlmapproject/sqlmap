@@ -155,6 +155,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             # Used for gradual expanding into unicode charspace
             shiftTable = [5, 4]
 
+        if CHAR_INFERENCE_MARK in payload and ord('\n') in charTbl:
+            charTbl.remove(ord('\n'))
+
         if len(charTbl) == 1:
             forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
             queriesCount[0] += 1
@@ -216,7 +219,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             return None
                     else:
                         retVal = minValue + 1
-                        if retVal in originalTbl:
+                        if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
                             return chr(retVal) if retVal < 128 else unichr(retVal)
                         else:
                             return None

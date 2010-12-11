@@ -1724,6 +1724,8 @@ def isDBMSVersionAtLeast(version):
                 value = float(value.replace("<=", ""))
             elif value.startswith(">"):
                 value = float(value.replace("<", "")) - 0.01
+            else:
+                value = float(value)
         retVal = value >= version
 
     return retVal
