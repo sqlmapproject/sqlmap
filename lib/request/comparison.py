@@ -93,7 +93,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         if conf.thold:
             conf.matchRatio = conf.thold
 
-        elif kb.pageStable and ratio > 0.6 and ratio < 1:
+        elif kb.pageStable and ratio > 0.6 and ratio < 0.99:
             conf.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % conf.matchRatio)
 
