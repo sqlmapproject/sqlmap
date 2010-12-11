@@ -194,7 +194,7 @@ class Fingerprint(GenericFingerprint):
                     kb.dbmsVersion = [">= 5.5.0"]
 
                 # Check if it is MySQL >= 5.1.2 and < 5.5.0
-                elif inject.getValue("SELECT MID(@@table_open_cache, 1, 1)", unpack=False):
+                elif inject.checkBooleanExpression("@@table_open_cache=@@table_open_cache"):
                     if inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.GLOBAL_STATUS LIMIT 0, 1)" % (randInt, randInt)):
                         kb.dbmsVersion = [">= 5.1.12", "< 5.5.0"]
                     elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1)" % (randInt,randInt)):
@@ -207,7 +207,7 @@ class Fingerprint(GenericFingerprint):
                         kb.dbmsVersion = [">= 5.1.2", "< 5.1.5"]
 
                 # Check if it is MySQL >= 5.0.0 and < 5.1.2
-                elif inject.getValue("SELECT MID(@@hostname, 1, 1)", unpack=False, suppressOutput=True):
+                elif inject.checkBooleanExpression("@@hostname=@@hostname"):
                     kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
                 elif inject.checkBooleanExpression("%s=(SELECT %s FROM DUAL)" % (randInt, randInt)):
                     kb.dbmsVersion = [">= 5.0.11", "< 5.0.38"]
@@ -232,7 +232,7 @@ class Fingerprint(GenericFingerprint):
                     kb.dbmsVersion = [">= 4.1.11", "< 5.0.0"]
                 elif inject.checkBooleanExpression("2=(SELECT COERCIBILITY(USER()))"):
                     kb.dbmsVersion = [">= 4.1.1", "< 4.1.11"]
-                elif inject.getValue("SELECT CURRENT_USER()", suppressOutput=True):
+                elif inject.checkBooleanExpression("CURRENT_USER()=CURRENT_USER()"):
                     kb.dbmsVersion = [">= 4.0.6", "< 4.1.1"]
 
                     if inject.checkBooleanExpression("(SELECT CHARSET(CURRENT_USER()))='utf8'"):
@@ -241,9 +241,9 @@ class Fingerprint(GenericFingerprint):
                         kb.dbmsVersion = [">= 4.0.6", "< 4.1.0"]
                 elif inject.checkBooleanExpression("0=(SELECT FOUND_ROWS()"):
                     kb.dbmsVersion = [">= 4.0.0", "< 4.0.6"]
-                elif inject.getValue("SELECT CONNECTION_ID()", suppressOutput=True):
+                elif inject.checkBooleanExpression("CONNECTION_ID()=CONNECTION_ID()"):
                     kb.dbmsVersion = [">= 3.23.14", "< 4.0.0"]
-                elif re.search("@[\w\.\-\_]+", inject.getValue("SELECT USER()", suppressOutput=True)):
+                elif inject.checkBooleanExpression("USER()=USER()"):
                     kb.dbmsVersion = [">= 3.22.11", "< 3.23.14"]
                 else:
                     kb.dbmsVersion = ["< 3.22.11"]
