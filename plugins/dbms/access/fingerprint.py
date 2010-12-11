@@ -22,6 +22,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -181,4 +182,4 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "Access (*)"
+        conf.db = "%s%s" % (DBMS.ACCESS, METADB_SUFFIX)

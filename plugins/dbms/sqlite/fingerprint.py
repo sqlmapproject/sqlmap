@@ -16,6 +16,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
+from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import SQLITE_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -109,4 +110,4 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "SQLite (*)"
+        conf.db = "%s%s" % (DBMS.SQLITE, METADB_SUFFIX)

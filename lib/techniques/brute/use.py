@@ -20,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
+from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 
 def tableExists(tableFile):
@@ -34,7 +35,7 @@ def tableExists(tableFile):
     length = len(tables)
 
     for table in tables:
-        if conf.db and '(*)' not in conf.db:
+        if conf.db and not conf.db.endswith(METADB_SUFFIX):
             table = "%s.%s" % (conf.db, table)
         result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)), expectingNone=True)
 
@@ -70,7 +71,7 @@ def columnExists(columnFile):
         raise sqlmapMissingMandatoryOptionException, errMsg
 
     columns = getFileItems(columnFile)
-    if conf.db and '(*)' not in conf.db:
+    if conf.db and not conf.db.endswith(METADB_SUFFIX):
         table = "%s.%s" % (conf.db, conf.tbl)
     else:
         table = conf.tbl

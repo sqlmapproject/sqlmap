@@ -142,4 +142,4 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "Firebird (*)"
+        conf.db = "%s%s" % (DBMS.FIREBIRD, METADB_SUFFIX)

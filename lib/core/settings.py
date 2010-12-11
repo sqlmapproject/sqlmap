@@ -49,6 +49,9 @@ DUMP_STOP_MARKER    = "__STOP__"
 PAYLOAD_DELIMITER   = "\x00"
 CHAR_INFERENCE_MARK = "%c"
 
+# suffix used for naming meta databases in DBMS(es) without explicit database name
+METADB_SUFFIX       = "_masterdb"
+
 # minimum time response set needed for time-comparison based on standard deviation
 MIN_TIME_RESPONSES  = 10
 
