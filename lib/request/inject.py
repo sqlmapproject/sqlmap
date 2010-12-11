@@ -97,10 +97,6 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
     return outputs
 
 def __goBooleanProxy(expression, resumeValue=True):
-
-    pushValue(conf.verbose)
-    conf.verbose = 0
-
     vector  = kb.injection.data[kb.technique].vector
 
     kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
@@ -117,8 +113,6 @@ def __goBooleanProxy(expression, resumeValue=True):
     
     if not output:
         output = Request.queryPage(payload)
-
-    conf.verbose = popValue()
 
     return output
 
@@ -404,7 +398,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     (if selected).
     """
 
-    if suppressOutput:
+    if suppressOutput or expected == EXPECTED.BOOL:
         pushValue(conf.verbose)
         conf.verbose = 0
 
@@ -478,7 +472,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             errMsg += "leveraged to retrieve queries output"
             raise sqlmapNotVulnerableException, errMsg
     finally:
-        if suppressOutput:
+        if suppressOutput or expected == EXPECTED.BOOL:
             conf.verbose = popValue()
 
     if value and expected == EXPECTED.BOOL:

@@ -112,13 +112,13 @@ class Fingerprint(GenericFingerprint):
         logger.info(logMsg)
 
         randInt = randomInt()
-        result = inject.checkBooleanExpression("NOROUND(%d)=%d" % (randInt, randInt))
+        result = inject.checkBooleanExpression("NOROUND(%d)=%d" % (randInt, randInt), expectingNone=True)
 
         if result:
             logMsg = "confirming SAP MaxDB"
             logger.info(logMsg)
 
-            result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
+            result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL", expectingNone=True)
 
             if not result:
                 warnMsg = "the back-end DBMS is not SAP MaxDB"

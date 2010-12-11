@@ -92,7 +92,7 @@ class Fingerprint(GenericFingerprint):
             result = True
         else:
             randInt = randomInt()
-            result = inject.checkBooleanExpression("BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt))
+            result = inject.checkBooleanExpression("BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt), expectingNone=True)
 
         if result:
             infoMsg = "confirming Microsoft SQL Server"

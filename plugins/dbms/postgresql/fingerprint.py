@@ -86,13 +86,13 @@ class Fingerprint(GenericFingerprint):
 
         randInt = getUnicode(randomInt(1))
 
-        result = inject.checkBooleanExpression("%s::int=%s" % (randInt, randInt))
+        result = inject.checkBooleanExpression("%s::int=%s" % (randInt, randInt), expectingNone=True)
 
         if result:
             infoMsg = "confirming PostgreSQL"
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("COALESCE(%s, NULL)=%s" % (randInt, randInt))
+            result = inject.checkBooleanExpression("COALESCE(%s, NULL)=%s" % (randInt, randInt), expectingNone=True)
 
             if not result:
                 warnMsg = "the back-end DBMS is not PostgreSQL"

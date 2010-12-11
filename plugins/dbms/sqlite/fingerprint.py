@@ -80,13 +80,13 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing SQLite"
         logger.info(logMsg)
 
-        result = inject.checkBooleanExpression("LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
+        result = inject.checkBooleanExpression("LAST_INSERT_ROWID()=LAST_INSERT_ROWID()", expectingNone=True)
 
         if result:
             logMsg = "confirming SQLite"
             logger.info(logMsg)
 
-            result = inject.checkBooleanExpression("SQLITE_VERSION()=SQLITE_VERSION()")
+            result = inject.checkBooleanExpression("SQLITE_VERSION()=SQLITE_VERSION()", expectingNone=True)
 
             if not result:
                 warnMsg = "the back-end DBMS is not SQLite"
@@ -94,7 +94,7 @@ class Fingerprint(GenericFingerprint):
 
                 return False
             else:
-                result = inject.checkBooleanExpression("RANDOMBLOB(-1)>0")
+                result = inject.checkBooleanExpression("RANDOMBLOB(-1)>0", expectingNone=True)
                 kb.dbmsVersion = [ '3' if result else '2' ]
 
             setDbms(DBMS.SQLITE)

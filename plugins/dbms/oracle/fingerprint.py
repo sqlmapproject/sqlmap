@@ -80,7 +80,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("ROWNUM=ROWNUM")
+            result = inject.checkBooleanExpression("ROWNUM=ROWNUM", expectingNone=True)
 
         if result:
             logMsg = "confirming Oracle"
@@ -91,7 +91,7 @@ class Fingerprint(GenericFingerprint):
             if conf.direct:
                 result = True
             else:
-                result = inject.checkBooleanExpression("LENGTH(SYSDATE)=LENGTH(SYSDATE)")
+                result = inject.checkBooleanExpression("LENGTH(SYSDATE)=LENGTH(SYSDATE)", expectingNone=True)
 
             if not result:
                 warnMsg = "the back-end DBMS is not Oracle"

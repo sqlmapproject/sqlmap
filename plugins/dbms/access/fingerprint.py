@@ -41,7 +41,7 @@ class Fingerprint(GenericFingerprint):
             elif kb.dbmsVersion[0] in ("2002-2003", "2007"):
                 table = "MSysAccessStorage"
             if table:
-                result = inject.checkBooleanExpression("EXISTS(SELECT CURDIR() FROM %s)" % table)
+                result = inject.checkBooleanExpression("EXISTS(SELECT CURDIR() FROM %s)" % table, expectingNone=True)
                 retVal = "not sandboxed" if result else "sandboxed"
 
         return retVal
@@ -68,7 +68,7 @@ class Fingerprint(GenericFingerprint):
                     negate = True
                     table = table[1:]
                 randInt = randomInt()
-                result = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
+                result = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt), expectingNone=True)
                 if result is None:
                     result = False
                 if negate:
@@ -89,7 +89,7 @@ class Fingerprint(GenericFingerprint):
 
         randInt = randomInt()
         randStr = randomStr()
-        _ = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
+        _ = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt), expectingNone=True)
 
         if wasLastRequestDBMSError():
             match = re.search("Could not find file\s+'([^']+?)'", kb.lastErrorPage[1])
@@ -153,13 +153,13 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing Microsoft Access"
         logger.info(logMsg)
 
-        result = inject.checkBooleanExpression("VAL(CVAR(1))=1")
+        result = inject.checkBooleanExpression("VAL(CVAR(1))=1", expectingNone=True)
 
         if result:
             logMsg = "confirming Microsoft Access"
             logger.info(logMsg)
 
-            result = inject.checkBooleanExpression("IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
+            result = inject.checkBooleanExpression("IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0", expectingNone=True)
 
             if not result:
                 warnMsg = "the back-end DBMS is not Microsoft Access"
