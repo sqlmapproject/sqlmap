@@ -1421,7 +1421,7 @@ Formats:
         </response>
         <details>
             <dbms>Firebird</dbms>
-            <dbms_version>&gt; 2.0</dbms_version>
+            <dbms_version>&gt;= 2.0</dbms_version>
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
@@ -1600,7 +1600,7 @@ Formats:
         </response>
         <details>
             <dbms>Firebird</dbms>
-            <dbms_version>&gt; 2.0</dbms_version>
+            <dbms_version>&gt;= 2.0</dbms_version>
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
@@ -1779,7 +1779,7 @@ Formats:
         </response>
         <details>
             <dbms>Firebird</dbms>
-            <dbms_version>&gt; 2.0</dbms_version>
+            <dbms_version>&gt;= 2.0</dbms_version>
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
