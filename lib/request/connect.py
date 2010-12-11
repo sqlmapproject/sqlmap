@@ -36,6 +36,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
@@ -264,8 +265,11 @@ class Connect:
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
             tbMsg = traceback.format_exc()
-
-            if "URLError" in tbMsg or "error" in tbMsg:
+            
+            if "no host given" in tbMsg:
+                warnMsg = "invalid url address used (%s)" % repr(url)
+                raise sqlmapSyntaxException, warnMsg
+            elif "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target url"
             elif "timeout" in tbMsg:
                 warnMsg = "connection timed out to the target url"
