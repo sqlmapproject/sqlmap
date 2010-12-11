@@ -103,35 +103,20 @@ def __goBooleanProxy(expression, resumeValue=True):
 
     vector  = kb.injection.data[kb.technique].vector
 
-    if kb.technique == PAYLOAD.TECHNIQUE.ERROR:
-        if not expression.upper().startswith("SELECT "):
-            expression = agent.forgeCaseStatement(expression)
-        output = __goError(expression, resumeValue)
+    kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
+    vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
+    vector  = agent.cleanupPayload(vector)
+
+    query   = agent.prefixQuery(vector)
+    query   = agent.suffixQuery(query)
+    payload = agent.payload(newValue=query)
+    if resumeValue:
+        output = resume(expression, payload)
     else:
-        kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
-        vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
-        vector  = agent.cleanupPayload(vector)
-
-        query   = agent.prefixQuery(vector)
-        query   = agent.suffixQuery(query)
-        payload = agent.payload(newValue=query)
-        if resumeValue:
-            output = resume(expression, payload)
-        else:
-            output = None
-        
-        if not output:
-            output = Request.queryPage(payload)
-
-    if output:
-        if isinstance(output, basestring):
-            output = output.lower()
-            if output in ("true", "false"):
-                output = bool(output)
-            else:
-                output = output != "0"
-        elif isinstance(output, int):
-            output = bool(output)
+        output = None
+    
+    if not output:
+        output = Request.queryPage(payload)
 
     conf.verbose = popValue()
 
@@ -434,13 +419,18 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             query = query.replace("DISTINCT ", "")
 
             if expected == EXPECTED.BOOL:
-                booleanExpression = expression
-                if booleanExpression.upper().startswith("SELECT "):
-                    booleanExpression = booleanExpression[len("SELECT "):]
+                forgeCaseExpression = booleanExpression = expression
+                if expression.upper().startswith("SELECT "):
+                    booleanExpression = expression[len("SELECT "):]
+                else:
+                    forgeCaseExpression = agent.forgeCaseStatement(expression)
 
             if inband and kb.unionTest is not None:
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
-                value = __goInband(query, expected, sort, resumeValue, unpack, dump)
+                if expected == EXPECTED.BOOL:
+                    value = __goInband(forgeCaseExpression, expected, sort, resumeValue, unpack, dump)
+                else:
+                    value = __goInband(query, expected, sort, resumeValue, unpack, dump)
                 found = value or (value is None and expectingNone)
 
                 if not found:
@@ -455,7 +445,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             if error and kb.errorTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
                 if expected == EXPECTED.BOOL:
-                    value = __goBooleanProxy(booleanExpression, resumeValue)
+                    value = __goError(forgeCaseExpression, resumeValue)
                 else:
                     value = __goError(query, resumeValue)
                 found = value or (value is None and expectingNone)
@@ -490,6 +480,16 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     finally:
         if suppressOutput:
             conf.verbose = popValue()
+
+    if value and expected == EXPECTED.BOOL:
+        if isinstance(value, basestring):
+            value = value.lower()
+            if value in ("true", "false"):
+                value = bool(value)
+            else:
+                value = value != "0"
+        elif isinstance(value, int):
+            value = bool(value)
 
     return value
 
