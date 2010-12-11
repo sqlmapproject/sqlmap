@@ -105,7 +105,7 @@ def __goBooleanProxy(expression, resumeValue=True):
     else:
         if not expression.upper().startswith("SELECT "):
             expression = agent.forgeCaseStatement(expression)
-        vector  = vector.replace("%s", expression)
+        vector  = vector.replace("[QUERY]", expression)
     vector  = agent.cleanupPayload(vector)
 
     query   = agent.prefixQuery(vector)

