@@ -97,27 +97,43 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
     return outputs
 
 def __goBooleanProxy(expression, resumeValue=True):
-    kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
+
+    pushValue(conf.verbose)
+    conf.verbose = 0
 
     vector  = kb.injection.data[kb.technique].vector
-    if kb.technique != PAYLOAD.TECHNIQUE.ERROR:
-        vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
-    else:
+
+    if kb.technique == PAYLOAD.TECHNIQUE.ERROR:
         if not expression.upper().startswith("SELECT "):
             expression = agent.forgeCaseStatement(expression)
-        vector  = vector.replace("[QUERY]", expression)
-    vector  = agent.cleanupPayload(vector)
-
-    query   = agent.prefixQuery(vector)
-    query   = agent.suffixQuery(query)
-    payload = agent.payload(newValue=query)
-    if resumeValue:
-        output = resume(expression, payload)
+        output = __goError(expression, resumeValue)
     else:
-        output = None
-    
-    if not output:
-        output = Request.queryPage(payload)
+        kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
+        vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
+        vector  = agent.cleanupPayload(vector)
+
+        query   = agent.prefixQuery(vector)
+        query   = agent.suffixQuery(query)
+        payload = agent.payload(newValue=query)
+        if resumeValue:
+            output = resume(expression, payload)
+        else:
+            output = None
+        
+        if not output:
+            output = Request.queryPage(payload)
+
+    if output:
+        if isinstance(output, basestring):
+            output = output.lower()
+            if output in ("true", "false"):
+                output = bool(output)
+            else:
+                output = output != "0"
+        elif isinstance(output, int):
+            output = bool(output)
+
+    conf.verbose = popValue()
 
     return output
 
@@ -477,17 +493,6 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     finally:
         if suppressOutput:
             conf.verbose = popValue()
-
-    if expected == EXPECTED.BOOL:
-        if value:
-            if isinstance(value, basestring):
-                value = value.lower()
-                if value in ("true", "false"):
-                    value = bool(value)
-                else:
-                    value = value != "0"
-            elif isinstance(value, int):
-                value = bool(value)
 
     return value
 
