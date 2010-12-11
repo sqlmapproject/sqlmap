@@ -148,9 +148,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if result:
             return result
 
-        if not continuousOrder:
-            originalTbl = list(charTbl)
-        else:
+        originalTbl = list(charTbl)
+
+        if continuousOrder:
             # Used for gradual expanding into unicode charspace
             shiftTable = [5, 4]
 
@@ -215,7 +215,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             return None
                     else:
                         retVal = minValue + 1
-                        return chr(retVal) if retVal < 128 else unichr(retVal)
+                        if retVal in originalTbl:
+                            return chr(retVal) if retVal < 128 else unichr(retVal)
+                        else:
+                            return None
                 else:
                     if minValue == maxChar or maxValue == minChar:
                         return None
