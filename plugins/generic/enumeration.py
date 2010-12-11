@@ -19,6 +19,7 @@ from lib.core.common import getFileItems
 from lib.core.common import getUnicode
 from lib.core.common import isNumPosStrValue
 from lib.core.common import parsePasswordHash
+from lib.core.common import parseSqliteTableSchema
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomStr
@@ -949,16 +950,14 @@ class Enumeration:
 
             value = inject.getValue(query, blind=False, error=False)
 
-            if value:
+            if kb.dbms == DBMS.SQLITE:
+                parseSqliteTableSchema(value)
+            elif value:
                 table = {}
                 columns = {}
 
-                if kb.dbms == DBMS.SQLITE:
-                    for match in re.finditer(getCompiledRegex(r"(\w+) ([A-Z]+)[,\r\n]"), value):
-                        columns[match.group(1)] = match.group(2)
-                else:
-                    for column, colType in value:
-                        columns[column] = colType
+                for column, colType in value:
+                    columns[column] = colType
 
                 table[conf.tbl] = columns
                 kb.data.cachedColumns[conf.db] = table
@@ -981,6 +980,13 @@ class Enumeration:
             elif kb.dbms == DBMS.FIREBIRD:
                 query = rootQuery.blind.count % (conf.tbl)
                 query += condQuery
+            elif kb.dbms == DBMS.SQLITE:
+                query = rootQuery.blind.query % conf.tbl
+                value = inject.getValue(query, inband=False)
+
+                parseSqliteTableSchema(value)
+
+                return kb.data.cachedColumns
 
             count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 

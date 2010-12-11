@@ -1729,3 +1729,13 @@ def isDBMSVersionAtLeast(version):
         retVal = value >= version
 
     return retVal
+
+def parseSqliteTableSchema(value):
+    table = {}
+    columns = {}
+
+    for match in re.finditer(getCompiledRegex(r"(\w+) ([A-Z]+)[,\r\n]"), value):
+        columns[match.group(1)] = match.group(2)
+
+    table[conf.tbl] = columns
+    kb.data.cachedColumns[conf.db] = table
