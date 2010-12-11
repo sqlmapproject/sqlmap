@@ -440,10 +440,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if inband and kb.unionTest is not None:
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
-                if expected == EXPECTED.BOOL:
-                    value = __goBooleanProxy(booleanExpression, resumeValue)
-                else:
-                    value = __goInband(query, expected, sort, resumeValue, unpack, dump)
+                value = __goInband(query, expected, sort, resumeValue, unpack, dump)
                 found = value or (value is None and expectingNone)
 
                 if not found:
