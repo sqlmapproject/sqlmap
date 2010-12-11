@@ -34,6 +34,7 @@ from lib.core.exception import sqlmapThreadException
 from lib.core.exception import unhandledException
 from lib.core.progress import ProgressBar
 from lib.core.settings import CHAR_INFERENCE_MARK
+from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -505,6 +506,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 etaProgressUpdate(time.time() - charStart, index)
             elif conf.verbose in (1, 2):
                 dataToStdout(val)
+
+            if len(finalValue) > INFERENCE_BLANK_BREAK and finalValue[-INFERENCE_BLANK_BREAK:].isspace():
+                break
 
     if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
