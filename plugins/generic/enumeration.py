@@ -915,7 +915,7 @@ class Enumeration:
                         }
 
         rootQuery = queries[kb.dbms].columns
-        condition = rootQuery.blind.condition
+        condition = rootQuery.blind.condition if 'condition' in rootQuery.blind else None
 
         infoMsg = "fetching columns "
 
@@ -1167,7 +1167,7 @@ class Enumeration:
 
             if kb.dbms == DBMS.ORACLE:
                 query = rootQuery.blind.count % conf.tbl.upper()
-            elif kb.dbms in (DBMS.SQLITE, DBMS.ACCESS):
+            elif kb.dbms in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                 query = rootQuery.blind.count % conf.tbl
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
@@ -1215,6 +1215,9 @@ class Enumeration:
 
                     elif kb.dbms == DBMS.SQLITE:
                         query = rootQuery.blind.query % (column, conf.tbl, index)
+
+                    elif kb.dbms == DBMS.FIREBIRD:
+                        query = rootQuery.blind.query % (index, column, conf.tbl)
 
                     value = inject.getValue(query, inband=False)
 

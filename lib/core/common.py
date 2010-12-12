@@ -1708,10 +1708,6 @@ def removeDynamicContent(page):
 
 def isDBMSVersionAtLeast(version):
     retVal = None
-    try:
-        version = float(version)
-    except ValueError, _:
-        raise sqlmapSyntaxException, "parameter version (%s) must be a floating point number" % version
 
     if kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown" and kb.dbmsVersion[0] != None:
         value = kb.dbmsVersion[0].replace(" ", "")
@@ -1724,9 +1720,8 @@ def isDBMSVersionAtLeast(version):
                 value = float(value.replace("<=", ""))
             elif value.startswith(">"):
                 value = float(value.replace("<", "")) - 0.01
-            else:
-                value = float(value)
-        retVal = value >= version
+
+        retVal = getUnicode(value) >= getUnicode(version)
 
     return retVal
 
