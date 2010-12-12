@@ -100,7 +100,7 @@ def __goBooleanProxy(expression, resumeValue=True):
     vector  = kb.injection.data[kb.technique].vector
 
     kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
-    vector  = vector.replace("[INFERENCE]", "(%s)" % expression)
+    vector  = vector.replace("[INFERENCE]", "%s" % expression)
     vector  = agent.cleanupPayload(vector)
 
     query   = agent.prefixQuery(vector)
