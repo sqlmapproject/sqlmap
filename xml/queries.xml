@@ -349,15 +349,14 @@
         <substring query="MID((%s), %d, %d)"/>
         <case query="IIF(%s,1,0)"/>
         <banner/>
-        <current_user query="SELECT CURRENTUSER()"/>
+        <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
+        <current_user/>
         <current_db/>
         <inference query="ASC(MID((%s), %d, 1)) > %d"/>
-        <is_dba query="IIF(CURRENTUSER()='Admin',1,0)"/>
+        <is_dba/>
         <dbs/>
-        <tables>
-            <inband query="SELECT Name FROM MSysObjects WHERE (Left([Name],1) &lt;&gt; '~') AND (Left([Name],4) &lt;&gt; 'MSys') AND ([Type] In (1, 4, 6))"/>
-            <blind query="SELECT MIN(Name) FROM MSysObjects WHERE Type = 1 AND name > '%s'" count="SELECT COUNT(*) FROM MSysObjects WHERE Type = 1"/>
-        </tables>
+        <!--MSysObjects have no read permission by default-->
+        <tables/>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT MIN(%s) FROM %s WHERE %s > '%s'" count="SELECT COUNT(*) FROM %s"/>
