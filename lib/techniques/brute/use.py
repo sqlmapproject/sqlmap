@@ -29,27 +29,27 @@ def tableExists(tableFile):
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
 
-    pushValue(conf.verbose)
-    conf.verbose = 0
     count = 0
     length = len(tables)
 
     for table in tables:
         if conf.db and not conf.db.endswith(METADB_SUFFIX):
             table = "%s.%s" % (conf.db, table)
-        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)), expectingNone=True)
+        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
 
         if result:
-            clearConsoleLine(True)
-            infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), table)
-            dataToStdout(infoMsg, True)
             retVal.append(table)
 
-        count += 1
-        status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
-        dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+            if conf.verbose in (1, 2):
+                clearConsoleLine(True)
+                infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), table)
+                dataToStdout(infoMsg, True)
 
-    conf.verbose = popValue()
+        count += 1
+
+        if conf.verbose in (1, 2):
+            status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
+            dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
 
     clearConsoleLine(True)
 
@@ -80,25 +80,25 @@ def columnExists(columnFile):
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
 
-    pushValue(conf.verbose)
-    conf.verbose = 0
     count = 0
     length = len(columns)
 
     for column in columns:
-        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)), expectingNone=True)
+        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
 
         if result:
-            clearConsoleLine(True)
-            infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), column)
-            dataToStdout(infoMsg, True)
             retVal.append(column)
 
-        count += 1
-        status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
-        dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+            if conf.verbose in (1, 2):
+                clearConsoleLine(True)
+                infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), column)
+                dataToStdout(infoMsg, True)
 
-    conf.verbose = popValue()
+        count += 1
+
+        if conf.verbose in (1, 2):
+            status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
+            dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
 
     clearConsoleLine(True)
 
@@ -109,7 +109,7 @@ def columnExists(columnFile):
         columns = {}
 
         for column in retVal:
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)), expectingNone=True)
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)))
 
             if result:
                 columns[column] = 'numeric'
