@@ -1711,6 +1711,7 @@ def isDBMSVersionAtLeast(version):
 
     if kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown" and kb.dbmsVersion[0] != None:
         value = kb.dbmsVersion[0].replace(" ", "")
+
         if isinstance(value, basestring):
             if value.startswith(">="):
                 value = float(value.replace(">=", ""))
