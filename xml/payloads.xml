@@ -1213,11 +1213,6 @@ Formats:
     <!-- End of error-based tests - GROUP BY and ORDER BY clauses -->
 
 
-    <!-- UNION query tests -->
-    <!-- TODO: Think about proper structure for this -->
-    <!-- End of UNION query tests -->
-
-
     <!-- Stacked queries tests -->
     <test>
         <title>MySQL &gt; 5.0.11 stacked queries</title>
@@ -1784,5 +1779,44 @@ Formats:
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of OR time-based blind tests -->
+
+    <!-- UNION query tests -->
+    <!-- TODO: sure about all these clauses? Verify on every DBMS -->
+    <!--
+    <test>
+        <title>UNION query</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>UNION ALL SELECT [UNION_STRING]</vector>
+        <request>
+            <payload>UNION ALL SELECT [UNION_TEST]</payload>
+            <comment></comment>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+    </test>
+
+    <test>
+        <title>Single-entry UNION query</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>2</where>
+        <vector>UNION ALL SELECT [UNION_STRING]</vector>
+        <request>
+            <payload>UNION ALL SELECT [UNION_TEST]</payload>
+            <comment></comment>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+    </test>
+    -->
+    <!-- End of UNION query tests -->
 
 </root>
