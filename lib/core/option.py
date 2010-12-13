@@ -1298,7 +1298,8 @@ def __mergeOptions(inputOptions):
         inputOptionsItems = inputOptions.__dict__.items()
 
     for key, value in inputOptionsItems:
-        if not conf.has_key(key) or conf[key] is None or value is not None:
+        if key not in conf or (conf[key] is False and value is True) or \
+           value not in (None, False):
             conf[key] = value
 
 def __setTrafficOutputFP():
