@@ -153,6 +153,7 @@ class Web:
         for count in xrange(len(choices)):
             ext = choices[count]
             message += "[%d] %s%s\n" % (count + 1, ext.upper(), (" (default)" if default == ext else ""))
+
             if default == ext:
                 default = count + 1
 

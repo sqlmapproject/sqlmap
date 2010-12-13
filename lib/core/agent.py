@@ -132,8 +132,8 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(query)
 
-        query   = self.prefixQuery(query)
-        query   = self.suffixQuery(query)
+        query = self.prefixQuery(query)
+        query = self.suffixQuery(query)
         payload = self.payload(newValue=query)
 
         return payload
@@ -216,6 +216,7 @@ class Agent:
         if "[INFERENCE]" in payload:
             if kb.dbms is not None:
                 inference = queries[kb.dbms].inference
+
                 if "dbms_version" in inference:
                     if isDBMSVersionAtLeast(inference.dbms_version):
                         inferenceQuery = inference.query
@@ -223,10 +224,13 @@ class Agent:
                         inferenceQuery = inference.query2
                 else:
                     inferenceQuery = inference.query
+
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
+
             elif kb.misc.testedDbms is not None:
                 inferenceQuery = queries[kb.misc.testedDbms].inference.query
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
+
             else:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
