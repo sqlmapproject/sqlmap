@@ -53,10 +53,10 @@ CHAR_INFERENCE_MARK = "%c"
 METADB_SUFFIX       = "_masterdb"
 
 # minimum time response set needed for time-comparison based on standard deviation
-MIN_TIME_RESPONSES  = 10
+MIN_TIME_RESPONSES  = 15
 
 # after these number of blanks at the end inference should stop (just in case)
-INFERENCE_BLANK_BREAK = 20
+INFERENCE_BLANK_BREAK = 10
 
 # System variables
 IS_WIN             = subprocess.mswindows
