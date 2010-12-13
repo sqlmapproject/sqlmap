@@ -92,7 +92,7 @@ class Fingerprint(GenericFingerprint):
             result = True
         else:
             randInt = randomInt()
-            result = inject.checkBooleanExpression("BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt), expectingNone=True)
+            result = inject.checkBooleanExpression("BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt))
 
         if result:
             infoMsg = "confirming Microsoft SQL Server"
@@ -176,21 +176,19 @@ class Fingerprint(GenericFingerprint):
 
         # Get back-end DBMS underlying operating system version
         for version, data in versions.items():
-            query  =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
             query += "LIKE '%Windows NT " + data[0] + "%')>0"
-            query  = agent.forgeCaseStatement(query)
 
-            if inject.getValue(query, charsetType=1, suppressOutput=True) == "1":
+            if inject.checkBooleanExpression(query):
+                infoMsg += " %s" % kb.osVersion
                 kb.osVersion = version
-                infoMsg     += " %s" % kb.osVersion
-
                 break
 
         if not kb.osVersion:
             kb.osVersion = "2003"
-            kb.osSP      = 2
+            kb.osSP = 2
 
-            warnMsg  = "unable to fingerprint the underlying operating "
+            warnMsg = "unable to fingerprint the underlying operating "
             warnMsg += "system version, assuming it is Windows "
             warnMsg += "%s Service Pack %d" % (kb.osVersion, kb.osSP)
             logger.warn(warnMsg)
@@ -203,11 +201,10 @@ class Fingerprint(GenericFingerprint):
         sps = versions[kb.osVersion][1]
 
         for sp in sps:
-            query  =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
             query += "LIKE '%Service Pack " + getUnicode(sp) + "%')>0"
-            query  = agent.forgeCaseStatement(query)
 
-            if inject.getValue(query, charsetType=1, suppressOutput=True) == "1":
+            if inject.checkBooleanExpression(query):
                 kb.osSP = sp
                 break
 

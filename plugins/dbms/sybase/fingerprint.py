@@ -81,13 +81,13 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("tempdb_id()=tempdb_id()", expectingNone=True)
+            result = inject.checkBooleanExpression("tempdb_id()=tempdb_id()")
 
         if result:
             logMsg = "confirming Sybase"
             logger.info(logMsg)
 
-            result = inject.checkBooleanExpression("suser_id()=suser_id()", expectingNone=True)
+            result = inject.checkBooleanExpression("suser_id()=suser_id()")
 
             if not result:
                 warnMsg = "the back-end DBMS is not Sybase"
@@ -103,7 +103,7 @@ class Fingerprint(GenericFingerprint):
                 return True
 
             for version in range(12, 16):
-                result = inject.checkBooleanExpression("@@VERSION_NUMBER/1000=%d" % version, expectingNone=True)
+                result = inject.checkBooleanExpression("@@VERSION_NUMBER/1000=%d" % version)
                 if result:
                     kb.dbmsVersion = ["%d" % version]
                     break

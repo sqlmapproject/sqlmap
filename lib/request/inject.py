@@ -97,15 +97,15 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
     return outputs
 
 def __goBooleanProxy(expression, resumeValue=True):
-    vector  = kb.injection.data[kb.technique].vector
-
     kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
-    vector  = vector.replace("[INFERENCE]", "%s" % expression)
-    vector  = agent.cleanupPayload(vector)
 
-    query   = agent.prefixQuery(vector)
-    query   = agent.suffixQuery(query)
+    vector = kb.injection.data[kb.technique].vector
+    vector = vector.replace("[INFERENCE]", expression)
+    vector = agent.cleanupPayload(vector)
+    query = agent.prefixQuery(vector)
+    query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
+
     if resumeValue:
         output = resume(expression, payload)
     else:
@@ -116,7 +116,6 @@ def __goBooleanProxy(expression, resumeValue=True):
 
     return output
 
-
 def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None, firstChar=None, lastChar=None):
     """
     Retrieve the output of a SQL query characted by character taking
@@ -124,21 +123,16 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     parameter through a bisection algorithm.
     """
 
-    if kb.technique and kb.injection.data[kb.technique].vector is not None:
-        vector = agent.cleanupPayload(kb.injection.data[kb.technique].vector)
-        kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
-    else:
-        vector = queries[kb.misc.testedDbms].inference.query
-        kb.pageTemplate = kb.originalPage
-
-    query          = agent.prefixQuery(vector)
-    query          = agent.suffixQuery(query)
-    payload        = agent.payload(newValue=query)
-    count          = None
-    startLimit     = 0
-    stopLimit      = None
-    outputs        = []
-    test           = None
+    kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
+    vector = agent.cleanupPayload(kb.injection.data[kb.technique].vector)
+    query = agent.prefixQuery(vector)
+    query = agent.suffixQuery(query)
+    payload = agent.payload(newValue=query)
+    count = None
+    startLimit = 0
+    stopLimit = None
+    outputs = []
+    test = None
     untilLimitChar = None
     untilOrderChar = None
 
@@ -161,7 +155,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
             expressionFieldsList = [expressionFields]
 
         if len(expressionFieldsList) > 1:
-            infoMsg  = "the SQL query provided has more than a field. "
+            infoMsg = "the SQL query provided has more than a field. "
             infoMsg += "sqlmap will now unpack it into distinct queries "
             infoMsg += "to be able to retrieve the output even if we "
             infoMsg += "are going blind"
@@ -398,7 +392,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     (if selected).
     """
 
-    if suppressOutput or expected == EXPECTED.BOOL:
+    if suppressOutput:
         pushValue(conf.verbose)
         conf.verbose = 0
 
@@ -414,6 +408,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if expected == EXPECTED.BOOL:
                 forgeCaseExpression = booleanExpression = expression
+
                 if expression.upper().startswith("SELECT "):
                     booleanExpression = expression[len("SELECT "):]
                 else:
@@ -421,35 +416,35 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if inband and kb.unionTest is not None:
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
+
                 if expected == EXPECTED.BOOL:
                     value = __goInband(forgeCaseExpression, expected, sort, resumeValue, unpack, dump)
                 else:
                     value = __goInband(query, expected, sort, resumeValue, unpack, dump)
-                found = value or (value is None and expectingNone)
 
-                if not found:
-                    warnMsg  = "for some reason(s) it was not possible to retrieve "
-                    warnMsg += "the query output through inband SQL injection "
-                    warnMsg += "technique, sqlmap is going blind"
-                    logger.warn(warnMsg)
+                found = value or (value is None and expectingNone)
 
             oldParamNegative = kb.unionNegative
             kb.unionNegative = False
 
             if error and kb.errorTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
+
                 if expected == EXPECTED.BOOL:
                     value = __goError(forgeCaseExpression, resumeValue)
                 else:
                     value = __goError(query, resumeValue)
+
                 found = value or (value is None and expectingNone)
 
             if blind and kb.booleanTest and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
+
                 if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(booleanExpression, resumeValue)
                 else:
                     value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+
                 found = value or (value is None and expectingNone)
 
             if time and (kb.timeTest or kb.stackedTest) and not found:
@@ -472,12 +467,13 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             errMsg += "leveraged to retrieve queries output"
             raise sqlmapNotVulnerableException, errMsg
     finally:
-        if suppressOutput or expected == EXPECTED.BOOL:
+        if suppressOutput:
             conf.verbose = popValue()
 
     if value and expected == EXPECTED.BOOL:
         if isinstance(value, basestring):
             value = value.lower()
+
             if value in ("true", "false"):
                 value = bool(value)
             else:
@@ -506,5 +502,5 @@ def goStacked(expression, silent=False):
 
     return payload, page
 
-def checkBooleanExpression(expression, expectingNone=False):
-    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, expectingNone=expectingNone)
+def checkBooleanExpression(expression):
+    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, suppressOutput=True, expectingNone=True)

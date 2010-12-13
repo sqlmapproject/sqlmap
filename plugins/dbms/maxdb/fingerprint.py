@@ -50,13 +50,13 @@ class Fingerprint(GenericFingerprint):
         minor, major = None, None
 
         for version in [6, 7]:
-            result = inject.checkBooleanExpression("(SELECT MAJORVERSION FROM SYSINFO.VERSION)=%d" % version)
+            result = inject.checkBooleanExpression("%d=(SELECT MAJORVERSION FROM SYSINFO.VERSION)" % version)
 
             if result:
                 major = version
 
         for version in xrange(0, 10):
-            result = inject.checkBooleanExpression("(SELECT MINORVERSION FROM SYSINFO.VERSION)=%d" % version)
+            result = inject.checkBooleanExpression("%d=(SELECT MINORVERSION FROM SYSINFO.VERSION)" % version)
 
             if result:
                 minor = version
@@ -113,13 +113,13 @@ class Fingerprint(GenericFingerprint):
         logger.info(logMsg)
 
         randInt = randomInt()
-        result = inject.checkBooleanExpression("NOROUND(%d)=%d" % (randInt, randInt), expectingNone=True)
+        result = inject.checkBooleanExpression("%d=NOROUND(%d)" % (randInt, randInt))
 
         if result:
             logMsg = "confirming SAP MaxDB"
             logger.info(logMsg)
 
-            result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL", expectingNone=True)
+            result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
 
             if not result:
                 warnMsg = "the back-end DBMS is not SAP MaxDB"

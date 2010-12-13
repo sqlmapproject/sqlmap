@@ -80,7 +80,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("ROWNUM=ROWNUM", expectingNone=True)
+            result = inject.checkBooleanExpression("ROWNUM=ROWNUM")
 
         if result:
             logMsg = "confirming Oracle"
@@ -91,7 +91,7 @@ class Fingerprint(GenericFingerprint):
             if conf.direct:
                 result = True
             else:
-                result = inject.checkBooleanExpression("LENGTH(SYSDATE)=LENGTH(SYSDATE)", expectingNone=True)
+                result = inject.checkBooleanExpression("LENGTH(SYSDATE)=LENGTH(SYSDATE)")
 
             if not result:
                 warnMsg = "the back-end DBMS is not Oracle"
@@ -106,17 +106,13 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            query = "SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1"
-            version = inject.getValue(query, unpack=False, suppressOutput=True)
+            for version in ("11i", "10g", "9i", "8i"):
+                number = re.search("([\d]+)", version).group(1)
+                output = inject.checkBooleanExpression("%s=(SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1)" % number)
 
-            if re.search("^11", version):
-                kb.dbmsVersion = ["11i"]
-            elif re.search("^10", version):
-                kb.dbmsVersion = ["10g"]
-            elif re.search("^9", version):
-                kb.dbmsVersion = ["9i"]
-            elif re.search("^8", version):
-                kb.dbmsVersion = ["8i"]
+                if output:
+                    kb.dbmsVersion = [ version ]
+                    break
 
             return True
         else:

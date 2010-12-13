@@ -85,14 +85,13 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         randInt = getUnicode(randomInt(1))
-
-        result = inject.checkBooleanExpression("%s::int=%s" % (randInt, randInt), expectingNone=True)
+        result = inject.checkBooleanExpression("%s::int=%s" % (randInt, randInt))
 
         if result:
             infoMsg = "confirming PostgreSQL"
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("COALESCE(%s, NULL)=%s" % (randInt, randInt), expectingNone=True)
+            result = inject.checkBooleanExpression("COALESCE(%s, NULL)=%s" % (randInt, randInt))
 
             if not result:
                 warnMsg = "the back-end DBMS is not PostgreSQL"
@@ -107,33 +106,33 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            if inject.getValue("SELECT DIV(6, 3)", unpack=False, charsetType=2, suppressOutput=True) == "2":
+            if inject.checkBooleanExpression("2=(SELECT DIV(6, 3))"):
                 kb.dbmsVersion = [">= 8.4.0"]
             elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)", unpack=False, charsetType=2, suppressOutput=True) in ( "1", "2" ) and not inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2, suppressOutput=True) in ( "1", "2" ):
                 kb.dbmsVersion = [">= 8.3.0", "< 8.4"]
             elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2, suppressOutput=True):
                 kb.dbmsVersion = [">= 8.2.0", "< 8.3.0"]
-            elif inject.getValue("SELECT GREATEST(5, 9, 1)", unpack=False, charsetType=2, suppressOutput=True) == "9":
+            elif inject.checkBooleanExpression("9=(SELECT GREATEST(5, 9, 1))"):
                 kb.dbmsVersion = [">= 8.1.0", "< 8.2.0"]
-            elif inject.getValue("SELECT WIDTH_BUCKET(5.35, 0.024, 10.06, 5)", unpack=False, charsetType=2, suppressOutput=True) == "3":
+            elif inject.checkBooleanExpression("3=(SELECT WIDTH_BUCKET(5.35, 0.024, 10.06, 5))"):
                 kb.dbmsVersion = [">= 8.0.0", "< 8.1.0"]
-            elif inject.getValue("SELECT SUBSTR(MD5('sqlmap'), 1, 1)", unpack=False, suppressOutput=True):
+            elif inject.checkBooleanExpression("'d'=(SELECT SUBSTR(MD5('sqlmap'), 1, 1))"):
                 kb.dbmsVersion = [">= 7.4.0", "< 8.0.0"]
-            elif inject.getValue("SELECT SUBSTR(CURRENT_SCHEMA(), 1, 1)", unpack=False, suppressOutput=True) == "p":
+            elif inject.checkBooleanExpression("'p'=(SELECT SUBSTR(CURRENT_SCHEMA(), 1, 1))"):
                 kb.dbmsVersion = [">= 7.3.0", "< 7.4.0"]
-            elif inject.getValue("SELECT BIT_LENGTH(1)") == "8":
+            elif inject.checkBooleanExpression("8=(SELECT BIT_LENGTH(1))"):
                 kb.dbmsVersion = [">= 7.2.0", "< 7.3.0"]
-            elif inject.getValue("SELECT SUBSTR(QUOTE_LITERAL('a'), 2, 1)", unpack=False, suppressOutput=True) == "a":
+            elif inject.checkBooleanExpression("'a'=(SELECT SUBSTR(QUOTE_LITERAL('a'), 2, 1))"):
                 kb.dbmsVersion = [">= 7.1.0", "< 7.2.0"]
-            elif inject.getValue("SELECT POW(2, 3)", unpack=False, charsetType=2, suppressOutput=True) == "8":
+            elif inject.checkBooleanExpression("8=(SELECT POW(2, 3))"):
                 kb.dbmsVersion = [">= 7.0.0", "< 7.1.0"]
-            elif inject.getValue("SELECT MAX('a')") == "a":
+            elif inject.checkBooleanExpression("'a'=(SELECT MAX('a'))"):
                 kb.dbmsVersion = [">= 6.5.0", "< 6.5.3"]
             elif re.search("([\d\.]+)", inject.getValue("SELECT SUBSTR(VERSION(), 12, 5)", unpack=False, suppressOutput=True)):
                 kb.dbmsVersion = [">= 6.4.0", "< 6.5.0"]
-            elif inject.getValue("SELECT SUBSTR(CURRENT_DATE, 1, 1)", unpack=False, charsetType=2, suppressOutput=True) == "2":
+            elif inject.checkBooleanExpression("2=(SELECT SUBSTR(CURRENT_DATE, 1, 1))"):
                 kb.dbmsVersion = [">= 6.3.0", "< 6.4.0"]
-            elif inject.getValue("SELECT SUBSTRING('sqlmap', 1, 1)", unpack=False, suppressOutput=True) == "s":
+            elif inject.checkBooleanExpression("'s'=(SELECT SUBSTRING('sqlmap', 1, 1))"):
                 kb.dbmsVersion = [">= 6.2.0", "< 6.3.0"]
             else:
                 kb.dbmsVersion = ["< 6.2.0"]
@@ -160,11 +159,10 @@ class Fingerprint(GenericFingerprint):
         osWindows = ( " Visual C++", "mingw" )
 
         for osPattern in osWindows:
-            query  = "(SELECT LENGTH(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query = "(SELECT LENGTH(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
             query += "LIKE '%" + osPattern + "%')>0"
-            query  = agent.forgeCaseStatement(query)
 
-            if inject.getValue(query, charsetType=1, suppressOutput=True) == "1":
+            if inject.checkBooleanExpression(query):
                 kb.os = "Windows"
 
                 break

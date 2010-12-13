@@ -84,7 +84,7 @@ class Fingerprint(GenericFingerprint):
             version, checks = table[i]
             failed = False
             check = checks[randomRange(0,len(checks)-1)].replace("%d", getUnicode(randomRange(1,100)))
-            result = inject.checkBooleanExpression(check, expectingNone=True)
+            result = inject.checkBooleanExpression(check)
             if result:
                 retVal = version
             else:
@@ -98,7 +98,7 @@ class Fingerprint(GenericFingerprint):
     def __dialectCheck(self):
         retVal = None
         if kb.dbms:
-            result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)", expectingNone=True)
+            result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
             retVal = "dialect 3" if result else "dialect 1"
         return retVal
 
@@ -115,13 +115,13 @@ class Fingerprint(GenericFingerprint):
         logger.info(logMsg)
 
         randInt = randomInt()
-        result = inject.checkBooleanExpression("EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt), expectingNone=True)
+        result = inject.checkBooleanExpression("EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
 
         if result:
             logMsg = "confirming Firebird"
             logger.info(logMsg)
 
-            result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)", expectingNone=True)
+            result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
 
             if not result:
                 warnMsg = "the back-end DBMS is not Firebird"
