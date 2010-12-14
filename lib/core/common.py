@@ -1290,13 +1290,20 @@ def stdev(values):
     if not values or len(values) < 2:
         return None
 
-    summa = 0.0
-    avg = average(values)
+    key = (values[0], values[-1], len(values))
 
-    for value in values:
-        summa += pow(value - avg, 2)
+    if key in kb.cache.stdev:
+        return kb.cache.stdev[key]
+    else:
+        summa = 0.0
+        avg = average(values)
 
-    return sqrt(summa/(len(values) - 1))
+        for value in values:
+            summa += pow(value - avg, 2)
+
+        retVal = sqrt(summa/(len(values) - 1))
+        kb.cache.stdev[key] = retVal
+        return retVal
 
 def average(values):
     """

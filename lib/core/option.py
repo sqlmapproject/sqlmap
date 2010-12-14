@@ -1125,6 +1125,7 @@ def __setKnowledgeBaseAttributes():
     kb.cache           = advancedDict()
     kb.cache.content   = {}
     kb.cache.regex     = {}
+    kb.cache.stdev     = {}
 
     kb.commonOutputs   = None
 
