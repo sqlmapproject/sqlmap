@@ -502,5 +502,5 @@ def goStacked(expression, silent=False):
 
     return payload, page
 
-def checkBooleanExpression(expression):
-    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, suppressOutput=True, expectingNone=True)
+def checkBooleanExpression(expression, expectingNone=True):
+    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, suppressOutput=True, expectingNone=expectingNone)
