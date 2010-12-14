@@ -1358,6 +1358,10 @@ def __basicOptionValidation():
         errMsg = "switch --forms is compatible only with -u (--url) target switch"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.timeSec < 1:
+        errMsg = "value for --time-sec option must be an integer greater than 0"
+        raise sqlmapSyntaxException, errMsg
+
 def init(inputOptions=advancedDict()):
     """
     Set attributes into both configuration and knowledge base singletons
