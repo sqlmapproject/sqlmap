@@ -16,10 +16,6 @@ class Syntax(GenericSyntax):
     def __init__(self):
         GenericSyntax.__init__(self)
 
-    # As ASCII_CHAR is only available from v2.1 we'll need to adapt this one to use the
-    # commented-out part only if detected version>=2.1
-    # Reference: wiki.firebirdsql.org/wiki/index.php?page=ASCII_CHAR
-
     @staticmethod
     def unescape(expression, quote=True):
         if isDBMSVersionAtLeast('2.1'):
