@@ -43,9 +43,3 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
-
-    def dumpTable(self):
-        warnMsg = "on Microsoft Access it is not yet implemented dumping of tables"
-        logger.warn(warnMsg)
-
-        return None
