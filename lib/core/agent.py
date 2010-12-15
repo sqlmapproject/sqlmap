@@ -13,6 +13,7 @@ from xml.etree import ElementTree as ET
 
 from lib.core.common import getCompiledRegex
 from lib.core.common import isDBMSVersionAtLeast
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import urlencode
@@ -77,7 +78,7 @@ class Agent:
             paramDict = conf.paramDict[kb.injection.place]
             origValue = paramDict[kb.injection.parameter]
 
-            if kb.technique and kb.technique in kb.injection.data:
+            if isTechniqueAvailable(kb.technique):
                 where = kb.injection.data[kb.technique].where
 
                 if where == 1:

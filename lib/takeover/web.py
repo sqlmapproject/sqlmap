@@ -19,6 +19,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
 from lib.core.common import ntToPosixSlashes
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
 from lib.core.common import posixToNtSlashes
@@ -104,7 +105,7 @@ class Web:
         uplQuery = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
         query = ""
 
-        if kb.technique and kb.technique in kb.injection.data:
+        if isTechniqueAvailable(kb.technique):
             where = kb.injection.data[kb.technique].where
 
             if where == 2:
