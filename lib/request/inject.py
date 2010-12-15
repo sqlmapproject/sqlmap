@@ -16,6 +16,8 @@ from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import expandAsteriskForColumns
+from lib.core.common import getPublicTypeMembers
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -399,7 +401,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     try:
         if conf.direct:
             value = direct(expression)
-        elif any(test is not None for test in [kb.booleanTest, kb.errorTest, kb.unionTest, kb.timeTest, kb.stackedTest]):
+        elif any(test is not None for test in map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))) or kb.unionTest:
             query = cleanQuery(expression)
             query = expandAsteriskForColumns(query)
             value = None
@@ -427,7 +429,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             oldParamNegative = kb.unionNegative
             kb.unionNegative = False
 
-            if error and kb.errorTest and not found:
+            if error and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
 
                 if expected == EXPECTED.BOOL:
@@ -437,7 +439,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
                 found = value or (value is None and expectingNone)
 
-            if blind and kb.booleanTest and not found:
+            if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
 
                 if expected == EXPECTED.BOOL:
@@ -447,10 +449,10 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
                 found = value or (value is None and expectingNone)
 
-            if time and (kb.timeTest or kb.stackedTest) and not found:
-                if kb.timeTest:
+            if time and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)) and not found:
+                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
                     kb.technique = PAYLOAD.TECHNIQUE.TIME
-                elif kb.stackedTest:
+                else:
                     kb.technique = PAYLOAD.TECHNIQUE.STACKED
 
                 if expected == EXPECTED.BOOL:

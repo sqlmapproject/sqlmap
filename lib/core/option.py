@@ -1134,10 +1134,10 @@ def __setKnowledgeBaseAttributes():
     kb.data            = advancedDict()
 
     # Injection types
-    kb.booleanTest     = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN))
-    kb.errorTest       = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR))
-    kb.stackedTest     = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED))
-    kb.timeTest        = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME))
+    kb.booleanTest     = None
+    kb.errorTest       = None
+    kb.stackedTest     = None
+    kb.timeTest        = None
     kb.unionTest       = None
 
     # Basic back-end DBMS fingerprint
