@@ -112,7 +112,7 @@ def __goBooleanProxy(expression, resumeValue=True):
         output = resume(expression, payload)
     else:
         output = None
-    
+
     if not output:
         output = Request.queryPage(payload)
 
@@ -343,12 +343,7 @@ def __goError(expression, resumeValue=True):
     if conf.direct:
         return direct(expression), None
 
-    condition = (
-                  kb.resumedQueries and conf.url in kb.resumedQueries.keys()
-                  and expression in kb.resumedQueries[conf.url].keys()
-                )
-
-    if condition and resumeValue:
+    if resumeValue:
         result = resume(expression, None)
 
     if not result:
@@ -367,12 +362,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     partial = False
     data    = []
 
-    condition = (
-                  kb.resumedQueries and conf.url in kb.resumedQueries.keys()
-                  and expression in kb.resumedQueries[conf.url].keys()
-                )
-
-    if condition and resumeValue:
+    if resumeValue:
         output = resume(expression, None)
 
         if not output or ( expected == EXPECTED.INT and not output.isdigit() ):
