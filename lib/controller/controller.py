@@ -406,8 +406,12 @@ def start():
 
                 if condition:
                     if kb.paramMatchRatio:
-                        conf.matchRatio = kb.paramMatchRatio[(kb.injection.place, kb.injection.parameter)]
-                        setMatchRatio()
+                        key = (kb.injection.place, kb.injection.parameter)
+                        if key in kb.paramMatchRatio:
+                            conf.matchRatio = kb.paramMatchRatio[key]
+                            setMatchRatio()
+                        else:
+                            conf.matchRatio = None
 
                     action()
 
