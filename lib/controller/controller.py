@@ -36,12 +36,8 @@ from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.session import setBooleanBased
-from lib.core.session import setError
 from lib.core.session import setInjection
 from lib.core.session import setMatchRatio
-from lib.core.session import setStacked
-from lib.core.session import setTimeBased
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 
@@ -131,25 +127,6 @@ def __saveToSessionFile():
             continue
 
         setInjection(inj)
-
-        place = inj.place
-        parameter = inj.parameter
-
-        for stype, sdata in inj.data.items():
-            payload = sdata.payload
-
-            if stype == 1:
-                kb.booleanTest = payload
-                setBooleanBased(place, parameter, payload)
-            elif stype == 2:
-                kb.errorTest = payload
-                setError(place, parameter, payload)
-            elif stype == 4:
-                kb.stackedTest = payload
-                setStacked(place, parameter, payload)
-            elif stype == 5:
-                kb.timeTest = payload
-                setTimeBased(place, parameter, payload)
 
 def start():
     """

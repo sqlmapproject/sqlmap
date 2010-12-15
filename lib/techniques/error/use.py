@@ -21,7 +21,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
-from lib.core.session import setError
+from lib.core.enums import PAYLOAD
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -32,7 +32,7 @@ def errorUse(expression):
     """
 
     output = None
-    vector = agent.cleanupPayload(kb.injection.data[2].vector)
+    vector = agent.cleanupPayload(kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector)
     query = unescaper.unescape(vector)
     query = agent.prefixQuery(query)
     query = agent.suffixQuery(query)

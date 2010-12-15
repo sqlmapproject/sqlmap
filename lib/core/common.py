@@ -1651,7 +1651,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
 
     kb.locks.reqLock.release()
 
-def getPublicTypeMembers(type_):
+def getPublicTypeMembers(type_, onlyValues=False):
     """
     Useful for getting members from types (e.g. in enums)
     """
@@ -1659,7 +1659,10 @@ def getPublicTypeMembers(type_):
 
     for name, value in getmembers(type_):
         if not name.startswith('__'):
-            retVal.append((name, value))
+            if not onlyValues:
+                retVal.append((name, value))
+            else:
+                retVal.append(value)
 
     return retVal
 
@@ -1743,3 +1746,11 @@ def parseSqliteTableSchema(value):
 
         table[conf.tbl] = columns
         kb.data.cachedColumns[conf.db] = table
+
+def getTechniqueData(technique=None):
+    retVal = None
+
+    if technique and technique in kb.injection.data:
+        retVal = kb.injection.data[technique]
+
+    return retVal

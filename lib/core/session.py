@@ -358,34 +358,6 @@ def resumeConfKb(expression, url, value):
             warnMsg += "but you did not provided it this time"
             logger.warn(warnMsg)
 
-    elif expression == "Boolean-based blind injection" and url == conf.url:
-        kb.booleanTest = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming boolean-based blind injection "
-        logMsg += "'%s' from session file" % kb.booleanTest
-        logger.info(logMsg)
-
-    elif expression == "Error-based injection" and url == conf.url:
-        kb.errorTest = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming error-based injection "
-        logMsg += "'%s' from session file" % kb.errorTest
-        logger.info(logMsg)
-
-    elif expression == "Stacked queries" and url == conf.url:
-        kb.stackedTest = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming stacked queries syntax "
-        logMsg += "'%s' from session file" % kb.stackedTest
-        logger.info(logMsg)
-
-    elif expression == "Time-based blind injection" and url == conf.url:
-        kb.timeTest = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming time-based blind injection "
-        logMsg += "'%s' from session file" % kb.timeTest
-        logger.info(logMsg)
-
     elif expression == "DBMS" and url == conf.url:
         dbms        = unSafeFormatString(value[:-1])
         dbms        = dbms.lower()
