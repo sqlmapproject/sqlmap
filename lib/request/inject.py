@@ -401,7 +401,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     try:
         if conf.direct:
             value = direct(expression)
-        elif any(test is not None for test in map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))) or kb.unionTest:
+
+        elif kb.unionTest or any(map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))):
             query = cleanQuery(expression)
             query = expandAsteriskForColumns(query)
             value = None
