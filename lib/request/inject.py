@@ -427,7 +427,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
                 found = value or (value is None and expectingNone)
 
-            oldParamNegative = kb.unionNegative
+            pushValue(kb.unionNegative)
             kb.unionNegative = False
 
             if error and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and not found:
@@ -461,7 +461,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 else:
                     value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
-            kb.unionNegative = oldParamNegative
+            kb.unionNegative = popValue()
 
             if value and isinstance(value, basestring):
                 value = value.strip()
@@ -469,15 +469,14 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             errMsg = "none of the injection types identified can be "
             errMsg += "leveraged to retrieve queries output"
             raise sqlmapNotVulnerableException, errMsg
+
     finally:
         if suppressOutput:
             conf.verbose = popValue()
 
     if value and expected == EXPECTED.BOOL:
         if isinstance(value, basestring):
-            value = value.lower()
-
-            if value in ("true", "false"):
+            if value.lower() in ("true", "false"):
                 value = bool(value)
             else:
                 value = value != "0"
