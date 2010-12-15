@@ -27,6 +27,7 @@ from lib.controller.checks import checkConnection
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import parseTargetDirect
@@ -1133,10 +1134,10 @@ def __setKnowledgeBaseAttributes():
     kb.data            = advancedDict()
 
     # Injection types
-    kb.booleanTest     = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.BOOLEAN) is not None)
-    kb.errorTest       = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.ERROR) is not None)
-    kb.stackedTest     = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.STACKED) is not None)
-    kb.timeTest        = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.TIME) is not None)
+    kb.booleanTest     = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN))
+    kb.errorTest       = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR))
+    kb.stackedTest     = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED))
+    kb.timeTest        = property(lambda self: isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME))
     kb.unionTest       = None
 
     # Basic back-end DBMS fingerprint

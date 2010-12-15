@@ -1754,3 +1754,6 @@ def getTechniqueData(technique=None):
         retVal = kb.injection.data[technique]
 
     return retVal
+
+def isTechniqueAvailable(technique=None):
+    return getTechniqueData(technique) is not None
