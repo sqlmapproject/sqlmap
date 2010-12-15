@@ -46,6 +46,7 @@ from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.datatype import injectionDict
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -1132,10 +1133,10 @@ def __setKnowledgeBaseAttributes():
     kb.data            = advancedDict()
 
     # Injection types
-    kb.booleanTest     = None
-    kb.errorTest       = None
-    kb.stackedTest     = None
-    kb.timeTest        = None
+    kb.booleanTest     = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.BOOLEAN) is not None)
+    kb.errorTest       = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.ERROR) is not None)
+    kb.stackedTest     = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.STACKED) is not None)
+    kb.timeTest        = property(lambda self: getTechniqueData(PAYLOAD.TECHNIQUE.TIME) is not None)
     kb.unionTest       = None
 
     # Basic back-end DBMS fingerprint
