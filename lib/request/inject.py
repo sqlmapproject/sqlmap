@@ -372,7 +372,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
         output = unionUse(expression, resetCounter=True, unpack=unpack, dump=dump)
 
     if output:
-        data = parseUnionPage(output, expression, partial, condition, sort)
+        data = parseUnionPage(output, expression, partial, None, sort)
 
     return data
 
