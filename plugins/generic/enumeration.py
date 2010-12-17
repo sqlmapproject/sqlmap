@@ -1104,7 +1104,13 @@ class Enumeration:
             kb.data.cachedColumns = self.getColumns(onlyColNames=True)
 
         colList = kb.data.cachedColumns[conf.db][conf.tbl].keys()
-        colList.sort(key=lambda x: x.lower())
+        colList.sort(key=lambda x: x.lower() if isinstance(x, basestring) else None)
+
+        if colList in ([None], ['None']):
+            warnMsg = "unable to retrieve column names"
+            logger.warn(warnMsg)
+            return None
+
         colString = ", ".join(column for column in colList)
 
         infoMsg = "fetching"
