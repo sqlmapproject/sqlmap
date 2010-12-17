@@ -25,6 +25,7 @@ from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 
 def safeFormatString(value):
     retVal = value
@@ -361,7 +362,7 @@ def resumeConfKb(expression, url, value):
     elif expression == "DBMS" and url == conf.url:
         dbms        = unSafeFormatString(value[:-1])
         dbms        = dbms.lower()
-        dbmsVersion = ["Unknown"]
+        dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
         logMsg = "resuming back-end DBMS '%s' " % dbms
         logMsg += "from session file"

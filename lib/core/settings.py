@@ -49,6 +49,8 @@ DUMP_STOP_MARKER    = "__STOP__"
 PAYLOAD_DELIMITER   = "\x00"
 CHAR_INFERENCE_MARK = "%c"
 
+UNKNOWN_DBMS_VERSION = "Unknown"
+
 # suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX       = "_masterdb"
 

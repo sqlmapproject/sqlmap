@@ -60,6 +60,7 @@ from lib.core.settings import PLATFORM
 from lib.core.settings import SITE
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
@@ -203,7 +204,7 @@ def formatDBMSfp(versions=None):
     while versions and None in versions:
         versions.remove(None)
 
-    if not versions and kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown" and kb.dbmsVersion[0] != None:
+    if not versions and kb.dbmsVersion and kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION and kb.dbmsVersion[0] != None:
         versions = kb.dbmsVersion
 
     if isinstance(versions, basestring):
@@ -1719,7 +1720,7 @@ def removeDynamicContent(page):
 def isDBMSVersionAtLeast(version):
     retVal = None
 
-    if kb.dbmsVersion and kb.dbmsVersion[0] != "Unknown" and kb.dbmsVersion[0] != None:
+    if kb.dbmsVersion and kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION and kb.dbmsVersion[0] != None:
         value = kb.dbmsVersion[0].replace(" ", "")
 
         if isinstance(value, basestring):

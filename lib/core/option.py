@@ -73,6 +73,7 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
@@ -1144,7 +1145,7 @@ def __setKnowledgeBaseAttributes():
     kb.dbmsDetected    = False
 
     # Active (extensive) back-end DBMS fingerprint
-    kb.dbmsVersion     = [ "Unknown" ]
+    kb.dbmsVersion     = [ UNKNOWN_DBMS_VERSION ]
 
     kb.dep             = None
     kb.docRoot         = None

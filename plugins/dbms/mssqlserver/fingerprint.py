@@ -19,6 +19,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import MSSQL_ALIASES
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -132,7 +133,7 @@ class Fingerprint(GenericFingerprint):
 
                         break
 
-            if not kb.dbmsVersion or kb.dbmsVersion == ["Unknown"]:
+            if not kb.dbmsVersion or kb.dbmsVersion == [UNKNOWN_DBMS_VERSION]:
                 for version, check in [\
                         ("2000", "HOST_NAME()=HOST_NAME()"),\
                         ("2005", "XACT_STATE()=XACT_STATE()"),\

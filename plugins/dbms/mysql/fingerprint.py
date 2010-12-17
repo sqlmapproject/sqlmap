@@ -22,6 +22,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PLACE
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -144,7 +145,7 @@ class Fingerprint(GenericFingerprint):
 
         if ((kb.dbms is not None and kb.dbms.lower() in MYSQL_ALIASES) \
            or conf.dbms in MYSQL_ALIASES) and kb.dbmsVersion and \
-           kb.dbmsVersion[0] != "Unknown":
+           kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION:
             kb.dbmsVersion[0] = kb.dbmsVersion[0].replace(">", "")
             kb.dbmsVersion[0] = kb.dbmsVersion[0].replace("=", "")
             kb.dbmsVersion[0] = kb.dbmsVersion[0].replace(" ", "")
