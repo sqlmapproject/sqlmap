@@ -341,10 +341,14 @@ def checkSqlInjection(place, parameter, value):
                         trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True)
 
                         if trueResult:
-                            infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                            logger.info(infoMsg)
+                            # Confirm test's results
+                            trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True)
 
-                            injectable = True
+                            if trueResult:
+                                infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                logger.info(infoMsg)
+
+                                injectable = True
 
                         # Restore value of socket timeout
                         socket.setdefaulttimeout(popValue())
