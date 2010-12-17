@@ -12,6 +12,7 @@ import ntpath
 import os
 
 from lib.core.common import getRange
+from lib.core.common import isNumPosStrValue
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
 from lib.core.data import conf
@@ -97,7 +98,7 @@ class Filesystem(GenericFilesystem):
             result = []
             count  = inject.getValue("SELECT COUNT(%s) FROM %s" % (self.tblField, hexTbl), resumeValue=False, charsetType=2)
 
-            if not count.isdigit() or not len(count) or count == "0":
+            if not isNumPosStrValue(count):
                 errMsg  = "unable to retrieve the content of the "
                 errMsg += "file '%s'" % rFile
                 raise sqlmapNoneDataException(errMsg)

@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import getRange
+from lib.core.common import isNumPosStrValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -118,7 +119,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count % queryUser
                 count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
+                if not isNumPosStrValue(count):
                     if not count.isdigit() and not query2:
                         infoMsg = "trying with table USER_SYS_PRIVS"
                         logger.info(infoMsg)
@@ -240,7 +241,7 @@ class Enumeration(GenericEnumeration):
                     query += " WHERE %s" % colQuery
                     count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
-                    if not count.isdigit() or not len(count) or count == "0":
+                    if not isNumPosStrValue(count):
                         warnMsg = "no tables contain column"
                         if colConsider == "1":
                             warnMsg += "s like"

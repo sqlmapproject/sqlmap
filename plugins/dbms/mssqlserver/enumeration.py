@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import getRange
+from lib.core.common import isNumPosStrValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -79,7 +80,7 @@ class Enumeration(GenericEnumeration):
                 query = rootQuery.blind.count % db
                 count = inject.getValue(query, inband=False, charsetType=2)
 
-                if not count.isdigit() or not len(count) or count == "0":
+                if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of "
                     warnMsg += "tables for database '%s'" % db
                     logger.warn(warnMsg)
@@ -163,7 +164,7 @@ class Enumeration(GenericEnumeration):
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
-                    if not count.isdigit() or not len(count) or count == "0":
+                    if not isNumPosStrValue(count):
                         warnMsg = "no table"
                         if tblConsider == "1":
                             warnMsg += "s like"
@@ -268,7 +269,7 @@ class Enumeration(GenericEnumeration):
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
 
-                    if not count.isdigit() or not len(count) or count == "0":
+                    if not isNumPosStrValue(count):
                         warnMsg = "no tables contain column"
                         if colConsider == "1":
                             warnMsg += "s like"
