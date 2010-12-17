@@ -361,7 +361,7 @@ def resumeConfKb(expression, url, value):
     elif expression == "DBMS" and url == conf.url:
         dbms        = unSafeFormatString(value[:-1])
         dbms        = dbms.lower()
-        dbmsVersion = None
+        dbmsVersion = ["Unknown"]
 
         logMsg = "resuming back-end DBMS '%s' " % dbms
         logMsg += "from session file"
