@@ -468,6 +468,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         if isinstance(value, basestring):
             if value.lower() in ("true", "false"):
                 value = bool(value)
+            elif value.capitalize() == "None":
+                value = None
             else:
                 value = value != "0"
         elif isinstance(value, int):

@@ -134,8 +134,6 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            kb.dbmsVersion = None
-
             return True
         else:
             warnMsg = "the back-end DBMS is not SAP MaxDB"
