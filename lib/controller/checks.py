@@ -409,10 +409,10 @@ def checkSqlInjection(place, parameter, value):
                     break
 
         except KeyboardInterrupt:
-            warnMsg = "Ctrl+C detected in detection mode"
+            warnMsg = "Ctrl+C detected in detection phase"
             logger.warn(warnMsg)
 
-            message = "What do you want to do? [(S)kip current/(a)bort detection/(q)uit]"
+            message = "How do you want to proceed? [(S)kip current test/(a)bort detection/(q)uit]"
             test = readInput(message, default="S")
 
             if not test or test[0] in ("s", "S"):
