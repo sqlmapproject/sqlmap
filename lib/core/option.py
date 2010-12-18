@@ -1119,7 +1119,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     logger.debug(debugMsg)
 
     kb.absFilePaths    = set()
-    kb.assumeEmpty     = False
     kb.authHeader      = None
     kb.bannerFp        = advancedDict()
 

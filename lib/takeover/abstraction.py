@@ -8,11 +8,13 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import dataToStdout
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.takeover.udf import UDF
@@ -35,7 +37,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
         xp_cmdshell.__init__(self)
 
     def execCmd(self, cmd, silent=False):
-        if self.webBackdoorUrl and not kb.stackedTest:
+        if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             self.webBackdoorRunCmd(cmd)
 
         elif kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
@@ -49,7 +51,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             raise sqlmapUnsupportedFeatureException, errMsg
 
     def evalCmd(self, cmd, first=None, last=None):
-        if self.webBackdoorUrl and not kb.stackedTest:
+        if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             return self.webBackdoorRunCmd(cmd)
 
         elif kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
@@ -84,7 +86,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             self.execCmd(cmd)
 
     def shell(self):
-        if self.webBackdoorUrl and not kb.stackedTest:
+        if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             infoMsg  = "calling OS shell. To quit type "
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)

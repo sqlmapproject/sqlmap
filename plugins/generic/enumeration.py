@@ -18,6 +18,7 @@ from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getUnicode
 from lib.core.common import isNumPosStrValue
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import parsePasswordHash
 from lib.core.common import parseSqliteTableSchema
 from lib.core.common import popValue
@@ -34,6 +35,7 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -1758,7 +1760,7 @@ class Enumeration:
 
             return output
         else:
-            if not kb.stackedTest and not conf.direct:
+            if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
                 warnMsg  = "execution of custom SQL queries is only "
                 warnMsg += "available when stacked queries are supported"
                 logger.warn(warnMsg)

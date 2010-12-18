@@ -11,12 +11,14 @@ import os
 
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -157,7 +159,7 @@ class UDF:
             errMsg = "UDF injection feature is not yet implemented on %s" % kb.dbms
             raise sqlmapUnsupportedFeatureException(errMsg)
 
-        if not kb.stackedTest and not conf.direct:
+        if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             return
 
         self.checkDbmsOs()

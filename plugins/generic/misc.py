@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.common import getCompiledRegex
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import posixToNtSlashes
@@ -19,6 +20,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setRemoteTempPath
@@ -94,7 +96,7 @@ class Miscellaneous:
         Cleanup database from sqlmap create tables and functions
         """
 
-        if not kb.stackedTest and not conf.direct:
+        if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             return
 
         if kb.os == "Windows":

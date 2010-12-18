@@ -13,12 +13,14 @@ import os
 
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.request import inject
 
@@ -254,8 +256,8 @@ class Filesystem:
 
         self.checkDbmsOs()
 
-        if conf.direct or kb.stackedTest:
-            if kb.stackedTest:
+        if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
                 debugMsg  = "going to read the file with stacked query SQL "
                 debugMsg += "injection technique"
                 logger.debug(debugMsg)
@@ -294,8 +296,8 @@ class Filesystem:
     def writeFile(self, wFile, dFile, fileType=None, confirm=True):
         self.checkDbmsOs()
 
-        if conf.direct or kb.stackedTest:
-            if kb.stackedTest:
+        if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
                 debugMsg  = "going to upload the %s file with " % fileType
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)

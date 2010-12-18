@@ -279,26 +279,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if conf.threadContinue:
                         charStart = time.time()
                         val = getChar(curidx)
-
                         if val is None:
-                            if not kb.assumeEmpty:
-                                iolock.acquire()
-
-                                warnMsg = "failed to get character at index %d (expected %d total)." % (curidx, length)
-                                logger.warn(warnMsg)
-
-                                message = "assume empty character? [Y/n/a]"
-                                choice = readInput(message, default="Y")
-                                iolock.release()
-
-                                if choice in ("a", "A"):
-                                    kb.assumeEmpty = True
-                                elif not choice or choice in ("y", "Y"):
-                                    pass # do nothing
-                                else:
-                                    raise sqlmapValueException
-
-                            val = ''
+                            val = '?'
                     else:
                         break
 
