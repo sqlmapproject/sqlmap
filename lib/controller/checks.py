@@ -412,12 +412,12 @@ def checkSqlInjection(place, parameter, value):
             warnMsg = "Ctrl+C detected in detection phase"
             logger.warn(warnMsg)
 
-            message = "How do you want to proceed? [(S)kip current test/(a)bort detection/(q)uit]"
+            message = "How do you want to proceed? [(S)kip test/(n)ext parameter/(q)uit]"
             test = readInput(message, default="S")
 
             if not test or test[0] in ("s", "S"):
                 pass
-            elif test[0] in ("a", "A"):
+            elif test[0] in ("n", "N"):
                 break
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
