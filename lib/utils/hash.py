@@ -191,9 +191,10 @@ __functions__ = {
                 }
 
 def dictionaryAttack():
-    hash_regex = None
+    hash_regexes = []
     attack_info = []
     results = []
+    wordlist = []
 
     for (_, hashes) in kb.data.cachedUsersPasswords.items():
         for hash_ in hashes:
@@ -211,18 +212,13 @@ def dictionaryAttack():
                     continue
 
                 elif re.match(regex, hash_):
-                    hash_regex = regex
-                    infoMsg = "using hash method: '%s'" % __functions__[hash_regex].func_name
-                    logger.info(infoMsg)
-                    break
+                    if regex not in hash_regexes:
+                        hash_regexes.append(regex)
+                        infoMsg = "using hash method: '%s'" % __functions__[regex].func_name
+                        logger.info(infoMsg)
 
-            if hash_regex:
-                break
 
-        if hash_regex:
-            break
-
-    if hash_regex:
+    for hash_regex in hash_regexes:
         for (user, hashes) in kb.data.cachedUsersPasswords.items():
             for hash_ in hashes:
                 if not hash_:
@@ -245,24 +241,25 @@ def dictionaryAttack():
                     elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD):
                         attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
 
-        if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
-            message = "what's the dictionary's location? [%s]" % paths.ORACLE_DEFAULT_PASSWD
-            dictpath = readInput(message, default=paths.ORACLE_DEFAULT_PASSWD)
+        if not wordlist:
+            if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
+                message = "what's the dictionary's location? [%s]" % paths.ORACLE_DEFAULT_PASSWD
+                dictpath = readInput(message, default=paths.ORACLE_DEFAULT_PASSWD)
 
-        else:
-            message = "what's the dictionary's location? [%s]" % paths.WORDLIST
-            dictpath = readInput(message, default=paths.WORDLIST)
+            else:
+                message = "what's the dictionary's location? [%s]" % paths.WORDLIST
+                dictpath = readInput(message, default=paths.WORDLIST)
 
-        checkFile(dictpath)
+            checkFile(dictpath)
 
-        infoMsg = "loading dictionary from: '%s'" % dictpath
+            infoMsg = "loading dictionary from: '%s'" % dictpath
+            logger.info(infoMsg)
+            wordlist = getFileItems(dictpath, None, False)
+
+            length = len(wordlist)
+
+        infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
-        wordlist = getFileItems(dictpath, None, False)
-
-        infoMsg = "starting dictionary attack"
-        logger.info(infoMsg)
-
-        length = len(wordlist)
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
@@ -313,7 +310,7 @@ def dictionaryAttack():
                 if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
                     kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
-    else:
+    if len(hash_regexes) == 0:
         warnMsg  = "unknown hash format. "
         warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
         logger.warn(warnMsg)
