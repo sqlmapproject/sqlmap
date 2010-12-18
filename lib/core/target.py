@@ -26,6 +26,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
 from lib.core.xmldump import dumper as xmldumper
@@ -275,7 +276,8 @@ def initTargetEnv():
         conf.parameters    = {}
         conf.sessionFile   = None
 
-        __setKnowledgeBaseAttributes()
+        __setKnowledgeBaseAttributes(False)
+        __setDBMS()
 
 def setupTargetEnv():
     __createTargetDirs()

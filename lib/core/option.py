@@ -1109,7 +1109,7 @@ def __setConfAttributes():
     conf.trafficFP        = None
     conf.wFileType        = None
 
-def __setKnowledgeBaseAttributes():
+def __setKnowledgeBaseAttributes(flushAll=True):
     """
     This function set some needed attributes into the knowledge base
     singleton.
@@ -1158,7 +1158,6 @@ def __setKnowledgeBaseAttributes():
     kb.injection.parameter = None
     kb.injection.place = None
     kb.injections      = []
-    kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
     kb.lastErrorPage   = None
     kb.lastQueryDuration = 0
     kb.lastRequestUID  = 0
@@ -1188,8 +1187,6 @@ def __setKnowledgeBaseAttributes():
     kb.responseTimes   = []
     kb.resumedQueries  = {}
     kb.retriesCount    = 0
-    kb.tamperFunctions = []
-    kb.targetUrls      = set()
     kb.testedParams    = set()
     kb.technique       = None
     kb.testMode        = False
@@ -1198,8 +1195,13 @@ def __setKnowledgeBaseAttributes():
     kb.unionCount      = None
     kb.unionPosition   = None
     kb.unionNegative   = False
-    kb.userAgents      = None
     kb.valueStack      = []
+
+    if flushAll:
+        kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
+        kb.tamperFunctions = []
+        kb.targetUrls      = set()
+        kb.userAgents      = None
 
 def __saveCmdline():
     """
