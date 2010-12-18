@@ -17,6 +17,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import initTechnique
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseUnionPage
 from lib.core.common import popValue
@@ -37,7 +38,6 @@ from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
-from lib.request.templates import getPageTemplate
 from lib.techniques.inband.union.use import unionUse
 from lib.techniques.blind.inference import bisection
 from lib.techniques.error.use import errorUse
@@ -99,7 +99,11 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
     return outputs
 
 def __goBooleanProxy(expression, resumeValue=True):
-    kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
+    """
+    Retrieve the output of a boolean based SQL query
+    """
+
+    initTechnique(kb.technique)
 
     vector = kb.injection.data[kb.technique].vector
     vector = vector.replace("[INFERENCE]", expression)
@@ -125,7 +129,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     parameter through a bisection algorithm.
     """
 
-    kb.pageTemplate = getPageTemplate(kb.injection.data[kb.technique].templatePayload, kb.injection.place)
+    initTechnique(kb.technique)
+
     vector = agent.cleanupPayload(kb.injection.data[kb.technique].vector)
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)

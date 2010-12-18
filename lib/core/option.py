@@ -1091,7 +1091,6 @@ def __setConfAttributes():
     conf.httpHeaders      = []
     conf.hostname         = None
     conf.loggedToOut      = None
-    conf.matchRatio       = None
     conf.multipleTargets  = False
     conf.outputPath       = None
     conf.paramDict        = {}
@@ -1169,6 +1168,7 @@ def __setKnowledgeBaseAttributes():
     kb.locks.reqLock   = threading.Lock()
     kb.locks.seqLock   = None
 
+    kb.matchRatio      = None
     kb.nullConnection  = None
     kb.pageTemplate    = None
     kb.pageTemplates   = advancedDict()
@@ -1181,7 +1181,6 @@ def __setKnowledgeBaseAttributes():
     kb.osSP            = None
 
     kb.pageStable      = None
-    kb.paramMatchRatio = {}
     kb.partRun         = None
     kb.proxyAuthHeader = None
     kb.queryCounter    = 0

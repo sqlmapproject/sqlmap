@@ -65,17 +65,6 @@ def setRegexp():
     if condition:
         dataToSessionFile("[%s][None][None][Regular expression][%s]\n" % (conf.url, safeFormatString(conf.regexp)))
 
-def setMatchRatio():
-    condition = (
-                  isinstance(conf.matchRatio, (int, float))
-                  and ( not kb.resumedQueries
-                  or ( kb.resumedQueries.has_key(conf.url) and not
-                  kb.resumedQueries[conf.url].has_key("Match ratio") ) )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Match ratio][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), conf.matchRatio))
-
 def setInjection(inj):
     """
     Save information retrieved about injection place and parameter in the
@@ -335,17 +324,6 @@ def resumeConfKb(expression, url, value):
 
             if not test or test[0] in ("y", "Y"):
                 conf.regexp = regexp
-
-    elif expression == "Match ratio" and url == conf.url and conf.matchRatio is None:
-        matchRatio = value[:-1]
-
-        logMsg = "resuming match ratio '%s' from session file" % matchRatio
-        logger.info(logMsg)
-
-        try:
-            conf.matchRatio = round(float(matchRatio), 3)
-        except ValueError:
-            pass
 
     elif expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])

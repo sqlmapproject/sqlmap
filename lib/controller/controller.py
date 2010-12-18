@@ -37,7 +37,6 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
-from lib.core.session import setMatchRatio
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 
@@ -382,14 +381,6 @@ def start():
                     condition = True
 
                 if condition:
-                    if kb.paramMatchRatio:
-                        key = (kb.injection.place, kb.injection.parameter)
-                        if key in kb.paramMatchRatio:
-                            conf.matchRatio = kb.paramMatchRatio[key]
-                            setMatchRatio()
-                        else:
-                            conf.matchRatio = None
-
                     action()
 
         except KeyboardInterrupt:

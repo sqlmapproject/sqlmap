@@ -48,6 +48,7 @@ from lib.core.convert import htmlunescape
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
 from lib.core.enums import PLACE
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
@@ -1652,6 +1653,9 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
 
     kb.locks.reqLock.release()
 
+def getPageTemplate(payload, place):
+    pass
+
 def getPublicTypeMembers(type_, onlyValues=False):
     """
     Useful for getting members from types (e.g. in enums)
@@ -1664,6 +1668,16 @@ def getPublicTypeMembers(type_, onlyValues=False):
                 retVal.append((name, value))
             else:
                 retVal.append(value)
+
+    return retVal
+
+def enumValueToNameLookup(type_, value_):
+    retVal = None
+
+    for name, value in getPublicTypeMembers(type_):
+        if value == value_:
+            retVal = name
+            break
 
     return retVal
 
@@ -1758,3 +1772,12 @@ def getTechniqueData(technique=None):
 
 def isTechniqueAvailable(technique=None):
     return getTechniqueData(technique) is not None
+
+def initTechnique(technique=None):
+    data = getTechniqueData(technique)
+    if data:
+        kb.pageTemplate = getPageTemplate(data.templatePayload, kb.injection.place)
+        kb.matchRatio = data.matchRatio
+    else:
+        warnMsg = "there is no injection data available for technique '%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
+        logger.warn(warnMsg)

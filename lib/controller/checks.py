@@ -292,9 +292,9 @@ def checkSqlInjection(place, parameter, value):
                         boundPayload = agent.cleanupPayload(boundPayload, value)
                         cmpPayload = agent.payload(place, parameter, value, boundPayload)
 
-                        # Useful to set conf.matchRatio at first based on
+                        # Useful to set kb.matchRatio at first based on
                         # the False response content
-                        conf.matchRatio = None
+                        kb.matchRatio = None
                         _ = Request.queryPage(cmpPayload, place)
 
                         # Perform the test's True request
@@ -308,7 +308,6 @@ def checkSqlInjection(place, parameter, value):
                                 infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
                                 logger.info(infoMsg)
 
-                                kb.paramMatchRatio[(place, parameter)] = conf.matchRatio
                                 injectable = True
 
                     # In case of error-based or UNION query SQL injections
@@ -382,6 +381,7 @@ def checkSqlInjection(place, parameter, value):
                     injection.data[stype].where = where
                     injection.data[stype].vector = vector
                     injection.data[stype].comment = comment
+                    injection.data[stype].matchRatio = kb.matchRatio
                     injection.data[stype].templatePayload = templatePayload
 
                     if hasattr(test, "details"):
@@ -455,7 +455,7 @@ def checkDynParam(place, parameter, value):
     dynamicity might depend on another parameter.
     """
 
-    conf.matchRatio = None
+    kb.matchRatio = None
 
     infoMsg = "testing if %s parameter '%s' is dynamic" % (place, parameter)
     logger.info(infoMsg)

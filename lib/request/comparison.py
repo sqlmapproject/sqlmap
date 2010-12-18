@@ -89,16 +89,16 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
-    if conf.matchRatio is None:
+    if kb.matchRatio is None:
         if conf.thold:
-            conf.matchRatio = conf.thold
+            kb.matchRatio = conf.thold
 
         elif kb.pageStable and ratio > 0.6 and ratio < 0.99:
-            conf.matchRatio = ratio
-            logger.debug("setting match ratio for current parameter to %.3f" % conf.matchRatio)
+            kb.matchRatio = ratio
+            logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
 
         elif not kb.pageStable or ( kb.pageStable and ratio < 0.6 ):
-            conf.matchRatio = CONSTANT_RATIO
+            kb.matchRatio = CONSTANT_RATIO
             logger.debug("setting match ratio for current parameter to default value 0.900")
 
     # If it has been requested to return the ratio and not a comparison
@@ -109,11 +109,11 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     elif ratio == 1:
         return True
 
-    elif conf.matchRatio is None:
+    elif kb.matchRatio is None:
         return None
 
     else:
-        if conf.matchRatio == CONSTANT_RATIO or conf.thold:
-            return ratio > conf.matchRatio
+        if kb.matchRatio == CONSTANT_RATIO or conf.thold:
+            return ratio > kb.matchRatio
         else:
-            return (ratio - conf.matchRatio) > DIFF_TOLERANCE
+            return (ratio - kb.matchRatio) > DIFF_TOLERANCE

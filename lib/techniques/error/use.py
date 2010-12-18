@@ -13,6 +13,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
+from lib.core.common import initTechnique
 from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
@@ -30,6 +31,8 @@ def errorUse(expression):
     Retrieve the output of a SQL query taking advantage of an error SQL
     injection vulnerability on the affected parameter.
     """
+
+    initTechnique(PAYLOAD.TECHNIQUE.ERROR)
 
     output = None
     vector = agent.cleanupPayload(kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector)
