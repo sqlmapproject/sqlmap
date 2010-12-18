@@ -192,8 +192,6 @@ __functions__ = {
 
 def dictionaryAttack():
     hash_regexes = []
-    attack_info = []
-    results = []
     wordlist = []
 
     for (_, hashes) in kb.data.cachedUsersPasswords.items():
@@ -219,6 +217,9 @@ def dictionaryAttack():
 
 
     for hash_regex in hash_regexes:
+        attack_info = []
+        results = []
+
         for (user, hashes) in kb.data.cachedUsersPasswords.items():
             for hash_ in hashes:
                 if not hash_:
