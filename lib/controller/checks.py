@@ -73,10 +73,14 @@ def checkSqlInjection(place, parameter, value):
     # successfully inject
     injection = injectionDict()
 
-    # Clear cookies after each query page attempt
+    # Set the flag for sql injection test mode
     kb.testMode = True
 
     for test in conf.tests:
+        # Check if there were any premature detection cancellation request
+        if not kb.testMode:
+            break
+
         try:
             title = test.title
             stype = test.stype
@@ -402,12 +406,15 @@ def checkSqlInjection(place, parameter, value):
             warnMsg = "Ctrl+C detected in detection phase"
             logger.warn(warnMsg)
 
-            message = "How do you want to proceed? [(S)kip test/(n)ext parameter/(q)uit]"
+            message = "How do you want to proceed? [(S)kip test/(e)nd detection phase/(n)ext parameter/(q)uit]"
             test = readInput(message, default="S")
 
             if not test or test[0] in ("s", "S"):
                 pass
             elif test[0] in ("n", "N"):
+                break
+            elif test[0] in ("e", "E"):
+                kb.testMode = False
                 break
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
