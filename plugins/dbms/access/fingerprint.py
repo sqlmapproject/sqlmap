@@ -12,6 +12,7 @@ import re
 from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
+from lib.core.common import getCurrentThreadData
 from lib.core.common import getHtmlErrorFp
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -93,7 +94,8 @@ class Fingerprint(GenericFingerprint):
         _ = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
 
         if wasLastRequestDBMSError():
-            match = re.search("Could not find file\s+'([^']+?)'", kb.lastErrorPage[1])
+            threadData = getCurrentThreadData()
+            match = re.search("Could not find file\s+'([^']+?)'", threadData.lastErrorPage[1])
 
             if match:
                 retVal = match.group(1).rstrip("%s.mdb" % randStr)

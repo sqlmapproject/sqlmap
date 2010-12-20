@@ -37,6 +37,7 @@ from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
+from lib.core.common import ThreadData
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
 from lib.core.data import kb
@@ -1164,13 +1165,10 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.htmlFp          = []
     kb.injection       = injectionDict()
     kb.injections      = []
-    kb.lastErrorPage   = None
-    kb.lastQueryDuration = 0
-    kb.lastRequestUID  = 0
 
     kb.locks           = advancedDict()
     kb.locks.cacheLock = threading.Lock()
-    kb.locks.reqLock   = threading.Lock()
+    kb.locks.logLock   = threading.Lock()
     kb.locks.seqLock   = None
 
     kb.matchRatio      = None
@@ -1198,11 +1196,11 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.testMode        = False
     kb.testQueryCount  = 0
     kb.threadContinue  = True
+    kb.threadData      = {}
     kb.unionComment    = ""
     kb.unionCount      = None
     kb.unionPosition   = None
     kb.unionNegative   = False
-    kb.valueStack      = {}
 
     if flushAll:
         kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))

@@ -12,6 +12,7 @@ import re
 from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
+from lib.core.common import getCurrentThreadData
 from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
@@ -42,7 +43,8 @@ class htmlHandler(ContentHandler):
             if self.__match:
                 self.dbms = self.__dbms
                 self.__match = None
-                kb.lastErrorPage = (kb.lastRequestUID, self.__page)
+                threadData = getCurrentThreadData()
+                threadData.lastErrorPage = (threadData.lastRequestUID, self.__page)
 
 def htmlParser(page):
     """

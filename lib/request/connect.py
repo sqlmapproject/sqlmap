@@ -20,6 +20,7 @@ from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import extractErrorMessage
+from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
@@ -69,12 +70,8 @@ class Connect:
             delay = 0.00001 * (conf.cpuThrottle ** 2)
             time.sleep(delay)
 
-        kb.locks.reqLock.acquire()
-
-        kb.lastRequestUID += 1
-        requestID = kb.lastRequestUID
-
-        kb.locks.reqLock.release()
+        threadData = getCurrentThreadData()
+        threadData.lastRequestUID += 1
 
         url             = kwargs.get('url',           conf.url).replace(" ", "%20")
         get             = kwargs.get('get',           None)
@@ -92,7 +89,7 @@ class Connect:
 
         page            = ""
         cookieStr       = ""
-        requestMsg      = "HTTP request [#%d]:\n%s " % (requestID, conf.method)
+        requestMsg      = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, conf.method)
         requestMsg     += "%s" % urlparse.urlsplit(url)[2] or "/"
         responseMsg     = "HTTP response "
         requestHeaders  = ""
@@ -246,7 +243,7 @@ class Connect:
             except:
                 pass
 
-            responseMsg = "\n%s[#%d] (%d %s):\n" % (responseMsg, requestID, code, status)
+            responseMsg = "\n%s[#%d] (%d %s):\n" % (responseMsg, threadData.lastRequestUID, code, status)
 
             if responseHeaders:
                 logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
@@ -310,7 +307,7 @@ class Connect:
         page = getUnicode(page)
         parseResponse(page, responseHeaders)
 
-        responseMsg += "[#%d] (%d %s):\n" % (requestID, code, status)
+        responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
         logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
 
         logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
@@ -355,6 +352,7 @@ class Connect:
             place = kb.injection.place
 
         payload = agent.extractPayload(value)
+        threadData = getCurrentThreadData()
 
         if payload:
             if kb.tamperFunctions:
@@ -426,7 +424,7 @@ class Connect:
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
 
-        kb.lastQueryDuration = calculateDeltaSeconds(start)
+        threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
         if conf.textOnly:
             page = getFilteredPageContent(page)
@@ -439,7 +437,7 @@ class Connect:
         if timeBasedCompare:
             return wasLastRequestDelayed()
         elif noteResponseTime:
-            kb.responseTimes.append(kb.lastQueryDuration)
+            kb.responseTimes.append(threadData.lastQueryDuration)
 
         if content or response:
             return page, headers

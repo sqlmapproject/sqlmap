@@ -1544,29 +1544,37 @@ def commonFinderOnly(initial, sequence):
 def getCurrentThreadID():
     return threading.currentThread().ident
 
-def pushValue(value):
+def getCurrentThreadData():
     """
-    Push value to the stack
+    Returns current thread's dependent data
     """
 
-    threadId = getCurrentThreadID()
-    if threadId not in kb.valueStack:
-        kb.valueStack[threadId] = []
-    kb.valueStack[threadId].append(value)
+    threadID = getCurrentThreadID()
+    if threadID not in kb.threadData:
+        kb.threadData[threadID] = ThreadData()
+    return kb.threadData[threadID]
+
+def pushValue(value):
+    """
+    Push value to the stack (thread dependent)
+    """
+    
+    getCurrentThreadData().valueStack.append(value)
 
 def popValue():
     """
-    Pop value from the stack
+    Pop value from the stack (thread dependent)
     """
 
-    return kb.valueStack[getCurrentThreadID()].pop()
+    return getCurrentThreadData().valueStack.pop()
 
 def wasLastRequestDBMSError():
     """
     Returns True if the last web request resulted in a (recognized) DBMS error page
     """
 
-    return kb.lastErrorPage and kb.lastErrorPage[0] == kb.lastRequestUID
+    threadData = getCurrentThreadData()
+    return threadData.lastErrorPage and threadData.lastErrorPage[0] == threadData.lastRequestUID
 
 def wasLastRequestDelayed():
     """
@@ -1577,6 +1585,7 @@ def wasLastRequestDelayed():
     # affected response times should be inside +-7*stdev([normal response times])
     # (Math reference: http://www.answers.com/topic/standard-deviation)
     deviation = stdev(kb.responseTimes)
+    threadData = getCurrentThreadData()
 
     if deviation:
         if len(kb.responseTimes) < MIN_TIME_RESPONSES:
@@ -1584,9 +1593,9 @@ def wasLastRequestDelayed():
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
             logger.warn(warnMsg)
 
-        return (kb.lastQueryDuration >= average(kb.responseTimes) + 7 * deviation)
+        return (threadData.lastQueryDuration >= average(kb.responseTimes) + 7 * deviation)
     else:
-        return kb.lastQueryDuration - conf.timeSec
+        return threadData.lastQueryDuration - conf.timeSec
 
 def extractErrorMessage(page):
     """
@@ -1665,13 +1674,13 @@ def runningAsAdmin():
     return isAdmin
 
 def logHTTPTraffic(requestLogMsg, responseLogMsg):
-    kb.locks.reqLock.acquire()
+    kb.locks.logLock.acquire()
 
     dataToTrafficFile("%s\n" % requestLogMsg)
     dataToTrafficFile("%s\n" % responseLogMsg)
     dataToTrafficFile("\n%s\n\n" % (76 * '#'))
 
-    kb.locks.reqLock.release()
+    kb.locks.logLock.release()
 
 def getPageTemplate(payload, place):
     pass
