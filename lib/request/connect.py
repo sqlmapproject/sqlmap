@@ -76,18 +76,19 @@ class Connect:
 
         kb.locks.reqLock.release()
 
-        url             = kwargs.get('url',        conf.url).replace(" ", "%20")
-        get             = kwargs.get('get',        None)
-        post            = kwargs.get('post',       None)
-        method          = kwargs.get('method',     None)
-        cookie          = kwargs.get('cookie',     None)
-        ua              = kwargs.get('ua',         None)
-        direct          = kwargs.get('direct',     False)
-        multipart       = kwargs.get('multipart',  False)
-        silent          = kwargs.get('silent',     False)
-        raise404        = kwargs.get('raise404',   True)
-        auxHeaders      = kwargs.get('auxHeaders', None)
-        response        = kwargs.get('response',   False)
+        url             = kwargs.get('url',           conf.url).replace(" ", "%20")
+        get             = kwargs.get('get',           None)
+        post            = kwargs.get('post',          None)
+        method          = kwargs.get('method',        None)
+        cookie          = kwargs.get('cookie',        None)
+        ua              = kwargs.get('ua',            None)
+        direct          = kwargs.get('direct',        False)
+        multipart       = kwargs.get('multipart',     False)
+        silent          = kwargs.get('silent',        False)
+        raise404        = kwargs.get('raise404',      True)
+        auxHeaders      = kwargs.get('auxHeaders',    None)
+        response        = kwargs.get('response',      False)
+        ignoreTimeout   = kwargs.get('ignoreTimeout', False)
 
         page            = ""
         cookieStr       = ""
@@ -287,7 +288,7 @@ class Connect:
             if "BadStatusLine" not in tbMsg:
                 warnMsg += " or proxy"
 
-            if silent:
+            if silent or (ignoreTimeout and "timeout" in tbMsg):
                 return None, None
             elif kb.retriesCount < conf.retries:
                 kb.retriesCount += 1
@@ -406,7 +407,7 @@ class Connect:
 
         start = time.time()
 
-        if not content and not response and kb.nullConnection:
+        if kb.nullConnection and not content and not response and not timeBasedCompare:
             if kb.nullConnection == NULLCONNECTION.HEAD:
                 method = HTTPMETHOD.HEAD
             elif kb.nullConnection == NULLCONNECTION.RANGE:
@@ -423,7 +424,7 @@ class Connect:
                 pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
 
         if not pageLength:
-            page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404)
+            page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
 
         kb.lastQueryDuration = calculateDeltaSeconds(start)
 
