@@ -113,6 +113,18 @@ class DynamicContentItem:
         self.lineContentBefore = lineContentBefore
         self.lineContentAfter = lineContentAfter
 
+
+class ThreadData():
+    """
+    Represents thread independent data
+    """
+
+    def __init__(self):
+        self.lastErrorPage = None
+        self.lastQueryDuration = 0
+        self.lastRequestUID = 0
+        self.valueStack = []
+
 def paramToDict(place, parameters=None):
     """
     Split the parameters into names and values, check if these parameters
