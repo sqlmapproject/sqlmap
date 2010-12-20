@@ -224,12 +224,9 @@ class Fingerprint(GenericFingerprint):
                 setDbms("%s 5" % DBMS.MYSQL)
                 self.getBanner()
 
-            # Otherwise assume it is MySQL < 5.0.0
-            else:
+            elif inject.checkBooleanExpression("0=(SELECT FOUND_ROWS())"):
                 kb.dbmsVersion = ["< 5.0.0"]
-
                 setDbms("%s 4" % DBMS.MYSQL)
-
                 self.getBanner()
 
                 if not conf.extensiveFp:
@@ -249,12 +246,10 @@ class Fingerprint(GenericFingerprint):
                         kb.dbmsVersion = [">= 4.0.6", "< 4.1.0"]
                 elif inject.checkBooleanExpression("0=(SELECT FOUND_ROWS())"):
                     kb.dbmsVersion = [">= 4.0.0", "< 4.0.6"]
-                elif inject.checkBooleanExpression("CONNECTION_ID()=CONNECTION_ID()"):
-                    kb.dbmsVersion = [">= 3.23.14", "< 4.0.0"]
-                elif inject.checkBooleanExpression("USER()=USER()"):
-                    kb.dbmsVersion = [">= 3.22.11", "< 3.23.14"]
-                else:
-                    kb.dbmsVersion = ["< 3.22.11"]
+            else:
+                kb.dbmsVersion = ["< 4.0.0"]
+                setDbms("%s 3" % DBMS.MYSQL)
+                self.getBanner()
 
             return True
         else:
