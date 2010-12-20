@@ -226,7 +226,7 @@ def start():
                     elif test[0] in ("q", "Q"):
                         break
 
-                else:
+                elif not conf.scriptKiddie:
                     message += "\ndo you want to test this url? [Y/n/q]"
                     test = readInput(message, default="Y")
 

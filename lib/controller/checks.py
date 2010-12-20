@@ -594,7 +594,10 @@ def checkStability():
         logger.warn(warnMsg)
 
         message = "how do you want to proceed? [C(ontinue)/s(tring)/r(egex)/q(uit)] "
-        test = readInput(message, default="C")
+        if not conf.scriptKiddie:
+            test = readInput(message, default="C")
+        else:
+            test = None
 
         if test and test[0] in ("q", "Q"):
             raise sqlmapUserQuitException
