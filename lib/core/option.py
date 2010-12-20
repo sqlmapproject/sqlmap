@@ -1118,7 +1118,6 @@ def __setConfAttributes():
     conf.sessionFP        = None
     conf.start            = True
     conf.tests            = []
-    conf.threadContinue   = True
     conf.threadException  = False
     conf.trafficFP        = None
     conf.wFileType        = None
@@ -1198,11 +1197,12 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.technique       = None
     kb.testMode        = False
     kb.testQueryCount  = 0
+    kb.threadContinue  = True
     kb.unionComment    = ""
     kb.unionCount      = None
     kb.unionPosition   = None
     kb.unionNegative   = False
-    kb.valueStack      = []
+    kb.valueStack      = {}
 
     if flushAll:
         kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))

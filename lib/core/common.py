@@ -21,6 +21,7 @@ import urlparse
 import ntpath
 import posixpath
 import subprocess
+import threading
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
@@ -1533,14 +1534,17 @@ def pushValue(value):
     Push value to the stack
     """
 
-    kb.valueStack.append(value)
+    threadId = threading.currentThread().ident
+    if threadId not in kb.valueStack:
+        kb.valueStack[threadId] = []
+    kb.valueStack[threadId].append(value)
 
 def popValue():
     """
     Pop value from the stack
     """
 
-    return kb.valueStack.pop()
+    return kb.valueStack[threading.currentThread().ident].pop()
 
 def wasLastRequestDBMSError():
     """

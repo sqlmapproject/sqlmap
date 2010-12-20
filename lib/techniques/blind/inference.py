@@ -260,11 +260,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         iolock  = threading.Lock()
         valuelock  = threading.Lock()
         kb.locks.seqLock = threading.Lock()
-        conf.threadContinue = True
+        kb.threadContinue = True
 
         def downloadThread():
             try:
-                while conf.threadContinue:
+                while kb.threadContinue:
                     idxlock.acquire()
 
                     if index[0] >= length:
@@ -276,7 +276,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     curidx = index[0]
                     idxlock.release()
 
-                    if conf.threadContinue:
+                    if kb.threadContinue:
                         charStart = time.time()
                         val = getChar(curidx)
                         if val is None:
@@ -289,7 +289,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     currentValue = list(value)
                     valuelock.release()
 
-                    if conf.threadContinue:
+                    if kb.threadContinue:
                         if showEta:
                             etaProgressUpdate(time.time() - charStart, index[0])
                         elif conf.verbose >= 1:
@@ -327,7 +327,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
                             iolock.release()
 
-                if not conf.threadContinue:
+                if not kb.threadContinue:
                     if int(threading.currentThread().getName()) == numThreads - 1:
                         partialValue = unicode()
                         for v in value:
@@ -380,7 +380,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         alive = True
                         thread.join(5)
         except KeyboardInterrupt:
-            conf.threadContinue = False
+            kb.threadContinue = False
             raise
 
         infoMsg = None
