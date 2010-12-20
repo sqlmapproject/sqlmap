@@ -1131,11 +1131,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.data            = advancedDict()
 
-    # Injection types
-    kb.booleanTest     = None
-    kb.errorTest       = None
-    kb.stackedTest     = None
-    kb.timeTest        = None
+    # Old style injection flag
     kb.unionTest       = None
 
     # Basic back-end DBMS fingerprint
@@ -1154,8 +1150,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.hintValue       = None
     kb.htmlFp          = []
     kb.injection       = injectionDict()
-    kb.injection.parameter = None
-    kb.injection.place = None
     kb.injections      = []
     kb.lastErrorPage   = None
     kb.lastQueryDuration = 0
@@ -1169,7 +1163,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.matchRatio      = None
     kb.nullConnection  = None
     kb.pageTemplate    = None
-    kb.pageTemplates   = advancedDict()
+    kb.pageTemplates   = dict()
     kb.originalPage    = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)

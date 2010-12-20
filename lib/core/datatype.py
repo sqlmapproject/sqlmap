@@ -62,22 +62,21 @@ class advancedDict(dict):
     def __setstate__(self, dict):
         self.__dict__ = dict
 
-def injectionDict():
-    injection = advancedDict()
+class injectionDict(advancedDict):
+    def __init__(self):
+        advancedDict.__init__(self)
 
-    injection.place = None
-    injection.parameter = None
-    injection.ptype = None
-    injection.prefix = None
-    injection.suffix = None
-    injection.clause = None
+        self.place = None
+        self.parameter = None
+        self.ptype = None
+        self.prefix = None
+        self.suffix = None
+        self.clause = None
 
-    # data is a dict with stype as key and a tuple as value with
-    # title, where, comment and reqPayload
-    injection.data = advancedDict()
+        # data is a dict with stype as key and a tuple as value with
+        # title, where, comment and reqPayload
+        self.data = advancedDict()
 
-    injection.dbms = None
-    injection.dbms_version = None
-    injection.os = None
-
-    return injection
+        self.dbms = None
+        self.dbms_version = None
+        self.os = None
