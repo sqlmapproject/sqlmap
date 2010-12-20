@@ -1541,18 +1541,18 @@ def longestCommonPrefix(*sequences):
 def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
 
-def getCurrentThreadID():
-    return threading.currentThread().ident
+def getCurrentThreadUID():
+    return hash(threading.currentThread())
 
 def getCurrentThreadData():
     """
     Returns current thread's dependent data
     """
 
-    threadID = getCurrentThreadID()
-    if threadID not in kb.threadData:
-        kb.threadData[threadID] = ThreadData()
-    return kb.threadData[threadID]
+    threadUID = getCurrentThreadUID()
+    if threadUID not in kb.threadData:
+        kb.threadData[threadUID] = ThreadData()
+    return kb.threadData[threadUID]
 
 def pushValue(value):
     """
