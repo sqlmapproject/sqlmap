@@ -244,7 +244,7 @@ class Fingerprint(GenericFingerprint):
                         kb.dbmsVersion = ["= 4.1.0"]
                     else:
                         kb.dbmsVersion = [">= 4.0.6", "< 4.1.0"]
-                elif inject.checkBooleanExpression("0=(SELECT FOUND_ROWS())"):
+                else:
                     kb.dbmsVersion = [">= 4.0.0", "< 4.0.6"]
             else:
                 kb.dbmsVersion = ["< 4.0.0"]
