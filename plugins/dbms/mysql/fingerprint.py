@@ -170,7 +170,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming MySQL"
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("ISNULL(1 DIV 0)")
+            result = inject.checkBooleanExpression("USER()=USER()")
 
             if not result:
                 warnMsg = "the back-end DBMS is not MySQL"
