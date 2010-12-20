@@ -560,7 +560,8 @@ def cmdLineParser():
         (args, _) = parser.parse_args(args)
 
         if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile\
-            and not args.requestFile and not args.updateAll and not args.smokeTest and not args.liveTest:
+            and not args.requestFile and not args.updateAll and not args.smokeTest and not args.liveTest\
+            and not args.scriptKiddie:
             errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)

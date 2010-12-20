@@ -660,6 +660,7 @@ def setPaths():
     paths.COMMON_COLUMNS         = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
+    paths.DORKS                  = os.path.join(paths.SQLMAP_TXT_PATH, "dorks.txt")
     paths.SQL_KEYWORDS           = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
     paths.ORACLE_DEFAULT_PASSWD  = os.path.join(paths.SQLMAP_TXT_PATH, "oracle-default-passwords.txt")
     paths.WORDLIST               = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
