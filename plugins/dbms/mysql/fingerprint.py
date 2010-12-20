@@ -224,7 +224,7 @@ class Fingerprint(GenericFingerprint):
                 setDbms("%s 5" % DBMS.MYSQL)
                 self.getBanner()
 
-            elif inject.checkBooleanExpression("0=(SELECT FOUND_ROWS())"):
+            elif inject.checkBooleanExpression("(SELECT FOUND_ROWS())>=0"):
                 kb.dbmsVersion = ["< 5.0.0"]
                 setDbms("%s 4" % DBMS.MYSQL)
                 self.getBanner()
