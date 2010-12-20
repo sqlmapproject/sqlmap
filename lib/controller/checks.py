@@ -396,7 +396,7 @@ def checkSqlInjection(place, parameter, value):
                                 elif detailKey == "os" and injection.os is None:
                                     injection.os = detailValue
 
-                        if conf.beep:
+                        if conf.beep or conf.scriptKiddie:
                             beep()
 
                         # There is no need to perform this test for other

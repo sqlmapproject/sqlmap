@@ -196,7 +196,7 @@ class Connect:
             if hasattr(conn, "setcookie"):
                 kb.redirectSetCookie = conn.setcookie
 
-            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled:
+            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled and not conf.scriptKiddie:
                 msg  = "sqlmap got a %d redirect to " % conn.redcode
                 msg += "%s - What target address do you " % conn.redurl
                 msg += "want to use from now on? %s " % conf.url
