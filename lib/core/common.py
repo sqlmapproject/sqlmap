@@ -1529,12 +1529,15 @@ def longestCommonPrefix(*sequences):
 def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
 
+def getCurrentThreadID():
+    return threading.currentThread().ident
+
 def pushValue(value):
     """
     Push value to the stack
     """
 
-    threadId = threading.currentThread().ident
+    threadId = getCurrentThreadID()
     if threadId not in kb.valueStack:
         kb.valueStack[threadId] = []
     kb.valueStack[threadId].append(value)
@@ -1544,7 +1547,7 @@ def popValue():
     Pop value from the stack
     """
 
-    return kb.valueStack[threading.currentThread().ident].pop()
+    return kb.valueStack[getCurrentThreadID()].pop()
 
 def wasLastRequestDBMSError():
     """
