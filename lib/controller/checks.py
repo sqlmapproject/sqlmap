@@ -463,6 +463,8 @@ def heuristicCheckSqlInjection(place, parameter, value):
         infoMsg += "not be injectable"
         logger.warn(infoMsg)
 
+    return result
+
 def checkDynParam(place, parameter, value):
     """
     This function checks if the url parameter is dynamic. If it is

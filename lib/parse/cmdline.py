@@ -532,6 +532,9 @@ def cmdLineParser():
         parser.add_option("--technique", dest="technique", type="int",
                           default=False, help=SUPPRESS_HELP)
 
+        parser.add_option("--script-kiddie", dest="scriptKiddie", action="store_true",
+                          default=False, help=SUPPRESS_HELP)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(optimization)

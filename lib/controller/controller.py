@@ -339,7 +339,9 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
-                            heuristicCheckSqlInjection(place, parameter, value)
+                            check = heuristicCheckSqlInjection(place, parameter, value)
+                            if not check and conf.scriptKiddie:
+                                continue
 
                             logMsg  = "testing sql injection on %s " % place
                             logMsg += "parameter '%s'" % parameter
