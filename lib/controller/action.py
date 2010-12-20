@@ -31,7 +31,7 @@ def action():
     # system to be able to go ahead with the injection
     setHandler()
 
-    if not kb.dbmsDetected and conf.dbmsHandler:
+    if not kb.dbmsDetected or not conf.dbmsHandler:
         htmlParsed = getHtmlErrorFp()
 
         errMsg  = "sqlmap was not able to fingerprint the "
