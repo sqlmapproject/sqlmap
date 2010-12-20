@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import threading
 import time
 
 from lib.core.common import clearConsoleLine
@@ -29,27 +30,59 @@ def tableExists(tableFile):
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
 
-    count = 0
+    count = [0]
     length = len(tables)
+    threads = []
+    tbllock = threading.Lock()
+    iolock = threading.Lock()
+    kb.locks.seqLock = threading.Lock()
+    kb.threadContinue = True
+    
+    def tableExistsThread():
+        while count[0] < length and kb.threadContinue:
+            tbllock.acquire()
+            table = tables[count[0]]
+            count[0] += 1
+            tbllock.release()
 
-    for table in tables:
-        if conf.db and not conf.db.endswith(METADB_SUFFIX):
-            table = "%s.%s" % (conf.db, table)
-        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
+            if conf.db and not conf.db.endswith(METADB_SUFFIX):
+                table = "%s.%s" % (conf.db, table)
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
 
-        if result:
-            retVal.append(table)
+            iolock.acquire()
+            if result:
+                retVal.append(table)
+
+                if conf.verbose in (1, 2):
+                    clearConsoleLine(True)
+                    infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), table)
+                    dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                clearConsoleLine(True)
-                infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), table)
-                dataToStdout(infoMsg, True)
+                status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
+                dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+            iolock.release()
 
-        count += 1
+    # Start the threads
+    for numThread in range(conf.threads):
+        thread = threading.Thread(target=tableExistsThread, name=str(numThread))
+        thread.start()
+        threads.append(thread)
 
-        if conf.verbose in (1, 2):
-            status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
-            dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+    # And wait for them to all finish
+    try:
+        alive = True
+        while alive:
+            alive = False
+            for thread in threads:
+                if thread.isAlive():
+                    alive = True
+                    thread.join(5)
+    except KeyboardInterrupt:
+        kb.threadContinue = False
+        raise
+    finally:
+        kb.locks.seqLock = None
 
     clearConsoleLine(True)
 
