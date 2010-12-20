@@ -99,49 +99,14 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming Microsoft SQL Server"
             logger.info(infoMsg)
 
-            for version in (0, 5, 8):
-                randInt = randomInt()
-                check   = "%d=(SELECT (CASE WHEN (( SUBSTRING((@@VERSION), 22, 1)=2 AND SUBSTRING((@@VERSION), 25, 1)=%d ) OR ( SUBSTRING((@@VERSION), 23, 1)=2 AND SUBSTRING((@@VERSION), 26, 1)=%d )) THEN %d ELSE %d END))" % (randInt, version, version, randInt, (randInt + 1))
-
-                if conf.direct:
-                    check = "SELECT 1 WHERE " + check
-
+            for version, check in [\
+                    ("2000", "HOST_NAME()=HOST_NAME()"),\
+                    ("2005", "XACT_STATE()=XACT_STATE()"),\
+                    ("2008", "SYSDATETIME()>0") ]:
                 result = inject.checkBooleanExpression(check)
 
                 if result:
-                    if version == 8:
-                        kb.dbmsVersion = ["2008"]
-
-                        break
-
-                    elif version == 5:
-                        kb.dbmsVersion = ["2005"]
-
-                        break
-
-                    elif version == 0:
-                        kb.dbmsVersion = ["2000"]
-
-                        break
-
-                    else:
-                        check   = "%d=(SELECT (CASE WHEN (SUBSTRING((@@VERSION), 22, 1)=7) THEN %d ELSE %d END))" % (randInt, randInt, (randInt + 1))
-                        result = inject.checkBooleanExpression(check)
-
-                        if result:
-                            kb.dbmsVersion = ["7.0"]
-
-                        break
-
-            if not kb.dbmsVersion or kb.dbmsVersion == [UNKNOWN_DBMS_VERSION]:
-                for version, check in [\
-                        ("2000", "HOST_NAME()=HOST_NAME()"),\
-                        ("2005", "XACT_STATE()=XACT_STATE()"),\
-                        ("2008", "SYSDATETIME()>0") ]:
-                    result = inject.checkBooleanExpression(check)
-
-                    if result:
-                        kb.dbmsVersion = [version]
+                    kb.dbmsVersion = [version]
 
             if kb.dbmsVersion:
                 setDbms("%s %s" % (DBMS.MSSQL, kb.dbmsVersion[0]))
