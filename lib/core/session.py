@@ -157,42 +157,6 @@ def setOs():
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(kb.os)))
 
-def setBooleanBased(place, parameter, payload):
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Boolean-based blind injection") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Boolean-based blind injection][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
-
-def setStacked(place, parameter, payload):
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Stacked queries") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Stacked queries][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
-
-def setError(place, parameter, payload):
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Error-based injection") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Error-based injection][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
-
-def setTimeBased(place, parameter, payload):
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Time-based blind injection") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Time-based blind injection][%s]\n" % (conf.url, place, safeFormatString(conf.parameters[place]), payload))
-
 def setUnion(comment=None, count=None, position=None, negative=False, char=None, payload=None):
     """
     @param comment: union comment to save in session file
