@@ -16,6 +16,7 @@ from difflib import SequenceMatcher
 from lib.core.agent import agent
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
+from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -448,8 +449,8 @@ def heuristicCheckSqlInjection(place, parameter, value):
 
     payload = "%s%s%s%s" % (value, prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
     payload = agent.payload(place, parameter, value, payload)
-    Request.queryPage(payload, place, raise404=False)
-    result = wasLastRequestDBMSError()
+    page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+    result = wasLastRequestDBMSError() or getCompiledRegex('(Error)|(Warning)|(Exception)', re.I|re.M).search(page)
 
     infoMsg  = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
