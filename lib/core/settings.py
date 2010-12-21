@@ -52,8 +52,8 @@ CHAR_INFERENCE_MARK = "%c"
 # coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF    = 10
 
-# maximum number of techniques used in inject.py/getValue() before deciding 'None' value
-MAX_TECHNIQUES_BEFORE_NONE = 2
+# maximum number of techniques used in inject.py/getValue() per one value
+MAX_TECHNIQUES_PER_VALUE = 2
 
 # suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX       = "_masterdb"

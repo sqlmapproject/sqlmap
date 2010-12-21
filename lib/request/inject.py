@@ -35,7 +35,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.settings import MIN_TIME_RESPONSES
-from lib.core.settings import MAX_TECHNIQUES_BEFORE_NONE
+from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -422,7 +422,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goInband(query, expected, sort, resumeValue, unpack, dump)
 
                 count += 1
-                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_BEFORE_NONE
+                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             oldUnionNegative = kb.unionNegative
             kb.unionNegative = False
@@ -436,7 +436,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goError(query, resumeValue)
 
                 count += 1
-                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_BEFORE_NONE
+                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
@@ -447,7 +447,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
                 count += 1
-                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_BEFORE_NONE
+                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             if time and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)) and not found:
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
