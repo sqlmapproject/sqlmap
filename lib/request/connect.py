@@ -265,7 +265,7 @@ class Connect:
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
             tbMsg = traceback.format_exc()
-            
+
             if "no host given" in tbMsg:
                 warnMsg = "invalid url address used (%s)" % repr(url)
                 raise sqlmapSyntaxException, warnMsg

@@ -37,7 +37,7 @@ def tableExists(tableFile):
     iolock = threading.Lock()
     kb.locks.seqLock = threading.Lock()
     kb.threadContinue = True
-    
+
     def tableExistsThread():
         while count[0] < length and kb.threadContinue:
             tbllock.acquire()

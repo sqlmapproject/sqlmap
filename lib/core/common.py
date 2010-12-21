@@ -1558,7 +1558,7 @@ def pushValue(value):
     """
     Push value to the stack (thread dependent)
     """
-    
+
     getCurrentThreadData().valueStack.append(value)
 
 def popValue():
@@ -1761,7 +1761,7 @@ def removeDynamicContent(page):
 
 def filterStringValue(value, regex):
     retVal = ""
-    
+
     if value:
         for char in value:
             if re.search(regex, char):

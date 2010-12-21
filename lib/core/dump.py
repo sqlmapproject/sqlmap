@@ -172,7 +172,7 @@ class Dump:
                 self.__write("+%s+\n" % lines)
         else:
             self.string("tables", dbTables)
-        
+
     def dbTableColumns(self, tableColumns):
         for db, tables in tableColumns.items():
             if not db:
