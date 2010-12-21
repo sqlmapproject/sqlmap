@@ -477,7 +477,7 @@ def checkDynParam(place, parameter, value):
 
     randInt = randomInt()
     payload = agent.payload(place, parameter, value, getUnicode(randInt))
-    dynResult = Request.queryPage(payload, place)
+    dynResult = Request.queryPage(payload, place, raise404=False)
 
     if True == dynResult:
         return False
@@ -487,7 +487,7 @@ def checkDynParam(place, parameter, value):
 
     randInt = randomInt()
     payload = agent.payload(place, parameter, value, getUnicode(randInt))
-    dynResult = Request.queryPage(payload, place)
+    dynResult = Request.queryPage(payload, place, raise404=False)
 
     return not dynResult
 
