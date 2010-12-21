@@ -78,6 +78,7 @@ def checkSqlInjection(place, parameter, value):
 
     for test in conf.tests:
         # Check if there were any premature detection cancellation request
+        # from the user (Ctrl+C)
         if not kb.testMode:
             break
 
