@@ -19,6 +19,7 @@ from lib.contrib import multipartpost
 from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import clearConsoleLine
 from lib.core.common import extractErrorMessage
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
@@ -391,6 +392,8 @@ class Connect:
 
         if timeBasedCompare:
             if len(kb.responseTimes) < MIN_TIME_RESPONSES:
+                clearConsoleLine()
+
                 warnMsg = "time-based comparison needs larger statistical "
                 warnMsg += "model. Making a few dummy requests, please wait.."
                 logger.warn(warnMsg)
