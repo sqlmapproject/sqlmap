@@ -61,6 +61,6 @@ def errorUse(expression):
 
     if output:
         output = output.replace(kb.misc.space, " ")
-        dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
+        dataToStdout("[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
 
     return output
