@@ -35,6 +35,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import MAX_TECHNIQUES_BEFORE_NONE
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -402,6 +403,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             value = None
             found = False
             query = query.replace("DISTINCT ", "")
+            count = 0
 
             if expected == EXPECTED.BOOL:
                 forgeCaseExpression = booleanExpression = expression
@@ -419,7 +421,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 else:
                     value = __goInband(query, expected, sort, resumeValue, unpack, dump)
 
-                found = value or (value is None and expectingNone)
+                count += 1
+                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_BEFORE_NONE
 
             oldUnionNegative = kb.unionNegative
             kb.unionNegative = False
@@ -432,7 +435,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 else:
                     value = __goError(query, resumeValue)
 
-                found = value or (value is None and expectingNone)
+                count += 1
+                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_BEFORE_NONE
 
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
@@ -442,7 +446,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 else:
                     value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
-                found = value or (value is None and expectingNone)
+                count += 1
+                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_BEFORE_NONE
 
             if time and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)) and not found:
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
