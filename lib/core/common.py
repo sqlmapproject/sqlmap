@@ -1759,12 +1759,30 @@ def removeDynamicContent(page):
 
     return page
 
+def filterStringValue(value, regex):
+    retVal = ""
+    
+    if value:
+        for char in value:
+            if re.search(regex, char):
+                retVal += char
+
+    return retVal
 
 def isDBMSVersionAtLeast(version):
     retVal = None
 
     if kb.dbmsVersion and kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION and kb.dbmsVersion[0] != None:
-        value = kb.dbmsVersion[0].replace(" ", "")
+        value = kb.dbmsVersion[0].replace(" ", "").rstrip('.')
+
+        while True:
+            index = value.find('.', value.find('.') + 1)
+            if index > -1:
+                value = value[0:index] + value[index + 1:]
+            else:
+                break
+
+        value = filterStringValue(value, '[0-9.><=]')
 
         if isinstance(value, basestring):
             if value.startswith(">="):
