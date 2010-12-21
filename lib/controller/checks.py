@@ -78,11 +78,6 @@ def checkSqlInjection(place, parameter, value):
     kb.testMode = True
 
     for test in conf.tests:
-        # Check if there were any premature detection cancellation request
-        # from the user (Ctrl+C)
-        if not kb.testMode:
-            break
-
         try:
             title = test.title
             stype = test.stype
@@ -416,7 +411,7 @@ def checkSqlInjection(place, parameter, value):
             elif test[0] in ("n", "N"):
                 break
             elif test[0] in ("e", "E"):
-                kb.testMode = False
+                kb.endDetection = True
                 break
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException

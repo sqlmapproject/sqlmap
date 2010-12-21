@@ -351,6 +351,12 @@ def start():
 
                             injection = checkSqlInjection(place, parameter, value)
 
+                            proceed = not kb.endDetection
+
+                            # In case when user wants to end detection phase (Ctrl+C)
+                            if not proceed:
+                                break
+
                             if injection is not None and injection.place is not None:
                                 kb.injections.append(injection)
 
