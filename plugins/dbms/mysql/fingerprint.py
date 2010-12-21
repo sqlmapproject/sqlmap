@@ -183,9 +183,7 @@ class Fingerprint(GenericFingerprint):
             if inject.checkBooleanExpression("EXISTS(SELECT %s FROM information_schema.TABLES)" % randInt):
                 kb.data.has_information_schema = True
                 kb.dbmsVersion = [">= 5.0.0"]
-
                 setDbms("%s 5" % DBMS.MYSQL)
-
                 self.getBanner()
 
                 if not conf.extensiveFp:

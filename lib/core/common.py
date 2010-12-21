@@ -1822,9 +1822,11 @@ def isTechniqueAvailable(technique=None):
 
 def initTechnique(technique=None):
     data = getTechniqueData(technique)
+
     if data:
         kb.pageTemplate = getPageTemplate(data.templatePayload, kb.injection.place)
         kb.matchRatio = data.matchRatio
     else:
-        warnMsg = "there is no injection data available for technique '%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
+        warnMsg = "there is no injection data available for technique "
+        warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
         logger.warn(warnMsg)

@@ -87,8 +87,8 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing Microsoft SQL Server"
         logger.info(infoMsg)
 
-        # NOTE: SELECT LEN(@@VERSION)=LEN(@@VERSION) FROM DUAL does not work connecting
-        # directly to the Microsoft SQL Server database
+        # NOTE: SELECT LEN(@@VERSION)=LEN(@@VERSION) FROM DUAL does not
+        # work connecting directly to the Microsoft SQL Server database
         if conf.direct:
             result = True
         else:
