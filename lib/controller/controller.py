@@ -367,9 +367,13 @@ def start():
                                 logger.warn(warnMsg)
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
-                errMsg = "all parameters are not injectable, try "
-                errMsg += "a higher --level"
-                raise sqlmapNotVulnerableException, errMsg
+                if not conf.scriptKiddie:
+                    errMsg = "all parameters are not injectable, try "
+                    errMsg += "a higher --level"
+                    raise sqlmapNotVulnerableException, errMsg
+                else:
+                    errMsg = "it seems that all parameters are not injectable"
+                    raise sqlmapNotVulnerableException, errMsg                
             else:
                 __saveToSessionFile()
                 __showInjections()

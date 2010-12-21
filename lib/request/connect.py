@@ -287,7 +287,7 @@ class Connect:
 
             if silent or (ignoreTimeout and "timeout" in tbMsg):
                 return None, None
-            elif kb.retriesCount < conf.retries and not conf.threadException:
+            elif kb.retriesCount < conf.retries and not conf.threadException and not conf.scriptKiddie:
                 kb.retriesCount += 1
 
                 warnMsg += ", sqlmap is going to retry the request"
