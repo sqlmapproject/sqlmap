@@ -390,8 +390,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     """
 
     if suppressOutput:
-        pushValue(conf.verbose)
-        conf.verbose = 0
+        kb.disableStdOut = True
 
     try:
         if conf.direct:
@@ -467,7 +466,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
     finally:
         if suppressOutput:
-            conf.verbose = popValue()
+            kb.disableStdOut = False
 
     if value and expected == EXPECTED.BOOL:
         if isinstance(value, basestring):

@@ -80,7 +80,17 @@ def tableExists(tableFile):
                     thread.join(5)
     except KeyboardInterrupt:
         kb.threadContinue = False
-        raise
+        kb.threadException = True
+
+        print
+        logger.debug("waiting for threads to finish")
+
+        try:
+            while (threading.activeCount() > 1):
+                pass
+
+        except KeyboardInterrupt:
+            raise sqlmapThreadException, "user aborted"
     finally:
         kb.locks.seqLock = None
 

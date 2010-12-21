@@ -1119,7 +1119,6 @@ def __setConfAttributes():
     conf.sessionFP        = None
     conf.start            = True
     conf.tests            = []
-    conf.threadException  = False
     conf.trafficFP        = None
     conf.wFileType        = None
 
@@ -1144,6 +1143,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.commonOutputs   = None
 
     kb.data            = advancedDict()
+    kb.disableStdOut   = False
 
     # Old style injection flag
     kb.unionTest       = None
@@ -1196,6 +1196,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.testMode        = False
     kb.testQueryCount  = 0
     kb.threadContinue  = True
+    kb.threadException = False
     kb.threadData      = {}
     kb.unionComment    = ""
     kb.unionCount      = None

@@ -11,6 +11,7 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
@@ -60,9 +61,6 @@ def errorUse(expression):
 
     if output:
         output = output.replace(kb.misc.space, " ")
-
-        if conf.verbose > 0:
-            infoMsg = "retrieved: %s" % replaceNewlineTabs(output, stdout=True)
-            logger.info(infoMsg)
+        dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
 
     return output

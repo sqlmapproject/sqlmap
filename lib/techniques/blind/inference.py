@@ -341,11 +341,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             except (sqlmapConnectionException, sqlmapValueException), errMsg:
                 print
-                conf.threadException = True
+                kb.threadException = True
                 logger.error("thread %d: %s" % (numThread + 1, errMsg))
 
             except KeyboardInterrupt:
-                conf.threadException = True
+                kb.threadException = True
 
                 print
                 logger.debug("waiting for threads to finish")
@@ -359,7 +359,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             except:
                 print
-                conf.threadException = True
+                kb.threadException = True
                 errMsg = unhandledException()
                 logger.error("thread %d: %s" % (numThread + 1, errMsg))
                 traceback.print_exc()
@@ -505,7 +505,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     if not partialValue:
         dataToSessionFile("]\n")
 
-    if conf.threadException:
+    if kb.threadException:
         raise sqlmapThreadException, "something unexpected happened inside the threads"
 
     return queriesCount[0], finalValue

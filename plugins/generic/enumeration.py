@@ -299,8 +299,7 @@ class Enumeration:
                             break
                         else:
                             query = rootQuery.blind.query % user
-                            pushValue(conf.verbose)
-                            conf.verbose = 0
+                            kb.disableStdOut = True
                     elif kb.dbms == DBMS.MSSQL:
                         if kb.dbmsVersion[0] in ( "2005", "2008" ):
                             query = rootQuery.blind.query2 % (user, index, user)
@@ -310,7 +309,7 @@ class Enumeration:
                         query = rootQuery.blind.query % (user, index)
                     password = inject.getValue(query, inband=False)
                     if kb.dbms == DBMS.SYBASE:
-                        conf.verbose = popValue()
+                        kb.disableStdOut = False
                         password = "0x%s" % strToHex(password)
                         infoMsg = "retrieved: %s" % password
                         logger.info(infoMsg)

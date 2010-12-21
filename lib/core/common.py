@@ -427,7 +427,9 @@ def filePathToString(filePath):
     return strRepl
 
 def dataToStdout(data, forceOutput=False):
-    if forceOutput or conf.verbose > 0:
+    if (forceOutput or conf.verbose > 0)\
+        and not ('threadException' in kb and kb.threadException)\
+        and not ('disableStdOut' in kb and kb.disableStdOut):
         try:
             sys.stdout.write(data)
             sys.stdout.flush()
