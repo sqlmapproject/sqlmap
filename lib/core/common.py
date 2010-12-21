@@ -71,6 +71,7 @@ from lib.core.settings import DUMP_TAB_MARKER
 from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import TIME_STDEV_COEFF
 
 class UnicodeRawConfigParser(RawConfigParser):
     """
@@ -1595,7 +1596,7 @@ def wasLastRequestDelayed():
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
             logger.warn(warnMsg)
 
-        return (threadData.lastQueryDuration >= average(kb.responseTimes) + 7 * deviation)
+        return (threadData.lastQueryDuration >= average(kb.responseTimes) + TIME_STDEV_COEFF * deviation)
     else:
         return threadData.lastQueryDuration - conf.timeSec
 

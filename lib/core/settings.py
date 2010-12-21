@@ -49,7 +49,8 @@ DUMP_STOP_MARKER    = "__STOP__"
 PAYLOAD_DELIMITER   = "\x00"
 CHAR_INFERENCE_MARK = "%c"
 
-UNKNOWN_DBMS_VERSION = "Unknown"
+# coefficient used for a time-based query delay checking (must be >= 7)
+TIME_STDEV_COEFF    = 10
 
 # suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX       = "_masterdb"
@@ -59,6 +60,9 @@ MIN_TIME_RESPONSES  = 15
 
 # after these number of blanks at the end inference should stop (just in case)
 INFERENCE_BLANK_BREAK = 10
+
+# string used for representation of unknown dbms version
+UNKNOWN_DBMS_VERSION = "Unknown"
 
 # System variables
 IS_WIN             = subprocess.mswindows
