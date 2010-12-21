@@ -294,7 +294,8 @@ def resumeConfKb(expression, url, value):
         logMsg = "resuming injection data from session file"
         logger.info(logMsg)
 
-        if injection.parameter in conf.paramDict[injection.place]:
+        if injection.place in conf.paramDict and\
+          injection.parameter in conf.paramDict[injection.place]:
             kb.injections.append(injection)
         else:
             warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
