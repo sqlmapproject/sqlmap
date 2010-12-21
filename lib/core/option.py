@@ -311,7 +311,7 @@ def __setScriptKiddie():
         return
 
     dorks = getFileItems(paths.DORKS)
-    conf.googleDork = "inurl:%s" % dorks[randomRange(0, len(dorks) - 1)]
+    conf.googleDork = dorks[randomRange(0, len(dorks) - 1)]
     conf.multipleTargets = True
 
     logMsg = "setting random google dork to: '%s'" % conf.googleDork
