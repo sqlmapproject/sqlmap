@@ -8,6 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
+from lib.core.common import getUnicode
+from lib.core.common import parseUnionPage
 from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import kb
@@ -45,6 +47,22 @@ def __unionPosition(negative=False, count=None, comment=None):
         if resultPage and randQuery in resultPage:
             setUnion(position=exprPosition)
             validPayload = payload
+
+            if not negative:
+                # Prepare expression with delimiters
+                randQuery2 = randomStr()
+                randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
+                randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
+
+                # Confirm that it is a full inband SQL injection
+                query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition, count=count, comment=comment, multipleUnions=randQueryUnescaped2)
+                payload = agent.payload(newValue=query, negative=negative)
+
+                # Perform the request
+                resultPage, _ = Request.queryPage(payload, content=True)
+
+                if resultPage and (randQuery not in resultPage or randQuery2 not in resultPage):
+                    setUnion(negative=True)
 
             break
 
