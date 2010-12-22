@@ -353,12 +353,12 @@ def start():
 
                             proceed = not kb.endDetection
 
-                            # In case when user wants to end detection phase (Ctrl+C)
-                            if not proceed:
-                                break
-
                             if injection is not None and injection.place is not None:
                                 kb.injections.append(injection)
+
+                                # In case when user wants to end detection phase (Ctrl+C)
+                                if not proceed:
+                                    break
 
                                 msg = "%s parameter '%s' " % (injection.place, injection.parameter)
                                 msg += "is vulnerable. Do you want to keep testing the others? [y/N] "
