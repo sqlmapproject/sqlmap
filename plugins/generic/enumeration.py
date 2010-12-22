@@ -684,7 +684,10 @@ class Enumeration:
             value = inject.getValue(query, blind=False, error=False)
 
             if value:
-                kb.data.cachedDbs = value
+                if isinstance(value, basestring):
+                    kb.data.cachedDbs = [value]
+                else:
+                    kb.data.cachedDbs = value
 
         if not kb.data.cachedDbs and not conf.direct:
             infoMsg = "fetching number of databases"
