@@ -523,6 +523,9 @@ class Agent:
         if comment is None:
             comment = kb.unionComment
 
+        if query.startswith("SELECT "):
+            query        = query[len("SELECT "):]
+
         inbandQuery = self.prefixQuery("UNION ALL SELECT ")
 
         if query.startswith("TOP"):
