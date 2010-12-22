@@ -28,7 +28,7 @@
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="DATABASE()"/>
-        <is_dba query="(SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y'"/>
+        <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0, 1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0, 1)='%s'"/>
         <users>
             <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES ORDER BY 1" query2="SELECT user FROM mysql.user ORDER BY 1"/>

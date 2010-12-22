@@ -129,7 +129,13 @@ class Enumeration:
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
 
-        query = agent.forgeCaseStatement(queries[kb.dbms].is_dba.query)
+        if kb.dbms == DBMS.MYSQL:
+            self.getCurrentUser()
+            query = queries[kb.dbms].is_dba.query % kb.data.currentUser.split("@")[0]
+        else:
+            query = queries[kb.dbms].is_dba.query
+
+        query = agent.forgeCaseStatement(query)
 
         kb.data.isDba = inject.getValue(query, unpack=False, charsetType=1)
 
