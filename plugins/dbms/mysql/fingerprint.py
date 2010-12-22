@@ -222,7 +222,7 @@ class Fingerprint(GenericFingerprint):
                 setDbms("%s 5" % DBMS.MYSQL)
                 self.getBanner()
 
-            elif inject.checkBooleanExpression("STRCMP(CHAR(97), CHAR(65))=0"):
+            elif inject.checkBooleanExpression("STRCMP(CHAR(97), CHAR(65))=1"):
                 kb.dbmsVersion = ["< 5.0.0"]
                 setDbms("%s 4" % DBMS.MYSQL)
                 self.getBanner()
