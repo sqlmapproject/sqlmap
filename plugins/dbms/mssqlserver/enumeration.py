@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
+from lib.core.common import arrayizeValue
 from lib.core.common import getRange
 from lib.core.common import isNumPosStrValue
 from lib.core.data import conf
@@ -63,7 +64,7 @@ class Enumeration(GenericEnumeration):
                 value = inject.getValue(query, blind=False, error=False)
 
                 if value:
-                    kb.data.cachedTables[db] = value
+                    kb.data.cachedTables[db] = arrayizeValue(value)
 
         if not kb.data.cachedTables and not conf.direct:
             for db in dbs:

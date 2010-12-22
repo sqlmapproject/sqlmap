@@ -11,6 +11,7 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import arrayizeValue
 from lib.core.common import dataToStdout
 from lib.core.common import getRange
 from lib.core.common import getCompiledRegex
@@ -158,7 +159,7 @@ class Enumeration:
             value = inject.getValue(query, blind=False, error=False)
 
             if value:
-                kb.data.cachedUsers = value
+                kb.data.cachedUsers = arrayizeValue(value)
 
         if not kb.data.cachedUsers and not conf.direct:
             infoMsg = "fetching number of database users"
@@ -684,10 +685,7 @@ class Enumeration:
             value = inject.getValue(query, blind=False, error=False)
 
             if value:
-                if isinstance(value, basestring):
-                    kb.data.cachedDbs = [value]
-                else:
-                    kb.data.cachedDbs = value
+                kb.data.cachedDbs = arrayizeValue(value)
 
         if not kb.data.cachedDbs and not conf.direct:
             infoMsg = "fetching number of databases"

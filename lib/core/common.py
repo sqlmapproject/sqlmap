@@ -1833,3 +1833,8 @@ def initTechnique(technique=None):
         warnMsg = "there is no injection data available for technique "
         warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
         logger.warn(warnMsg)
+
+def arrayizeValue(value):
+    if not isinstance(value, list):
+        value = [value]
+    return value
