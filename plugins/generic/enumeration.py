@@ -749,23 +749,37 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].tables
 
+        if conf.db:
+            if "," in conf.db:
+                dbs = conf.db.split(",")
+            else:
+                dbs = [conf.db]
+        else:
+            if not len(kb.data.cachedDbs):
+                dbs = self.getDbs()
+            else:
+                dbs = kb.data.cachedDbs
+
         if kb.unionPosition is not None or conf.direct:
             query = rootQuery.inband.query
-            condition = rootQuery.inband.condition
+            condition = rootQuery.inband.condition if 'condition' in rootQuery.inband else None
 
-            if conf.db and kb.dbms != DBMS.SQLITE:
-                if "," in conf.db:
-                    dbs = conf.db.split(",")
+            if condition:
+                if conf.db and kb.dbms != DBMS.SQLITE:
+                    if "," in conf.db:
+                        dbs = conf.db.split(",")
+                        query += " WHERE "
+                        query += " OR ".join("%s = '%s'" % (condition, db) for db in dbs)
+                    else:
+                        query += " WHERE %s='%s'" % (condition, conf.db)
+                elif conf.excludeSysDbs:
                     query += " WHERE "
-                    query += " OR ".join("%s = '%s'" % (condition, db) for db in dbs)
-                else:
-                    query += " WHERE %s='%s'" % (condition, conf.db)
-            elif conf.excludeSysDbs:
-                query += " WHERE "
-                query += " AND ".join("%s != '%s'" % (condition, db) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
-                logger.info(infoMsg)
+                    query += " AND ".join("%s != '%s'" % (condition, db) for db in self.excludeDbsList)
+                    infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                    logger.info(infoMsg)
 
+            if kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                query = safeStringFormat(query, conf.db)
             value = inject.getValue(query, blind=False, error=False)
 
             if value:
@@ -787,17 +801,6 @@ class Enumeration:
                         kb.data.cachedTables[db].append(table)
 
         if not kb.data.cachedTables and not conf.direct:
-            if conf.db:
-                if "," in conf.db:
-                    dbs = conf.db.split(",")
-                else:
-                    dbs = [conf.db]
-            else:
-                if not len(kb.data.cachedDbs):
-                    dbs = self.getDbs()
-                else:
-                    dbs = kb.data.cachedDbs
-
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
