@@ -164,8 +164,6 @@ class Connect:
 
                     cookieStr += "%s; " % cookie[8:index]
 
-            conn = urllib2.urlopen(req)
-
             if not req.has_header("Accept-Encoding"):
                 requestHeaders += "Accept-Encoding: identity\n"
 
@@ -180,11 +178,13 @@ class Connect:
             requestMsg += "\n%s" % requestHeaders
 
             if post:
-                requestMsg += "\n%s" % post
+                requestMsg += "\n\n%s" % post
 
             requestMsg += "\n"
 
             logger.log(8, requestMsg)
+
+            conn = urllib2.urlopen(req)
 
             if not kb.authHeader and req.has_header("Authorization"):
                 kb.authHeader = req.get_header("Authorization")
@@ -244,12 +244,17 @@ class Connect:
             except:
                 pass
 
-            responseMsg = "\n%s[#%d] (%d %s):\n" % (responseMsg, threadData.lastRequestUID, code, status)
-
+            responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
             if responseHeaders:
                 logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
-
             logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
+
+            if conf.verbose <= 5:
+                responseMsg += getUnicode(logHeaders)
+            elif conf.verbose > 5:
+                responseMsg += "%s\n%s\n" % (logHeaders, page)
+
+            logger.log(7, responseMsg)
 
             if e.code == 401:
                 errMsg  = "not authorized, try to provide right HTTP "
@@ -309,8 +314,8 @@ class Connect:
         parseResponse(page, responseHeaders)
 
         responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
-        logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
-
+        if responseHeaders:
+            logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
         logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
         if conf.verbose <= 5:
