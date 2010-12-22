@@ -266,6 +266,7 @@ class Connect:
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
+                parseResponse(page, responseHeaders)
                 return page, responseHeaders
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:

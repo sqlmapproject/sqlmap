@@ -23,6 +23,7 @@
         <error regexp="OLE DB.*SQL Server"/>
         <error regexp="SQL Server.*Driver"/>
         <error regexp="Warning.*mssql_.*"/>
+        <error regexp="SQL Server.*[0-9a-fA-F]{8}"/>
     </dbms>
 
     <!-- Microsoft Access -->

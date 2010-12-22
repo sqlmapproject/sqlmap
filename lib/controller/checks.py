@@ -444,7 +444,8 @@ def heuristicCheckSqlInjection(place, parameter, value):
 
     payload = "%s%s%s%s" % (value, prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
     payload = agent.payload(place, parameter, value, payload)
-    page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+    Request.queryPage(payload, place, content=False, raise404=False)
+
     result = wasLastRequestDBMSError()
 
     infoMsg  = "heuristic test shows that %s " % place
