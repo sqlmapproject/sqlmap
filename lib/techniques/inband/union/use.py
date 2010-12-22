@@ -79,7 +79,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms == DBMS.MSSQL:
+                elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
                     limitGroupStart = queries[kb.dbms].limitgroupstart.query
                     limitGroupStop  = queries[kb.dbms].limitgroupstop.query
 
@@ -108,7 +108,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                         untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
                         expression = expression[:untilLimitChar]
 
-                    elif kb.dbms == DBMS.MSSQL:
+                    elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
                         stopLimit += startLimit
                 elif dump:
                     if conf.limitStart:
@@ -171,7 +171,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                         return
 
                     for num in xrange(startLimit, stopLimit):
-                        if kb.dbms == DBMS.MSSQL:
+                        if kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
                             field = expressionFieldsList[0]
                         elif kb.dbms == DBMS.ORACLE:
                             field = expressionFieldsList

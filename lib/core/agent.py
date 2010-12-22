@@ -393,7 +393,7 @@ class Agent:
         elif kb.dbms in ( DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE ):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
-        elif kb.dbms == DBMS.MSSQL:
+        elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
             concatenatedQuery = "%s+%s" % (query1, query2)
 
         return concatenatedQuery
@@ -464,7 +464,7 @@ class Agent:
             if kb.dbms == DBMS.ORACLE and " FROM " not in concatenatedQuery and ( fieldsSelect or fieldsNoSelect ):
                 concatenatedQuery += " FROM DUAL"
 
-        elif kb.dbms == DBMS.MSSQL:
+        elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
             if fieldsSelectTop:
                 topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatenatedQuery, re.I).group(1)
                 concatenatedQuery = concatenatedQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, kb.misc.start), 1)
@@ -619,7 +619,7 @@ class Agent:
             limitedQuery  = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
-        elif kb.dbms == DBMS.MSSQL:
+        elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
             forgeNotIn = True
 
             if " ORDER BY " in limitedQuery:
