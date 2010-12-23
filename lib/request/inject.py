@@ -112,6 +112,7 @@ def __goBooleanProxy(expression, resumeValue=True):
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
+    timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
 
     if resumeValue:
         output = resume(expression, payload)
@@ -119,7 +120,7 @@ def __goBooleanProxy(expression, resumeValue=True):
         output = None
 
     if not output:
-        output = Request.queryPage(payload)
+        output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare)
 
     return output
 
