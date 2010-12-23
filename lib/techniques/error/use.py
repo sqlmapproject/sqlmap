@@ -52,12 +52,9 @@ def errorUse(expression):
     expression = unescaper.unescape(expression)
     expression = query.replace("[QUERY]", expression)
 
-    #debugMsg = "query: %s" % expression
-    #logger.debug(debugMsg)
-
     payload = agent.payload(newValue=expression)
-    reqBody, _ = Request.queryPage(payload, content=True)
-    output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
+    page, _ = Request.queryPage(payload, content=True)
+    output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE)
 
     if output:
         output = output.replace(kb.misc.space, " ")
