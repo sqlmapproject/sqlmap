@@ -19,8 +19,8 @@
 
     <!-- Microsoft SQL Server -->
     <dbms value="Microsoft SQL Server">
-        <error regexp="Driver.*SQL[\-\_\ ]*Server"/>
-        <error regexp="OLE DB.*SQL Server"/>
+        <error regexp="Driver.* SQL[\-\_\ ]*Server"/>
+        <error regexp="OLE DB.* SQL Server"/>
         <error regexp="SQL Server.*Driver"/>
         <error regexp="Warning.*mssql_.*"/>
         <error regexp="SQL Server.*[0-9a-fA-F]{8}"/>
