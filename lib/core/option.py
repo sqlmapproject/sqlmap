@@ -303,20 +303,6 @@ def __setRequestFromFile():
 
     __feedTargetsDict(conf.requestFile, addedTargetUrls)
 
-def __setScriptKiddie():
-    """
-    This function sets a random google dork
-    """
-    if not conf.scriptKiddie or conf.url or conf.list or conf.requestFile or conf.googleDork:
-        return
-
-    dorks = getFileItems(paths.DORKS)
-    conf.googleDork = dorks[randomRange(0, len(dorks) - 1)]
-    conf.multipleTargets = True
-
-    logMsg = "setting random google dork to: '%s'" % conf.googleDork
-    logger.info(logMsg)
-
 def __setGoogleDorking():
     """
     This function checks if the way to request testable hosts is through
@@ -1393,7 +1379,7 @@ def init(inputOptions=advancedDict()):
     parseTargetUrl()
     parseTargetDirect()
 
-    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest or conf.scriptKiddie:
+    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest:
         __setHTTPTimeout()
         __setHTTPExtraHeaders()
         __setHTTPCookies()
@@ -1404,7 +1390,6 @@ def init(inputOptions=advancedDict()):
         __setHTTPProxy()
         __setSafeUrl()
         __setUnion()
-        __setScriptKiddie()
         __setGoogleDorking()
         __urllib2Opener()
         __findPageForms()

@@ -195,7 +195,7 @@ class Connect:
             if hasattr(conn, "setcookie"):
                 kb.redirectSetCookie = conn.setcookie
 
-            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled and not conf.scriptKiddie:
+            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled and not conf.realTest:
                 msg  = "sqlmap got a %d redirect to " % conn.redcode
                 msg += "%s - What target address do you " % conn.redurl
                 msg += "want to use from now on? %s " % conf.url
@@ -294,7 +294,7 @@ class Connect:
 
             if silent or (ignoreTimeout and "timeout" in tbMsg):
                 return None, None
-            elif kb.retriesCount < conf.retries and not kb.threadException and not conf.scriptKiddie:
+            elif kb.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
                 kb.retriesCount += 1
 
                 warnMsg += ", sqlmap is going to retry the request"

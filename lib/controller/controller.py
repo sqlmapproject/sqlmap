@@ -227,7 +227,7 @@ def start():
                     elif test[0] in ("q", "Q"):
                         break
 
-                elif conf.scriptKiddie:
+                elif conf.realTest:
                     logger.info(message)
                 else:
                     message += "\ndo you want to test this url? [Y/n/q]"
@@ -343,7 +343,7 @@ def start():
 
                         if testSqlInj:
                             check = heuristicCheckSqlInjection(place, parameter, value)
-                            if not check and conf.scriptKiddie:
+                            if not check and conf.realTest:
                                 continue
 
                             logMsg  = "testing sql injection on %s " % place
@@ -376,7 +376,7 @@ def start():
                                 logger.warn(warnMsg)
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
-                if not conf.scriptKiddie:
+                if not conf.realTest:
                     errMsg = "all parameters are not injectable, try "
                     errMsg += "a higher --level"
                     raise sqlmapNotVulnerableException, errMsg

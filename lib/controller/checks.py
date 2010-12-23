@@ -387,7 +387,7 @@ def checkSqlInjection(place, parameter, value):
                                 elif detailKey == "os" and injection.os is None:
                                     injection.os = detailValue
 
-                        if conf.beep or conf.scriptKiddie:
+                        if conf.beep or conf.realTest:
                             beep()
 
                         # There is no need to perform this test for other
@@ -589,7 +589,7 @@ def checkStability():
         logger.warn(warnMsg)
 
         message = "how do you want to proceed? [C(ontinue)/s(tring)/r(egex)/q(uit)] "
-        if not conf.scriptKiddie:
+        if not conf.realTest:
             test = readInput(message, default="C")
         else:
             test = None
