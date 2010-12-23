@@ -183,6 +183,7 @@ def start():
                 if paramKey not in kb.testedParams:
                     testSqlInj = True
 
+            testSqlInj &= (conf.hostname, conf.path, None, None) not in kb.testedParams
             if not testSqlInj:
                 infoMsg = "skipping '%s'" % targetUrl
                 logger.info(infoMsg)
@@ -366,6 +367,8 @@ def start():
 
                                 if test[0] in ("n", "N"):
                                     proceed = False
+                                    paramKey = (conf.hostname, conf.path, None, None)
+                                    kb.testedParams.add(paramKey)
                                     break
                             else:
                                 warnMsg  = "%s parameter '%s' is not " % (place, parameter)

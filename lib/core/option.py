@@ -1192,7 +1192,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.responseTimes   = []
     kb.resumedQueries  = {}
     kb.retriesCount    = 0
-    kb.testedParams    = set()
     kb.technique       = None
     kb.testMode        = False
     kb.testQueryCount  = 0
@@ -1208,6 +1207,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
         kb.tamperFunctions = []
         kb.targetUrls      = set()
+        kb.testedParams    = set()
         kb.userAgents      = None
 
 def __saveCmdline():
