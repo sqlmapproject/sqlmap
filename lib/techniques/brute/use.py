@@ -123,25 +123,67 @@ def columnExists(columnFile):
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
 
-    count = 0
+    count = [0]
     length = len(columns)
+    threads = []
+    collock = threading.Lock()
+    iolock = threading.Lock()
+    kb.locks.seqLock = threading.Lock()
+    kb.threadContinue = True
 
-    for column in columns:
-        result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
+    def columnExistsThread():
+        while count[0] < length and kb.threadContinue:
+            collock.acquire()
+            column = columns[count[0]]
+            count[0] += 1
+            collock.release()
 
-        if result:
-            retVal.append(column)
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
+
+            iolock.acquire()
+            if result:
+                retVal.append(column)
+
+                if conf.verbose in (1, 2):
+                    clearConsoleLine(True)
+                    infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), column)
+                    dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                clearConsoleLine(True)
-                infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), column)
-                dataToStdout(infoMsg, True)
+                status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
+                dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+            iolock.release()
 
-        count += 1
+    # Start the threads
+    for numThread in range(conf.threads):
+        thread = threading.Thread(target=columnExistsThread, name=str(numThread))
+        thread.start()
+        threads.append(thread)
 
-        if conf.verbose in (1, 2):
-            status = '%d/%d items (%d%s)' % (count, length, round(100.0*count/length), '%')
-            dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+    # And wait for them to all finish
+    try:
+        alive = True
+        while alive:
+            alive = False
+            for thread in threads:
+                if thread.isAlive():
+                    alive = True
+                    thread.join(5)
+    except KeyboardInterrupt:
+        kb.threadContinue = False
+        kb.threadException = True
+
+        print
+        logger.debug("waiting for threads to finish")
+
+        try:
+            while (threading.activeCount() > 1):
+                pass
+
+        except KeyboardInterrupt:
+            raise sqlmapThreadException, "user aborted"
+    finally:
+        kb.locks.seqLock = None
 
     clearConsoleLine(True)
 

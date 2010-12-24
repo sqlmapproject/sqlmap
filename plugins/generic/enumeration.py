@@ -1227,7 +1227,7 @@ class Enumeration:
                                 value = value[:-1] + chr(ord(value[-1]) + 1)
                             query = rootQuery.blind.query % (column, conf.tbl, column, value)
                         else:
-                            query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], entries[column][index])
+                            query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], entries[colList[0]][index])
 
                         value = inject.getValue(query, inband=False)
                         lengths[column] = max(lengths[column], len(value))
