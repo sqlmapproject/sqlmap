@@ -1210,36 +1210,60 @@ class Enumeration:
                 plusOne = False
             indexRange = getRange(count, dump=True, plusOne=plusOne)
 
-            for index in indexRange:
+            if kb.dbms == DBMS.ACCESS:
+                value = " "
                 for column in colList:
-                    if column not in lengths:
-                        lengths[column] = 0
+                    for index in indexRange:
+                        if column not in lengths:
+                            lengths[column] = 0
 
-                    if column not in entries:
-                        entries[column] = []
+                        if column not in entries:
+                            entries[column] = []
 
-                    if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
-                        query = rootQuery.blind.query % (column, conf.db,
-                                                               conf.tbl, index)
-                    elif kb.dbms == DBMS.ORACLE:
-                        query = rootQuery.blind.query % (column, column,
-                                                               conf.tbl.upper(),
-                                                               index)
-                    elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
-                        query = rootQuery.blind.query % (column, index, conf.db,
-                                                               conf.tbl, colList[0],
-                                                               colList[0], colList[0])
+                        if column == colList[0]:
+                            # Correction for values with unrecognized chars
+                            if value and '?' in value and value[0]!='?':
+                                value = value.split('?')[0]
+                                value = value[:-1] + chr(ord(value[-1]) + 1)
+                            query = rootQuery.blind.query % (column, conf.tbl, column, value)
+                        else:
+                            query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], entries[column][index])
 
-                    elif kb.dbms == DBMS.SQLITE:
-                        query = rootQuery.blind.query % (column, conf.tbl, index)
+                        value = inject.getValue(query, inband=False)
+                        lengths[column] = max(lengths[column], len(value))
+                        entries[column].append(value)
 
-                    elif kb.dbms == DBMS.FIREBIRD:
-                        query = rootQuery.blind.query % (index, column, conf.tbl)
+            else:
+                for index in indexRange:
+                    for column in colList:
+                        if column not in lengths:
+                            lengths[column] = 0
 
-                    value = inject.getValue(query, inband=False)
+                        if column not in entries:
+                            entries[column] = []
 
-                    lengths[column] = max(lengths[column], len(value))
-                    entries[column].append(value)
+                        if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+                            query = rootQuery.blind.query % (column, conf.db,
+                                                                   conf.tbl, index)
+                        elif kb.dbms == DBMS.ORACLE:
+                            query = rootQuery.blind.query % (column, column,
+                                                                   conf.tbl.upper(),
+                                                                   index)
+                        elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                            query = rootQuery.blind.query % (column, index, conf.db,
+                                                                   conf.tbl, colList[0],
+                                                                   colList[0], colList[0])
+
+                        elif kb.dbms == DBMS.SQLITE:
+                            query = rootQuery.blind.query % (column, conf.tbl, index)
+
+                        elif kb.dbms == DBMS.FIREBIRD:
+                            query = rootQuery.blind.query % (index, column, conf.tbl)
+
+                        value = inject.getValue(query, inband=False)
+
+                        lengths[column] = max(lengths[column], len(value))
+                        entries[column].append(value)
 
             for column, columnEntries in entries.items():
                 if lengths[column] < len(column):
