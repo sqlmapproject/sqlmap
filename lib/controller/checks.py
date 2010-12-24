@@ -299,13 +299,13 @@ def checkSqlInjection(place, parameter, value):
                             # Useful to set kb.matchRatio at first based on
                             # the False response content
                             kb.matchRatio = None
-                            _ = Request.queryPage(cmpPayload, place)
+                            _ = Request.queryPage(cmpPayload, place, raise404=False)
 
                             # Perform the test's True request
-                            trueResult = Request.queryPage(reqPayload, place)
+                            trueResult = Request.queryPage(reqPayload, place, raise404=False)
 
                             if trueResult:
-                                falseResult = Request.queryPage(cmpPayload, place)
+                                falseResult = Request.queryPage(cmpPayload, place, raise404=False)
 
                                 # Perform the test's False request
                                 if not falseResult:
@@ -318,7 +318,7 @@ def checkSqlInjection(place, parameter, value):
                         elif method == PAYLOAD.METHOD.GREP:
                             # Perform the test's request and grep the response
                             # body for the test's <grep> regular expression
-                            reqBody, _ = Request.queryPage(reqPayload, place, content=True)
+                            reqBody, _ = Request.queryPage(reqPayload, place, content=True, raise404=False)
                             output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
 
                             if output:
@@ -334,11 +334,11 @@ def checkSqlInjection(place, parameter, value):
                         # SQL injections
                         elif method == PAYLOAD.METHOD.TIME:
                             # Perform the test's request
-                            trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True)
+                            trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
                             if trueResult:
                                 # Confirm test's results
-                                trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True)
+                                trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
                                 if trueResult:
                                     infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
