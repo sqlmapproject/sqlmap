@@ -335,7 +335,7 @@
     <dbms value="Microsoft Access">
         <cast query="CVAR(%s)"/>
         <length query="LEN(%s)"/>
-        <isnull query="IIF(ISNULL(%s), ' ', %s)"/>
+        <isnull query="IIF(LEN(%s)=0, ' ', %s)"/>
         <delimiter query=","/>
         <limit query="TOP %d"/>
         <limitregexp query="\s+TOP\s+([\d]+)"/>
@@ -352,7 +352,7 @@
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>
         <current_db/>
-        <inference query="MID((%s), %d, 1) > CHR(%d)"/>
+        <inference query="ASC(MID((%s), %d, 1)) > %d"/>
         <is_dba/>
         <dbs/>
         <!--MSysObjects have no read permission by default-->

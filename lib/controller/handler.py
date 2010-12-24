@@ -62,10 +62,7 @@ def setHandler():
                   ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
                 ]
 
-    if kb.htmlFp:
-        inferencedDbms = kb.htmlFp[-1]
-    else:
-        inferencedDbms = None
+    inferencedDbms = (kb.htmlFp[-1] if kb.htmlFp else None) or kb.dbms
 
     for injection in kb.injections:
         if hasattr(injection, "dbms"):
