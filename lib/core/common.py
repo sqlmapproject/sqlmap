@@ -1750,6 +1750,11 @@ def aliasToDbmsEnum(value):
     return retVal
 
 def removeDynamicContent(page):
+    """
+    Removing dynamic content from supplied
+    page basing removal on precalculated
+    dynamic markings
+    """
     if page:
         for item in kb.dynamicMarkings:
             prefix, suffix = item
@@ -1763,6 +1768,11 @@ def removeDynamicContent(page):
     return page
 
 def filterStringValue(value, regex):
+    """
+    Returns string value consisting only
+    of chars satisfying supplied regular
+    expressson
+    """
     retVal = ""
 
     if value:
@@ -1773,6 +1783,10 @@ def filterStringValue(value, regex):
     return retVal
 
 def isDBMSVersionAtLeast(version):
+    """
+    Checks if the recognized DBMS version
+    is at least the version specified
+    """
     retVal = None
 
     if kb.dbmsVersion and kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION and kb.dbmsVersion[0] != None:
@@ -1802,6 +1816,10 @@ def isDBMSVersionAtLeast(version):
     return retVal
 
 def parseSqliteTableSchema(value):
+    """
+    Parses table column names and types from
+    specified SQLite table schema
+    """
     if value:
         table = {}
         columns = {}
@@ -1813,6 +1831,9 @@ def parseSqliteTableSchema(value):
         kb.data.cachedColumns[conf.db] = table
 
 def getTechniqueData(technique=None):
+    """
+    Returns injection data for technique specified
+    """
     retVal = None
 
     if technique and technique in kb.injection.data:
@@ -1821,9 +1842,17 @@ def getTechniqueData(technique=None):
     return retVal
 
 def isTechniqueAvailable(technique=None):
+    """
+    Returns True if there is injection data which
+    sqlmap could use for technique specified
+    """
     return getTechniqueData(technique) is not None
 
 def initTechnique(technique=None):
+    """
+    Prepares proper page template and match ratio
+    for technique specified
+    """
     data = getTechniqueData(technique)
 
     if data:
@@ -1835,6 +1864,24 @@ def initTechnique(technique=None):
         logger.warn(warnMsg)
 
 def arrayizeValue(value):
+    """
+    Makes a list out of value if it's not already
+    list itself
+    """
     if not isinstance(value, list):
         value = [value]
     return value
+
+def getInjectionTests():
+    """
+    Returns prioritized test list by eventually
+    detected DBMS from error messages
+    """
+    retVal = conf.tests
+    if kb.htmlFp:
+        dbms = kb.htmlFp[-1]
+        retVal = sorted(retVal, key=lambda test: False\
+          if 'details' in test and 'dbms' in test.details\
+          and test.details.dbms == dbms else True)
+
+    return retVal

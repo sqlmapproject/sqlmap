@@ -17,6 +17,7 @@ from lib.core.agent import agent
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
 from lib.core.common import getCompiledRegex
+from lib.core.common import getInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -77,7 +78,7 @@ def checkSqlInjection(place, parameter, value):
     # Set the flag for sql injection test mode
     kb.testMode = True
 
-    for test in conf.tests:
+    for test in getInjectionTests():
         try:
             title = test.title
             stype = test.stype
