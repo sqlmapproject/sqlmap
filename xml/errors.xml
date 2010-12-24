@@ -28,8 +28,7 @@
 
     <!-- Microsoft Access -->
     <dbms value="Microsoft Access">
-        <error regexp="Access.*Driver"/>
-        <error regexp="Driver.*Access"/>
+        <error regexp="Microsoft Access Driver"/>
         <error regexp="JET Database Engine"/>
         <error regexp="Access Database Engine"/>
     </dbms>
