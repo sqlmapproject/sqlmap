@@ -1073,6 +1073,9 @@ def __cleanupOptions():
         conf.nullConnection = not (conf.textOnly or conf.longestCommon)
         conf.threads = 4 if conf.threads < 2 else conf.threads
 
+    if conf.realTest:
+        conf.userAgentsFile = paths.USER_AGENTS
+
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration
