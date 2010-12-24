@@ -138,6 +138,9 @@ class Connect:
             # Perform HTTP request
             headers = forgeHeaders(cookie, ua)
 
+            if conf.realTest:
+                headers["Referer"] = "%s://%s" % (conf.scheme, conf.hostname)
+
             if kb.authHeader:
                 headers["Authorization"] = kb.authHeader
 
