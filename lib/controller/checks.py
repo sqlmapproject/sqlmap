@@ -265,7 +265,7 @@ def checkSqlInjection(place, parameter, value):
                     elif where == 3:
                         origValue = ""
 
-                    kb.pageTemplate = getPageTemplate(templatePayload, place)
+                    kb.pageTemplate, kb.errorIsNone = getPageTemplate(templatePayload, place)
 
                     # Forge request payload by prepending with boundary's
                     # prefix and appending the boundary's suffix to the
@@ -762,6 +762,7 @@ def checkConnection(suppressOutput=False):
     try:
         page, _ = Request.queryPage(content=True)
         kb.originalPage = kb.pageTemplate = page
+        kb.errorIsNone = not wasLastRequestDBMSError()
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg

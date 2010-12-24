@@ -12,11 +12,11 @@ import re
 from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
-from lib.core.common import getCurrentThreadData
 from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
+from lib.core.threads import getCurrentThreadData
 
 class htmlHandler(ContentHandler):
     """
@@ -59,6 +59,9 @@ def htmlParser(page):
     parseXmlFile(xmlfile, handler)
 
     if handler.dbms and handler.dbms not in kb.htmlFp:
+        kb.lastParserStatus = handler.dbms
         kb.htmlFp.append(handler.dbms)
+    else:
+        kb.lastParserStatus = None
 
     return handler.dbms

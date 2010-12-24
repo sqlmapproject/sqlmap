@@ -21,7 +21,6 @@ import urlparse
 import ntpath
 import posixpath
 import subprocess
-import threading
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
@@ -72,6 +71,7 @@ from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import TIME_STDEV_COEFF
+from lib.core.threads import getCurrentThreadData
 
 class UnicodeRawConfigParser(RawConfigParser):
     """
@@ -114,17 +114,6 @@ class DynamicContentItem:
         self.lineContentBefore = lineContentBefore
         self.lineContentAfter = lineContentAfter
 
-
-class ThreadData():
-    """
-    Represents thread independent data
-    """
-
-    def __init__(self):
-        self.lastErrorPage = None
-        self.lastQueryDuration = 0
-        self.lastRequestUID = 0
-        self.valueStack = []
 
 def paramToDict(place, parameters=None):
     """
@@ -1544,19 +1533,6 @@ def longestCommonPrefix(*sequences):
 def commonFinderOnly(initial, sequence):
     return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
 
-def getCurrentThreadUID():
-    return hash(threading.currentThread())
-
-def getCurrentThreadData():
-    """
-    Returns current thread's dependent data
-    """
-
-    threadUID = getCurrentThreadUID()
-    if threadUID not in kb.threadData:
-        kb.threadData[threadUID] = ThreadData()
-    return kb.threadData[threadUID]
-
 def pushValue(value):
     """
     Push value to the stack (thread dependent)
@@ -1856,7 +1832,7 @@ def initTechnique(technique=None):
     data = getTechniqueData(technique)
 
     if data:
-        kb.pageTemplate = getPageTemplate(data.templatePayload, kb.injection.place)
+        kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
         kb.matchRatio = data.matchRatio
     else:
         warnMsg = "there is no injection data available for technique "

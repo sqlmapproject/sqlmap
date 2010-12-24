@@ -40,6 +40,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import parseResponse

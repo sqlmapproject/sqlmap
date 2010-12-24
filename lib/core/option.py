@@ -37,7 +37,6 @@ from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
-from lib.core.common import ThreadData
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
 from lib.core.data import kb
@@ -1147,6 +1146,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.docRoot         = None
     kb.dynamicMarkings = []
     kb.endDetection    = False
+    kb.errorIsNone     = True
     kb.formNames       = []
     kb.headersCount    = 0
     kb.headersFp       = {}

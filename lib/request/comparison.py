@@ -58,7 +58,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
             return re.search(conf.regexp, page, re.I | re.M) is not None
 
         # In case of an DBMS error page return None
-        if wasLastRequestDBMSError():
+        if kb.errorIsNone and wasLastRequestDBMSError():
             return None
 
         # Dynamic content lines to be excluded before comparison

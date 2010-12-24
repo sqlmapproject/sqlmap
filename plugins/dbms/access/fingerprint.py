@@ -24,6 +24,7 @@ from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import METADB_SUFFIX
+from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
