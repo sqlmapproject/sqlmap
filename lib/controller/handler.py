@@ -65,7 +65,7 @@ def setHandler():
     inferencedDbms = (kb.htmlFp[-1] if kb.htmlFp else None) or kb.dbms
 
     for injection in kb.injections:
-        if hasattr(injection, "dbms"):
+        if hasattr(injection, "dbms") and injection.dbms:
             inferencedDbms = injection.dbms
             break
 
