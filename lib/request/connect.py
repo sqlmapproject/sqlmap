@@ -266,6 +266,8 @@ class Connect:
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
+                page = sanitizeAsciiString(page)
+                page = getUnicode(page)
                 parseResponse(page, responseHeaders)
                 return page, responseHeaders
 
