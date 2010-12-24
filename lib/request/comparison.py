@@ -18,6 +18,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import DIFF_TOLERANCE
+from lib.core.settings import LOWER_RATIO_BOUND, UPPER_RATIO_BOUND
 
 def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if page is None and pageLength is None:
@@ -93,11 +94,11 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
         if conf.thold:
             kb.matchRatio = conf.thold
 
-        elif kb.pageStable and ratio > 0.6 and ratio < 0.99:
+        elif kb.pageStable and ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
             kb.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
 
-        elif not kb.pageStable or ( kb.pageStable and ratio < 0.6 ):
+        elif not kb.pageStable:
             kb.matchRatio = CONSTANT_RATIO
             logger.debug("setting match ratio for current parameter to default value 0.900")
 

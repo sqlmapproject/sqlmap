@@ -67,6 +67,10 @@ INFERENCE_BLANK_BREAK = 10
 # string used for representation of unknown dbms version
 UNKNOWN_DBMS_VERSION = "Unknown"
 
+# lower and upper values for match ratio in case of stable page
+LOWER_RATIO_BOUND = 0.02
+UPPER_RATIO_BOUND = 0.98
+
 # System variables
 IS_WIN             = subprocess.mswindows
 # The name of the operating system dependent module imported. The following
