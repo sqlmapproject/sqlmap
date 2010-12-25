@@ -14,10 +14,12 @@ import re
 import StringIO
 import zlib
 
+from lib.core.common import extractErrorMessage
 from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
+from lib.core.common import sanitizeAsciiString
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -132,4 +134,15 @@ def decodePage(page, contentEncoding, contentType):
         if charset:
             page = getUnicode(page, charset)
 
+    return page
+
+def processResponse(page, responseHeaders):
+    page = sanitizeAsciiString(page)
+    page = getUnicode(page)
+    parseResponse(page, responseHeaders)
+    if conf.parseErrors:
+        msg = extractErrorMessage(page)
+
+        if msg:
+            logger.info("parsed error message: '%s'" % msg) 
     return page

@@ -59,6 +59,7 @@ from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import SITE
+from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
@@ -1584,7 +1585,7 @@ def extractErrorMessage(page):
     retVal = None
 
     if isinstance(page, basestring):
-        for regex in (r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s+(?P<result>.+?)<br\s*/?\s*>", r"<li>Error Type:<br>(?P<result>.+?)</li>"):
+        for regex in ERROR_PARSING_REGEXES:
             match = re.search(regex, page, re.DOTALL | re.IGNORECASE)
 
             if match:
@@ -1661,6 +1662,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
 
     kb.locks.logLock.release()
 
+# cross-linked method
 def getPageTemplate(payload, place):
     pass
 

@@ -20,7 +20,6 @@ from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
-from lib.core.common import extractErrorMessage
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
@@ -33,7 +32,6 @@ from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.common import sanitizeAsciiString
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PLACE
@@ -43,7 +41,7 @@ from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
-from lib.request.basic import parseResponse
+from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
@@ -270,9 +268,7 @@ class Connect:
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
-                page = sanitizeAsciiString(page)
-                page = getUnicode(page)
-                parseResponse(page, responseHeaders)
+                page = processResponse(page, responseHeaders)
                 return page, responseHeaders
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
@@ -316,9 +312,7 @@ class Connect:
 
         socket.setdefaulttimeout(conf.timeout)
 
-        page = sanitizeAsciiString(page)
-        page = getUnicode(page)
-        parseResponse(page, responseHeaders)
+        page = processResponse(page, responseHeaders)
 
         responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
         if responseHeaders:
@@ -331,12 +325,6 @@ class Connect:
             responseMsg += "%s\n%s\n" % (logHeaders, page)
 
         logger.log(7, responseMsg)
-
-        if conf.parseErrors:
-            msg = extractErrorMessage(page)
-
-            if msg:
-                logger.info("parsed error message: '%s'" % msg)
 
         return page, responseHeaders
 
