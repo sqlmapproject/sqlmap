@@ -43,3 +43,19 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
+
+    def getCurrentUser(self):
+        warnMsg = "on Microsoft Access it is not possible to enumerate the current user"
+        logger.warn(warnMsg)
+
+    def getUsers(self):
+        warnMsg = "on Microsoft Access it is not possible to enumerate the users"
+        logger.warn(warnMsg)
+
+        return []
+
+    def getPrivileges(self, *args):
+        warnMsg = "on Microsoft Access it is not possible to enumerate the user privileges"
+        logger.warn(warnMsg)
+
+        return {}
