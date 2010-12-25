@@ -13,6 +13,7 @@ import time
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
+from lib.core.common import getPageTextWordsSet
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
@@ -21,14 +22,24 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
+from lib.core.exception import sqlmapThreadException
 from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 
 def tableExists(tableFile):
     tables = getFileItems(tableFile)
+    tableSet = set(tables)
     retVal = []
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
+    
+    infoMsg = "adding words used on web page to check list"
+    logger.info(infoMsg)
+    pageWords = getPageTextWordsSet(kb.originalPage)
+    for word in pageWords:
+        word = word.lower()
+        if len(word) > 1 and not word[0].isdigit() and word not in tableSet:
+            tables.append(word)
 
     count = [0]
     length = len(tables)
