@@ -1213,7 +1213,7 @@ class Enumeration:
             if kb.dbms == DBMS.ACCESS:
                 for column in colList:
                     # It would be good to have a numeric column as a pivot
-                    result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, conf.tbl, column)))
+                    result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE RND(%s)>0)", (column, conf.tbl, column)))
 
                     if result:
                         colList.remove(column)
@@ -1236,9 +1236,13 @@ class Enumeration:
                                 value = value[:-1] + chr(ord(value[-1]) + 1)
                             query = rootQuery.blind.query % (column, conf.tbl, column, value)
                         else:
+                            if index >= len(entries[colList[0]]):
+                                break
                             query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], entries[colList[0]][index])
 
                         value = inject.getValue(query, inband=False)
+                        if column == colList[0] and not value:
+                            break
                         lengths[column] = max(lengths[column], len(value))
                         entries[column].append(value)
 
