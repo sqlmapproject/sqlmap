@@ -37,10 +37,9 @@ def tableExists(tableFile):
     logger.info(infoMsg)
     pageWords = getPageTextWordsSet(kb.originalPage)
     for word in pageWords:
-        if len(word) > 2 and not word[0].isdigit() and word.lower() not in tableSet:
-            tables.append(word.lower())
-            if word.lower() != word:
-                tables.append(word)
+        word = word.lower()
+        if len(word) > 2 and not word[0].isdigit() and word not in tableSet:
+            tables.append(word)
 
     count = [0]
     length = len(tables)
