@@ -359,7 +359,7 @@
         <tables/>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT MIN(%s) FROM %s WHERE CVAR(%s) > '%s'" query2="SELECT TOP 1 %s FROM %s WHERE %s LIKE '%s'" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CVAR(%s) > '%s'" query2="SELECT TOP 1 %s FROM %s WHERE CVAR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
    </dbms>
 

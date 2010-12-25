@@ -1211,6 +1211,15 @@ class Enumeration:
             indexRange = getRange(count, dump=True, plusOne=plusOne)
 
             if kb.dbms == DBMS.ACCESS:
+                for column in colList:
+                    # It would be good to have a numeric column as a pivot
+                    result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, conf.tbl, column)))
+
+                    if result:
+                        colList.remove(column)
+                        colList.insert(0, column)
+                        break
+
                 value = " "
                 for column in colList:
                     for index in indexRange:
