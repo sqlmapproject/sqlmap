@@ -33,13 +33,14 @@ def tableExists(tableFile):
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
     
-    infoMsg = "adding words used on web page to check list"
+    infoMsg = "adding words used on web page to name check list"
     logger.info(infoMsg)
     pageWords = getPageTextWordsSet(kb.originalPage)
     for word in pageWords:
-        word = word.lower()
-        if len(word) > 1 and not word[0].isdigit() and word not in tableSet:
-            tables.append(word)
+        if len(word) > 2 and not word[0].isdigit() and word.lower() not in tableSet:
+            tables.append(word.lower())
+            if word.lower() != word:
+                tables.append(word)
 
     count = [0]
     length = len(tables)
