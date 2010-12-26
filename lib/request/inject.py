@@ -120,7 +120,7 @@ def __goBooleanProxy(expression, resumeValue=True):
         output = None
 
     if not output:
-        output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare)
+        output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare, raise404=False)
 
     return output
 
