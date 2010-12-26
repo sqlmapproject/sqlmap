@@ -472,6 +472,64 @@ lname
 sale_date
 module_addr
 
+# spanish
+usuario
+nombre
+contrasena
+consumidor
+clave
+tecla
+llave
+chaveta
+tono
+cuna
+
+# german
+benutzername
+benutzer
+passwort
+kennwort
+parole
+losungswort
+losung
+kennung
+motto
+stichwort
+schlusselwort
+
+# french
+utilisateur
+usager
+consommateur
+nom
+mot
+passe
+cle
+touche
+clef
+
+# italian
+utente
+nome
+utilizzatore
+parola
+chiave
+tasto
+pulsante
+chiavetta
+cifrario
+
+# portuguese
+usufrutuario
+chave
+cavilha
+
+# slavic
+korisnik
+sifra
+lozinka
+kljuc
+
 # List from schemafuzz.py (http://www.beenuarora.com/code/schemafuzz.py)
 user
 pass
@@ -532,7 +590,6 @@ fjalekalimin
 kodi
 emer
 ime
-korisnik
 korisnici
 user1
 administrator
@@ -542,8 +599,6 @@ login_password
 login_pass
 login_passwd
 login_pwd
-sifra
-lozinka
 psw
 pass1word
 pass_word
@@ -648,7 +703,6 @@ number
 nummer
 pass_hash
 passwordsalt
-passwort
 personal_key
 phone
 privacy
@@ -798,7 +852,6 @@ adressee-mail
 complet
 groupe
 hachage
-nom
 connexion
 membre
 membres
@@ -811,10 +864,8 @@ monmotdepasse
 ignatiusj
 caroline-du-nord
 nouveau
-nombre
 sel
 recherche
-utilisateur
 utilisateurs
 o
 konto
@@ -856,7 +907,6 @@ yonghu
 
 # site:br
 content_id
-nome
 codigo
 geometry
 published
@@ -1401,7 +1451,6 @@ terms_body
 prenom
 nid
 n_client
-mot
 n_compte
 apid
 n_dept
