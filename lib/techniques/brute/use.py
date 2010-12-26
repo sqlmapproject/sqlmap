@@ -12,6 +12,7 @@ import time
 
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import filterListValue
 from lib.core.common import getFileItems
 from lib.core.common import getPageTextWordsSet
 from lib.core.common import popValue
@@ -27,9 +28,8 @@ from lib.core.exception import sqlmapThreadException
 from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 
-def tableExists(tableFile):
+def tableExists(tableFile, regex=None):
     tables = getFileItems(tableFile, lowercase=kb.dbms in (DBMS.ACCESS), unique=True)
-    tableSet = set(tables)
     retVal = []
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
@@ -39,9 +39,10 @@ def tableExists(tableFile):
     pageWords = getPageTextWordsSet(kb.originalPage)
     for word in pageWords:
         word = word.lower()
-        if len(word) > 2 and not word[0].isdigit() and word not in tableSet:
+        if len(word) > 2 and not word[0].isdigit() and word not in tables:
             tables.append(word)
 
+    tables = filterListValue(tables, regex)
     count = [0]
     length = len(tables)
     threads = []
@@ -129,12 +130,14 @@ def tableExists(tableFile):
 
     return kb.data.cachedTables
 
-def columnExists(columnFile):
+def columnExists(columnFile, regex=None):
     if not conf.tbl:
         errMsg = "missing table parameter"
         raise sqlmapMissingMandatoryOptionException, errMsg
 
     columns = getFileItems(columnFile, unique=True)
+    columns = filterListValue(columns, regex)
+
     if conf.db and not conf.db.endswith(METADB_SUFFIX):
         table = "%s.%s" % (conf.db, conf.tbl)
     else:

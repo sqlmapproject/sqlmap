@@ -1501,10 +1501,30 @@ class Enumeration:
         return foundDbs
 
     def searchTable(self):
+        bruteForce = False
+
         if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            bruteForce = True
+
+        elif kb.dbms == DBMS.ACCESS:
+            errMsg  = "cannot retrieve table names, "
+            errMsg += "back-end DBMS is Access"
+            logger.error(errMsg)
+            bruteForce = True
+
+        if bruteForce:
+            message = "do you want to use common table existance check? [Y/n/q]"
+            test = readInput(message, default="Y")
+
+            if test[0] in ("n", "N"):
+                return
+            elif test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+            else:
+                regex = "|".join(conf.tbl.split(","))
+                return tableExists(paths.COMMON_TABLES, regex)
 
         rootQuery = queries[kb.dbms].search_table
         foundTbls = {}
@@ -1622,10 +1642,30 @@ class Enumeration:
         return foundTbls
 
     def searchColumn(self):
+        bruteForce = False
+
         if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            bruteForce = True
+
+        elif kb.dbms == DBMS.ACCESS:
+            errMsg  = "cannot retrieve column names, "
+            errMsg += "back-end DBMS is Access"
+            logger.error(errMsg)
+            bruteForce = True
+
+        if bruteForce:
+            message = "do you want to use common columns existance check? [Y/n/q]"
+            test = readInput(message, default="Y")
+
+            if test[0] in ("n", "N"):
+                return
+            elif test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+            else:
+                regex = "|".join(conf.col.split(","))
+                return columnExists(paths.COMMON_COLUMNS, regex)
 
         rootQuery = queries[kb.dbms].search_column
         foundCols = {}

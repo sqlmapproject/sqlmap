@@ -1877,3 +1877,18 @@ def getInjectionTests():
           and test.details.dbms == dbms else True)
 
     return retVal
+
+def filterListValue(value, regex):
+    """
+    Returns list with items that have parts
+    satisfying given regular expression
+    """
+    if regex:
+        retVal = []
+        filter = getCompiledRegex(regex, re.I)
+        for word in value:
+            if filter.search(word):
+                retVal.append(word)
+        return retVal
+    else:
+        return value
