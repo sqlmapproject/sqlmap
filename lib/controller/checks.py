@@ -28,6 +28,7 @@ from lib.core.common import removeDynamicContent
 from lib.core.common import showStaticWords
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
+from lib.core.common import wasLastRequestHTTPError
 from lib.core.common import DynamicContentItem
 from lib.core.data import conf
 from lib.core.data import kb
@@ -762,7 +763,7 @@ def checkConnection(suppressOutput=False):
     try:
         page, _ = Request.queryPage(content=True)
         kb.originalPage = kb.pageTemplate = page
-        kb.errorIsNone = not wasLastRequestDBMSError()
+        kb.errorIsNone = not wasLastRequestDBMSError() and not wasLastRequestHTTPError()
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg

@@ -1560,6 +1560,14 @@ def wasLastRequestDBMSError():
     threadData = getCurrentThreadData()
     return threadData.lastErrorPage and threadData.lastErrorPage[0] == threadData.lastRequestUID
 
+def wasLastRequestHTTPError():
+    """
+    Returns True if the last web request resulted in an errornous HTTP code (like 500)
+    """
+
+    threadData = getCurrentThreadData()
+    return threadData.lastHTTPError and threadData.lastHTTPError[0] == threadData.lastRequestUID
+
 def wasLastRequestDelayed():
     """
     Returns True if the last web request resulted in a time-delay

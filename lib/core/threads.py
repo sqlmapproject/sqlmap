@@ -18,6 +18,7 @@ class ThreadData():
 
     def __init__(self):
         self.lastErrorPage = None
+        self.lastHTTPError = None
         self.lastQueryDuration = 0
         self.lastRequestUID = 0
         self.valueStack = []

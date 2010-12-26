@@ -235,6 +235,8 @@ class Connect:
             code = e.code
             status = e.msg
 
+            threadData.lastHTTPError = (threadData.lastRequestUID, code)
+
             try:
                 page = e.read()
                 responseHeaders = e.info()
