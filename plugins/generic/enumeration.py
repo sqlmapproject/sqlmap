@@ -1228,9 +1228,9 @@ class Enumeration:
                         colList.insert(0, column)
                         break
 
-                value = " "
-                for column in colList:
-                    for index in indexRange:
+                pivotValue = " "
+                for index in indexRange:
+                    for column in colList:
                         if column not in lengths:
                             lengths[column] = 0
 
@@ -1238,19 +1238,20 @@ class Enumeration:
                             entries[column] = []
 
                         if column == colList[0]:
-                            # Correction for values with unrecognized chars
-                            if value and '?' in value and value[0]!='?':
-                                value = value.split('?')[0]
-                                value = value[:-1] + chr(ord(value[-1]) + 1)
-                            query = rootQuery.blind.query % (column, conf.tbl, column, value)
+                            # Correction for pivotValues with unrecognized chars
+                            if pivotValue and '?' in pivotValue and pivotValue[0]!='?':
+                                pivotValue = pivotValue.split('?')[0]
+                                pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
+                            query = rootQuery.blind.query % (column, conf.tbl, column, pivotValue)
                         else:
-                            if index >= len(entries[colList[0]]):
-                                break
-                            query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], entries[colList[0]][index])
+                            query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], pivotValue)
 
                         value = inject.getValue(query, inband=False)
-                        if column == colList[0] and not value:
-                            break
+                        if column == colList[0]:
+                            if not value:
+                                break
+                            else:
+                                pivotValue = value
                         lengths[column] = max(lengths[column], len(value))
                         entries[column].append(value)
 
