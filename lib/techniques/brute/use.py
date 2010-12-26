@@ -223,7 +223,7 @@ def columnExists(columnFile):
         columns = {}
 
         for column in retVal:
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s>0)", (column, table, column)))
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE RND(%s)>0)", (column, table, column)))
 
             if result:
                 columns[column] = 'numeric'
