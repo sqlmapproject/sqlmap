@@ -33,7 +33,7 @@ def tableExists(tableFile):
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
     
-    infoMsg = "adding words used on web page to name check list"
+    infoMsg = "adding words used on web page to the check list"
     logger.info(infoMsg)
     pageWords = getPageTextWordsSet(kb.originalPage)
     for word in pageWords:
@@ -73,6 +73,10 @@ def tableExists(tableFile):
                 status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
                 dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
             iolock.release()
+
+    if conf.threads > 1:
+        debugMsg = "starting %d thread%s" % (conf.threads, ("s" if conf.threads > 1 else ""))
+        logger.debug(debugMsg)
 
     # Start the threads
     for numThread in range(conf.threads):
@@ -166,6 +170,10 @@ def columnExists(columnFile):
                 status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
                 dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
             iolock.release()
+
+    if conf.threads > 1:
+        debugMsg = "starting %d thread%s" % (conf.threads, ("s" if conf.threads > 1 else ""))
+        logger.debug(debugMsg)
 
     # Start the threads
     for numThread in range(conf.threads):
