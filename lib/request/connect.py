@@ -231,6 +231,14 @@ class Connect:
             responseHeaders = conn.info()
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
+            # Explicit closing of connection object
+            if not conf.keepAlive:
+                try:
+                    conn.close()
+                except Exception, msg:
+                    warnMsg = "problem occured during connection closing ('%s')" % msg
+                    logger.warn(warnMsg)
+
         except urllib2.HTTPError, e:
             code = e.code
             status = e.msg
