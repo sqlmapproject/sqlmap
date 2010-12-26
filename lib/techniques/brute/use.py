@@ -104,6 +104,8 @@ def tableExists(tableFile):
             raise sqlmapThreadException, "user aborted"
     finally:
         kb.locks.seqLock = None
+        kb.threadContinue = True
+        kb.threadException = False
 
     clearConsoleLine(True)
 
@@ -195,6 +197,8 @@ def columnExists(columnFile):
             raise sqlmapThreadException, "user aborted"
     finally:
         kb.locks.seqLock = None
+        kb.threadContinue = True
+        kb.threadException = False
 
     clearConsoleLine(True)
 
