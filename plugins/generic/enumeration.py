@@ -1212,10 +1212,18 @@ class Enumeration:
 
             if kb.dbms == DBMS.ACCESS:
                 for column in colList:
-                    # It would be good to have a numeric column as a pivot
-                    result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE RND(%s)>0)", (column, conf.tbl, column)))
+                    infoMsg = "fetching number of distinct "
+                    infoMsg += "values for column '%s'" % column
+                    logger.info(infoMsg)
 
-                    if result:
+                    query = rootQuery.blind.count2 % (column, conf.tbl)
+                    value = inject.getValue(query, inband=False)
+
+                    if isNumPosStrValue(value) and value == count:
+                        infoMsg = "using column '%s' as a pivot " % column
+                        infoMsg += "for retrieving row data"
+                        logger.info(infoMsg)
+
                         colList.remove(column)
                         colList.insert(0, column)
                         break
