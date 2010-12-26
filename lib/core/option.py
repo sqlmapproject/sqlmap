@@ -79,6 +79,7 @@ from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
 from lib.request.connect import Connect as Request
 from lib.request.proxy import ProxyHTTPSHandler
+from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
@@ -813,7 +814,7 @@ def __setHTTPAuthentication():
         passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), authUsername, authPassword)
 
         if aTypeLower == "basic":
-            authHandler = urllib2.HTTPBasicAuthHandler(passwordMgr)
+            authHandler = SmartHTTPBasicAuthHandler(passwordMgr)
 
         elif aTypeLower == "digest":
             authHandler = urllib2.HTTPDigestAuthHandler(passwordMgr)
