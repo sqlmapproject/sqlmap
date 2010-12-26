@@ -21,13 +21,14 @@ from lib.core.common import safeStringFormat
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import DBMS
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapThreadException
 from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 
 def tableExists(tableFile):
-    tables = getFileItems(tableFile)
+    tables = getFileItems(tableFile, lowercase=kb.dbms in (DBMS.ACCESS), unique=True)
     tableSet = set(tables)
     retVal = []
     infoMsg = "checking table existence using items from '%s'" % tableFile
@@ -133,7 +134,7 @@ def columnExists(columnFile):
         errMsg = "missing table parameter"
         raise sqlmapMissingMandatoryOptionException, errMsg
 
-    columns = getFileItems(columnFile)
+    columns = getFileItems(columnFile, unique=True)
     if conf.db and not conf.db.endswith(METADB_SUFFIX):
         table = "%s.%s" % (conf.db, conf.tbl)
     else:

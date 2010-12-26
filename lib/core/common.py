@@ -1355,7 +1355,7 @@ def initCommonOutputs():
 
     cfile.close()
 
-def getFileItems(filename, commentPrefix='#', unicode_=True):
+def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, unique=False):
     retVal = []
 
     checkFile(filename)
@@ -1376,6 +1376,10 @@ def getFileItems(filename, commentPrefix='#', unicode_=True):
             except UnicodeDecodeError:
                 continue
         if line:
+            if lowercase:
+                line = line.lower()
+            if unique and line in retVal:
+                continue
             retVal.append(line)
 
     return retVal
