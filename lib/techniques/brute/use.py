@@ -77,8 +77,8 @@ def tableExists(tableFile, regex=None):
             iolock.release()
 
     if conf.threads > 1:
-        debugMsg = "starting %d threads" % conf.threads
-        logger.debug(debugMsg)
+        infoMsg = "starting %d threads" % conf.threads
+        logger.info(infoMsg)
     else:
         warnMsg = "running in a single-thread mode. this could take a while."
         logger.warn(warnMsg)
@@ -179,8 +179,8 @@ def columnExists(columnFile, regex=None):
             iolock.release()
 
     if conf.threads > 1:
-        debugMsg = "starting %d threads" % conf.threads
-        logger.debug(debugMsg)
+        infoMsg = "starting %d threads" % conf.threads
+        logger.info(infoMsg)
     else:
         warnMsg = "running in a single-thread mode. this could take a while."
         logger.warn(warnMsg)
