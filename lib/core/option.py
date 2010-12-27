@@ -1128,6 +1128,10 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.authHeader      = None
     kb.bannerFp        = advancedDict()
 
+    kb.brute           = advancedDict()
+    kb.brute.tables    = []
+    kb.brute.columns   = []
+
     kb.cache           = advancedDict()
     kb.cache.content   = {}
     kb.cache.regex     = {}

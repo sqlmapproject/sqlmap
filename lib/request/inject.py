@@ -403,7 +403,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             query = expandAsteriskForColumns(query)
             value = None
             found = False
-            query = query.replace("DISTINCT ", "")
+            if query and not 'COUNT(*)' in query:
+                query = query.replace("DISTINCT ", "")
             count = 0
 
             if expected == EXPECTED.BOOL:

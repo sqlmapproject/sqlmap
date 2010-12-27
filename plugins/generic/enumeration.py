@@ -725,6 +725,8 @@ class Enumeration:
     def getTables(self):
         bruteForce = False
 
+        self.forceDbmsEnum()
+
         if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
@@ -738,6 +740,22 @@ class Enumeration:
             bruteForce = True
 
         if bruteForce:
+            resumeAvailable = False
+            for db, table in kb.brute.tables:
+                if db == conf.db:
+                    resumeAvailable = True
+                    break
+
+            if resumeAvailable:
+                for db, table in kb.brute.tables:
+                    if db == conf.db:
+                        if not kb.data.cachedTables.has_key(conf.db):
+                            kb.data.cachedTables[conf.db] = [table]
+                        else:
+                            kb.data.cachedTables[conf.db].append(table)
+
+                return kb.data.cachedTables
+
             message = "do you want to use common table existance check? [Y/n/q]"
             test = readInput(message, default="Y")
 
@@ -747,8 +765,6 @@ class Enumeration:
                 raise sqlmapUserQuitException
             else:
                 return tableExists(paths.COMMON_TABLES)
-
-        self.forceDbmsEnum()
 
         infoMsg = "fetching tables"
         if conf.db:
@@ -869,6 +885,11 @@ class Enumeration:
     def getColumns(self, onlyColNames=False):
         bruteForce = False
 
+        if "." in conf.tbl:
+            conf.db, conf.tbl = conf.tbl.split(".")
+
+        self.forceDbmsEnum()
+
         if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
@@ -882,6 +903,21 @@ class Enumeration:
             bruteForce = True
 
         if bruteForce:
+            resumeAvailable = False
+            for db, table, colName, colType in kb.brute.columns:
+                if db == conf.db and table == conf.tbl:
+                    resumeAvailable = True
+                    break
+
+            if resumeAvailable:
+                columns = {}
+                for db, table, colName, colType in kb.brute.columns:
+                    if db == conf.db and table == conf.tbl:
+                        columns[colName] = colType
+
+                kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
+                return kb.data.cachedColumns
+
             message = "do you want to use common columns existance check? [Y/n/q]"
             test = readInput(message, default="Y")
 
@@ -895,11 +931,6 @@ class Enumeration:
         if not conf.tbl:
             errMsg = "missing table parameter"
             raise sqlmapMissingMandatoryOptionException, errMsg
-
-        if "." in conf.tbl:
-            conf.db, conf.tbl = conf.tbl.split(".")
-
-        self.forceDbmsEnum()
 
         if not conf.db:
             warnMsg  = "missing database parameter, sqlmap is going to "
@@ -1219,6 +1250,7 @@ class Enumeration:
 
             if kb.dbms == DBMS.ACCESS:
                 validColumnList = False
+                validPivotValue = False
 
                 for column in colList:
                     infoMsg = "fetching number of distinct "
@@ -1235,6 +1267,8 @@ class Enumeration:
                             infoMsg += "for retrieving row data"
                             logger.info(infoMsg)
 
+                            validPivotValue = True
+
                             colList.remove(column)
                             colList.insert(0, column)
                             break
@@ -1243,8 +1277,16 @@ class Enumeration:
                     errMsg = "all column name(s) provided are non-existent"
                     raise sqlmapNoneDataException, errMsg
 
+                if not validPivotValue:
+                    warnMsg = "no proper pivot column provided (with unique values)." 
+                    warnMsg += " all row data won't be retrieved."
+                    logger.warn(warnMsg)
+
                 pivotValue = " "
+                breakRetrieval = False
                 for index in indexRange:
+                    if breakRetrieval:
+                        break
                     for column in colList:
                         if column not in lengths:
                             lengths[column] = 0
@@ -1264,6 +1306,7 @@ class Enumeration:
                         value = inject.getValue(query, inband=False)
                         if column == colList[0]:
                             if not value:
+                                breakRetrieval = True
                                 break
                             else:
                                 pivotValue = value

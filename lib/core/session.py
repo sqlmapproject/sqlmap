@@ -21,6 +21,7 @@ from lib.core.data import logger
 from lib.core.datatype import injectionDict
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
+from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import PGSQL_ALIASES
@@ -356,6 +357,35 @@ def resumeConfKb(expression, url, value):
                 conf.os = os
         else:
             conf.os = os
+
+    elif expression == "TABLE_EXISTS" and url == conf.url:
+        table = unSafeFormatString(value[:-1])
+
+        if '.' in table:
+            db, table = table.split('.')
+        else:
+            db = "%s%s" % (kb.dbms, METADB_SUFFIX)
+
+        logMsg = "resuming brute forced table name "
+        logMsg += "'%s' from session file" % table
+        logger.info(logMsg)
+
+        kb.brute.tables.append((db, table))
+
+    elif expression == "COLUMN_EXISTS" and url == conf.url:
+        table, column = unSafeFormatString(value[:-1]).split('..')
+        colName, colType = column.split(' ')
+
+        if '.' in table:
+            db, table = table.split('.')
+        else:
+            db = "%s%s" % (kb.dbms, METADB_SUFFIX)
+
+        logMsg = "resuming brute forced column name "
+        logMsg += "'%s' for table '%s' from session file" % (colName, table)
+        logger.info(logMsg)
+
+        kb.brute.columns.append((db, table, colName, colType))
 
     elif expression == "Union comment" and url == conf.url:
         kb.unionComment = unSafeFormatString(value[:-1])

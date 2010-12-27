@@ -11,6 +11,7 @@ import threading
 import time
 
 from lib.core.common import clearConsoleLine
+from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import filterListValue
 from lib.core.common import getFileItems
@@ -26,6 +27,7 @@ from lib.core.enums import DBMS
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapThreadException
 from lib.core.settings import METADB_SUFFIX
+from lib.core.session import safeFormatString
 from lib.request import inject
 
 def tableExists(tableFile, regex=None):
@@ -59,12 +61,18 @@ def tableExists(tableFile, regex=None):
             tbllock.release()
 
             if conf.db and not conf.db.endswith(METADB_SUFFIX):
-                table = "%s.%s" % (conf.db, table)
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), table)))
+                fullTableName = "%s.%s" % (conf.db, table)
+            else:
+                fullTableName = table
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), fullTableName)))
 
             iolock.acquire()
             if result:
                 retVal.append(table)
+
+                dataToSessionFile("[%s][%s][%s][TABLE_EXISTS][%s]\n" % (conf.url,\
+                  kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]),\
+                  safeFormatString(fullTableName)))
 
                 if conf.verbose in (1, 2):
                     clearConsoleLine(True)
@@ -227,12 +235,16 @@ def columnExists(columnFile, regex=None):
         columns = {}
 
         for column in retVal:
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE RND(%s)>0)", (column, table, column)))
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)>0)", (column, table, column)))
 
             if result:
                 columns[column] = 'numeric'
             else:
                 columns[column] = 'non-numeric'
+
+            dataToSessionFile("[%s][%s][%s][COLUMN_EXISTS][%s..%s %s]\n" % (conf.url, kb.injection.place,\
+              safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(table),\
+              safeFormatString(column), safeFormatString(columns[column])))
 
         kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
 
