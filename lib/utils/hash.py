@@ -387,4 +387,8 @@ def dictionaryAttack(attack_dict):
         warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
         logger.warn(warnMsg)
 
+    if len(results) == 0:
+        warnMsg  = "no clear password(s) found"
+        logger.warn(warnMsg)
+
     return results
