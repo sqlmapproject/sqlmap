@@ -20,6 +20,7 @@ from lib.core.common import checkFile
 from lib.core.common import conf
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import paths
@@ -30,6 +31,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
+from lib.core.exception import sqlmapUserQuitException
+from lib.core.settings import DUMMY_USER_PREFIX
 
 def mysql_passwd(password, uppercase=True):
     """
@@ -190,37 +193,96 @@ __functions__ = {
                     HASH.SHA1_GENERIC: sha1_generic_passwd
                 }
 
-def dictionaryAttack():
-    hash_regexes = []
-    wordlist = []
+def attackCachedUsersPasswords():
+    if kb.data.cachedUsersPasswords:
+        results = dictionaryAttack(kb.data.cachedUsersPasswords)
+        for (user, hash_, password) in results:
+            for i in xrange(len(kb.data.cachedUsersPasswords[user])):
+                if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
+                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
-    for (_, hashes) in kb.data.cachedUsersPasswords.items():
+def attackDumpedTable():
+    if kb.data.dumpedTable:
+        table = kb.data.dumpedTable
+        columns = table.keys()
+        count = table["__infos__"]["count"]
+
+        colUser = ''
+        attack_dict = {}
+
+        for column in columns:
+            if column and column.lower() in ('user', 'username', 'user_name'):
+                colUser = column
+                break
+
+        for i in range(count):
+            for column in columns:
+                if column == colUser or column == '__infos__':
+                    continue
+                value = table[column]['values'][i]
+                if hashRecognition(value):
+                    if colUser:
+                        if table[colUser]['values'][i] not in attack_dict:
+                            attack_dict[table[colUser]['values'][i]] = []
+                        attack_dict[table[colUser]['values'][i]].append(value)
+                    else:
+                        attack_dict['%s%d' % (DUMMY_USER_PREFIX, i)] = [value]
+
+        if attack_dict:
+            message = "recognized possible password hash values. "
+            message += "do you want to use dictionary attack on retrieved table items? [Y/n/q]"
+            test = readInput(message, default="Y")
+
+            if test[0] in ("n", "N"):
+                return
+            elif test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+
+            results = dictionaryAttack(attack_dict)
+            for (user, hash_, password) in results:
+                for i in range(count):
+                    for column in columns:
+                        if column == colUser or column == '__infos__':
+                            continue
+                        value = table[column]['values'][i]
+                        if value.lower() == hash_.lower():
+                            table[column]['values'][i] += " (%s)" % password
+
+def hashRecognition(value):
+    retVal = None
+
+    if value:
+        for name, regex in getPublicTypeMembers(HASH):
+            #hashes for Oracle and old MySQL look the same hence these checks
+            if kb.dbms == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
+                continue
+            elif kb.dbms == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
+                continue
+            elif getCompiledRegex(regex).match(value):
+                retVal = regex
+                break
+
+    return retVal
+
+def dictionaryAttack(attack_dict):
+    hash_regexes = []
+    results = []
+
+    for (_, hashes) in attack_dict.items():
         for hash_ in hashes:
             if not hash_:
                 continue
-
             hash_ = hash_.split()[0]
-
-            for name, regex in getPublicTypeMembers(HASH):
-                #hashes for Oracle and old MySQL look the same hence these checks
-                if kb.dbms == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
-                    continue
-
-                elif kb.dbms == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
-                    continue
-
-                elif re.match(regex, hash_):
-                    if regex not in hash_regexes:
-                        hash_regexes.append(regex)
-                        infoMsg = "using hash method: '%s'" % __functions__[regex].func_name
-                        logger.info(infoMsg)
-
+            regex = hashRecognition(hash_)
+            if regex not in hash_regexes:
+                hash_regexes.append(regex)
+                infoMsg = "using hash method: '%s'" % __functions__[regex].func_name
+                logger.info(infoMsg)
 
     for hash_regex in hash_regexes:
         attack_info = []
-        results = []
 
-        for (user, hashes) in kb.data.cachedUsersPasswords.items():
+        for (user, hashes) in attack_dict.items():
             for hash_ in hashes:
                 if not hash_:
                     continue
@@ -242,7 +304,7 @@ def dictionaryAttack():
                     elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD):
                         attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
 
-        if not wordlist:
+        if not kb.wordlist:
             if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
                 message = "what's the dictionary's location? [%s]" % paths.ORACLE_DEFAULT_PASSWD
                 dictpath = readInput(message, default=paths.ORACLE_DEFAULT_PASSWD)
@@ -255,9 +317,9 @@ def dictionaryAttack():
 
             infoMsg = "loading dictionary from: '%s'" % dictpath
             logger.info(infoMsg)
-            wordlist = getFileItems(dictpath, None, False)
+            kb.wordlist = getFileItems(dictpath, None, False)
 
-            length = len(wordlist)
+            length = len(kb.wordlist)
 
         infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
@@ -265,7 +327,7 @@ def dictionaryAttack():
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
 
-            for word in wordlist:
+            for word in kb.wordlist:
                 count += 1
                 current = __functions__[hash_regex](password = word, uppercase = False)
 
@@ -275,7 +337,14 @@ def dictionaryAttack():
                     if hash_ == current:
                         results.append((user, hash_, word))
                         clearConsoleLine()
-                        dataToStdout("[%s] [INFO] found: '%s' for user: '%s'\n" % (time.strftime("%X"), word, user), True)
+                        
+                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                        if user and not user.startswith(DUMMY_USER_PREFIX):
+                            infoMsg += " for user: '%s'\n" % user
+                        else:
+                            infoMsg += " for hash: '%s'\n" % hash_
+                        dataToStdout(infoMsg, True)
+
                         attack_info.remove(item)
 
                     elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
@@ -288,7 +357,7 @@ def dictionaryAttack():
             for ((user, hash_), kwargs) in attack_info:
                 count = 0
 
-                for word in wordlist:
+                for word in kb.wordlist:
                     current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
                     count += 1
 
@@ -297,7 +366,14 @@ def dictionaryAttack():
                             word = word.upper()
                         results.append((user, hash_, word))
                         clearConsoleLine()
-                        dataToStdout("[%s] [INFO] found: '%s' for user: '%s'\n" % (time.strftime("%X"), word, user), True)
+
+                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                        if user and not user.startswith(DUMMY_USER_PREFIX):
+                            infoMsg += " for user: '%s'\n" % user
+                        else:
+                            infoMsg += " for hash: '%s'\n" % hash_
+                        dataToStdout(infoMsg, True)
+
                         break
 
                     elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
@@ -306,12 +382,9 @@ def dictionaryAttack():
 
                 clearConsoleLine()
 
-        for (user, hash_, password) in results:
-            for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
-                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
-
     if len(hash_regexes) == 0:
         warnMsg  = "unknown hash format. "
         warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
         logger.warn(warnMsg)
+
+    return results

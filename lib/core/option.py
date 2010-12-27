@@ -1203,6 +1203,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.targetUrls      = set()
         kb.testedParams    = set()
         kb.userAgents      = None
+        kb.wordlist        = None
 
 def __saveCmdline():
     """

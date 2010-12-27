@@ -51,7 +51,8 @@ from lib.request.connect import Connect as Request
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
 from lib.techniques.inband.union.test import unionTest
-from lib.utils.hash import dictionaryAttack
+from lib.utils.hash import attackDumpedTable
+from lib.utils.hash import attackCachedUsersPasswords
 
 class Enumeration:
     """
@@ -345,7 +346,7 @@ class Enumeration:
         elif test[0] in ("q", "Q"):
             raise sqlmapUserQuitException
         else:
-            dictionaryAttack()
+            attackCachedUsersPasswords()
 
         return kb.data.cachedUsersPasswords
 
@@ -1314,6 +1315,8 @@ class Enumeration:
             logger.warn(warnMsg)
 
             return None
+
+        attackDumpedTable()
 
         return kb.data.dumpedTable
 

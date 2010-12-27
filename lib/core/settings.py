@@ -74,6 +74,9 @@ UPPER_RATIO_BOUND = 0.98
 # dynamicity mark length used in dynamicity removal engine
 DYNAMICITY_MARK_LENGTH = 32
 
+# dummy user prefix used in dictionary attack
+DUMMY_USER_PREFIX = '__dummy__'
+
 # System variables
 IS_WIN             = subprocess.mswindows
 # The name of the operating system dependent module imported. The following
