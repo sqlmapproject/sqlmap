@@ -1117,8 +1117,12 @@ class Enumeration:
 
         if conf.col:
             colList = conf.col.split(",")
-        else:
+        elif kb.data.cachedColumns and conf.db in kb.data.cachedColumns and conf.tbl in kb.data.cachedColumns[conf.db]:
             colList = kb.data.cachedColumns[conf.db][conf.tbl].keys()
+        else:
+            errMsg  = "missing column names, "
+            errMsg += "can't dump table"
+            raise sqlmapNoneDataException, errMsg
 
         if colList in ([None], ['None']):
             warnMsg = "unable to retrieve column names"
