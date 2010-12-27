@@ -1665,7 +1665,15 @@ class Enumeration:
                 raise sqlmapUserQuitException
             else:
                 regex = "|".join(conf.col.split(","))
-                return columnExists(paths.COMMON_COLUMNS, regex)
+                conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS, regex))
+
+                message = "do you want to dump entries? [Y/n] "
+                output = readInput(message, default="Y")
+
+                if output and output[0] not in ("n", "N"):
+                    self.dumpAll()
+
+                return
 
         rootQuery = queries[kb.dbms].search_column
         foundCols = {}
