@@ -61,7 +61,7 @@ class Enumeration:
 
     def __init__(self, dbms):
         kb.data.has_information_schema = False
-        kb.data.banner                 = ""
+        kb.data.banner                 = None
         kb.data.currentUser            = ""
         kb.data.currentDb              = ""
         kb.data.cachedUsers            = []
@@ -84,7 +84,7 @@ class Enumeration:
         infoMsg = "fetching banner"
         logger.info(infoMsg)
 
-        if not kb.data.banner:
+        if kb.data.banner is None:
             if conf.unionTest:
                 conf.dumper.technic("inband injection payload", unionTest())
 
