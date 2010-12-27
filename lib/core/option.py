@@ -118,6 +118,11 @@ def __urllib2Opener():
             warnMsg += "been disabled because of it's incompatibility "
             warnMsg += "with HTTP(s) proxy"
             logger.warn(warnMsg)
+        elif conf.aType:
+            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
+            warnMsg += "been disabled because of it's incompatibility "
+            warnMsg += "with authentication methods"
+            logger.warn(warnMsg)
         else:
             handlers.append(keepAliveHandler)
 
