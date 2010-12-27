@@ -109,7 +109,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if getSeqMatcher:
         return ratio
 
-    elif ratio == 1:
+    elif ratio > UPPER_RATIO_BOUND:
         return True
 
     elif kb.matchRatio is None:
