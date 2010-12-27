@@ -1279,7 +1279,7 @@ class Enumeration:
 
                 if not validPivotValue:
                     warnMsg = "no proper pivot column provided (with unique values)." 
-                    warnMsg += " all row data won't be retrieved."
+                    warnMsg += " all rows can't be retrieved."
                     logger.warn(warnMsg)
 
                 pivotValue = " "
