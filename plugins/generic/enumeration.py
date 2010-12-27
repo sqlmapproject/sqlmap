@@ -79,12 +79,12 @@ class Enumeration:
         if not conf.getBanner:
             return
 
-        kb.dbmsDetected = True
-
-        infoMsg = "fetching banner"
-        logger.info(infoMsg)
-
         if kb.data.banner is None:
+            kb.dbmsDetected = True
+
+            infoMsg = "fetching banner"
+            logger.info(infoMsg)
+
             if conf.unionTest:
                 conf.dumper.technic("inband injection payload", unionTest())
 
@@ -92,16 +92,16 @@ class Enumeration:
             kb.data.banner = inject.getValue(query)
             bannerParser(kb.data.banner)
 
-        if conf.os and conf.os == "windows":
-            kb.bannerFp["type"] = set([ "Windows" ])
+            if conf.os and conf.os == "windows":
+                kb.bannerFp["type"] = set([ "Windows" ])
 
-        elif conf.os and conf.os == "linux":
-            kb.bannerFp["type"] = set([ "Linux" ])
+            elif conf.os and conf.os == "linux":
+                kb.bannerFp["type"] = set([ "Linux" ])
 
-        elif conf.os:
-            kb.bannerFp["type"] = set([ "%s%s" % (conf.os[0].upper(), conf.os[1:]) ])
+            elif conf.os:
+                kb.bannerFp["type"] = set([ "%s%s" % (conf.os[0].upper(), conf.os[1:]) ])
 
-        setOs()
+            setOs()
 
         return kb.data.banner
 
