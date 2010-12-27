@@ -1218,6 +1218,8 @@ class Enumeration:
             indexRange = getRange(count, dump=True, plusOne=plusOne)
 
             if kb.dbms == DBMS.ACCESS:
+                validColumnList = False
+
                 for column in colList:
                     infoMsg = "fetching number of distinct "
                     infoMsg += "values for column '%s'" % column
@@ -1226,14 +1228,20 @@ class Enumeration:
                     query = rootQuery.blind.count2 % (column, conf.tbl)
                     value = inject.getValue(query, inband=False)
 
-                    if isNumPosStrValue(value) and value == count:
-                        infoMsg = "using column '%s' as a pivot " % column
-                        infoMsg += "for retrieving row data"
-                        logger.info(infoMsg)
+                    if isNumPosStrValue(value):
+                        validColumnList = True
+                        if value == count:
+                            infoMsg = "using column '%s' as a pivot " % column
+                            infoMsg += "for retrieving row data"
+                            logger.info(infoMsg)
 
-                        colList.remove(column)
-                        colList.insert(0, column)
-                        break
+                            colList.remove(column)
+                            colList.insert(0, column)
+                            break
+
+                if not validColumnList:
+                    errMsg = "all column name(s) provided are non-existent"
+                    raise sqlmapNoneDataException, errMsg
 
                 pivotValue = " "
                 for index in indexRange:
