@@ -1892,3 +1892,15 @@ def filterListValue(value, regex):
         return retVal
     else:
         return value
+
+def unicodeToSafeHTMLValue(value):
+    """
+    Returns HTML representation of unicode 
+    string value safe for sending over HTTP(s)
+    """
+    retVal = value
+    if value:
+        for char in value:
+            if ord(char) > 127:
+                retVal = retVal.replace(char, "&#%d;" % ord(char))
+    return retVal

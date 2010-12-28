@@ -22,6 +22,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
+from lib.core.common import unicodeToSafeHTMLValue
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
@@ -149,6 +150,11 @@ class Connect:
             if auxHeaders:
                 for key, item in auxHeaders.items():
                     headers[key] = item
+
+            for key, item in headers.items():
+                headers[key] = unicodeToSafeHTMLValue(item)
+
+            post = unicodeToSafeHTMLValue(post)
 
             if method:
                 req = MethodRequest(url, post, headers)
