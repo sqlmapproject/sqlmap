@@ -11,11 +11,10 @@ import re
 import socket
 import time
 
-from difflib import SequenceMatcher
-
 from lib.core.agent import agent
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
+from lib.core.common import findDynamicContent
 from lib.core.common import getCompiledRegex
 from lib.core.common import getInjectionTests
 from lib.core.common import getUnicode
@@ -47,7 +46,6 @@ from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
-from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
@@ -494,8 +492,7 @@ def checkDynParam(place, parameter, value):
 
 def checkDynamicContent(firstPage, secondPage):
     """
-    This function checks if the provided pages have dynamic content. If they
-    are dynamic, proper markings will be made.
+    This function checks for the dynamic content in the provided pages
     """
 
     if kb.nullConnection:
@@ -510,47 +507,29 @@ def checkDynamicContent(firstPage, secondPage):
         logger.debug(debugMsg)
         return
 
-    infoMsg = "searching for dynamic content"
-    logger.info(infoMsg)
+    conf.seqMatcher.set_seq1(firstPage)
+    conf.seqMatcher.set_seq2(secondPage)
 
-    blocks = SequenceMatcher(None, firstPage, secondPage).get_matching_blocks()
-    kb.dynamicMarkings = []
+    # In case of an intolerable difference turn on dynamicity removal engine
+    if conf.seqMatcher.quick_ratio() <= UPPER_RATIO_BOUND:
+        findDynamicContent(firstPage, secondPage)
 
-    # Removing too small matching blocks
-    i = 0
-    while i < len(blocks):
-        block = blocks[i]
-        (_, _, length) = block
+        count = 0
+        while not Request.queryPage():
+            count += 1
 
-        if length <= DYNAMICITY_MARK_LENGTH:
-            blocks.remove(block)
+            if count > conf.retries:
+                errMsg = "target url is too dynamic. unable to continue. "
+                errMsg += "consider using other switches (e.g. "
+                errMsg += "--longest-common, --string, --text-only, etc.)"
+                raise sqlmapSiteTooDynamic, errMsg
 
-        else:
-            i += 1
+            warnMsg = "target url is heavily dynamic"
+            warnMsg += ", sqlmap is going to retry the request"
+            logger.critical(warnMsg)
 
-    # Making of dynamic markings based on prefix/suffix principle
-    if len(blocks) > 0:
-        blocks.insert(0, None)
-        blocks.append(None)
-
-        for i in xrange(len(blocks) - 1):
-            prefix = firstPage[blocks[i][0]:blocks[i][0] + blocks[i][2]] if blocks[i] else None
-            suffix = firstPage[blocks[i + 1][0]:blocks[i + 1][0] + blocks[i + 1][2]] if blocks[i + 1] else None
-
-            if prefix is None and blocks[i + 1][0] == 0:
-                continue
-
-            if suffix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
-                continue
-
-            prefix = trimAlphaNum(prefix)
-            suffix = trimAlphaNum(suffix)
-
-            kb.dynamicMarkings.append((re.escape(prefix[-DYNAMICITY_MARK_LENGTH/2:]) if prefix else None, re.escape(suffix[:DYNAMICITY_MARK_LENGTH/2]) if suffix else None))
-
-    if len(kb.dynamicMarkings) > 0:
-        infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
-        logger.info(infoMsg)
+            secondPage, _ = Request.queryPage(content=True)
+            findDynamicContent(firstPage, secondPage)
 
 def checkStability():
     """
@@ -637,29 +616,7 @@ def checkStability():
                 errMsg = "Empty value supplied"
                 raise sqlmapNoneDataException, errMsg
         else:
-            conf.seqMatcher.set_seq1(firstPage)
-            conf.seqMatcher.set_seq2(secondPage)
-
-            # In case of an intolerable difference turn on dynamicity removal engine
-            if conf.seqMatcher.quick_ratio() <= UPPER_RATIO_BOUND:
-                checkDynamicContent(firstPage, secondPage)
-
-                count = 0
-                while not Request.queryPage():
-                    count += 1
-
-                    if count > conf.retries:
-                        errMsg = "target url is too dynamic. unable to continue. "
-                        errMsg += "consider using other switches (e.g. "
-                        errMsg += "--longest-common, --string, --text-only, etc.)"
-                        raise sqlmapSiteTooDynamic, errMsg
-
-                    warnMsg = "target url is heavily dynamic"
-                    warnMsg += ", sqlmap is going to retry the request"
-                    logger.critical(warnMsg)
-
-                    secondPage, _ = Request.queryPage(content=True)
-                    checkDynamicContent(firstPage, secondPage)
+            checkDynamicContent(firstPage, secondPage)
 
     return kb.pageStable
 

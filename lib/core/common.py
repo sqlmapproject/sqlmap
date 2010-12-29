@@ -72,6 +72,7 @@ from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import TIME_STDEV_COEFF
+from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.threads import getCurrentThreadData
 
 class UnicodeRawConfigParser(RawConfigParser):
@@ -1738,6 +1739,54 @@ def aliasToDbmsEnum(value):
             break
 
     return retVal
+
+def findDynamicContent(firstPage, secondPage):
+    """
+    This function checks if the provided pages have dynamic content. If they
+    are dynamic, proper markings will be made.
+    """
+
+    infoMsg = "searching for dynamic content"
+    logger.info(infoMsg)
+
+    blocks = SequenceMatcher(None, firstPage, secondPage).get_matching_blocks()
+    kb.dynamicMarkings = []
+
+    # Removing too small matching blocks
+    i = 0
+    while i < len(blocks):
+        block = blocks[i]
+        (_, _, length) = block
+
+        if length <= DYNAMICITY_MARK_LENGTH:
+            blocks.remove(block)
+
+        else:
+            i += 1
+
+    # Making of dynamic markings based on prefix/suffix principle
+    if len(blocks) > 0:
+        blocks.insert(0, None)
+        blocks.append(None)
+
+        for i in xrange(len(blocks) - 1):
+            prefix = firstPage[blocks[i][0]:blocks[i][0] + blocks[i][2]] if blocks[i] else None
+            suffix = firstPage[blocks[i + 1][0]:blocks[i + 1][0] + blocks[i + 1][2]] if blocks[i + 1] else None
+
+            if prefix is None and blocks[i + 1][0] == 0:
+                continue
+
+            if suffix is None and (blocks[i][0] + blocks[i][2] >= len(firstPage)):
+                continue
+
+            prefix = trimAlphaNum(prefix)
+            suffix = trimAlphaNum(suffix)
+
+            kb.dynamicMarkings.append((re.escape(prefix[-DYNAMICITY_MARK_LENGTH/2:]) if prefix else None, re.escape(suffix[:DYNAMICITY_MARK_LENGTH/2]) if suffix else None))
+
+    if len(kb.dynamicMarkings) > 0:
+        infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
+        logger.info(infoMsg)
 
 def removeDynamicContent(page):
     """
