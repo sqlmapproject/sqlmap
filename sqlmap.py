@@ -30,6 +30,7 @@ from lib.core.common import getUnicode
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import exceptionsTuple
@@ -112,6 +113,10 @@ def main():
 
     else:
         closeDumper(True)
+
+    finally:
+        kb.threadContinue = False
+        kb.threadException = True
 
     dataToStdout("\n[*] shutting down at: %s\n\n" % time.strftime("%X"), forceOutput=True)
 
