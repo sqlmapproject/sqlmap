@@ -48,6 +48,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
+from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
@@ -636,24 +637,29 @@ def checkStability():
                 errMsg = "Empty value supplied"
                 raise sqlmapNoneDataException, errMsg
         else:
-            checkDynamicContent(firstPage, secondPage)
+            conf.seqMatcher.set_seq1(firstPage)
+            conf.seqMatcher.set_seq2(secondPage)
 
-            count = 0
-            while not Request.queryPage():
-                count += 1
-
-                if count > conf.retries:
-                    errMsg = "target url is too dynamic. unable to continue. "
-                    errMsg += "consider using other switches (e.g. "
-                    errMsg += "--longest-common, --string, --text-only, etc.)"
-                    raise sqlmapSiteTooDynamic, errMsg
-
-                warnMsg = "target url is heavily dynamic"
-                warnMsg += ", sqlmap is going to retry the request"
-                logger.critical(warnMsg)
-
-                secondPage, _ = Request.queryPage(content=True)
+            # In case of an intolerable difference turn on dynamicity removal engine
+            if conf.seqMatcher.quick_ratio() <= UPPER_RATIO_BOUND:
                 checkDynamicContent(firstPage, secondPage)
+
+                count = 0
+                while not Request.queryPage():
+                    count += 1
+
+                    if count > conf.retries:
+                        errMsg = "target url is too dynamic. unable to continue. "
+                        errMsg += "consider using other switches (e.g. "
+                        errMsg += "--longest-common, --string, --text-only, etc.)"
+                        raise sqlmapSiteTooDynamic, errMsg
+
+                    warnMsg = "target url is heavily dynamic"
+                    warnMsg += ", sqlmap is going to retry the request"
+                    logger.critical(warnMsg)
+
+                    secondPage, _ = Request.queryPage(content=True)
+                    checkDynamicContent(firstPage, secondPage)
 
     return kb.pageStable
 
