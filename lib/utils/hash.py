@@ -324,6 +324,10 @@ def dictionaryAttack(attack_dict):
         infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
 
+        for item in attack_info:
+            ((user, _), _) = item
+            kb.wordlist.append(user)
+
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
 
