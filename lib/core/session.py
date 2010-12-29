@@ -82,6 +82,22 @@ def setInjection(inj):
     if condition:
         dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
 
+def setDynamicMarkings(markings):
+    """
+    Save information retrieved about dynamic markings to the
+    session file.
+    """
+
+    condition = (
+                  ( not kb.resumedQueries
+                  or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Dynamic markings")
+                  ) )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Dynamic markings][%s]\n" % (conf.url, None, None, base64pickle(markings)))
+
 def setDbms(dbms):
     """
     @param dbms: database management system to be set into the knowledge
@@ -302,6 +318,11 @@ def resumeConfKb(expression, url, value):
             warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
             warnMsg += "but you did not provided it this time"
             logger.warn(warnMsg)
+
+    elif expression == "Dynamic markings" and url == conf.url:
+        kb.dynamicMarkings = base64unpickle(value[:-1])
+        logMsg = "resuming dynamic markings from session file"
+        logger.info(logMsg)
 
     elif expression == "DBMS" and url == conf.url:
         dbms        = unSafeFormatString(value[:-1])

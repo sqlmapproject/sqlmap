@@ -44,6 +44,7 @@ from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSiteTooDynamic
 from lib.core.exception import sqlmapUserQuitException
+from lib.core.session import setDynamicMarkings
 from lib.core.session import setString
 from lib.core.session import setRegexp
 from lib.core.settings import UPPER_RATIO_BOUND
@@ -530,6 +531,8 @@ def checkDynamicContent(firstPage, secondPage):
 
             secondPage, _ = Request.queryPage(content=True)
             findDynamicContent(firstPage, secondPage)
+
+        setDynamicMarkings(kb.dynamicMarkings)
 
 def checkStability():
     """
