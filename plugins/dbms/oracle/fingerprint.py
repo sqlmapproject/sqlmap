@@ -107,8 +107,8 @@ class Fingerprint(GenericFingerprint):
                 return True
 
             for version in ("11i", "10g", "9i", "8i"):
-                number = re.search("([\d]+)", version).group(1)
-                output = inject.checkBooleanExpression("%s=(SELECT SUBSTR((VERSION), 1, 2) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1)" % number)
+                number = int(re.search("([\d]+)", version).group(1))
+                output = inject.checkBooleanExpression("%d=(SELECT SUBSTR((VERSION), 1, %d) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1)" % (number, 1 if number < 10 else 2))
 
                 if output:
                     kb.dbmsVersion = [ version ]
