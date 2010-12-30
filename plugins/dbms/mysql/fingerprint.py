@@ -66,10 +66,7 @@ class Fingerprint(GenericFingerprint):
             for version in range(element[0], element[1] + 1):
                 randInt = randomInt()
                 version = getUnicode(version)
-                query   = agent.prefixQuery("/*!%s AND %d=%d*/" % (version, randInt, randInt + 1))
-                query   = agent.suffixQuery(query)
-                payload = agent.payload(newValue=query)
-                result  = Request.queryPage(payload)
+                result = inject.checkBooleanExpression("%d=%d/*!%s AND %d=%d*/" % (randInt, randInt, version, randInt, randInt + 1))
 
                 if result:
                     if not prevVer:
