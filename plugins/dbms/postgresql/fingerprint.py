@@ -108,9 +108,9 @@ class Fingerprint(GenericFingerprint):
 
             if inject.checkBooleanExpression("2=(SELECT DIV(6, 3))"):
                 kb.dbmsVersion = [">= 8.4.0"]
-            elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP()::text, 1, 1)", unpack=False, charsetType=2, suppressOutput=True) in ( "1", "2" ) and not inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2, suppressOutput=True) in ( "1", "2" ):
+            elif inject.checkBooleanExpression("EXTRACT(ISODOW FROM CURRENT_TIMESTAMP)<8"):
                 kb.dbmsVersion = [">= 8.3.0", "< 8.4"]
-            elif inject.getValue("SELECT SUBSTR(TRANSACTION_TIMESTAMP(), 1, 1)", unpack=False, charsetType=2, suppressOutput=True):
+            elif inject.checkBooleanExpression("ISFINITE(TRANSACTION_TIMESTAMP())"):
                 kb.dbmsVersion = [">= 8.2.0", "< 8.3.0"]
             elif inject.checkBooleanExpression("9=(SELECT GREATEST(5, 9, 1))"):
                 kb.dbmsVersion = [">= 8.1.0", "< 8.2.0"]
@@ -128,7 +128,7 @@ class Fingerprint(GenericFingerprint):
                 kb.dbmsVersion = [">= 7.0.0", "< 7.1.0"]
             elif inject.checkBooleanExpression("'a'=(SELECT MAX('a'))"):
                 kb.dbmsVersion = [">= 6.5.0", "< 6.5.3"]
-            elif re.search("([\d\.]+)", inject.getValue("SELECT SUBSTR(VERSION(), 12, 5)", unpack=False, suppressOutput=True)):
+            elif inject.checkBooleanExpression("VERSION()=VERSION()"):
                 kb.dbmsVersion = [">= 6.4.0", "< 6.5.0"]
             elif inject.checkBooleanExpression("2=(SELECT SUBSTR(CURRENT_DATE, 1, 1))"):
                 kb.dbmsVersion = [">= 6.3.0", "< 6.4.0"]
