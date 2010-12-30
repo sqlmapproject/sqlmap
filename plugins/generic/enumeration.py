@@ -885,10 +885,22 @@ class Enumeration:
     def getColumns(self, onlyColNames=False):
         bruteForce = False
 
+        if not conf.tbl:
+            errMsg = "missing table parameter"
+            raise sqlmapMissingMandatoryOptionException, errMsg
+
         if "." in conf.tbl:
             conf.db, conf.tbl = conf.tbl.split(".")
 
         self.forceDbmsEnum()
+
+        if not conf.db:
+            warnMsg  = "missing database parameter, sqlmap is going to "
+            warnMsg += "use the current database to enumerate table "
+            warnMsg += "'%s' columns" % conf.tbl
+            logger.warn(warnMsg)
+
+            conf.db = self.getCurrentDb()
 
         if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
@@ -927,18 +939,6 @@ class Enumeration:
                 raise sqlmapUserQuitException
             else:
                 return columnExists(paths.COMMON_COLUMNS)
-
-        if not conf.tbl:
-            errMsg = "missing table parameter"
-            raise sqlmapMissingMandatoryOptionException, errMsg
-
-        if not conf.db:
-            warnMsg  = "missing database parameter, sqlmap is going to "
-            warnMsg += "use the current database to enumerate table "
-            warnMsg += "'%s' columns" % conf.tbl
-            logger.warn(warnMsg)
-
-            conf.db = self.getCurrentDb()
 
         firebirdTypes = {
                             "261":"BLOB",
