@@ -36,10 +36,8 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "executing MySQL comment injection fingerprint"
         logger.info(infoMsg)
 
-        query   = agent.prefixQuery("/* NoValue */")
-        query   = agent.suffixQuery(query)
-        payload = agent.payload(newValue=query)
-        result  = Request.queryPage(payload)
+        randInt = randomInt()
+        result = inject.checkBooleanExpression("%d=%d/* NoValue */" % (randInt, randInt))
 
         if not result:
             warnMsg = "unable to perform MySQL comment injection"
