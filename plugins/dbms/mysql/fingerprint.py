@@ -49,15 +49,15 @@ class Fingerprint(GenericFingerprint):
 
         # MySQL valid versions updated on 01/2010
         versions = (
-                     (32200, 32234),    # MySQL 3.22
-                     (32300, 32360),    # MySQL 3.23
+                     (32200, 32235),    # MySQL 3.22
+                     (32300, 32359),    # MySQL 3.23
                      (40000, 40032),    # MySQL 4.0
-                     (40100, 40123),    # MySQL 4.1
-                     (50000, 50090),    # MySQL 5.0
-                     (50100, 50142),    # MySQL 5.1
-                     (50400, 50405),    # MySQL 5.4
-                     (50500, 50502),    # MySQL 5.5
-                     (60000, 60011),    # MySQL 6.0
+                     (40100, 40131),    # MySQL 4.1
+                     (50000, 50092),    # MySQL 5.0
+                     (50100, 50154),    # MySQL 5.1
+                     (50400, 50404),    # MySQL 5.4
+                     (50500, 50509),    # MySQL 5.5
+                     (60000, 60014),    # MySQL 6.0
                    )
 
         index = -1

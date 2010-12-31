@@ -378,7 +378,7 @@ def start():
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if not conf.realTest:
                     errMsg = "all parameters are not injectable, try "
-                    errMsg += "a higher --level"
+                    errMsg += "a higher --level/--risk and/or --text-only switch"
                     raise sqlmapNotVulnerableException, errMsg
                 else:
                     errMsg = "it seems that all parameters are not injectable"
