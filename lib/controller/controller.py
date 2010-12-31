@@ -311,11 +311,11 @@ def start():
                     if not conf.paramDict.has_key(place):
                         continue
 
-                    if not proceed:
-                        break
-
                     paramDict = conf.paramDict[place]
                     for parameter, value in paramDict.items():
+                        if not proceed:
+                            break
+
                         testSqlInj = True
 
                         paramKey = (conf.hostname, conf.path, place, parameter)
@@ -369,7 +369,6 @@ def start():
                                     proceed = False
                                     paramKey = (conf.hostname, conf.path, None, None)
                                     kb.testedParams.add(paramKey)
-                                    break
                             else:
                                 warnMsg  = "%s parameter '%s' is not " % (place, parameter)
                                 warnMsg += "injectable"

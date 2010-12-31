@@ -412,15 +412,15 @@ def checkSqlInjection(place, parameter, value):
             if not test or test[0] in ("s", "S"):
                 pass
             elif test[0] in ("n", "N"):
-                break
+                return None
             elif test[0] in ("e", "E"):
                 kb.endDetection = True
-                break
+                return None
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
-
-    # Flush the flag
-    kb.testMode = False
+        finally:
+            # Flush the flag
+            kb.testMode = False
 
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:
