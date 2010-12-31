@@ -60,10 +60,22 @@ class Fingerprint(GenericFingerprint):
                      (60000, 60011),    # MySQL 6.0
                    )
 
-        for element in versions:
+        index = None
+        for i in xrange(len(versions)):
+            element = versions[i]
+            version = element[0]
+            randInt = randomInt()
+            version = getUnicode(version)
+            result = inject.checkBooleanExpression("%d=%d/*!%s AND %d=%d*/" % (randInt, randInt, version, randInt, randInt + 1))
+
+            if result:
+                index = i - 1
+                break
+
+        if index and index >= 0:
             prevVer = None
 
-            for version in range(element[0], element[1] + 1):
+            for version in range(versions[index][0], versions[index][1] + 1):
                 randInt = randomInt()
                 version = getUnicode(version)
                 result = inject.checkBooleanExpression("%d=%d/*!%s AND %d=%d*/" % (randInt, randInt, version, randInt, randInt + 1))
