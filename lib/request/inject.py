@@ -424,7 +424,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goInband(query, expected, sort, resumeValue, unpack, dump)
 
                 count += 1
-                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
+                found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             oldUnionNegative = kb.unionNegative
             kb.unionNegative = False
@@ -438,7 +438,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goError(query, resumeValue)
 
                 count += 1
-                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
+                found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
@@ -449,7 +449,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
 
                 count += 1
-                found = value or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
+                found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             if time and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)) and not found:
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
