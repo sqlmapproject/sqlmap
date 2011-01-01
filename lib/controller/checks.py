@@ -731,7 +731,18 @@ def checkConnection(suppressOutput=False):
     try:
         page, _ = Request.queryPage(content=True)
         kb.originalPage = kb.pageTemplate = page
-        kb.errorIsNone = not wasLastRequestDBMSError() and not wasLastRequestHTTPError()
+
+        kb.errorIsNone = False
+        if wasLastRequestDBMSError():
+            warnMsg = "there is an (DBMS) error found in the content of provided target url"
+            warnMsg += " which could interfere with the results of the tests"
+            logger.warn(warnMsg)
+        elif wasLastRequestHTTPError():
+            warnMsg = "there is an (HTTP) error found in the content of provided target url"
+            warnMsg += " which could interfere with the results of the tests"
+            logger.warn(warnMsg)
+        else:
+            kb.errorIsNone = True
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise sqlmapConnectionException, errMsg
