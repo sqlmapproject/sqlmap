@@ -217,12 +217,16 @@ class Fingerprint(GenericFingerprint):
                 # Check if it is MySQL >= 5.0.0 and < 5.1.2
                 elif inject.checkBooleanExpression("@@hostname=@@hostname"):
                     kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
+                elif inject.checkBooleanExpression("@@character_set_filesystem=@@character_set_filesystem"):
+                    kb.dbmsVersion = [">= 5.0.19", "< 5.0.38"]
                 elif not inject.checkBooleanExpression("%s=(SELECT %s FROM DUAL WHERE %s!=%s)" % (randInt, randInt, randInt, randInt)):
-                    kb.dbmsVersion = [">= 5.0.11", "< 5.0.38"]
-                elif inject.checkBooleanExpression("DATABASE() LIKE SCHEMA()"):
-                    kb.dbmsVersion = [">= 5.0.2", "< 5.0.11"]
+                    kb.dbmsVersion = [">= 5.0.11", "< 5.0.19"]
+                elif inject.checkBooleanExpression("@@div_precision_increment=@@div_precision_increment"):
+                    kb.dbmsVersion = [">= 5.0.6", "< 5.0.11"]
+                elif inject.checkBooleanExpression("@@automatic_sp_privileges=@@automatic_sp_privileges"):
+                    kb.dbmsVersion = [">= 5.0.3", "< 5.0.6"]
                 else:
-                    kb.dbmsVersion = [">= 5.0.0", "<= 5.0.1"]
+                    kb.dbmsVersion = [">= 5.0.0", "< 5.0.3"]
 
             # For cases when information_schema is missing
             elif inject.checkBooleanExpression("DATABASE() LIKE SCHEMA()"):
