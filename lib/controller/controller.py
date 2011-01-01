@@ -19,7 +19,6 @@ from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.controller.checks import checkNullConnection
 from lib.core.agent import agent
-from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
@@ -327,7 +326,7 @@ def start():
 
                         # Avoid dinamicity test if the user provided the
                         # parameter manually
-                        elif parameter in conf.testParameter:
+                        elif parameter in conf.testParameter or conf.realTest:
                             pass
 
                         elif not checkDynParam(place, parameter, value):
