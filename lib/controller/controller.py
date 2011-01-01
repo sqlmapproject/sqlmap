@@ -27,7 +27,6 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.dump import dumper
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
@@ -118,7 +117,7 @@ def __showInjections():
 
     data = data.rstrip("\n")
 
-    dumper.technic(header, data)
+    conf.dumper.technic(header, data)
 
 def __saveToSessionFile():
     for inj in kb.injections:
