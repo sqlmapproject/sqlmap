@@ -1139,11 +1139,6 @@ class Enumeration:
                 kb.data.cachedColumns[conf.db][conf.tbl][column] = None
 
         elif not kb.data.cachedColumns:
-            if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
-                errMsg  = "information_schema not available, "
-                errMsg += "back-end DBMS is MySQL < 5.0"
-                raise sqlmapUnsupportedFeatureException, errMsg
-
             kb.data.cachedColumns = self.getColumns(onlyColNames=True)
 
         if conf.col:
@@ -1248,102 +1243,106 @@ class Enumeration:
                 plusOne = False
             indexRange = getRange(count, dump=True, plusOne=plusOne)
 
-            if kb.dbms == DBMS.ACCESS:
-                validColumnList = False
-                validPivotValue = False
+            try:
+                if kb.dbms == DBMS.ACCESS:
+                    validColumnList = False
+                    validPivotValue = False
 
-                for column in colList:
-                    infoMsg = "fetching number of distinct "
-                    infoMsg += "values for column '%s'" % column
-                    logger.info(infoMsg)
-
-                    query = rootQuery.blind.count2 % (column, conf.tbl)
-                    value = inject.getValue(query, inband=False)
-
-                    if isNumPosStrValue(value):
-                        validColumnList = True
-                        if value == count:
-                            infoMsg = "using column '%s' as a pivot " % column
-                            infoMsg += "for retrieving row data"
-                            logger.info(infoMsg)
-
-                            validPivotValue = True
-
-                            colList.remove(column)
-                            colList.insert(0, column)
-                            break
-
-                if not validColumnList:
-                    errMsg = "all column name(s) provided are non-existent"
-                    raise sqlmapNoneDataException, errMsg
-
-                if not validPivotValue:
-                    warnMsg = "no proper pivot column provided (with unique values)." 
-                    warnMsg += " all rows can't be retrieved."
-                    logger.warn(warnMsg)
-
-                pivotValue = " "
-                breakRetrieval = False
-                for index in indexRange:
-                    if breakRetrieval:
-                        break
                     for column in colList:
-                        if column not in lengths:
-                            lengths[column] = 0
+                        infoMsg = "fetching number of distinct "
+                        infoMsg += "values for column '%s'" % column
+                        logger.info(infoMsg)
 
-                        if column not in entries:
-                            entries[column] = []
-
-                        if column == colList[0]:
-                            # Correction for pivotValues with unrecognized chars
-                            if pivotValue and '?' in pivotValue and pivotValue[0]!='?':
-                                pivotValue = pivotValue.split('?')[0]
-                                pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
-                            query = rootQuery.blind.query % (column, conf.tbl, column, pivotValue)
-                        else:
-                            query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], pivotValue)
-
+                        query = rootQuery.blind.count2 % (column, conf.tbl)
                         value = inject.getValue(query, inband=False)
-                        if column == colList[0]:
-                            if not value:
-                                breakRetrieval = True
+
+                        if isNumPosStrValue(value):
+                            validColumnList = True
+                            if value == count:
+                                infoMsg = "using column '%s' as a pivot " % column
+                                infoMsg += "for retrieving row data"
+                                logger.info(infoMsg)
+
+                                validPivotValue = True
+
+                                colList.remove(column)
+                                colList.insert(0, column)
                                 break
+
+                    if not validColumnList:
+                        errMsg = "all column name(s) provided are non-existent"
+                        raise sqlmapNoneDataException, errMsg
+
+                    if not validPivotValue:
+                        warnMsg = "no proper pivot column provided (with unique values)." 
+                        warnMsg += " all rows can't be retrieved."
+                        logger.warn(warnMsg)
+
+                    pivotValue = " "
+                    breakRetrieval = False
+                    for index in indexRange:
+                        if breakRetrieval:
+                            break
+                        for column in colList:
+                            if column not in lengths:
+                                lengths[column] = 0
+
+                            if column not in entries:
+                                entries[column] = []
+
+                            if column == colList[0]:
+                                # Correction for pivotValues with unrecognized chars
+                                if pivotValue and '?' in pivotValue and pivotValue[0]!='?':
+                                    pivotValue = pivotValue.split('?')[0]
+                                    pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
+                                query = rootQuery.blind.query % (column, conf.tbl, column, pivotValue)
                             else:
-                                pivotValue = value
-                        lengths[column] = max(lengths[column], len(value))
-                        entries[column].append(value)
+                                query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], pivotValue)
 
-            else:
-                for index in indexRange:
-                    for column in colList:
-                        if column not in lengths:
-                            lengths[column] = 0
+                            value = inject.getValue(query, inband=False)
+                            if column == colList[0]:
+                                if not value:
+                                    breakRetrieval = True
+                                    break
+                                else:
+                                    pivotValue = value
+                            lengths[column] = max(lengths[column], len(value))
+                            entries[column].append(value)
 
-                        if column not in entries:
-                            entries[column] = []
+                else:
+                    for index in indexRange:
+                        for column in colList:
+                            if column not in lengths:
+                                lengths[column] = 0
 
-                        if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
-                            query = rootQuery.blind.query % (column, conf.db,
-                                                                   conf.tbl, index)
-                        elif kb.dbms == DBMS.ORACLE:
-                            query = rootQuery.blind.query % (column, column,
-                                                                   conf.tbl.upper(),
-                                                                   index)
-                        elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
-                            query = rootQuery.blind.query % (column, index, conf.db,
-                                                                   conf.tbl, colList[0],
-                                                                   colList[0], colList[0])
+                            if column not in entries:
+                                entries[column] = []
 
-                        elif kb.dbms == DBMS.SQLITE:
-                            query = rootQuery.blind.query % (column, conf.tbl, index)
+                            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+                                query = rootQuery.blind.query % (column, conf.db,
+                                                                       conf.tbl, index)
+                            elif kb.dbms == DBMS.ORACLE:
+                                query = rootQuery.blind.query % (column, column,
+                                                                       conf.tbl.upper(),
+                                                                       index)
+                            elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                                query = rootQuery.blind.query % (column, index, conf.db,
+                                                                       conf.tbl, colList[0],
+                                                                       colList[0], colList[0])
 
-                        elif kb.dbms == DBMS.FIREBIRD:
-                            query = rootQuery.blind.query % (index, column, conf.tbl)
+                            elif kb.dbms == DBMS.SQLITE:
+                                query = rootQuery.blind.query % (column, conf.tbl, index)
 
-                        value = inject.getValue(query, inband=False)
+                            elif kb.dbms == DBMS.FIREBIRD:
+                                query = rootQuery.blind.query % (index, column, conf.tbl)
 
-                        lengths[column] = max(lengths[column], len(value))
-                        entries[column].append(value)
+                            value = inject.getValue(query, inband=False)
+
+                            lengths[column] = max(lengths[column], len(value))
+                            entries[column].append(value)
+            except KeyboardInterrupt:
+                warnMsg = "Ctrl+C detected in dumping phase"
+                logger.warn(warnMsg)
 
             for column, columnEntries in entries.items():
                 if lengths[column] < len(column):
