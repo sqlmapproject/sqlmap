@@ -1190,6 +1190,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.responseTimes   = []
     kb.resumedQueries  = {}
     kb.retriesCount    = 0
+    kb.skipTests       = None
     kb.technique       = None
     kb.testMode        = False
     kb.testQueryCount  = 0

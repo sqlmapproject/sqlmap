@@ -139,6 +139,21 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
+                if kb.htmlFp and kb.htmlFp[-1] and kb.htmlFp[-1] != dbms\
+                  and kb.skipTests is None:
+                    message = "heuristic test showed that the back-end DBMS could be '%s'." % kb.htmlFp[-1]
+                    message += " do you want to skip test payloads specific for other DBMSes? [Y/n]"
+                    kb.skipTests = conf.realTest or readInput(message, default="Y") not in ("n", "N")
+
+                if kb.skipTests:
+                    debugMsg = "skipping test '%s' because " % title
+                    debugMsg += "the heuristic test showed that "
+                    debugMsg += "the back-end DBMS could be "
+                    debugMsg += "%s" % kb.htmlFp[-1]
+                    logger.debug(debugMsg)
+
+                    continue
+
             # Skip test if it is the same SQL injection type already
             # identified by another test
             if injection.data and stype in injection.data:
