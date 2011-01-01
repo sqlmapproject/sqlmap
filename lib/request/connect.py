@@ -240,6 +240,7 @@ class Connect:
             # Explicit closing of connection object
             if not conf.keepAlive:
                 try:
+                    conn.fp._sock.close()
                     conn.close()
                 except Exception, msg:
                     warnMsg = "problem occured during connection closing ('%s')" % msg
