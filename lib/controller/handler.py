@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import getErrorParsedDBMS
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.data import conf
@@ -62,7 +63,7 @@ def setHandler():
                   ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
                 ]
 
-    inferencedDbms = (kb.htmlFp[-1] if kb.htmlFp else None) or kb.dbms
+    inferencedDbms = getErrorParsedDBMS() or kb.dbms
 
     for injection in kb.injections:
         if hasattr(injection, "dbms") and injection.dbms:

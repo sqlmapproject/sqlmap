@@ -1919,8 +1919,8 @@ def getInjectionTests():
     detected DBMS from error messages
     """
     retVal = conf.tests
-    if kb.htmlFp:
-        dbms = kb.htmlFp[-1]
+    if getErrorParsedDBMS():
+        dbms = getErrorParsedDBMS()
         retVal = sorted(retVal, key=lambda test: False\
           if 'details' in test and 'dbms' in test.details\
           and test.details.dbms == dbms else True)
@@ -1953,3 +1953,6 @@ def unicodeToSafeHTMLValue(value):
             if ord(char) > 127:
                 retVal = retVal.replace(char, "&#%d;" % ord(char))
     return retVal
+
+def getErrorParsedDBMS():
+    return kb.htmlFp[0] if kb.htmlFp else None

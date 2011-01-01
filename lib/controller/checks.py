@@ -16,6 +16,7 @@ from lib.core.common import beep
 from lib.core.common import extractRegexResult
 from lib.core.common import findDynamicContent
 from lib.core.common import getCompiledRegex
+from lib.core.common import getErrorParsedDBMS
 from lib.core.common import getInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import popValue
@@ -139,9 +140,9 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-                if kb.htmlFp and kb.htmlFp[-1] and kb.htmlFp[-1] != dbms\
+                if getErrorParsedDBMS() and getErrorParsedDBMS() != dbms\
                   and kb.skipTests is None:
-                    message = "heuristic test showed that the back-end DBMS could be '%s'." % kb.htmlFp[-1]
+                    message = "heuristic test showed that the back-end DBMS could be '%s'." % getErrorParsedDBMS()
                     message += " do you want to skip test payloads specific for other DBMSes? [Y/n]"
                     kb.skipTests = conf.realTest or readInput(message, default="Y") not in ("n", "N")
 
@@ -149,7 +150,7 @@ def checkSqlInjection(place, parameter, value):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the heuristic test showed that "
                     debugMsg += "the back-end DBMS could be "
-                    debugMsg += "%s" % kb.htmlFp[-1]
+                    debugMsg += "%s" % getErrorParsedDBMS()
                     logger.debug(debugMsg)
 
                     continue
@@ -472,7 +473,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
     infoMsg += "parameter '%s' might " % parameter
 
     if result:
-        infoMsg += "be injectable (possible DBMS: %s)" % (kb.htmlFp[-1] if kb.htmlFp else 'Unknown')
+        infoMsg += "be injectable (possible DBMS: %s)" % (getErrorParsedDBMS() or 'Unknown')
         logger.info(infoMsg)
     else:
         infoMsg += "not be injectable"
