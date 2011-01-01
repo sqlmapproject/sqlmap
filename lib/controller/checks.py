@@ -81,7 +81,10 @@ def checkSqlInjection(place, parameter, value):
     kb.testMode = True
 
     for test in getInjectionTests():
-        try:
+        try:            
+            if kb.endDetection:
+                break
+
             title = test.title
             stype = test.stype
             clause = test.clause
@@ -415,7 +418,6 @@ def checkSqlInjection(place, parameter, value):
                 return None
             elif test[0] in ("e", "E"):
                 kb.endDetection = True
-                return None
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
         finally:
