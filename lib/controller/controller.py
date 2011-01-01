@@ -387,7 +387,9 @@ def start():
                 __selectInjection()
 
             if kb.injection.place is not None and kb.injection.parameter is not None:
-                if conf.multipleTargets:
+                if kb.testQueryCount == 0 and conf.realTest:
+                    condition = False
+                elif conf.multipleTargets:
                     message = "do you want to exploit this SQL injection? [Y/n] "
                     exploit = readInput(message, default="Y")
 
