@@ -21,6 +21,7 @@ import urlparse
 import ntpath
 import posixpath
 import subprocess
+import httplib
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
@@ -419,14 +420,13 @@ def filePathToString(filePath):
     return strRepl
 
 def dataToStdout(data, forceOutput=False):
-    if (forceOutput or conf.verbose > 0)\
-        and not ('threadException' in kb and kb.threadException)\
-        and not ('disableStdOut' in kb and kb.disableStdOut):
-        try:
-            sys.stdout.write(data)
-            sys.stdout.flush()
-        except UnicodeEncodeError:
-            print data.encode(conf.dataEncoding)
+    if not ('threadException' in kb and kb.threadException):
+        if forceOutput or (conf.verbose > 0) and not ('disableStdOut' in kb and kb.disableStdOut):
+            try:
+                sys.stdout.write(data)
+                sys.stdout.flush()
+            except UnicodeEncodeError:
+                print data.encode(conf.dataEncoding)
 
 def dataToSessionFile(data):
     if not conf.sessionFile:
@@ -1956,3 +1956,11 @@ def unicodeToSafeHTMLValue(value):
 
 def getErrorParsedDBMS():
     return kb.htmlFp[0] if kb.htmlFp else None
+
+def showHttpErrorCodes():
+    if kb.httpErrorCodes:
+        warnMsg = "HTTP error codes detected during testing:\n"
+        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code]\
+          if code in httplib.responses else '?', count)\
+          for code, count in kb.httpErrorCodes.items())
+        logger.warn(warnMsg)

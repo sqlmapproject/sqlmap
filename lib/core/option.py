@@ -1156,6 +1156,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.docRoot         = None
     kb.dynamicMarkings = []
     kb.endDetection    = False
+    kb.httpErrorCodes  = {}
     kb.errorIsNone     = True
     kb.formNames       = []
     kb.headersCount    = 0

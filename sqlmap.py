@@ -115,10 +115,10 @@ def main():
         closeDumper(True)
 
     finally:
+        dataToStdout("\n[*] shutting down at: %s\n\n" % time.strftime("%X"), forceOutput=True)
+
         kb.threadContinue = False
         kb.threadException = True
-
-    dataToStdout("\n[*] shutting down at: %s\n\n" % time.strftime("%X"), forceOutput=True)
 
 if __name__ == "__main__":
     main()

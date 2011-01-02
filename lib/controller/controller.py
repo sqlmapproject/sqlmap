@@ -23,6 +23,7 @@ from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
+from lib.core.common import showHttpErrorCodes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -431,6 +432,9 @@ def start():
             else:
                 logger.critical(e)
                 return False
+
+        finally:
+            showHttpErrorCodes()
 
     if conf.loggedToOut:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)

@@ -252,6 +252,10 @@ class Connect:
 
             threadData.lastHTTPError = (threadData.lastRequestUID, code)
 
+            if code not in kb.httpErrorCodes:
+                kb.httpErrorCodes[code] = 0
+            kb.httpErrorCodes[code] += 1
+
             try:
                 page = e.read()
                 responseHeaders = e.info()
