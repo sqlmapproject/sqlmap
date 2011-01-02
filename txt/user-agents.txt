@@ -8,45 +8,7 @@ Gigabot/2.0
 Googlebot-Image/1.0
 Googlebot/2.1 (+http://www.google.com/bot.html)
 Jigsaw/2.2.5 W3C_CSS_Validator_JFouffa/2.0
-Links (0.99pre14; CYGWIN_NT-5.0 1.5.16(0.128/4/2) i686; 80x25)
-Links (2.1pre17; Linux 2.6.11-gentoo-r8 i686; 80x24)
-Links (2.1pre19; Linux 2.6.14-gentoo-r5 i686; x)
-Lynx/2.8.4rel.1 libwww-FM/2.14
-Lynx/2.8.5rel.1 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.8a
 Microsoft Internet Explorer/4.0b1 (Windows 95)
-Mozilla/1.1 (compatible; MSPIE 2.0; Windows CE)
-Mozilla/1.22 (compatible; MSIE 1.5; Windows NT)
-Mozilla/1.22 (compatible; MSIE 2.0; Windows 95)
-Mozilla/2.0 (compatible; Ask Jeeves/Teoma)
-Mozilla/2.0 (compatible; MSIE 3.01; Windows 98)
-Mozilla/3.0 (OS/2; U)
-Mozilla/3.0 (Slurp/si; slurp@inktomi.com; http://www.inktomi.com/slurp.html)
-Mozilla/3.0 (X11; I; SunOS 5.4 sun4m)
-Mozilla/4.0 (compatible; grub-client-1.4.3; Crawl your own stuff with http://grub.org) Mozilla/4.0 (compatible; grub-client-2.3)
-Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; PPC; 240x320)
-Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; Smartphone; 176x220)
-Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; Smartphone; 240x320)
-Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)
-Mozilla/4.0 (compatible; MSIE 5.0; SunOS 5.9 sun4u; X11)
-Mozilla/4.0 (compatible; MSIE 5.0; Windows 2000) Opera 6.03 [en]
-Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 5.0)
-Mozilla/4.0 (compatible; MSIE 6.0; ; Linux armv5tejl; U) Opera 8.02 [en_US] Maemo browser 0.4.31 N770/SU-18
-Mozilla/4.0 (compatible; MSIE 6.0; America Online Browser 1.1; rev1.1; Windows NT 5.1;)
-Mozilla/4.0 (compatible; MSIE 6.0; America Online Browser 1.1; rev1.2; Windows NT 5.1;)
-Mozilla/4.0 (compatible; MSIE 6.0; America Online Browser 1.1; rev1.5; Windows NT 5.1;)
-Mozilla/4.0 (compatible; MSIE 6.0; MSN 2.5; Windows 98)
-Mozilla/4.0 (compatible; MSIE 6.0; Nitro) Opera 8.50 [en]
-Mozilla/4.0 (compatible; MSIE 6.0; Nitro) Opera 8.50 [ja]
-Mozilla/4.0 (compatible; MSIE 6.0; Symbian OS; Nokia 6630/4.03.38; 6937) Opera 8.50 [es]
-Mozilla/4.0 (compatible; MSIE 6.0; Windows CE; IEMobile m.n) where 
-Mozilla/4.0 (compatible; MSIE 6.0; Windows CE; Motorola VIP12xx)
-Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en) Opera 8.50
-Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
-Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)
-Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2)
-Mozilla/4.0 (compatible; MSIE 7.0b; Win32)
-Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 5.1)
-Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 6.0)
 Mozilla/4.61 (Macintosh; I; PPC)
 Mozilla/4.61 [en] (OS/2; U)
 Mozilla/4.7 (compatible; OffByOne; Windows 2000)
