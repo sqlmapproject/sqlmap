@@ -361,23 +361,24 @@ def resumeConfKb(expression, url, value):
     elif expression == "OS" and url == conf.url:
         os = unSafeFormatString(value[:-1])
 
-        logMsg = "resuming back-end DBMS operating system '%s' " % os
-        logMsg += "from session file"
-        logger.info(logMsg)
+        if os and os != 'None':
+            logMsg = "resuming back-end DBMS operating system '%s' " % os
+            logMsg += "from session file"
+            logger.info(logMsg)
 
-        if conf.os and conf.os.lower() != os.lower():
-            message  = "you provided '%s' as back-end DBMS operating " % conf.os
-            message += "system, but from a past scan information on the "
-            message += "target URL sqlmap assumes the back-end DBMS "
-            message += "operating system is %s. " % os
-            message += "Do you really want to force the back-end DBMS "
-            message += "OS value? [y/N] "
-            test = readInput(message, default="N")
+            if conf.os and conf.os.lower() != os.lower():
+                message  = "you provided '%s' as back-end DBMS operating " % conf.os
+                message += "system, but from a past scan information on the "
+                message += "target URL sqlmap assumes the back-end DBMS "
+                message += "operating system is %s. " % os
+                message += "Do you really want to force the back-end DBMS "
+                message += "OS value? [y/N] "
+                test = readInput(message, default="N")
 
-            if not test or test[0] in ("n", "N"):
+                if not test or test[0] in ("n", "N"):
+                    conf.os = os
+            else:
                 conf.os = os
-        else:
-            conf.os = os
 
     elif expression == "TABLE_EXISTS" and url == conf.url:
         table = unSafeFormatString(value[:-1])
