@@ -1313,7 +1313,7 @@ class Enumeration:
                                     break
                                 else:
                                     pivotValue = value
-                            lengths[column] = max(lengths[column], len(value))
+                            lengths[column] = max(lengths[column], len(value) if value else 0)
                             entries[column].append(value)
 
                 else:
@@ -1345,7 +1345,7 @@ class Enumeration:
 
                             value = inject.getValue(query, inband=False)
 
-                            lengths[column] = max(lengths[column], len(value))
+                            lengths[column] = max(lengths[column], len(value) if value else 0)
                             entries[column].append(value)
             except KeyboardInterrupt:
                 warnMsg = "Ctrl+C detected in dumping phase"
