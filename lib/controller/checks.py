@@ -142,14 +142,14 @@ def checkSqlInjection(place, parameter, value):
 
                 if getErrorParsedDBMS() and getErrorParsedDBMS() != dbms\
                   and kb.skipTests is None:
-                    message = "heuristic test showed that the back-end DBMS could be '%s'." % getErrorParsedDBMS()
+                    message = "parsed error message(s) showed that the back-end DBMS could be '%s'." % getErrorParsedDBMS()
                     message += " do you want to skip test payloads specific for other DBMSes? [Y/n]"
                     kb.skipTests = conf.realTest or readInput(message, default="Y") not in ("n", "N")
 
                 if kb.skipTests:
                     debugMsg = "skipping test '%s' because " % title
-                    debugMsg += "the heuristic test showed that "
-                    debugMsg += "the back-end DBMS could be "
+                    debugMsg += "the parsed error message(s) showed "
+                    debugMsg += "that the back-end DBMS could be "
                     debugMsg += "%s" % getErrorParsedDBMS()
                     logger.debug(debugMsg)
 
