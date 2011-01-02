@@ -101,7 +101,8 @@ class Enumeration:
             elif conf.os:
                 kb.bannerFp["type"] = set([ "%s%s" % (conf.os[0].upper(), conf.os[1:]) ])
 
-            setOs()
+            if conf.os:
+                setOs()
 
         return kb.data.banner
 
