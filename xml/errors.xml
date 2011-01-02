@@ -25,6 +25,7 @@
         <error regexp="Warning.*mssql_.*"/>
         <error regexp="(\W|\A)SQL Server.*[0-9a-fA-F]{8}"/>
         <error regexp="Exception Details:.*\WSystem\."/>
+        <error regexp="Exception Details:.*\WRoadhouse\.Cms\."/>
     </dbms>
 
     <!-- Microsoft Access -->
