@@ -38,6 +38,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
+from extra.pagerank.pagerank import get_pagerank
 
 def __selectInjection():
     """
@@ -193,7 +194,7 @@ def start():
                 if conf.forms:
                     message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
                 else:
-                    message = "%s %d:\n%s %s" % ("url", hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
+                    message = "%s %d:\n%s %s (PR: %s)" % ("url", hostCount, conf.method or HTTPMETHOD.GET, targetUrl, get_pagerank(targetUrl))
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
