@@ -612,4 +612,10 @@
     <regexp value="Apache/2\.2\.16 \(Ubuntu\)">
         <info type="Linux" distrib="Ubuntu" release="10.10" codename="Maverick Meerkat"/>
     </regexp>
+
+    <!-- Nginx -->
+
+    <regexp value="nginx/([\w\.]+)">
+        <info technology="Nginx"/>
+    </regexp>
 </root>
