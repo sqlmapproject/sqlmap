@@ -1662,7 +1662,8 @@ class Enumeration:
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query)
                     foundDb = inject.getValue(query, inband=False)
-                    foundTbls[foundDb] = []
+                    if foundDb not in foundTbls:
+                        foundTbls[foundDb] = []
 
                     if tblConsider == "2":
                         foundTbls[foundDb].append(tbl)
