@@ -16,7 +16,8 @@ from lib.core.common import beep
 from lib.core.common import extractRegexResult
 from lib.core.common import findDynamicContent
 from lib.core.common import getCompiledRegex
-from lib.core.common import getErrorParsedDBMS
+from lib.core.common import getErrorParsedDBMSes
+from lib.core.common import getErrorParsedDBMSesFormatted
 from lib.core.common import getInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import popValue
@@ -140,9 +141,9 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-                if getErrorParsedDBMS() and getErrorParsedDBMS() != dbms\
+                if getErrorParsedDBMSes() and dbms not in getErrorParsedDBMSes()\
                   and kb.skipTests is None:
-                    message = "parsed error message(s) showed that the back-end DBMS could be '%s'." % getErrorParsedDBMS()
+                    message = "parsed error message(s) showed that the back-end DBMS could be '%s'." % getErrorParsedDBMSesFormatted()
                     message += " do you want to skip test payloads specific for other DBMSes? [Y/n]"
                     kb.skipTests = conf.realTest or readInput(message, default="Y") not in ("n", "N")
 
@@ -150,7 +151,7 @@ def checkSqlInjection(place, parameter, value):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the parsed error message(s) showed "
                     debugMsg += "that the back-end DBMS could be "
-                    debugMsg += "%s" % getErrorParsedDBMS()
+                    debugMsg += "%s" % getErrorParsedDBMSesFormatted()
                     logger.debug(debugMsg)
 
                     continue
@@ -473,7 +474,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
     infoMsg += "parameter '%s' might " % parameter
 
     if result:
-        infoMsg += "be injectable (possible DBMS: %s)" % (getErrorParsedDBMS() or 'Unknown')
+        infoMsg += "be injectable (possible DBMS: %s)" % (getErrorParsedDBMSesFormatted() or 'Unknown')
         logger.info(infoMsg)
     else:
         infoMsg += "not be injectable"

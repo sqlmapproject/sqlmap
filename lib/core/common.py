@@ -282,7 +282,7 @@ def formatFingerprint(target, info):
 
     return infoStr
 
-def getHtmlErrorFp():
+def getErrorParsedDBMSesFormatted():
     """
     This function parses the knowledge base htmlFp list and return its
     values formatted as a human readable string.
@@ -1919,11 +1919,10 @@ def getInjectionTests():
     detected DBMS from error messages
     """
     retVal = conf.tests
-    if getErrorParsedDBMS():
-        dbms = getErrorParsedDBMS()
+    if getErrorParsedDBMSes():
         retVal = sorted(retVal, key=lambda test: False\
           if 'details' in test and 'dbms' in test.details\
-          and test.details.dbms == dbms else True)
+          and test.details.dbms in getErrorParsedDBMSes() else True)
 
     return retVal
 
@@ -1954,8 +1953,8 @@ def unicodeToSafeHTMLValue(value):
                 retVal = retVal.replace(char, "&#%d;" % ord(char))
     return retVal
 
-def getErrorParsedDBMS():
-    return kb.htmlFp[0] if kb.htmlFp else None
+def getErrorParsedDBMSes():
+    return kb.htmlFp
 
 def showHttpErrorCodes():
     if kb.httpErrorCodes:

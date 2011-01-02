@@ -10,7 +10,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
-from lib.core.common import getHtmlErrorFp
+from lib.core.common import getErrorParsedDBMSesFormatted
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -64,7 +64,7 @@ class Fingerprint(GenericFingerprint):
 
                 value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = getHtmlErrorFp()
+        htmlErrorFp = getErrorParsedDBMSesFormatted()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)

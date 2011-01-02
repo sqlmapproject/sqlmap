@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.controller.handler import setHandler
-from lib.core.common import getHtmlErrorFp
+from lib.core.common import getErrorParsedDBMSesFormatted
 from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import kb
@@ -32,7 +32,7 @@ def action():
     setHandler()
 
     if not kb.dbmsDetected or not conf.dbmsHandler:
-        htmlParsed = getHtmlErrorFp()
+        htmlParsed = getErrorParsedDBMSesFormatted()
 
         errMsg  = "sqlmap was not able to fingerprint the "
         errMsg += "back-end database management system"

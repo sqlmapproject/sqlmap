@@ -12,7 +12,7 @@ import re
 from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
-from lib.core.common import getHtmlErrorFp
+from lib.core.common import getErrorParsedDBMSesFormatted
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomRange
@@ -93,7 +93,7 @@ class Fingerprint(GenericFingerprint):
         if kb.bannerFp:
             value += "\n%sbanner parsing fingerprint: -" % blank
 
-        htmlErrorFp = getHtmlErrorFp()
+        htmlErrorFp = getErrorParsedDBMSesFormatted()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
