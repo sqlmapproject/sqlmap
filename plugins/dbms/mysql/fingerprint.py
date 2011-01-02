@@ -275,12 +275,13 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "fingerprinting the back-end DBMS operating system"
         logger.info(infoMsg)
 
-        if inject.checkBooleanExpression("'/'=(SELECT MID(@@datadir, 1, 1))"):
+        result = inject.checkBooleanExpression("'/'=(SELECT MID(@@datadir, 1, 1))")
+        if result is True:
             kb.os = "Linux"
-        else:
+        elif result is False:
             kb.os = "Windows"
 
-        infoMsg = "the back-end DBMS operating system is %s" % kb.os
+        infoMsg = "the back-end DBMS operating system is %s" % (kb.os or "Unknown")
         logger.info(infoMsg)
 
         self.cleanup(onlyFileTbl=True)
