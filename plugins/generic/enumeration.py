@@ -1131,6 +1131,12 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].dump_table
 
+        if kb.dbms == DBMS.MYSQL:
+            if '-' in conf.tbl:
+                conf.tbl = "`%s`" % conf.tbl
+            if '-' in conf.db:
+                conf.db = "`%s`" % conf.db
+
         if conf.col:
             colList = conf.col.split(",")
             kb.data.cachedColumns[conf.db] = {}
