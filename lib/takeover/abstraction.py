@@ -107,7 +107,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 errMsg = "feature not yet implemented for the back-end DBMS"
                 raise sqlmapUnsupportedFeatureException, errMsg
 
-            infoMsg  = "calling %s OS shell. To quit type " % kb.os or "Windows"
+            infoMsg  = "calling %s OS shell. To quit type " % (kb.os or "Windows")
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)
 
