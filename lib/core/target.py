@@ -16,6 +16,7 @@ import time
 from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
 from lib.core.common import readInput
+from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -29,6 +30,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
+from lib.core.session import setTextOnly
 from lib.core.xmldump import dumper as xmldumper
 from lib.request.connect import Connect as Request
 
@@ -263,6 +265,22 @@ def __createTargetDirs():
     __createFilesDir()
     __configureDumper()
 
+def __saveSwitches():
+    """
+    Store critical switches to the session file.
+    """
+    if conf.textOnly:
+        setTextOnly()
+
+def __restoreCmdLineOptions():
+    """
+    Restore command line options that could be possibly 
+    changed during the testing of previous target.
+    """
+    conf.regexp = cmdLineOptions.regexp
+    conf.string = cmdLineOptions.string
+    conf.textOnly = cmdLineOptions.textOnly
+
 def initTargetEnv():
     """
     Initialize target environment.
@@ -277,9 +295,11 @@ def initTargetEnv():
         conf.sessionFile   = None
 
         __setKnowledgeBaseAttributes(False)
+        __restoreCmdLineOptions()
         __setDBMS()
 
 def setupTargetEnv():
     __createTargetDirs()
     __setRequestParams()
     __setOutputResume()
+    __saveSwitches()

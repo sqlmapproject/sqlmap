@@ -21,6 +21,9 @@ from lib.core.settings import FIREBIRD_ALIASES
 # sqlmap paths
 paths = advancedDict()
 
+# object to store original command line options
+cmdLineOptions = advancedDict()
+
 # object to share within function and classes command
 # line options and settings
 conf = advancedDict()

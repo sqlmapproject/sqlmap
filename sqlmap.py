@@ -29,6 +29,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
+from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -64,7 +65,9 @@ def main():
     setPaths()
 
     banner()
-    cmdLineOptions = cmdLineParser()
+
+    # Store original command line options for possible later restoration
+    cmdLineOptions.update(cmdLineParser().__dict__)
 
     dataToStdout("[*] starting at: %s\n\n" % time.strftime("%X"), forceOutput=True)
 
