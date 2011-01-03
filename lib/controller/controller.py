@@ -439,7 +439,7 @@ def start():
         finally:
             showHttpErrorCodes()
 
-    if conf.loggedToOut:
+    if conf.loggedToOut and not conf.multipleTargets:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
 
     return True
