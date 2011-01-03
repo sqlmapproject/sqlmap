@@ -50,9 +50,6 @@ class sqlmapUserQuitException(Exception):
 class sqlmapRegExprException(Exception):
     pass
 
-class sqlmapSiteTooDynamic(Exception):
-    pass
-
 class sqlmapSyntaxException(Exception):
     pass
 
@@ -93,7 +90,6 @@ exceptionsTuple = (
                     sqlmapMissingMandatoryOptionException,
                     sqlmapNoneDataException,
                     sqlmapRegExprException,
-                    sqlmapSiteTooDynamic,
                     sqlmapSyntaxException,
                     sqlmapUndefinedMethod,
                     sqlmapMissingPrivileges,

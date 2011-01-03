@@ -20,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import sqlmapGenericException
 from lib.request.basic import decodePage
 
 class Google:
@@ -128,5 +129,10 @@ class Google:
             raise sqlmapConnectionException, errMsg
 
         self.__matches = self.__parsePage(page)
+        
+        if not self.__matches and "detected unusual traffic" in page:
+            warnMsg  = "Google has detected 'unusual' traffic from "
+            warnMsg  += "this computer disabling further searches"
+            raise sqlmapGenericException, warnMsg
 
         return self.__matches
