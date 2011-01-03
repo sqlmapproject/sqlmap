@@ -298,10 +298,12 @@ class Connect:
             if "no host given" in tbMsg:
                 warnMsg = "invalid url address used (%s)" % repr(url)
                 raise sqlmapSyntaxException, warnMsg
+            elif "forcibly closed" in tbMsg:
+                warnMsg = "connection was forcibly closed by the target url"
+            elif "timed out" in tbMsg:
+                warnMsg = "connection timed out to the target url"
             elif "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target url"
-            elif "timeout" in tbMsg:
-                warnMsg = "connection timed out to the target url"
             elif "BadStatusLine" in tbMsg:
                 warnMsg  = "the target url responded with an unknown HTTP "
                 warnMsg += "status code, try to force the HTTP User-Agent "
@@ -315,7 +317,10 @@ class Connect:
             if "BadStatusLine" not in tbMsg:
                 warnMsg += " or proxy"
 
-            if silent or (ignoreTimeout and "timeout" in tbMsg):
+            if "forcibly closed" in tbMsg:
+                logger.critical(warnMsg)
+                return None, None
+            elif silent or (ignoreTimeout and "timed out" in tbMsg):
                 return None, None
             elif kb.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
                 kb.retriesCount += 1
