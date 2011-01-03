@@ -50,6 +50,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setDynamicMarkings
 from lib.core.session import setString
 from lib.core.session import setRegexp
+from lib.core.session import setTextOnly
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.unescaper import unescaper
@@ -487,7 +488,8 @@ def heuristicCheckSqlInjection(place, parameter, value):
 def simpletonCheckSqlInjection(place, parameter, value):
     """
     This is a function for the quickest and simplest 
-    sql injection check (e.g. AND 1=1)
+    sql injection check (e.g. AND 1=1) - only works
+    with integer parameters
     """
 
     result = False
@@ -497,17 +499,14 @@ def simpletonCheckSqlInjection(place, parameter, value):
     if value.isdigit():
         payload = "%s AND %d=%d" % (value, randInt, randInt)
     else:
-        payload = "%s' AND '%s'='%s" % (value, randStr, randStr)
+        return False
 
     payload = agent.payload(place, parameter, value, payload)
     firstPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
     if not (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
         if getComparePageRatio(kb.originalPage, firstPage, filtered=True) > CONSTANT_RATIO:
-            if value.isdigit():
-                payload = "%s AND %d=%d" % (value, randInt, randInt+1)
-            else:
-                payload = "%s' AND '%s'='%s" % (value, randStr, randomStr())
+            payload = "%s AND %d=%d" % (value, randInt, randInt+1)
 
             payload = agent.payload(place, parameter, value, payload)
             secondPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
@@ -582,10 +581,13 @@ def checkDynamicContent(firstPage, secondPage):
             count += 1
 
             if count > conf.retries:
-                errMsg = "target url is too dynamic. unable to continue. "
-                errMsg += "consider using other switches (e.g. "
-                errMsg += "--longest-common, --string, --text-only, etc.)"
-                raise sqlmapSiteTooDynamic, errMsg
+                warnMsg = "target url is too dynamic. "
+                warnMsg += "switching to --text-only. "
+                logger.warn(warnMsg)
+
+                conf.textOnly = True
+                setTextOnly()
+                return
 
             warnMsg = "target url is heavily dynamic"
             warnMsg += ", sqlmap is going to retry the request"
