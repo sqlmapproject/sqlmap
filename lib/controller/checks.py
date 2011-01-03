@@ -19,6 +19,7 @@ from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
 from lib.core.common import getErrorParsedDBMSes
 from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import getFilteredPageContent
 from lib.core.common import getInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import popValue
@@ -585,6 +586,8 @@ def checkDynamicContent(firstPage, secondPage):
                 logger.warn(warnMsg)
 
                 conf.textOnly = True
+                kb.originalPage = getFilteredPageContent(kb.originalPage)
+                kb.pageTemplates.clear()
                 setTextOnly()
                 return
 
