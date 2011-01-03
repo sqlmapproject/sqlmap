@@ -59,7 +59,7 @@ class Google:
 
         for match in self.__matches:
             if re.search("(.*?)\?(.+)", match, re.I):
-                kb.targetUrls.add(( htmlunescape(match), None, None, None ))
+                kb.targetUrls.add(( htmlunescape(htmlunescape(match)), None, None, None ))
 
     def getCookie(self):
         """
