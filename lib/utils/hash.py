@@ -219,6 +219,9 @@ def attackDumpedTable():
             for column in columns:
                 if column == colUser or column == '__infos__':
                     continue
+                if len(table[column]['values']) <= i:
+                    continue
+
                 value = table[column]['values'][i]
                 if hashRecognition(value):
                     if colUser:
@@ -244,6 +247,9 @@ def attackDumpedTable():
                     for column in columns:
                         if column == colUser or column == '__infos__':
                             continue
+                        if len(table[column]['values']) <= i:
+                            continue
+
                         value = table[column]['values'][i]
                         if value.lower() == hash_.lower():
                             table[column]['values'][i] += " (%s)" % password

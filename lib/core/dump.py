@@ -348,6 +348,9 @@ class Dump:
                 if column != "__infos__":
                     info = tableValues[column]
 
+                    if len(info["values"]) <= i:
+                        continue
+
                     value = getUnicode(info["values"][i])
 
                     if re.search("^[\ *]*$", value):
