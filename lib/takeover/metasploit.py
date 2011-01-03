@@ -141,7 +141,7 @@ class Metasploit:
 
         if not choice:
             if lst:
-                choice = getUnicode(default)
+                choice = getUnicode(default, conf.dataEncoding)
             else:
                 return default
 

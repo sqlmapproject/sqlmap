@@ -27,7 +27,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        errMsg = "profiling requires third-party libraries (%s)" % getUnicode(e)
+        errMsg = "profiling requires third-party libraries (%s)" % getUnicode(e, conf.dataEncoding)
         logger.error(errMsg)
         return
 

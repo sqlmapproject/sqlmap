@@ -89,7 +89,7 @@ class UnicodeRawConfigParser(RawConfigParser):
             fp.write("[%s]\n" % DEFAULTSECT)
 
             for (key, value) in self._defaults.items():
-                fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+                fp.write("%s = %s\n" % (key, getUnicode(value, conf.dataEncoding).replace('\n', '\n\t')))
 
             fp.write("\n")
 
@@ -101,7 +101,7 @@ class UnicodeRawConfigParser(RawConfigParser):
                     if value is None:
                         fp.write("%s\n" % (key))
                     else:
-                        fp.write("%s = %s\n" % (key, getUnicode(value).replace('\n', '\n\t')))
+                        fp.write("%s = %s\n" % (key, getUnicode(value, conf.dataEncoding).replace('\n', '\n\t')))
 
             fp.write("\n")
 
@@ -498,7 +498,7 @@ def readInput(message, default=None):
         message += " "
 
     if conf.batch and default:
-        infoMsg = "%s%s" % (message, getUnicode(default))
+        infoMsg = "%s%s" % (message, getUnicode(default, conf.dataEncoding))
         logger.info(infoMsg)
 
         debugMsg = "used the default behaviour, running in batch mode"
@@ -1511,7 +1511,7 @@ def getUnicode(value, encoding=None):
     """
 
     if isinstance(value, basestring):
-        return value if isinstance(value, unicode) else unicode(value, encoding or kb.pageEncoding or "utf-8", errors='replace')
+        return value if isinstance(value, unicode) else unicode(value, encoding or kb.pageEncoding or conf.dataEncoding, errors='replace')
     else:
         return unicode(value) # encoding ignored for non-basestring instances
 

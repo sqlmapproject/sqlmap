@@ -13,7 +13,6 @@ import time
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
-from lib.core.common import getUnicode
 from lib.core.common import initTechnique
 from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs

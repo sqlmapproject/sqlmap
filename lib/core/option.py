@@ -1183,7 +1183,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.osVersion       = None
     kb.osSP            = None
 
-    kb.pageEncoding    = "utf-8"
+    kb.pageEncoding    = None
     kb.pageStable      = None
     kb.partRun         = None
     kb.proxyAuthHeader = None

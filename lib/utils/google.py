@@ -111,7 +111,7 @@ class Google:
             responseMsg = "HTTP response (%s - %d):\n" % (status, code)
 
             if conf.verbose <= 4:
-                responseMsg += getUnicode(responseHeaders)
+                responseMsg += getUnicode(responseHeaders, conf.dataEncoding)
             elif conf.verbose > 4:
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
 

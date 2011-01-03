@@ -45,7 +45,7 @@ def direct(query, content=True):
             output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
 
         infoMsg  = "resumed from file '%s': " % conf.sessionFile
-        infoMsg += "%s..." % getUnicode(output)[:20]
+        infoMsg += "%s..." % getUnicode(output, conf.dataEncoding)[:20]
         logger.info(infoMsg)
     else:
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
@@ -61,7 +61,7 @@ def direct(query, content=True):
                 out = list(output)[0][0]
                 if isinstance(out, str):
                     out = utf8decode(out)
-                return getUnicode(out)
+                return getUnicode(out, conf.dataEncoding)
             else:
                 return list(output)
         else:
