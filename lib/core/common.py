@@ -1954,9 +1954,17 @@ def unicodeToSafeHTMLValue(value):
     return retVal
 
 def getErrorParsedDBMSes():
+    """
+    Returns array with parsed DBMS
+    names till now
+    """
     return kb.htmlFp
 
 def showHttpErrorCodes():
+    """
+    Shows all HTTP error codes 
+    raised till now
+    """
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during testing:\n"
         warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code]\
@@ -1964,7 +1972,16 @@ def showHttpErrorCodes():
           for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
 
-def getComparePageRatio(firstPage, secondPage):
+def getComparePageRatio(firstPage, secondPage, filtered=False):
+    """
+    Returns comparison ratio between
+    two given pages
+    """
+    if filtered:
+        firstPage = getFilteredPageContent(firstPage)
+        secondPage = getFilteredPageContent(secondPage)
+
     conf.seqMatcher.set_seq1(firstPage)
     conf.seqMatcher.set_seq2(secondPage)
+
     return conf.seqMatcher.quick_ratio()

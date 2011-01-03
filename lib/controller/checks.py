@@ -497,11 +497,11 @@ def simpletonCheckSqlInjection(place, parameter, value):
     firstPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
     if not (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
-        if getComparePageRatio(kb.originalPage, firstPage) > CONSTANT_RATIO:
+        if getComparePageRatio(kb.originalPage, firstPage, filtered=True) > CONSTANT_RATIO:
             payload = "%s AND %d>%d" % (value, randInt, randInt+1)
             payload = agent.payload(place, parameter, value, payload)
             secondPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
-            result = getComparePageRatio(firstPage, secondPage) <= CONSTANT_RATIO
+            result = getComparePageRatio(firstPage, secondPage, filtered=True) <= CONSTANT_RATIO
 
     infoMsg  = "simpleton test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
