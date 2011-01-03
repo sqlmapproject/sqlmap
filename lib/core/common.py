@@ -1510,10 +1510,8 @@ def getUnicode(value, encoding=None):
     u'1'
     """
 
-    if encoding is None:
-        encoding = conf.dataEncoding if 'dataEncoding' in conf else "utf-8"
     if isinstance(value, basestring):
-        return value if isinstance(value, unicode) else unicode(value, encoding, errors='replace')
+        return value if isinstance(value, unicode) else unicode(value, encoding or kb.pageEncoding or "utf-8", errors='replace')
     else:
         return unicode(value) # encoding ignored for non-basestring instances
 

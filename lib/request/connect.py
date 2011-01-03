@@ -233,9 +233,9 @@ class Connect:
             # Get HTTP response
             page = conn.read()
             code = conn.code
-            status = conn.msg
             responseHeaders = conn.info()
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+            status = getUnicode(conn.msg)
 
             # Explicit closing of connection object
             if not conf.keepAlive:
@@ -247,18 +247,11 @@ class Connect:
                     logger.warn(warnMsg)
 
         except urllib2.HTTPError, e:
-            code = e.code
-            status = e.msg
-
-            threadData.lastHTTPError = (threadData.lastRequestUID, code)
-
-            if code not in kb.httpErrorCodes:
-                kb.httpErrorCodes[code] = 0
-            kb.httpErrorCodes[code] += 1
-
+            page = None
             try:
                 page = e.read()
                 responseHeaders = e.info()
+                page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
             except socket.timeout:
                 warnMsg  = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % code
@@ -267,9 +260,19 @@ class Connect:
             except:
                 pass
 
+            code = e.code
+            threadData.lastHTTPError = (threadData.lastRequestUID, code)
+
+            if code not in kb.httpErrorCodes:
+                kb.httpErrorCodes[code] = 0
+            kb.httpErrorCodes[code] += 1
+
+            status = getUnicode(e.msg)
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
+
             if responseHeaders:
-                logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
+                logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items()])
+
             logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
             if conf.verbose <= 5:
@@ -342,7 +345,7 @@ class Connect:
 
         responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
         if responseHeaders:
-            logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, value) for (key, value) in responseHeaders.items()])
+            logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items()])
         logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
         if conf.verbose <= 5:

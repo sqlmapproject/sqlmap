@@ -132,7 +132,8 @@ def decodePage(page, contentEncoding, contentType):
         charset = checkCharEncoding(contentType.split('charset=')[-1])
 
         if charset:
-            page = getUnicode(page, charset)
+            kb.pageEncoding = charset
+            page = getUnicode(page)
 
     return page
 
