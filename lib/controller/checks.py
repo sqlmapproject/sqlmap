@@ -495,9 +495,9 @@ def simpletonCheckSqlInjection(place, parameter, value):
     randStr = randomStr()
 
     if value.isdigit():
-        payload = "%s OR %d>%d" % (value, randInt, randInt+1)
+        payload = "%s AND %d=%d" % (value, randInt, randInt)
     else:
-        payload = "%s' OR '%s'!='%s" % (value, randStr, randStr)
+        payload = "%s' AND '%s'='%s" % (value, randStr, randStr)
 
     payload = agent.payload(place, parameter, value, payload)
     firstPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
@@ -505,9 +505,9 @@ def simpletonCheckSqlInjection(place, parameter, value):
     if not (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
         if getComparePageRatio(kb.originalPage, firstPage, filtered=True) > CONSTANT_RATIO:
             if value.isdigit():
-                payload = "%s AND %d>%d" % (value, randInt, randInt+1)
+                payload = "%s AND %d=%d" % (value, randInt, randInt+1)
             else:
-                payload = "%s' AND '%s'!='%s" % (value, randStr, randStr)
+                payload = "%s' AND '%s'='%s" % (value, randStr, randomStr())
 
             payload = agent.payload(place, parameter, value, payload)
             secondPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
