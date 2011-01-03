@@ -11,13 +11,14 @@ import re
 
 from lib.controller.action import action
 from lib.controller.checks import checkSqlInjection
-from lib.controller.checks import heuristicCheckSqlInjection
 from lib.controller.checks import checkDynParam
 from lib.controller.checks import checkStability
 from lib.controller.checks import checkString
 from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.controller.checks import checkNullConnection
+from lib.controller.checks import heuristicCheckSqlInjection
+from lib.controller.checks import simpletonCheckSqlInjection
 from lib.core.agent import agent
 from lib.core.common import getUnicode
 from lib.core.common import paramToDict
@@ -343,7 +344,8 @@ def start():
 
                         if testSqlInj:
                             check = heuristicCheckSqlInjection(place, parameter, value)
-                            if not check and conf.realTest:
+                            if not check and conf.realTest and\
+                              not simpletonCheckSqlInjection(place, parameter, value):
                                 continue
 
                             logMsg  = "testing sql injection on %s " % place

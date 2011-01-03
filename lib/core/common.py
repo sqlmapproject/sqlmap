@@ -1963,3 +1963,8 @@ def showHttpErrorCodes():
           if code in httplib.responses else '?', count)\
           for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
+
+def getComparePageRatio(firstPage, secondPage):
+    conf.seqMatcher.set_seq1(firstPage)
+    conf.seqMatcher.set_seq2(secondPage)
+    return conf.seqMatcher.quick_ratio()

@@ -25,6 +25,10 @@ SITE               = "http://sqlmap.sourceforge.net"
 DIFF_TOLERANCE     = 0.05
 CONSTANT_RATIO     = 0.9
 
+# lower and upper values for match ratio in case of stable page
+LOWER_RATIO_BOUND = 0.02
+UPPER_RATIO_BOUND = 0.98
+
 # sqlmap logger
 logging.addLevelName(9, "PAYLOAD")
 logging.addLevelName(8, "TRAFFIC OUT")
@@ -66,10 +70,6 @@ INFERENCE_BLANK_BREAK = 10
 
 # string used for representation of unknown dbms version
 UNKNOWN_DBMS_VERSION = "Unknown"
-
-# lower and upper values for match ratio in case of stable page
-LOWER_RATIO_BOUND = 0.02
-UPPER_RATIO_BOUND = 0.98
 
 # dynamicity mark length used in dynamicity removal engine
 DYNAMICITY_MARK_LENGTH = 32

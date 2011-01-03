@@ -15,6 +15,7 @@ from lib.core.agent import agent
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
 from lib.core.common import findDynamicContent
+from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
 from lib.core.common import getErrorParsedDBMSes
 from lib.core.common import getErrorParsedDBMSesFormatted
@@ -49,6 +50,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setDynamicMarkings
 from lib.core.session import setString
 from lib.core.session import setRegexp
+from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
@@ -466,7 +468,7 @@ def heuristicCheckSqlInjection(place, parameter, value):
 
     payload = "%s%s%s%s" % (value, prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
     payload = agent.payload(place, parameter, value, payload)
-    Request.queryPage(payload, place, content=False, raise404=False)
+    Request.queryPage(payload, place, content=True, raise404=False)
 
     result = wasLastRequestDBMSError()
 
@@ -475,6 +477,37 @@ def heuristicCheckSqlInjection(place, parameter, value):
 
     if result:
         infoMsg += "be injectable (possible DBMS: %s)" % (getErrorParsedDBMSesFormatted() or 'Unknown')
+        logger.info(infoMsg)
+    else:
+        infoMsg += "not be injectable"
+        logger.warn(infoMsg)
+
+    return result
+
+def simpletonCheckSqlInjection(place, parameter, value):
+    """
+    This is a function for the quickest and simplest 
+    sql injection check (e.g. AND 1=1)
+    """
+
+    result = False
+    randInt = randomInt()
+    payload = "%s OR %d>%d" % (value, randInt, randInt+1)
+    payload = agent.payload(place, parameter, value, payload)
+    firstPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
+
+    if not (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
+        if getComparePageRatio(kb.originalPage, firstPage) > CONSTANT_RATIO:
+            payload = "%s AND %d>%d" % (value, randInt, randInt+1)
+            payload = agent.payload(place, parameter, value, payload)
+            secondPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
+            result = getComparePageRatio(firstPage, secondPage) <= CONSTANT_RATIO
+
+    infoMsg  = "simpleton test shows that %s " % place
+    infoMsg += "parameter '%s' might " % parameter
+
+    if result:
+        infoMsg += "be injectable"
         logger.info(infoMsg)
     else:
         infoMsg += "not be injectable"
