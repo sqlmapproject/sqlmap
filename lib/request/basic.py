@@ -133,12 +133,8 @@ def decodePage(page, contentEncoding, contentType):
 
         if charset:
             kb.pageEncoding = charset
-            page = getUnicode(page)
 
-    if isinstance(page, str):
-        page = getUnicode(page)
-
-    return page
+    return getUnicode(page)
 
 def processResponse(page, responseHeaders):
     page = getUnicode(page)
