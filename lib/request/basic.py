@@ -15,6 +15,7 @@ import StringIO
 import zlib
 
 from lib.core.common import extractErrorMessage
+from lib.core.common import extractRegexResult
 from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
@@ -23,6 +24,7 @@ from lib.core.common import sanitizeAsciiString
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.settings import META_CHARSET_REGEX
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -127,12 +129,17 @@ def decodePage(page, contentEncoding, contentType):
 
         page = data.read()
 
+    charset = None
+
     # http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
     if contentType and (contentType.find('charset=') != -1):
-        charset = checkCharEncoding(contentType.split('charset=')[-1])
+        charset = contentType.split('charset=')[-1]
+    elif extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE):
+        charset = extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE)
 
-        if charset:
-            kb.pageEncoding = charset
+    charset = checkCharEncoding(charset)
+    if charset:
+        kb.pageEncoding = charset
 
     return getUnicode(page)
 

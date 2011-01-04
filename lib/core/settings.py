@@ -169,3 +169,5 @@ ERROR_PARSING_REGEXES = (
                             r"<li>Error Type:<br>(?P<result>.+?)</li>", 
                             r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)"
                         )
+
+META_CHARSET_REGEX  = r'<meta http-equiv="Content-Type" content="[^"]*?charset=(?P<result>[^"]+)" />'
