@@ -1806,7 +1806,7 @@ def removeDynamicContent(page):
 
     return page
 
-def filterStringValue(value, regex):
+def filterStringValue(value, regex, replace=None):
     """
     Returns string value consisting only
     of chars satisfying supplied regular
@@ -1818,6 +1818,8 @@ def filterStringValue(value, regex):
         for char in value:
             if re.search(regex, char):
                 retVal += char
+            elif replace:
+                retVal += replace
 
     return retVal
 
