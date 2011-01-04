@@ -37,6 +37,7 @@ from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
+from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -1350,6 +1351,11 @@ class Enumeration:
             except KeyboardInterrupt:
                 warnMsg = "Ctrl+C detected in dumping phase"
                 logger.warn(warnMsg)
+
+            except sqlmapConnectionException, e:
+                errMsg = "connection exception detected in dumping phase: "
+                errMsg += "'%s'" % e
+                logger.critical(errMsg)
 
             for column, columnEntries in entries.items():
                 if lengths[column] < len(column):
