@@ -122,6 +122,8 @@ extern DLLIMPORT Datum sys_eval(PG_FUNCTION_ARGS) {
 	result = (char *)malloc(1);
 	outlen = 0;
 
+    result[0] = (char)0;
+
 	pipe = popen(command, "r");
 
 	while (fgets(line, sizeof(line), pipe) != NULL) {

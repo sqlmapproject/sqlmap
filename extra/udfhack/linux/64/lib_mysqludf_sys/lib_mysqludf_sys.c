@@ -443,6 +443,8 @@ char* sys_eval(
 	result = (char *)malloc(1);
 	outlen = 0;
 
+    result[0] = (char)0;
+
 	pipe = popen(args->args[0], "r");
 
 	while (fgets(line, sizeof(line), pipe) != NULL) {
