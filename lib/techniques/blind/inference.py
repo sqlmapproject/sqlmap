@@ -14,6 +14,7 @@ import traceback
 from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
+from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
@@ -324,7 +325,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             output += status if count != length else " "*len(status)
 
                             iolock.acquire()
-                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
+                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
                             iolock.release()
 
                 if not kb.threadContinue:
@@ -394,10 +395,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if partialValue:
                 finalValue = partialValue
-                infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), finalValue)
+                infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
         else:
             finalValue = "".join(value)
-            infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), finalValue)
+            infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
 
         if isinstance(finalValue, basestring) and len(finalValue) > 0:
             dataToSessionFile(replaceNewlineTabs(finalValue))
@@ -499,7 +500,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         dataToStdout("\n")
 
     if ( conf.verbose in ( 1, 2 ) and showEta ) or conf.verbose >= 3:
-        infoMsg = "retrieved: %s" % finalValue
+        infoMsg = "retrieved: %s" % filterControlChars(finalValue)
         logger.info(infoMsg)
 
     if not partialValue:

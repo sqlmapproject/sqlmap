@@ -52,7 +52,7 @@ DUMP_STOP_MARKER    = "__STOP__"
 
 PAYLOAD_DELIMITER   = "\x00"
 CHAR_INFERENCE_MARK = "%c"
-READABLE_CHAR_REGEX = r'[\ -~]'
+NON_CONTROL_CHAR_REGEX = r'[^\x00-\x1f]'
 
 # coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF    = 10
