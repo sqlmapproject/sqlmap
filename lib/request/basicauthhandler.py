@@ -26,8 +26,8 @@ class SmartHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
 
     def http_error_auth_reqed(self, auth_header, host, req, headers):
         # Reset the retry counter once for each request.
-        if req not in self.retried_req:
-            self.retried_req.append(req)
+        if hash(req) not in self.retried_req:
+            self.retried_req.append(hash(req))
             self.retried = 0
         return urllib2.HTTPBasicAuthHandler.http_error_auth_reqed(
                         self, auth_header, host, req, headers)
