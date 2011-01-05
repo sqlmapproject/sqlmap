@@ -16,7 +16,7 @@ class SmartHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
     """
     def __init__(self, *args, **kwargs):
         urllib2.HTTPBasicAuthHandler.__init__(self, *args, **kwargs)
-        self.retried_req = []
+        self.retried_req = set()
 
     def reset_retry_count(self):
         # Python 2.6.5 will call this on 401 or 407 errors and thus loop
@@ -27,7 +27,7 @@ class SmartHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
     def http_error_auth_reqed(self, auth_header, host, req, headers):
         # Reset the retry counter once for each request.
         if hash(req) not in self.retried_req:
-            self.retried_req.append(hash(req))
+            self.retried_req.add(hash(req))
             self.retried = 0
         return urllib2.HTTPBasicAuthHandler.http_error_auth_reqed(
                         self, auth_header, host, req, headers)

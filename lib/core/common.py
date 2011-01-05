@@ -1829,7 +1829,7 @@ def filterControlChars(value):
     Returns string value with control
     chars being supstituted with ' '
     """
-    return filterStringValue(output, NON_CONTROL_CHAR_REGEX, ' ')
+    return filterStringValue(value, NON_CONTROL_CHAR_REGEX, ' ')
 
 def isDBMSVersionAtLeast(version):
     """
