@@ -7,7 +7,11 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import time
+
 from lib.core.agent import agent
+from lib.core.common import clearConsoleLine
+from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
 from lib.core.common import randomStr
@@ -106,21 +110,29 @@ def __unionTestByCharBruteforce(comment):
 
     query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
 
-    for count in range(conf.uColsStart, conf.uColsStop+1):
+    for num in range(conf.uColsStart, conf.uColsStop+1):
         if kb.dbms == DBMS.ORACLE and query.endswith(" FROM DUAL"):
             query = query[:-len(" FROM DUAL")]
 
-        if count:
+        if num:
             query += ", %s" % conf.uChar
 
         if kb.dbms == DBMS.ORACLE:
             query += " FROM DUAL"
 
-        validPayload = __unionConfirm(count, comment)
+        if conf.verbose in (1, 2):
+            length = conf.uColsStop + 1 - conf.uColsStart
+            count = num - conf.uColsStart + 1
+            status = '%d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
+            dataToStdout("\r[%s] [INFO] number of columns: %s" % (time.strftime("%X"), status), True)
+
+        validPayload = __unionConfirm(num, comment)
 
         if validPayload:
-            setUnion(count=count)
+            setUnion(count=num)
             break
+
+    clearConsoleLine(True)
 
     return validPayload
 
