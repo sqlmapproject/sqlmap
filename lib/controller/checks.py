@@ -19,7 +19,6 @@ from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
 from lib.core.common import getErrorParsedDBMSes
 from lib.core.common import getErrorParsedDBMSesFormatted
-from lib.core.common import getFilteredPageContent
 from lib.core.common import getInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import popValue
@@ -586,8 +585,6 @@ def checkDynamicContent(firstPage, secondPage):
                 logger.warn(warnMsg)
 
                 conf.textOnly = True
-                kb.originalPage = getFilteredPageContent(kb.originalPage)
-                kb.pageTemplates.clear()
                 setTextOnly()
                 return
 
@@ -640,7 +637,7 @@ def checkStability():
         warnMsg += "expression to match on"
         logger.warn(warnMsg)
 
-        message = "how do you want to proceed? [C(ontinue)/s(tring)/r(egex)/q(uit)] "
+        message = "how do you want to proceed? [C(ontinue)/s(tring)/r(egex)/t(ext only)q(uit)] "
         if not conf.realTest:
             test = readInput(message, default="C")
         else:
@@ -657,6 +654,7 @@ def checkStability():
 
             if test:
                 conf.string = test
+                setString()
 
                 if kb.nullConnection:
                     debugMsg  = "turning off NULL connection "
@@ -674,6 +672,7 @@ def checkStability():
 
             if test:
                 conf.regex = test
+                setRegexp()
 
                 if kb.nullConnection:
                     debugMsg  = "turning off NULL connection "
@@ -684,6 +683,18 @@ def checkStability():
             else:
                 errMsg = "Empty value supplied"
                 raise sqlmapNoneDataException, errMsg
+
+        elif test and test[0] in ("t", "T"):
+            conf.textOnly = True
+            setTextOnly()
+
+            if kb.nullConnection:
+                debugMsg  = "turning off NULL connection "
+                debugMsg += "support because of regex checking"
+                logger.debug(debugMsg)
+
+                kb.nullConnection = None
+
         else:
             checkDynamicContent(firstPage, secondPage)
 

@@ -12,6 +12,7 @@ import re
 from lib.core.common import aliasToDbmsEnum
 from lib.core.common import dataToSessionFile
 from lib.core.common import formatFingerprintString
+from lib.core.common import getFilteredPageContent
 from lib.core.common import readInput
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
@@ -52,6 +53,9 @@ def setTextOnly():
 
     if condition:
         dataToSessionFile("[%s][None][None][Text only][True]\n" % conf.url)
+
+    kb.originalPage = getFilteredPageContent(kb.originalPage)
+    kb.pageTemplates.clear()
 
 def setString():
     """
