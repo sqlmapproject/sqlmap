@@ -172,31 +172,39 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                         return
 
-                    for num in xrange(startLimit, stopLimit):
-                        if kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
-                            field = expressionFieldsList[0]
-                        elif kb.dbms == DBMS.ORACLE:
-                            field = expressionFieldsList
-                        else:
-                            field = None
+                    try:
+                        for num in xrange(startLimit, stopLimit):
+                                if kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                                    field = expressionFieldsList[0]
+                                elif kb.dbms == DBMS.ORACLE:
+                                    field = expressionFieldsList
+                                else:
+                                    field = None
 
-                        limitedExpr = agent.limitQuery(num, expression, field)
-                        output = resume(limitedExpr, None)
+                                limitedExpr = agent.limitQuery(num, expression, field)
+                                output = resume(limitedExpr, None)
 
-                        if not output:
-                            output = unionUse(limitedExpr, direct=True, unescape=False)
+                                if not output:
+                                    output = unionUse(limitedExpr, direct=True, unescape=False)
 
-                        if output:
-                            value += output
-                            parseUnionPage(output, limitedExpr)
+                                if output:
+                                    value += output
+                                    parseUnionPage(output, limitedExpr)
 
-                        if conf.verbose in (1, 2):
-                            length = stopLimit - startLimit
-                            count = num - startLimit + 1
-                            status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
-                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
+                                if conf.verbose in (1, 2):
+                                    length = stopLimit - startLimit
+                                    count = num - startLimit + 1
+                                    status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
+                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
 
-                    clearConsoleLine(True)
+                    except KeyboardInterrupt:
+                        print
+                        warnMsg = "Ctrl+C detected in dumping phase"
+                        logger.warn(warnMsg)
+
+                    finally:
+                        clearConsoleLine(True)
+
                     return value
 
         value = unionUse(expression, direct=True, unescape=False)
