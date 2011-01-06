@@ -507,7 +507,7 @@ def readInput(message, default=None):
 
         data = default
     else:
-        data = raw_input(message.encode(sys.stdout.encoding))
+        data = raw_input(message.encode(sys.stdout.encoding or conf.dataEncoding))
 
         if not data:
             data = default

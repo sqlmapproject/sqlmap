@@ -511,8 +511,8 @@ def __setUnion():
         debugMsg = "setting the UNION query SQL injection range of columns"
         logger.debug(debugMsg)
 
-        if "-" not in conf.uCols:
-            raise sqlmapSyntaxException, "--union-cols must be a range with hyphon"
+        if "-" not in conf.uCols or len(conf.uCols.split("-")) != 2:
+            raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
 
         conf.uCols = conf.uCols.replace(" ", "")
         conf.uColsStart, conf.uColsStop = conf.uCols.split("-")

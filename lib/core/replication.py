@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.exception import sqlmapMissingDependence
+from lib.core.exception import sqlmapValueException
 
 class Replication:
     """
@@ -62,7 +63,11 @@ class Replication:
             """
             This function is used for inserting row(s) into current table.
             """
-            self.parent.cursor.execute('INSERT INTO %s VALUES (%s)' % (self.name, ','.join(['?']*len(values))), values)
+            if len(values) == len(self.columns):
+                self.parent.cursor.execute('INSERT INTO %s VALUES (%s)' % (self.name, ','.join(['?']*len(values))), values)
+            else:
+                errMsg = "wrong number of columns used in replicating insert"
+                raise sqlmapValueException, errMsg
 
         def select(self, condition=None):
             """
