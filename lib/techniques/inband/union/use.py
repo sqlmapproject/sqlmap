@@ -12,6 +12,8 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import clearConsoleLine
+from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
 from lib.core.data import conf
@@ -188,6 +190,13 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                             value += output
                             parseUnionPage(output, limitedExpr)
 
+                        if conf.verbose in (1, 2):
+                            length = stopLimit - startLimit
+                            count = num - startLimit + 1
+                            status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
+                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
+
+                    clearConsoleLine(True)
                     return value
 
         value = unionUse(expression, direct=True, unescape=False)
