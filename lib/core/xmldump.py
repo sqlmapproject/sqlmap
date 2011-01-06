@@ -487,7 +487,7 @@ class XMLDump:
                         self.__doc = xml.dom.minidom.parse(self.__outputFile)
                         self.__root = self.__doc.childNodes[0]
                     except ExpatError:
-                        pass
+                        self.__doc = Document()
 
                 self.__outputFP = codecs.open(self.__outputFile, "w+", conf.dataEncoding)
 
@@ -500,7 +500,7 @@ class XMLDump:
                 raise sqlmapFilePathException("Wrong filename provided for saving the xml file: %s" % conf.xmlFile)
 
     def getOutputFile(self):
-        return self.__outputFile                
+        return self.__outputFile
 
     def finish(self, resultStatus, resultMsg=""):
         '''
