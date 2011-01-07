@@ -1358,10 +1358,7 @@ class Enumeration:
                 logger.critical(errMsg)
 
             for column, columnEntries in entries.items():
-                if lengths[column] < len(column):
-                    length = len(column)
-                else:
-                    length = lengths[column]
+                length = max(lengths[column], len(column))
 
                 kb.data.dumpedTable[column] = { "length": length,
                                                 "values": columnEntries }

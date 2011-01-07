@@ -259,6 +259,7 @@ def attackDumpedTable():
 
                         if value.lower() == hash_.lower():
                             table[column]['values'][i] += " (%s)" % password
+                            table[column]['length'] = max(table[column]['length'], table[column]['values'][i])
 
 def hashRecognition(value):
     retVal = None
