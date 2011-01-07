@@ -12,6 +12,7 @@ import time
 
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
+from lib.core.common import dataToStdout
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
 from lib.core.common import replaceNewlineTabs
@@ -129,7 +130,7 @@ def resume(expression, payload):
             else:
                 infoMsg += logValue
 
-            logger.info(infoMsg)
+            dataToStdout("[%s] [INFO] %s\n" % (time.strftime("%X"), infoMsg))
 
             return resumedValue
 

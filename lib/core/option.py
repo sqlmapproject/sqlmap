@@ -1140,7 +1140,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.commonOutputs   = None
 
     kb.data            = advancedDict()
-    kb.disableStdOut   = False
 
     # Old style injection flag
     kb.unionTest       = None

@@ -14,7 +14,6 @@ from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
-from lib.core.common import dataToStdout
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import initTechnique
@@ -36,6 +35,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
+from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -391,8 +391,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     (if selected).
     """
 
-    if suppressOutput:
-        kb.disableStdOut = True
+    getCurrentThreadData().disableStdOut = suppressOutput
 
     try:
         if conf.direct:
@@ -472,8 +471,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             raise sqlmapNotVulnerableException, errMsg
 
     finally:
-        if suppressOutput:
-            kb.disableStdOut = False
+        getCurrentThreadData().disableStdOut = False
 
     if value and expected == EXPECTED.BOOL:
         if isinstance(value, basestring):

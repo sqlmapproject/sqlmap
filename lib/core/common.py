@@ -422,7 +422,7 @@ def filePathToString(filePath):
 
 def dataToStdout(data, forceOutput=False):
     if not ('threadException' in kb and kb.threadException):
-        if forceOutput or (conf.verbose > 0) and not ('disableStdOut' in kb and kb.disableStdOut):
+        if forceOutput or (conf.verbose > 0) and not getCurrentThreadData().disableStdOut:
             try:
                 sys.stdout.write(data)
                 sys.stdout.flush()

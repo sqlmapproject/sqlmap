@@ -46,6 +46,7 @@ from lib.core.session import setOs
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
+from lib.core.threads import getCurrentThreadData
 from lib.parse.banner import bannerParser
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -309,7 +310,7 @@ class Enumeration:
                             break
                         else:
                             query = rootQuery.blind.query % user
-                            kb.disableStdOut = True
+                            getCurrentThreadData().disableStdOut = True
                     elif kb.dbms == DBMS.MSSQL:
                         if kb.dbmsVersion[0] in ( "2005", "2008" ):
                             query = rootQuery.blind.query2 % (user, index, user)
@@ -319,7 +320,7 @@ class Enumeration:
                         query = rootQuery.blind.query % (user, index)
                     password = inject.getValue(query, inband=False)
                     if kb.dbms == DBMS.SYBASE:
-                        kb.disableStdOut = False
+                        getCurrentThreadData().disableStdOut = False
                         password = "0x%s" % strToHex(password)
                         infoMsg = "retrieved: %s" % password
                         logger.info(infoMsg)

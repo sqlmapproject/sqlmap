@@ -17,6 +17,7 @@ class ThreadData():
     """
 
     def __init__(self):
+        self.disableStdOut = False
         self.lastErrorPage = None
         self.lastHTTPError = None
         self.lastQueryDuration = 0
