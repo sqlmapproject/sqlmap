@@ -33,14 +33,17 @@ from lib.request import inject
 def tableExists(tableFile, regex=None):
     tables = getFileItems(tableFile, lowercase=kb.dbms in (DBMS.ACCESS), unique=True)
     retVal = []
+
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
     
     infoMsg = "adding words used on web page to the check list"
     logger.info(infoMsg)
     pageWords = getPageTextWordsSet(kb.originalPage)
+
     for word in pageWords:
         word = word.lower()
+
         if len(word) > 2 and not word[0].isdigit() and word not in tables:
             tables.append(word)
 
@@ -64,9 +67,11 @@ def tableExists(tableFile, regex=None):
                 fullTableName = "%s.%s" % (conf.db, table)
             else:
                 fullTableName = table
+
             result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), fullTableName)))
 
             iolock.acquire()
+
             if result:
                 retVal.append(table)
 
@@ -82,6 +87,7 @@ def tableExists(tableFile, regex=None):
             if conf.verbose in (1, 2):
                 status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
                 dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+
             iolock.release()
 
     if conf.threads > 1:
@@ -100,8 +106,10 @@ def tableExists(tableFile, regex=None):
     # And wait for them to all finish
     try:
         alive = True
+
         while alive:
             alive = False
+
             for thread in threads:
                 if thread.isAlive():
                     alive = True
@@ -173,6 +181,7 @@ def columnExists(columnFile, regex=None):
             result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
 
             iolock.acquire()
+
             if result:
                 retVal.append(column)
 
@@ -184,6 +193,7 @@ def columnExists(columnFile, regex=None):
             if conf.verbose in (1, 2):
                 status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
                 dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+
             iolock.release()
 
     if conf.threads > 1:
@@ -202,8 +212,10 @@ def columnExists(columnFile, regex=None):
     # And wait for them to all finish
     try:
         alive = True
+
         while alive:
             alive = False
+
             for thread in threads:
                 if thread.isAlive():
                     alive = True

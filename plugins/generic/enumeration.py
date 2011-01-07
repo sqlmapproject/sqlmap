@@ -1288,9 +1288,11 @@ class Enumeration:
 
                     pivotValue = " "
                     breakRetrieval = False
+
                     for index in indexRange:
                         if breakRetrieval:
                             break
+
                         for column in colList:
                             if column not in lengths:
                                 lengths[column] = 0
@@ -1308,15 +1310,16 @@ class Enumeration:
                                 query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], pivotValue)
 
                             value = inject.getValue(query, inband=False)
+
                             if column == colList[0]:
                                 if not value:
                                     breakRetrieval = True
                                     break
                                 else:
                                     pivotValue = value
+
                             lengths[column] = max(lengths[column], len(value) if value else 0)
                             entries[column].append(value)
-
                 else:
                     for index in indexRange:
                         for column in colList:
