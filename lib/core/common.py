@@ -1371,7 +1371,9 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
         if commentPrefix:
             if line.find(commentPrefix) != -1:
                 line = line[:line.find(commentPrefix)]
+
         line = line.strip()
+
         if not unicode_:
             try:
                 line = str.encode(line)
@@ -1380,8 +1382,10 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
         if line:
             if lowercase:
                 line = line.lower()
+
             if unique and line in retVal:
                 continue
+
             retVal.append(line)
 
     return retVal
@@ -1958,10 +1962,10 @@ def filterListValue(value, regex):
 
     if regex:
         retVal = []
-        filter = getCompiledRegex(regex, re.I)
+        filt = getCompiledRegex(regex, re.I)
 
         for word in value:
-            if filter.search(word):
+            if filt.search(word):
                 retVal.append(word)
 
         return retVal
