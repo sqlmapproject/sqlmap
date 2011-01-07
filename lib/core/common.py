@@ -430,7 +430,7 @@ def dataToStdout(data, forceOutput=False):
                 print data.encode(conf.dataEncoding)
 
 def dataToSessionFile(data):
-    if not conf.sessionFile:
+    if not conf.sessionFile or kb.suppressSession:
         return
 
     conf.sessionFP.write(data)
