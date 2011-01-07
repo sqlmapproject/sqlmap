@@ -196,6 +196,7 @@ __functions__ = {
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
         results = dictionaryAttack(kb.data.cachedUsersPasswords)
+
         for (user, hash_, password) in results:
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
                 if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
@@ -219,14 +220,17 @@ def attackDumpedTable():
             for column in columns:
                 if column == colUser or column == '__infos__':
                     continue
+
                 if len(table[column]['values']) <= i:
                     continue
 
                 value = table[column]['values'][i]
+
                 if hashRecognition(value):
                     if colUser:
                         if table[colUser]['values'][i] not in attack_dict:
                             attack_dict[table[colUser]['values'][i]] = []
+
                         attack_dict[table[colUser]['values'][i]].append(value)
                     else:
                         attack_dict['%s%d' % (DUMMY_USER_PREFIX, i)] = [value]
@@ -242,6 +246,7 @@ def attackDumpedTable():
                 raise sqlmapUserQuitException
 
             results = dictionaryAttack(attack_dict)
+
             for (user, hash_, password) in results:
                 for i in range(count):
                     for column in columns:
@@ -251,6 +256,7 @@ def attackDumpedTable():
                             continue
 
                         value = table[column]['values'][i]
+
                         if value.lower() == hash_.lower():
                             table[column]['values'][i] += " (%s)" % password
 
@@ -278,8 +284,10 @@ def dictionaryAttack(attack_dict):
         for hash_ in hashes:
             if not hash_:
                 continue
+
             hash_ = hash_.split()[0]
             regex = hashRecognition(hash_)
+
             if regex not in hash_regexes:
                 hash_regexes.append(regex)
                 infoMsg = "using hash method: '%s'" % __functions__[regex].func_name
@@ -349,10 +357,12 @@ def dictionaryAttack(attack_dict):
                         clearConsoleLine()
                         
                         infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+
                         if user and not user.startswith(DUMMY_USER_PREFIX):
                             infoMsg += " for user: '%s'\n" % user
                         else:
                             infoMsg += " for hash: '%s'\n" % hash_
+
                         dataToStdout(infoMsg, True)
 
                         attack_info.remove(item)
@@ -378,10 +388,12 @@ def dictionaryAttack(attack_dict):
                         clearConsoleLine()
 
                         infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+
                         if user and not user.startswith(DUMMY_USER_PREFIX):
                             infoMsg += " for user: '%s'\n" % user
                         else:
                             infoMsg += " for hash: '%s'\n" % hash_
+
                         dataToStdout(infoMsg, True)
 
                         break
