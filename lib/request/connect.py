@@ -428,7 +428,7 @@ class Connect:
                 logger.warn(warnMsg)
 
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
-                    _ = Connect.queryPage(content=True)
+                    Connect.queryPage(content=True)
 
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1

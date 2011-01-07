@@ -12,6 +12,11 @@ from lib.core.datatype import advancedDict
 
 class Unescaper(advancedDict):
     def unescape(self, expression, quote=True):
-        return self[kb.dbms if kb.dbms else kb.misc.testedDbms](expression, quote=quote)
+        if hasattr(kb, "dbms") and kb.dbms is not None:
+            return self[kb.dbms if kb.dbms else kb.misc.testedDbms](expression, quote=quote)
+        elif hasattr(kb.misc, "testedDbms") and kb.misc.testedDbms is not None:
+            return self[kb.misc.testedDbms](expression, quote=quote)
+        else:
+            return expression
 
 unescaper = Unescaper()

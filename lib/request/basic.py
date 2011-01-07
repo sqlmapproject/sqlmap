@@ -67,11 +67,12 @@ def parseResponse(page, headers):
         htmlParser(page)
 
         # Detect injectable page absolute system path
-        # NOTE: this regular expression works if the remote web application
-        # is written in PHP and debug/error messages are enabled.
-
+        # NOTE: this regular expression works if the remote web
+        # application is written in PHP and debug/error messages are
+        # enabled
         for regex in ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" ):
             regObj = getCompiledRegex(regex)
+
             for match in regObj.finditer(page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
@@ -145,10 +146,13 @@ def decodePage(page, contentEncoding, contentType):
 
 def processResponse(page, responseHeaders):
     page = getUnicode(page)
+
     parseResponse(page, responseHeaders)
+
     if conf.parseErrors:
         msg = extractErrorMessage(page)
 
         if msg:
             logger.info("parsed error message: '%s'" % msg) 
+
     return page

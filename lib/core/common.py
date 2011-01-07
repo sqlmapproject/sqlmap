@@ -1789,13 +1789,14 @@ def findDynamicContent(firstPage, secondPage):
 
 def removeDynamicContent(page):
     """
-    Removing dynamic content from supplied
-    page basing removal on precalculated
-    dynamic markings
+    Removing dynamic content from supplied page basing removal on
+    precalculated dynamic markings
     """
+
     if page:
         for item in kb.dynamicMarkings:
             prefix, suffix = item
+
             if prefix is None and suffix is None:
                 continue
             elif prefix is None:
@@ -1809,10 +1810,10 @@ def removeDynamicContent(page):
 
 def filterStringValue(value, regex, replace=None):
     """
-    Returns string value consisting only
-    of chars satisfying supplied regular
-    expressson
+    Returns string value consisting only of chars satisfying supplied
+    regular expression
     """
+
     retVal = ""
 
     if value:
@@ -1826,16 +1827,17 @@ def filterStringValue(value, regex, replace=None):
 
 def filterControlChars(value):
     """
-    Returns string value with control
-    chars being supstituted with ' '
+    Returns string value with control chars being supstituted with ' '
     """
+
     return filterStringValue(value, NON_CONTROL_CHAR_REGEX, ' ')
 
 def isDBMSVersionAtLeast(version):
     """
-    Checks if the recognized DBMS version
-    is at least the version specified
+    Checks if the recognized DBMS version is at least the version
+    specified
     """
+
     retVal = None
 
     if kb.dbmsVersion and kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION and kb.dbmsVersion[0] != None:
@@ -1843,6 +1845,7 @@ def isDBMSVersionAtLeast(version):
 
         while True:
             index = value.find('.', value.find('.') + 1)
+
             if index > -1:
                 value = value[0:index] + value[index + 1:]
             else:
@@ -1866,9 +1869,9 @@ def isDBMSVersionAtLeast(version):
 
 def parseSqliteTableSchema(value):
     """
-    Parses table column names and types from
-    specified SQLite table schema
+    Parses table column names and types from specified SQLite table schema
     """
+
     if value:
         table = {}
         columns = {}
@@ -1883,6 +1886,7 @@ def getTechniqueData(technique=None):
     """
     Returns injection data for technique specified
     """
+
     retVal = None
 
     if technique and technique in kb.injection.data:
@@ -1892,16 +1896,17 @@ def getTechniqueData(technique=None):
 
 def isTechniqueAvailable(technique=None):
     """
-    Returns True if there is injection data which
-    sqlmap could use for technique specified
+    Returns True if there is injection data which sqlmap could use for
+    technique specified
     """
+
     return getTechniqueData(technique) is not None
 
 def initTechnique(technique=None):
     """
-    Prepares proper page template and match ratio
-    for technique specified
+    Prepares proper page template and match ratio for technique specified
     """
+
     data = getTechniqueData(technique)
 
     if data:
@@ -1914,77 +1919,87 @@ def initTechnique(technique=None):
 
 def arrayizeValue(value):
     """
-    Makes a list out of value if it's not already
-    list itself
+    Makes a list out of value if it is not already a list, tuple or set
+    itself
     """
-    if not isinstance(value, list):
-        value = [value]
+
+    if not isinstance(value, (list, tuple, set)):
+        value = [ value ]
+
     return value
 
 def getInjectionTests():
     """
-    Returns prioritized test list by eventually
-    detected DBMS from error messages
+    Returns prioritized test list by eventually detected DBMS from error
+    messages
     """
+
     retVal = conf.tests
+
     if getErrorParsedDBMSes():
-        retVal = sorted(retVal, key=lambda test: False\
-          if 'details' in test and 'dbms' in test.details\
+        retVal = sorted(retVal, key=lambda test: False \
+          if 'details' in test and 'dbms' in test.details \
           and test.details.dbms in getErrorParsedDBMSes() else True)
 
     return retVal
 
 def filterListValue(value, regex):
     """
-    Returns list with items that have parts
-    satisfying given regular expression
+    Returns list with items that have parts satisfying given regular
+    expression
     """
+
     if regex:
         retVal = []
         filter = getCompiledRegex(regex, re.I)
+
         for word in value:
             if filter.search(word):
                 retVal.append(word)
+
         return retVal
     else:
         return value
 
 def unicodeToSafeHTMLValue(value):
     """
-    Returns HTML representation of unicode 
-    string value safe for sending over HTTP(s)
+    Returns HTML representation of unicode string value safe for sending
+    over HTTP(s)
     """
+
     retVal = value
+
     if value:
         for char in value:
             if ord(char) > 127:
                 retVal = retVal.replace(char, "&#%d;" % ord(char))
+
     return retVal
 
 def getErrorParsedDBMSes():
     """
-    Returns array with parsed DBMS
-    names till now
+    Returns array with parsed DBMS names till now
     """
+
     return kb.htmlFp
 
 def showHttpErrorCodes():
     """
-    Shows all HTTP error codes 
-    raised till now
+    Shows all HTTP error codes raised till now
     """
+
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during testing:\n"
-        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code]\
-          if code in httplib.responses else '?', count)\
+        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code] \
+          if code in httplib.responses else '?', count) \
           for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
 
 def getComparePageRatio(firstPage, secondPage, filtered=False):
     """
-    Returns comparison ratio between
-    two given pages
+    Returns comparison ratio between two given pages
     """
+
     if filtered:
         firstPage = getFilteredPageContent(firstPage)
         secondPage = getFilteredPageContent(secondPage)

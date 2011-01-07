@@ -151,8 +151,7 @@ Tag: <test>
         Sub-tag: <grep>
             Regular expression to grep for in the response body.
 
-            NOTE: useful to test for error-based and UNION query SQL
-            injections.
+            NOTE: useful to test for error-based SQL injection.
 
         Sub-tag: <time>
             Time in seconds to wait before the response is returned.
@@ -160,7 +159,12 @@ Tag: <test>
             NOTE: useful to test for time-based blind and stacked queries
             SQL injections.
 
-        Sub-tag: <out-of-band>
+        Sub-tag: <union>
+            Calls unionTest() function.
+
+            NOTE: useful to test for UNION query (inband) SQL injection.
+
+        Sub-tag: <oob>
             # TODO
 
     Sub-tag: <details>
@@ -202,6 +206,8 @@ Formats:
             <comparison></comparison>
             <grep></grep>
             <time></time>
+            <union></union>
+            <oob></oob>
         </response>
         <details>
             <dbms></dbms>
@@ -1817,44 +1823,5 @@ Formats:
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of OR time-based blind tests -->
-
-    <!-- UNION query tests -->
-    <!-- TODO: sure about all these clauses? Verify on every DBMS -->
-    <!--
-    <test>
-        <title>UNION query</title>
-        <stype>3</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>UNION ALL SELECT [UNION_STRING]</vector>
-        <request>
-            <payload>UNION ALL SELECT [UNION_TEST]</payload>
-            <comment></comment>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-    </test>
-
-    <test>
-        <title>Single-entry UNION query</title>
-        <stype>3</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>2</where>
-        <vector>UNION ALL SELECT [UNION_STRING]</vector>
-        <request>
-            <payload>UNION ALL SELECT [UNION_TEST]</payload>
-            <comment></comment>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-    </test>
-    -->
-    <!-- End of UNION query tests -->
 
 </root>

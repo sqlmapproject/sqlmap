@@ -185,6 +185,7 @@ def start():
                     testSqlInj = True
 
             testSqlInj &= (conf.hostname, conf.path, None, None) not in kb.testedParams
+
             if not testSqlInj:
                 infoMsg = "skipping '%s'" % targetUrl
                 logger.info(infoMsg)

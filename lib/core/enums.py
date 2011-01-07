@@ -98,6 +98,7 @@ class PAYLOAD:
         COMPARISON = "comparison"
         GREP = "grep"
         TIME = "time"
+        UNION = "union"
 
     class TECHNIQUE:
         HEURISTIC = 0
