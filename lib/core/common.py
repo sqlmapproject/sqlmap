@@ -1936,10 +1936,17 @@ def getInjectionTests():
 
     retVal = conf.tests
 
+    def priorityFunction(test):
+        retVal = 0
+        if 'details' in test and 'dbms' in test.details:
+            if test.details.dbms in getErrorParsedDBMSes():
+                retVal = 1
+            else:
+                retVal = 2
+        return retVal
+
     if getErrorParsedDBMSes():
-        retVal = sorted(retVal, key=lambda test: False \
-          if 'details' in test and 'dbms' in test.details \
-          and test.details.dbms in getErrorParsedDBMSes() else True)
+        retVal = sorted(retVal, key=priorityFunction)
 
     return retVal
 
