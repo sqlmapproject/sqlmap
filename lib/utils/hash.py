@@ -288,7 +288,7 @@ def dictionaryAttack(attack_dict):
             hash_ = hash_.split()[0]
             regex = hashRecognition(hash_)
 
-            if regex not in hash_regexes:
+            if regex and regex not in hash_regexes:
                 hash_regexes.append(regex)
                 infoMsg = "using hash method: '%s'" % __functions__[regex].func_name
                 logger.info(infoMsg)
