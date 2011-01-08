@@ -1670,6 +1670,10 @@ def runningAsAdmin():
     return isAdmin
 
 def logHTTPTraffic(requestLogMsg, responseLogMsg):
+    """
+    Logs HTTP traffic to the output file
+    """
+
     kb.locks.logLock.acquire()
 
     dataToTrafficFile("%s\n" % requestLogMsg)
@@ -1686,6 +1690,7 @@ def getPublicTypeMembers(type_, onlyValues=False):
     """
     Useful for getting members from types (e.g. in enums)
     """
+
     retVal = []
 
     for name, value in getmembers(type_):
@@ -1698,6 +1703,10 @@ def getPublicTypeMembers(type_, onlyValues=False):
     return retVal
 
 def enumValueToNameLookup(type_, value_):
+    """
+    Returns name of a enum member with a given value
+    """
+
     retVal = None
 
     for name, value in getPublicTypeMembers(type_):
@@ -1708,6 +1717,11 @@ def enumValueToNameLookup(type_, value_):
     return retVal
 
 def extractRegexResult(regex, content, flags=0):
+    """
+    Returns 'result' group value from a possible match with regex on a given 
+    content
+    """
+
     retVal = None
 
     if regex and content and '?P<result>' in regex:
@@ -1722,6 +1736,7 @@ def trimAlphaNum(value):
     """
     Trims alpha numeric characters from start and ending of a given value
     """
+
     while value and value[-1].isalnum():
         value = value[:-1]
 
@@ -1731,9 +1746,17 @@ def trimAlphaNum(value):
     return value
 
 def isNumPosStrValue(value):
+    """
+    Returns True if value is a string with a positive integer representation
+    """
+
     return value and isinstance(value, basestring) and value.isdigit() and value != "0"
 
 def aliasToDbmsEnum(value):
+    """
+    Returns major DBMS name from a given alias
+    """
+
     retVal = None
 
     for key, item in dbmsDict.items():
@@ -1746,7 +1769,7 @@ def aliasToDbmsEnum(value):
 def findDynamicContent(firstPage, secondPage):
     """
     This function checks if the provided pages have dynamic content. If they
-    are dynamic, proper markings will be made.
+    are dynamic, proper markings will be made
     """
 
     infoMsg = "searching for dynamic content"
@@ -2019,3 +2042,17 @@ def getComparePageRatio(firstPage, secondPage, filtered=False):
     conf.seqMatcher.set_seq2(secondPage)
 
     return conf.seqMatcher.quick_ratio()
+
+def openFile(filename, mode='r'):
+    """
+    Returns file handle of a given filename
+    """
+
+    try:
+        return codecs.open(filename, mode, conf.dataEncoding)
+    except IOError, e:
+        errMsg = "there has been a file opening error for filename '%s'. " % filename
+        errMsg += "Please check %s permissions on a file " % ("write" if mode and\
+          ('w' in mode or 'a' in mode or '+' in mode) else "read")
+        errMsg += "and that it's not locked by another process."
+        raise sqlmapFilePathException, errMsg

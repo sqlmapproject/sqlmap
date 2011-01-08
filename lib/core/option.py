@@ -29,6 +29,7 @@ from lib.core.common import getFileItems
 from lib.core.common import getFileType
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
+from lib.core.common import openFile
 from lib.core.common import parseTargetDirect
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
@@ -130,7 +131,7 @@ def __urllib2Opener():
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
-    fp = codecs.open(reqFile, "rb")
+    fp = openFile(reqFile, "rb")
 
     fread = fp.read()
     fread = fread.replace("\r", "")
@@ -1262,7 +1263,7 @@ def __saveCmdline():
 
             config.set(family, option, value)
 
-    confFP = codecs.open(paths.SQLMAP_CONFIG, "wb", conf.dataEncoding)
+    confFP = openFile(paths.SQLMAP_CONFIG, "wb")
     config.write(confFP)
 
     infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
@@ -1317,7 +1318,7 @@ def __mergeOptions(inputOptions):
 
 def __setTrafficOutputFP():
     if conf.trafficFile:
-        conf.trafficFP = codecs.open(conf.trafficFile, "w+", conf.dataEncoding)
+        conf.trafficFP = openFile(conf.trafficFile, "w+")
 
 def __basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):

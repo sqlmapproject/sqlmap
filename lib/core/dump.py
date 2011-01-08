@@ -14,6 +14,7 @@ import os
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
+from lib.core.common import openFile
 from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import kb
@@ -259,7 +260,7 @@ class Dump:
                 os.makedirs(dumpDbPath, 0755)
 
             dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, table)
-            dumpFP = codecs.open(dumpFileName, "wb", conf.dataEncoding)
+            dumpFP = openFile(dumpFileName, "wb")
 
         count       = int(tableValues["__infos__"]["count"])
         separator   = str()
