@@ -50,6 +50,7 @@ from lib.core.convert import urlencode
 from lib.core.enums import DBMS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
+from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
@@ -1933,16 +1934,21 @@ def initTechnique(technique=None):
     """
     Prepares proper page template and match ratio for technique specified
     """
+    try:
+        data = getTechniqueData(technique)
 
-    data = getTechniqueData(technique)
-
-    if data:
-        kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
-        kb.matchRatio = data.matchRatio
-    else:
-        warnMsg = "there is no injection data available for technique "
-        warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
-        logger.warn(warnMsg)
+        if data:
+            kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
+            kb.matchRatio = data.matchRatio
+        else:
+            warnMsg = "there is no injection data available for technique "
+            warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
+            logger.warn(warnMsg)
+    except sqlmapDataException, ex:
+        errMsg = "missing data in old session file(s). "
+        errMsg += "please use '--flush-session' to deal "
+        errMsg += "with this error"
+        raise sqlmapNoneDataException, errMsg
 
 def arrayizeValue(value):
     """

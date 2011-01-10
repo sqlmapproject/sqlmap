@@ -1149,6 +1149,10 @@ class Enumeration:
 
         elif not kb.data.cachedColumns:
             kb.data.cachedColumns = self.getColumns(onlyColNames=True)
+
+        if conf.col:
+            colList = conf.col.split(",")
+        elif kb.data.cachedColumns and conf.db in kb.data.cachedColumns and conf.tbl in kb.data.cachedColumns[conf.db]:
             colList = kb.data.cachedColumns[conf.db][conf.tbl].keys()
         else:
             errMsg  = "missing column names, "
