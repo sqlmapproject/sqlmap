@@ -23,6 +23,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getUnicode
 from lib.core.common import paths
 from lib.core.common import readInput
 from lib.core.convert import hexdecode
@@ -334,14 +335,14 @@ def dictionaryAttack(attack_dict):
             logger.info(infoMsg)
             kb.wordlist = getFileItems(dictpath, None, False)
 
-            length = len(kb.wordlist)
-
         infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
 
         for item in attack_info:
             ((user, _), _) = item
-            kb.wordlist.append(user)
+            kb.wordlist.append(getUnicode(user))
+
+        length = len(kb.wordlist)
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
@@ -356,7 +357,7 @@ def dictionaryAttack(attack_dict):
                     if hash_ == current:
                         results.append((user, hash_, word))
                         clearConsoleLine()
-                        
+
                         infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
 
                         if user and not user.startswith(DUMMY_USER_PREFIX):
