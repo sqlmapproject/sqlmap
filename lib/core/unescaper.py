@@ -16,10 +16,10 @@ class Unescaper(advancedDict):
             return self[kb.dbms](expression, quote=quote)
         elif hasattr(kb.misc, "testedDbms") and kb.misc.testedDbms is not None:
             return self[kb.misc.testedDbms](expression, quote=quote)
-        if dbms is not None:
-            return self[dbms](expression, quote=quote)
         elif hasattr(kb.misc, "testedDbms") and kb.misc.testedDbms is not None:
             return self[kb.misc.testedDbms](expression, quote=quote)
+        elif dbms is not None:
+            return self[dbms](expression, quote=quote)
         else:
             return expression
 
