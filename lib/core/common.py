@@ -1935,6 +1935,7 @@ def initTechnique(technique=None):
     """
     Prepares proper page template and match ratio for technique specified
     """
+
     try:
         data = getTechniqueData(technique)
 
@@ -1945,7 +1946,8 @@ def initTechnique(technique=None):
             warnMsg = "there is no injection data available for technique "
             warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
             logger.warn(warnMsg)
-    except sqlmapDataException, ex:
+
+    except sqlmapDataException, _:
         errMsg = "missing data in old session file(s). "
         errMsg += "please use '--flush-session' to deal "
         errMsg += "with this error"
@@ -2063,3 +2065,35 @@ def openFile(filename, mode='r'):
           ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
         raise sqlmapFilePathException, errMsg
+
+def configUnion():
+    if isinstance(conf.uCols, basestring):
+        debugMsg = "setting the UNION query SQL injection range of columns"
+        logger.debug(debugMsg)
+
+        if "-" not in conf.uCols or len(conf.uCols.split("-")) != 2:
+            raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
+
+        conf.uCols = conf.uCols.replace(" ", "")
+        conf.uColsStart, conf.uColsStop = conf.uCols.split("-")
+
+        if not conf.uColsStart.isdigit() or not conf.uColsStop.isdigit():
+            raise sqlmapSyntaxException, "--union-cols must be a range of integers"
+
+        conf.uColsStart = int(conf.uColsStart)
+        conf.uColsStop = int(conf.uColsStop)
+
+        if conf.uColsStart > conf.uColsStop:
+            errMsg = "--union-cols range has to be from lower to "
+            errMsg += "higher number of columns"
+            raise sqlmapSyntaxException, errMsg
+
+    if isinstance(conf.uChar, basestring) and conf.uChar != "NULL":
+        debugMsg = "setting the UNION query SQL injection character to '%s'" % conf.uChar
+        logger.debug(debugMsg)
+
+        if not conf.uChar.isdigit() and ( not conf.uChar.startswith("'") or not conf.uChar.endswith("'") ):
+            debugMsg = "forcing the UNION query SQL injection character to '%s'" % conf.uChar
+            logger.debug(debugMsg)
+
+            conf.uChar = "'%s'" % conf.uChar

@@ -110,8 +110,8 @@ def __formatInjection(inj):
     return data
 
 def __showInjections():
-    header = "sqlmap identified the following injection points "
-    header += "with %d HTTP(s) requests" % kb.testQueryCount
+    header = "sqlmap identified the following injection points with "
+    header += "a total of %d HTTP(s) requests" % kb.testQueryCount
     data = ""
 
     for inj in kb.injections:
@@ -349,12 +349,11 @@ def start():
                               not simpletonCheckSqlInjection(place, parameter, value):
                                 continue
 
-                            logMsg  = "testing sql injection on %s " % place
+                            logMsg = "testing sql injection on %s " % place
                             logMsg += "parameter '%s'" % parameter
                             logger.info(logMsg)
 
                             injection = checkSqlInjection(place, parameter, value)
-
                             proceed = not kb.endDetection
 
                             if injection is not None and injection.place is not None:
@@ -373,7 +372,7 @@ def start():
                                     paramKey = (conf.hostname, conf.path, None, None)
                                     kb.testedParams.add(paramKey)
                             else:
-                                warnMsg  = "%s parameter '%s' is not " % (place, parameter)
+                                warnMsg = "%s parameter '%s' is not " % (place, parameter)
                                 warnMsg += "injectable"
                                 logger.warn(warnMsg)
 
@@ -386,6 +385,9 @@ def start():
                     errMsg = "it seems that all parameters are not injectable"
                     raise sqlmapNotVulnerableException, errMsg                
             else:
+                # Flush the flag
+                kb.testMode = False
+
                 __saveToSessionFile()
                 __showInjections()
                 __selectInjection()

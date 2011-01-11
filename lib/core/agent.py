@@ -53,7 +53,7 @@ class Agent:
 
         return query
 
-    def payload(self, place=None, parameter=None, value=None, newValue=None, negative=False):
+    def payload(self, place=None, parameter=None, value=None, newValue=None, where=None):
         """
         This method replaces the affected parameter with the SQL
         injection statement to request
@@ -62,58 +62,37 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(newValue)
 
-        falseValue = ""
-        negValue   = ""
-        retValue   = ""
+        retValue = ""
 
-        if negative or kb.unionNegative:
-            negValue = "-"
+        if where is None and isTechniqueAvailable(kb.technique):
+            where = kb.injection.data[kb.technique].where
 
-        # After identifing the injectable parameter
-        if kb.injection.place == PLACE.UA and kb.injection.parameter:
-            retValue = kb.injection.parameter.replace(kb.injection.parameter,
-                                                      self.addPayloadDelimiters("%s%s" % (negValue, kb.injection.parameter + falseValue + newValue)))
-        elif kb.injection.place and kb.injection.parameter:
-            paramString = conf.parameters[kb.injection.place]
-            paramDict = conf.paramDict[kb.injection.place]
-            origValue = paramDict[kb.injection.parameter]
+        if kb.injection.place is not None:
+            place = kb.injection.place
 
-            if isTechniqueAvailable(kb.technique):
-                where = kb.injection.data[kb.technique].where
+        if kb.injection.parameter is not None:
+            parameter = kb.injection.parameter
 
+        if place == PLACE.UA:
+            retValue = parameter.replace(parameter, self.addPayloadDelimiters(parameter + newValue))
+        else:
+            paramString = conf.parameters[place]
+            paramDict = conf.paramDict[place]
+            origValue = paramDict[parameter]
+
+            if value is None:
                 if where == 1:
                     value = origValue
                 elif where == 2:
                     value = "-%s" % randomInt()
                 elif where == 3:
                     value = ""
-            else:
-                value = origValue
+                else:
+                    value = origValue
+
+                newValue = "%s%s" % (value, newValue)
 
             newValue = self.cleanupPayload(newValue, origValue)
-
-            if "POSTxml" in conf.paramDict and kb.injection.place == PLACE.POST:
-                root = ET.XML(paramString)
-                iterator = root.getiterator(kb.injection.parameter)
-
-                for child in iterator:
-                    child.text = self.addPayloadDelimiters(negValue + value + falseValue + newValue)
-
-                retValue = ET.tostring(root)
-            elif kb.injection.place == PLACE.URI:
-                retValue = paramString.replace("*",
-                                               self.addPayloadDelimiters("%s%s" % (negValue, falseValue + newValue)))
-            else:
-                retValue = paramString.replace("%s=%s" % (kb.injection.parameter, origValue),
-                                               "%s=%s" % (kb.injection.parameter, self.addPayloadDelimiters(negValue + value + falseValue + newValue)))
-
-        # Before identifing the injectable parameter
-        elif parameter == PLACE.UA:
-            retValue = value.replace(value, self.addPayloadDelimiters(newValue))
-        elif place == PLACE.URI:
-            retValue = value.replace("*", self.addPayloadDelimiters("%s" % newValue.replace(value, str())))
-        else:
-            paramString = conf.parameters[place]
 
             if "POSTxml" in conf.paramDict and place == PLACE.POST:
                 root = ET.XML(paramString)
@@ -123,10 +102,13 @@ class Agent:
                     child.text = self.addPayloadDelimiters(newValue)
 
                 retValue = ET.tostring(root)
+            elif place == PLACE.URI:
+                retValue = paramString.replace("*", self.addPayloadDelimiters(newValue))
             else:
-                retValue = paramString.replace("%s=%s" % (parameter, value),
+                retValue = paramString.replace("%s=%s" % (parameter, origValue),
                                                "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
 
+#        print "retValue:", retValue
         return retValue
 
     def fullPayload(self, query):
@@ -139,7 +121,7 @@ class Agent:
 
         return payload
 
-    def prefixQuery(self, string):
+    def prefixQuery(self, string, prefix=None, where=None, clause=None):
         """
         This method defines how the input string has to be escaped
         to perform the injection depending on the injection type
@@ -156,9 +138,10 @@ class Agent:
         # payload, do not put a space after the prefix
         if kb.technique == PAYLOAD.TECHNIQUE.STACKED:
             query = kb.injection.prefix
-        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 3 ]:
-            if kb.technique != PAYLOAD.TECHNIQUE.UNION:
-                query = kb.injection.prefix
+        elif where == 3 or clause == [2, 3] or clause == [ 2 ] or clause == [ 3 ]:
+            query = prefix
+        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ] or kb.injection.clause == [ 3 ]:
+            query = kb.injection.prefix
         elif kb.technique and kb.technique in kb.injection.data:
             where = kb.injection.data[kb.technique].where
 
@@ -166,14 +149,17 @@ class Agent:
                 query = kb.injection.prefix
 
         if query is None:
-            query = "%s " % kb.injection.prefix
+            if kb.injection.prefix is None and prefix is not None:
+                query = "%s " % prefix
+            else:
+                query = "%s " % kb.injection.prefix
 
         query = "%s%s" % (query, string)
         query = self.cleanupPayload(query)
 
         return query
 
-    def suffixQuery(self, string, comment=None):
+    def suffixQuery(self, string, comment=None, suffix=None):
         """
         This method appends the DBMS comment to the
         SQL injection request
@@ -185,12 +171,16 @@ class Agent:
         if comment is not None:
             string += comment
 
-        string += " %s" % kb.injection.suffix
+        if kb.injection.suffix is None and suffix is not None:
+            string += " %s" % suffix
+        else:
+            string += " %s" % kb.injection.suffix
+
         string = self.cleanupPayload(string)
 
         return string.rstrip()
 
-    def cleanupPayload(self, payload, origvalue=None):
+    def cleanupPayload(self, payload, origvalue=None, unionVector=None):
         if payload is None:
             return
 
@@ -207,11 +197,9 @@ class Agent:
         payload = payload.replace("[DELIMITER_STOP]", kb.misc.stop)
         payload = payload.replace("[SPACE_REPLACE]", kb.misc.space)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+        payload = payload.replace("[UNION]", str(unionVector))
 
         if origvalue is not None:
-            if not origvalue.isdigit():
-                origvalue = "'%s'" % origvalue
-
             payload = payload.replace("[ORIGVALUE]", origvalue)
 
         if "[INFERENCE]" in payload:
@@ -228,14 +216,15 @@ class Agent:
 
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
 
-            elif kb.misc.testedDbms is not None:
+            elif hasattr(kb.misc, "testedDbms") and kb.misc.testedDbms is not None:
                 inferenceQuery = queries[kb.misc.testedDbms].inference.query
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
 
-            else:
-                errMsg = "invalid usage of inference payload without "
-                errMsg += "knowledge of underlying DBMS"
-                raise sqlmapNoneDataException, errMsg
+            # NOTE: Leave this commented for the time being
+            #else:
+            #    errMsg = "invalid usage of inference payload without "
+            #    errMsg += "knowledge of underlying DBMS"
+            #    raise sqlmapNoneDataException, errMsg
 
         return payload
 
@@ -483,7 +472,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, exprPosition=None, nullChar=None, count=None, comment=None, multipleUnions=None):
+    def forgeInbandQuery(self, query, exprPosition=None, nullChar=None, count=None, comment=None, prefix=None, suffix=None, multipleUnions=None):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -526,7 +515,7 @@ class Agent:
         if query.startswith("SELECT "):
             query        = query[len("SELECT "):]
 
-        inbandQuery = self.prefixQuery("UNION ALL SELECT ")
+        inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if query.startswith("TOP"):
             topNum       = re.search("\ATOP\s+([\d]+)\s+", query, re.I).group(1)
@@ -584,8 +573,7 @@ class Agent:
             if kb.dbms == DBMS.ORACLE:
                 inbandQuery += " FROM DUAL"
 
-
-        inbandQuery = self.suffixQuery(inbandQuery, comment)
+        inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
         return inbandQuery
 

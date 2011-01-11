@@ -32,6 +32,7 @@ from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
 from lib.core.common import DynamicContentItem
+from lib.core.common import configUnion
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -55,8 +56,12 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
+from lib.techniques.inband.union.test import unionTest
 
 def unescape(string, dbms):
+    if string is None:
+        return string
+
     if dbms in unescaper and "WAITFOR DELAY " not in string:
         return unescaper[dbms](string)
     else:
@@ -84,8 +89,9 @@ def checkSqlInjection(place, parameter, value):
     # Set the flag for sql injection test mode
     kb.testMode = True
 
-    for test in getInjectionTests():
-        try:            
+    #for test in getInjectionTests():
+    for test in conf.tests:
+        try:
             if kb.endDetection:
                 break
 
@@ -143,11 +149,12 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-                if getErrorParsedDBMSes() and dbms not in getErrorParsedDBMSes()\
-                  and kb.skipTests is None:
-                    message = "parsed error message(s) showed that the back-end DBMS could be '%s'." % getErrorParsedDBMSesFormatted()
-                    message += " do you want to skip test payloads specific for other DBMSes? [Y/n]"
-                    kb.skipTests = conf.realTest or readInput(message, default="Y") not in ("n", "N")
+                # NOTE: Leave this commented for the time being
+                #if getErrorParsedDBMSes() and dbms not in getErrorParsedDBMSes() and kb.skipTests is None:
+                #    msg = "parsed error message(s) showed that the "
+                #    msg += "back-end DBMS could be '%s'. " % getErrorParsedDBMSesFormatted()
+                #    msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
+                #    kb.skipTests = conf.realTest or readInput(msg, default="Y") not in ("n", "N")
 
                 if kb.skipTests:
                     debugMsg = "skipping test '%s' because " % title
@@ -189,7 +196,6 @@ def checkSqlInjection(place, parameter, value):
             comment = agent.getComment(test.request)
             fstPayload = agent.cleanupPayload(test.request.payload, value)
             fstPayload = unescapeDbms(fstPayload, injection, dbms)
-            fstPayload = "%s%s" % (fstPayload, comment)
 
             if stype != 4 and clause != [2, 3] and clause != [ 3 ]:
                 space = " "
@@ -280,11 +286,11 @@ def checkSqlInjection(place, parameter, value):
                     if where == 1:
                         origValue = value
                     elif where == 2:
+                        # Use different page template than the original
+                        # one as we are changing parameters value, which
+                        # will likely result in a different content
                         origValue = "-%s" % randomInt()
-                        # Use different page template than the original one
-                        # as we are changing parameters value, which will result
-                        # most definitely with a different content
-                        templatePayload = agent.payload(place, parameter, value, origValue)
+                        templatePayload = agent.payload(place, parameter, newValue=origValue, where=where)
                     elif where == 3:
                         origValue = ""
 
@@ -293,10 +299,11 @@ def checkSqlInjection(place, parameter, value):
                     # Forge request payload by prepending with boundary's
                     # prefix and appending the boundary's suffix to the
                     # test's ' <payload><comment> ' string
-                    boundPayload = "%s%s%s%s %s" % (origValue, prefix, space, fstPayload, suffix)
-                    boundPayload = boundPayload.strip()
+                    boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
+                    boundPayload = agent.suffixQuery(boundPayload, comment, suffix)
                     boundPayload = agent.cleanupPayload(boundPayload, value)
-                    reqPayload = agent.payload(place, parameter, value, boundPayload)
+                    reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                    unionVector = None
 
                     # Perform the test's request and check whether or not the
                     # payload was successful
@@ -308,16 +315,15 @@ def checkSqlInjection(place, parameter, value):
                         if method == PAYLOAD.METHOD.COMPARISON:
                             sndPayload = agent.cleanupPayload(test.response.comparison, value)
                             sndPayload = unescapeDbms(sndPayload, injection, dbms)
-                            sndPayload = "%s%s" % (sndPayload, comment)
 
                             # Forge response payload by prepending with
                             # boundary's prefix and appending the boundary's
                             # suffix to the test's ' <payload><comment> '
                             # string
-                            boundPayload = "%s%s%s%s %s" % (origValue, prefix, space, sndPayload, suffix)
-                            boundPayload = boundPayload.strip()
+                            boundPayload = agent.prefixQuery(sndPayload, prefix, where, clause)
+                            boundPayload = agent.suffixQuery(boundPayload, comment, suffix)
                             boundPayload = agent.cleanupPayload(boundPayload, value)
-                            cmpPayload = agent.payload(place, parameter, value, boundPayload)
+                            cmpPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
 
                             # Useful to set kb.matchRatio at first based on
                             # the False response content
@@ -337,7 +343,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
-                        # In case of error-based or UNION query SQL injections
+                        # In case of error-based SQL injection
                         elif method == PAYLOAD.METHOD.GREP:
                             # Perform the test's request and grep the response
                             # body for the test's <grep> regular expression
@@ -369,6 +375,20 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
+                        # In case of UNION query SQL injection
+                        elif method == PAYLOAD.METHOD.UNION:
+                            conf.uChar = test.request.char
+                            conf.uCols = test.request.columns
+                            configUnion()
+
+                            reqPayload, unionVector = unionTest(comment, place, parameter, value, prefix, suffix)
+
+                            if isinstance(reqPayload, basestring):
+                                infoMsg = "%s parameter '%s' is '%s' injectable" % (place, parameter, title)
+                                logger.info(infoMsg)
+
+                                injectable = True
+
                     # If the injection test was successful feed the injection
                     # object with the test's details
                     if injectable is True:
@@ -396,7 +416,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].title = title
                         injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload, False)
                         injection.data[stype].where = where
-                        injection.data[stype].vector = vector
+                        injection.data[stype].vector = agent.cleanupPayload(vector, unionVector=unionVector)
                         injection.data[stype].comment = comment
                         injection.data[stype].matchRatio = kb.matchRatio
                         injection.data[stype].templatePayload = templatePayload
@@ -439,9 +459,6 @@ def checkSqlInjection(place, parameter, value):
                 kb.endDetection = True
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
-        finally:
-            # Flush the flag
-            kb.testMode = False
 
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:
@@ -466,8 +483,8 @@ def heuristicCheckSqlInjection(place, parameter, value):
         if conf.suffix:
             suffix = conf.suffix
 
-    payload = "%s%s%s%s" % (value, prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
-    payload = agent.payload(place, parameter, value, payload)
+    payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
+    payload = agent.payload(place, parameter, newValue=payload)
     Request.queryPage(payload, place, content=True, raise404=False)
 
     result = wasLastRequestDBMSError()
@@ -808,13 +825,14 @@ def checkConnection(suppressOutput=False):
         kb.originalPage = kb.pageTemplate = page
 
         kb.errorIsNone = False
+
         if wasLastRequestDBMSError():
-            warnMsg = "there is an (DBMS) error found in the content of provided target url"
-            warnMsg += " which could interfere with the results of the tests"
+            warnMsg = "there is a DBMS error found in the HTTP response body"
+            warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
         elif wasLastRequestHTTPError():
-            warnMsg = "there is an (HTTP) error found in the content of provided target url"
-            warnMsg += " which could interfere with the results of the tests"
+            warnMsg = "the web server responded with an HTTP error code "
+            warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
         else:
             kb.errorIsNone = True

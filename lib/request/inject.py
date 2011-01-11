@@ -397,7 +397,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         if conf.direct:
             value = direct(expression)
 
-        elif kb.unionTest or any(map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))):
+        elif any(map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))):
             query = cleanQuery(expression)
             query = expandAsteriskForColumns(query)
             value = None
@@ -414,7 +414,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 else:
                     forgeCaseExpression = agent.forgeCaseStatement(expression)
 
-            if inband and kb.unionTest is not None:
+            if inband and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
 
                 if expected == EXPECTED.BOOL:

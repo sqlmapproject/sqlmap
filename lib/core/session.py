@@ -204,70 +204,18 @@ def setUnion(comment=None, count=None, position=None, negative=False, char=None,
     """
 
     if comment:
-        condition = (
-                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      not kb.resumedQueries[conf.url].has_key("Union comment") )
-                    )
-
-        if condition:
-            dataToSessionFile("[%s][%s][%s][Union comment][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(comment)))
-
         kb.unionComment = comment
 
     if count:
-        condition = (
-                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      not kb.resumedQueries[conf.url].has_key("Union count") )
-                    )
-
-        if condition:
-            dataToSessionFile("[%s][%s][%s][Union count][%d]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), count))
-
         kb.unionCount = count
 
     if position is not None:
-        condition = (
-                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      not kb.resumedQueries[conf.url].has_key("Union position") )
-                    )
-
-        if condition:
-            dataToSessionFile("[%s][%s][%s][Union position][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), position))
-
         kb.unionPosition = position
 
     if negative:
-        condition = (
-                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      ( not kb.resumedQueries[conf.url].has_key("Union negative")
-                      ) )
-                    )
-
-        if condition:
-            dataToSessionFile("[%s][%s][%s][Union negative][Yes]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place])))
-
         kb.unionNegative = True
 
-    if char:
-        condition = (
-                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      ( not kb.resumedQueries[conf.url].has_key("Union char")
-                      ) )
-                    )
-
-        if condition:
-            dataToSessionFile("[%s][%s][%s][Union char][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), char))
-
     if payload:
-        condition = (
-                      not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                      ( not kb.resumedQueries[conf.url].has_key("Union payload")
-                      ) )
-                    )
-
-        if condition:
-            dataToSessionFile("[%s][%s][%s][Union payload][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), payload))
-
         kb.unionTest = payload
 
 def setRemoteTempPath():

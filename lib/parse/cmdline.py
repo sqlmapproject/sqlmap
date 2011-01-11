@@ -235,7 +235,7 @@ def cmdLineParser():
                               action="store_true", default=False,
                               help="Test for and use UNION query (inband) SQL injection")
 
-        techniques.add_option("--union-cols", dest="uCols", default="1-20",
+        techniques.add_option("--union-cols", dest="uCols",
                               help="Range of columns to test for UNION query SQL injection")
 
         techniques.add_option("--union-char", dest="uChar", default="NULL",

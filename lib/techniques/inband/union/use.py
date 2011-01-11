@@ -15,12 +15,14 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
+from lib.core.common import initTechnique
 from lib.core.common import parseUnionPage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.techniques.inband.union.test import unionTest
@@ -34,6 +36,8 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
     url then call its subsidiary function to effectively perform an
     inband SQL injection on the affected url
     """
+
+    initTechnique(PAYLOAD.TECHNIQUE.UNION)
 
     count      = None
     origExpr   = expression
