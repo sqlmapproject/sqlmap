@@ -49,7 +49,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
         # Perform the request
         resultPage, _ = Request.queryPage(payload, place=place, content=True)
 
-        if resultPage and randQuery in resultPage and query not in resultPage:
+        if resultPage and randQuery in resultPage and " UNION ALL SELECT " not in resultPage:
             setUnion(position=exprPosition)
             validPayload = payload
             unionVector = agent.forgeInbandQuery("[PAYLOAD]", exprPosition, count=count, comment=comment, prefix=prefix, suffix=suffix)
