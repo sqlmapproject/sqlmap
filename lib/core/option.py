@@ -1183,10 +1183,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.osVersion       = None
     kb.osSP            = None
 
-    # Default page encoding for HTML documents
-    # Reference: http://en.wikipedia.org/wiki/ISO/IEC_8859-1
-    kb.pageEncoding    = 'iso-8859-1'
-
+    kb.pageEncoding    = None
     kb.pageStable      = None
     kb.partRun         = None
     kb.proxyAuthHeader = None
