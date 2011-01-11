@@ -320,13 +320,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length-1):
                                 output = output[:-2] + '..'
 
-                            output += '_' * (min(length, conf.progressWidth) - len(output))
-                            status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
-                            output += status if count != length else " "*len(status)
+                            if conf.verbose in (1, 2) and not showEta:
+                                output += '_' * (min(length, conf.progressWidth) - len(output))
+                                status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
+                                output += status if count != length else " "*len(status)
 
-                            iolock.acquire()
-                            dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
-                            iolock.release()
+                                iolock.acquire()
+                                dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
+                                iolock.release()
 
                 if not kb.threadContinue:
                     if int(threading.currentThread().getName()) == numThreads - 1:

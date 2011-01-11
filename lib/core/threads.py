@@ -36,4 +36,3 @@ def getCurrentThreadData():
     if threadUID not in kb.threadData:
         kb.threadData[threadUID] = ThreadData()
     return kb.threadData[threadUID]
-

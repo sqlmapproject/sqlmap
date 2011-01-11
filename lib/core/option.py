@@ -114,14 +114,13 @@ def __urllib2Opener():
 
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
     if conf.keepAlive:
+        warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
+        warnMsg += "been disabled because of it's incompatibility "
+
         if conf.proxy:
-            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-            warnMsg += "been disabled because of it's incompatibility "
             warnMsg += "with HTTP(s) proxy"
             logger.warn(warnMsg)
         elif conf.aType:
-            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-            warnMsg += "been disabled because of it's incompatibility "
             warnMsg += "with authentication methods"
             logger.warn(warnMsg)
         else:
@@ -506,38 +505,6 @@ def __setWriteFile():
         raise sqlmapMissingMandatoryOptionException, errMsg
 
     conf.wFileType = getFileType(conf.wFile)
-
-def __setUnion():
-    if isinstance(conf.uCols, basestring) and conf.uChar != "1-20":
-        debugMsg = "setting the UNION query SQL injection range of columns"
-        logger.debug(debugMsg)
-
-        if "-" not in conf.uCols or len(conf.uCols.split("-")) != 2:
-            raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
-
-        conf.uCols = conf.uCols.replace(" ", "")
-        conf.uColsStart, conf.uColsStop = conf.uCols.split("-")
-
-        if not conf.uColsStart.isdigit() or not conf.uColsStop.isdigit():
-            raise sqlmapSyntaxException, "--union-cols must be a range of integers"
-
-        conf.uColsStart = int(conf.uColsStart)
-        conf.uColsStop = int(conf.uColsStop)
-
-        if conf.uColsStart > conf.uColsStop:
-            errMsg = "--union-cols range has to be from lower to "
-            errMsg += "higher number of columns"
-            raise sqlmapSyntaxException, errMsg
-
-    if isinstance(conf.uChar, basestring) and conf.uChar != "NULL":
-        debugMsg = "setting the UNION query SQL injection character to '%s'" % conf.uChar
-        logger.debug(debugMsg)
-
-        if not conf.uChar.isdigit() and ( not conf.uChar.startswith("'") or not conf.uChar.endswith("'") ):
-            debugMsg = "forcing the UNION query SQL injection character to '%s'" % conf.uChar
-            logger.debug(debugMsg)
-
-            conf.uChar = "'%s'" % conf.uChar
 
 def __setOS():
     """
@@ -1406,7 +1373,6 @@ def init(inputOptions=advancedDict()):
         __setHTTPAuthentication()
         __setHTTPProxy()
         __setSafeUrl()
-        __setUnion()
         __setGoogleDorking()
         __urllib2Opener()
         __findPageForms()

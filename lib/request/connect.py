@@ -463,6 +463,7 @@ class Connect:
 
         if kb.testMode:
             kb.testQueryCount += 1
+
             if conf.cj:
                 conf.cj.clear()
 

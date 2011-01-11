@@ -744,6 +744,7 @@ class Enumeration:
 
         if bruteForce:
             resumeAvailable = False
+
             for db, table in kb.brute.tables:
                 if db == conf.db:
                     resumeAvailable = True
@@ -919,6 +920,7 @@ class Enumeration:
 
         if bruteForce:
             resumeAvailable = False
+
             for db, table, colName, colType in kb.brute.columns:
                 if db == conf.db and table == conf.tbl:
                     resumeAvailable = True
@@ -931,6 +933,7 @@ class Enumeration:
                         columns[colName] = colType
 
                 kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
+
                 return kb.data.cachedColumns
 
             message = "do you want to use common columns existance check? [Y/n/q]"
