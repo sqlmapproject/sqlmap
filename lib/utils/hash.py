@@ -349,29 +349,36 @@ def dictionaryAttack(attack_dict):
 
             for word in kb.wordlist:
                 count += 1
-                current = __functions__[hash_regex](password = word, uppercase = False)
 
-                for item in attack_info:
-                    ((user, hash_), _) = item
+                try:
+                    current = __functions__[hash_regex](password = word, uppercase = False)
 
-                    if hash_ == current:
-                        results.append((user, hash_, word))
-                        clearConsoleLine()
+                    for item in attack_info:
+                        ((user, hash_), _) = item
 
-                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                        if hash_ == current:
+                            results.append((user, hash_, word))
+                            clearConsoleLine()
 
-                        if user and not user.startswith(DUMMY_USER_PREFIX):
-                            infoMsg += " for user: '%s'\n" % user
-                        else:
-                            infoMsg += " for hash: '%s'\n" % hash_
+                            infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
 
-                        dataToStdout(infoMsg, True)
+                            if user and not user.startswith(DUMMY_USER_PREFIX):
+                                infoMsg += " for user: '%s'\n" % user
+                            else:
+                                infoMsg += " for hash: '%s'\n" % hash_
 
-                        attack_info.remove(item)
+                            dataToStdout(infoMsg, True)
 
-                    elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
-                        status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
-                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                            attack_info.remove(item)
+
+                        elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
+                            status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                            dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+                except:
+                    warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                    warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+                    logger.critical(warnMsg)
 
             clearConsoleLine()
 
@@ -382,27 +389,32 @@ def dictionaryAttack(attack_dict):
                 for word in kb.wordlist:
                     current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
                     count += 1
+                    try:
+                        if hash_ == current:
+                            if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
+                                word = word.upper()
+                            results.append((user, hash_, word))
+                            clearConsoleLine()
 
-                    if hash_ == current:
-                        if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
-                            word = word.upper()
-                        results.append((user, hash_, word))
-                        clearConsoleLine()
+                            infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
 
-                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                            if user and not user.startswith(DUMMY_USER_PREFIX):
+                                infoMsg += " for user: '%s'\n" % user
+                            else:
+                                infoMsg += " for hash: '%s'\n" % hash_
 
-                        if user and not user.startswith(DUMMY_USER_PREFIX):
-                            infoMsg += " for user: '%s'\n" % user
-                        else:
-                            infoMsg += " for hash: '%s'\n" % hash_
+                            dataToStdout(infoMsg, True)
 
-                        dataToStdout(infoMsg, True)
+                            break
 
-                        break
+                        elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
+                            status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
+                            dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
-                    elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
-                        status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
-                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                    except:
+                        warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                        warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+                        logger.critical(warnMsg)
 
                 clearConsoleLine()
 
