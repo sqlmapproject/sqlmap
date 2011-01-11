@@ -25,7 +25,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
-from lib.techniques.inband.union.test import unionTest
 from lib.utils.resume import resume
 
 reqCount = 0
@@ -51,9 +50,6 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
     if resetCounter:
         reqCount = 0
-
-    if not kb.unionTest:
-        unionTest()
 
     if not kb.unionCount:
         return

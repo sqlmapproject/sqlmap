@@ -11,9 +11,13 @@ from lib.core.data import kb
 from lib.core.datatype import advancedDict
 
 class Unescaper(advancedDict):
-    def unescape(self, expression, quote=True):
+    def unescape(self, expression, quote=True, dbms=None):
         if hasattr(kb, "dbms") and kb.dbms is not None:
-            return self[kb.dbms if kb.dbms else kb.misc.testedDbms](expression, quote=quote)
+            return self[kb.dbms](expression, quote=quote)
+        elif hasattr(kb.misc, "testedDbms") and kb.misc.testedDbms is not None:
+            return self[kb.misc.testedDbms](expression, quote=quote)
+        if dbms is not None:
+            return self[dbms](expression, quote=quote)
         elif hasattr(kb.misc, "testedDbms") and kb.misc.testedDbms is not None:
             return self[kb.misc.testedDbms](expression, quote=quote)
         else:

@@ -26,7 +26,7 @@ from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
 
-def __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=1):
+def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count, where=1):
     validPayload = None
     unionVector = None
 
@@ -40,7 +40,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         # Prepare expression with delimiters
         randQuery = randomStr()
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
-        randQueryUnescaped = unescaper.unescape(randQueryProcessed)
+        randQueryUnescaped = unescaper.unescape(randQueryProcessed, dbms=dbms)
 
         # Forge the inband SQL injection request
         query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition, count=count, comment=comment, prefix=prefix, suffix=suffix)
@@ -58,7 +58,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 # Prepare expression with delimiters
                 randQuery2 = randomStr()
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
-                randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
+                randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2, dbms=dbms)
 
                 # Confirm that it is a full inband SQL injection
                 query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition, count=count, comment=comment, prefix=prefix, suffix=suffix, multipleUnions=randQueryUnescaped2)
@@ -74,19 +74,19 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
 
     return validPayload, unionVector
 
-def __unionConfirm(comment, place, parameter, value, prefix, suffix, count):
+def __unionConfirm(comment, place, parameter, value, prefix, suffix, dbms, count):
     validPayload = None
     unionVector = None
 
     # Confirm the inband SQL injection and get the exact column
     # position which can be used to extract data
     if not isinstance(kb.unionPosition, int):
-        validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, count)
+        validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count)
 
         # Assure that the above function found the exploitable full inband
         # SQL injection position
         if not isinstance(kb.unionPosition, int):
-            validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=2)
+            validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count, where=2)
 
             # Assure that the above function found the exploitable partial
             # (single entry) inband SQL injection position with negative
@@ -98,7 +98,7 @@ def __unionConfirm(comment, place, parameter, value, prefix, suffix, count):
 
     return validPayload, unionVector
 
-def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix):
+def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix, dbms):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 50 columns
@@ -123,7 +123,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         debugMsg = "testing number of columns: %s" % status
         logger.debug(debugMsg)
 
-        validPayload, unionVector = __unionConfirm(comment, place, parameter, value, prefix, suffix, count)
+        validPayload, unionVector = __unionConfirm(comment, place, parameter, value, prefix, suffix, dbms, count)
 
         if validPayload:
             setUnion(count=count)
@@ -133,7 +133,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
     return validPayload, unionVector
 
-def unionTest(comment, place, parameter, value, prefix, suffix):
+def unionTest(comment, place, parameter, value, prefix, suffix, dbms):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 3*50 times
@@ -144,7 +144,7 @@ def unionTest(comment, place, parameter, value, prefix, suffix):
 
     oldTechnique = kb.technique
     kb.technique = PAYLOAD.TECHNIQUE.UNION
-    validPayload, unionVector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
+    validPayload, unionVector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix, dbms)
 
     if validPayload:
         validPayload = agent.removePayloadDelimiters(validPayload, False)

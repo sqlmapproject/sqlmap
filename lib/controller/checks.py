@@ -149,14 +149,15 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-                # NOTE: Leave this commented for the time being
-                #if getErrorParsedDBMSes() and dbms not in getErrorParsedDBMSes() and kb.skipTests is None:
-                #    msg = "parsed error message(s) showed that the "
-                #    msg += "back-end DBMS could be '%s'. " % getErrorParsedDBMSesFormatted()
-                #    msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
-                #    kb.skipTests = conf.realTest or readInput(msg, default="Y") not in ("n", "N")
+                if getErrorParsedDBMSes() and dbms not in getErrorParsedDBMSes() and kb.skipOthersDbms is None:
+                    msg = "parsed error message(s) showed that the "
+                    msg += "back-end DBMS could be '%s'. " % getErrorParsedDBMSesFormatted()
+                    msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
 
-                if kb.skipTests:
+                    if conf.realTest or readInput(msg, default="Y") in ("y", "Y"):
+                        kb.skipOthersDbms = getErrorParsedDBMSes()
+
+                if kb.skipOthersDbms and dbms not in kb.skipOthersDbms:
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the parsed error message(s) showed "
                     debugMsg += "that the back-end DBMS could be "
@@ -378,7 +379,8 @@ def checkSqlInjection(place, parameter, value):
                         elif method == PAYLOAD.METHOD.UNION:
                             configUnion(test.request.char, test.request.columns)
 
-                            reqPayload, unionVector = unionTest(comment, place, parameter, value, prefix, suffix)
+                            dbmsToUnescape = dbms if dbms is not None else injection.dbms
+                            reqPayload, unionVector = unionTest(comment, place, parameter, value, prefix, suffix, dbmsToUnescape)
 
                             if isinstance(reqPayload, basestring):
                                 infoMsg = "%s parameter '%s' is '%s' injectable" % (place, parameter, title)
