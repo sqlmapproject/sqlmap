@@ -2066,34 +2066,37 @@ def openFile(filename, mode='r'):
         errMsg += "and that it's not locked by another process."
         raise sqlmapFilePathException, errMsg
 
-def configUnion():
+def __configUnionChar(char):
+    if char.isdigit() or char == "NULL":
+        conf.uChar = char
+    elif not char.startswith("'") or not char.endswith("'"):
+        conf.uChar = "'%s'" % char
+
+def __configUnionCols(columns):
+    if "-" not in columns or len(columns.split("-")) != 2:
+        raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
+
+    columns = columns.replace(" ", "")
+    conf.uColsStart, conf.uColsStop = columns.split("-")
+
+    if not conf.uColsStart.isdigit() or not conf.uColsStop.isdigit():
+        raise sqlmapSyntaxException, "--union-cols must be a range of integers"
+
+    conf.uColsStart = int(conf.uColsStart)
+    conf.uColsStop = int(conf.uColsStop)
+
+    if conf.uColsStart > conf.uColsStop:
+        errMsg = "--union-cols range has to be from lower to "
+        errMsg += "higher number of columns"
+        raise sqlmapSyntaxException, errMsg
+
+def configUnion(char, columns):
+    if isinstance(conf.uChar, basestring):
+        __configUnionChar(conf.uChar)
+    elif isinstance(char, basestring):
+        __configUnionChar(char)
+
     if isinstance(conf.uCols, basestring):
-        debugMsg = "setting the UNION query SQL injection range of columns"
-        logger.debug(debugMsg)
-
-        if "-" not in conf.uCols or len(conf.uCols.split("-")) != 2:
-            raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
-
-        conf.uCols = conf.uCols.replace(" ", "")
-        conf.uColsStart, conf.uColsStop = conf.uCols.split("-")
-
-        if not conf.uColsStart.isdigit() or not conf.uColsStop.isdigit():
-            raise sqlmapSyntaxException, "--union-cols must be a range of integers"
-
-        conf.uColsStart = int(conf.uColsStart)
-        conf.uColsStop = int(conf.uColsStop)
-
-        if conf.uColsStart > conf.uColsStop:
-            errMsg = "--union-cols range has to be from lower to "
-            errMsg += "higher number of columns"
-            raise sqlmapSyntaxException, errMsg
-
-    if isinstance(conf.uChar, basestring) and conf.uChar != "NULL":
-        debugMsg = "setting the UNION query SQL injection character to '%s'" % conf.uChar
-        logger.debug(debugMsg)
-
-        if not conf.uChar.isdigit() and ( not conf.uChar.startswith("'") or not conf.uChar.endswith("'") ):
-            debugMsg = "forcing the UNION query SQL injection character to '%s'" % conf.uChar
-            logger.debug(debugMsg)
-
-            conf.uChar = "'%s'" % conf.uChar
+        __configUnionCols(conf.uCols)
+    elif isinstance(columns, basestring):
+        __configUnionCols(columns)

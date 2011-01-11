@@ -235,7 +235,6 @@ def checkSqlInjection(place, parameter, value):
                 # default) value
                 # Parse boundary's <level>
                 if boundary.level > conf.level:
-                    # NOTE: shall we report every single skipped boundary too?
                     continue
 
                 # Skip boundary if it does not match against test's <clause>
@@ -377,9 +376,7 @@ def checkSqlInjection(place, parameter, value):
 
                         # In case of UNION query SQL injection
                         elif method == PAYLOAD.METHOD.UNION:
-                            conf.uChar = test.request.char
-                            conf.uCols = test.request.columns
-                            configUnion()
+                            configUnion(test.request.char, test.request.columns)
 
                             reqPayload, unionVector = unionTest(comment, place, parameter, value, prefix, suffix)
 

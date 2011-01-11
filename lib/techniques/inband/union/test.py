@@ -81,17 +81,11 @@ def __unionConfirm(comment, place, parameter, value, prefix, suffix, count):
     # Confirm the inband SQL injection and get the exact column
     # position which can be used to extract data
     if not isinstance(kb.unionPosition, int):
-        debugMsg = "testing full inband with %s columns" % count
-        logger.debug(debugMsg)
-
         validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, count)
 
         # Assure that the above function found the exploitable full inband
         # SQL injection position
         if not isinstance(kb.unionPosition, int):
-            debugMsg = "testing single-entry inband with %s columns" % count
-            logger.debug(debugMsg)
-
             validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=2)
 
             # Assure that the above function found the exploitable partial
@@ -125,11 +119,9 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         if kb.dbms == DBMS.ORACLE:
             query += " FROM DUAL"
 
-        if conf.verbose in (1, 2):
-            status = '%d/%d (%d%s)' % (count, conf.uColsStop, round(100.0*count/conf.uColsStop), '%')
-            dataToStdout("\r[%s] [INFO] number of columns: %s" % (time.strftime("%X"), status), True)
-
-        dataToStdout("\n")
+        status = '%d/%d (%d%s)' % (count, conf.uColsStop, round(100.0*count/conf.uColsStop), '%')
+        debugMsg = "testing number of columns: %s" % status
+        logger.debug(debugMsg)
 
         validPayload, unionVector = __unionConfirm(comment, place, parameter, value, prefix, suffix, count)
 
@@ -152,12 +144,6 @@ def unionTest(comment, place, parameter, value, prefix, suffix):
 
     oldTechnique = kb.technique
     kb.technique = PAYLOAD.TECHNIQUE.UNION
-
-    if conf.uChar == "NULL":
-        technique = "NULL bruteforcing"
-    else:
-        technique = "char (%s) bruteforcing" % conf.uChar
-
     validPayload, unionVector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     if validPayload:

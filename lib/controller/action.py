@@ -17,7 +17,6 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
-from lib.techniques.inband.union.test import unionTest
 
 def action():
     """
@@ -55,10 +54,6 @@ def action():
         raise sqlmapUnsupportedDBMSException, errMsg
 
     dataToStdout("%s\n" % conf.dbmsHandler.getFingerprint())
-
-    # Techniques options
-    if conf.unionTest and kb.unionPosition is None:
-        conf.dumper.technic("inband injection payload", unionTest())
 
     # Enumeration options
     if conf.getBanner:

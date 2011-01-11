@@ -231,14 +231,10 @@ def cmdLineParser():
                               help="Seconds to delay the DBMS response "
                                    "(default 5)")
 
-        techniques.add_option("--union-test", dest="unionTest",
-                              action="store_true", default=False,
-                              help="Test for and use UNION query (inband) SQL injection")
-
         techniques.add_option("--union-cols", dest="uCols",
                               help="Range of columns to test for UNION query SQL injection")
 
-        techniques.add_option("--union-char", dest="uChar", default="NULL",
+        techniques.add_option("--union-char", dest="uChar",
                               help="Character to use to bruteforce number of columns")
 
         # Fingerprint options

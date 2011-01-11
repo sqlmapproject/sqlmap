@@ -1856,9 +1856,10 @@ Formats:
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of OR time-based blind tests -->
 
+
     <!-- UNION query tests -->
     <test>
-        <title>MySQL NULL UNION query - 4 to 7 columns</title>
+        <title>MySQL NULL UNION query - 1 to 3 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -1869,7 +1870,95 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
+            <columns>1-3</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL NULL UNION query - 4 to 7 columns</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>#</comment>
+            <char>NULL</char>
             <columns>4-7</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL NULL UNION query - 8 to 12 columns</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>#</comment>
+            <char>NULL</char>
+            <columns>8-12</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL NULL UNION query - 13 to 18 columns</title>
+        <stype>3</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>#</comment>
+            <char>NULL</char>
+            <columns>13-18</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL NULL UNION query - 19 to 25 columns</title>
+        <stype>3</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>#</comment>
+            <char>NULL</char>
+            <columns>19-25</columns>
         </request>
         <response>
             <union/>
@@ -1892,6 +1981,82 @@ Formats:
             <comment>--</comment>
             <char>NULL</char>
             <columns>1-3</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic NULL UNION query - 4 to 7 columns</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>4-7</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic NULL UNION query - 8 to 12 columns</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>8-12</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic NULL UNION query - 13 to 18 columns</title>
+        <stype>3</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>13-18</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic NULL UNION query - 19 to 25 columns</title>
+        <stype>3</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>19-25</columns>
         </request>
         <response>
             <union/>

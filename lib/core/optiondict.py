@@ -76,7 +76,6 @@ optDict = {
 
             "Techniques":    {
                                "timeSec":           "integer",
-                               "unionTest":         "boolean",
                                "uCols":             "string",
                                "uChar":             "string"
                              },
