@@ -426,9 +426,10 @@ def dataToStdout(data, forceOutput=False):
         if forceOutput or (conf.verbose > 0) and not getCurrentThreadData().disableStdOut:
             try:
                 sys.stdout.write(data)
-                sys.stdout.flush()
             except UnicodeEncodeError:
-                print data.encode(conf.dataEncoding)
+                sys.stdout.write(data.encode(conf.dataEncoding))
+            finally:
+                sys.stdout.flush()
 
 def dataToSessionFile(data):
     if not conf.sessionFile or kb.suppressSession:
