@@ -1164,7 +1164,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadContinue  = True
     kb.threadException = False
     kb.threadData      = {}
-    kb.unionNegative   = False
 
     if flushAll:
         kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))

@@ -425,9 +425,6 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
-            oldUnionNegative = kb.unionNegative
-            kb.unionNegative = False
-
             if error and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
 
@@ -460,8 +457,6 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goBooleanProxy(booleanExpression, resumeValue)
                 else:
                     value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
-
-            kb.unionNegative = oldUnionNegative
 
             if value and isinstance(value, basestring):
                 value = value.strip()

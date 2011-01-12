@@ -378,8 +378,12 @@ def checkSqlInjection(place, parameter, value):
 
                         # In case of UNION query SQL injection
                         elif method == PAYLOAD.METHOD.UNION:
+                            # Test for UNION injection and set the sample
+                            # payload as well as the vector.
+                            # NOTE: vector is set to a tuple with 6 elements,
+                            # used afterwards by Agent.forgeInbandQuery()
+                            # method to forge the UNION query payload
                             configUnion(test.request.char, test.request.columns)
-
                             dbmsToUnescape = dbms if dbms is not None else injection.dbms
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix, dbmsToUnescape)
 
@@ -388,6 +392,10 @@ def checkSqlInjection(place, parameter, value):
                                 logger.info(infoMsg)
 
                                 injectable = True
+
+                                # Overwrite 'where' because it can differ
+                                # in unionTest()'s vector (1 or 2)
+                                where = vector[5]
 
                     # If the injection test was successful feed the injection
                     # object with the test's details

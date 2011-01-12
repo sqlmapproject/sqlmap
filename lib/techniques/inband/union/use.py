@@ -56,7 +56,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         expression = agent.concatQuery(expression, unpack)
         expression = unescaper.unescape(expression)
 
-    if kb.unionNegative and not direct:
+    if kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == 2 and not direct:
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
 
         # We have to check if the SQL query might return multiple entries
@@ -193,6 +193,8 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                                     count = num - startLimit + 1
                                     status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
                                     dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
+
+                        dataToStdout("\n")
 
                     except KeyboardInterrupt:
                         print

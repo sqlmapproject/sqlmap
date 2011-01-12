@@ -191,10 +191,6 @@ def setOs():
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(kb.os)))
 
-def setUnion(negative=False):
-    if negative:
-        kb.unionNegative = True
-
 def setRemoteTempPath():
     condition = (
                   not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
