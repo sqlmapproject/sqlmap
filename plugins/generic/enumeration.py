@@ -52,7 +52,6 @@ from lib.request import inject
 from lib.request.connect import Connect as Request
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
-from lib.techniques.inband.union.test import unionTest
 from lib.utils.hash import attackDumpedTable
 from lib.utils.hash import attackCachedUsersPasswords
 
@@ -87,10 +86,7 @@ class Enumeration:
             infoMsg = "fetching banner"
             logger.info(infoMsg)
 
-            if conf.unionTest:
-                conf.dumper.technic("inband injection payload", unionTest())
-
-            query          = queries[kb.dbms].banner.query
+            query = queries[kb.dbms].banner.query
             kb.data.banner = inject.getValue(query)
             bannerParser(kb.data.banner)
 

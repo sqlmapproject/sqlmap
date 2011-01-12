@@ -215,9 +215,6 @@ def setUnion(comment=None, count=None, position=None, negative=False, char=None,
     if negative:
         kb.unionNegative = True
 
-    if payload:
-        kb.unionTest = payload
-
 def setRemoteTempPath():
     condition = (
                   not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
@@ -389,46 +386,6 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
         kb.brute.columns.append((db, table, colName, colType))
-
-    elif expression == "Union comment" and url == conf.url:
-        kb.unionComment = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming union comment "
-        logMsg += "'%s' from session file" % kb.unionComment
-        logger.info(logMsg)
-
-    elif expression == "Union count" and url == conf.url:
-        kb.unionCount = int(value[:-1])
-
-        logMsg = "resuming union count "
-        logMsg += "%s from session file" % kb.unionCount
-        logger.info(logMsg)
-
-    elif expression == "Union position" and url == conf.url:
-        kb.unionPosition = int(value[:-1])
-
-        logMsg = "resuming union position "
-        logMsg += "%s from session file" % kb.unionPosition
-        logger.info(logMsg)
-
-    elif expression == "Union negative" and url == conf.url:
-        kb.unionNegative = True if value[:-1] == "Yes" else False
-
-        logMsg = "resuming union negative from session file"
-        logger.info(logMsg)
-
-    elif expression == "Union char" and url == conf.url:
-        conf.uChar = value[:-1]
-
-        logMsg = "resuming union char %s from session file" % conf.uChar
-        logger.info(logMsg)
-
-    elif expression == "Union payload" and url == conf.url:
-        kb.unionTest = value[:-1]
-
-        logMsg = "resuming union payload "
-        logMsg += "%s from session file" % kb.unionTest
-        logger.info(logMsg)
 
     elif expression == "Remote temp path" and url == conf.url:
         conf.tmpPath = unSafeFormatString(value[:-1])

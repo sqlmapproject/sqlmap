@@ -280,6 +280,7 @@ def checkSqlInjection(place, parameter, value):
                 # For each test's <where>
                 for where in test.where:
                     templatePayload = None
+                    vector = None
 
                     # Threat the parameter original value according to the
                     # test's <where> tag
@@ -380,7 +381,7 @@ def checkSqlInjection(place, parameter, value):
                             configUnion(test.request.char, test.request.columns)
 
                             dbmsToUnescape = dbms if dbms is not None else injection.dbms
-                            reqPayload, unionVector = unionTest(comment, place, parameter, value, prefix, suffix, dbmsToUnescape)
+                            reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix, dbmsToUnescape)
 
                             if isinstance(reqPayload, basestring):
                                 infoMsg = "%s parameter '%s' is '%s' injectable" % (place, parameter, title)
@@ -405,17 +406,15 @@ def checkSqlInjection(place, parameter, value):
                             injection.suffix = suffix
                             injection.clause = clause
 
-                        if "vector" in test and test.vector is not None:
+                        if vector is None and "vector" in test and test.vector is not None:
                             vector = "%s%s" % (test.vector, comment)
-                        else:
-                            vector = None
 
                         # Feed with test details every time a test is successful
                         injection.data[stype] = advancedDict()
                         injection.data[stype].title = title
                         injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload, False)
                         injection.data[stype].where = where
-                        injection.data[stype].vector = agent.cleanupPayload(vector, unionVector=unionVector)
+                        injection.data[stype].vector = vector
                         injection.data[stype].comment = comment
                         injection.data[stype].matchRatio = kb.matchRatio
                         injection.data[stype].templatePayload = templatePayload

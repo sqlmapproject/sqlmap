@@ -108,7 +108,6 @@ class Agent:
                 retValue = paramString.replace("%s=%s" % (parameter, origValue),
                                                "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
 
-#        print "retValue:", retValue
         return retValue
 
     def fullPayload(self, query):
@@ -180,7 +179,7 @@ class Agent:
 
         return string.rstrip()
 
-    def cleanupPayload(self, payload, origvalue=None, unionVector=None):
+    def cleanupPayload(self, payload, origvalue=None, unionVector=None, query=None):
         if payload is None:
             return
 
@@ -198,6 +197,9 @@ class Agent:
         payload = payload.replace("[SPACE_REPLACE]", kb.misc.space)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
         payload = payload.replace("[UNION]", str(unionVector))
+
+        if query is not None:
+            payload = payload.replace("[QUERY]", query.lstrip())
 
         if origvalue is not None:
             payload = payload.replace("[ORIGVALUE]", origvalue)
@@ -220,11 +222,10 @@ class Agent:
                 inferenceQuery = queries[kb.misc.testedDbms].inference.query
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
 
-            # NOTE: Leave this commented for the time being
-            #else:
-            #    errMsg = "invalid usage of inference payload without "
-            #    errMsg += "knowledge of underlying DBMS"
-            #    raise sqlmapNoneDataException, errMsg
+            else:
+                errMsg = "invalid usage of inference payload without "
+                errMsg += "knowledge of underlying DBMS"
+                raise sqlmapNoneDataException, errMsg
 
         return payload
 
