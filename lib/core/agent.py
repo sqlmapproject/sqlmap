@@ -179,7 +179,7 @@ class Agent:
 
         return string.rstrip()
 
-    def cleanupPayload(self, payload, origvalue=None, unionVector=None, query=None):
+    def cleanupPayload(self, payload, origvalue=None, query=None):
         if payload is None:
             return
 
@@ -196,7 +196,6 @@ class Agent:
         payload = payload.replace("[DELIMITER_STOP]", kb.misc.stop)
         payload = payload.replace("[SPACE_REPLACE]", kb.misc.space)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
-        payload = payload.replace("[UNION]", str(unionVector))
 
         if query is not None:
             payload = payload.replace("[QUERY]", query.lstrip())
