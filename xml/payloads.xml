@@ -121,10 +121,10 @@ Tag: <test>
         Where to add our '<prefix> <payload><comment> <suffix>' string.
 
         Valid values:
-            1: Append to the parameter original value
-            2: Append to the parameter original value and change the
-               original value to its negative representation
-            3: Replace the parameter original value
+            1: Append the string to the parameter original value
+            2: Replace the parameter original value with a negative random
+               integer value and append our string
+            3: Replace the parameter original value with our string
 
     Sub-tag: <vector>
         The payload that will be used to exploit the injection point.
