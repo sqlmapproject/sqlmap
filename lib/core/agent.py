@@ -67,46 +67,52 @@ class Agent:
         if where is None and isTechniqueAvailable(kb.technique):
             where = kb.injection.data[kb.technique].where
 
+        # Debug print
+        #print "value: %s, newValue: %s, where: %s, kb.technique: %s" % (value, newValue, where, kb.technique)
+
         if kb.injection.place is not None:
             place = kb.injection.place
 
         if kb.injection.parameter is not None:
             parameter = kb.injection.parameter
 
-        if place == PLACE.UA:
-            retValue = parameter.replace(parameter, self.addPayloadDelimiters(parameter + newValue))
-        else:
-            paramString = conf.parameters[place]
-            paramDict = conf.paramDict[place]
-            origValue = paramDict[parameter]
+        paramString = conf.parameters[place]
+        paramDict = conf.paramDict[place]
+        origValue = paramDict[parameter]
 
-            if value is None:
-                if where == 1:
-                    value = origValue
-                elif where == 2:
-                    value = "-%s" % randomInt()
-                elif where == 3:
+        if value is None:
+            if where == 1:
+                value = origValue
+            elif where == 2:
+                if newValue.startswith("-"):
                     value = ""
                 else:
-                    value = origValue
-
-                newValue = "%s%s" % (value, newValue)
-
-            newValue = self.cleanupPayload(newValue, origValue)
-
-            if "POSTxml" in conf.paramDict and place == PLACE.POST:
-                root = ET.XML(paramString)
-                iterator = root.getiterator(parameter)
-
-                for child in iterator:
-                    child.text = self.addPayloadDelimiters(newValue)
-
-                retValue = ET.tostring(root)
-            elif place == PLACE.URI:
-                retValue = paramString.replace("*", self.addPayloadDelimiters(newValue))
+                    value = "-%s" % randomInt()
+            elif where == 3:
+                value = ""
             else:
-                retValue = paramString.replace("%s=%s" % (parameter, origValue),
-                                               "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
+                value = origValue
+
+            newValue = "%s%s" % (value, newValue)
+
+        newValue = self.cleanupPayload(newValue, origValue)
+
+        if "POSTxml" in conf.paramDict and place == PLACE.POST:
+            root = ET.XML(paramString)
+            iterator = root.getiterator(parameter)
+
+            for child in iterator:
+                child.text = self.addPayloadDelimiters(newValue)
+
+            retValue = ET.tostring(root)
+        elif place in (PLACE.UA, PLACE.URI):
+            retValue = paramString.replace("*", self.addPayloadDelimiters(newValue))
+        else:
+            retValue = paramString.replace("%s=%s" % (parameter, origValue),
+                                           "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
+
+        # Debug print
+        #print "retValue:", retValue
 
         return retValue
 
