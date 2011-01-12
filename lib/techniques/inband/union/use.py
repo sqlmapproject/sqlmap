@@ -51,9 +51,6 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
     if resetCounter:
         reqCount = 0
 
-    if not kb.unionCount:
-        return
-
     # Prepare expression with delimiters
     if unescape:
         expression = agent.concatQuery(expression, unpack)
@@ -211,8 +208,8 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
     else:
         # Forge the inband SQL injection request
-        query = unescaper.unescape(expression)
-        query = agent.cleanupPayload(kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector, query=query)
+        vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
+        query = agent.forgeInbandQuery(expression, exprPosition=vector[0], count=vector[1], comment=vector[2], prefix=vector[3], suffix=vector[4])
         payload = agent.payload(newValue=query)
 
         # Perform the request

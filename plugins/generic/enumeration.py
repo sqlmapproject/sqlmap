@@ -151,7 +151,7 @@ class Enumeration:
         condition  = ( kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ) )
         condition |= ( kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema )
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             if condition:
                 query = rootQuery.inband.query2
             else:
@@ -210,7 +210,7 @@ class Enumeration:
 
         logger.info(infoMsg)
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             if kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
                 query = rootQuery.inband.query2
             else:
@@ -431,7 +431,7 @@ class Enumeration:
                          "E": "EXECUTE"
                      }
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                 query     = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -677,7 +677,7 @@ class Enumeration:
 
         rootQuery = queries[kb.dbms].dbs
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
             else:
@@ -784,7 +784,7 @@ class Enumeration:
             else:
                 dbs = kb.data.cachedDbs
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             query = rootQuery.inband.query
             condition = rootQuery.inband.condition if 'condition' in rootQuery.inband else None
 
@@ -977,7 +977,7 @@ class Enumeration:
         infoMsg += "on database '%s'" % conf.db
         logger.info(infoMsg)
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
                 query = rootQuery.inband.query % (conf.tbl, conf.db)
                 query += condQuery
@@ -1174,7 +1174,7 @@ class Enumeration:
 
         entriesCount = 0
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             if kb.dbms == DBMS.ORACLE:
                 query = rootQuery.inband.query % (colString, conf.tbl.upper())
             elif kb.dbms == DBMS.SQLITE:
@@ -1516,7 +1516,7 @@ class Enumeration:
             dbQuery = "%s%s" % (dbCond, dbCondParam)
             dbQuery = dbQuery % db
 
-            if kb.unionPosition is not None or conf.direct:
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
                 if kb.dbms == DBMS.MYSQL and not kb.data.has_information_schema:
                     query = rootQuery.inband.query2
                 else:
@@ -1624,7 +1624,7 @@ class Enumeration:
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % tbl
 
-            if kb.unionPosition is not None or conf.direct:
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
                 query = rootQuery.inband.query
                 query += tblQuery
                 query += exclDbsQuery
@@ -1774,7 +1774,7 @@ class Enumeration:
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % column
 
-            if kb.unionPosition is not None or conf.direct:
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
                 query = rootQuery.inband.query
                 query += colQuery
                 query += exclDbsQuery

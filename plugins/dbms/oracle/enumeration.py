@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.agent import agent
 from lib.core.common import getRange
 from lib.core.common import isNumPosStrValue
+from lib.core.common import isTechniqueAvailable
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -39,7 +40,7 @@ class Enumeration(GenericEnumeration):
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if kb.unionPosition is not None or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
             if query2:
                 query     = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -199,7 +200,7 @@ class Enumeration(GenericEnumeration):
             colQuery = colQuery % column
 
             for db in dbs.keys():
-                if kb.unionPosition is not None or conf.direct:
+                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
                     query = rootQuery.inband.query
                     query += colQuery
                     values = inject.getValue(query, blind=False, error=False)

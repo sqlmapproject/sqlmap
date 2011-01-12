@@ -1109,9 +1109,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.data            = advancedDict()
 
-    # Old style injection flag
-    kb.unionTest       = None
-
     # Basic back-end DBMS fingerprint
     kb.dbms            = None
     kb.dbmsDetected    = False
@@ -1167,9 +1164,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadContinue  = True
     kb.threadException = False
     kb.threadData      = {}
-    kb.unionComment    = ""
-    kb.unionCount      = None
-    kb.unionPosition   = None
     kb.unionNegative   = False
 
     if flushAll:

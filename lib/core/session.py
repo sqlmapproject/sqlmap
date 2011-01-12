@@ -191,27 +191,7 @@ def setOs():
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(kb.os)))
 
-def setUnion(comment=None, count=None, position=None, negative=False, char=None, payload=None):
-    """
-    @param comment: union comment to save in session file
-    @type comment: C{str}
-
-    @param count: union count to save in session file
-    @type count: C{str}
-
-    @param position: union position to save in session file
-    @type position: C{str}
-    """
-
-    if comment:
-        kb.unionComment = comment
-
-    if count:
-        kb.unionCount = count
-
-    if position is not None:
-        kb.unionPosition = position
-
+def setUnion(negative=False):
     if negative:
         kb.unionNegative = True
 

@@ -30,9 +30,6 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
     validPayload = None
     unionVector = None
 
-    if count is None:
-        count = kb.unionCount
-
     # For each column of the table (# of NULL) perform a request using
     # the UNION ALL SELECT statement to test it the target url is
     # affected by an exploitable inband SQL injection vulnerability
@@ -50,9 +47,8 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
         resultPage, _ = Request.queryPage(payload, place=place, content=True)
 
         if resultPage and randQuery in resultPage and " UNION ALL SELECT " not in resultPage:
-            setUnion(position=exprPosition)
             validPayload = payload
-            unionVector = agent.forgeInbandQuery("[QUERY]", exprPosition, count=count, comment=comment, prefix=prefix, suffix=suffix)
+            unionVector = (exprPosition, count, comment, prefix, suffix)
 
             if where == 1:
                 # Prepare expression with delimiters
@@ -80,21 +76,20 @@ def __unionConfirm(comment, place, parameter, value, prefix, suffix, dbms, count
 
     # Confirm the inband SQL injection and get the exact column
     # position which can be used to extract data
-    if not isinstance(kb.unionPosition, int):
-        validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count)
+    validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count)
 
-        # Assure that the above function found the exploitable full inband
-        # SQL injection position
-        if not isinstance(kb.unionPosition, int):
-            validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count, where=2)
+    # Assure that the above function found the exploitable full inband
+    # SQL injection position
+    if not validPayload:
+        validPayload, unionVector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count, where=2)
 
-            # Assure that the above function found the exploitable partial
-            # (single entry) inband SQL injection position with negative
-            # parameter validPayload
-            if not isinstance(kb.unionPosition, int):
-                return None, None
-            else:
-                setUnion(negative=True)
+        # Assure that the above function found the exploitable partial
+        # (single entry) inband SQL injection position with negative
+        # parameter validPayload
+        if not validPayload:
+            return None, None
+        else:
+            setUnion(negative=True)
 
     return validPayload, unionVector
 
@@ -126,7 +121,6 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         validPayload, unionVector = __unionConfirm(comment, place, parameter, value, prefix, suffix, dbms, count)
 
         if validPayload:
-            setUnion(count=count)
             break
 
     clearConsoleLine(True)
@@ -148,8 +142,5 @@ def unionTest(comment, place, parameter, value, prefix, suffix, dbms):
 
     if validPayload:
         validPayload = agent.removePayloadDelimiters(validPayload, False)
-        setUnion(char=conf.uChar)
-        setUnion(comment=comment)
-        setUnion(payload=validPayload)
 
     return validPayload, unionVector

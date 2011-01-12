@@ -473,7 +473,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, exprPosition=None, nullChar=None, count=None, comment=None, prefix=None, suffix=None, multipleUnions=None):
+    def forgeInbandQuery(self, query, exprPosition=None, count=None, comment=None, prefix=None, suffix=None, multipleUnions=None):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -504,15 +504,6 @@ class Agent:
         @rtype: C{str}
         """
 
-        if nullChar is None:
-            nullChar = conf.uChar
-
-        if count is None:
-            count = kb.unionCount
-
-        if comment is None:
-            comment = kb.unionComment
-
         if query.startswith("SELECT "):
             query        = query[len("SELECT "):]
 
@@ -522,9 +513,6 @@ class Agent:
             topNum       = re.search("\ATOP\s+([\d]+)\s+", query, re.I).group(1)
             query        = query[len("TOP %s " % topNum):]
             inbandQuery += "TOP %s " % topNum
-
-        if not isinstance(exprPosition, int):
-            exprPosition = kb.unionPosition
 
         intoRegExp = re.search("(\s+INTO (DUMP|OUT)FILE\s+\'(.+?)\')", query, re.I)
 
@@ -546,7 +534,7 @@ class Agent:
                 else:
                     inbandQuery += query
             else:
-                inbandQuery += nullChar
+                inbandQuery += conf.uChar
 
         if " FROM " in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
             conditionIndex = query.index(" FROM ")
@@ -569,7 +557,7 @@ class Agent:
                 if element == exprPosition:
                     inbandQuery += multipleUnions
                 else:
-                    inbandQuery += nullChar
+                    inbandQuery += conf.uChar
 
             if kb.dbms == DBMS.ORACLE:
                 inbandQuery += " FROM DUAL"

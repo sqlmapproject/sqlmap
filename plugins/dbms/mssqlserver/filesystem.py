@@ -13,6 +13,7 @@ import os
 
 from lib.core.common import getRange
 from lib.core.common import isNumPosStrValue
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
 from lib.core.data import conf
@@ -91,7 +92,7 @@ class Filesystem(GenericFilesystem):
         binToHexQuery = binToHexQuery.replace("    ", "").replace("\n", " ")
         inject.goStacked(binToHexQuery)
 
-        if kb.unionPosition is not None:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
             result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), sort=False, resumeValue=False, blind=False, error=False)
 
         if not result:
