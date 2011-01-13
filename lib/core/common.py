@@ -1974,7 +1974,9 @@ def getInjectionTests():
 
     def priorityFunction(test):
         retVal = 0
-        if 'details' in test and 'dbms' in test.details:
+        if test.stype == PAYLOAD.TECHNIQUE.UNION:
+            retVal = 3
+        elif 'details' in test and 'dbms' in test.details:
             if test.details.dbms in getErrorParsedDBMSes():
                 retVal = 1
             else:

@@ -89,8 +89,7 @@ def checkSqlInjection(place, parameter, value):
     # Set the flag for sql injection test mode
     kb.testMode = True
 
-    #for test in getInjectionTests():
-    for test in conf.tests:
+    for test in getInjectionTests():
         try:
             if kb.endDetection:
                 break
