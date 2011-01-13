@@ -478,7 +478,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, exprPosition=None, count=None, comment=None, prefix=None, suffix=None, multipleUnions=None):
+    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, multipleUnions=None):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -501,9 +501,9 @@ class Agent:
         forged within an UNION ALL SELECT statement
         @type query: C{str}
 
-        @param exprPosition: it is the NULL position where it is possible
+        @param position: it is the NULL position where it is possible
         to inject the query
-        @type exprPosition: C{int}
+        @type position: C{int}
 
         @return: UNION ALL SELECT query string forged
         @rtype: C{str}
@@ -532,14 +532,14 @@ class Agent:
             if element > 0:
                 inbandQuery += ", "
 
-            if element == exprPosition:
+            if element == position:
                 if " FROM " in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
                     conditionIndex = query.index(" FROM ")
                     inbandQuery += query[:conditionIndex]
                 else:
                     inbandQuery += query
             else:
-                inbandQuery += conf.uChar
+                inbandQuery += char
 
         if " FROM " in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
             conditionIndex = query.index(" FROM ")
@@ -559,10 +559,10 @@ class Agent:
                 if element > 0:
                     inbandQuery += ", "
 
-                if element == exprPosition:
+                if element == position:
                     inbandQuery += multipleUnions
                 else:
-                    inbandQuery += conf.uChar
+                    inbandQuery += char
 
             if kb.dbms == DBMS.ORACLE:
                 inbandQuery += " FROM DUAL"

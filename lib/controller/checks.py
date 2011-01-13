@@ -395,7 +395,7 @@ def checkSqlInjection(place, parameter, value):
 
                                 # Overwrite 'where' because it can differ
                                 # in unionTest()'s vector (1 or 2)
-                                where = vector[5]
+                                where = vector[6]
 
                     # If the injection test was successful feed the injection
                     # object with the test's details
