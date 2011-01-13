@@ -297,12 +297,10 @@ def getErrorParsedDBMSesFormatted():
 
     htmlParsed = ""
 
-    if not kb.htmlFp:
+    if len(kb.htmlFp) == 0:
         return None
-
-    if len(kb.htmlFp) == 1:
-        htmlVer = kb.htmlFp[0]
-        htmlParsed = htmlVer
+    elif len(kb.htmlFp) == 1:
+        htmlParsed = kb.htmlFp[0]
     elif len(kb.htmlFp) > 1:
         htmlParsed = " or ".join([htmlFp for htmlFp in kb.htmlFp])
 
@@ -2047,7 +2045,7 @@ def getIdentifiedDBMS():
         dbms = kb.dbms
     elif conf.dbms is not None:
         dbms = conf.dbms
-    elif getErrorParsedDBMSes() is not None:
+    elif len(getErrorParsedDBMSes()) > 0:
         dbms = getErrorParsedDBMSes()[0]
 
     return aliasToDbmsEnum(dbms)

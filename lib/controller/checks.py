@@ -149,7 +149,7 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-                if getErrorParsedDBMSes() and dbms not in getErrorParsedDBMSes() and kb.skipOthersDbms is None:
+                if len(getErrorParsedDBMSes()) > 0 and dbms not in getErrorParsedDBMSes() and kb.skipOthersDbms is None:
                     msg = "parsed error message(s) showed that the "
                     msg += "back-end DBMS could be '%s'. " % getErrorParsedDBMSesFormatted()
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
