@@ -2028,6 +2028,14 @@ def unicodeToSafeHTMLValue(value):
 def getErrorParsedDBMSes():
     """
     Returns array with parsed DBMS names till now
+
+    This functions is called to:
+
+    1. Sort the tests, getInjectionTests() - detection phase.
+    2. Ask user whether or not skip specific DBMS tests in detection phase,
+       lib/controller/checks.py - detection phase.
+    3. Sort the fingerprint of the DBMS, lib/controller/handler.py - 
+       fingerprint phase.
     """
 
     return kb.htmlFp
