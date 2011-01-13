@@ -64,7 +64,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         # entry per time
         # NOTE: I assume that only queries that get data from a table can
         # return multiple entries
-        if " FROM " in expression:
+        if " FROM " in expression and "EXISTS(" not in expression:
             limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
 
             if limitRegExp:

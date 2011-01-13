@@ -533,7 +533,7 @@ class Agent:
                 inbandQuery += ", "
 
             if element == position:
-                if " FROM " in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
+                if " FROM " in query and "EXISTS(" not in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
                     conditionIndex = query.index(" FROM ")
                     inbandQuery += query[:conditionIndex]
                 else:
@@ -541,7 +541,7 @@ class Agent:
             else:
                 inbandQuery += char
 
-        if " FROM " in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
+        if " FROM " in query and "EXISTS(" not in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
