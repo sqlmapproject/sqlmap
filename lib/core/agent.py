@@ -12,6 +12,7 @@ import re
 from xml.etree import ElementTree as ET
 
 from lib.core.common import getCompiledRegex
+from lib.core.common import getErrorParsedDBMSes
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
@@ -545,7 +546,7 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if kb.dbms == DBMS.ORACLE:
+        if kb.dbms == DBMS.ORACLE or DBMS.ORACLE in getErrorParsedDBMSes():
             if " FROM " not in inbandQuery:
                 inbandQuery += " FROM DUAL"
 

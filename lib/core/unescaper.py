@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import getErrorParsedDBMSes
 from lib.core.data import kb
 from lib.core.datatype import advancedDict
 
@@ -16,6 +17,8 @@ class Unescaper(advancedDict):
             return self[kb.dbms](expression, quote=quote)
         elif hasattr(kb.misc, "testedDbms") and kb.misc.testedDbms is not None:
             return self[kb.misc.testedDbms](expression, quote=quote)
+        elif getErrorParsedDBMSes():
+            return self[getErrorParsedDBMSes()[0]](expression, quote=quote)
         elif dbms is not None:
             return self[dbms](expression, quote=quote)
         else:
