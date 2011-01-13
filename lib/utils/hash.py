@@ -22,6 +22,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
 from lib.core.common import paths
@@ -267,10 +268,10 @@ def hashRecognition(value):
 
     if value:
         for name, regex in getPublicTypeMembers(HASH):
-            #hashes for Oracle and old MySQL look the same hence these checks
-            if kb.dbms == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
+            # Hashes for Oracle and old MySQL look the same hence these checks
+            if getIdentifiedDBMS() == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
                 continue
-            elif kb.dbms == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
+            elif getIdentifiedDBMS() == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
                 continue
             elif getCompiledRegex(regex).match(value):
                 retVal = regex

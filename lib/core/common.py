@@ -218,15 +218,15 @@ def formatDBMSfp(versions=None):
         versions = kb.dbmsVersion
 
     if isinstance(versions, basestring):
-        return "%s %s" % (kb.dbms, versions)
+        return "%s %s" % (getIdentifiedDBMS(), versions)
     elif isinstance(versions, (list, set, tuple)):
-        return "%s %s" % (kb.dbms, " and ".join([version for version in versions]))
+        return "%s %s" % (getIdentifiedDBMS(), " and ".join([version for version in versions]))
     elif not versions:
         warnMsg  = "unable to extensively fingerprint the back-end "
         warnMsg += "DBMS version"
         logger.warn(warnMsg)
 
-        return kb.dbms
+        return getIdentifiedDBMS()
 
 def formatFingerprintString(values, chain=" or "):
     strJoin = "|".join([v for v in values])
@@ -627,7 +627,7 @@ def parsePasswordHash(password):
     if not password or password == " ":
         password = "NULL"
 
-    if kb.dbms == DBMS.MSSQL and password != "NULL" and isHexEncodedString(password):
+    if getIdentifiedDBMS() == DBMS.MSSQL and password != "NULL" and isHexEncodedString(password):
         hexPassword = password
         password  = "%s\n" % hexPassword
         password += "%sheader: %s\n" % (blank, hexPassword[:6])
@@ -928,25 +928,25 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 def getDelayQuery(andCond=False):
     query = None
 
-    if kb.dbms in (DBMS.MYSQL, DBMS.PGSQL):
+    if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
         if not kb.data.banner:
             conf.dbmsHandler.getVersionFromBanner()
 
         banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
 
-        if banVer is None or (kb.dbms == DBMS.MYSQL and banVer >= "5.0.12") or (kb.dbms == DBMS.PGSQL and banVer >= "8.2"):
-            query = queries[kb.dbms].timedelay.query % conf.timeSec
+        if banVer is None or (getIdentifiedDBMS() == DBMS.MYSQL and banVer >= "5.0.12") or (getIdentifiedDBMS() == DBMS.PGSQL and banVer >= "8.2"):
+            query = queries[getIdentifiedDBMS()].timedelay.query % conf.timeSec
         else:
-            query = queries[kb.dbms].timedelay.query2 % conf.timeSec
-    elif kb.dbms == DBMS.FIREBIRD:
-        query = queries[kb.dbms].timedelay.query
+            query = queries[getIdentifiedDBMS()].timedelay.query2 % conf.timeSec
+    elif getIdentifiedDBMS() == DBMS.FIREBIRD:
+        query = queries[getIdentifiedDBMS()].timedelay.query
     else:
-        query = queries[kb.dbms].timedelay.query % conf.timeSec
+        query = queries[getIdentifiedDBMS()].timedelay.query % conf.timeSec
 
     if andCond:
-        if kb.dbms in ( DBMS.MYSQL, DBMS.SQLITE ):
+        if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.SQLITE ):
             query = query.replace("SELECT ", "")
-        elif kb.dbms == DBMS.FIREBIRD:
+        elif getIdentifiedDBMS() == DBMS.FIREBIRD:
             query = "(%s)>0" % query
 
     return query
@@ -1763,7 +1763,7 @@ def aliasToDbmsEnum(value):
     retVal = None
 
     for key, item in dbmsDict.items():
-        if value in item[0]:
+        if value.lower() in item[0]:
             retVal = key
             break
 
@@ -2039,6 +2039,18 @@ def getErrorParsedDBMSes():
     """
 
     return kb.htmlFp
+
+def getIdentifiedDBMS():
+    dbms = None
+
+    if kb.dbms is not None:
+        dbms = kb.dbms
+    elif conf.dbms is not None:
+        dbms = conf.dbms
+    elif getErrorParsedDBMSes() is not None:
+        dbms = getErrorParsedDBMSes()[0]
+
+    return aliasToDbmsEnum(dbms)
 
 def showHttpErrorCodes():
     """

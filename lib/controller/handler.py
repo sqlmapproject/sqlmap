@@ -7,7 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import getErrorParsedDBMSes
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.data import conf
@@ -63,18 +63,11 @@ def setHandler():
                   ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
                 ]
 
-    inferencedDbms = (getErrorParsedDBMSes()[0] if getErrorParsedDBMSes() else '') or kb.dbms
-
-    for injection in kb.injections:
-        if hasattr(injection, "dbms") and injection.dbms:
-            inferencedDbms = injection.dbms
-            break
-
-    if inferencedDbms is not None:
+    if getIdentifiedDBMS() is not None:
         for i in xrange(len(dbmsObj)):
             dbmsAliases, _, _ = dbmsObj[i]
 
-            if inferencedDbms.lower() in dbmsAliases:
+            if getIdentifiedDBMS().lower() in dbmsAliases:
                 if i > 0:
                     pushValue(dbmsObj[i])
                     dbmsObj.remove(dbmsObj[i])

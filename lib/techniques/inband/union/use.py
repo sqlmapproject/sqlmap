@@ -14,6 +14,7 @@ from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
 from lib.core.common import parseUnionPage
@@ -65,12 +66,12 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
         # NOTE: I assume that only queries that get data from a table can
         # return multiple entries
         if " FROM " in expression and "EXISTS(" not in expression:
-            limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
+            limitRegExp = re.search(queries[getIdentifiedDBMS()].limitregexp.query, expression, re.I)
 
             if limitRegExp:
-                if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
-                    limitGroupStart = queries[kb.dbms].limitgroupstart.query
-                    limitGroupStop  = queries[kb.dbms].limitgroupstop.query
+                if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
+                    limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -78,9 +79,9 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
-                    limitGroupStart = queries[kb.dbms].limitgroupstart.query
-                    limitGroupStop  = queries[kb.dbms].limitgroupstop.query
+                elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+                    limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
+                    limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -88,7 +89,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms == DBMS.ORACLE:
+                elif getIdentifiedDBMS() == DBMS.ORACLE:
                     limitCond = False
             else:
                 limitCond = True
@@ -102,12 +103,12 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
                         stopLimit += startLimit
-                        untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
+                        untilLimitChar = expression.index(queries[getIdentifiedDBMS()].limitstring.query)
                         expression = expression[:untilLimitChar]
 
-                    elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                    elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
                         stopLimit += startLimit
                 elif dump:
                     if conf.limitStart:
@@ -116,14 +117,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
                         stopLimit = conf.limitStop
 
                 if not stopLimit or stopLimit <= 1:
-                    if kb.dbms == DBMS.ORACLE and expression.endswith("FROM DUAL"):
+                    if getIdentifiedDBMS() == DBMS.ORACLE and expression.endswith("FROM DUAL"):
                         test = False
                     else:
                         test = True
 
                 if test:
                     # Count the number of SQL query entries output
-                    countFirstField   = queries[kb.dbms].count.query % expressionFieldsList[0]
+                    countFirstField   = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
                     countedExpression = origExpr.replace(expressionFields, countFirstField, 1)
 
                     if re.search(" ORDER BY ", expression, re.I):
@@ -171,9 +172,9 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, nullCh
 
                     try:
                         for num in xrange(startLimit, stopLimit):
-                                if kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                                if getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
                                     field = expressionFieldsList[0]
-                                elif kb.dbms == DBMS.ORACLE:
+                                elif getIdentifiedDBMS() == DBMS.ORACLE:
                                     field = expressionFieldsList
                                 else:
                                     field = None

@@ -31,7 +31,7 @@ class DBMS:
     MSSQL       = "Microsoft SQL Server"
     MYSQL       = "MySQL"
     ORACLE      = "Oracle"
-    PGSQL  = "PostgreSQL"
+    PGSQL       = "PostgreSQL"
     SQLITE      = "SQLite"
     SYBASE      = "Sybase"
 

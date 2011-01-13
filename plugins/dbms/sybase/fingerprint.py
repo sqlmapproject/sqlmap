@@ -11,6 +11,7 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
@@ -63,7 +64,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if ((kb.dbms is not None and kb.dbms.lower() in SYBASE_ALIASES) \
+        if ((getIdentifiedDBMS() is not None and getIdentifiedDBMS().lower() in SYBASE_ALIASES) \
            or conf.dbms in SYBASE_ALIASES) and kb.dbmsVersion and \
            kb.dbmsVersion[0].isdigit():
             setDbms("%s %s" % (DBMS.SYBASE, kb.dbmsVersion[0]))

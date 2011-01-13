@@ -15,6 +15,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import filterListValue
 from lib.core.common import getFileItems
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getPageTextWordsSet
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -31,7 +32,7 @@ from lib.core.session import safeFormatString
 from lib.request import inject
 
 def tableExists(tableFile, regex=None):
-    tables = getFileItems(tableFile, lowercase=kb.dbms in (DBMS.ACCESS), unique=True)
+    tables = getFileItems(tableFile, lowercase=getIdentifiedDBMS() in (DBMS.ACCESS), unique=True)
     retVal = []
 
     infoMsg = "checking table existence using items from '%s'" % tableFile

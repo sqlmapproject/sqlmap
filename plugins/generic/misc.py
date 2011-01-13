@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.common import getCompiledRegex
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -56,19 +57,19 @@ class Miscellaneous:
         infoMsg = "detecting back-end DBMS version from its banner"
         logger.info(infoMsg)
 
-        if kb.dbms == DBMS.MYSQL:
+        if getIdentifiedDBMS() == DBMS.MYSQL:
             first, last = 1, 6
 
-        elif kb.dbms == DBMS.PGSQL:
+        elif getIdentifiedDBMS() == DBMS.PGSQL:
             first, last = 12, 6
 
-        elif kb.dbms == DBMS.MSSQL:
+        elif getIdentifiedDBMS() == DBMS.MSSQL:
             first, last = 29, 9
 
         else:
             raise sqlmapUnsupportedFeatureException, "unsupported DBMS"
 
-        query = queries[kb.dbms].substring.query % (queries[kb.dbms].banner.query, first, last)
+        query = queries[getIdentifiedDBMS()].substring.query % (queries[getIdentifiedDBMS()].banner.query, first, last)
 
         if conf.direct:
             query = "SELECT %s" % query
@@ -119,7 +120,7 @@ class Miscellaneous:
         if not onlyFileTbl:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
 
-            if kb.dbms == DBMS.MSSQL:
+            if getIdentifiedDBMS() == DBMS.MSSQL:
                 return
 
             if udfDict is None:
@@ -132,7 +133,7 @@ class Miscellaneous:
                 if not output or output in ("y", "Y"):
                     dropStr = "DROP FUNCTION %s" % udf
 
-                    if kb.dbms == DBMS.PGSQL:
+                    if getIdentifiedDBMS() == DBMS.PGSQL:
                         inp      = ", ".join(i for i in inpRet["input"])
                         dropStr += "(%s)" % inp
 

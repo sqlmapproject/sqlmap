@@ -13,6 +13,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import initTechnique
 from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs
@@ -44,7 +45,7 @@ def errorUse(expression):
     _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
     nulledCastedField = agent.nullAndCastField(fieldToCastStr)
 
-    if kb.dbms == DBMS.MYSQL:
+    if getIdentifiedDBMS() == DBMS.MYSQL:
         nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))") # fix for that 'Subquery returns more than 1 row'
 
     expression = expression.replace(fieldToCastStr, nulledCastedField, 1)

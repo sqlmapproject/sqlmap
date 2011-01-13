@@ -34,6 +34,7 @@ from lib.core.common import parseTargetDirect
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
+from lib.core.common import randomStr
 from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
@@ -46,6 +47,7 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.datatype import injectionDict
+from lib.core.enums import DBMS
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
@@ -1164,6 +1166,12 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadContinue  = True
     kb.threadException = False
     kb.threadData      = {}
+
+    kb.misc            = advancedDict()
+    kb.misc.delimiter  = randomStr(length=6)
+    kb.misc.start      = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.misc.stop       = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.misc.space      = ":%s:" % randomStr(length=1, lowercase=True)
 
     if flushAll:
         kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))

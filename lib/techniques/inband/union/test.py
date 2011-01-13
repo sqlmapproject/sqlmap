@@ -12,6 +12,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
 from lib.core.common import randomStr
@@ -62,7 +63,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
                 # Perform the request
                 resultPage, _ = Request.queryPage(payload, place=place, content=True)
 
-                if resultPage and " UNION ALL SELECT " not in resultPage and (randQuery not in resultPage or randQuery2 not in resultPage):
+                if resultPage and " UNION ALL SELECT " not in resultPage and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
 
             break
@@ -96,13 +97,13 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
 
     for count in range(conf.uColsStart, conf.uColsStop+1):
-        if kb.dbms == DBMS.ORACLE and query.endswith(" FROM DUAL"):
+        if getIdentifiedDBMS() == DBMS.ORACLE and query.endswith(" FROM DUAL"):
             query = query[:-len(" FROM DUAL")]
 
         if count:
             query += ", %s" % conf.uChar
 
-        if kb.dbms == DBMS.ORACLE:
+        if getIdentifiedDBMS() == DBMS.ORACLE:
             query += " FROM DUAL"
 
         status = '%d/%d (%d%s)' % (count, conf.uColsStop, round(100.0*count/conf.uColsStop), '%')

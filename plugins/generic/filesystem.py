@@ -13,6 +13,7 @@ import os
 
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -86,13 +87,13 @@ class Filesystem:
         return fileLines
 
     def __checkWrittenFile(self, wFile, dFile, fileType):
-        if kb.dbms == DBMS.MYSQL:
+        if getIdentifiedDBMS() == DBMS.MYSQL:
             lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % dFile
 
-        elif kb.dbms == DBMS.PGSQL:
+        elif getIdentifiedDBMS() == DBMS.PGSQL:
             lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
 
-        elif kb.dbms == DBMS.MSSQL:
+        elif getIdentifiedDBMS() == DBMS.MSSQL:
             self.createSupportTbl(self.fileTblName, self.tblField, "text")
 
             # Reference: http://msdn.microsoft.com/en-us/library/ms188365.aspx
@@ -270,7 +271,7 @@ class Filesystem:
 
             fileContent = self.unionReadFile(rFile)
 
-        if fileContent in ( None, "" ) and kb.dbms != "PostgreSQL":
+        if fileContent in ( None, "" ) and getIdentifiedDBMS() != DBMS.PGSQL:
             self.cleanup(onlyFileTbl=True)
 
             return
@@ -288,7 +289,7 @@ class Filesystem:
         fileContent = self.__unhexString(fileContent)
         rFilePath = dataToOutFile(fileContent)
 
-        if kb.dbms != "PostgreSQL":
+        if getIdentifiedDBMS() != DBMS.PGSQL:
             self.cleanup(onlyFileTbl=True)
 
         return rFilePath

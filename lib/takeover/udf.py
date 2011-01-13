@@ -11,6 +11,7 @@ import os
 
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -50,7 +51,7 @@ class UDF:
     def __checkExistUdf(self, udf):
         logger.info("checking if UDF '%s' already exist" % udf)
 
-        query  = agent.forgeCaseStatement(queries[kb.dbms].check_udf.query % (udf, udf))
+        query  = agent.forgeCaseStatement(queries[getIdentifiedDBMS()].check_udf.query % (udf, udf))
         exists = inject.getValue(query, resumeValue=False, unpack=False, charsetType=2)
 
         if exists == "1":
@@ -103,7 +104,7 @@ class UDF:
         return output
 
     def udfCheckNeeded(self):
-        if ( not conf.rFile or ( conf.rFile and kb.dbms != DBMS.PGSQL ) ) and "sys_fileread" in self.sysUdfs:
+        if ( not conf.rFile or ( conf.rFile and getIdentifiedDBMS() != DBMS.PGSQL ) ) and "sys_fileread" in self.sysUdfs:
             self.sysUdfs.pop("sys_fileread")
 
         if not conf.osPwn:
@@ -142,9 +143,9 @@ class UDF:
             if udf in self.udfToCreate and udf not in self.createdUdf:
                 self.udfCreateFromSharedLib(udf, inpRet)
 
-        if kb.dbms == DBMS.MYSQL:
+        if getIdentifiedDBMS() == DBMS.MYSQL:
             supportTblType = "longtext"
-        elif kb.dbms == DBMS.PGSQL:
+        elif getIdentifiedDBMS() == DBMS.PGSQL:
             supportTblType = "text"
 
         self.udfCreateSupportTbl(supportTblType)
@@ -155,8 +156,8 @@ class UDF:
         self.udfInjectCore(self.sysUdfs)
 
     def udfInjectCustom(self):
-        if kb.dbms not in ( DBMS.MYSQL, DBMS.PGSQL ):
-            errMsg = "UDF injection feature is not yet implemented on %s" % kb.dbms
+        if getIdentifiedDBMS() not in ( DBMS.MYSQL, DBMS.PGSQL ):
+            errMsg = "UDF injection feature is not yet implemented on %s" % getIdentifiedDBMS()
             raise sqlmapUnsupportedFeatureException(errMsg)
 
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
@@ -235,9 +236,9 @@ class UDF:
                 else:
                     logger.warn("you need to specify the name of the UDF")
 
-            if kb.dbms == DBMS.MYSQL:
+            if getIdentifiedDBMS() == DBMS.MYSQL:
                 defaultType = "string"
-            elif kb.dbms == DBMS.PGSQL:
+            elif getIdentifiedDBMS() == DBMS.PGSQL:
                 defaultType = "text"
 
             self.udfs[udfName]["input"] = []

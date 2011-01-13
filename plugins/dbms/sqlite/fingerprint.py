@@ -11,6 +11,7 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import getIdentifiedDBMS
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -70,7 +71,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
         """
 
-        if (kb.dbms is not None and kb.dbms.lower() in SQLITE_ALIASES) or conf.dbms in SQLITE_ALIASES:
+        if (getIdentifiedDBMS() is not None and getIdentifiedDBMS().lower() in SQLITE_ALIASES) or conf.dbms in SQLITE_ALIASES:
             setDbms(DBMS.SQLITE)
 
             self.getBanner()

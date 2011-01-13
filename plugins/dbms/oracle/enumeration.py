@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getRange
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -29,7 +30,7 @@ class Enumeration(GenericEnumeration):
     def getRoles(self, query2=False):
         infoMsg = "fetching database users roles"
 
-        rootQuery = queries[kb.dbms].roles
+        rootQuery = queries[getIdentifiedDBMS()].roles
 
         if conf.user == "CU":
             infoMsg += " for current user"
@@ -178,7 +179,7 @@ class Enumeration(GenericEnumeration):
         return []
 
     def searchColumn(self):
-        rootQuery = queries[kb.dbms].search_column
+        rootQuery = queries[getIdentifiedDBMS()].search_column
         foundCols = {}
         dbs = { "USERS": {} }
         colList = conf.col.split(",")

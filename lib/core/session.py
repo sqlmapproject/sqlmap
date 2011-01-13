@@ -13,6 +13,7 @@ from lib.core.common import aliasToDbmsEnum
 from lib.core.common import dataToSessionFile
 from lib.core.common import formatFingerprintString
 from lib.core.common import getFilteredPageContent
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import readInput
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
@@ -140,7 +141,7 @@ def setDbms(dbms):
     if dbmsRegExp:
         dbms = dbmsRegExp.group(1)
 
-    kb.dbms = dbms
+    kb.dbms = aliasToDbmsEnum(dbms)
 
     logger.info("the back-end DBMS is %s" % kb.dbms)
 
@@ -340,7 +341,7 @@ def resumeConfKb(expression, url, value):
         if '.' in table:
             db, table = table.split('.')
         else:
-            db = "%s%s" % (kb.dbms, METADB_SUFFIX)
+            db = "%s%s" % (getIdentifiedDBMS(), METADB_SUFFIX)
 
         logMsg = "resuming brute forced table name "
         logMsg += "'%s' from session file" % table
@@ -355,7 +356,7 @@ def resumeConfKb(expression, url, value):
         if '.' in table:
             db, table = table.split('.')
         else:
-            db = "%s%s" % (kb.dbms, METADB_SUFFIX)
+            db = "%s%s" % (getIdentifiedDBMS(), METADB_SUFFIX)
 
         logMsg = "resuming brute forced column name "
         logMsg += "'%s' for table '%s' from session file" % (colName, table)

@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import dataToStdout
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -40,10 +41,10 @@ class Abstraction(Web, UDF, xp_cmdshell):
         if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             self.webBackdoorRunCmd(cmd)
 
-        elif kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+        elif getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
             self.udfExecCmd(cmd, silent=silent)
 
-        elif kb.dbms == DBMS.MSSQL:
+        elif getIdentifiedDBMS() == DBMS.MSSQL:
             self.xpCmdshellExecCmd(cmd, silent=silent)
 
         else:
@@ -54,10 +55,10 @@ class Abstraction(Web, UDF, xp_cmdshell):
         if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             return self.webBackdoorRunCmd(cmd)
 
-        elif kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+        elif getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
             return self.udfEvalCmd(cmd, first, last)
 
-        elif kb.dbms == DBMS.MSSQL:
+        elif getIdentifiedDBMS() == DBMS.MSSQL:
             return self.xpCmdshellEvalCmd(cmd, first, last)
 
         else:
@@ -92,13 +93,13 @@ class Abstraction(Web, UDF, xp_cmdshell):
             logger.info(infoMsg)
 
         else:
-            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
                 infoMsg  = "going to use injected sys_eval and sys_exec "
                 infoMsg += "user-defined functions for operating system "
                 infoMsg += "command execution"
                 logger.info(infoMsg)
 
-            elif kb.dbms == DBMS.MSSQL:
+            elif getIdentifiedDBMS() == DBMS.MSSQL:
                 infoMsg  = "going to use xp_cmdshell extended procedure for "
                 infoMsg += "operating system command execution"
                 logger.info(infoMsg)
@@ -150,9 +151,9 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 warnMsg += "the session user is not a database administrator"
                 logger.warn(warnMsg)
 
-            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
                 self.udfInjectSys()
-            elif kb.dbms == DBMS.MSSQL:
+            elif getIdentifiedDBMS() == DBMS.MSSQL:
                 if mandatory:
                     self.xpCmdshellInit()
             else:

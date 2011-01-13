@@ -12,6 +12,7 @@ import socket
 import time
 
 from lib.core.agent import agent
+from lib.core.common import aliasToDbmsEnum
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
 from lib.core.common import findDynamicContent
@@ -430,7 +431,7 @@ def checkSqlInjection(place, parameter, value):
                             for detailKey, detailValue in test.details.items():
                                 if detailKey == "dbms" and injection.dbms is None:
                                     injection.dbms = detailValue
-                                    kb.dbms = detailValue
+                                    kb.dbms = aliasToDbmsEnum(detailValue)
                                 elif detailKey == "dbms_version" and injection.dbms_version is None:
                                     injection.dbms_version = detailValue
                                     kb.dbmsVersion = [ detailValue ]

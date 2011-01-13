@@ -15,6 +15,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import initTechnique
 from lib.core.common import isTechniqueAvailable
@@ -48,7 +49,7 @@ from lib.utils.resume import resume
 def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None):
     start = time.time()
 
-    if ( conf.eta or conf.threads > 1 ) and kb.dbms:
+    if ( conf.eta or conf.threads > 1 ) and getIdentifiedDBMS():
         _, length, _ = queryOutputLength(expression, payload)
     else:
         length = None
@@ -160,7 +161,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(expression)
 
         rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
-        if rdbRegExp and kb.dbms == DBMS.FIREBIRD:
+        if rdbRegExp and getIdentifiedDBMS() == DBMS.FIREBIRD:
             expressionFieldsList = [expressionFields]
 
         if len(expressionFieldsList) > 1:
@@ -176,13 +177,13 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         # NOTE: I assume that only queries that get data from a table
         # can return multiple entries
         if fromUser and " FROM " in expression:
-            limitRegExp = re.search(queries[kb.dbms].limitregexp.query, expression, re.I)
+            limitRegExp = re.search(queries[getIdentifiedDBMS()].limitregexp.query, expression, re.I)
             topLimit    = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-            if limitRegExp or ( kb.dbms in (DBMS.MSSQL, DBMS.SYBASE) and topLimit ):
-                if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
-                    limitGroupStart = queries[kb.dbms].limitgroupstart.query
-                    limitGroupStop  = queries[kb.dbms].limitgroupstop.query
+            if limitRegExp or ( getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit ):
+                if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
+                    limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -190,10 +191,10 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
                     if limitRegExp:
-                        limitGroupStart = queries[kb.dbms].limitgroupstart.query
-                        limitGroupStop  = queries[kb.dbms].limitgroupstop.query
+                        limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
+                        limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
 
                         if limitGroupStart.isdigit():
                             startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -205,7 +206,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         stopLimit  = int(topLimit.group(1))
                         limitCond  = int(stopLimit) > 1
 
-                elif kb.dbms == DBMS.ORACLE:
+                elif getIdentifiedDBMS() == DBMS.ORACLE:
                     limitCond = False
             else:
                 limitCond = True
@@ -219,16 +220,16 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
                         stopLimit += startLimit
-                        untilLimitChar = expression.index(queries[kb.dbms].limitstring.query)
+                        untilLimitChar = expression.index(queries[getIdentifiedDBMS()].limitstring.query)
                         expression = expression[:untilLimitChar]
 
-                    elif kb.dbms in (DBMS.MSSQL, DBMS.SYBASE):
+                    elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
                         stopLimit += startLimit
 
                 if not stopLimit or stopLimit <= 1:
-                    if kb.dbms == DBMS.ORACLE and expression.endswith("FROM DUAL"):
+                    if getIdentifiedDBMS() == DBMS.ORACLE and expression.endswith("FROM DUAL"):
                         test = "n"
                     elif batch:
                         test = "y"
@@ -239,7 +240,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                 if not test or test[0] in ("y", "Y"):
                     # Count the number of SQL query entries output
-                    countFirstField   = queries[kb.dbms].count.query % expressionFieldsList[0]
+                    countFirstField   = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
                     countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
                     if re.search(" ORDER BY ", expression, re.I):
@@ -327,7 +328,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     return outputs
 
-        elif kb.dbms == DBMS.ORACLE and expression.startswith("SELECT ") and " FROM " not in expression:
+        elif getIdentifiedDBMS() == DBMS.ORACLE and expression.startswith("SELECT ") and " FROM " not in expression:
             expression = "%s FROM DUAL" % expression
 
         outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
@@ -488,7 +489,7 @@ def goStacked(expression, silent=False):
     if conf.direct:
         return direct(expression), None
 
-    comment = queries[kb.dbms].comment.query
+    comment = queries[getIdentifiedDBMS()].comment.query
     query = agent.prefixQuery("; %s" % expression)
     query = agent.suffixQuery("%s;%s" % (query, comment))
 

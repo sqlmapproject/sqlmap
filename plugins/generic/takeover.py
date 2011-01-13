@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import os
 
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
@@ -44,7 +45,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
     def osCmd(self):
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
             web = False
-        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and kb.dbms == DBMS.MYSQL:
+        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and getIdentifiedDBMS() == DBMS.MYSQL:
             infoMsg = "going to use a web backdoor for command execution"
             logger.info(infoMsg)
 
@@ -65,7 +66,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
     def osShell(self):
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
             web = False
-        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and kb.dbms == DBMS.MYSQL:
+        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and getIdentifiedDBMS() == DBMS.MYSQL:
             infoMsg = "going to use a web backdoor for command prompt"
             logger.info(infoMsg)
 
@@ -148,7 +149,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "is unlikely to receive commands send from you"
                 logger.error(errMsg)
 
-            if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
                 self.sysUdfs.pop("sys_bineval")
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
@@ -158,7 +159,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.initEnv(web=web)
 
             if tunnel == 1:
-                if kb.dbms in ( DBMS.MYSQL, DBMS.PGSQL ):
+                if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
                     msg  = "how do you want to execute the Metasploit shellcode "
                     msg += "on the back-end database underlying operating system?"
                     msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
@@ -188,7 +189,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     self.uploadMsfPayloadStager()
 
                 if kb.os == "Windows" and conf.privEsc:
-                    if kb.dbms == DBMS.MYSQL:
+                    if getIdentifiedDBMS() == DBMS.MYSQL:
                         debugMsg  = "by default MySQL on Windows runs as SYSTEM "
                         debugMsg += "user, no need to privilege escalate"
                         logger.debug(debugMsg)
@@ -206,7 +207,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 self.uploadIcmpshSlave(web=web)
                 self.icmpPwn()
 
-        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and kb.dbms == DBMS.MYSQL:
+        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and getIdentifiedDBMS() == DBMS.MYSQL:
             web = True
 
             infoMsg = "going to use a web backdoor to establish the tunnel"
@@ -255,13 +256,13 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             raise sqlmapUnsupportedDBMSException(errMsg)
 
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
-            if kb.dbms in ( DBMS.PGSQL, DBMS.MSSQL ):
+            if getIdentifiedDBMS() in ( DBMS.PGSQL, DBMS.MSSQL ):
                 errMsg  = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
                 errMsg += "queries are supported"
                 raise sqlmapUnsupportedDBMSException(errMsg)
 
-            elif kb.dbms == DBMS.MYSQL:
+            elif getIdentifiedDBMS() == DBMS.MYSQL:
                 debugMsg  = "since stacked queries are not supported, "
                 debugMsg += "sqlmap is going to perform the SMB relay "
                 debugMsg += "attack via inference blind SQL injection"
@@ -270,18 +271,18 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         printWarn = True
         warnMsg   = "it is unlikely that this attack will be successful "
 
-        if kb.dbms == DBMS.MYSQL:
+        if getIdentifiedDBMS() == DBMS.MYSQL:
             warnMsg += "because by default MySQL on Windows runs as "
             warnMsg += "Local System which is not a real user, it does "
             warnMsg += "not send the NTLM session hash when connecting to "
             warnMsg += "a SMB service"
 
-        elif kb.dbms == DBMS.PGSQL:
+        elif getIdentifiedDBMS() == DBMS.PGSQL:
             warnMsg += "because by default PostgreSQL on Windows runs "
             warnMsg += "as postgres user which is a real user of the "
             warnMsg += "system, but not within the Administrators group"
 
-        elif kb.dbms == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
+        elif getIdentifiedDBMS() == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
             warnMsg += "because often Microsoft SQL Server %s " % kb.dbmsVersion[0]
             warnMsg += "runs as Network Service which is not a real user, "
             warnMsg += "it does not send the NTLM session hash when "
@@ -299,7 +300,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             return
 
-        if not kb.dbms == DBMS.MSSQL or kb.dbmsVersion[0] not in ( "2000", "2005" ):
+        if not getIdentifiedDBMS() == DBMS.MSSQL or kb.dbmsVersion[0] not in ( "2000", "2005" ):
             errMsg  = "the back-end DBMS must be Microsoft SQL Server "
             errMsg += "2000 or 2005 to be able to exploit the heap-based "
             errMsg += "buffer overflow in the 'sp_replwritetovarbin' "
