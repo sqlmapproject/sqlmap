@@ -62,7 +62,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
                 # Perform the request
                 resultPage, _ = Request.queryPage(payload, place=place, content=True)
 
-                if resultPage and (randQuery not in resultPage or randQuery2 not in resultPage):
+                if resultPage and " UNION ALL SELECT " not in resultPage and (randQuery not in resultPage or randQuery2 not in resultPage):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
 
             break
