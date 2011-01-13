@@ -16,6 +16,14 @@ class PRIORITY:
     HIGHER  = 50
     HIGHEST = 100
 
+class SORTORDER:
+    FIRST   = 0
+    SECOND  = 1
+    THIRD   = 2
+    FOURTH  = 3
+    FIFTH   = 4
+    LAST    = 100
+
 class DBMS:
     ACCESS      = "Microsoft Access"
     FIREBIRD    = "Firebird"

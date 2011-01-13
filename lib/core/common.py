@@ -50,6 +50,7 @@ from lib.core.convert import urlencode
 from lib.core.enums import DBMS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
+from lib.core.enums import SORTORDER
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -1973,16 +1974,16 @@ def getInjectionTests():
     retVal = conf.tests
 
     def priorityFunction(test):
-        retVal = 0
+        retVal = SORTORDER.FIRST
 
         if test.stype == PAYLOAD.TECHNIQUE.UNION:
-            retVal = 3
+            retVal = SORTORDER.LAST
 
         elif 'details' in test and 'dbms' in test.details:
             if test.details.dbms in getErrorParsedDBMSes():
-                retVal = 1
+                retVal = SORTORDER.SECOND
             else:
-                retVal = 2
+                retVal = SORTORDER.THIRD
 
         return retVal
 
