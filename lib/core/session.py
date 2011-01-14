@@ -42,48 +42,6 @@ def unSafeFormatString(value):
         retVal = retVal.replace("__LEFT_SQUARE_BRACKET__", "[").replace("__RIGHT_SQUARE_BRACKET__", "]")
     return retVal
 
-def setTextOnly():
-    """
-    Save text only option to session file.
-    """
-
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Text only") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][None][None][Text only][True]\n" % conf.url)
-
-    kb.originalPage = getFilteredPageContent(kb.originalPage)
-    kb.pageTemplates.clear()
-
-def setString():
-    """
-    Save string to match in session file.
-    """
-
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("String") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][None][None][String][%s]\n" % (conf.url, safeFormatString(conf.string)))
-
-def setRegexp():
-    """
-    Save regular expression to match in session file.
-    """
-
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Regular expression") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][None][None][Regular expression][%s]\n" % (conf.url, safeFormatString(conf.regexp)))
-
 def setInjection(inj):
     """
     Save information retrieved about injection place and parameter in the
@@ -202,23 +160,7 @@ def setRemoteTempPath():
         dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(conf.tmpPath)))
 
 def resumeConfKb(expression, url, value):
-    if expression == "Text only" and url == conf.url:
-        value = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming text only option '%s' from session file" % value
-        logger.info(logMsg)
-
-        if value and not conf.textOnly:
-            message = "you did not turned on --text-only switch this time "
-            message += "which could potentially lead to different "
-            message += "and/or unstable results. "
-            message += "Do you want to turn it on? [Y/n] "
-            test = readInput(message, default="Y")
-
-            if not test or test[0] in ("y", "Y"):
-                conf.textOnly = value
-
-    elif expression == "String" and url == conf.url:
+    if expression == "String" and url == conf.url:
         string = unSafeFormatString(value[:-1])
 
         logMsg = "resuming string match '%s' from session file" % string

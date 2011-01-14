@@ -80,3 +80,4 @@ class injectionDict(advancedDict):
         self.dbms = None
         self.dbms_version = None
         self.os = None
+

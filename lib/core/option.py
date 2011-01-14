@@ -1045,7 +1045,7 @@ def __cleanupOptions():
     if conf.optimize:
         #conf.predictOutput = True
         conf.keepAlive = True
-        conf.nullConnection = not (conf.textOnly or conf.longestCommon)
+        conf.nullConnection = not conf.textOnly
         conf.threads = 4 if conf.threads < 2 else conf.threads
 
     if conf.realTest:
@@ -1318,10 +1318,6 @@ def __basicOptionValidation():
 
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch --text-only is incompatible with switch --null-connection"
-        raise sqlmapSyntaxException, errMsg
-
-    if conf.longestCommon and conf.nullConnection:
-        errMsg = "switch --longest-common is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
     if conf.data and conf.nullConnection:

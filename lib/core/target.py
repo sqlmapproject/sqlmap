@@ -30,7 +30,6 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
-from lib.core.session import setTextOnly
 from lib.core.xmldump import dumper as xmldumper
 from lib.request.connect import Connect as Request
 
@@ -265,13 +264,6 @@ def __createTargetDirs():
     __createFilesDir()
     __configureDumper()
 
-def __saveSwitches():
-    """
-    Store critical switches to the session file.
-    """
-    if conf.textOnly:
-        setTextOnly()
-
 def __restoreCmdLineOptions():
     """
     Restore command line options that could be possibly 
@@ -302,4 +294,3 @@ def setupTargetEnv():
     __createTargetDirs()
     __setRequestParams()
     __setOutputResume()
-    __saveSwitches()

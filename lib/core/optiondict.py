@@ -70,8 +70,7 @@ optDict = {
                                "eString":           "string",
                                "eRegexp":           "string",
                                "thold":             "float",
-                               "textOnly":          "boolean",
-                               "longestCommon":     "boolean"
+                               "textOnly":          "boolean"
                              },
 
             "Techniques":    {

@@ -48,9 +48,6 @@ from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setDynamicMarkings
-from lib.core.session import setString
-from lib.core.session import setRegexp
-from lib.core.session import setTextOnly
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.unescaper import unescaper
@@ -424,8 +421,13 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].where = where
                         injection.data[stype].vector = vector
                         injection.data[stype].comment = comment
-                        injection.data[stype].matchRatio = kb.matchRatio
                         injection.data[stype].templatePayload = templatePayload
+
+                        injection.data[stype].conf = advancedDict()
+                        injection.data[stype].conf.matchRatio = kb.matchRatio
+                        injection.data[stype].conf.textOnly = conf.textOnly
+                        injection.data[stype].conf.string = conf.string
+                        injection.data[stype].conf.regexp = conf.regexp
 
                         if hasattr(test, "details"):
                             for detailKey, detailValue in test.details.items():
@@ -585,12 +587,6 @@ def checkDynamicContent(firstPage, secondPage):
         logger.debug(debugMsg)
         return
 
-    if conf.longestCommon:
-        debugMsg  = "dynamic content checking skipped "
-        debugMsg += "because longest common comparison used"
-        logger.debug(debugMsg)
-        return
-
     conf.seqMatcher.set_seq1(firstPage)
     conf.seqMatcher.set_seq2(secondPage)
 
@@ -608,7 +604,6 @@ def checkDynamicContent(firstPage, secondPage):
                 logger.warn(warnMsg)
 
                 conf.textOnly = True
-                setTextOnly()
                 return
 
             warnMsg = "target url is heavily dynamic"
@@ -677,7 +672,6 @@ def checkStability():
 
             if test:
                 conf.string = test
-                setString()
 
                 if kb.nullConnection:
                     debugMsg  = "turning off NULL connection "
@@ -695,7 +689,6 @@ def checkStability():
 
             if test:
                 conf.regex = test
-                setRegexp()
 
                 if kb.nullConnection:
                     debugMsg  = "turning off NULL connection "
@@ -709,7 +702,6 @@ def checkStability():
 
         elif test and test[0] in ("t", "T"):
             conf.textOnly = True
-            setTextOnly()
 
             if kb.nullConnection:
                 debugMsg  = "turning off NULL connection "
@@ -727,24 +719,13 @@ def checkString():
     if not conf.string:
         return True
 
-    condition = (
-                  kb.resumedQueries.has_key(conf.url) and
-                  kb.resumedQueries[conf.url].has_key("String") and
-                  kb.resumedQueries[conf.url]["String"][:-1] == conf.string
-                )
-
-    if condition:
-        return True
-
     infoMsg  = "testing if the provided string is within the "
     infoMsg += "target URL page content"
     logger.info(infoMsg)
 
     page, _ = Request.queryPage(content=True)
 
-    if conf.string in page:
-        setString()
-    else:
+    if conf.string not in page:
         warnMsg  = "you provided '%s' as the string to " % conf.string
         warnMsg += "match, but such a string is not within the target "
         warnMsg += "URL page content original request, sqlmap will "
@@ -757,24 +738,13 @@ def checkRegexp():
     if not conf.regexp:
         return True
 
-    condition = (
-                  kb.resumedQueries.has_key(conf.url) and
-                  kb.resumedQueries[conf.url].has_key("Regular expression") and
-                  kb.resumedQueries[conf.url]["Regular expression"][:-1] == conf.regexp
-                )
-
-    if condition:
-        return True
-
     infoMsg  = "testing if the provided regular expression matches within "
     infoMsg += "the target URL page content"
     logger.info(infoMsg)
 
     page, _ = Request.queryPage(content=True)
 
-    if re.search(conf.regexp, page, re.I | re.M):
-        setRegexp()
-    else:
+    if not re.search(conf.regexp, page, re.I | re.M):
         warnMsg  = "you provided '%s' as the regular expression to " % conf.regexp
         warnMsg += "match, but such a regular expression does not have any "
         warnMsg += "match within the target URL page content, sqlmap "

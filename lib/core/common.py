@@ -1943,7 +1943,20 @@ def initTechnique(technique=None):
 
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
-            kb.matchRatio = data.matchRatio
+
+            kb.matchRatio = data.conf.matchRatio
+            if data.conf.textOnly:
+                conf.textOnly = True
+                debugMsg = "restoring switch --text-only"
+                logger.debug(debugMsg)
+            if data.conf.string:
+                conf.string = data.conf.string
+                debugMsg = "restoring option --string '%s'" % data.conf.string
+                logger.debug(debugMsg)
+            if data.conf.regexp:
+                conf.regexp = data.conf.regexp
+                debugMsg = "restoring option --regexp '%s'" % data.conf.regexp
+                logger.debug(debugMsg)
         else:
             warnMsg = "there is no injection data available for technique "
             warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)

@@ -214,10 +214,6 @@ def cmdLineParser():
                              action="store_true", default=False,
                              help="Compare pages based only on their textual content")
 
-        detection.add_option("--longest-common", dest="longestCommon",
-                             action="store_true", default=False,
-                             help="Compare pages based on their longest common match")
-
 
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "

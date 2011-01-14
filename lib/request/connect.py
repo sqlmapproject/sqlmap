@@ -458,9 +458,6 @@ class Connect:
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
-        if conf.textOnly:
-            page = getFilteredPageContent(page)
-
         if kb.testMode:
             kb.testQueryCount += 1
 

@@ -11,6 +11,7 @@ import re
 
 from difflib import SequenceMatcher
 
+from lib.core.common import getFilteredPageContent
 from lib.core.common import removeDynamicContent
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
@@ -63,7 +64,7 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
             return None
 
         # Dynamic content lines to be excluded before comparison
-        if not kb.nullConnection and not conf.longestCommon:
+        if not kb.nullConnection:
             page = removeDynamicContent(page)
             conf.seqMatcher.set_seq1(removeDynamicContent(kb.pageTemplate))
 
@@ -73,12 +74,10 @@ def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
     if kb.locks.seqLock:
         kb.locks.seqLock.acquire()
 
-    if conf.longestCommon:
-        (firstPage, secondPage) = (conf.seqMatcher.a, page)
-        match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
-        ratio = round(SequenceMatcher(None, firstPage[match[0]:match[0]+match[2]], secondPage[match[1]:match[1]+match[2]]).ratio(), 3)
+    if conf.textOnly:
+        (conf.seqMatcher.a, page) = map(getFilteredPageContent, (conf.seqMatcher.a, page))
 
-    elif not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
+    if not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
         ratio = 1. * pageLength / len(conf.seqMatcher.a)
 
         if ratio > 1.:
