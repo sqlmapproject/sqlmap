@@ -1950,10 +1950,12 @@ def initTechnique(technique=None):
                 conf.textOnly = True
                 debugMsg = "restoring switch --text-only"
                 logger.debug(debugMsg)
+
             if kb.injection.conf.string:
                 conf.string = kb.injection.conf.string
                 debugMsg = "restoring option --string '%s'" % conf.string
                 logger.debug(debugMsg)
+
             if kb.injection.conf.regexp:
                 conf.regexp = kb.injection.conf.regexp
                 debugMsg = "restoring option --regexp '%s'" % conf.regexp

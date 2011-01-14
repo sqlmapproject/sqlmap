@@ -73,11 +73,11 @@ class injectionDict(advancedDict):
         self.suffix = None
         self.clause = None
 
-        # data is a dict with stype as key and a tuple as value with
-        # title, where, comment and reqPayload
+        # data is a dict with various stype, each which is a dict with
+        # all the information specific for that stype
         self.data = advancedDict()
 
-        # conf is a dict with stores current snapshot of important
+        # conf is a dict which stores current snapshot of important
         # options used during detection
         self.conf = advancedDict()
 
