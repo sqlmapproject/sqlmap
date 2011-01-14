@@ -94,11 +94,10 @@ def setHandler():
             conf.dbmsConnector.connect()
 
         if handler.checkDbms():
-            if not conf.dbms or conf.dbms in dbmsAliases:
-                kb.dbmsDetected = True
-                conf.dbmsHandler = handler
+            kb.dbmsDetected = True
+            conf.dbmsHandler = handler
 
-                break
+            break
         else:
             conf.dbmsConnector = None
 

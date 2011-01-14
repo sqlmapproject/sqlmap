@@ -98,13 +98,15 @@ class Fingerprint(GenericFingerprint):
 
     def __dialectCheck(self):
         retVal = None
+
         if getIdentifiedDBMS():
             result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
             retVal = "dialect 3" if result else "dialect 1"
+
         return retVal
 
     def checkDbms(self):
-        if (getIdentifiedDBMS() is not None and getIdentifiedDBMS().lower() in FIREBIRD_ALIASES) or conf.dbms in FIREBIRD_ALIASES:
+        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in FIREBIRD_ALIASES) or conf.dbms in FIREBIRD_ALIASES:
             setDbms(DBMS.FIREBIRD)
 
             self.getBanner()

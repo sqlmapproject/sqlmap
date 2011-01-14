@@ -14,7 +14,6 @@ from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getErrorParsedDBMSesFormatted
-from lib.core.common import getIdentifiedDBMS
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import wasLastRequestDBMSError
@@ -149,11 +148,10 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if (getIdentifiedDBMS() is not None and getIdentifiedDBMS().lower() in ACCESS_ALIASES) or conf.dbms in ACCESS_ALIASES:
+        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in ACCESS_ALIASES) or conf.dbms in ACCESS_ALIASES:
             setDbms(DBMS.ACCESS)
 
-            if not conf.extensiveFp:
-                return True
+            return True
 
         logMsg = "testing Microsoft Access"
         logger.info(logMsg)

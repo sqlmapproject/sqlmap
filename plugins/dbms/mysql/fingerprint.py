@@ -13,7 +13,6 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getErrorParsedDBMSesFormatted
-from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -152,7 +151,7 @@ class Fingerprint(GenericFingerprint):
         * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
-        if ((getIdentifiedDBMS() is not None and getIdentifiedDBMS().lower() in MYSQL_ALIASES) \
+        if not conf.extensiveFp and ((kb.dbms is not None and kb.dbms.lower() in MYSQL_ALIASES) \
            or conf.dbms in MYSQL_ALIASES) and kb.dbmsVersion and \
            kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION:
             kb.dbmsVersion[0] = kb.dbmsVersion[0].replace(">", "")
@@ -166,8 +165,7 @@ class Fingerprint(GenericFingerprint):
 
             self.getBanner()
 
-            if not conf.extensiveFp:
-                return True
+            return True
 
         infoMsg = "testing MySQL"
         logger.info(infoMsg)

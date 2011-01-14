@@ -81,9 +81,6 @@ class Enumeration:
             return
 
         if kb.data.banner is None:
-            # TODO: is this assignement an ugly hack?
-            kb.dbmsDetected = True
-
             infoMsg = "fetching banner"
             logger.info(infoMsg)
 

@@ -13,7 +13,6 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getErrorParsedDBMSesFormatted
-from lib.core.common import getIdentifiedDBMS
 from lib.core.common import randomInt
 from lib.core.common import randomRange
 from lib.core.data import conf
@@ -101,13 +100,12 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if (getIdentifiedDBMS() is not None and getIdentifiedDBMS().lower() in MAXDB_ALIASES) or conf.dbms in MAXDB_ALIASES:
+        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in MAXDB_ALIASES) or conf.dbms in MAXDB_ALIASES:
             setDbms(DBMS.MAXDB)
 
             self.getBanner()
 
-            if not conf.extensiveFp:
-                return True
+            return True
 
         logMsg = "testing SAP MaxDB"
         logger.info(logMsg)

@@ -13,7 +13,6 @@ from lib.core.agent import agent
 from lib.core.common import formatDBMSfp
 from lib.core.common import formatFingerprint
 from lib.core.common import getErrorParsedDBMSesFormatted
-from lib.core.common import getIdentifiedDBMS
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -65,13 +64,12 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if (getIdentifiedDBMS() is not None and getIdentifiedDBMS().lower() in ORACLE_ALIASES) or conf.dbms in ORACLE_ALIASES:
+        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in ORACLE_ALIASES) or conf.dbms in ORACLE_ALIASES:
             setDbms(DBMS.ORACLE)
 
             self.getBanner()
 
-            if not conf.extensiveFp:
-                return True
+            return True
 
         logMsg = "testing Oracle"
         logger.info(logMsg)
