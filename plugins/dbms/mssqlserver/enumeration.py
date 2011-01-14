@@ -17,7 +17,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
@@ -26,7 +25,7 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def __init__(self):
-        GenericEnumeration.__init__(self, DBMS.MSSQL)
+        GenericEnumeration.__init__(self)
 
     def getPrivileges(self, *args):
         warnMsg  = "on Microsoft SQL Server it is not possible to fetch "

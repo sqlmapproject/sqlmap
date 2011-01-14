@@ -2044,7 +2044,9 @@ def getErrorParsedDBMSes():
 def getIdentifiedDBMS():
     dbms = None
 
-    if kb.dbms is not None:
+    if kb.misc.fpDbms is not None:
+        dbms = kb.misc.fpDbms
+    elif kb.dbms is not None:
         dbms = kb.dbms
     elif conf.dbms is not None:
         dbms = conf.dbms

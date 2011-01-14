@@ -33,7 +33,7 @@ from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
     def __init__(self):
-        GenericFingerprint.__init__(self)
+        GenericFingerprint.__init__(self, DBMS.ACCESS)
 
     def __sandBoxCheck(self):
         # Reference: http://milw0rm.com/papers/198

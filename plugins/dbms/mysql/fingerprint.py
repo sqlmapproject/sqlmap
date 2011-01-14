@@ -31,7 +31,7 @@ from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
     def __init__(self):
-        GenericFingerprint.__init__(self)
+        GenericFingerprint.__init__(self, DBMS.MYSQL)
 
     def __commentCheck(self):
         infoMsg = "executing MySQL comment injection fingerprint"

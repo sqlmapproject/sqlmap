@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.data import kb
 from lib.core.exception import sqlmapUndefinedMethod
 
 class Fingerprint:
@@ -14,8 +15,8 @@ class Fingerprint:
     This class defines generic fingerprint functionalities for plugins.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, dbms):
+        kb.misc.fpDbms = dbms
 
     def getFingerprint(self):
         errMsg  = "'getFingerprint' method must be defined "

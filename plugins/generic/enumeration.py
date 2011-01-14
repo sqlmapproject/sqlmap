@@ -61,7 +61,7 @@ class Enumeration:
     This class defines generic enumeration functionalities for plugins.
     """
 
-    def __init__(self, dbms):
+    def __init__(self):
         kb.data.has_information_schema = False
         kb.data.banner                 = None
         kb.data.currentUser            = ""

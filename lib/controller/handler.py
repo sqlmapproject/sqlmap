@@ -98,6 +98,10 @@ def setHandler():
                 kb.dbmsDetected = True
                 conf.dbmsHandler = handler
 
-                return
+                break
         else:
             conf.dbmsConnector = None
+
+    # At this point proper back-end DBMS will be identified (kb.dbms)
+    # so we have to force DBMS
+    kb.misc.fpDbms = None

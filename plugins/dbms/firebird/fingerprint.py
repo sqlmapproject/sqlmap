@@ -31,7 +31,7 @@ from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
     def __init__(self):
-        GenericFingerprint.__init__(self)
+        GenericFingerprint.__init__(self, DBMS.FIREBIRD)
 
     def getFingerprint(self):
         value  = ""
