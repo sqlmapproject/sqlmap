@@ -20,6 +20,7 @@ from lib.controller.checks import checkNullConnection
 from lib.controller.checks import heuristicCheckSqlInjection
 from lib.controller.checks import simpletonCheckSqlInjection
 from lib.core.agent import agent
+from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
@@ -379,11 +380,16 @@ def start():
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if not conf.realTest:
                     errMsg = "all parameters are not injectable, try "
-                    errMsg += "a higher --level/--risk and/or --text-only switch"
+                    errMsg += "a higher --level/--risk to use more tests"
+                    if not conf.textOnly and kb.originalPage:
+                        percent = (1.0 * len(kb.originalPage) / len(getFilteredPageContent(kb.originalPage)))
+                        errMsg += " and/or --text-only switch if the target page "
+                        errMsg += "has a low percentage of textual content "
+                        errMsg += "(%.2f%% of page content is text)" % percent
                     raise sqlmapNotVulnerableException, errMsg
                 else:
                     errMsg = "it seems that all parameters are not injectable"
-                    raise sqlmapNotVulnerableException, errMsg                
+                    raise sqlmapNotVulnerableException, errMsg
             else:
                 # Flush the flag
                 kb.testMode = False
