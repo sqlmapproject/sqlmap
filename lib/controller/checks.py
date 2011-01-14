@@ -33,7 +33,6 @@ from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
 from lib.core.common import DynamicContentItem
-from lib.core.common import configUnion
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -57,6 +56,7 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
+from lib.techniques.inband.union.use import configUnion
 from lib.techniques.inband.union.test import unionTest
 
 def unescape(string, dbms):

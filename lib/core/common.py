@@ -2089,38 +2089,3 @@ def openFile(filename, mode='r'):
           ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
         raise sqlmapFilePathException, errMsg
-
-def __configUnionChar(char):
-    if char.isdigit() or char == "NULL":
-        conf.uChar = char
-    elif not char.startswith("'") or not char.endswith("'"):
-        conf.uChar = "'%s'" % char
-
-def __configUnionCols(columns):
-    if "-" not in columns or len(columns.split("-")) != 2:
-        raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
-
-    columns = columns.replace(" ", "")
-    conf.uColsStart, conf.uColsStop = columns.split("-")
-
-    if not conf.uColsStart.isdigit() or not conf.uColsStop.isdigit():
-        raise sqlmapSyntaxException, "--union-cols must be a range of integers"
-
-    conf.uColsStart = int(conf.uColsStart)
-    conf.uColsStop = int(conf.uColsStop)
-
-    if conf.uColsStart > conf.uColsStop:
-        errMsg = "--union-cols range has to be from lower to "
-        errMsg += "higher number of columns"
-        raise sqlmapSyntaxException, errMsg
-
-def configUnion(char, columns):
-    if isinstance(conf.uChar, basestring):
-        __configUnionChar(conf.uChar)
-    elif isinstance(char, basestring):
-        __configUnionChar(char)
-
-    if isinstance(conf.uCols, basestring):
-        __configUnionCols(conf.uCols)
-    elif isinstance(columns, basestring):
-        __configUnionCols(columns)
