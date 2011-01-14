@@ -670,7 +670,10 @@ class Agent:
         @rtype: C{str}
         """
 
-        return queries[getIdentifiedDBMS()].case.query % expression
+        if getIdentifiedDBMS() is not None and hasattr(queries[getIdentifiedDBMS()], "case"):
+            return queries[getIdentifiedDBMS()].case.query % expression
+        else:
+            return expression
 
     def addPayloadDelimiters(self, inpStr):
         """
