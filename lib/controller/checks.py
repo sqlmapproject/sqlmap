@@ -425,8 +425,11 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].matchRatio = kb.matchRatio
 
                         injection.conf.textOnly = conf.textOnly
-                        injection.conf.string = conf.string
-                        injection.conf.regexp = conf.regexp
+                        injection.conf.string   = conf.string
+                        injection.conf.regexp   = conf.regexp
+                        injection.conf.uCols    = conf.uCols
+                        injection.conf.uChar    = conf.uChar
+                        injection.conf.timeSec  = conf.timeSec
 
                         if hasattr(test, "details"):
                             for detailKey, detailValue in test.details.items():

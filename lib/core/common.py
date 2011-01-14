@@ -1946,20 +1946,11 @@ def initTechnique(technique=None):
             kb.matchRatio = data.matchRatio
 
             # Restoring stored conf options
-            if kb.injection.conf.textOnly:
-                conf.textOnly = True
-                debugMsg = "restoring switch --text-only"
-                logger.debug(debugMsg)
-
-            if kb.injection.conf.string:
-                conf.string = kb.injection.conf.string
-                debugMsg = "restoring option --string '%s'" % conf.string
-                logger.debug(debugMsg)
-
-            if kb.injection.conf.regexp:
-                conf.regexp = kb.injection.conf.regexp
-                debugMsg = "restoring option --regexp '%s'" % conf.regexp
-                logger.debug(debugMsg)
+            for key, value in kb.injection.conf.items():
+                if value:
+                    setattr(conf, key, value)
+                    debugMsg = "restoring configuration option '%s' (%s)" % (key, value)
+                    logger.debug(debugMsg)
         else:
             warnMsg = "there is no injection data available for technique "
             warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
