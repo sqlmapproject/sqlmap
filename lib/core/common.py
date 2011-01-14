@@ -1753,15 +1753,18 @@ def isNumPosStrValue(value):
 
     return value and isinstance(value, basestring) and value.isdigit() and value != "0"
 
-def aliasToDbmsEnum(value):
+def aliasToDbmsEnum(dbms):
     """
     Returns major DBMS name from a given alias
     """
 
     retVal = None
 
+    if dbms is None:
+        return None
+
     for key, item in dbmsDict.items():
-        if value.lower() in item[0]:
+        if dbms.lower() in item[0]:
             retVal = key
             break
 
