@@ -1943,19 +1943,20 @@ def initTechnique(technique=None):
 
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
+            kb.matchRatio = data.matchRatio
 
-            kb.matchRatio = data.conf.matchRatio
-            if data.conf.textOnly:
+            # Restoring stored conf options
+            if kb.injection.conf.textOnly:
                 conf.textOnly = True
                 debugMsg = "restoring switch --text-only"
                 logger.debug(debugMsg)
-            if data.conf.string:
-                conf.string = data.conf.string
-                debugMsg = "restoring option --string '%s'" % data.conf.string
+            if kb.injection.conf.string:
+                conf.string = kb.injection.conf.string
+                debugMsg = "restoring option --string '%s'" % conf.string
                 logger.debug(debugMsg)
-            if data.conf.regexp:
-                conf.regexp = data.conf.regexp
-                debugMsg = "restoring option --regexp '%s'" % data.conf.regexp
+            if kb.injection.conf.regexp:
+                conf.regexp = kb.injection.conf.regexp
+                debugMsg = "restoring option --regexp '%s'" % conf.regexp
                 logger.debug(debugMsg)
         else:
             warnMsg = "there is no injection data available for technique "
@@ -2086,8 +2087,7 @@ def getComparePageRatio(firstPage, secondPage, filtered=False):
     """
 
     if filtered:
-        firstPage = getFilteredPageContent(firstPage)
-        secondPage = getFilteredPageContent(secondPage)
+        (firstPage, secondPage) = map(getFilteredPageContent, (firstPage, secondPage))
 
     conf.seqMatcher.set_seq1(firstPage)
     conf.seqMatcher.set_seq2(secondPage)

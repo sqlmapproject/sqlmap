@@ -77,6 +77,10 @@ class injectionDict(advancedDict):
         # title, where, comment and reqPayload
         self.data = advancedDict()
 
+        # conf is a dict with stores current snapshot of important
+        # options used during detection
+        self.conf = advancedDict()
+
         self.dbms = None
         self.dbms_version = None
         self.os = None

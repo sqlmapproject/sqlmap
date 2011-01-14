@@ -422,12 +422,11 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].vector = vector
                         injection.data[stype].comment = comment
                         injection.data[stype].templatePayload = templatePayload
+                        injection.data[stype].matchRatio = kb.matchRatio
 
-                        injection.data[stype].conf = advancedDict()
-                        injection.data[stype].conf.matchRatio = kb.matchRatio
-                        injection.data[stype].conf.textOnly = conf.textOnly
-                        injection.data[stype].conf.string = conf.string
-                        injection.data[stype].conf.regexp = conf.regexp
+                        injection.conf.textOnly = conf.textOnly
+                        injection.conf.string = conf.string
+                        injection.conf.regexp = conf.regexp
 
                         if hasattr(test, "details"):
                             for detailKey, detailValue in test.details.items():
