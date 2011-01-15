@@ -280,7 +280,10 @@ class Fingerprint(GenericFingerprint):
         elif result is False:
             kb.os = "Windows"
 
-        infoMsg = "the back-end DBMS operating system is %s" % (kb.os or "Unknown")
-        logger.info(infoMsg)
+        if kb.os:
+            infoMsg = "the back-end DBMS operating system is %s" % kb.os
+            logger.info(infoMsg)
+        else:
+            self.userChooseDbmsOs()
 
         self.cleanup(onlyFileTbl=True)
