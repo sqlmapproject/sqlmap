@@ -1945,9 +1945,9 @@ def initTechnique(technique=None):
 
             # Restoring stored conf options
             for key, value in kb.injection.conf.items():
-                if value:
+                if value and (not hasattr(conf, key) or (hasattr(conf, key) and getattr(conf, key) in ("", None))):
                     setattr(conf, key, value)
-                    debugMsg = "restoring configuration option '%s' (%s)" % (key, value)
+                    debugMsg = "resuming configuration option '%s' (%s)" % (key, value)
                     logger.debug(debugMsg)
         else:
             warnMsg = "there is no injection data available for technique "
