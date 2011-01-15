@@ -196,11 +196,6 @@ def checkSqlInjection(place, parameter, value):
             fstPayload = agent.cleanupPayload(test.request.payload, value)
             fstPayload = unescapeDbms(fstPayload, injection, dbms)
 
-            if stype != 4 and clause != [2, 3] and clause != [ 3 ]:
-                space = " "
-            else:
-                space = ""
-
             if conf.prefix is not None and conf.suffix is not None:
                 # Create a custom boundary object for user's supplied prefix
                 # and suffix
