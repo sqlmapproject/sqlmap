@@ -34,6 +34,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
 from lib.core.exception import sqlmapUserQuitException
+from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import DUMMY_USER_PREFIX
 
 def mysql_passwd(password, uppercase=True):
@@ -336,6 +337,13 @@ def dictionaryAttack(attack_dict):
             logger.info(infoMsg)
             kb.wordlist = getFileItems(dictpath, None, False)
 
+        message = "do you want to use common password suffixes? (slow!) [y/N] "
+        test = readInput(message, default="N")
+
+        suffix_list = [""]
+        if test[0] in ("y", "Y"):
+            suffix_list = COMMON_PASSWORD_SUFFIXES
+
         infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
 
@@ -343,79 +351,99 @@ def dictionaryAttack(attack_dict):
             ((user, _), _) = item
             kb.wordlist.append(getUnicode(user))
 
-        length = len(kb.wordlist)
+        length = len(kb.wordlist) * len(suffix_list)
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
 
-            for word in kb.wordlist:
-                count += 1
+            for suffix in suffix_list:
+                for word in kb.wordlist:
+                    count += 1
 
-                try:
-                    current = __functions__[hash_regex](password = word, uppercase = False)
+                    if suffix:
+                        word = word + suffix
 
-                    for item in attack_info:
-                        ((user, hash_), _) = item
+                    try:
+                        current = __functions__[hash_regex](password = word, uppercase = False)
 
-                        if hash_ == current:
-                            results.append((user, hash_, word))
-                            clearConsoleLine()
+                        for item in attack_info:
+                            ((user, hash_), _) = item
 
-                            infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                            if hash_ == current:
+                                results.append((user, hash_, word))
+                                clearConsoleLine()
 
-                            if user and not user.startswith(DUMMY_USER_PREFIX):
-                                infoMsg += " for user: '%s'\n" % user
-                            else:
-                                infoMsg += " for hash: '%s'\n" % hash_
+                                infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
 
-                            dataToStdout(infoMsg, True)
+                                if user and not user.startswith(DUMMY_USER_PREFIX):
+                                    infoMsg += " for user: '%s'\n" % user
+                                else:
+                                    infoMsg += " for hash: '%s'\n" % hash_
 
-                            attack_info.remove(item)
+                                dataToStdout(infoMsg, True)
 
-                        elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
-                            status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
-                            dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                                attack_info.remove(item)
 
-                except:
-                    warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                    warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
-                    logger.critical(warnMsg)
+                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
+                                status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                                dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+                    except KeyboardInterrupt:
+                        raise
+
+                    except:
+                        warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                        warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+                        logger.critical(warnMsg)
 
             clearConsoleLine()
 
         else:
             for ((user, hash_), kwargs) in attack_info:
                 count = 0
+                found = False
 
-                for word in kb.wordlist:
-                    current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
-                    count += 1
-                    try:
-                        if hash_ == current:
-                            if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
-                                word = word.upper()
-                            results.append((user, hash_, word))
-                            clearConsoleLine()
+                for suffix in suffix_list:
+                    if found:
+                        break
 
-                            infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                    for word in kb.wordlist:
+                        current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
+                        count += 1
 
-                            if user and not user.startswith(DUMMY_USER_PREFIX):
-                                infoMsg += " for user: '%s'\n" % user
-                            else:
-                                infoMsg += " for hash: '%s'\n" % hash_
+                        if suffix:
+                            word = word + suffix
 
-                            dataToStdout(infoMsg, True)
+                        try:
+                            if hash_ == current:
+                                if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
+                                    word = word.upper()
+                                results.append((user, hash_, word))
+                                clearConsoleLine()
 
-                            break
+                                infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
 
-                        elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
-                            status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
-                            dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                                if user and not user.startswith(DUMMY_USER_PREFIX):
+                                    infoMsg += " for user: '%s'\n" % user
+                                else:
+                                    infoMsg += " for hash: '%s'\n" % hash_
 
-                    except:
-                        warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                        warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
-                        logger.critical(warnMsg)
+                                dataToStdout(infoMsg, True)
+
+                                found = True
+                                break
+
+                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
+                                status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
+                                dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+                        except KeyboardInterrupt:
+                            raise
+
+                        except:
+                            warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                            warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+                            logger.critical(warnMsg)
 
                 clearConsoleLine()
 

@@ -175,3 +175,6 @@ ERROR_PARSING_REGEXES = (
                         )
 
 META_CHARSET_REGEX  = r'<meta http-equiv="Content-Type" content="[^"]*?charset=(?P<result>[^"]+)" />'
+
+# Reference: http://www.the-interweb.com/serendipity/index.php?/archives/94-A-brief-analysis-of-40,000-leaked-MySpace-passwords.html
+COMMON_PASSWORD_SUFFIXES = ["", "1", "2", "123", "12", "3", "7", "07", "11", "4", "5", "!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@"]
