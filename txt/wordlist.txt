@@ -178774,6 +178774,7 @@ mspass
 mspc
 mspedoi
 mspringles
+mssqlpass
 msr
 msrbaby95
 mss
@@ -180860,6 +180861,7 @@ myspb
 myspys
 mysqabc
 mysql
+mysqlpass
 mysql2t6
 mysrahku
 myssan
@@ -192239,6 +192241,7 @@ oracle8
 oracle8i
 oracle9
 oracle9i
+oraclepass
 oracles
 oracular
 oraculo
@@ -200784,6 +200787,7 @@ pgonderin
 pgoo
 pgpgpg
 pgserv
+pgsqlpass
 pgtnsc
 pguty
 pgz65
