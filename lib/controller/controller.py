@@ -380,11 +380,13 @@ def start():
                 if not conf.realTest:
                     errMsg = "all parameters are not injectable, try "
                     errMsg += "a higher --level/--risk to use more tests"
+
                     if not conf.textOnly and kb.originalPage:
                         percent = (1.0 * len(kb.originalPage) / len(getFilteredPageContent(kb.originalPage)))
                         errMsg += " and/or --text-only switch if the target page "
                         errMsg += "has a low percentage of textual content "
                         errMsg += "(%.2f%% of page content is text)" % percent
+
                     raise sqlmapNotVulnerableException, errMsg
                 else:
                     errMsg = "it seems that all parameters are not injectable"

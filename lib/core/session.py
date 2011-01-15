@@ -160,50 +160,7 @@ def setRemoteTempPath():
         dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(conf.tmpPath)))
 
 def resumeConfKb(expression, url, value):
-    if expression == "String" and url == conf.url:
-        string = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming string match '%s' from session file" % string
-        logger.info(logMsg)
-
-        if string and ( not conf.string or string != conf.string ):
-            if not conf.string:
-                message = "you did not provide any string to match. "
-            else:
-                message  = "The string you provided does not match "
-                message += "the resumed string. "
-
-            message += "Do you want to use the resumed string "
-            message += "to be matched in page when the query "
-            message += "is valid? [Y/n] "
-            test = readInput(message, default="Y")
-
-            if not test or test[0] in ("y", "Y"):
-                conf.string = string
-
-    elif expression == "Regular expression" and url == conf.url:
-        regexp = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming regular expression match '%s' from session file" % regexp
-        logger.info(logMsg)
-
-        if regexp and ( not conf.regexp or regexp != conf.regexp ):
-            if not conf.regexp:
-                message  = "you did not provide any regular expression "
-                message += "to match. "
-            else:
-                message  = "The regular expression you provided does not "
-                message += "match the resumed regular expression. "
-
-            message += "Do you want to use the resumed regular expression "
-            message += "to be matched in page when the query "
-            message += "is valid? [Y/n] "
-            test = readInput(message, default="Y")
-
-            if not test or test[0] in ("y", "Y"):
-                conf.regexp = regexp
-
-    elif expression == "Injection data" and url == conf.url:
+    if expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
         logMsg = "resuming injection data from session file"
         logger.info(logMsg)
@@ -277,6 +234,13 @@ def resumeConfKb(expression, url, value):
             else:
                 conf.os = os
 
+    elif expression == "Remote temp path" and url == conf.url:
+        conf.tmpPath = unSafeFormatString(value[:-1])
+
+        logMsg = "resuming remote absolute path of temporary "
+        logMsg += "files directory '%s' from session file" % conf.tmpPath
+        logger.info(logMsg)
+
     elif expression == "TABLE_EXISTS" and url == conf.url:
         table = unSafeFormatString(value[:-1])
 
@@ -305,10 +269,3 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
         kb.brute.columns.append((db, table, colName, colType))
-
-    elif expression == "Remote temp path" and url == conf.url:
-        conf.tmpPath = unSafeFormatString(value[:-1])
-
-        logMsg = "resuming remote absolute path of temporary "
-        logMsg += "files directory '%s' from session file" % conf.tmpPath
-        logger.info(logMsg)
