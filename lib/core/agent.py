@@ -27,6 +27,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import INBAND_FROM_TABLE
 from lib.core.settings import PAYLOAD_DELIMITER
 
 class Agent:
@@ -515,8 +516,8 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if getIdentifiedDBMS() == DBMS.ORACLE and inbandQuery.endswith(" FROM DUAL"):
-            inbandQuery = inbandQuery[:-len(" FROM DUAL")]
+        if getIdentifiedDBMS() in INBAND_FROM_TABLE and inbandQuery.endswith(INBAND_FROM_TABLE[getIdentifiedDBMS()]):
+            inbandQuery = inbandQuery[:-len(INBAND_FROM_TABLE[getIdentifiedDBMS()])]
 
         for element in range(count):
             if element > 0:
@@ -535,9 +536,9 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if getIdentifiedDBMS() == DBMS.ORACLE:
+        if getIdentifiedDBMS() in INBAND_FROM_TABLE:
             if " FROM " not in inbandQuery:
-                inbandQuery += " FROM DUAL"
+                inbandQuery += INBAND_FROM_TABLE[getIdentifiedDBMS()]
 
         if intoRegExp:
             inbandQuery += intoRegExp
@@ -554,8 +555,8 @@ class Agent:
                 else:
                     inbandQuery += char
 
-            if getIdentifiedDBMS() == DBMS.ORACLE:
-                inbandQuery += " FROM DUAL"
+            if getIdentifiedDBMS() in INBAND_FROM_TABLE:
+                inbandQuery += INBAND_FROM_TABLE[getIdentifiedDBMS()]
 
         inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 

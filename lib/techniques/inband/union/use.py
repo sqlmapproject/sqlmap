@@ -25,6 +25,7 @@ from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.settings import INBAND_FROM_TABLE
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -118,7 +119,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                         stopLimit = conf.limitStop
 
                 if not stopLimit or stopLimit <= 1:
-                    if getIdentifiedDBMS() == DBMS.ORACLE and expression.endswith("FROM DUAL"):
+                    if getIdentifiedDBMS() in INBAND_FROM_TABLE and expression.endswith(INBAND_FROM_TABLE[getIdentifiedDBMS()]):
                         test = False
                     else:
                         test = True
