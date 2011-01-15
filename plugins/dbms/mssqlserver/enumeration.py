@@ -18,6 +18,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import EXPECTED
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
 
