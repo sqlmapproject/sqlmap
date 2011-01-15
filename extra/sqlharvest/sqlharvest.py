@@ -52,12 +52,12 @@ def main():
     i = int(config.get('options',  'index'))
 
     try:
-        file = open(TABLES_FILE, 'r')
-        for line in file.xreadlines():
+        f = open(TABLES_FILE, 'r')
+        for line in f.xreadlines():
             if len(line) > 0 and ',' in line:
                 temp = line.split(',')
                 tables[temp[0]] = int(temp[1])
-        file.close()
+        f.close()
     except:
         pass
 
@@ -66,7 +66,7 @@ def main():
     files, oldFiles = None, None
     try:
         while True:
-            quit = False
+            abort = False
             oldFiles = files
             files = []
 
@@ -76,7 +76,7 @@ def main():
                 for match in refiles.finditer(page):
                     files.append(urllib.unquote(match.group(1)))
                     if len(files) >= 10: break
-                quit = (files == oldFiles)
+                abort = (files == oldFiles)
 
             except KeyboardInterrupt:
                 raise
@@ -84,17 +84,17 @@ def main():
             except Exception, msg:
                 print msg
 
-            if quit:
+            if abort:
                 break
 
             sys.stdout.write("\n---------------\n")
             sys.stdout.write("Result page #%d\n" % (i+1))
             sys.stdout.write("---------------\n")
 
-            for file in files:
-                print file
+            for sqlfile in files:
+                print sqlfile
                 try:
-                    req = urllib2.Request(file)
+                    req = urllib2.Request(sqlfile)
                     response = urllib2.urlopen(req)
 
                     if response.headers.has_key('Content-Length'):
@@ -133,19 +133,19 @@ def main():
         pass
 
     finally:
-        file = open(TABLES_FILE, 'w+')
+        f = open(TABLES_FILE, 'w+')
 
         tables = sorted(tables.items(), key=itemgetter(1), reverse=True)
 
         for table, count in tables:
-            file.write("%s,%d\n" % (table, count))
+            f.write("%s,%d\n" % (table, count))
 
-        file.close()
+        f.close()
         config.set('options',  'index', str(i+1))
 
-        file = open(CONFIG_FILE, 'w+')
-        config.write(file)
-        file.close()
+        f = open(CONFIG_FILE, 'w+')
+        config.write(f)
+        f.close()
 
 if __name__ == "__main__":
     main()
