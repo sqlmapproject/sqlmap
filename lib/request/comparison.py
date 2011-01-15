@@ -23,7 +23,7 @@ from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 
-def comparison(page, headers=None, getSeqMatcher=False, pageLength=None):
+def comparison(page, getSeqMatcher=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 

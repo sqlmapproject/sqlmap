@@ -28,6 +28,8 @@ class MSSQLBannerHandler(ContentHandler):
     """
 
     def __init__(self, banner, info):
+        ContentHandler.__init__(self)
+
         self.__banner        = sanitizeStr(banner)
         self.__inVersion     = False
         self.__inServicePack = False

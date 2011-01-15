@@ -25,6 +25,8 @@ class htmlHandler(ContentHandler):
     """
 
     def __init__(self, page):
+        ContentHandler.__init__(self)
+
         self.__dbms   = None
         self.__page   = page
         self.__regexp = None

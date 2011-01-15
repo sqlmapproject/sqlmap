@@ -92,7 +92,7 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
 
         sqlQuery = "%s INTO DUMPFILE '%s'" % (fcEncodedStr, dFile)
-        unionUse(sqlQuery, direct=True, unescape=False, nullChar="''")
+        unionUse(sqlQuery, direct=True, unescape=False)
 
         if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)

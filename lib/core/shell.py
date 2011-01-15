@@ -57,7 +57,7 @@ class CompleterNG(rlcompleter.Completer):
 def autoCompletion(sqlShell=False, osShell=False):
     # First of all we check if the readline is available, by default
     # it is not in Python default installation on Windows
-    if not readline.haveReadline:
+    if not readline._readline:
         return
 
     if sqlShell:

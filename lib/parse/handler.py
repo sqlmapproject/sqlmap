@@ -18,6 +18,8 @@ class FingerprintHandler(ContentHandler):
     """
 
     def __init__(self, banner, info):
+        ContentHandler.__init__(self)
+
         self.__banner      = sanitizeStr(banner)
         self.__regexp      = None
         self.__match       = None
