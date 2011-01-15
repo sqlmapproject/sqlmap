@@ -45,7 +45,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
         # Perform the request
-        resultPage, _ = Request.queryPage(payload, place=place, content=True)
+        resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
         if resultPage and randQuery in resultPage and " UNION ALL SELECT " not in resultPage:
             validPayload = payload
@@ -62,7 +62,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
                 payload = agent.payload(place=place, parameter=parameter, newValue=query, where=2)
 
                 # Perform the request
-                resultPage, _ = Request.queryPage(payload, place=place, content=True)
+                resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
                 if resultPage and " UNION ALL SELECT " not in resultPage and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
