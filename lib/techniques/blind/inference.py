@@ -81,9 +81,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     else:
         expressionUnescaped              = unescaper.unescape(expression)
 
-    debugMsg = "query: %s" % expressionUnescaped
-    logger.debug(debugMsg)
-
     if length and not isinstance(length, int) and length.isdigit():
         length = int(length)
 

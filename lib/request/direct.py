@@ -35,7 +35,7 @@ def direct(query, content=True):
                 select = True
                 break
 
-    logger.debug("query: %s" % query)
+    logger.log(9, query)
 
     if not select:
         output = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)

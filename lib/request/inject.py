@@ -492,10 +492,6 @@ def goStacked(expression, silent=False):
     comment = queries[getIdentifiedDBMS()].comment.query
     query = agent.prefixQuery("; %s" % expression)
     query = agent.suffixQuery("%s;%s" % (query, comment))
-
-    debugMsg = "query: %s" % query
-    logger.debug(debugMsg)
-
     payload = agent.payload(newValue=query)
     page, _ = Request.queryPage(payload, content=True, silent=silent, noteResponseTime=False)
 
