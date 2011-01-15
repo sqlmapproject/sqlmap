@@ -141,7 +141,7 @@ def liveTest():
         count += 1
         msg = "running live test case '%s' (%d/%d)" % (name, count, length)
         logger.info(msg)
-        result = runCase(name, switches, log, session)
+        result = runCase(switches, log, session)
         if result:
             logger.info("test passed")
         else:
@@ -180,7 +180,7 @@ def cleanCase():
     conf.verbose = 1
     __setVerbosity()
 
-def runCase(name=None, switches=None, log=None, session=None):
+def runCase(switches=None, log=None, session=None):
     retVal = True
     initCase(switches)
 

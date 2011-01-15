@@ -20,14 +20,12 @@ import time
 import urlparse
 import ntpath
 import posixpath
-import subprocess
 import httplib
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
 from StringIO import StringIO
 from difflib import SequenceMatcher
-from inspect import getmembers
 from math import sqrt
 from subprocess import PIPE
 from subprocess import Popen as execute
@@ -142,7 +140,7 @@ def paramToDict(place, parameters=None):
     if conf.parameters.has_key(place) and not parameters:
         parameters = conf.parameters[place]
 
-    if place is not "POSTxml":
+    if place != "POSTxml":
         parameters = parameters.replace(", ", ",")
 
         if place == PLACE.COOKIE:
@@ -1164,7 +1162,7 @@ def decloakToNamedTemporaryFile(filepath, name=None):
     def __del__():
         try:
             if hasattr(retVal, 'old_name'):
-                retVal.name = old_name
+                retVal.name = retVal.old_name
             retVal.close()
         except OSError:
             pass
@@ -1242,7 +1240,7 @@ def getConsoleWidth(default=80):
     if 'COLUMNS' in os.environ and os.environ['COLUMNS'].isdigit():
         width = int(os.environ['COLUMNS'])
     else:
-        output=subprocess.Popen('stty size', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.read()
+        output=execute('stty size', shell=True, stdout=PIPE, stderr=PIPE).stdout.read()
         items = output.split()
 
         if len(items) == 2 and items[1].isdigit():
@@ -1694,7 +1692,7 @@ def getPublicTypeMembers(type_, onlyValues=False):
 
     retVal = []
 
-    for name, value in getmembers(type_):
+    for name, value in inspect.getmembers(type_):
         if not name.startswith('__'):
             if not onlyValues:
                 retVal.append((name, value))
@@ -2094,7 +2092,7 @@ def openFile(filename, mode='r'):
 
     try:
         return codecs.open(filename, mode, conf.dataEncoding)
-    except IOError, e:
+    except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
         errMsg += "Please check %s permissions on a file " % ("write" if mode and\
           ('w' in mode or 'a' in mode or '+' in mode) else "read")

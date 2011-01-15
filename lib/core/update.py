@@ -13,10 +13,8 @@ import os
 import re
 import shutil
 import sys
-import tempfile
 import time
 import urlparse
-import zipfile
 
 from distutils.dir_util import mkpath
 from xml.dom.minidom import Document

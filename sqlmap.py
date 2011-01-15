@@ -20,7 +20,7 @@ try:
     import psyco
     psyco.full()
     psyco.profile()
-except ImportError, _:
+except ImportError:
     pass
 
 from lib.controller.controller import start

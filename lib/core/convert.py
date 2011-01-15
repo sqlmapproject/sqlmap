@@ -20,80 +20,80 @@ import urllib
 
 from lib.core.data import conf
 
-def base64decode(string):
-    return string.decode("base64")
+def base64decode(value):
+    return value.decode("base64")
 
-def base64encode(string):
-    return string.encode("base64")[:-1].replace("\n", "")
+def base64encode(value):
+    return value.encode("base64")[:-1].replace("\n", "")
 
-def base64pickle(string):
-    return base64encode(pickle.dumps(string))
+def base64pickle(value):
+    return base64encode(pickle.dumps(value))
 
-def base64unpickle(string):
-    return pickle.loads(base64decode(string))
+def base64unpickle(value):
+    return pickle.loads(base64decode(value))
 
-def hexdecode(string):
-    string = string.lower()
+def hexdecode(value):
+    value = value.lower()
 
-    if string.startswith("0x"):
-        string = string[2:]
+    if value.startswith("0x"):
+        value = value[2:]
 
-    return string.decode("hex")
+    return value.decode("hex")
 
-def hexencode(string):
-    return string.encode("hex")
+def hexencode(value):
+    return value.encode("hex")
 
-def md5hash(string):
+def md5hash(value):
     if sys.modules.has_key('hashlib'):
-        return hashlib.md5(string).hexdigest()
+        return hashlib.md5(value).hexdigest()
     else:
-        return md5.new(string).hexdigest()
+        return md5.new(value).hexdigest()
 
-def orddecode(string):
-    packedString = struct.pack("!"+"I" * len(string), *string)
+def orddecode(value):
+    packedString = struct.pack("!"+"I" * len(value), *value)
     return "".join([chr(char) for char in struct.unpack("!"+"I"*(len(packedString)/4), packedString)])
 
-def ordencode(string):
-    return tuple([ord(char) for char in string])
+def ordencode(value):
+    return tuple([ord(char) for char in value])
 
-def sha1hash(string):
+def sha1hash(value):
     if sys.modules.has_key('hashlib'):
-        return hashlib.sha1(string).hexdigest()
+        return hashlib.sha1(value).hexdigest()
     else:
-        return sha.new(string).hexdigest()
+        return sha.new(value).hexdigest()
 
-def urldecode(string):
+def urldecode(value):
     result = None
 
-    if string:
-        result = urllib.unquote_plus(string)
+    if value:
+        result = urllib.unquote_plus(value)
 
     return result
 
-def urlencode(string, safe=":/?%&=", convall=False):
+def urlencode(value, safe=":/?%&=", convall=False):
     if conf.direct or "POSTxml" in conf.paramDict:
-        return string
+        return value
 
     result = None
 
-    if string is None:
+    if value is None:
         return result
 
     if convall:
-        result = urllib.quote(utf8encode(string)) # Reference: http://old.nabble.com/Re:-Problem:-neither-urllib2.quote-nor-urllib.quote-encode-the--unicode-strings-arguments-p19823144.html
+        result = urllib.quote(utf8encode(value)) # Reference: http://old.nabble.com/Re:-Problem:-neither-urllib2.quote-nor-urllib.quote-encode-the--unicode-strings-arguments-p19823144.html
     else:
-        result = urllib.quote(utf8encode(string), safe)
+        result = urllib.quote(utf8encode(value), safe)
 
     return result
 
-def utf8encode(string):
-    return string.encode("utf-8")
+def utf8encode(value):
+    return value.encode("utf-8")
 
-def utf8decode(string):
-    return string.decode("utf-8")
+def utf8decode(value):
+    return value.decode("utf-8")
 
-def htmlescape(string):
-    return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;').replace(' ', '&nbsp;')
+def htmlescape(value):
+    return value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;').replace(' ', '&nbsp;')
 
-def htmlunescape(string):
-    return string.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'").replace('&nbsp;', ' ')
+def htmlunescape(value):
+    return value.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'").replace('&nbsp;', ' ')

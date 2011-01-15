@@ -168,7 +168,6 @@ def start():
             conf.method = targetMethod
             conf.data   = targetData
             conf.cookie = targetCookie
-            injData     = []
 
             initTargetEnv()
             parseTargetUrl()

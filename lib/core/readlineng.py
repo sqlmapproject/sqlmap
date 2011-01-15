@@ -7,50 +7,44 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import sys
-
 from lib.core.data import logger
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 
-try:
-    from readline import *
-    import readline as _rl
+_readline = None
 
-    haveReadline = True
+try:
+    import readline as _readline
 except ImportError:
     try:
-        from pyreadline import *
-        import pyreadline as _rl
+        import pyreadline as _readline
+    except ImportError:
+        pass
 
-        haveReadline = True
-    except ImportError:    
-        haveReadline = False
-
-if IS_WIN and haveReadline:
+if IS_WIN and _readline:
     try:
-        _outputfile=_rl.GetOutputFile()
+        _outputfile = _readline.GetOutputFile()
     except AttributeError:
-        debugMsg  = "Failed GetOutputFile when using platform's "
+        debugMsg = "Failed GetOutputFile when using platform's "
         debugMsg += "readline library"
         logger.debug(debugMsg)
 
-        haveReadline = False
+        _readline = None
 
 # Test to see if libedit is being used instead of GNU readline.
 # Thanks to Boyd Waters for this patch.
 uses_libedit = False
 
-if PLATFORM == 'mac' and haveReadline:
+if PLATFORM == 'mac' and _readline:
     import commands
 
-    (status, result) = commands.getstatusoutput( "otool -L %s | grep libedit" % _rl.__file__ )
+    (status, result) = commands.getstatusoutput( "otool -L %s | grep libedit" % _readline.__file__ )
 
     if status == 0 and len(result) > 0:
         # We are bound to libedit - new in Leopard
-        _rl.parse_and_bind("bind ^I rl_complete")
+        _readline.parse_and_bind("bind ^I rl_complete")
 
-        debugMsg  = "Leopard libedit detected when using platform's "
+        debugMsg = "Leopard libedit detected when using platform's "
         debugMsg += "readline library"
         logger.debug(debugMsg)
 
@@ -61,11 +55,11 @@ if PLATFORM == 'mac' and haveReadline:
 # existence.  Some known platforms actually don't have it.  This thread:
 # http://mail.python.org/pipermail/python-dev/2003-August/037845.html
 # has the original discussion.
-if haveReadline:
+if _readline:
     try:
-        _rl.clear_history
+        _readline.clear_history()
     except AttributeError:
         def clear_history():
             pass
 
-        _rl.clear_history = clear_history
+        _readline.clear_history = clear_history

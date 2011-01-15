@@ -291,7 +291,7 @@ class Dump:
                             if re.search("^[\ *]*$", value): #NULL
                                 continue
 
-                            temp = int(value)
+                            _ = int(value)
                         except ValueError:
                             colType = None
                             break
@@ -304,7 +304,7 @@ class Dump:
                                 if re.search("^[\ *]*$", value): #NULL
                                     continue
 
-                                temp = float(value)
+                                _ = float(value)
                             except ValueError:
                                 colType = None
                                 break

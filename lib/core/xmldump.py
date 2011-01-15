@@ -415,7 +415,7 @@ class XMLDump:
 
         logger.info("Table '%s.%s' dumped to XML file" % (db, table))
 
-    def dbColumns(self, dbColumns, colConsider, dbs):
+    def dbColumns(self, dbColumns, _, dbs):
         '''
         Adds information about the columns
         '''
@@ -496,7 +496,7 @@ class XMLDump:
                     self.__root.setAttributeNode(self.__createAttribute(XMLNS_ATTR,NAME_SPACE_ATTR))
                     self.__root.setAttributeNode(self.__createAttribute(SCHEME_NAME_ATTR,SCHEME_NAME))
                     self.__doc.appendChild(self.__root)
-            except IOError, e:
+            except IOError:
                 raise sqlmapFilePathException("Wrong filename provided for saving the xml file: %s" % conf.xmlFile)
 
     def getOutputFile(self):
