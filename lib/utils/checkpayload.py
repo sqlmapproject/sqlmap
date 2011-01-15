@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
-import sre_constants
 
 from lib.core.common import getCompiledRegex
 from lib.core.common import readXmlFile

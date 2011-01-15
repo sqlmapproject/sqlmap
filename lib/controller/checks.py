@@ -301,7 +301,6 @@ def checkSqlInjection(place, parameter, value):
                     boundPayload = agent.suffixQuery(boundPayload, comment, suffix)
                     boundPayload = agent.cleanupPayload(boundPayload, value)
                     reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
-                    unionVector = None
 
                     # Perform the test's request and check whether or not the
                     # payload was successful
@@ -474,7 +473,7 @@ def checkSqlInjection(place, parameter, value):
     else:
         return None
 
-def heuristicCheckSqlInjection(place, parameter, value):
+def heuristicCheckSqlInjection(place, parameter):
     if kb.nullConnection:
         debugMsg  = "heuristic checking skipped "
         debugMsg += "because NULL connection used"
@@ -518,7 +517,6 @@ def simpletonCheckSqlInjection(place, parameter, value):
 
     result = False
     randInt = randomInt()
-    randStr = randomStr()
 
     if value.isdigit():
         payload = "%s AND %d=%d" % (value, randInt, randInt)

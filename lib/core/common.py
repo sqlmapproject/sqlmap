@@ -1621,7 +1621,7 @@ def beep():
                 try:
                     audio = file(dev, 'wb')
 
-                    for i in xrange(250):
+                    for _ in xrange(250):
                         audio.write(chr(32) * 4)
                         audio.write(chr(0) * 4)
 

@@ -282,7 +282,7 @@ def start():
                         if __paramDict:
                             conf.paramDict[PLACE.COOKIE] = __paramDict
                             # TODO: consider the following line in __setRequestParams()
-                            __testableParameters = True
+                            # __testableParameters = True
 
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
                 and (kb.injection.place is None or kb.injection.parameter is None):
@@ -344,7 +344,7 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
-                            check = heuristicCheckSqlInjection(place, parameter, value)
+                            check = heuristicCheckSqlInjection(place, parameter)
                             if not check and conf.realTest and\
                               not simpletonCheckSqlInjection(place, parameter, value):
                                 continue

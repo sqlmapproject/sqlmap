@@ -128,7 +128,6 @@ def unionTest(comment, place, parameter, value, prefix, suffix, dbms):
     if conf.direct:
         return
 
-    oldTechnique = kb.technique
     kb.technique = PAYLOAD.TECHNIQUE.UNION
     validPayload, vector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix, dbms)
 

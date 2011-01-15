@@ -415,7 +415,7 @@ class XMLDump:
 
         logger.info("Table '%s.%s' dumped to XML file" % (db, table))
 
-    def dbColumns(self, dbColumns, _, dbs):
+    def dbColumns(self, dbColumns, colConsider, dbs):
         '''
         Adds information about the columns
         '''
