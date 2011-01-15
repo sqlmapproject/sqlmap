@@ -20,6 +20,7 @@ from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
 from lib.core.common import getErrorParsedDBMSes
 from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import popValue
@@ -379,6 +380,17 @@ def checkSqlInjection(place, parameter, value):
                             # NOTE: vector is set to a tuple with 6 elements,
                             # used afterwards by Agent.forgeInbandQuery()
                             # method to forge the UNION query payload
+
+                            # Set current fingeprinted DBMS according to the
+                            # current test settings for proper unescaping
+                            kb.misc.fpDbms = dbms
+
+                            if not getIdentifiedDBMS():
+                                warnMsg = "using unescaped version of the test "
+                                warnMsg += "because of zero knowledge of the "
+                                warnMsg += "back-end DBMS"
+                                logger.warn(warnMsg)
+
                             configUnion(test.request.char, test.request.columns)
                             dbmsToUnescape = dbms if dbms is not None else injection.dbms
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix, dbmsToUnescape)
@@ -392,6 +404,8 @@ def checkSqlInjection(place, parameter, value):
                                 # Overwrite 'where' because it can differ
                                 # in unionTest()'s vector (1 or 2)
                                 where = vector[6]
+
+                            kb.misc.fpDbms = None
 
                     # If the injection test was successful feed the injection
                     # object with the test's details
