@@ -26,7 +26,7 @@ from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
 from StringIO import StringIO
 from difflib import SequenceMatcher
-from math import ceil, sqrt
+from math import sqrt
 from subprocess import PIPE
 from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
@@ -1604,7 +1604,7 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     Adjusts time delay in time based data retrieval
     """
 
-    candidate = 1 + int(ceil((1 - (lastQueryDuration - lowerStdLimit) / lastQueryDuration) * conf.timeSec))
+    candidate = 1 + int(round((1 - (lastQueryDuration - lowerStdLimit) / lastQueryDuration) * conf.timeSec))
 
     if candidate:
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
