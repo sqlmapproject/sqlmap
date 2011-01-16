@@ -26,7 +26,7 @@ from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
 from StringIO import StringIO
 from difflib import SequenceMatcher
-from math import sqrt
+from math import ceil, sqrt
 from subprocess import PIPE
 from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
@@ -1588,7 +1588,18 @@ def wasLastRequestDelayed():
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
             logger.warn(warnMsg)
 
-        return (threadData.lastQueryDuration >= average(kb.responseTimes) + TIME_STDEV_COEFF * deviation)
+        lowerLimit = average(kb.responseTimes) + TIME_STDEV_COEFF * deviation
+        retVal = (threadData.lastQueryDuration >= lowerLimit)
+
+        if not kb.testMode and retVal:
+            newVal = int(ceil((1 - (threadData.lastQueryDuration - lowerLimit) / threadData.lastQueryDuration) * conf.timeSec))
+            if newVal and newVal != conf.timeSec:
+                clearConsoleLine(True)
+                warnMsg = "adjusting time delay to %d seconds" % newVal
+                logger.warn(warnMsg)
+                conf.timeSec = newVal
+
+        return retVal
     else:
         return threadData.lastQueryDuration - conf.timeSec
 
