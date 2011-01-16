@@ -1609,7 +1609,7 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     if candidate:
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
         if all([x == candidate for x in kb.delayCandidates]) and candidate < conf.timeSec:
-            clearConsoleLine(True)
+            print
             warnMsg = "adjusting time delay to %d seconds" % candidate
             logger.warn(warnMsg)
             conf.timeSec = candidate
