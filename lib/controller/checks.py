@@ -437,7 +437,6 @@ def checkSqlInjection(place, parameter, value):
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.string = conf.string
                         injection.conf.regexp = conf.regexp
-                        injection.conf.timeSec = conf.timeSec
 
                         if hasattr(test, "details"):
                             for detailKey, detailValue in test.details.items():
