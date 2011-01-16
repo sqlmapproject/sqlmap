@@ -150,12 +150,10 @@ class Agent:
                 query = kb.injection.prefix
 
         if query is None:
-            if not kb.injection.prefix and not prefix:
-                query = ""
-            elif kb.injection.prefix is None and prefix:
-                query = "%s " % prefix
-            else:
-                query = "%s " % kb.injection.prefix
+            query = kb.injection.prefix or prefix or ''
+
+            if not (string and string[0] == ';'):
+                query += " "
 
         query = "%s%s" % (query, string)
         query = self.cleanupPayload(query)
