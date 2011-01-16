@@ -88,7 +88,7 @@ def tableExists(tableFile, regex=None):
 
             if conf.verbose in (1, 2):
                 status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
-                dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
             iolock.release()
 
@@ -136,6 +136,7 @@ def tableExists(tableFile, regex=None):
         kb.suppressSession = False
 
     clearConsoleLine(True)
+    dataToStdout("\n")
 
     if not retVal:
         warnMsg = "no table found"
@@ -196,7 +197,7 @@ def columnExists(columnFile, regex=None):
 
             if conf.verbose in (1, 2):
                 status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
-                dataToStdout("\r[%s] [INFO] tried: %s" % (time.strftime("%X"), status), True)
+                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
             iolock.release()
 
@@ -244,6 +245,7 @@ def columnExists(columnFile, regex=None):
         kb.suppressSession = False
 
     clearConsoleLine(True)
+    dataToStdout("\n")
 
     if not retVal:
         warnMsg = "no column found"

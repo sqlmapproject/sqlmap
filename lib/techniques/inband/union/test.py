@@ -107,8 +107,8 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         if getIdentifiedDBMS() in INBAND_FROM_TABLE:
             query += INBAND_FROM_TABLE[getIdentifiedDBMS()]
 
-        status = '%d/%d (%d%s)' % (count, conf.uColsStop, round(100.0*count/conf.uColsStop), '%')
-        debugMsg = "testing number of columns: %s" % status
+        status = "%d/%d" % (count, conf.uColsStop)
+        debugMsg = "testing %s columns (%d%%)" % (status, round(100.0*count/conf.uColsStop))
         logger.debug(debugMsg)
 
         validPayload, vector = __unionConfirm(comment, place, parameter, value, prefix, suffix, dbms, count)

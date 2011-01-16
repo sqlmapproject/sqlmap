@@ -376,7 +376,7 @@ def checkSqlInjection(place, parameter, value):
                             # used afterwards by Agent.forgeInbandQuery()
                             # method to forge the UNION query payload
 
-                            # Set current fingeprinted DBMS according to the
+                            # Set fingerprinted DBMS according to the
                             # current test settings for proper unescaping
                             kb.misc.fpDbms = dbms
 
@@ -387,7 +387,7 @@ def checkSqlInjection(place, parameter, value):
                                 logger.warn(warnMsg)
 
                             configUnion(test.request.char, test.request.columns)
-                            dbmsToUnescape = dbms if dbms is not None else injection.dbms
+                            dbmsToUnescape = kb.misc.fpDbms if kb.misc.fpDbms is not None else injection.dbms
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix, dbmsToUnescape)
 
                             if isinstance(reqPayload, basestring):
@@ -396,8 +396,8 @@ def checkSqlInjection(place, parameter, value):
 
                                 injectable = True
 
-                                # Overwrite 'where' because it can differ
-                                # in unionTest()'s vector (1 or 2)
+                                # Overwrite 'where' because it can be set
+                                # by unionTest() directly
                                 where = vector[6]
 
                             kb.misc.fpDbms = None
