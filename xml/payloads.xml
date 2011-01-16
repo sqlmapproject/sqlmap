@@ -1455,6 +1455,26 @@ Formats:
     </test>
 
     <test>
+        <title>Oracle stacked queries (DBMS_LOCK.SLEEP)</title>
+        <stype>4</stype>
+        <level>5</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>; BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;</vector>
+        <request>
+            <payload>; BEGIN DBMS_LOCK.SLEEP([SLEEPTIME]); END;</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>SQLite &gt; 2.0 stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>3</level>
