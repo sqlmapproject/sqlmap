@@ -77,6 +77,7 @@ from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
+from lib.core.settings import TIME_DELAY_CANDIDATES
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
@@ -1116,6 +1117,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     # Active (extensive) back-end DBMS fingerprint
     kb.dbmsVersion     = [ UNKNOWN_DBMS_VERSION ]
 
+    kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]
     kb.dep             = None
     kb.docRoot         = None
     kb.dynamicMarkings = []

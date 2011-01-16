@@ -73,6 +73,7 @@ from lib.core.settings import DUMP_TAB_MARKER
 from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.threads import getCurrentThreadData
@@ -1588,20 +1589,30 @@ def wasLastRequestDelayed():
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
             logger.warn(warnMsg)
 
-        lowerLimit = average(kb.responseTimes) + TIME_STDEV_COEFF * deviation
-        retVal = (threadData.lastQueryDuration >= lowerLimit)
+        lowerStdLimit = average(kb.responseTimes) + TIME_STDEV_COEFF * deviation
+        retVal = (threadData.lastQueryDuration >= lowerStdLimit)
 
-        if not kb.testMode and retVal:
-            newVal = int(ceil((1 - (threadData.lastQueryDuration - lowerLimit) / threadData.lastQueryDuration) * conf.timeSec))
-            if newVal and newVal != conf.timeSec:
-                clearConsoleLine(True)
-                warnMsg = "adjusting time delay to %d seconds" % newVal
-                logger.warn(warnMsg)
-                conf.timeSec = newVal
+        if not kb.testMode and retVal and conf.timeSec == TIME_DEFAULT_DELAY:
+            adjustTimeDelay(threadData.lastQueryDuration, lowerStdLimit)
 
         return retVal
     else:
         return threadData.lastQueryDuration - conf.timeSec
+
+def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
+    """
+    Adjusts time delay in time based data retrieval
+    """
+
+    candidate = 1 + int(ceil((1 - (lastQueryDuration - lowerStdLimit) / lastQueryDuration) * conf.timeSec))
+
+    if candidate:
+        kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
+        if all([x == candidate for x in kb.delayCandidates]) and candidate < conf.timeSec:
+            clearConsoleLine(True)
+            warnMsg = "adjusting time delay to %d seconds" % candidate
+            logger.warn(warnMsg)
+            conf.timeSec = candidate
 
 def extractErrorMessage(page):
     """

@@ -16,6 +16,7 @@ from optparse import SUPPRESS_HELP
 
 from lib.core.convert import utf8decode
 from lib.core.data import logger
+from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import VERSION_STRING
 
 def cmdLineParser():
@@ -223,7 +224,7 @@ def cmdLineParser():
                                  "the default blind SQL injection technique.")
 
         techniques.add_option("--time-sec", dest="timeSec",
-                              type="int", default=5,
+                              type="int", default=TIME_DEFAULT_DELAY,
                               help="Seconds to delay the DBMS response "
                                    "(default 5)")
 

@@ -56,16 +56,22 @@ CHAR_INFERENCE_MARK = "%c"
 NON_CONTROL_CHAR_REGEX = r'[^\x00-\x1f]'
 
 # coefficient used for a time-based query delay checking (must be >= 7)
-TIME_STDEV_COEFF    = 10
+TIME_STDEV_COEFF = 10
+
+# length of queue for candidates for time delay adjustment
+TIME_DELAY_CANDIDATES = 3
+
+# default time delay in seconds
+TIME_DEFAULT_DELAY = 5
 
 # maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2
 
 # suffix used for naming meta databases in DBMS(es) without explicit database name
-METADB_SUFFIX       = "_masterdb"
+METADB_SUFFIX = "_masterdb"
 
 # minimum time response set needed for time-comparison based on standard deviation
-MIN_TIME_RESPONSES  = 15
+MIN_TIME_RESPONSES = 15
 
 # after these number of blanks at the end inference should stop (just in case)
 INFERENCE_BLANK_BREAK = 10

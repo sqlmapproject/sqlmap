@@ -49,7 +49,9 @@ from lib.utils.resume import resume
 def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None):
     start = time.time()
 
-    if ( conf.eta or conf.threads > 1 ) and getIdentifiedDBMS():
+    timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
+
+    if ( conf.eta or conf.threads > 1 ) and getIdentifiedDBMS() and not timeBasedCompare:
         _, length, _ = queryOutputLength(expression, payload)
     else:
         length = None

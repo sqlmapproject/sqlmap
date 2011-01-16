@@ -99,8 +99,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progressTime = []
 
     if numThreads > 1:
-        debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
-        logger.debug(debugMsg)
+        if not timeBasedCompare:
+            debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
+            logger.debug(debugMsg)
+        else:
+            debugMsg = "multi-threading is not considered safe in time-based data retrieval"
+            logger.debug(debugMsg)
+            numThreads = 1
 
     if conf.verbose in (1, 2) and not showEta:
         if isinstance(length, int) and conf.threads > 1:
