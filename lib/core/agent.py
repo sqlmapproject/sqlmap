@@ -150,7 +150,9 @@ class Agent:
                 query = kb.injection.prefix
 
         if query is None:
-            if kb.injection.prefix is None and prefix is not None:
+            if not kb.injection.prefix and not prefix:
+                query = ""
+            elif kb.injection.prefix is None and prefix:
                 query = "%s " % prefix
             else:
                 query = "%s " % kb.injection.prefix
