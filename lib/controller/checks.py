@@ -664,7 +664,7 @@ def checkStability():
         warnMsg += "expression to match on"
         logger.warn(warnMsg)
 
-        message = "how do you want to proceed? [C(ontinue)/s(tring)/r(egex)/t(ext only)q(uit)] "
+        message = "how do you want to proceed? [(C)ontinue/(s)tring/(r)egex/(q)uit] "
         if not conf.realTest:
             test = readInput(message, default="C")
         else:
@@ -708,16 +708,6 @@ def checkStability():
             else:
                 errMsg = "Empty value supplied"
                 raise sqlmapNoneDataException, errMsg
-
-        elif test and test[0] in ("t", "T"):
-            conf.textOnly = True
-
-            if kb.nullConnection:
-                debugMsg  = "turning off NULL connection "
-                debugMsg += "support because of regex checking"
-                logger.debug(debugMsg)
-
-                kb.nullConnection = None
 
         else:
             checkDynamicContent(firstPage, secondPage)
