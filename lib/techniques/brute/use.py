@@ -54,7 +54,6 @@ def tableExists(tableFile, regex=None):
     threads = []
     tbllock = threading.Lock()
     iolock = threading.Lock()
-    kb.locks.seqLock = threading.Lock()
     kb.threadContinue = True
     kb.suppressSession = True
 
@@ -130,7 +129,6 @@ def tableExists(tableFile, regex=None):
         except KeyboardInterrupt:
             raise sqlmapThreadException, "user aborted"
     finally:
-        kb.locks.seqLock = None
         kb.threadContinue = True
         kb.threadException = False
         kb.suppressSession = False
@@ -172,7 +170,6 @@ def columnExists(columnFile, regex=None):
     threads = []
     collock = threading.Lock()
     iolock = threading.Lock()
-    kb.locks.seqLock = threading.Lock()
     kb.threadContinue = True
     kb.suppressSession = True
 
@@ -239,7 +236,6 @@ def columnExists(columnFile, regex=None):
         except KeyboardInterrupt:
             raise sqlmapThreadException, "user aborted"
     finally:
-        kb.locks.seqLock = None
         kb.threadContinue = True
         kb.threadException = False
         kb.suppressSession = False

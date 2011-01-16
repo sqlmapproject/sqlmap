@@ -2080,10 +2080,11 @@ def getComparePageRatio(firstPage, secondPage, filtered=False):
     if filtered:
         (firstPage, secondPage) = map(getFilteredPageContent, (firstPage, secondPage))
 
-    conf.seqMatcher.set_seq1(firstPage)
-    conf.seqMatcher.set_seq2(secondPage)
+    seqMatcher = getCurrentThreadData().seqMatcher
+    seqMatcher.set_seq1(firstPage)
+    seqMatcher.set_seq2(secondPage)
 
-    return conf.seqMatcher.quick_ratio()
+    return seqMatcher.quick_ratio()
 
 def openFile(filename, mode='r'):
     """

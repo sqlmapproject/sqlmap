@@ -22,13 +22,16 @@ from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
+from lib.core.threads import getCurrentThreadData
 
 def comparison(page, getSeqMatcher=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 
     regExpResults = None
-    conf.seqMatcher.set_seq1(kb.pageTemplate)
+
+    seqMatcher = getCurrentThreadData().seqMatcher
+    seqMatcher.set_seq1(kb.pageTemplate)
 
     if page:
         # String to be excluded before calculating page hash
@@ -66,28 +69,22 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
         # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection:
             page = removeDynamicContent(page)
-            conf.seqMatcher.set_seq1(removeDynamicContent(kb.pageTemplate))
+            seqMatcher.set_seq1(removeDynamicContent(kb.pageTemplate))
 
         if not pageLength:
             pageLength = len(page)
 
-    if kb.locks.seqLock:
-        kb.locks.seqLock.acquire()
-
     if conf.textOnly:
-        (conf.seqMatcher.a, page) = map(getFilteredPageContent, (conf.seqMatcher.a, page))
+        (seqMatcher.a, page) = map(getFilteredPageContent, (seqMatcher.a, page))
 
     if not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
-        ratio = 1. * pageLength / len(conf.seqMatcher.a)
+        ratio = 1. * pageLength / len(seqMatcher.a)
 
         if ratio > 1.:
             ratio = 1. / ratio
     else:
-        conf.seqMatcher.set_seq2(page)
-        ratio = round(conf.seqMatcher.quick_ratio(), 3)
-
-    if kb.locks.seqLock:
-        kb.locks.seqLock.release()
+        seqMatcher.set_seq2(page)
+        ratio = round(seqMatcher.quick_ratio(), 3)
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content

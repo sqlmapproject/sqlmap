@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import difflib
 import threading
 
 from lib.core.data import kb
@@ -17,12 +18,13 @@ class ThreadData():
     """
 
     def __init__(self):
-        self.disableStdOut = False
-        self.lastErrorPage = None
-        self.lastHTTPError = None
-        self.lastQueryDuration = 0
-        self.lastRequestUID = 0
-        self.valueStack = []
+        self.disableStdOut      = False
+        self.lastErrorPage      = None
+        self.lastHTTPError      = None
+        self.lastQueryDuration  = 0
+        self.lastRequestUID     = 0
+        self.seqMatcher         = difflib.SequenceMatcher(None)
+        self.valueStack         = []
 
 def getCurrentThreadUID():
     return hash(threading.currentThread())

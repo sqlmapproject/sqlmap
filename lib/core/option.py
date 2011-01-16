@@ -1077,8 +1077,6 @@ def __setConfAttributes():
     conf.port             = None
     conf.redirectHandled  = False
     conf.scheme           = None
-    #conf.seqMatcher       = difflib.SequenceMatcher(lambda x: x in " \t")
-    conf.seqMatcher       = difflib.SequenceMatcher(None)
     conf.sessionFP        = None
     conf.start            = True
     conf.tests            = []
@@ -1135,7 +1133,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.locks           = advancedDict()
     kb.locks.cacheLock = threading.Lock()
     kb.locks.logLock   = threading.Lock()
-    kb.locks.seqLock   = None
 
     kb.matchRatio      = None
     kb.nullConnection  = None

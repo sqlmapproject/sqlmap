@@ -51,6 +51,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setDynamicMarkings
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import UPPER_RATIO_BOUND
+from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
@@ -594,12 +595,13 @@ def checkDynamicContent(firstPage, secondPage):
         debugMsg += "because NULL connection used"
         logger.debug(debugMsg)
         return
-
-    conf.seqMatcher.set_seq1(firstPage)
-    conf.seqMatcher.set_seq2(secondPage)
+    
+    seqMatcher = getCurrentThreadData().seqMatcher
+    seqMatcher.set_seq1(firstPage)
+    seqMatcher.set_seq2(secondPage)
 
     # In case of an intolerable difference turn on dynamicity removal engine
-    if conf.seqMatcher.quick_ratio() <= UPPER_RATIO_BOUND:
+    if seqMatcher.quick_ratio() <= UPPER_RATIO_BOUND:
         findDynamicContent(firstPage, secondPage)
 
         count = 0
