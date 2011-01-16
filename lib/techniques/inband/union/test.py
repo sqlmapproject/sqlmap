@@ -27,7 +27,7 @@ from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
 
-def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count, where=1):
+def __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=1):
     validPayload = None
     vector = None
 
@@ -38,7 +38,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
         # Prepare expression with delimiters
         randQuery = randomStr()
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
-        randQueryUnescaped = unescaper.unescape(randQueryProcessed, dbms=dbms)
+        randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
         # Forge the inband SQL injection request
         query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, conf.uChar)
@@ -55,7 +55,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
                 # Prepare expression with delimiters
                 randQuery2 = randomStr()
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
-                randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2, dbms=dbms)
+                randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 
                 # Confirm that it is a full inband SQL injection
                 query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, conf.uChar, multipleUnions=randQueryUnescaped2)
@@ -71,22 +71,22 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, coun
 
     return validPayload, vector
 
-def __unionConfirm(comment, place, parameter, value, prefix, suffix, dbms, count):
+def __unionConfirm(comment, place, parameter, value, prefix, suffix, count):
     validPayload = None
     vector = None
 
     # Confirm the inband SQL injection and get the exact column
     # position which can be used to extract data
-    validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count)
+    validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, count)
 
     # Assure that the above function found the exploitable full inband
     # SQL injection position
     if not validPayload:
-        validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, dbms, count, where=2)
+        validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=2)
 
     return validPayload, vector
 
-def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix, dbms):
+def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 50 columns
@@ -111,7 +111,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         debugMsg = "testing %s columns (%d%%)" % (status, round(100.0*count/conf.uColsStop))
         logger.debug(debugMsg)
 
-        validPayload, vector = __unionConfirm(comment, place, parameter, value, prefix, suffix, dbms, count)
+        validPayload, vector = __unionConfirm(comment, place, parameter, value, prefix, suffix, count)
 
         if validPayload:
             break
@@ -120,7 +120,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
     return validPayload, vector
 
-def unionTest(comment, place, parameter, value, prefix, suffix, dbms):
+def unionTest(comment, place, parameter, value, prefix, suffix):
     """
     This method tests if the target url is affected by an inband
     SQL injection vulnerability. The test is done up to 3*50 times
@@ -130,7 +130,7 @@ def unionTest(comment, place, parameter, value, prefix, suffix, dbms):
         return
 
     kb.technique = PAYLOAD.TECHNIQUE.UNION
-    validPayload, vector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix, dbms)
+    validPayload, vector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     if validPayload:
         validPayload = agent.removePayloadDelimiters(validPayload, False)

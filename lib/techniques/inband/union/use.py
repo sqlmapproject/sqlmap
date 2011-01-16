@@ -67,7 +67,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
         # entry per time
         # NOTE: I assume that only queries that get data from a table can
         # return multiple entries
-        if " FROM " in expression and "EXISTS(" not in expression:
+        if " FROM " in expression.upper() and " FROM DUAL" not in expression.upper() and "EXISTS(" not in expression.upper():
             limitRegExp = re.search(queries[getIdentifiedDBMS()].limitregexp.query, expression, re.I)
 
             if limitRegExp:

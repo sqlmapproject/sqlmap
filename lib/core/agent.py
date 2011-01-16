@@ -422,26 +422,20 @@ class Agent:
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr = self.getFields(query)
 
         if getIdentifiedDBMS() == DBMS.MYSQL:
-            if fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
-                concatenatedQuery += ",'%s')" % kb.misc.stop
-            elif fieldsSelectFrom:
+            if fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", ",'%s') FROM " % kb.misc.stop, 1)
-            elif fieldsSelect:
+            elif (fieldsSelect, fieldsSelectCase):
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery += ",'%s')" % kb.misc.stop
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
         elif getIdentifiedDBMS() in ( DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE ):
-            if fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
-                concatenatedQuery += "||'%s'" % kb.misc.stop
-            elif fieldsSelectFrom:
+            if fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.misc.stop, 1)
-            elif fieldsSelect:
+            elif (fieldsSelect, fieldsSelectCase):
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsNoSelect:
@@ -455,13 +449,10 @@ class Agent:
                 topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatenatedQuery, re.I).group(1)
                 concatenatedQuery = concatenatedQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, kb.misc.start), 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.misc.stop, 1)
-            elif fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
-                concatenatedQuery += "+'%s'" % kb.misc.stop
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.misc.stop, 1)
-            elif fieldsSelect:
+            elif (fieldsSelect, fieldsSelectCase):
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery += "+'%s'" % kb.misc.stop
             elif fieldsNoSelect:
@@ -524,7 +515,7 @@ class Agent:
                 inbandQuery += ", "
 
             if element == position:
-                if " FROM " in query and "EXISTS(" not in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
+                if " FROM " in query and "EXISTS(" not in query and not query.startswith("SELECT "):
                     conditionIndex = query.index(" FROM ")
                     inbandQuery += query[:conditionIndex]
                 else:
@@ -532,7 +523,7 @@ class Agent:
             else:
                 inbandQuery += char
 
-        if " FROM " in query and "EXISTS(" not in query and not query.startswith("SELECT ") and "(CASE WHEN (" not in query:
+        if " FROM " in query and "EXISTS(" not in query and not query.startswith("SELECT "):
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 

@@ -72,11 +72,13 @@ def unescapeDbms(payload, injection, dbms):
     # provided a DBMS (conf.dbms), unescape the strings between single
     # quotes in the payload
     if injection.dbms is not None:
-        payload = unescape(payload, injection.dbms)
+        payload = unescape(payload, dbms=injection.dbms)
     elif dbms is not None:
-        payload = unescape(payload, dbms)
+        payload = unescape(payload, dbms=dbms)
     elif conf.dbms is not None:
-        payload = unescape(payload, conf.dbms)
+        payload = unescape(payload, dbms=conf.dbms)
+    elif getIdentifiedDBMS() is not None:
+        payload = unescape(payload, dbms=getIdentifiedDBMS())
 
     return payload
 
@@ -387,8 +389,7 @@ def checkSqlInjection(place, parameter, value):
                                 logger.warn(warnMsg)
 
                             configUnion(test.request.char, test.request.columns)
-                            dbmsToUnescape = kb.misc.fpDbms if kb.misc.fpDbms is not None else injection.dbms
-                            reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix, dbmsToUnescape)
+                            reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
                             if isinstance(reqPayload, basestring):
                                 infoMsg = "%s parameter '%s' is '%s' injectable" % (place, parameter, title)
