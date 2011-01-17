@@ -2083,6 +2083,28 @@ Formats:
 
     <!-- UNION query tests -->
     <test>
+        <title>MySQL NULL UNION query - [COLSTART] to [COLSTOP] columns</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>#</comment>
+            <char>NULL</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL NULL UNION query - 1 to 3 columns</title>
         <stype>3</stype>
         <level>1</level>
@@ -2190,6 +2212,25 @@ Formats:
         <details>
             <dbms>MySQL</dbms>
         </details>
+    </test>
+
+    <test>
+        <title>Generic NULL UNION query - [COLSTART] to [COLSTOP] columns</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
     </test>
 
     <test>

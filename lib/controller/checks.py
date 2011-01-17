@@ -55,8 +55,8 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
-from lib.techniques.inband.union.use import configUnion
 from lib.techniques.inband.union.test import unionTest
+from lib.techniques.inband.union.use import configUnion
 
 def unescape(string, dbms):
     if string is None:
@@ -99,6 +99,14 @@ def checkSqlInjection(place, parameter, value):
             title = test.title
             stype = test.stype
             clause = test.clause
+
+            if stype == 3 and test.request.columns == "[COLSTART]-[COLSTOP]":
+                if conf.uCols is None:
+                    continue
+                else:
+                    configUnion()
+                    title = title.replace("[COLSTART]", str(conf.uColsStart))
+                    title = title.replace("[COLSTOP]", str(conf.uColsStop))
 
             # Skip test if the user's wants to test only for a specific
             # technique
@@ -383,13 +391,20 @@ def checkSqlInjection(place, parameter, value):
                             # current test settings for proper unescaping
                             kb.misc.forcedDbms = dbms
 
+                            if conf.uCols is not None and test.request.columns != "[COLSTART]-[COLSTOP]":
+                                debugMsg = "skipping test '%s' because custom " % title
+                                debugMsg += "UNION columns range was provided"
+                                logger.debug(debugMsg)
+                                continue
+
+                            configUnion(test.request.char, test.request.columns)
+
                             if not getIdentifiedDBMS():
                                 warnMsg = "using unescaped version of the test "
                                 warnMsg += "because of zero knowledge of the "
                                 warnMsg += "back-end DBMS"
                                 logger.warn(warnMsg)
 
-                            configUnion(test.request.char, test.request.columns)
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
                             if isinstance(reqPayload, basestring):
