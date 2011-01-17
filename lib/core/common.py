@@ -425,7 +425,7 @@ def dataToStdout(data, forceOutput=False):
             try:
                 sys.stdout.write(data)
             except UnicodeEncodeError:
-                sys.stdout.write(data.encode(kb.pageEncoding or conf.dataEncoding))
+                sys.stdout.write(data.encode(conf.dataEncoding))
             finally:
                 sys.stdout.flush()
 
@@ -1515,10 +1515,16 @@ def getUnicode(value, encoding=None):
     u'1'
     """
 
-    if isinstance(value, basestring):
-        return value if isinstance(value, unicode) else unicode(value, encoding or kb.pageEncoding or conf.dataEncoding, errors='replace')
+    if isinstance(value, unicode):
+        return value
+    elif isinstance(value, basestring):
+        if encoding and encoding != conf.dataEncoding:
+            # transencoding from encoding to conf.dataEncoding
+            value = unicode(value, encoding, errors='replace').encode(conf.dataEncoding)
+        return unicode(value, conf.dataEncoding)
     else:
         return unicode(value) # encoding ignored for non-basestring instances
+
 
 # http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 def longestCommonPrefix(*sequences):
