@@ -95,7 +95,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
         expression = unescaper.unescape(expression)
 
     if kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == 2 and not direct:
-        _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(origExpr)
+        _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
         # We have to check if the SQL query might return multiple entries
         # and in such case forge the SQL limiting the query output one

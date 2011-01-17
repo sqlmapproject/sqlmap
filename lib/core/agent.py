@@ -341,15 +341,19 @@ class Agent:
         @return: query fields (columns) and more details
         @rtype: C{str}
         """
+
         prefixRegex          = "(?:\s+(?:FIRST|SKIP)\s+\d+)*"
         fieldsSelectTop      = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectDistinct = re.search("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
         fieldsSelectCase     = re.search("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
         fieldsSelectFrom     = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
+        fieldsExists         = re.search("EXISTS(.*)", query, re.I)
         fieldsSelect         = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
         fieldsNoSelect       = query
 
-        if fieldsSelectTop:
+        if fieldsExists:
+            fieldsToCastStr = fieldsSelect.groups()[0]
+        elif fieldsSelectTop:
             fieldsToCastStr = fieldsSelectTop.groups()[0]
         elif fieldsSelectDistinct:
             fieldsToCastStr = fieldsSelectDistinct.groups()[0]
@@ -368,7 +372,7 @@ class Agent:
             fieldsToCastList = fieldsToCastStr.replace(", ", ",")
             fieldsToCastList = fieldsToCastList.split(",")
 
-        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr
+        return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr, fieldsExists
 
     def simpleConcatQuery(self, query1, query2):
         concatenatedQuery = ""
@@ -414,15 +418,18 @@ class Agent:
             concatenatedQuery = ""
             query             = query.replace(", ", ",")
 
-            fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr = self.getFields(query)
+            fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
             castedFields      = self.nullCastConcatFields(fieldsToCastStr)
             concatenatedQuery = query.replace(fieldsToCastStr, castedFields, 1)
         else:
             concatenatedQuery = query
-            fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr = self.getFields(query)
+            fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
 
         if getIdentifiedDBMS() == DBMS.MYSQL:
-            if fieldsSelectFrom:
+            if fieldsExists:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
+                concatenatedQuery += ",'%s')" % kb.misc.stop
+            elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", ",'%s') FROM " % kb.misc.stop, 1)
             elif fieldsSelect or fieldsSelectCase:
@@ -432,7 +439,10 @@ class Agent:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
         elif getIdentifiedDBMS() in ( DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE ):
-            if fieldsSelectFrom:
+            if fieldsExists:
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
+                concatenatedQuery += "||'%s'" % kb.misc.stop
+            elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.misc.stop, 1)
             elif fieldsSelect or fieldsSelectCase:
@@ -445,7 +455,10 @@ class Agent:
                 concatenatedQuery += " FROM DUAL"
 
         elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
-            if fieldsSelectTop:
+            if fieldsExists:
+                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
+                concatenatedQuery += "+'%s'" % kb.misc.stop
+            elif fieldsSelectTop:
                 topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatenatedQuery, re.I).group(1)
                 concatenatedQuery = concatenatedQuery.replace("SELECT TOP %s " % topNum, "TOP %s '%s'+" % (topNum, kb.misc.start), 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.misc.stop, 1)

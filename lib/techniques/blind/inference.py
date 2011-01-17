@@ -75,12 +75,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         lastChar = int(lastChar)
 
     if kb.dbmsDetected:
-        _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
-        nulledCastedField                = agent.nullAndCastField(fieldToCastStr)
-        expressionReplaced               = expression.replace(fieldToCastStr, nulledCastedField, 1)
-        expressionUnescaped              = unescaper.unescape(expressionReplaced)
+        _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
+        nulledCastedField = agent.nullAndCastField(fieldToCastStr)
+        expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
+        expressionUnescaped = unescaper.unescape(expressionReplaced)
     else:
-        expressionUnescaped              = unescaper.unescape(expression)
+        expressionUnescaped = unescaper.unescape(expression)
 
     if length and not isinstance(length, int) and length.isdigit():
         length = int(length)

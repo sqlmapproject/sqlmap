@@ -160,7 +160,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         return __goInference(payload, expression, charsetType, firstChar, lastChar)
 
     if kb.dbmsDetected:
-        _, _, _, _, _, expressionFieldsList, expressionFields = agent.getFields(expression)
+        _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
         rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
         if rdbRegExp and getIdentifiedDBMS() == DBMS.FIREBIRD:

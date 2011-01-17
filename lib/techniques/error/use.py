@@ -42,7 +42,7 @@ def errorUse(expression):
     query = agent.suffixQuery(query)
     check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
 
-    _, _, _, _, _, _, fieldToCastStr = agent.getFields(expression)
+    _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
     nulledCastedField = agent.nullAndCastField(fieldToCastStr)
 
     if getIdentifiedDBMS() == DBMS.MYSQL:
