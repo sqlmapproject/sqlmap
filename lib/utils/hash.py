@@ -357,7 +357,13 @@ def dictionaryAttack(attack_dict):
             count = 0
 
             for suffix in suffix_list:
+                if not attack_info:
+                    break
+
                 for word in kb.wordlist:
+                    if not attack_info:
+                        break
+
                     count += 1
 
                     if suffix:
