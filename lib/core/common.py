@@ -425,7 +425,7 @@ def dataToStdout(data, forceOutput=False):
             try:
                 sys.stdout.write(data)
             except UnicodeEncodeError:
-                sys.stdout.write(data.encode(conf.dataEncoding))
+                sys.stdout.write(data.encode(kb.pageEncoding or conf.dataEncoding))
             finally:
                 sys.stdout.flush()
 
