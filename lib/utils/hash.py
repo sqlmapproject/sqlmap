@@ -342,7 +342,7 @@ def dictionaryAttack(attack_dict):
 
         suffix_list = [""]
         if test[0] in ("y", "Y"):
-            suffix_list = COMMON_PASSWORD_SUFFIXES
+            suffix_list += COMMON_PASSWORD_SUFFIXES
 
         infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
