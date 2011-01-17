@@ -14,9 +14,11 @@ from lib.core.settings import PLATFORM
 _readline = None
 
 try:
+    from readline import *
     import readline as _readline
 except ImportError:
     try:
+        from pyreadline import *
         import pyreadline as _readline
     except ImportError:
         pass
