@@ -86,7 +86,10 @@ UNKNOWN_DBMS_VERSION = "Unknown"
 DYNAMICITY_MARK_LENGTH = 32
 
 # dummy user prefix used in dictionary attack
-DUMMY_USER_PREFIX = '__dummy__'
+DUMMY_USER_PREFIX = "__dummy__"
+
+# Reference: http://en.wikipedia.org/wiki/ISO/IEC_8859-1
+DEFAULT_PAGE_ENCODING = "iso-8859-1"
 
 # System variables
 IS_WIN             = subprocess.mswindows

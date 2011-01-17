@@ -25,6 +25,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.settings import META_CHARSET_REGEX
+from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -139,8 +140,7 @@ def decodePage(page, contentEncoding, contentType):
         charset = extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE)
 
     charset = checkCharEncoding(charset)
-    if charset:
-        kb.pageEncoding = charset
+    kb.pageEncoding = charset or DEFAULT_PAGE_ENCODING
 
     return getUnicode(page)
 
