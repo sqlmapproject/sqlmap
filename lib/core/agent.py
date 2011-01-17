@@ -425,8 +425,8 @@ class Agent:
             if fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", ",'%s') FROM " % kb.misc.stop, 1)
-            elif (fieldsSelect, fieldsSelectCase):
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
+            elif fieldsSelect or fieldsSelectCase:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery += ",'%s')" % kb.misc.stop
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
@@ -435,7 +435,7 @@ class Agent:
             if fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.misc.stop, 1)
-            elif (fieldsSelect, fieldsSelectCase):
+            elif fieldsSelect or fieldsSelectCase:
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsNoSelect:
@@ -452,7 +452,7 @@ class Agent:
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.misc.stop, 1)
-            elif (fieldsSelect, fieldsSelectCase):
+            elif fieldsSelect or fieldsSelectCase:
                 concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery += "+'%s'" % kb.misc.stop
             elif fieldsNoSelect:
