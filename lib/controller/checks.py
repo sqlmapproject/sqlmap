@@ -381,7 +381,7 @@ def checkSqlInjection(place, parameter, value):
 
                             # Set fingerprinted DBMS according to the
                             # current test settings for proper unescaping
-                            kb.misc.fpDbms = dbms
+                            kb.misc.forcedDbms = dbms
 
                             if not getIdentifiedDBMS():
                                 warnMsg = "using unescaped version of the test "
@@ -402,7 +402,7 @@ def checkSqlInjection(place, parameter, value):
                                 # by unionTest() directly
                                 where = vector[6]
 
-                            kb.misc.fpDbms = None
+                            kb.misc.forcedDbms = None
 
                     # If the injection test was successful feed the injection
                     # object with the test's details

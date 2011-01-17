@@ -101,6 +101,5 @@ def setHandler():
         else:
             conf.dbmsConnector = None
 
-    # At this point proper back-end DBMS will be identified (kb.dbms)
-    # so we have to force DBMS
-    kb.misc.fpDbms = None
+    # At this point proper back-end DBMS is fingerprinted (kb.dbms)
+    kb.misc.forcedDbms = None

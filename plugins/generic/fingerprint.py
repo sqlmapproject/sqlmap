@@ -18,7 +18,7 @@ class Fingerprint:
     """
 
     def __init__(self, dbms):
-        kb.misc.fpDbms = dbms
+        kb.misc.forcedDbms = dbms
 
     def getFingerprint(self):
         errMsg  = "'getFingerprint' method must be defined "
