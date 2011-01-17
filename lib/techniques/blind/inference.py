@@ -37,6 +37,7 @@ from lib.core.exception import unhandledException
 from lib.core.progress import ProgressBar
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import INFERENCE_BLANK_BREAK
+from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -216,6 +217,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # list
                         if expand and shiftTable:
                             charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
+                            originalTbl = list(charTbl)
                             maxChar = maxValue = charTbl[-1]
                             minChar = minValue = charTbl[0]
                         else:
@@ -282,7 +284,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         charStart = time.time()
                         val = getChar(curidx)
                         if val is None:
-                            val = '?'
+                            val = INFERENCE_UNKNOWN_CHAR
                     else:
                         break
 
@@ -495,6 +497,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if len(finalValue) > INFERENCE_BLANK_BREAK and finalValue[-INFERENCE_BLANK_BREAK:].isspace():
                 break
+
+    if finalValue:
+        finalValue = finalValue.rstrip(INFERENCE_UNKNOWN_CHAR)
 
     if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
