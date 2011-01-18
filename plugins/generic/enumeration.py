@@ -149,12 +149,12 @@ class Enumeration:
         condition  = ( getIdentifiedDBMS() == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ) )
         condition |= ( getIdentifiedDBMS() == DBMS.MYSQL and not kb.data.has_information_schema )
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if condition:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = inject.getValue(query, blind=False, error=False)
+            value = inject.getValue(query, blind=False)
 
             if value:
                 kb.data.cachedUsers = arrayizeValue(value)
@@ -167,7 +167,7 @@ class Enumeration:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
-            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
@@ -186,7 +186,7 @@ class Enumeration:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index
-                user = inject.getValue(query, inband=False)
+                user = inject.getValue(query, inband=False, error=False)
 
                 if user:
                     kb.data.cachedUsers.append(user)
@@ -208,7 +208,7 @@ class Enumeration:
 
         logger.info(infoMsg)
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if getIdentifiedDBMS() == DBMS.MSSQL and kb.dbmsVersion[0] in ( "2005", "2008" ):
                 query = rootQuery.inband.query2
             else:
@@ -230,7 +230,7 @@ class Enumeration:
 
                     query += " WHERE %s = '%s'" % (condition, conf.user)
 
-            value = inject.getValue(query, blind=False, error=False)
+            value = inject.getValue(query, blind=False)
 
             if value:
                 for user, password in value:
@@ -276,7 +276,7 @@ class Enumeration:
                     query = rootQuery.blind.count2 % user
                 else:
                     query = rootQuery.blind.count % user
-                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of password "
@@ -312,7 +312,7 @@ class Enumeration:
                             query = rootQuery.blind.query % (user, index, user)
                     else:
                         query = rootQuery.blind.query % (user, index)
-                    password = inject.getValue(query, inband=False)
+                    password = inject.getValue(query, inband=False, error=False)
                     if getIdentifiedDBMS() == DBMS.SYBASE:
                         getCurrentThreadData().disableStdOut = False
                         password = "0x%s" % strToHex(password)
@@ -429,7 +429,7 @@ class Enumeration:
                          "E": "EXECUTE"
                      }
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if getIdentifiedDBMS() == DBMS.MYSQL and not kb.data.has_information_schema:
                 query     = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -451,7 +451,7 @@ class Enumeration:
                 else:
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
-            values = inject.getValue(query, blind=False, error=False)
+            values = inject.getValue(query, blind=False)
 
             if not values and getIdentifiedDBMS() == DBMS.ORACLE and not query2:
                 infoMsg = "trying with table USER_SYS_PRIVS"
@@ -554,7 +554,7 @@ class Enumeration:
                     query = rootQuery.blind.count2 % queryUser
                 else:
                     query = rootQuery.blind.count % queryUser
-                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     if not (isinstance(count, basestring) and count.isdigit()) and getIdentifiedDBMS() == DBMS.ORACLE and not query2:
@@ -590,7 +590,7 @@ class Enumeration:
                         query = rootQuery.blind.query % (index, queryUser)
                     else:
                         query = rootQuery.blind.query % (queryUser, index)
-                    privilege = inject.getValue(query, inband=False)
+                    privilege = inject.getValue(query, inband=False, error=False)
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise
@@ -675,12 +675,12 @@ class Enumeration:
 
         rootQuery = queries[getIdentifiedDBMS()].dbs
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if getIdentifiedDBMS() == DBMS.MYSQL and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = inject.getValue(query, blind=False, error=False)
+            value = inject.getValue(query, blind=False)
 
             if value:
                 kb.data.cachedDbs = arrayizeValue(value)
@@ -693,7 +693,7 @@ class Enumeration:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
-            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of databases"
@@ -708,7 +708,7 @@ class Enumeration:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index
-                db = inject.getValue(query, inband=False)
+                db = inject.getValue(query, inband=False, error=False)
 
                 if db:
                     kb.data.cachedDbs.append(db)
@@ -782,7 +782,7 @@ class Enumeration:
             else:
                 dbs = kb.data.cachedDbs
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             query = rootQuery.inband.query
             condition = rootQuery.inband.condition if 'condition' in rootQuery.inband else None
 
@@ -802,7 +802,7 @@ class Enumeration:
 
             if getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
                 query = safeStringFormat(query, conf.db)
-            value = inject.getValue(query, blind=False, error=False)
+            value = inject.getValue(query, blind=False)
 
             if value:
                 if getIdentifiedDBMS() == DBMS.SQLITE:
@@ -838,7 +838,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % db
-                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of "
@@ -863,7 +863,7 @@ class Enumeration:
                         query = rootQuery.blind.query % index
                     else:
                         query = rootQuery.blind.query % (db, index)
-                    table = inject.getValue(query, inband=False)
+                    table = inject.getValue(query, inband=False, error=False)
                     tables.append(table)
                     kb.hintValue = table
 
@@ -975,7 +975,7 @@ class Enumeration:
         infoMsg += "on database '%s'" % conf.db
         logger.info(infoMsg)
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
                 query = rootQuery.inband.query % (conf.tbl, conf.db)
                 query += condQuery
@@ -991,7 +991,7 @@ class Enumeration:
             elif getIdentifiedDBMS() == DBMS.SQLITE:
                 query = rootQuery.inband.query % conf.tbl
 
-            value = inject.getValue(query, blind=False, error=False)
+            value = inject.getValue(query, blind=False)
 
             if getIdentifiedDBMS() == DBMS.SQLITE:
                 parseSqliteTableSchema(value)
@@ -1025,13 +1025,13 @@ class Enumeration:
                 query += condQuery
             elif getIdentifiedDBMS() == DBMS.SQLITE:
                 query = rootQuery.blind.query % conf.tbl
-                value = inject.getValue(query, inband=False)
+                value = inject.getValue(query, inband=False, error=False)
 
                 parseSqliteTableSchema(value)
 
                 return kb.data.cachedColumns
 
-            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 errMsg  = "unable to retrieve the number of columns "
@@ -1066,7 +1066,7 @@ class Enumeration:
                     field = None
 
                 query = agent.limitQuery(index, query, field)
-                column = inject.getValue(query, inband=False)
+                column = inject.getValue(query, inband=False, error=False)
 
                 if not onlyColNames:
                     if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
@@ -1080,7 +1080,7 @@ class Enumeration:
                     elif getIdentifiedDBMS() == DBMS.FIREBIRD:
                         query = rootQuery.blind.query2 % (conf.tbl, column)
 
-                    colType = inject.getValue(query, inband=False)
+                    colType = inject.getValue(query, inband=False, error=False)
 
                     if getIdentifiedDBMS() == DBMS.FIREBIRD:
                         colType = firebirdTypes[colType] if colType in firebirdTypes else colType
@@ -1172,14 +1172,14 @@ class Enumeration:
 
         entriesCount = 0
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if getIdentifiedDBMS() == DBMS.ORACLE:
                 query = rootQuery.inband.query % (colString, conf.tbl.upper())
             elif getIdentifiedDBMS() == DBMS.SQLITE:
                 query = rootQuery.inband.query % (colString, conf.tbl)
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
-            entries = inject.getValue(query, blind=False, error=False, dump=True)
+            entries = inject.getValue(query, blind=False, dump=True)
 
             if entries:
                 if isinstance(entries, basestring):
@@ -1227,7 +1227,7 @@ class Enumeration:
                 query = rootQuery.blind.count % conf.tbl
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
-            count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
                 warnMsg = "unable to retrieve the number of "
@@ -1260,7 +1260,7 @@ class Enumeration:
                         logger.info(infoMsg)
 
                         query = rootQuery.blind.count2 % (column, conf.tbl)
-                        value = inject.getValue(query, inband=False)
+                        value = inject.getValue(query, inband=False, error=False)
 
                         if isNumPosStrValue(value):
                             validColumnList = True
@@ -1307,7 +1307,7 @@ class Enumeration:
                             else:
                                 query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], pivotValue)
 
-                            value = inject.getValue(query, inband=False)
+                            value = inject.getValue(query, inband=False, error=False)
 
                             if column == colList[0]:
                                 if not value:
@@ -1345,7 +1345,7 @@ class Enumeration:
                             elif getIdentifiedDBMS() == DBMS.FIREBIRD:
                                 query = rootQuery.blind.query % (index, column, conf.tbl)
 
-                            value = inject.getValue(query, inband=False)
+                            value = inject.getValue(query, inband=False, error=False)
 
                             lengths[column] = max(lengths[column], len(value) if value else 0)
                             entries[column].append(value)
@@ -1514,14 +1514,14 @@ class Enumeration:
             dbQuery = "%s%s" % (dbCond, dbCondParam)
             dbQuery = dbQuery % db
 
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                 if getIdentifiedDBMS() == DBMS.MYSQL and not kb.data.has_information_schema:
                     query = rootQuery.inband.query2
                 else:
                     query = rootQuery.inband.query
                 query += dbQuery
                 query += exclDbsQuery
-                values = inject.getValue(query, blind=False, error=False)
+                values = inject.getValue(query, blind=False)
 
                 if values:
                     if isinstance(values, basestring):
@@ -1542,7 +1542,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                 query += dbQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "no database"
@@ -1564,7 +1564,7 @@ class Enumeration:
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query, dbCond)
 
-                    foundDbs.append(inject.getValue(query, inband=False))
+                    foundDbs.append(inject.getValue(query, inband=False, error=False))
 
         return foundDbs
 
@@ -1622,11 +1622,11 @@ class Enumeration:
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % tbl
 
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                 query = rootQuery.inband.query
                 query += tblQuery
                 query += exclDbsQuery
-                values = inject.getValue(query, blind=False, error=False)
+                values = inject.getValue(query, blind=False)
 
                 if values:
                     if isinstance(values, basestring):
@@ -1647,7 +1647,7 @@ class Enumeration:
                 query = rootQuery.blind.count
                 query += tblQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "no databases have table"
@@ -1665,7 +1665,7 @@ class Enumeration:
                     query += tblQuery
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query)
-                    foundDb = inject.getValue(query, inband=False)
+                    foundDb = inject.getValue(query, inband=False, error=False)
                     if foundDb not in foundTbls:
                         foundTbls[foundDb] = []
 
@@ -1685,7 +1685,7 @@ class Enumeration:
                     query = rootQuery.blind.count2
                     query = query % db
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -1704,7 +1704,7 @@ class Enumeration:
                         query = query % db
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query)
-                        foundTbl = inject.getValue(query, inband=False)
+                        foundTbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = foundTbl
                         foundTbls[db].append(foundTbl)
 
@@ -1772,11 +1772,11 @@ class Enumeration:
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % column
 
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                 query = rootQuery.inband.query
                 query += colQuery
                 query += exclDbsQuery
-                values = inject.getValue(query, blind=False, error=False)
+                values = inject.getValue(query, blind=False)
 
                 if values:
                     if isinstance(values, basestring):
@@ -1815,7 +1815,7 @@ class Enumeration:
                 query = rootQuery.blind.count
                 query += colQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "no databases have tables containing column"
@@ -1833,7 +1833,7 @@ class Enumeration:
                     query += colQuery
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query)
-                    db = inject.getValue(query, inband=False)
+                    db = inject.getValue(query, inband=False, error=False)
 
                     if db not in dbs:
                         dbs[db] = {}
@@ -1855,7 +1855,7 @@ class Enumeration:
                         query = rootQuery.blind.count2
                         query = query % db
                         query += " AND %s" % colQuery
-                        count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                        count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                         if not isNumPosStrValue(count):
                             warnMsg = "no tables contain column"
@@ -1874,7 +1874,7 @@ class Enumeration:
                             query = query % db
                             query += " AND %s" % colQuery
                             query = agent.limitQuery(index, query)
-                            tbl = inject.getValue(query, inband=False)
+                            tbl = inject.getValue(query, inband=False, error=False)
                             kb.hintValue = tbl
 
                             if tbl not in dbs[db]:

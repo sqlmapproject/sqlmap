@@ -41,7 +41,7 @@ class Enumeration(GenericEnumeration):
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if query2:
                 query     = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -54,7 +54,7 @@ class Enumeration(GenericEnumeration):
                 query += " WHERE "
                 query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
-            values = inject.getValue(query, blind=False, error=False)
+            values = inject.getValue(query, blind=False)
 
             if not values and not query2:
                 infoMsg = "trying with table USER_ROLE_PRIVS"
@@ -119,7 +119,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count2 % queryUser
                 else:
                     query = rootQuery.blind.count % queryUser
-                count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     if not count.isdigit() and not query2:
@@ -145,7 +145,7 @@ class Enumeration(GenericEnumeration):
                         query = rootQuery.blind.query2 % (queryUser, index)
                     else:
                         query = rootQuery.blind.query % (queryUser, index)
-                    role = inject.getValue(query, inband=False)
+                    role = inject.getValue(query, inband=False, error=False)
 
                     # In Oracle we get the list of roles as string
                     roles.add(role)
@@ -201,10 +201,10 @@ class Enumeration(GenericEnumeration):
             colQuery = colQuery % column
 
             for db in dbs.keys():
-                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                     query = rootQuery.inband.query
                     query += colQuery
-                    values = inject.getValue(query, blind=False, error=False)
+                    values = inject.getValue(query, blind=False)
 
                     if values:
                         if isinstance(values, basestring):
@@ -241,7 +241,7 @@ class Enumeration(GenericEnumeration):
 
                     query = rootQuery.blind.count2
                     query += " WHERE %s" % colQuery
-                    count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no tables contain column"
@@ -259,7 +259,7 @@ class Enumeration(GenericEnumeration):
                         query = rootQuery.blind.query2
                         query += " WHERE %s" % colQuery
                         query = agent.limitQuery(index, query)
-                        tbl = inject.getValue(query, inband=False)
+                        tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
 
                         if tbl not in dbs[db]:

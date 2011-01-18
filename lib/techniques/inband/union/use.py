@@ -17,6 +17,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
+from lib.core.common import isNumPosStrValue
 from lib.core.common import parseUnionPage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -25,7 +26,7 @@ from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapSyntaxException
-from lib.core.settings import INBAND_FROM_TABLE
+from lib.core.settings import FROM_TABLE
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -76,13 +77,13 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
 
     initTechnique(PAYLOAD.TECHNIQUE.UNION)
 
-    count      = None
-    origExpr   = expression
-    start      = time.time()
+    count = None
+    origExpr = expression
+    start = time.time()
     startLimit = 0
-    stopLimit  = None
-    test       = True
-    value      = ""
+    stopLimit = None
+    test = True
+    value = ""
 
     global reqCount
 
@@ -102,13 +103,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
         # entry per time
         # NOTE: I assume that only queries that get data from a table can
         # return multiple entries
-        if " FROM " in expression.upper() and " FROM DUAL" not in expression.upper() and "EXISTS(" not in expression.upper():
+        if " FROM " in expression.upper() and ((getIdentifiedDBMS() not in FROM_TABLE) or (getIdentifiedDBMS() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]))) and "EXISTS(" not in expression.upper():
             limitRegExp = re.search(queries[getIdentifiedDBMS()].limitregexp.query, expression, re.I)
+            topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-            if limitRegExp:
-                if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if limitRegExp or (getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
+                if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
                     limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                    limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
+                    limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -117,14 +119,19 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                     limitCond = int(stopLimit) > 1
 
                 elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
-                    limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                    limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
+                    if limitRegExp:
+                        limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
+                        limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
 
-                    if limitGroupStart.isdigit():
-                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
+                        if limitGroupStart.isdigit():
+                            startLimit = int(limitRegExp.group(int(limitGroupStart)))
 
-                    stopLimit = limitRegExp.group(int(limitGroupStop))
-                    limitCond = int(stopLimit) > 1
+                        stopLimit = limitRegExp.group(int(limitGroupStop))
+                        limitCond = int(stopLimit) > 1
+                    elif topLimit:
+                        startLimit = 0
+                        stopLimit = int(topLimit.group(1))
+                        limitCond = int(stopLimit) > 1
 
                 elif getIdentifiedDBMS() == DBMS.ORACLE:
                     limitCond = False
@@ -140,7 +147,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
                         stopLimit += startLimit
                         untilLimitChar = expression.index(queries[getIdentifiedDBMS()].limitstring.query)
                         expression = expression[:untilLimitChar]
@@ -154,14 +161,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                         stopLimit = conf.limitStop
 
                 if not stopLimit or stopLimit <= 1:
-                    if getIdentifiedDBMS() in INBAND_FROM_TABLE and expression.endswith(INBAND_FROM_TABLE[getIdentifiedDBMS()]):
+                    if getIdentifiedDBMS() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]):
                         test = False
                     else:
                         test = True
 
                 if test:
                     # Count the number of SQL query entries output
-                    countFirstField   = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
+                    countFirstField = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
                     countedExpression = origExpr.replace(expressionFields, countFirstField, 1)
 
                     if re.search(" ORDER BY ", expression, re.I):
@@ -177,15 +184,15 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                             if output:
                                 count = parseUnionPage(output, countedExpression)
 
-                        if count and count.isdigit() and int(count) > 0:
+                        if isNumPosStrValue(count):
                             stopLimit = int(count)
 
-                            infoMsg  = "the SQL query used returns "
+                            infoMsg = "the SQL query used returns "
                             infoMsg += "%d entries" % stopLimit
                             logger.info(infoMsg)
 
                         elif count and not count.isdigit():
-                            warnMsg  = "it was not possible to count the number "
+                            warnMsg = "it was not possible to count the number "
                             warnMsg += "of entries for the used SQL query. "
                             warnMsg += "sqlmap will assume that it returns only "
                             warnMsg += "one entry"
@@ -193,44 +200,44 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
 
                             stopLimit = 1
 
-                        elif ( not count or int(count) == 0 ):
-                            warnMsg  = "the SQL query used does not "
+                        elif (not count or int(count) == 0):
+                            warnMsg = "the SQL query used does not "
                             warnMsg += "return any output"
                             logger.warn(warnMsg)
 
-                            return
+                            return None
 
-                    elif ( not count or int(count) == 0 ) and ( not stopLimit or stopLimit == 0 ):
-                        warnMsg  = "the SQL query used does not "
+                    elif (not count or int(count) == 0) and (not stopLimit or stopLimit == 0):
+                        warnMsg = "the SQL query used does not "
                         warnMsg += "return any output"
                         logger.warn(warnMsg)
 
-                        return
+                        return None
 
                     try:
                         for num in xrange(startLimit, stopLimit):
-                                if getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
-                                    field = expressionFieldsList[0]
-                                elif getIdentifiedDBMS() == DBMS.ORACLE:
-                                    field = expressionFieldsList
-                                else:
-                                    field = None
+                            if getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+                                field = expressionFieldsList[0]
+                            elif getIdentifiedDBMS() == DBMS.ORACLE:
+                                field = expressionFieldsList
+                            else:
+                                field = None
 
-                                limitedExpr = agent.limitQuery(num, expression, field)
-                                output = resume(limitedExpr, None)
+                            limitedExpr = agent.limitQuery(num, expression, field)
+                            output = resume(limitedExpr, None)
 
-                                if not output:
-                                    output = unionUse(limitedExpr, direct=True, unescape=False)
+                            if not output:
+                                output = unionUse(limitedExpr, direct=True, unescape=False)
 
-                                if output:
-                                    value += output
-                                    parseUnionPage(output, limitedExpr)
+                            if output:
+                                value += output
+                                parseUnionPage(output, limitedExpr)
 
-                                if conf.verbose in (1, 2):
-                                    length = stopLimit - startLimit
-                                    count = num - startLimit + 1
-                                    status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
-                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
+                            if conf.verbose in (1, 2):
+                                length = stopLimit - startLimit
+                                count = num - startLimit + 1
+                                status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
+                                dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
 
                         dataToStdout("\n")
 

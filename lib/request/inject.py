@@ -18,6 +18,7 @@ from lib.core.common import expandAsteriskForColumns
 from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import initTechnique
+from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseUnionPage
 from lib.core.common import popValue
@@ -34,6 +35,8 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
+from lib.core.exception import sqlmapUserQuitException
+from lib.core.settings import FROM_TABLE
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.threads import getCurrentThreadData
@@ -51,7 +54,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
-    if ( conf.eta or conf.threads > 1 ) and getIdentifiedDBMS() and not timeBasedCompare:
+    if (conf.eta or conf.threads > 1) and getIdentifiedDBMS() and not timeBasedCompare:
         _, length, _ = queryOutputLength(expression, payload)
     else:
         length = None
@@ -66,8 +69,8 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
     return value
 
 def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None, resumeValue=True, charsetType=None, firstChar=None, lastChar=None):
-    outputs     = []
-    origExpr    = None
+    outputs = []
+    origExpr = None
 
     for field in expressionFieldsList:
         output = None
@@ -76,7 +79,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
             continue
 
         if isinstance(num, int):
-            origExpr   = expression
+            origExpr = expression
             expression = agent.limitQuery(num, expression, field)
 
         if "ROWNUM" in expressionFieldsList:
@@ -87,9 +90,9 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         if resumeValue:
             output = resume(expressionReplaced, payload)
 
-        if not output or ( expected == EXPECTED.INT and not output.isdigit() ):
+        if not output or (expected == EXPECTED.INT and not output.isdigit()):
             if output:
-                warnMsg  = "expected value type %s, resumed '%s', " % (expected, output)
+                warnMsg = "expected value type %s, resumed '%s', " % (expected, output)
                 warnMsg += "sqlmap is going to retrieve the value again"
                 logger.warn(warnMsg)
 
@@ -101,31 +104,6 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         outputs.append(output)
 
     return outputs
-
-def __goBooleanProxy(expression, resumeValue=True):
-    """
-    Retrieve the output of a boolean based SQL query
-    """
-
-    initTechnique(kb.technique)
-
-    vector = kb.injection.data[kb.technique].vector
-    vector = vector.replace("[INFERENCE]", expression)
-    vector = agent.cleanupPayload(vector)
-    query = agent.prefixQuery(vector)
-    query = agent.suffixQuery(query)
-    payload = agent.payload(newValue=query)
-    timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
-
-    if resumeValue:
-        output = resume(expression, payload)
-    else:
-        output = None
-
-    if not output:
-        output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare, raise404=False)
-
-    return output
 
 def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None, firstChar=None, lastChar=None):
     """
@@ -153,7 +131,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     else:
         output = None
 
-    if output and ( expected is None or ( expected == EXPECTED.INT and output.isdigit() ) ):
+    if output and (expected is None or (expected == EXPECTED.INT and output.isdigit())):
         return output
 
     if not unpack:
@@ -178,14 +156,14 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         # forge the SQL limiting the query output one entry per time
         # NOTE: I assume that only queries that get data from a table
         # can return multiple entries
-        if fromUser and " FROM " in expression:
+        if fromUser and " FROM " in expression.upper() and ((getIdentifiedDBMS() not in FROM_TABLE) or (getIdentifiedDBMS() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]))):
             limitRegExp = re.search(queries[getIdentifiedDBMS()].limitregexp.query, expression, re.I)
-            topLimit    = re.search("TOP\s+([\d]+)\s+", expression, re.I)
+            topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-            if limitRegExp or ( getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit ):
-                if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if limitRegExp or (getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
+                if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
                     limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                    limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
+                    limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -196,7 +174,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                 elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
                     if limitRegExp:
                         limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                        limitGroupStop  = queries[getIdentifiedDBMS()].limitgroupstop.query
+                        limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
 
                         if limitGroupStart.isdigit():
                             startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -205,8 +183,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         limitCond = int(stopLimit) > 1
                     elif topLimit:
                         startLimit = 0
-                        stopLimit  = int(topLimit.group(1))
-                        limitCond  = int(stopLimit) > 1
+                        stopLimit = int(topLimit.group(1))
+                        limitCond = int(stopLimit) > 1
 
                 elif getIdentifiedDBMS() == DBMS.ORACLE:
                     limitCond = False
@@ -222,7 +200,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
                         stopLimit += startLimit
                         untilLimitChar = expression.index(queries[getIdentifiedDBMS()].limitstring.query)
                         expression = expression[:untilLimitChar]
@@ -231,18 +209,14 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         stopLimit += startLimit
 
                 if not stopLimit or stopLimit <= 1:
-                    if getIdentifiedDBMS() == DBMS.ORACLE and expression.endswith("FROM DUAL"):
-                        test = "n"
-                    elif batch:
-                        test = "y"
+                    if getIdentifiedDBMS() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]):
+                        test = False
                     else:
-                        message  = "can the SQL query provided return "
-                        message += "multiple entries? [Y/n] "
-                        test = readInput(message, default="Y")
+                        test = True
 
-                if not test or test[0] in ("y", "Y"):
+                if test:
                     # Count the number of SQL query entries output
-                    countFirstField   = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
+                    countFirstField = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
                     countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
                     if re.search(" ORDER BY ", expression, re.I):
@@ -254,16 +228,16 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                     if not stopLimit:
                         if not count or not count.isdigit():
-                            count = __goInference(payload, countedExpression, charsetType, firstChar, lastChar)
+                            count = __goInference(payload, countedExpression, 2, firstChar, lastChar)
 
-                        if count and count.isdigit() and int(count) > 0:
+                        if isNumPosStrValue(count):
                             count = int(count)
 
                             if batch:
                                 stopLimit = count
                             else:
-                                message  = "the SQL query provided can return "
-                                message += "up to %d entries. How many " % count
+                                message = "the SQL query provided can return "
+                                message += "%d entries. How many " % count
                                 message += "entries do you want to retrieve?\n"
                                 message += "[a] All (default)\n[#] Specific number\n"
                                 message += "[q] Quit"
@@ -273,21 +247,21 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                                     stopLimit = count
 
                                 elif test[0] in ("q", "Q"):
-                                    return "Quit"
+                                    raise sqlmapUserQuitException
 
                                 elif test.isdigit() and int(test) > 0 and int(test) <= count:
                                     stopLimit = int(test)
 
-                                    infoMsg  = "sqlmap is now going to retrieve the "
+                                    infoMsg = "sqlmap is now going to retrieve the "
                                     infoMsg += "first %d query output entries" % stopLimit
                                     logger.info(infoMsg)
 
                                 elif test[0] in ("#", "s", "S"):
-                                    message = "How many? "
+                                    message = "how many? "
                                     stopLimit = readInput(message, default="10")
 
                                     if not stopLimit.isdigit():
-                                        errMsg = "Invalid choice"
+                                        errMsg = "invalid choice"
                                         logger.error(errMsg)
 
                                         return None
@@ -296,13 +270,13 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                                         stopLimit = int(stopLimit)
 
                                 else:
-                                    errMsg = "Invalid choice"
+                                    errMsg = "invalid choice"
                                     logger.error(errMsg)
 
                                     return None
 
                         elif count and not count.isdigit():
-                            warnMsg  = "it was not possible to count the number "
+                            warnMsg = "it was not possible to count the number "
                             warnMsg += "of entries for the SQL query provided. "
                             warnMsg += "sqlmap will assume that it returns only "
                             warnMsg += "one entry"
@@ -310,39 +284,68 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                             stopLimit = 1
 
-                        elif ( not count or int(count) == 0 ):
-                            warnMsg  = "the SQL query provided does not "
+                        elif (not count or int(count) == 0):
+                            warnMsg = "the SQL query provided does not "
                             warnMsg += "return any output"
                             logger.warn(warnMsg)
 
                             return None
 
-                    elif ( not count or int(count) == 0 ) and ( not stopLimit or stopLimit == 0 ):
-                        warnMsg  = "the SQL query provided does not "
+                    elif (not count or int(count) == 0) and (not stopLimit or stopLimit == 0):
+                        warnMsg = "the SQL query provided does not "
                         warnMsg += "return any output"
                         logger.warn(warnMsg)
 
                         return None
 
-                    for num in xrange(startLimit, stopLimit):
-                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
-                        outputs.append(output)
+                    try:
+                        for num in xrange(startLimit, stopLimit):
+                            output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
+                            outputs.append(output)
+
+                    except KeyboardInterrupt:
+                        print
+                        warnMsg = "Ctrl+C detected in dumping phase"
+                        logger.warn(warnMsg)
 
                     return outputs
 
-        elif getIdentifiedDBMS() == DBMS.ORACLE and expression.startswith("SELECT ") and " FROM " not in expression:
-            expression = "%s FROM DUAL" % expression
+        elif getIdentifiedDBMS() in FROM_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
+            expression += FROM_TABLE[getIdentifiedDBMS()]
 
         outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
-
         returnValue = ", ".join([output for output in outputs])
-
     else:
         returnValue = __goInference(payload, expression, charsetType, firstChar, lastChar)
 
     return returnValue
 
-def __goError(expression, resumeValue=True):
+def __goBooleanProxy(expression, resumeValue=True):
+    """
+    Retrieve the output of a boolean based SQL query
+    """
+
+    initTechnique(kb.technique)
+
+    vector = kb.injection.data[kb.technique].vector
+    vector = vector.replace("[INFERENCE]", expression)
+    vector = agent.cleanupPayload(vector)
+    query = agent.prefixQuery(vector)
+    query = agent.suffixQuery(query)
+    payload = agent.payload(newValue=query)
+    timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
+
+    if resumeValue:
+        output = resume(expression, payload)
+    else:
+        output = None
+
+    if not output:
+        output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare, raise404=False)
+
+    return output
+
+def __goError(expression, expected=None, resumeValue=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an error-based
     SQL injection vulnerability on the affected parameter.
@@ -357,8 +360,7 @@ def __goError(expression, resumeValue=True):
         result = resume(expression, None)
 
     if not result:
-        result = errorUse(expression)
-        dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(result)))
+        result = errorUse(expression, expected, resumeValue, dump)
 
     return result
 
@@ -368,14 +370,14 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     injection vulnerability on the affected parameter.
     """
 
-    output  = None
+    output = None
     partial = False
-    data    = []
+    data = []
 
     if resumeValue:
         output = resume(expression, None)
 
-        if not output or ( expected == EXPECTED.INT and not output.isdigit() ):
+        if not output or (expected == EXPECTED.INT and not output.isdigit()):
             partial = True
 
     if not output:
@@ -405,8 +407,10 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             query = expandAsteriskForColumns(query)
             value = None
             found = False
+
             if query and not 'COUNT(*)' in query:
                 query = query.replace("DISTINCT ", "")
+
             count = 0
 
             if expected == EXPECTED.BOOL:
@@ -432,9 +436,9 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
 
                 if expected == EXPECTED.BOOL:
-                    value = __goError(forgeCaseExpression, resumeValue)
+                    value = __goError(forgeCaseExpression, expected, resumeValue, dump)
                 else:
-                    value = __goError(query, resumeValue)
+                    value = __goError(query, expected, resumeValue, dump)
 
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE

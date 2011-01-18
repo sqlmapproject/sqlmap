@@ -27,7 +27,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.settings import INBAND_FROM_TABLE
+from lib.core.settings import FROM_TABLE
 from lib.core.settings import PAYLOAD_DELIMITER
 
 class Agent:
@@ -312,9 +312,9 @@ class Agent:
         if not kb.dbmsDetected:
             return fields
 
-        fields             = fields.replace(", ", ",")
-        fieldsSplitted     = fields.split(",")
-        dbmsDelimiter      = queries[getIdentifiedDBMS()].delimiter.query
+        fields = fields.replace(", ", ",")
+        fieldsSplitted = fields.split(",")
+        dbmsDelimiter = queries[getIdentifiedDBMS()].delimiter.query
         nulledCastedFields = []
 
         for field in fieldsSplitted:
@@ -342,14 +342,14 @@ class Agent:
         @rtype: C{str}
         """
 
-        prefixRegex          = "(?:\s+(?:FIRST|SKIP)\s+\d+)*"
-        fieldsSelectTop      = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
+        prefixRegex = "(?:\s+(?:FIRST|SKIP)\s+\d+)*"
+        fieldsSelectTop = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectDistinct = re.search("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
-        fieldsSelectCase     = re.search("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
-        fieldsSelectFrom     = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
-        fieldsExists         = re.search("EXISTS(.*)", query, re.I)
-        fieldsSelect         = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
-        fieldsNoSelect       = query
+        fieldsSelectCase = re.search("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
+        fieldsSelectFrom = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
+        fieldsExists = re.search("EXISTS(.*)", query, re.I)
+        fieldsSelect = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
+        fieldsNoSelect = query
 
         if fieldsExists:
             fieldsToCastStr = fieldsSelect.groups()[0]
@@ -366,7 +366,7 @@ class Agent:
         elif fieldsNoSelect:
             fieldsToCastStr = fieldsNoSelect
 
-        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I): #function
+        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I): # Function
             fieldsToCastList = [fieldsToCastStr]
         else:
             fieldsToCastList = fieldsToCastStr.replace(", ", ",")
@@ -380,7 +380,7 @@ class Agent:
         if getIdentifiedDBMS() == DBMS.MYSQL:
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
-        elif getIdentifiedDBMS() in ( DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE ):
+        elif getIdentifiedDBMS() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
         elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
@@ -416,10 +416,10 @@ class Agent:
 
         if unpack:
             concatenatedQuery = ""
-            query             = query.replace(", ", ",")
+            query = query.replace(", ", ",")
 
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
-            castedFields      = self.nullCastConcatFields(fieldsToCastStr)
+            castedFields = self.nullCastConcatFields(fieldsToCastStr)
             concatenatedQuery = query.replace(fieldsToCastStr, castedFields, 1)
         else:
             concatenatedQuery = query
@@ -438,25 +438,25 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-        elif getIdentifiedDBMS() in ( DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE ):
+        elif getIdentifiedDBMS() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
             if fieldsExists:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.misc.stop, 1)
             elif fieldsSelect or fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'||%s||'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-            if getIdentifiedDBMS() == DBMS.ORACLE and " FROM " not in concatenatedQuery and ( fieldsSelect or fieldsNoSelect ):
+            if getIdentifiedDBMS() == DBMS.ORACLE and " FROM " not in concatenatedQuery and (fieldsSelect or fieldsNoSelect):
                 concatenatedQuery += " FROM DUAL"
 
         elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
             if fieldsExists:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery += "+'%s'" % kb.misc.stop
             elif fieldsSelectTop:
                 topNum = re.search("\ASELECT\s+TOP\s+([\d]+)\s+", concatenatedQuery, re.I).group(1)
@@ -466,7 +466,7 @@ class Agent:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.misc.stop, 1)
             elif fieldsSelect or fieldsSelectCase:
-                concatenatedQuery  = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery += "+'%s'" % kb.misc.stop
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'+%s+'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
@@ -520,8 +520,8 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if getIdentifiedDBMS() in INBAND_FROM_TABLE and inbandQuery.endswith(INBAND_FROM_TABLE[getIdentifiedDBMS()]):
-            inbandQuery = inbandQuery[:-len(INBAND_FROM_TABLE[getIdentifiedDBMS()])]
+        if getIdentifiedDBMS() in FROM_TABLE and inbandQuery.endswith(FROM_TABLE[getIdentifiedDBMS()]):
+            inbandQuery = inbandQuery[:-len(FROM_TABLE[getIdentifiedDBMS()])]
 
         for element in range(count):
             if element > 0:
@@ -540,9 +540,9 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if getIdentifiedDBMS() in INBAND_FROM_TABLE:
+        if getIdentifiedDBMS() in FROM_TABLE:
             if " FROM " not in inbandQuery:
-                inbandQuery += INBAND_FROM_TABLE[getIdentifiedDBMS()]
+                inbandQuery += FROM_TABLE[getIdentifiedDBMS()]
 
         if intoRegExp:
             inbandQuery += intoRegExp
@@ -559,8 +559,8 @@ class Agent:
                 else:
                     inbandQuery += char
 
-            if getIdentifiedDBMS() in INBAND_FROM_TABLE:
-                inbandQuery += INBAND_FROM_TABLE[getIdentifiedDBMS()]
+            if getIdentifiedDBMS() in FROM_TABLE:
+                inbandQuery += FROM_TABLE[getIdentifiedDBMS()]
 
         inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
@@ -595,7 +595,7 @@ class Agent:
         fromFrom = limitedQuery[fromIndex+1:]
         orderBy = False
 
-        if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE ):
+        if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
             limitStr = queries[getIdentifiedDBMS()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
@@ -612,7 +612,7 @@ class Agent:
                 limitedQuery = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
             else:
                 limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, ", ".join(f for f in field), limitStr)
-            limitedQuery  = limitedQuery % fromFrom
+            limitedQuery = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
         elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
@@ -634,21 +634,21 @@ class Agent:
                 if topNums:
                     topNums = topNums.groups()
                     quantityTopNums = topNums[0]
-                    limitedQuery    = limitedQuery.replace("TOP %s" % quantityTopNums, "TOP 1", 1)
-                    startTopNums    = topNums[1]
-                    limitedQuery    = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
-                    forgeNotIn      = False
+                    limitedQuery = limitedQuery.replace("TOP %s" % quantityTopNums, "TOP 1", 1)
+                    startTopNums = topNums[1]
+                    limitedQuery = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
+                    forgeNotIn = False
                 else:
-                    topNum          = re.search("TOP\s+([\d]+)\s+", limitedQuery, re.I).group(1)
-                    limitedQuery    = limitedQuery.replace("TOP %s " % topNum, "")
+                    topNum = re.search("TOP\s+([\d]+)\s+", limitedQuery, re.I).group(1)
+                    limitedQuery = limitedQuery.replace("TOP %s " % topNum, "")
 
             if forgeNotIn:
                 limitedQuery = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
 
                 if " WHERE " in limitedQuery:
-                    limitedQuery  = "%s AND %s " % (limitedQuery, field)
+                    limitedQuery = "%s AND %s " % (limitedQuery, field)
                 else:
-                    limitedQuery  = "%s WHERE %s " % (limitedQuery, field)
+                    limitedQuery = "%s WHERE %s " % (limitedQuery, field)
 
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
                 limitedQuery += "%s %s)" % (field, fromFrom)

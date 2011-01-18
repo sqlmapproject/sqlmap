@@ -22,7 +22,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.settings import INBAND_FROM_TABLE
+from lib.core.settings import FROM_TABLE
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.connect import Connect as Request
@@ -98,14 +98,14 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
 
     for count in range(conf.uColsStart, conf.uColsStop+1):
-        if getIdentifiedDBMS() in INBAND_FROM_TABLE and query.endswith(INBAND_FROM_TABLE[getIdentifiedDBMS()]):
-            query = query[:-len(INBAND_FROM_TABLE[getIdentifiedDBMS()])]
+        if getIdentifiedDBMS() in FROM_TABLE and query.endswith(FROM_TABLE[getIdentifiedDBMS()]):
+            query = query[:-len(FROM_TABLE[getIdentifiedDBMS()])]
 
         if count:
             query += ", %s" % conf.uChar
 
-        if getIdentifiedDBMS() in INBAND_FROM_TABLE:
-            query += INBAND_FROM_TABLE[getIdentifiedDBMS()]
+        if getIdentifiedDBMS() in FROM_TABLE:
+            query += FROM_TABLE[getIdentifiedDBMS()]
 
         status = "%d/%d" % (count, conf.uColsStop)
         debugMsg = "testing %s columns (%d%%)" % (status, round(100.0*count/conf.uColsStop))

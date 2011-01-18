@@ -132,7 +132,12 @@ SYBASE_ALIASES      = [ "sybase", "sybase sql server" ]
 SUPPORTED_DBMS      = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES
 SUPPORTED_OS        = ( "linux", "windows" )
 
-INBAND_FROM_TABLE   = {DBMS.ORACLE: " FROM DUAL", DBMS.ACCESS: " FROM MSysObjects", DBMS.FIREBIRD: " FROM RDB$DATABASE", DBMS.MAXDB: " FROM VERSIONS"}
+FROM_TABLE          = {
+                        DBMS.ORACLE: " FROM DUAL",
+                        DBMS.ACCESS: " FROM MSysObjects",
+                        DBMS.FIREBIRD: " FROM RDB$DATABASE",
+                        DBMS.MAXDB: " FROM VERSIONS"
+                      }
 
 SQL_STATEMENTS      = {
                        "SQL SELECT statement":  (

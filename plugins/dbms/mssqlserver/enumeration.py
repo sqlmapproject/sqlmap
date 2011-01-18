@@ -54,7 +54,7 @@ class Enumeration(GenericEnumeration):
             else:
                 dbs = [conf.db]
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -63,7 +63,7 @@ class Enumeration(GenericEnumeration):
                     continue
 
                 query = rootQuery.inband.query % db
-                value = inject.getValue(query, blind=False, error=False)
+                value = inject.getValue(query, blind=False)
 
                 if value:
                     kb.data.cachedTables[db] = arrayizeValue(value)
@@ -81,7 +81,7 @@ class Enumeration(GenericEnumeration):
                 logger.info(infoMsg)
 
                 query = rootQuery.blind.count % db
-                count = inject.getValue(query, inband=False, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, charsetType=2)
 
                 if not isNumPosStrValue(count):
                     warnMsg  = "unable to retrieve the number of "
@@ -93,7 +93,7 @@ class Enumeration(GenericEnumeration):
 
                 for index in range(int(count)):
                     query = rootQuery.blind.query % (db, index, db)
-                    table = inject.getValue(query, inband=False)
+                    table = inject.getValue(query, inband=False, error=False)
                     tables.append(table)
                     kb.hintValue = table
 
@@ -144,10 +144,10 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                     query = rootQuery.inband.query % db
                     query += tblQuery
-                    values = inject.getValue(query, blind=False, error=False)
+                    values = inject.getValue(query, blind=False)
 
                     if values:
                         if isinstance(values, basestring):
@@ -165,7 +165,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count2
                     query = query % db
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -184,7 +184,7 @@ class Enumeration(GenericEnumeration):
                         query = query % db
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query, tblCond)
-                        tbl = inject.getValue(query, inband=False)
+                        tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
                         foundTbls[db].append(tbl)
 
@@ -229,10 +229,10 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or conf.direct:
+                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                     query = rootQuery.inband.query % (db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
-                    values = inject.getValue(query, blind=False, error=False)
+                    values = inject.getValue(query, blind=False)
 
                     if values:
                         if isinstance(values, basestring):
@@ -270,7 +270,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count2
                     query = query % (db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
-                    count = inject.getValue(query, inband=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no tables contain column"
@@ -289,7 +289,7 @@ class Enumeration(GenericEnumeration):
                         query = query % (db, db, db, db, db)
                         query += " AND %s" % colQuery.replace("[DB]", db)
                         query = agent.limitQuery(index, query, colCond.replace("[DB]", db))
-                        tbl = inject.getValue(query, inband=False)
+                        tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
 
                         if tbl not in dbs[db]:
