@@ -155,7 +155,7 @@ def paramToDict(place, parameters=None):
             if len(elem) == 2:
                 parameter = elem[0].replace(" ", "")
 
-                condition  = not conf.testParameter
+                condition = not conf.testParameter
                 condition |= parameter in conf.testParameter
 
                 if condition:
@@ -182,12 +182,12 @@ def paramToDict(place, parameters=None):
         paramStr = ", ".join(test for test in conf.testParameter)
 
         if len(conf.testParameter) > 1:
-            warnMsg  = "the testable parameters '%s' " % paramStr
+            warnMsg = "the testable parameters '%s' " % paramStr
             warnMsg += "you provided are not into the %s" % place
         else:
             parameter = conf.testParameter[0]
 
-            warnMsg  = "the testable parameter '%s' " % paramStr
+            warnMsg = "the testable parameter '%s' " % paramStr
             warnMsg += "you provided is not into the %s" % place
 
         logger.warn(warnMsg)
@@ -195,7 +195,7 @@ def paramToDict(place, parameters=None):
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
             if not testableParameters.has_key(parameter):
-                warnMsg  =  "the testable parameter '%s' " % parameter
+                warnMsg =  "the testable parameter '%s' " % parameter
                 warnMsg += "you provided is not into the %s" % place
                 logger.warn(warnMsg)
 
@@ -221,7 +221,7 @@ def formatDBMSfp(versions=None):
     elif isinstance(versions, (list, set, tuple)):
         return "%s %s" % (getIdentifiedDBMS(), " and ".join([version for version in versions]))
     elif not versions:
-        warnMsg  = "unable to extensively fingerprint the back-end "
+        warnMsg = "unable to extensively fingerprint the back-end "
         warnMsg += "DBMS version"
         logger.warn(warnMsg)
 
@@ -327,12 +327,12 @@ def getDocRoot(webApi=None):
 
             if isWindowsPath(absFilePath):
                 absFilePathWin = posixToNtSlashes(absFilePath)
-                absFilePath    = ntToPosixSlashes(absFilePath[2:])
+                absFilePath = ntToPosixSlashes(absFilePath[2:])
             elif isWindowsDriveLetterPath(absFilePath): # E.g. C:/xampp/htdocs
-                absFilePath    = absFilePath[2:]
+                absFilePath = absFilePath[2:]
 
             if pagePath in absFilePath:
-                index   = absFilePath.index(pagePath)
+                index = absFilePath.index(pagePath)
                 docRoot = absFilePath[:index]
 
                 if len(docRoot) == 0:
@@ -352,7 +352,7 @@ def getDocRoot(webApi=None):
         warnMsg = "unable to retrieve the web server document root"
         logger.warn(warnMsg)
 
-        message  = "please provide the web server document root "
+        message = "please provide the web server document root "
         message += "[%s]: " % defaultDocRoot
         inputDocRoot = readInput(message, default=defaultDocRoot)
 
@@ -378,7 +378,7 @@ def getDirs(webApi=None):
         defaultDirs.append(kb.docRoot)
 
     if kb.absFilePaths:
-        infoMsg  = "retrieved web server full paths: "
+        infoMsg = "retrieved web server full paths: "
         infoMsg += "'%s'" % ", ".join(path for path in kb.absFilePaths)
         logger.info(infoMsg)
 
@@ -397,8 +397,8 @@ def getDirs(webApi=None):
         warnMsg = "unable to retrieve any web server path"
         logger.warn(warnMsg)
 
-    message   = "please provide any additional web server full path to try "
-    message  += "to upload the agent [%s]: " % ",".join(directory for directory in defaultDirs)
+    message = "please provide any additional web server full path to try "
+    message += "to upload the agent [%s]: " % ",".join(directory for directory in defaultDirs)
     inputDirs = readInput(message, default=",".join(directory for directory in defaultDirs))
 
     if inputDirs:
@@ -626,7 +626,7 @@ def parsePasswordHash(password):
 
     if getIdentifiedDBMS() == DBMS.MSSQL and password != "NULL" and isHexEncodedString(password):
         hexPassword = password
-        password  = "%s\n" % hexPassword
+        password = "%s\n" % hexPassword
         password += "%sheader: %s\n" % (blank, hexPassword[:6])
         password += "%ssalt: %s\n" % (blank, hexPassword[6:14])
         password += "%smixedcase: %s\n" % (blank, hexPassword[14:54])
@@ -651,38 +651,38 @@ def cleanQuery(query):
 
 def setPaths():
     # sqlmap paths
-    paths.SQLMAP_CONTRIB_PATH    = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "contrib")
-    paths.SQLMAP_EXTRAS_PATH     = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
-    paths.SQLMAP_SHELL_PATH      = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
-    paths.SQLMAP_TXT_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
-    paths.SQLMAP_UDF_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "udf")
-    paths.SQLMAP_XML_PATH        = os.path.join(paths.SQLMAP_ROOT_PATH, "xml")
+    paths.SQLMAP_CONTRIB_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "contrib")
+    paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
+    paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
+    paths.SQLMAP_TXT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
+    paths.SQLMAP_UDF_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "udf")
+    paths.SQLMAP_XML_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "xml")
     paths.SQLMAP_XML_BANNER_PATH = os.path.join(paths.SQLMAP_XML_PATH, "banner")
-    paths.SQLMAP_OUTPUT_PATH     = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
-    paths.SQLMAP_DUMP_PATH       = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
-    paths.SQLMAP_FILES_PATH      = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
+    paths.SQLMAP_OUTPUT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
+    paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
+    paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
     # sqlmap files
-    paths.SQLMAP_HISTORY         = os.path.join(paths.SQLMAP_ROOT_PATH, ".sqlmap_history")
-    paths.SQLMAP_CONFIG          = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
-    paths.COMMON_COLUMNS         = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
-    paths.COMMON_TABLES          = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
-    paths.COMMON_OUTPUTS         = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
-    paths.SQL_KEYWORDS           = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
-    paths.ORACLE_DEFAULT_PASSWD  = os.path.join(paths.SQLMAP_TXT_PATH, "oracle-default-passwords.txt")
-    paths.USER_AGENTS            = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
-    paths.WORDLIST               = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
-    paths.PHPIDS_RULES_XML       = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
-    paths.ERRORS_XML             = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
-    paths.PAYLOADS_XML           = os.path.join(paths.SQLMAP_XML_PATH, "payloads.xml")
-    paths.INJECTIONS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
-    paths.LIVE_TESTS_XML         = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
-    paths.QUERIES_XML            = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
-    paths.GENERIC_XML            = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
-    paths.MSSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mssql.xml")
-    paths.MYSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
-    paths.ORACLE_XML             = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
-    paths.PGSQL_XML              = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
+    paths.SQLMAP_HISTORY = os.path.join(paths.SQLMAP_ROOT_PATH, ".sqlmap_history")
+    paths.SQLMAP_CONFIG = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
+    paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
+    paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
+    paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
+    paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
+    paths.ORACLE_DEFAULT_PASSWD = os.path.join(paths.SQLMAP_TXT_PATH, "oracle-default-passwords.txt")
+    paths.USER_AGENTS = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
+    paths.WORDLIST = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
+    paths.PHPIDS_RULES_XML = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
+    paths.ERRORS_XML = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
+    paths.PAYLOADS_XML = os.path.join(paths.SQLMAP_XML_PATH, "payloads.xml")
+    paths.INJECTIONS_XML = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
+    paths.LIVE_TESTS_XML = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
+    paths.QUERIES_XML = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
+    paths.GENERIC_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
+    paths.MSSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mssql.xml")
+    paths.MYSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
+    paths.ORACLE_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
+    paths.PGSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
 
 def weAreFrozen():
     """
@@ -723,10 +723,10 @@ def parseTargetDirect():
             if details.group('remote'):
                 remote = True
                 conf.hostname = details.group('hostname')
-                conf.port     = int(details.group('port'))
+                conf.port = int(details.group('port'))
             else:
                 conf.hostname = "localhost"
-                conf.port     = 0
+                conf.port = 0
 
             conf.dbmsDb = details.group('db')
 
@@ -750,7 +750,7 @@ def parseTargetDirect():
                         logger.warn(warnMsg)
 
                         conf.hostname = "localhost"
-                        conf.port     = 0
+                        conf.port = 0
                 elif not remote:
                         errMsg = "missing remote connection details"
                         raise sqlmapSyntaxException, errMsg
@@ -778,7 +778,7 @@ def parseTargetDirect():
                 elif dbmsName == DBMS.FIREBIRD:
                     import kinterbasdb
             except ImportError, _:
-                errMsg  = "sqlmap requires '%s' third-party library " % data[1]
+                errMsg = "sqlmap requires '%s' third-party library " % data[1]
                 errMsg += "in order to directly connect to the database "
                 errMsg += "'%s'. Download from '%s'" % (dbmsName, data[2])
                 raise sqlmapMissingDependence, errMsg
@@ -797,12 +797,12 @@ def parseTargetUrl():
         else:
             conf.url = "http://" + conf.url
 
-    __urlSplit     = urlparse.urlsplit(conf.url)
+    __urlSplit = urlparse.urlsplit(conf.url)
     __hostnamePort = __urlSplit[1].split(":")
 
-    conf.scheme    = __urlSplit[0]
-    conf.path      = __urlSplit[2]
-    conf.hostname  = __hostnamePort[0]
+    conf.scheme = __urlSplit[0]
+    conf.path = __urlSplit[2]
+    conf.hostname = __hostnamePort[0]
 
     if len(__hostnamePort) == 2:
         try:
@@ -827,7 +827,7 @@ def expandAsteriskForColumns(expression):
     asterisk = re.search("^SELECT\s+\*\s+FROM\s+([\w\.\_]+)\s*", expression, re.I)
 
     if asterisk:
-        infoMsg  = "you did not provide the fields in your query. "
+        infoMsg = "you did not provide the fields in your query. "
         infoMsg += "sqlmap will retrieve the column names itself"
         logger.info(infoMsg)
 
@@ -846,17 +846,17 @@ def expandAsteriskForColumns(expression):
             columnsStr = ", ".join([column for column in columns])
             expression = expression.replace("*", columnsStr, 1)
 
-            infoMsg  = "the query with column names is: "
+            infoMsg = "the query with column names is: "
             infoMsg += "%s" % expression
             logger.info(infoMsg)
 
     return expression
 
 def getRange(count, dump=False, plusOne=False):
-    count      = int(count)
+    count = int(count)
     indexRange = None
     limitStart = 1
-    limitStop  = count
+    limitStop = count
 
     if dump:
         if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
@@ -1583,9 +1583,9 @@ def wasLastRequestDelayed():
     Returns True if the last web request resulted in a time-delay
     """
 
-    # 99.9999999997440% of all non time-based sql injection
-    # affected response times should be inside +-7*stdev([normal response times])
-    # (Math reference: http://www.answers.com/topic/standard-deviation)
+    # 99.9999999997440% of all non time-based sql injection affected
+    # response times should be inside +-7*stdev([normal response times])
+    # Math reference: http://www.answers.com/topic/standard-deviation
     deviation = stdev(kb.responseTimes)
     threadData = getCurrentThreadData()
 
@@ -1607,17 +1607,20 @@ def wasLastRequestDelayed():
 
 def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     """
-    Adjusts time delay in time based data retrieval
+    Adjusts time delay in time-based data retrieval
     """
 
     candidate = 1 + int(round((1 - (lastQueryDuration - lowerStdLimit) / lastQueryDuration) * conf.timeSec))
 
     if candidate:
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
+
         if all([x == candidate for x in kb.delayCandidates]) and candidate < conf.timeSec:
             print
+
             warnMsg = "adjusting time delay to %d second%s" % (candidate, 's' if candidate > 1 else '')
             logger.warn(warnMsg)
+
             conf.timeSec = candidate
 
 def extractErrorMessage(page):
@@ -1685,7 +1688,7 @@ def runningAsAdmin():
         if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
             isAdmin = True
     else:
-        errMsg  = "sqlmap is not able to check if you are running it "
+        errMsg = "sqlmap is not able to check if you are running it "
         errMsg += "as an administrator account on this platform. "
         errMsg += "sqlmap will assume that you are an administrator "
         errMsg += "which is mandatory for the requested takeover attack "
@@ -1709,8 +1712,11 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
 
     kb.locks.logLock.release()
 
-# cross-linked method
 def getPageTemplate(payload, place):
+    """
+    Cross-linked method
+    """
+
     pass
 
 def getPublicTypeMembers(type_, onlyValues=False):
@@ -2123,7 +2129,7 @@ def openFile(filename, mode='r'):
         return codecs.open(filename, mode, conf.dataEncoding)
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
-        errMsg += "Please check %s permissions on a file " % ("write" if mode and\
-          ('w' in mode or 'a' in mode or '+' in mode) else "read")
+        errMsg += "Please check %s permissions on a file " % ("write" if \
+          mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
         raise sqlmapFilePathException, errMsg
