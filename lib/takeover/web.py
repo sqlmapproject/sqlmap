@@ -78,7 +78,6 @@ class Web:
 
     def __webFileStreamUpload(self, stream, destFileName, directory):
         stream.seek(0) # Rewind
-        stream.name = destFileName
 
         if self.webApi in ("php", "asp", "aspx", "jsp"):
             multipartParams = {
