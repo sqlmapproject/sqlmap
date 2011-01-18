@@ -100,13 +100,18 @@ def checkSqlInjection(place, parameter, value):
             stype = test.stype
             clause = test.clause
 
-            if stype == 3 and test.request.columns == "[COLSTART]-[COLSTOP]":
-                if conf.uCols is None:
-                    continue
-                else:
-                    configUnion()
-                    title = title.replace("[COLSTART]", str(conf.uColsStart))
-                    title = title.replace("[COLSTOP]", str(conf.uColsStop))
+            if stype == 3:
+                configUnion(test.request.char)
+
+                if test.request.columns == "[COLSTART]-[COLSTOP]":
+                    if conf.uCols is None:
+                        continue
+                    else:
+                        title = title.replace("[COLSTART]", str(conf.uColsStart))
+                        title = title.replace("[COLSTOP]", str(conf.uColsStop))
+
+                if "[CHAR]" in title:
+                    title = title.replace("[CHAR]", conf.uChar)
 
             # Skip test if the user's wants to test only for a specific
             # technique
@@ -136,7 +141,8 @@ def checkSqlInjection(place, parameter, value):
                 continue
 
             # Skip DBMS-specific test if it does not match either the
-            # previously identified or the user's provided DBMS
+            # previously identified or the user's provided DBMS (either
+            # from program switch or from parsed error message(s))
             if "details" in test and "dbms" in test.details:
                 dbms = test.details.dbms
             else:
@@ -387,10 +393,12 @@ def checkSqlInjection(place, parameter, value):
                             # used afterwards by Agent.forgeInbandQuery()
                             # method to forge the UNION query payload
 
-                            # Set fingerprinted DBMS according to the
-                            # current test settings for proper unescaping
+                            # Force back-end DBMS according to the current
+                            # test value for proper payload unescaping
                             kb.misc.forcedDbms = dbms
 
+                            # Skip test if the user provided custom column
+                            # range and this is not a custom UNION test
                             if conf.uCols is not None and test.request.columns != "[COLSTART]-[COLSTOP]":
                                 debugMsg = "skipping test '%s' because custom " % title
                                 debugMsg += "UNION columns range was provided"
@@ -405,6 +413,7 @@ def checkSqlInjection(place, parameter, value):
                                 warnMsg += "back-end DBMS"
                                 logger.warn(warnMsg)
 
+                            # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
                             if isinstance(reqPayload, basestring):
@@ -417,6 +426,7 @@ def checkSqlInjection(place, parameter, value):
                                 # by unionTest() directly
                                 where = vector[6]
 
+                            # Reset back-end DBMS value
                             kb.misc.forcedDbms = None
 
                     # If the injection test was successful feed the injection
@@ -454,15 +464,38 @@ def checkSqlInjection(place, parameter, value):
                         injection.conf.regexp = conf.regexp
 
                         if hasattr(test, "details"):
-                            for detailKey, detailValue in test.details.items():
-                                if detailKey == "dbms" and injection.dbms is None:
-                                    injection.dbms = detailValue
-                                    kb.dbms = aliasToDbmsEnum(detailValue)
-                                elif detailKey == "dbms_version" and injection.dbms_version is None:
-                                    injection.dbms_version = detailValue
-                                    kb.dbmsVersion = [ detailValue ]
-                                elif detailKey == "os" and injection.os is None:
-                                    injection.os = detailValue
+                            for dKey, dValue in test.details.items():
+                                # Little precaution, in theory this condition
+                                # should always be false
+                                if dKey == "dbms" and injection.dbms is not None and dValue != injection.dbms:
+                                    msg = "previous test(s) identified that the "
+                                    msg += "back-end DBMS possibly is %s. " % injection.dbms
+                                    msg += "However the last successful test "
+                                    msg += "fingerprinted %s. " % dValue
+                                    msg += "Please, specify which DBMS is "
+                                    msg += "correct [%s (default)/%s] " % (injection.dbms, dValue)
+
+                                    while True:
+                                        inp = readInput(msg, default=injection.dbms)
+
+                                        if inp == injection.dbms:
+                                            break
+                                        elif inp == dValue:
+                                            kb.dbms = aliasToDbmsEnum(inp)
+                                            injection.dbms = aliasToDbmsEnum(inp)
+                                            injection.dbms_version = None
+                                            break
+                                        else:
+                                            warnMsg = "invalid value"
+                                            logger.warn(warnMsg)
+                                elif dKey == "dbms" and injection.dbms is None:
+                                    kb.dbms = aliasToDbmsEnum(dValue)
+                                    injection.dbms = aliasToDbmsEnum(dValue)
+                                elif dKey == "dbms_version" and injection.dbms_version is None:
+                                    kb.dbmsVersion = [ dValue ]
+                                    injection.dbms_version = dValue
+                                elif dKey == "os" and injection.os is None:
+                                    injection.os = dValue
 
                         if conf.beep or conf.realTest:
                             beep()
@@ -500,7 +533,7 @@ def checkSqlInjection(place, parameter, value):
 
 def heuristicCheckSqlInjection(place, parameter):
     if kb.nullConnection:
-        debugMsg  = "heuristic checking skipped "
+        debugMsg = "heuristic checking skipped "
         debugMsg += "because NULL connection used"
         logger.debug(debugMsg)
         return
@@ -521,7 +554,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     result = wasLastRequestDBMSError()
 
-    infoMsg  = "heuristic test shows that %s " % place
+    infoMsg = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
     if result:
@@ -559,7 +592,7 @@ def simpletonCheckSqlInjection(place, parameter, value):
             secondPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
             result = getComparePageRatio(firstPage, secondPage, filtered=True) <= CONSTANT_RATIO
 
-    infoMsg  = "simpleton test shows that %s " % place
+    infoMsg = "simpleton test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
     if result:
@@ -605,7 +638,7 @@ def checkDynamicContent(firstPage, secondPage):
     """
 
     if kb.nullConnection:
-        debugMsg  = "dynamic content checking skipped "
+        debugMsg = "dynamic content checking skipped "
         debugMsg += "because NULL connection used"
         logger.debug(debugMsg)
         return
@@ -661,17 +694,17 @@ def checkStability():
 
     if kb.pageStable:
         if firstPage:
-            logMsg  = "url is stable"
+            logMsg = "url is stable"
             logger.info(logMsg)
         else:
-            errMsg  = "there was an error checking the stability of page "
+            errMsg = "there was an error checking the stability of page "
             errMsg += "because of lack of content. please check the "
             errMsg += "page request results (and probable errors) by "
             errMsg += "using higher verbosity levels"
             raise sqlmapNoneDataException, errMsg
 
     else:
-        warnMsg  = "url is not stable, sqlmap will base the page "
+        warnMsg = "url is not stable, sqlmap will base the page "
         warnMsg += "comparison on a sequence matcher. If no dynamic nor "
         warnMsg += "injectable parameters are detected, or in case of "
         warnMsg += "junk results, refer to user's manual paragraph "
@@ -698,7 +731,7 @@ def checkStability():
                 conf.string = test
 
                 if kb.nullConnection:
-                    debugMsg  = "turning off NULL connection "
+                    debugMsg = "turning off NULL connection "
                     debugMsg += "support because of string checking"
                     logger.debug(debugMsg)
 
@@ -715,7 +748,7 @@ def checkStability():
                 conf.regex = test
 
                 if kb.nullConnection:
-                    debugMsg  = "turning off NULL connection "
+                    debugMsg = "turning off NULL connection "
                     debugMsg += "support because of regex checking"
                     logger.debug(debugMsg)
 
@@ -733,14 +766,14 @@ def checkString():
     if not conf.string:
         return True
 
-    infoMsg  = "testing if the provided string is within the "
+    infoMsg = "testing if the provided string is within the "
     infoMsg += "target URL page content"
     logger.info(infoMsg)
 
     page, _ = Request.queryPage(content=True)
 
     if conf.string not in page:
-        warnMsg  = "you provided '%s' as the string to " % conf.string
+        warnMsg = "you provided '%s' as the string to " % conf.string
         warnMsg += "match, but such a string is not within the target "
         warnMsg += "URL page content original request, sqlmap will "
         warnMsg += "keep going anyway"
@@ -752,14 +785,14 @@ def checkRegexp():
     if not conf.regexp:
         return True
 
-    infoMsg  = "testing if the provided regular expression matches within "
+    infoMsg = "testing if the provided regular expression matches within "
     infoMsg += "the target URL page content"
     logger.info(infoMsg)
 
     page, _ = Request.queryPage(content=True)
 
     if not re.search(conf.regexp, page, re.I | re.M):
-        warnMsg  = "you provided '%s' as the regular expression to " % conf.regexp
+        warnMsg = "you provided '%s' as the regular expression to " % conf.regexp
         warnMsg += "match, but such a regular expression does not have any "
         warnMsg += "match within the target URL page content, sqlmap "
         warnMsg += "will keep going anyway"
