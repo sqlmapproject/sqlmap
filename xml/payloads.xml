@@ -1623,7 +1623,7 @@ Formats:
     <test>
         <title>PostgreSQL &gt; 8.1 AND time-based blind</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
