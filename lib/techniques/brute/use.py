@@ -250,7 +250,7 @@ def columnExists(columnFile, regex=None):
         columns = {}
 
         for column in retVal:
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)>0)", (column, table, column)))
+            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
             if result:
                 columns[column] = 'numeric'
