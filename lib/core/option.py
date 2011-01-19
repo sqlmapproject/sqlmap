@@ -56,6 +56,7 @@ from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapMissingPrivileges
+from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
@@ -410,15 +411,11 @@ def __setMetasploit():
     if IS_WIN:
         warnMsg  = "some sqlmap takeover functionalities are not yet "
         warnMsg += "supported on Windows. Please use Linux in a virtual "
-        warnMsg += "machine for out-of-band features. sqlmap will now "
-        warnMsg += "carry on ignoring out-of-band switches"
-        logger.warn(warnMsg)
+        warnMsg += "machine for out-of-band features."
 
-        conf.osPwn = None
-        conf.osSmb = None
-        conf.osBof = None
+        logger.critical(warnMsg)
 
-        return
+        raise sqlmapSilentQuitException
 
     if conf.osSmb:
         isAdmin = runningAsAdmin()
