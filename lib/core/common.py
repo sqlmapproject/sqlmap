@@ -57,6 +57,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
+from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -2139,4 +2140,4 @@ def decodeIntToUnicode(value):
     try:
         return struct.pack('>H', value).decode(kb.pageEncoding)
     except:
-        return '?'
+        return INFERENCE_UNKNOWN_CHAR
