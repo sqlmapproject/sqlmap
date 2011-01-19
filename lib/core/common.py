@@ -21,6 +21,7 @@ import urlparse
 import ntpath
 import posixpath
 import httplib
+import struct
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
@@ -1518,7 +1519,7 @@ def getUnicode(value, encoding=None):
     if isinstance(value, unicode):
         return value
     elif isinstance(value, basestring):
-        return unicode(value, encoding or conf.dataEncoding, errors='replace')
+        return unicode(value, encoding or conf.dataEncoding)
     else:
         return unicode(value) # encoding ignored for non-basestring instances
 
@@ -2130,3 +2131,12 @@ def openFile(filename, mode='r'):
           mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
         raise sqlmapFilePathException, errMsg
+
+def decodeIntToUnicode(value):
+    """
+    Decodes inferenced integer value with usage of current page encoding
+    """
+    try:
+        return struct.pack('>H', value).decode(kb.pageEncoding)
+    except:
+        return '?'

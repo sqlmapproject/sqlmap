@@ -14,6 +14,7 @@ import traceback
 from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
+from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import getIdentifiedDBMS
@@ -168,7 +169,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
             if result:
-                return chr(charTbl[0]) if charTbl[0] < 128 else unichr(charTbl[0])
+                return chr(charTbl[0]) if charTbl[0] < 128 else decodeIntToUnicode(charTbl[0])
             else: 
                 return None
 
@@ -182,7 +183,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if CHAR_INFERENCE_MARK not in payload:
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
             else:
-                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(CHAR_INFERENCE_MARK, chr(posValue) if posValue < 128 else unichr(posValue))
+                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(CHAR_INFERENCE_MARK, chr(posValue) if posValue < 128 else decodeIntToUnicode(posValue))
 
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
@@ -225,7 +226,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         retVal = minValue + 1
                         if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                            return chr(retVal) if retVal < 128 else unichr(retVal)
+                            return chr(retVal) if retVal < 128 else decodeIntToUnicode(retVal)
                         else:
                             return None
                 else:
@@ -241,7 +242,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
                         if result:
-                            return chr(retVal) if retVal < 128 else unichr(retVal)
+                            return chr(retVal) if retVal < 128 else decodeIntToUnicode(retVal)
 
                     return None
 
