@@ -8,9 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import formatDBMSfp
-from lib.core.common import formatFingerprint
-from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -29,13 +28,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = formatFingerprint("web server", kb.headersFp)
+        wsOsFp = format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -55,7 +54,7 @@ class Fingerprint(GenericFingerprint):
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = getErrorParsedDBMSesFormatted()
+        htmlErrorFp = format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -70,32 +69,36 @@ class Fingerprint(GenericFingerprint):
         * http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
         """
 
-        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in SQLITE_ALIASES) or conf.dbms in SQLITE_ALIASES:
+        if not conf.extensiveFp and (backend.isDbmsWithin(SQLITE_ALIASES) or conf.dbms in SQLITE_ALIASES):
             setDbms(DBMS.SQLITE)
 
             self.getBanner()
 
             return True
 
-        logMsg = "testing SQLite"
+        logMsg = "testing %s" % DBMS.SQLITE
         logger.info(logMsg)
 
         result = inject.checkBooleanExpression("LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
 
         if result:
-            logMsg = "confirming SQLite"
+            logMsg = "confirming %s" % DBMS.SQLITE
             logger.info(logMsg)
 
             result = inject.checkBooleanExpression("SQLITE_VERSION()=SQLITE_VERSION()")
 
             if not result:
-                warnMsg = "the back-end DBMS is not SQLite"
+                warnMsg = "the back-end DBMS is not %s" % DBMS.SQLITE
                 logger.warn(warnMsg)
 
                 return False
             else:
+                infoMsg = "actively fingerprinting %s" % DBMS.SQLITE
+                logger.info(infoMsg)
+
                 result = inject.checkBooleanExpression("RANDOMBLOB(-1)>0")
-                kb.dbmsVersion = [ '3' if result else '2' ]
+                version = '3' if result else '2'
+                backend.setVersion(version)
 
             setDbms(DBMS.SQLITE)
 
@@ -103,7 +106,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not SQLite"
+            warnMsg = "the back-end DBMS is not %s" % DBMS.SQLITE
             logger.warn(warnMsg)
 
             return False

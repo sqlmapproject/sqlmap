@@ -13,15 +13,14 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import aliasToDbmsEnum
+from lib.core.common import backend
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
 from lib.core.common import findDynamicContent
+from lib.core.common import format
 from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
-from lib.core.common import getErrorParsedDBMSes
-from lib.core.common import getErrorParsedDBMSesFormatted
-from lib.core.common import getIdentifiedDBMS
-from lib.core.common import getInjectionTests
+from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -50,6 +49,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setDynamicMarkings
 from lib.core.settings import CONSTANT_RATIO
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
@@ -78,8 +78,8 @@ def unescapeDbms(payload, injection, dbms):
         payload = unescape(payload, dbms=dbms)
     elif conf.dbms is not None:
         payload = unescape(payload, dbms=conf.dbms)
-    elif getIdentifiedDBMS() is not None:
-        payload = unescape(payload, dbms=getIdentifiedDBMS())
+    elif backend.getIdentifiedDbms() is not None:
+        payload = unescape(payload, dbms=backend.getIdentifiedDbms())
 
     return payload
 
@@ -91,7 +91,7 @@ def checkSqlInjection(place, parameter, value):
     # Set the flag for sql injection test mode
     kb.testMode = True
 
-    for test in getInjectionTests():
+    for test in getSortedInjectionTests():
         try:
             if kb.endDetection:
                 break
@@ -164,19 +164,19 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-                if len(getErrorParsedDBMSes()) > 0 and dbms not in getErrorParsedDBMSes() and kb.skipOthersDbms is None:
+                if len(backend.getErrorParsedDBMSes()) > 0 and dbms not in backend.getErrorParsedDBMSes() and kb.skipOthersDbms is None:
                     msg = "parsed error message(s) showed that the "
-                    msg += "back-end DBMS could be '%s'. " % getErrorParsedDBMSesFormatted()
+                    msg += "back-end DBMS could be %s. " % format.getErrorParsedDBMSes()
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
 
                     if conf.realTest or readInput(msg, default="Y") in ("y", "Y"):
-                        kb.skipOthersDbms = getErrorParsedDBMSes()
+                        kb.skipOthersDbms = backend.getErrorParsedDBMSes()
 
                 if kb.skipOthersDbms and dbms not in kb.skipOthersDbms:
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the parsed error message(s) showed "
                     debugMsg += "that the back-end DBMS could be "
-                    debugMsg += "%s" % getErrorParsedDBMSesFormatted()
+                    debugMsg += "%s" % format.getErrorParsedDBMSes()
                     logger.debug(debugMsg)
 
                     continue
@@ -395,7 +395,7 @@ def checkSqlInjection(place, parameter, value):
 
                             # Force back-end DBMS according to the current
                             # test value for proper payload unescaping
-                            kb.misc.forcedDbms = dbms
+                            backend.forceDbms(dbms)
 
                             # Skip test if the user provided custom column
                             # range and this is not a custom UNION test
@@ -407,7 +407,7 @@ def checkSqlInjection(place, parameter, value):
 
                             configUnion(test.request.char, test.request.columns)
 
-                            if not getIdentifiedDBMS():
+                            if not backend.getIdentifiedDbms():
                                 warnMsg = "using unescaped version of the test "
                                 warnMsg += "because of zero knowledge of the "
                                 warnMsg += "back-end DBMS"
@@ -426,8 +426,8 @@ def checkSqlInjection(place, parameter, value):
                                 # by unionTest() directly
                                 where = vector[6]
 
-                            # Reset back-end DBMS value
-                            kb.misc.forcedDbms = None
+                            # Reset forced back-end DBMS value
+                            backend.flushForcedDbms()
 
                     # If the injection test was successful feed the injection
                     # object with the test's details
@@ -481,7 +481,7 @@ def checkSqlInjection(place, parameter, value):
                                         if inp == injection.dbms:
                                             break
                                         elif inp == dValue:
-                                            kb.dbms = aliasToDbmsEnum(inp)
+                                            backend.setDbms(inp)
                                             injection.dbms = aliasToDbmsEnum(inp)
                                             injection.dbms_version = None
                                             break
@@ -489,10 +489,10 @@ def checkSqlInjection(place, parameter, value):
                                             warnMsg = "invalid value"
                                             logger.warn(warnMsg)
                                 elif dKey == "dbms" and injection.dbms is None:
-                                    kb.dbms = aliasToDbmsEnum(dValue)
+                                    backend.setDbms(dValue)
                                     injection.dbms = aliasToDbmsEnum(dValue)
                                 elif dKey == "dbms_version" and injection.dbms_version is None:
-                                    kb.dbmsVersion = [ dValue ]
+                                    backend.setVersion(dValue)
                                     injection.dbms_version = dValue
                                 elif dKey == "os" and injection.os is None:
                                     injection.os = dValue
@@ -558,7 +558,7 @@ def heuristicCheckSqlInjection(place, parameter):
     infoMsg += "parameter '%s' might " % parameter
 
     if result:
-        infoMsg += "be injectable (possible DBMS: %s)" % (getErrorParsedDBMSesFormatted() or 'Unknown')
+        infoMsg += "be injectable (possible DBMS: %s)" % (format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
         logger.info(infoMsg)
     else:
         infoMsg += "not be injectable"

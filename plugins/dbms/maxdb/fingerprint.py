@@ -10,9 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import formatDBMSfp
-from lib.core.common import formatFingerprint
-from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.common import randomInt
 from lib.core.common import randomRange
 from lib.core.data import conf
@@ -32,7 +31,7 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.MAXDB)
 
     def __versionCheck(self):
-        infoMsg = "executing SAP MaxDB SYSINFO version check"
+        infoMsg = "executing %s SYSINFO version check" % DBMS.MAXDB
         logger.info(infoMsg)
 
         query   = agent.prefixQuery("/* NoValue */")
@@ -41,7 +40,7 @@ class Fingerprint(GenericFingerprint):
         result  = Request.queryPage(payload)
 
         if not result:
-            warnMsg = "unable to perform SAP MaxDB version check"
+            warnMsg = "unable to perform %s version check" % DBMS.MAXDB
             logger.warn(warnMsg)
 
             return None
@@ -67,13 +66,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = formatFingerprint("web server", kb.headersFp)
+        wsOsFp = format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -92,7 +91,7 @@ class Fingerprint(GenericFingerprint):
         if kb.bannerFp:
             value += "\n%sbanner parsing fingerprint: -" % blank
 
-        htmlErrorFp = getErrorParsedDBMSesFormatted()
+        htmlErrorFp = format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -100,27 +99,27 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in MAXDB_ALIASES) or conf.dbms in MAXDB_ALIASES:
+        if not conf.extensiveFp and (backend.isDbmsWithin(MAXDB_ALIASES) or conf.dbms in MAXDB_ALIASES):
             setDbms(DBMS.MAXDB)
 
             self.getBanner()
 
             return True
 
-        logMsg = "testing SAP MaxDB"
+        logMsg = "testing %s" % DBMS.MAXDB
         logger.info(logMsg)
 
         randInt = randomInt()
         result = inject.checkBooleanExpression("%d=NOROUND(%d)" % (randInt, randInt))
 
         if result:
-            logMsg = "confirming SAP MaxDB"
+            logMsg = "confirming %s" % DBMS.MAXDB
             logger.info(logMsg)
 
             result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
 
             if not result:
-                warnMsg = "the back-end DBMS is not SAP MaxDB"
+                warnMsg = "the back-end DBMS is not %s" % DBMS.MAXDB
                 logger.warn(warnMsg)
 
                 return False
@@ -129,12 +128,9 @@ class Fingerprint(GenericFingerprint):
 
             self.getBanner()
 
-            if not conf.extensiveFp:
-                return True
-
             return True
         else:
-            warnMsg = "the back-end DBMS is not SAP MaxDB"
+            warnMsg = "the back-end DBMS is not %s" % DBMS.MAXDB
             logger.warn(warnMsg)
 
             return False

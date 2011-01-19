@@ -8,9 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import formatDBMSfp
-from lib.core.common import formatFingerprint
-from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
@@ -29,13 +28,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = formatFingerprint("web server", kb.headersFp)
+        wsOsFp = format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -55,7 +54,7 @@ class Fingerprint(GenericFingerprint):
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = getErrorParsedDBMSesFormatted()
+        htmlErrorFp = format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -63,10 +62,10 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and ((kb.dbms is not None and kb.dbms.lower() in SYBASE_ALIASES) \
-           or conf.dbms in SYBASE_ALIASES) and kb.dbmsVersion and \
-           kb.dbmsVersion[0].isdigit():
-            setDbms("%s %s" % (DBMS.SYBASE, kb.dbmsVersion[0]))
+        if not conf.extensiveFp and (backend.isDbmsWithin(SYBASE_ALIASES) \
+           or conf.dbms in SYBASE_ALIASES) and backend.getVersion() and \
+           backend.getVersion().isdigit():
+            setDbms("%s %s" % (DBMS.SYBASE, backend.getVersion()))
 
             self.getBanner()
 
@@ -74,7 +73,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing Sybase"
+        infoMsg = "testing %s" % DBMS.SYBASE
         logger.info(infoMsg)
 
         if conf.direct:
@@ -83,13 +82,13 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("tempdb_id()=tempdb_id()")
 
         if result:
-            logMsg = "confirming Sybase"
+            logMsg = "confirming %s" % DBMS.SYBASE
             logger.info(logMsg)
 
             result = inject.checkBooleanExpression("suser_id()=suser_id()")
 
             if not result:
-                warnMsg = "the back-end DBMS is not Sybase"
+                warnMsg = "the back-end DBMS is not %s" % DBMS.SYBASE
                 logger.warn(warnMsg)
 
                 return False
@@ -101,15 +100,19 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
+            infoMsg = "actively fingerprinting %s" % DBMS.SYBASE
+            logger.info(infoMsg)
+
             for version in range(12, 16):
                 result = inject.checkBooleanExpression("@@VERSION_NUMBER/1000=%d" % version)
+
                 if result:
-                    kb.dbmsVersion = ["%d" % version]
+                    backend.setVersion(str(version))
                     break
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not Sybase"
+            warnMsg = "the back-end DBMS is not %s" % DBMS.SYBASE
             logger.warn(warnMsg)
 
             return False

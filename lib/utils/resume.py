@@ -13,7 +13,7 @@ import time
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
-from lib.core.common import getIdentifiedDBMS
+from lib.core.common import backend
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
 from lib.core.common import replaceNewlineTabs
@@ -34,7 +34,7 @@ def queryOutputLength(expression, payload):
     Returns the query output length.
     """
 
-    lengthQuery         = queries[getIdentifiedDBMS()].length.query
+    lengthQuery         = queries[backend.getIdentifiedDbms()].length.query
     select              = re.search("\ASELECT\s+", expression, re.I)
     selectTopExpr       = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
     selectDistinctExpr  = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
@@ -60,7 +60,7 @@ def queryOutputLength(expression, payload):
     if selectDistinctExpr:
         lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % regExpr, expression)
 
-        if getIdentifiedDBMS() in ( DBMS.MYSQL, DBMS.PGSQL ):
+        if backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
             lengthExpr += " AS %s" % randomStr(lowercase=True)
     elif select:
         lengthExpr = expression.replace(regExpr, lengthQuery % regExpr, 1)
@@ -142,10 +142,10 @@ def resume(expression, payload):
         if not payload:
             return None
 
-        if not getIdentifiedDBMS():
+        if not backend.getIdentifiedDbms():
             return None
 
-        substringQuery = queries[getIdentifiedDBMS()].substring.query
+        substringQuery = queries[backend.getIdentifiedDbms()].substring.query
         select = re.search("\ASELECT ", expression, re.I)
 
         _, length, regExpr = queryOutputLength(expression, payload)

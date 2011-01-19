@@ -8,9 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import formatDBMSfp
-from lib.core.common import formatFingerprint
-from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -31,13 +30,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = formatFingerprint("web server", kb.headersFp)
+        wsOsFp = format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -58,13 +57,13 @@ class Fingerprint(GenericFingerprint):
             servicepack = kb.bannerFp["dbmsServicePack"] if 'dbmsServicePack' in kb.bannerFp else None
 
             if release and version and servicepack:
-                banVer = "Microsoft SQL Server %s " % release
+                banVer = "%s %s " % (DBMS.MSSQL, release)
                 banVer += "Service Pack %s " % servicepack
                 banVer += "version %s" % version
 
                 value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = getErrorParsedDBMSesFormatted()
+        htmlErrorFp = format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -72,10 +71,10 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and ((kb.dbms is not None and kb.dbms.lower() in MSSQL_ALIASES) \
-           or conf.dbms in MSSQL_ALIASES) and kb.dbmsVersion and \
-           kb.dbmsVersion[0].isdigit():
-            setDbms("%s %s" % (DBMS.MSSQL, kb.dbmsVersion[0]))
+        if not conf.extensiveFp and (backend.isDbmsWithin(MSSQL_ALIASES) \
+           or conf.dbms in MSSQL_ALIASES) and backend.getVersion() and \
+           backend.getVersion().isdigit():
+            setDbms("%s %s" % (DBMS.MSSQL, backend.getVersion()))
 
             self.getBanner()
 
@@ -83,7 +82,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing Microsoft SQL Server"
+        infoMsg = "testing %s" % DBMS.MSSQL
         logger.info(infoMsg)
 
         # NOTE: SELECT LEN(@@VERSION)=LEN(@@VERSION) FROM DUAL does not
@@ -95,20 +94,19 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt))
 
         if result:
-            infoMsg = "confirming Microsoft SQL Server"
+            infoMsg = "confirming %s" % DBMS.MSSQL
             logger.info(infoMsg)
 
-            for version, check in [\
-                    ("2000", "HOST_NAME()=HOST_NAME()"),\
-                    ("2005", "XACT_STATE()=XACT_STATE()"),\
-                    ("2008", "SYSDATETIME()=SYSDATETIME()") ]:
+            for version, check in [ ("2000", "HOST_NAME()=HOST_NAME()"), \
+                                    ("2005", "XACT_STATE()=XACT_STATE()"), \
+                                    ("2008", "SYSDATETIME()=SYSDATETIME()") ]:
                 result = inject.checkBooleanExpression(check)
 
                 if result:
-                    kb.dbmsVersion = [version]
+                    backend.setVersion(version)
 
-            if kb.dbmsVersion:
-                setDbms("%s %s" % (DBMS.MSSQL, kb.dbmsVersion[0]))
+            if backend.getVersion():
+                setDbms("%s %s" % (DBMS.MSSQL, backend.getVersion()))
             else:
                 setDbms(DBMS.MSSQL)
 
@@ -118,7 +116,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not Microsoft SQL Server"
+            warnMsg = "the back-end DBMS is not %s" % DBMS.MSSQL
             logger.warn(warnMsg)
 
             return False

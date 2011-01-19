@@ -7,12 +7,12 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import getIdentifiedDBMS
+from lib.core.common import backend
 from lib.core.datatype import advancedDict
 
 class Unescaper(advancedDict):
     def unescape(self, expression, quote=True, dbms=None):
-        identifiedDbms = getIdentifiedDBMS()
+        identifiedDbms = backend.getIdentifiedDbms()
 
         if identifiedDbms is not None:
             return self[identifiedDbms](expression, quote=quote)

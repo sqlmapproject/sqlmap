@@ -11,9 +11,8 @@ import re
 
 from xml.etree import ElementTree as ET
 
+from lib.core.common import backend
 from lib.core.common import getCompiledRegex
-from lib.core.common import getErrorParsedDBMSes
-from lib.core.common import getIdentifiedDBMS
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
@@ -206,8 +205,8 @@ class Agent:
             payload = payload.replace("[ORIGVALUE]", origvalue)
 
         if "[INFERENCE]" in payload:
-            if getIdentifiedDBMS() is not None:
-                inference = queries[getIdentifiedDBMS()].inference
+            if backend.getIdentifiedDbms() is not None:
+                inference = queries[backend.getIdentifiedDbms()].inference
 
                 if "dbms_version" in inference:
                     if isDBMSVersionAtLeast(inference.dbms_version):
@@ -265,17 +264,17 @@ class Agent:
 
         # SQLite version 2 does not support neither CAST() nor IFNULL(),
         # introduced only in SQLite version 3
-        if getIdentifiedDBMS() == DBMS.SQLITE:
+        if backend.getIdentifiedDbms() == DBMS.SQLITE:
             return field
 
         if field.startswith("(CASE"):
             nulledCastedField = field
         else:
-            nulledCastedField = queries[getIdentifiedDBMS()].cast.query % field
-            if getIdentifiedDBMS() == DBMS.ACCESS:
-                nulledCastedField = queries[getIdentifiedDBMS()].isnull.query % (nulledCastedField, nulledCastedField)
+            nulledCastedField = queries[backend.getIdentifiedDbms()].cast.query % field
+            if backend.getIdentifiedDbms() == DBMS.ACCESS:
+                nulledCastedField = queries[backend.getIdentifiedDbms()].isnull.query % (nulledCastedField, nulledCastedField)
             else:
-                nulledCastedField = queries[getIdentifiedDBMS()].isnull.query % nulledCastedField
+                nulledCastedField = queries[backend.getIdentifiedDbms()].isnull.query % nulledCastedField
 
         return nulledCastedField
 
@@ -309,12 +308,12 @@ class Agent:
         @rtype: C{str}
         """
 
-        if not kb.dbmsDetected:
+        if not backend.getDbms():
             return fields
 
         fields = fields.replace(", ", ",")
         fieldsSplitted = fields.split(",")
-        dbmsDelimiter = queries[getIdentifiedDBMS()].delimiter.query
+        dbmsDelimiter = queries[backend.getIdentifiedDbms()].delimiter.query
         nulledCastedFields = []
 
         for field in fieldsSplitted:
@@ -377,13 +376,13 @@ class Agent:
     def simpleConcatQuery(self, query1, query2):
         concatenatedQuery = ""
 
-        if getIdentifiedDBMS() == DBMS.MYSQL:
+        if backend.getIdentifiedDbms() == DBMS.MYSQL:
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
-        elif getIdentifiedDBMS() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
+        elif backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
-        elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+        elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             concatenatedQuery = "%s+%s" % (query1, query2)
 
         return concatenatedQuery
@@ -425,7 +424,7 @@ class Agent:
             concatenatedQuery = query
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
 
-        if getIdentifiedDBMS() == DBMS.MYSQL:
+        if backend.getIdentifiedDbms() == DBMS.MYSQL:
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery += ",'%s')" % kb.misc.stop
@@ -438,7 +437,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-        elif getIdentifiedDBMS() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
+        elif backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
@@ -451,10 +450,10 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'||%s||'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-            if getIdentifiedDBMS() == DBMS.ORACLE and " FROM " not in concatenatedQuery and (fieldsSelect or fieldsNoSelect):
+            if backend.getIdentifiedDbms() == DBMS.ORACLE and " FROM " not in concatenatedQuery and (fieldsSelect or fieldsNoSelect):
                 concatenatedQuery += " FROM DUAL"
 
-        elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+        elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.misc.start, 1)
                 concatenatedQuery += "+'%s'" % kb.misc.stop
@@ -520,8 +519,8 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if getIdentifiedDBMS() in FROM_TABLE and inbandQuery.endswith(FROM_TABLE[getIdentifiedDBMS()]):
-            inbandQuery = inbandQuery[:-len(FROM_TABLE[getIdentifiedDBMS()])]
+        if backend.getIdentifiedDbms() in FROM_TABLE and inbandQuery.endswith(FROM_TABLE[backend.getIdentifiedDbms()]):
+            inbandQuery = inbandQuery[:-len(FROM_TABLE[backend.getIdentifiedDbms()])]
 
         for element in range(count):
             if element > 0:
@@ -540,9 +539,9 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if getIdentifiedDBMS() in FROM_TABLE:
+        if backend.getIdentifiedDbms() in FROM_TABLE:
             if " FROM " not in inbandQuery:
-                inbandQuery += FROM_TABLE[getIdentifiedDBMS()]
+                inbandQuery += FROM_TABLE[backend.getIdentifiedDbms()]
 
         if intoRegExp:
             inbandQuery += intoRegExp
@@ -559,8 +558,8 @@ class Agent:
                 else:
                     inbandQuery += char
 
-            if getIdentifiedDBMS() in FROM_TABLE:
-                inbandQuery += FROM_TABLE[getIdentifiedDBMS()]
+            if backend.getIdentifiedDbms() in FROM_TABLE:
+                inbandQuery += FROM_TABLE[backend.getIdentifiedDbms()]
 
         inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
@@ -589,21 +588,21 @@ class Agent:
         """
 
         limitedQuery = query
-        limitStr = queries[getIdentifiedDBMS()].limit.query
+        limitStr = queries[backend.getIdentifiedDbms()].limit.query
         fromIndex = limitedQuery.index(" FROM ")
         untilFrom = limitedQuery[:fromIndex]
         fromFrom = limitedQuery[fromIndex+1:]
         orderBy = False
 
-        if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
-            limitStr = queries[getIdentifiedDBMS()].limit.query % (num, 1)
+        if backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
+            limitStr = queries[backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
-        elif getIdentifiedDBMS() == DBMS.FIREBIRD:
-            limitStr = queries[getIdentifiedDBMS()].limit.query % (num+1, num+1)
+        elif backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+            limitStr = queries[backend.getIdentifiedDbms()].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
-        elif getIdentifiedDBMS() == DBMS.ORACLE:
+        elif backend.getIdentifiedDbms() == DBMS.ORACLE:
             if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
@@ -615,7 +614,7 @@ class Agent:
             limitedQuery = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
-        elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+        elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             forgeNotIn = True
 
             if " ORDER BY " in limitedQuery:
@@ -629,7 +628,7 @@ class Agent:
                 limitedQuery = limitedQuery.replace("DISTINCT %s" % notDistinct, notDistinct)
 
             if limitedQuery.startswith("SELECT TOP ") or limitedQuery.startswith("TOP "):
-                topNums = re.search(queries[getIdentifiedDBMS()].limitregexp.query, limitedQuery, re.I)
+                topNums = re.search(queries[backend.getIdentifiedDbms()].limitregexp.query, limitedQuery, re.I)
 
                 if topNums:
                     topNums = topNums.groups()
@@ -675,8 +674,8 @@ class Agent:
         @rtype: C{str}
         """
 
-        if getIdentifiedDBMS() is not None and hasattr(queries[getIdentifiedDBMS()], "case"):
-            return queries[getIdentifiedDBMS()].case.query % expression
+        if backend.getIdentifiedDbms() is not None and hasattr(queries[backend.getIdentifiedDbms()], "case"):
+            return queries[backend.getIdentifiedDbms()].case.query % expression
         else:
             return expression
 

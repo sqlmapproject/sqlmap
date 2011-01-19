@@ -7,7 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import getIdentifiedDBMS
+from lib.core.common import backend
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.data import conf
@@ -63,11 +63,11 @@ def setHandler():
                   ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
                 ]
 
-    if getIdentifiedDBMS() is not None:
+    if backend.getIdentifiedDbms() is not None:
         for i in xrange(len(dbmsObj)):
             dbmsAliases, _, _ = dbmsObj[i]
 
-            if getIdentifiedDBMS().lower() in dbmsAliases:
+            if backend.getIdentifiedDbms().lower() in dbmsAliases:
                 if i > 0:
                     pushValue(dbmsObj[i])
                     dbmsObj.remove(dbmsObj[i])
@@ -94,12 +94,12 @@ def setHandler():
             conf.dbmsConnector.connect()
 
         if handler.checkDbms():
-            kb.dbmsDetected = True
             conf.dbmsHandler = handler
 
             break
         else:
             conf.dbmsConnector = None
 
-    # At this point proper back-end DBMS is fingerprinted (kb.dbms)
-    kb.misc.forcedDbms = None
+    # At this point back-end DBMS is correctly fingerprinted, no need
+    # to enforce it anymore
+    backend.flushForcedDbms()

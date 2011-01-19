@@ -10,9 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import formatDBMSfp
-from lib.core.common import formatFingerprint
-from lib.core.common import getErrorParsedDBMSesFormatted
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -33,14 +32,14 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.MYSQL)
 
     def __commentCheck(self):
-        infoMsg = "executing MySQL comment injection fingerprint"
+        infoMsg = "executing %s comment injection fingerprint" % DBMS.MYSQL
         logger.info(infoMsg)
 
         randInt = randomInt()
         result = inject.checkBooleanExpression("%d=%d/* NoValue */" % (randInt, randInt))
 
         if not result:
-            warnMsg = "unable to perform MySQL comment injection"
+            warnMsg = "unable to perform %s comment injection" % DBMS.MYSQL
             logger.warn(warnMsg)
 
             return None
@@ -98,19 +97,19 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = formatFingerprint("web server", kb.headersFp)
+        wsOsFp = format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value  += "back-end DBMS: "
-        actVer  = formatDBMSfp()
+        value += "back-end DBMS: "
+        actVer = format.getDbms()
 
         if not conf.extensiveFp:
             value += actVer
@@ -121,7 +120,7 @@ class Fingerprint(GenericFingerprint):
         value += "active fingerprint: %s" % actVer
 
         if comVer:
-            comVer = formatDBMSfp([comVer])
+            comVer = format.getDbms([comVer])
             value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
 
         if kb.bannerFp:
@@ -130,10 +129,10 @@ class Fingerprint(GenericFingerprint):
             if re.search("-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
-            banVer = formatDBMSfp([banVer])
+            banVer = format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = getErrorParsedDBMSesFormatted()
+        htmlErrorFp = format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -151,36 +150,38 @@ class Fingerprint(GenericFingerprint):
         * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
-        if not conf.extensiveFp and ((kb.dbms is not None and kb.dbms.lower() in MYSQL_ALIASES) \
-           or conf.dbms in MYSQL_ALIASES) and kb.dbmsVersion and \
-           kb.dbmsVersion[0] != UNKNOWN_DBMS_VERSION:
-            kb.dbmsVersion[0] = kb.dbmsVersion[0].replace(">", "")
-            kb.dbmsVersion[0] = kb.dbmsVersion[0].replace("=", "")
-            kb.dbmsVersion[0] = kb.dbmsVersion[0].replace(" ", "")
+        if not conf.extensiveFp and (backend.isDbmsWithin(MYSQL_ALIASES) \
+           or conf.dbms in MYSQL_ALIASES) and backend.getVersion() and \
+           backend.getVersion() != UNKNOWN_DBMS_VERSION:
+            v = backend.getVersion().replace(">", "")
+            v = v.replace("=", "")
+            v = v.replace(" ", "")
 
-            setDbms("%s %s" % (DBMS.MYSQL, kb.dbmsVersion[0]))
+            backend.setVersion(v)
 
-            if str(kb.dbmsVersion[0]) >= '5':
+            setDbms("%s %s" % (DBMS.MYSQL, backend.getVersion()))
+
+            if backend.isVersionGreaterOrEqualThan("5"):
                 kb.data.has_information_schema = True
 
             self.getBanner()
 
             return True
 
-        infoMsg = "testing MySQL"
+        infoMsg = "testing %s" % DBMS.MYSQL
         logger.info(infoMsg)
 
         randInt = getUnicode(randomInt(1))
         result = inject.checkBooleanExpression("CONNECTION_ID()=CONNECTION_ID()")
 
         if result:
-            infoMsg = "confirming MySQL"
+            infoMsg = "confirming %s" % DBMS.MYSQL
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("USER()=USER()")
 
             if not result:
-                warnMsg = "the back-end DBMS is not MySQL"
+                warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
                 logger.warn(warnMsg)
 
                 return False
@@ -189,52 +190,55 @@ class Fingerprint(GenericFingerprint):
             #if inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.TABLES LIMIT 0, 1)" % (randInt, randInt)):
             if inject.checkBooleanExpression("EXISTS(SELECT %s FROM information_schema.TABLES)" % randInt):
                 kb.data.has_information_schema = True
-                kb.dbmsVersion = [">= 5.0.0"]
+                backend.setVersion(">= 5.0.0")
                 setDbms("%s 5" % DBMS.MYSQL)
                 self.getBanner()
 
                 if not conf.extensiveFp:
                     return True
 
+                infoMsg = "actively fingerprinting %s" % DBMS.MYSQL
+                logger.info(infoMsg)
+
                 # Check if it is MySQL >= 5.5.0
                 if inject.checkBooleanExpression("TO_SECONDS(950501)>0"):
-                    kb.dbmsVersion = [">= 5.5.0"]
+                    backend.setVersion(">= 5.5.0")
 
                 # Check if it is MySQL >= 5.1.2 and < 5.5.0
                 elif inject.checkBooleanExpression("@@table_open_cache=@@table_open_cache"):
                     if inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.GLOBAL_STATUS LIMIT 0, 1)" % (randInt, randInt)):
-                        kb.dbmsVersion = [">= 5.1.12", "< 5.5.0"]
+                        backend.setVersionList([">= 5.1.12", "< 5.5.0"])
                     elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1)" % (randInt,randInt)):
-                        kb.dbmsVersion = [">= 5.1.7", "< 5.1.12"]
+                        backend.setVersionList([">= 5.1.7", "< 5.1.12"])
                     elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1)" % (randInt, randInt)):
-                        kb.dbmsVersion = ["= 5.1.6"]
+                        backend.setVersion("= 5.1.6")
                     elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PLUGINS LIMIT 0, 1)" % (randInt, randInt)):
-                        kb.dbmsVersion = [">= 5.1.5", "< 5.1.6"]
+                        backend.setVersionList([">= 5.1.5", "< 5.1.6"])
                     else:
-                        kb.dbmsVersion = [">= 5.1.2", "< 5.1.5"]
+                        backend.setVersionList([">= 5.1.2", "< 5.1.5"])
 
                 # Check if it is MySQL >= 5.0.0 and < 5.1.2
                 elif inject.checkBooleanExpression("@@hostname=@@hostname"):
-                    kb.dbmsVersion = [">= 5.0.38", "< 5.1.2"]
+                    backend.setVersionList([">= 5.0.38", "< 5.1.2"])
                 elif inject.checkBooleanExpression("@@character_set_filesystem=@@character_set_filesystem"):
-                    kb.dbmsVersion = [">= 5.0.19", "< 5.0.38"]
+                    backend.setVersionList([">= 5.0.19", "< 5.0.38"])
                 elif not inject.checkBooleanExpression("%s=(SELECT %s FROM DUAL WHERE %s!=%s)" % (randInt, randInt, randInt, randInt)):
-                    kb.dbmsVersion = [">= 5.0.11", "< 5.0.19"]
+                    backend.setVersionList([">= 5.0.11", "< 5.0.19"])
                 elif inject.checkBooleanExpression("@@div_precision_increment=@@div_precision_increment"):
-                    kb.dbmsVersion = [">= 5.0.6", "< 5.0.11"]
+                    backend.setVersionList([">= 5.0.6", "< 5.0.11"])
                 elif inject.checkBooleanExpression("@@automatic_sp_privileges=@@automatic_sp_privileges"):
-                    kb.dbmsVersion = [">= 5.0.3", "< 5.0.6"]
+                    backend.setVersionList([">= 5.0.3", "< 5.0.6"])
                 else:
-                    kb.dbmsVersion = [">= 5.0.0", "< 5.0.3"]
+                    backend.setVersionList([">= 5.0.0", "< 5.0.3"])
 
             # For cases when information_schema is missing
             elif inject.checkBooleanExpression("DATABASE() LIKE SCHEMA()"):
-                kb.dbmsVersion = [">= 5.0.2"]
+                backend.setVersion(">= 5.0.2")
                 setDbms("%s 5" % DBMS.MYSQL)
                 self.getBanner()
 
             elif inject.checkBooleanExpression("STRCMP(LOWER(CURRENT_USER()), UPPER(CURRENT_USER()))=0"):
-                kb.dbmsVersion = ["< 5.0.0"]
+                backend.setVersion("< 5.0.0")
                 setDbms("%s 4" % DBMS.MYSQL)
                 self.getBanner()
 
@@ -243,26 +247,26 @@ class Fingerprint(GenericFingerprint):
 
                 # Check which version of MySQL < 5.0.0 it is
                 if inject.checkBooleanExpression("3=(SELECT COERCIBILITY(USER()))"):
-                    kb.dbmsVersion = [">= 4.1.11", "< 5.0.0"]
+                    backend.setVersionList([">= 4.1.11", "< 5.0.0"])
                 elif inject.checkBooleanExpression("2=(SELECT COERCIBILITY(USER()))"):
-                    kb.dbmsVersion = [">= 4.1.1", "< 4.1.11"]
+                    backend.setVersionList([">= 4.1.1", "< 4.1.11"])
                 elif inject.checkBooleanExpression("CURRENT_USER()=CURRENT_USER()"):
-                    kb.dbmsVersion = [">= 4.0.6", "< 4.1.1"]
+                    backend.setVersionList([">= 4.0.6", "< 4.1.1"])
 
                     if inject.checkBooleanExpression("'utf8'=(SELECT CHARSET(CURRENT_USER()))"):
-                        kb.dbmsVersion = ["= 4.1.0"]
+                        backend.setVersion("= 4.1.0")
                     else:
-                        kb.dbmsVersion = [">= 4.0.6", "< 4.1.0"]
+                        backend.setVersionList([">= 4.0.6", "< 4.1.0"])
                 else:
-                    kb.dbmsVersion = [">= 4.0.0", "< 4.0.6"]
+                    backend.setVersionList([">= 4.0.0", "< 4.0.6"])
             else:
-                kb.dbmsVersion = ["< 4.0.0"]
+                backend.setVersion("< 4.0.0")
                 setDbms("%s 3" % DBMS.MYSQL)
                 self.getBanner()
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not MySQL"
+            warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
             logger.warn(warnMsg)
 
             return False
@@ -275,9 +279,10 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("'/'=(SELECT MID(@@datadir, 1, 1))")
-        if result is True:
+
+        if result:
             kb.os = "Linux"
-        elif result is False:
+        elif not result:
             kb.os = "Windows"
 
         if kb.os:

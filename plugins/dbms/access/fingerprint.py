@@ -10,10 +10,9 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import formatDBMSfp
-from lib.core.common import formatFingerprint
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.common import getCurrentThreadData
-from lib.core.common import getErrorParsedDBMSesFormatted
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import wasLastRequestDBMSError
@@ -38,14 +37,15 @@ class Fingerprint(GenericFingerprint):
         # Reference: http://milw0rm.com/papers/198
         retVal = None
         table = None
-        if kb.dbmsVersion and len(kb.dbmsVersion) > 0:
-            if kb.dbmsVersion[0] in ("97", "2000"):
-                table = "MSysAccessObjects"
-            elif kb.dbmsVersion[0] in ("2002-2003", "2007"):
-                table = "MSysAccessStorage"
-            if table:
-                result = inject.checkBooleanExpression("EXISTS(SELECT CURDIR() FROM %s)" % table)
-                retVal = "not sandboxed" if result else "sandboxed"
+
+        if backend.isVersionWithin(("97", "2000")):
+            table = "MSysAccessObjects"
+        elif backend.isVersionWithin(("2002-2003", "2007")):
+            table = "MSysAccessStorage"
+
+        if table is not None:
+            result = inject.checkBooleanExpression("EXISTS(SELECT CURDIR() FROM %s)" % table)
+            retVal = "not sandboxed" if result else "sandboxed"
 
         return retVal
 
@@ -55,30 +55,37 @@ class Fingerprint(GenericFingerprint):
 
         # Microsoft Access table reference updated on 01/2010
         sysTables = { 
-                        "97":           ("MSysModules2", "MSysAccessObjects"),
-                        "2000" :        ("!MSysModules2", "MSysAccessObjects"),
-                        "2002-2003" :   ("MSysAccessStorage", "!MSysNavPaneObjectIDs"),
-                        "2007" :        ("MSysAccessStorage", "MSysNavPaneObjectIDs")
+                      "97":           ("MSysModules2", "MSysAccessObjects"),
+                      "2000" :        ("!MSysModules2", "MSysAccessObjects"),
+                      "2002-2003" :   ("MSysAccessStorage", "!MSysNavPaneObjectIDs"),
+                      "2007" :        ("MSysAccessStorage", "MSysNavPaneObjectIDs")
                     }
         # MSysAccessXML is not a reliable system table because it doesn't always exist
         # ("Access through Access", p6, should be "normally doesn't exist" instead of "is normally empty")
 
         for version, tables in sysTables.items():
             exist = True
+
             for table in tables:
                 negate = False
+
                 if table[0] == '!':
                     negate = True
                     table = table[1:]
+
                 randInt = randomInt()
                 result = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
                 if result is None:
                     result = False
+
                 if negate:
                     result = not result
+
                 exist &= result
+
                 if not exist:
                     break
+
             if exist:
                 return version
 
@@ -108,13 +115,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = formatFingerprint("web server", kb.headersFp)
+        wsOsFp = format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -122,7 +129,7 @@ class Fingerprint(GenericFingerprint):
         value  += "back-end DBMS: "
 
         if not conf.extensiveFp:
-            value += "Microsoft Access"
+            value += DBMS.ACCESS
             return value
 
         actVer = formatDBMSfp() + " (%s)" % (self.__sandBoxCheck())
@@ -138,7 +145,7 @@ class Fingerprint(GenericFingerprint):
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = getErrorParsedDBMSesFormatted()
+        htmlErrorFp = format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -148,37 +155,43 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in ACCESS_ALIASES) or conf.dbms in ACCESS_ALIASES:
+        if not conf.extensiveFp and (backend.isDbmsWithin(ACCESS_ALIASES) or conf.dbms in ACCESS_ALIASES):
             setDbms(DBMS.ACCESS)
 
             return True
 
-        logMsg = "testing Microsoft Access"
+        logMsg = "testing %s" % DBMS.ACCESS
         logger.info(logMsg)
 
         result = inject.checkBooleanExpression("VAL(CVAR(1))=1")
 
         if result:
-            logMsg = "confirming Microsoft Access"
+            logMsg = "confirming %s" % DBMS.ACCESS
             logger.info(logMsg)
 
             result = inject.checkBooleanExpression("IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
 
             if not result:
-                warnMsg = "the back-end DBMS is not Microsoft Access"
+                warnMsg = "the back-end DBMS is not %s" % DBMS.ACCESS
                 logger.warn(warnMsg)
                 return False
 
-            setDbms("Microsoft Access")
+            setDbms(DBMS.ACCESS)
 
             if not conf.extensiveFp:
                 return True
 
-            kb.dbmsVersion = [self.__sysTablesCheck()]
+            infoMsg = "actively fingerprinting %s" % DBMS.ACCESS
+            logger.info(infoMsg)
+
+            version = self.__sysTablesCheck()
+
+            if version is not None:
+                backend.setVersion(version)
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not Microsoft Access"
+            warnMsg = "the back-end DBMS is not %s" % DBMS.ACCESS
             logger.warn(warnMsg)
 
             return False

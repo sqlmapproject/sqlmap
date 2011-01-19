@@ -24,6 +24,7 @@ from extra.clientform.clientform import ParseResponse
 from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
+from lib.core.common import backend
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
@@ -550,11 +551,10 @@ def __setDBMS():
 
     conf.dbms = conf.dbms.lower()
     firstRegExp = "(%s)" % "|".join([alias for alias in SUPPORTED_DBMS])
-    dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms)
+    dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms, re.I)
 
     if dbmsRegExp:
-        conf.dbms      = dbmsRegExp.group(1)
-        kb.dbmsVersion = [ dbmsRegExp.group(2) ]
+        backend.setVersion(str(dbmsRegExp.group(2)))
 
     if conf.dbms not in SUPPORTED_DBMS:
         errMsg  = "you provided an unsupported back-end database management "
@@ -1107,11 +1107,8 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.data            = advancedDict()
 
-    # Basic back-end DBMS fingerprint
+    # Active back-end DBMS fingerprint
     kb.dbms            = None
-    kb.dbmsDetected    = False
-
-    # Active (extensive) back-end DBMS fingerprint
     kb.dbmsVersion     = [ UNKNOWN_DBMS_VERSION ]
 
     kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]

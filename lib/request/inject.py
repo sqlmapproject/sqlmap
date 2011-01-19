@@ -11,11 +11,11 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
-from lib.core.common import getIdentifiedDBMS
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
@@ -54,7 +54,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
-    if (conf.eta or conf.threads > 1) and getIdentifiedDBMS() and not timeBasedCompare:
+    if (conf.eta or conf.threads > 1) and backend.getIdentifiedDbms() and not timeBasedCompare:
         _, length, _ = queryOutputLength(expression, payload)
     else:
         length = None
@@ -137,186 +137,183 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     if not unpack:
         return __goInference(payload, expression, charsetType, firstChar, lastChar)
 
-    if kb.dbmsDetected:
-        _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
+    _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
-        rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
-        if rdbRegExp and getIdentifiedDBMS() == DBMS.FIREBIRD:
-            expressionFieldsList = [expressionFields]
+    rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
+    if rdbRegExp and backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+        expressionFieldsList = [expressionFields]
 
-        if len(expressionFieldsList) > 1:
-            infoMsg = "the SQL query provided has more than a field. "
-            infoMsg += "sqlmap will now unpack it into distinct queries "
-            infoMsg += "to be able to retrieve the output even if we "
-            infoMsg += "are going blind"
-            logger.info(infoMsg)
+    if len(expressionFieldsList) > 1:
+        infoMsg = "the SQL query provided has more than a field. "
+        infoMsg += "sqlmap will now unpack it into distinct queries "
+        infoMsg += "to be able to retrieve the output even if we "
+        infoMsg += "are going blind"
+        logger.info(infoMsg)
 
-        # If we have been here from SQL query/shell we have to check if
-        # the SQL query might return multiple entries and in such case
-        # forge the SQL limiting the query output one entry per time
-        # NOTE: I assume that only queries that get data from a table
-        # can return multiple entries
-        if fromUser and " FROM " in expression.upper() and ((getIdentifiedDBMS() not in FROM_TABLE) or (getIdentifiedDBMS() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]))):
-            limitRegExp = re.search(queries[getIdentifiedDBMS()].limitregexp.query, expression, re.I)
-            topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
+    # If we have been here from SQL query/shell we have to check if
+    # the SQL query might return multiple entries and in such case
+    # forge the SQL limiting the query output one entry per time
+    # NOTE: I assume that only queries that get data from a table
+    # can return multiple entries
+    if fromUser and " FROM " in expression.upper() and ((backend.getIdentifiedDbms() not in FROM_TABLE) or (backend.getIdentifiedDbms() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[backend.getIdentifiedDbms()]))):
+        limitRegExp = re.search(queries[backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
+        topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-            if limitRegExp or (getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
-                if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
-                    limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                    limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
+        if limitRegExp or (backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
+            if backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                limitGroupStart = queries[backend.getIdentifiedDbms()].limitgroupstart.query
+                limitGroupStop = queries[backend.getIdentifiedDbms()].limitgroupstop.query
+
+                if limitGroupStart.isdigit():
+                    startLimit = int(limitRegExp.group(int(limitGroupStart)))
+
+                stopLimit = limitRegExp.group(int(limitGroupStop))
+                limitCond = int(stopLimit) > 1
+
+            elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                if limitRegExp:
+                    limitGroupStart = queries[backend.getIdentifiedDbms()].limitgroupstart.query
+                    limitGroupStop = queries[backend.getIdentifiedDbms()].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
 
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
+                elif topLimit:
+                    startLimit = 0
+                    stopLimit = int(topLimit.group(1))
+                    limitCond = int(stopLimit) > 1
 
-                elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
-                    if limitRegExp:
-                        limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                        limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
+            elif backend.getIdentifiedDbms() == DBMS.ORACLE:
+                limitCond = False
+        else:
+            limitCond = True
 
-                        if limitGroupStart.isdigit():
-                            startLimit = int(limitRegExp.group(int(limitGroupStart)))
+        # I assume that only queries NOT containing a "LIMIT #, 1"
+        # (or similar depending on the back-end DBMS) can return
+        # multiple entries
+        if limitCond:
+            if limitRegExp:
+                stopLimit = int(stopLimit)
 
-                        stopLimit = limitRegExp.group(int(limitGroupStop))
-                        limitCond = int(stopLimit) > 1
-                    elif topLimit:
-                        startLimit = 0
-                        stopLimit = int(topLimit.group(1))
-                        limitCond = int(stopLimit) > 1
+                # From now on we need only the expression until the " LIMIT "
+                # (or similar, depending on the back-end DBMS) word
+                if backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                    stopLimit += startLimit
+                    untilLimitChar = expression.index(queries[backend.getIdentifiedDbms()].limitstring.query)
+                    expression = expression[:untilLimitChar]
 
-                elif getIdentifiedDBMS() == DBMS.ORACLE:
-                    limitCond = False
-            else:
-                limitCond = True
+                elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                    stopLimit += startLimit
 
-            # I assume that only queries NOT containing a "LIMIT #, 1"
-            # (or similar depending on the back-end DBMS) can return
-            # multiple entries
-            if limitCond:
-                if limitRegExp:
-                    stopLimit = int(stopLimit)
+            if not stopLimit or stopLimit <= 1:
+                if backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[backend.getIdentifiedDbms()]):
+                    test = False
+                else:
+                    test = True
 
-                    # From now on we need only the expression until the " LIMIT "
-                    # (or similar, depending on the back-end DBMS) word
-                    if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
-                        stopLimit += startLimit
-                        untilLimitChar = expression.index(queries[getIdentifiedDBMS()].limitstring.query)
-                        expression = expression[:untilLimitChar]
+            if test:
+                # Count the number of SQL query entries output
+                countFirstField = queries[backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
+                countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
-                    elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
-                        stopLimit += startLimit
+                if re.search(" ORDER BY ", expression, re.I):
+                    untilOrderChar = countedExpression.index(" ORDER BY ")
+                    countedExpression = countedExpression[:untilOrderChar]
 
-                if not stopLimit or stopLimit <= 1:
-                    if getIdentifiedDBMS() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]):
-                        test = False
-                    else:
-                        test = True
+                if resumeValue:
+                    count = resume(countedExpression, payload)
 
-                if test:
-                    # Count the number of SQL query entries output
-                    countFirstField = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
-                    countedExpression = expression.replace(expressionFields, countFirstField, 1)
+                if not stopLimit:
+                    if not count or not count.isdigit():
+                        count = __goInference(payload, countedExpression, 2, firstChar, lastChar)
 
-                    if re.search(" ORDER BY ", expression, re.I):
-                        untilOrderChar = countedExpression.index(" ORDER BY ")
-                        countedExpression = countedExpression[:untilOrderChar]
+                    if isNumPosStrValue(count):
+                        count = int(count)
 
-                    if resumeValue:
-                        count = resume(countedExpression, payload)
+                        if batch:
+                            stopLimit = count
+                        else:
+                            message = "the SQL query provided can return "
+                            message += "%d entries. How many " % count
+                            message += "entries do you want to retrieve?\n"
+                            message += "[a] All (default)\n[#] Specific number\n"
+                            message += "[q] Quit"
+                            test = readInput(message, default="a")
 
-                    if not stopLimit:
-                        if not count or not count.isdigit():
-                            count = __goInference(payload, countedExpression, 2, firstChar, lastChar)
-
-                        if isNumPosStrValue(count):
-                            count = int(count)
-
-                            if batch:
+                            if not test or test[0] in ("a", "A"):
                                 stopLimit = count
-                            else:
-                                message = "the SQL query provided can return "
-                                message += "%d entries. How many " % count
-                                message += "entries do you want to retrieve?\n"
-                                message += "[a] All (default)\n[#] Specific number\n"
-                                message += "[q] Quit"
-                                test = readInput(message, default="a")
 
-                                if not test or test[0] in ("a", "A"):
-                                    stopLimit = count
+                            elif test[0] in ("q", "Q"):
+                                raise sqlmapUserQuitException
 
-                                elif test[0] in ("q", "Q"):
-                                    raise sqlmapUserQuitException
+                            elif test.isdigit() and int(test) > 0 and int(test) <= count:
+                                stopLimit = int(test)
 
-                                elif test.isdigit() and int(test) > 0 and int(test) <= count:
-                                    stopLimit = int(test)
+                                infoMsg = "sqlmap is now going to retrieve the "
+                                infoMsg += "first %d query output entries" % stopLimit
+                                logger.info(infoMsg)
 
-                                    infoMsg = "sqlmap is now going to retrieve the "
-                                    infoMsg += "first %d query output entries" % stopLimit
-                                    logger.info(infoMsg)
+                            elif test[0] in ("#", "s", "S"):
+                                message = "how many? "
+                                stopLimit = readInput(message, default="10")
 
-                                elif test[0] in ("#", "s", "S"):
-                                    message = "how many? "
-                                    stopLimit = readInput(message, default="10")
-
-                                    if not stopLimit.isdigit():
-                                        errMsg = "invalid choice"
-                                        logger.error(errMsg)
-
-                                        return None
-
-                                    else:
-                                        stopLimit = int(stopLimit)
-
-                                else:
+                                if not stopLimit.isdigit():
                                     errMsg = "invalid choice"
                                     logger.error(errMsg)
 
                                     return None
 
-                        elif count and not count.isdigit():
-                            warnMsg = "it was not possible to count the number "
-                            warnMsg += "of entries for the SQL query provided. "
-                            warnMsg += "sqlmap will assume that it returns only "
-                            warnMsg += "one entry"
-                            logger.warn(warnMsg)
+                                else:
+                                    stopLimit = int(stopLimit)
 
-                            stopLimit = 1
+                            else:
+                                errMsg = "invalid choice"
+                                logger.error(errMsg)
 
-                        elif (not count or int(count) == 0):
-                            warnMsg = "the SQL query provided does not "
-                            warnMsg += "return any output"
-                            logger.warn(warnMsg)
+                                return None
 
-                            return None
+                    elif count and not count.isdigit():
+                        warnMsg = "it was not possible to count the number "
+                        warnMsg += "of entries for the SQL query provided. "
+                        warnMsg += "sqlmap will assume that it returns only "
+                        warnMsg += "one entry"
+                        logger.warn(warnMsg)
 
-                    elif (not count or int(count) == 0) and (not stopLimit or stopLimit == 0):
+                        stopLimit = 1
+
+                    elif (not count or int(count) == 0):
                         warnMsg = "the SQL query provided does not "
                         warnMsg += "return any output"
                         logger.warn(warnMsg)
 
                         return None
 
-                    try:
-                        for num in xrange(startLimit, stopLimit):
-                            output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
-                            outputs.append(output)
+                elif (not count or int(count) == 0) and (not stopLimit or stopLimit == 0):
+                    warnMsg = "the SQL query provided does not "
+                    warnMsg += "return any output"
+                    logger.warn(warnMsg)
 
-                    except KeyboardInterrupt:
-                        print
-                        warnMsg = "Ctrl+C detected in dumping phase"
-                        logger.warn(warnMsg)
+                    return None
 
-                    return outputs
+                try:
+                    for num in xrange(startLimit, stopLimit):
+                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
+                        outputs.append(output)
 
-        elif getIdentifiedDBMS() in FROM_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
-            expression += FROM_TABLE[getIdentifiedDBMS()]
+                except KeyboardInterrupt:
+                    print
+                    warnMsg = "Ctrl+C detected in dumping phase"
+                    logger.warn(warnMsg)
 
-        outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
-        returnValue = ", ".join([output for output in outputs])
-    else:
-        returnValue = __goInference(payload, expression, charsetType, firstChar, lastChar)
+                return outputs
+
+    elif backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
+        expression += FROM_TABLE[backend.getIdentifiedDbms()]
+
+    outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
+    returnValue = ", ".join([output for output in outputs])
 
     return returnValue
 
@@ -495,7 +492,7 @@ def goStacked(expression, silent=False):
     if conf.direct:
         return direct(expression), None
 
-    comment = queries[getIdentifiedDBMS()].comment.query
+    comment = queries[backend.getIdentifiedDbms()].comment.query
     query = agent.prefixQuery("; %s" % expression)
     query = agent.suffixQuery("%s;%s" % (query, comment))
     payload = agent.payload(newValue=query)

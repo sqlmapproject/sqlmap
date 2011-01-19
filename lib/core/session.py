@@ -9,11 +9,10 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import aliasToDbmsEnum
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.common import dataToSessionFile
-from lib.core.common import formatFingerprintString
 from lib.core.common import getFilteredPageContent
-from lib.core.common import getIdentifiedDBMS
 from lib.core.common import readInput
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
@@ -99,9 +98,9 @@ def setDbms(dbms):
     if dbmsRegExp:
         dbms = dbmsRegExp.group(1)
 
-    kb.dbms = aliasToDbmsEnum(dbms)
+    backend.setDbms(dbms)
 
-    logger.info("the back-end DBMS is %s" % kb.dbms)
+    logger.info("the back-end DBMS is %s" % backend.getDbms())
 
 def setOs():
     """
@@ -128,15 +127,15 @@ def setOs():
         return
 
     if "type" in kb.bannerFp:
-        kb.os   = formatFingerprintString(kb.bannerFp["type"])
+        kb.os = format.humanize(kb.bannerFp["type"])
         infoMsg = "the back-end DBMS operating system is %s" % kb.os
 
     if "distrib" in kb.bannerFp:
-        kb.osVersion = formatFingerprintString(kb.bannerFp["distrib"])
-        infoMsg     += " %s" % kb.osVersion
+        kb.osVersion = format.humanize(kb.bannerFp["distrib"])
+        infoMsg += " %s" % kb.osVersion
 
     if "sp" in kb.bannerFp:
-        kb.osSP = int(formatFingerprintString(kb.bannerFp["sp"]).replace("Service Pack ", ""))
+        kb.osSP = int(format.humanize(kb.bannerFp["sp"]).replace("Service Pack ", ""))
 
     elif "sp" not in kb.bannerFp and kb.os == "Windows":
         kb.osSP = 0
@@ -206,11 +205,11 @@ def resumeConfKb(expression, url, value):
             test = readInput(message, default="N")
 
             if not test or test[0] in ("n", "N"):
-                kb.dbms = aliasToDbmsEnum(dbms)
-                kb.dbmsVersion = dbmsVersion
+                backend.setDbms(dbms)
+                backend.setVersionList(dbmsVersion)
         else:
-            kb.dbms = aliasToDbmsEnum(dbms)
-            kb.dbmsVersion = dbmsVersion
+            backend.setDbms(dbms)
+            backend.setVersionList(dbmsVersion)
 
     elif expression == "OS" and url == conf.url:
         os = unSafeFormatString(value[:-1])
@@ -247,7 +246,7 @@ def resumeConfKb(expression, url, value):
         if '.' in table:
             db, table = table.split('.')
         else:
-            db = "%s%s" % (getIdentifiedDBMS(), METADB_SUFFIX)
+            db = "%s%s" % (backend.getIdentifiedDbms(), METADB_SUFFIX)
 
         logMsg = "resuming brute forced table name "
         logMsg += "'%s' from session file" % table
@@ -262,7 +261,7 @@ def resumeConfKb(expression, url, value):
         if '.' in table:
             db, table = table.split('.')
         else:
-            db = "%s%s" % (getIdentifiedDBMS(), METADB_SUFFIX)
+            db = "%s%s" % (backend.getIdentifiedDbms(), METADB_SUFFIX)
 
         logMsg = "resuming brute forced column name "
         logMsg += "'%s' for table '%s' from session file" % (colName, table)

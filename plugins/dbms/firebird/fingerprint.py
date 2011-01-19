@@ -10,10 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import formatDBMSfp
-from lib.core.common import formatFingerprint
-from lib.core.common import getErrorParsedDBMSesFormatted
-from lib.core.common import getIdentifiedDBMS
+from lib.core.common import backend
+from lib.core.common import format
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomRange
@@ -35,13 +33,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = formatFingerprint("web server", kb.headersFp)
+        wsOsFp = format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = formatFingerprint("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -65,7 +63,7 @@ class Fingerprint(GenericFingerprint):
             banVer = formatDBMSfp([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = getErrorParsedDBMSesFormatted()
+        htmlErrorFp = format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -84,13 +82,15 @@ class Fingerprint(GenericFingerprint):
         for i in xrange(len(table)):
             version, checks = table[i]
             failed = False
-            check = checks[randomRange(0,len(checks)-1)].replace("%d", getUnicode(randomRange(1,100)))
+            check = checks[randomRange(0, len(checks)-1)].replace("%d", getUnicode(randomRange(1,100)))
             result = inject.checkBooleanExpression(check)
+
             if result:
                 retVal = version
             else:
                 failed = True
                 break
+
             if failed:
                 break
 
@@ -99,14 +99,14 @@ class Fingerprint(GenericFingerprint):
     def __dialectCheck(self):
         retVal = None
 
-        if getIdentifiedDBMS():
+        if backend.getIdentifiedDbms():
             result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
             retVal = "dialect 3" if result else "dialect 1"
 
         return retVal
 
     def checkDbms(self):
-        if not conf.extensiveFp and (kb.dbms is not None and kb.dbms.lower() in FIREBIRD_ALIASES) or conf.dbms in FIREBIRD_ALIASES:
+        if not conf.extensiveFp and (backend.isDbmsWithin(FIREBIRD_ALIASES) or conf.dbms in FIREBIRD_ALIASES):
             setDbms(DBMS.FIREBIRD)
 
             self.getBanner()
@@ -114,33 +114,39 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-        logMsg = "testing Firebird"
+        logMsg = "testing %s" % DBMS.FIREBIRD
         logger.info(logMsg)
 
         randInt = randomInt()
         result = inject.checkBooleanExpression("EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
 
         if result:
-            logMsg = "confirming Firebird"
+            logMsg = "confirming %s" % DBMS.FIREBIRD
             logger.info(logMsg)
 
             result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
 
             if not result:
-                warnMsg = "the back-end DBMS is not Firebird"
+                warnMsg = "the back-end DBMS is not %s" % DBMS.FIREBIRD
                 logger.warn(warnMsg)
 
                 return False
 
             setDbms(DBMS.FIREBIRD)
 
-            kb.dbmsVersion = [self.__sysTablesCheck()]
+            infoMsg = "actively fingerprinting %s" % DBMS.FIREBIRD
+            logger.info(infoMsg)
+
+            version = self.__sysTablesCheck()
+
+            if version is not None:
+                backend.setVersion(version)
 
             self.getBanner()
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not Firebird"
+            warnMsg = "the back-end DBMS is not %s" % DBMS.FIREBIRD
             logger.warn(warnMsg)
 
             return False

@@ -14,7 +14,7 @@ from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import getIdentifiedDBMS
+from lib.core.common import backend
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
@@ -103,14 +103,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
         # entry per time
         # NOTE: I assume that only queries that get data from a table can
         # return multiple entries
-        if " FROM " in expression.upper() and ((getIdentifiedDBMS() not in FROM_TABLE) or (getIdentifiedDBMS() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]))) and "EXISTS(" not in expression.upper():
-            limitRegExp = re.search(queries[getIdentifiedDBMS()].limitregexp.query, expression, re.I)
+        if " FROM " in expression.upper() and ((backend.getIdentifiedDbms() not in FROM_TABLE) or (backend.getIdentifiedDbms() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[backend.getIdentifiedDbms()]))) and "EXISTS(" not in expression.upper():
+            limitRegExp = re.search(queries[backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
             topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-            if limitRegExp or (getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
-                if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
-                    limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                    limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
+            if limitRegExp or (backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
+                if backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                    limitGroupStart = queries[backend.getIdentifiedDbms()].limitgroupstart.query
+                    limitGroupStop = queries[backend.getIdentifiedDbms()].limitgroupstop.query
 
                     if limitGroupStart.isdigit():
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -118,10 +118,10 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
 
-                elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+                elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                     if limitRegExp:
-                        limitGroupStart = queries[getIdentifiedDBMS()].limitgroupstart.query
-                        limitGroupStop = queries[getIdentifiedDBMS()].limitgroupstop.query
+                        limitGroupStart = queries[backend.getIdentifiedDbms()].limitgroupstart.query
+                        limitGroupStop = queries[backend.getIdentifiedDbms()].limitgroupstop.query
 
                         if limitGroupStart.isdigit():
                             startLimit = int(limitRegExp.group(int(limitGroupStart)))
@@ -133,7 +133,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                         stopLimit = int(topLimit.group(1))
                         limitCond = int(stopLimit) > 1
 
-                elif getIdentifiedDBMS() == DBMS.ORACLE:
+                elif backend.getIdentifiedDbms() == DBMS.ORACLE:
                     limitCond = False
             else:
                 limitCond = True
@@ -147,12 +147,12 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
 
                     # From now on we need only the expression until the " LIMIT "
                     # (or similar, depending on the back-end DBMS) word
-                    if getIdentifiedDBMS() in (DBMS.MYSQL, DBMS.PGSQL):
+                    if backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                         stopLimit += startLimit
-                        untilLimitChar = expression.index(queries[getIdentifiedDBMS()].limitstring.query)
+                        untilLimitChar = expression.index(queries[backend.getIdentifiedDbms()].limitstring.query)
                         expression = expression[:untilLimitChar]
 
-                    elif getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+                    elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                         stopLimit += startLimit
                 elif dump:
                     if conf.limitStart:
@@ -161,14 +161,14 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                         stopLimit = conf.limitStop
 
                 if not stopLimit or stopLimit <= 1:
-                    if getIdentifiedDBMS() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[getIdentifiedDBMS()]):
+                    if backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[backend.getIdentifiedDbms()]):
                         test = False
                     else:
                         test = True
 
                 if test:
                     # Count the number of SQL query entries output
-                    countFirstField = queries[getIdentifiedDBMS()].count.query % expressionFieldsList[0]
+                    countFirstField = queries[backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
                     countedExpression = origExpr.replace(expressionFields, countFirstField, 1)
 
                     if re.search(" ORDER BY ", expression, re.I):
@@ -216,9 +216,9 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
 
                     try:
                         for num in xrange(startLimit, stopLimit):
-                            if getIdentifiedDBMS() in (DBMS.MSSQL, DBMS.SYBASE):
+                            if backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                                 field = expressionFieldsList[0]
-                            elif getIdentifiedDBMS() == DBMS.ORACLE:
+                            elif backend.getIdentifiedDbms() == DBMS.ORACLE:
                                 field = expressionFieldsList
                             else:
                                 field = None

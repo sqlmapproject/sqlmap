@@ -12,7 +12,7 @@ import os
 import rlcompleter
 
 from lib.core import readlineng as readline
-from lib.core.common import getIdentifiedDBMS
+from lib.core.common import backend
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.data import queries
@@ -30,7 +30,7 @@ def loadHistory():
 def queriesForAutoCompletion():
     autoComplQueries = {}
 
-    for item in queries[getIdentifiedDBMS()]._toflat():
+    for item in queries[backend.getIdentifiedDbms()]._toflat():
         if item._has_key('query') and len(item.query) > 1 and item._name != 'blind':
             autoComplQueries[item.query] = None
 

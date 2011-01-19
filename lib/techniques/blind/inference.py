@@ -12,12 +12,13 @@ import time
 import traceback
 
 from lib.core.agent import agent
+from lib.core.common import backend
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
-from lib.core.common import getIdentifiedDBMS
+from lib.core.common import backend
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import popValue
@@ -75,7 +76,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     elif ( isinstance(lastChar, basestring) and lastChar.isdigit() ) or isinstance(lastChar, int):
         lastChar = int(lastChar)
 
-    if kb.dbmsDetected:
+    if backend.getDbms():
         _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
         nulledCastedField = agent.nullAndCastField(fieldToCastStr)
         expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
@@ -125,7 +126,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         hintlock.release()
 
         if hintValue is not None and len(hintValue) >= idx:
-            if getIdentifiedDBMS() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
+            if backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
                 posValue = hintValue[idx-1]
             else:
                 posValue = ord(hintValue[idx-1])
@@ -456,7 +457,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # check it via equal against the substring-query output
                 if commonPattern is not None:
                     # Substring-query containing equals commonPattern
-                    subquery = queries[getIdentifiedDBMS()].substring.query % (expressionUnescaped, 1, len(commonPattern))
+                    subquery = queries[backend.getIdentifiedDbms()].substring.query % (expressionUnescaped, 1, len(commonPattern))
                     testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                     query = agent.suffixQuery(query)
