@@ -74,7 +74,7 @@ METADB_SUFFIX = "_masterdb"
 MIN_TIME_RESPONSES = 15
 
 # after these number of blanks at the end inference should stop (just in case)
-INFERENCE_BLANK_BREAK = 10
+INFERENCE_BLANK_BREAK = 15
 
 # use this replacement character for cases when inference is not able to retrieve the proper character value
 INFERENCE_UNKNOWN_CHAR = '?'
