@@ -183,6 +183,8 @@ class Dump:
                 maxlength1 = 0
                 maxlength2 = 0
 
+                colType = None
+
                 colList = columns.keys()
                 colList.sort(key=lambda x: x.lower())
 
