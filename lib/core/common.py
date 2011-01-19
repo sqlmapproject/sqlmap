@@ -1518,10 +1518,7 @@ def getUnicode(value, encoding=None):
     if isinstance(value, unicode):
         return value
     elif isinstance(value, basestring):
-        if encoding and encoding != conf.dataEncoding:
-            # transencoding from encoding to conf.dataEncoding
-            value = unicode(value, encoding, errors='replace').encode(conf.dataEncoding)
-        return unicode(value, conf.dataEncoding)
+        return unicode(value, encoding or conf.dataEncoding, errors='replace')
     else:
         return unicode(value) # encoding ignored for non-basestring instances
 
