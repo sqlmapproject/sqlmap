@@ -82,6 +82,8 @@ from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import TIME_DELAY_CANDIDATES
+from lib.core.settings import BURP_SPLITTER
+from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
@@ -145,7 +147,12 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         """
         Parses web scarab logs (POST method not supported)
         """
-        reqResList = content.split("### Conversation")
+        reqResList = content.split(WEBSCARAB_SPLITTER)
+
+        if WEBSCARAB_SPLITTER not in content:
+            warnMsg = "given file is not a valid WebScarab log file"
+            logger.warning(warnMsg)
+            return
 
         for request in reqResList:
             url    = extractRegexResult(r"URL: (?P<result>.+?)\n", request, re.I)
@@ -173,7 +180,12 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         port   = None
         scheme = None
 
-        reqResList = content.split("======================================================")
+        if BURP_SPLITTER not in content:
+            warnMsg = "given file is not a valid Burp log file"
+            logger.warning(warnMsg)
+            return
+
+        reqResList = content.split(BURP_SPLITTER)
 
         for request in reqResList:
             if scheme is None:
@@ -267,14 +279,14 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
     fp = openFile(reqFile, "rb")
 
-    fread = fp.read()
-    fread = fread.replace("\r", "")
+    content = fp.read()
+    content = content.replace("\r", "")
 
     if conf.scope:
         logger.info("using regular expression '%s' for filtering targets" % conf.scope)
 
-    __parseBurpLog(fread)
-    __parseWebScarabLog(fread)
+    __parseBurpLog(content)
+    __parseWebScarabLog(content)
 
 def __loadQueries():
     """

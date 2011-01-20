@@ -198,3 +198,9 @@ COMMON_PASSWORD_SUFFIXES = ["1", "123", "2", "12", "3", "13", "7", "11", "5", "2
 
 # Reference: http://www.the-interweb.com/serendipity/index.php?/archives/94-A-brief-analysis-of-40,000-leaked-MySpace-passwords.html
 COMMON_PASSWORD_SUFFIXES += ["!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@"]
+
+# Splitter used between requests in WebScarab log files
+WEBSCARAB_SPLITTER = "### Conversation"
+
+# Splitter used between requests in BURP log files
+BURP_SPLITTER = "======================================================"
