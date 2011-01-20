@@ -230,7 +230,7 @@ class _baseDes(object):
 		# there is no way to correctly decode the data into bytes.
 		if _pythonMajorVersion < 3:
 			if isinstance(data, unicode):
-				raise ValueError("pyDes can only work with bytes, not Unicode strings.")
+                data = str(data)
 		else:
 			if isinstance(data, str):
 				# Only accept ascii unicode values.
