@@ -122,6 +122,9 @@ def decodePage(page, contentEncoding, contentType):
     Decode compressed/charset HTTP response
     """
 
+    if not page or (conf.nullConnection and len(page) < 2):
+        return getUnicode(page)
+
     if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ('gzip', 'x-gzip', 'deflate'):
         if contentEncoding == 'deflate':
             # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations

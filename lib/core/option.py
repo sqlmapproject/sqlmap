@@ -62,6 +62,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
+from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
@@ -1142,7 +1143,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.osVersion       = None
     kb.osSP            = None
 
-    kb.pageEncoding    = None
+    kb.pageEncoding    = DEFAULT_PAGE_ENCODING
     kb.pageStable      = None
     kb.partRun         = None
     kb.proxyAuthHeader = None
