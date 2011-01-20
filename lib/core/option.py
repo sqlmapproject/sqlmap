@@ -149,11 +149,6 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         """
         reqResList = content.split(WEBSCARAB_SPLITTER)
 
-        if WEBSCARAB_SPLITTER not in content:
-            warnMsg = "given file is not a valid WebScarab log file"
-            logger.warning(warnMsg)
-            return
-
         for request in reqResList:
             url    = extractRegexResult(r"URL: (?P<result>.+?)\n", request, re.I)
             method = extractRegexResult(r"METHOD: (?P<result>.+?)\n", request, re.I)
@@ -180,11 +175,6 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         """
         port   = None
         scheme = None
-
-        if BURP_SPLITTER not in content:
-            warnMsg = "given file is not a valid Burp log file"
-            logger.warning(warnMsg)
-            return
 
         reqResList = content.split(BURP_SPLITTER)
 
