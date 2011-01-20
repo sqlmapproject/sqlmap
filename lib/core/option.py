@@ -25,6 +25,7 @@ from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import backend
+from lib.core.common import extractRegexResult
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
@@ -136,108 +137,144 @@ def __urllib2Opener():
     urllib2.install_opener(opener)
 
 def __feedTargetsDict(reqFile, addedTargetUrls):
+    """
+    Parses web scarab and burp logs and adds results to the target url list
+    """
+
+    def __parseWebScarabLog(content):
+        """
+        Parses web scarab logs (POST method not supported)
+        """
+        reqResList = content.split("### Conversation")
+
+        for request in reqResList:
+            url    = extractRegexResult(r"URL: (?P<result>.+?)\n", request, re.I)
+            method = extractRegexResult(r"METHOD: (?P<result>.+?)\n", request, re.I)
+            cookie = extractRegexResult(r"COOKIE: (?P<result>.+?)\n", request, re.I)
+
+            if not method or not url:
+                logger.debug("Invalid log data")
+                continue
+
+            if method.upper() == "POST":
+                warnMsg = "POST requests from WebScarab logs are not supported "
+                warnMsg += "as data content is stored in separate files"
+                logger.warning(warnMsg)
+                continue
+
+            if not kb.targetUrls or url not in addedTargetUrls:
+                kb.targetUrls.add((url, method, None, cookie))
+                addedTargetUrls.add(url)
+
+    def __parseBurpLog(content):
+        """
+        Parses burp logs
+        """
+        port   = None
+        scheme = None
+
+        reqResList = content.split("======================================================")
+
+        for request in reqResList:
+            if scheme is None:
+                schemePort = re.search("\d\d[\:|\.]\d\d[\:|\.]\d\d\s+(http[\w]*)\:\/\/.*?\:([\d]+)", request, re.I)
+
+                if schemePort:
+                    scheme = schemePort.group(1)
+                    port   = schemePort.group(2)
+
+            if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I):
+                continue
+
+            if re.search("^[\n]*(GET|POST).*?\.(gif|jpg|png)\sHTTP\/", request, re.I):
+                continue
+
+            getPostReq = False
+            url        = None
+            host       = None
+            method     = None
+            data       = None
+            cookie     = None
+            params     = False
+            lines      = request.split("\n")
+
+            for line in lines:
+                if len(line) == 0 or line == "\n":
+                    continue
+
+                if line.startswith("GET ") or line.startswith("POST "):
+                    if line.startswith("GET "):
+                        index = 4
+                    else:
+                        index = 5
+
+                    url = line[index:line.index(" HTTP/")]
+                    method = line[:index-1]
+
+                    if "?" in line and "=" in line:
+                        params = True
+
+                    getPostReq = True
+
+                # POST parameters
+                elif data is not None and params:
+                    data += line
+
+                # GET parameters
+                elif "?" in line and "=" in line and ": " not in line:
+                    params = True
+
+                # Headers
+                elif ": " in line:
+                    key, value = line.split(": ", 1)
+
+                    # Cookie and Host headers
+                    if key.lower() == "cookie":
+                        cookie = value
+                    elif key.lower() == "host":
+                        splitValue = value.split(":")
+                        host = splitValue[0]
+
+                        if len(splitValue) > 1:
+                            port = splitValue[1]
+
+                            if not scheme and port == "443":
+                                scheme = "https"
+
+                    # Avoid to add a static content length header to
+                    # conf.httpHeaders and consider the following lines as
+                    # POSTed data
+                    if key == "Content-Length":
+                        data = ""
+                        params = True
+
+                    # Avoid proxy and connection type related headers
+                    elif key not in ( "Proxy-Connection", "Connection" ):
+                        conf.httpHeaders.append((str(key), str(value)))
+
+            if conf.scope:
+                getPostReq &= re.search(conf.scope, host) is not None
+
+            if getPostReq and params:
+                if not url.startswith("http"):
+                    url    = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
+                    scheme = None
+                    port   = None
+
+                if not kb.targetUrls or url not in addedTargetUrls:
+                    kb.targetUrls.add((url, method, data, cookie))
+                    addedTargetUrls.add(url)
+
     fp = openFile(reqFile, "rb")
 
     fread = fp.read()
     fread = fread.replace("\r", "")
 
-    reqResList = fread.split("======================================================")
-
-    port   = None
-    scheme = None
-
     if conf.scope:
         logger.info("using regular expression '%s' for filtering targets" % conf.scope)
 
-    for request in reqResList:
-        if scheme is None:
-            schemePort = re.search("\d\d[\:|\.]\d\d[\:|\.]\d\d\s+(http[\w]*)\:\/\/.*?\:([\d]+)", request, re.I)
-
-            if schemePort:
-                scheme = schemePort.group(1)
-                port   = schemePort.group(2)
-
-        if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I):
-            continue
-
-        if re.search("^[\n]*(GET|POST).*?\.(gif|jpg|png)\sHTTP\/", request, re.I):
-            continue
-
-        getPostReq = False
-        url        = None
-        host       = None
-        method     = None
-        data       = None
-        cookie     = None
-        params     = False
-        lines      = request.split("\n")
-
-        for line in lines:
-            if len(line) == 0 or line == "\n":
-                continue
-
-            if line.startswith("GET ") or line.startswith("POST "):
-                if line.startswith("GET "):
-                    index = 4
-                else:
-                    index = 5
-
-                url = line[index:line.index(" HTTP/")]
-                method = line[:index-1]
-
-                if "?" in line and "=" in line:
-                    params = True
-
-                getPostReq = True
-
-            # POST parameters
-            elif data is not None and params:
-                data += line
-
-            # GET parameters
-            elif "?" in line and "=" in line and ": " not in line:
-                params = True
-
-            # Headers
-            elif ": " in line:
-                key, value = line.split(": ", 1)
-
-                # Cookie and Host headers
-                if key.lower() == "cookie":
-                    cookie = value
-                elif key.lower() == "host":
-                    splitValue = value.split(":")
-                    host = splitValue[0]
-
-                    if len(splitValue) > 1:
-                        port = splitValue[1]
-
-                        if not scheme and port == "443":
-                            scheme = "https"
-
-                # Avoid to add a static content length header to
-                # conf.httpHeaders and consider the following lines as
-                # POSTed data
-                if key == "Content-Length":
-                    data = ""
-                    params = True
-
-                # Avoid proxy and connection type related headers
-                elif key not in ( "Proxy-Connection", "Connection" ):
-                    conf.httpHeaders.append((str(key), str(value)))
-
-        if conf.scope:
-            getPostReq &= re.search(conf.scope, host) is not None
-
-        if getPostReq and params:
-            if not url.startswith("http"):
-                url    = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
-                scheme = None
-                port   = None
-
-            if not kb.targetUrls or url not in addedTargetUrls:
-                kb.targetUrls.add((url, method, data, cookie))
-                addedTargetUrls.add(url)
+    __parseBurpLog(fread)
+    __parseWebScarabLog(fread)
 
 def __loadQueries():
     """
