@@ -23,7 +23,7 @@ from lib.utils.timeout import timeout
 
 def direct(query, content=True):
     output = None
-    select = False
+    select = True
     query = agent.payloadDirect(query)
 
     if backend.getIdentifiedDbms() == DBMS.ORACLE and query.startswith("SELECT ") and " FROM " not in query:
@@ -31,9 +31,12 @@ def direct(query, content=True):
 
     for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
         for sqlStatement in sqlStatements:
-            if query.lower().startswith(sqlStatement) and sqlTitle == "SQL SELECT statement":
-                select = True
+            if query.lower().startswith(sqlStatement) and sqlTitle != "SQL SELECT statement":
+                select = False
                 break
+
+    if select and not query.upper().startswith("SELECT "):
+        query = "SELECT " + query
 
     logger.log(9, query)
 
