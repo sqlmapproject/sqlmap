@@ -2065,12 +2065,42 @@ class backend:
     # Set methods
     @staticmethod
     def setDbms(dbms):
-        kb.dbms = aliasToDbmsEnum(dbms)
+        dbms = aliasToDbmsEnum(dbms)
+
+        if dbms is None:
+            return None
+
+        # Little precaution, in theory this condition should always be false
+        elif kb.dbms is not None and kb.dbms != dbms:
+            msg = "sqlmap previously fingerprinted back-end DBMS "
+            msg += "%s. However now it has been fingerprinted " % kb.dbms
+            msg += "to be %s. " % dbms
+            msg += "Please, specify which DBMS is "
+            msg += "correct [%s (default)/%s] " % (kb.dbms, dbms)
+
+            while True:
+                inp = readInput(msg, default=kb.dbms)
+
+                if aliasToDbmsEnum(inp) == kb.dbms:
+                    break
+                elif aliasToDbmsEnum(inp) == dbms:
+                    kb.dbms = aliasToDbmsEnum(inp)
+                    break
+                else:
+                    warnMsg = "invalid value"
+                    logger.warn(warnMsg)
+
+        elif kb.dbms is None:
+            kb.dbms = aliasToDbmsEnum(dbms)
+
+        return kb.dbms
 
     @staticmethod
     def setVersion(version):
         if isinstance(version, basestring):
             kb.dbmsVersion = [ version ]
+
+        return kb.dbmsVersion
 
     @staticmethod
     def setVersionList(versionsList):
@@ -2088,6 +2118,36 @@ class backend:
     @staticmethod
     def flushForcedDbms():
         kb.misc.forcedDbms = None
+
+    @staticmethod
+    def setOs(os):
+        if os is None:
+            return None
+
+        # Little precaution, in theory this condition should always be false
+        elif kb.os is not None and kb.os != os:
+            msg = "sqlmap previously fingerprinted back-end DBMS "
+            msg += "operating system %s. However now it has " % kb.os
+            msg += "been fingerprinted to be %s. " % os
+            msg += "Please, specify which OS is "
+            msg += "correct [%s (default)/%s] " % (kb.os, os)
+
+            while True:
+                inp = readInput(msg, default=kb.os)
+
+                if inp == kb.os:
+                    break
+                elif inp == os:
+                    kb.os = inp
+                    break
+                else:
+                    warnMsg = "invalid value"
+                    logger.warn(warnMsg)
+
+        elif kb.os is None:
+            kb.os = os
+
+        return kb.os
 
     # Get methods
     @staticmethod
