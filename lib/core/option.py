@@ -164,8 +164,9 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 continue
 
             if method.upper() == "POST":
-                warnMsg = "POST requests from WebScarab logs are not supported "
-                warnMsg += "as data content is stored in separate files"
+                warnMsg = "POST requests from WebScarab logs aren't supported "
+                warnMsg += "as their body content is stored in separate files. "
+                warnMsg += "Nevertheless you can use -r to load them individually."
                 logger.warning(warnMsg)
                 continue
 
