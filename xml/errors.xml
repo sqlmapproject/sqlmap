@@ -67,6 +67,7 @@
         <error regexp="SQLite.Exception"/>
         <error regexp="System.Data.SQLite.SQLiteException"/>
         <error regexp="Warning.*sqlite_.*"/>
+        <error regexp="Warning.*SQLite3::"/>
     </dbms>
 
     <!-- SAP MaxDB -->
