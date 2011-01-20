@@ -319,8 +319,8 @@
             <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' LIMIT %d, 1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
         </tables>
         <columns>
-            <inband query="SELECT sql FROM sqlite_master WHERE tbl_name='%s'"/>
-            <blind query="SELECT sql FROM sqlite_master WHERE tbl_name='%s'" condition=""/>
+            <inband query="SELECT sql FROM sqlite_master WHERE tbl_name='%s' LIMIT 1"/>
+            <blind query="SELECT sql FROM sqlite_master WHERE tbl_name='%s' LIMIT 1" condition=""/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
