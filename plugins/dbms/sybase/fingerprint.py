@@ -45,13 +45,13 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.SYBASE
             return value
 
-        actVer = formatDBMSfp()
+        actVer = format.getDbms()
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"]
-            banVer = formatDBMSfp([banVer])
+            banVer = format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         htmlErrorFp = format.getErrorParsedDBMSes()

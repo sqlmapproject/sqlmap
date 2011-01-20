@@ -132,7 +132,7 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.ACCESS
             return value
 
-        actVer = formatDBMSfp() + " (%s)" % (self.__sandBoxCheck())
+        actVer = format.getDbms() + " (%s)" % (self.__sandBoxCheck())
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
@@ -142,7 +142,7 @@ class Fingerprint(GenericFingerprint):
             if re.search("-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
-            banVer = formatDBMSfp([banVer])
+            banVer = format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         htmlErrorFp = format.getErrorParsedDBMSes()

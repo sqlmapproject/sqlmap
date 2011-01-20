@@ -42,7 +42,7 @@ class Fingerprint(GenericFingerprint):
                 value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
-        actVer = formatDBMSfp()
+        actVer = format.getDbms()
 
         if not conf.extensiveFp:
             value += actVer

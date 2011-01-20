@@ -84,7 +84,7 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.MAXDB
             return value
 
-        actVer = formatDBMSfp() + " (%s)" % self.__versionCheck()
+        actVer = format.getDbms() + " (%s)" % self.__versionCheck()
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
