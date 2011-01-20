@@ -219,7 +219,8 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
                 if not stopLimit:
                     if not count or not count.isdigit():
-                        count = __oneShotErrorUse(countedExpression, expressionFields)
+                        _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
+                        count = __oneShotErrorUse(countedExpression, countedExpressionFields)
 
                     if isNumPosStrValue(count):
                         stopLimit = int(count)
