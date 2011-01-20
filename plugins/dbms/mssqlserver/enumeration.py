@@ -125,6 +125,9 @@ class Enumeration(GenericEnumeration):
             enumDbs = kb.data.cachedDbs
 
         for db in enumDbs:
+            if isinstance(db, list):
+                db = db[0]
+
             foundTbls[db] = []
 
         for tbl in tblList:
