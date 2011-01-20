@@ -367,6 +367,8 @@
    <dbms value="Firebird">
         <cast query="CAST(%s AS VARCHAR(10000))"/>
         <length query="CHAR_LENGTH(%s)"/>
+        <!-- TODO: add proper value -->
+        <delimiter query=""/>
         <limit query="ROWS %d TO %d"/>
         <limitregexp query="\s+ROWS\s+([\d]+)(\s+\TO\s+([\d]+))?"/>
         <limitgroupstart query="1"/>
