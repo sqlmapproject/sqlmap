@@ -448,8 +448,8 @@ class Agent:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsSelectCase:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
-                concatenatedQuery += "||'%s'" % kb.misc.stop
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||(SELECT " % kb.misc.start, 1)
+                concatenatedQuery += ")||'%s'" % kb.misc.stop
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.misc.stop, 1)
@@ -458,9 +458,6 @@ class Agent:
                 concatenatedQuery += "||'%s'" % kb.misc.stop
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'||%s||'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
-
-            if backend.getIdentifiedDbms() == DBMS.ORACLE and " FROM " not in concatenatedQuery and (fieldsSelect or fieldsNoSelect):
-                concatenatedQuery += " FROM DUAL"
 
         elif backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             if fieldsExists:
@@ -552,7 +549,7 @@ class Agent:
             inbandQuery += query[conditionIndex:]
 
         if backend.getIdentifiedDbms() in FROM_TABLE:
-            if " FROM " not in inbandQuery:
+            if " FROM " not in inbandQuery or "(CASE " in inbandQuery:
                 inbandQuery += FROM_TABLE[backend.getIdentifiedDbms()]
 
         if intoRegExp:
