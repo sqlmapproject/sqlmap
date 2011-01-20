@@ -279,6 +279,9 @@ def initTargetEnv():
     """
 
     if conf.multipleTargets:
+        if conf.sessionFP:
+            conf.sessionFP.close()
+
         if conf.cj:
             conf.cj.clear()
 
