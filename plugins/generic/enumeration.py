@@ -76,6 +76,7 @@ class Enumeration:
         kb.data.cachedColumns          = {}
         kb.data.dumpedTable            = {}
         kb.data.processChar            = None
+        self.alwaysRetrieveSqlOutput   = False
 
     def getBanner(self):
         if not conf.getBanner:
@@ -1000,8 +1001,13 @@ class Enumeration:
                 table = {}
                 columns = {}
 
-                for column, colType in value:
-                    columns[column] = colType
+                for columnData in value:
+                    name = columnData[0]
+
+                    if len(columnData) == 1:
+                        columns[name] = ""
+                    else:
+                        columns[name] = columnData[1]
 
                 table[conf.tbl] = columns
                 kb.data.cachedColumns[conf.db] = table
@@ -1913,8 +1919,9 @@ class Enumeration:
             raise sqlmapMissingMandatoryOptionException, errMsg
 
     def sqlQuery(self, query):
-        output  = None
+        output = None
         sqlType = None
+        getOutput = None
 
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:
@@ -1923,11 +1930,15 @@ class Enumeration:
 
                     break
 
-        message   = "do you want to retrieve the SQL statement output? "
-        message  += "[Y/n] "
-        getOutput = readInput(message, default="Y")
+        if not self.alwaysRetrieveSqlOutput:
+            message = "do you want to retrieve the SQL statement output? "
+            message += "[Y/n/a] "
+            getOutput = readInput(message, default="Y")
 
-        if not getOutput or getOutput in ("y", "Y"):
+            if getOutput in ("a", "A"):
+                self.alwaysRetrieveSqlOutput = True
+
+        if not getOutput or getOutput in ("y", "Y") or self.alwaysRetrieveSqlOutput:
             infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             logger.info(infoMsg)
 
