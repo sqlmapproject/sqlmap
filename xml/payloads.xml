@@ -441,7 +441,7 @@ Formats:
 
     <!-- Boolean-based blind tests - WHERE/HAVING clause -->
     <test>
-        <title>AND boolean-based blind - WHERE or HAVING clauses</title>
+        <title>AND boolean-based blind - WHERE or HAVING clause</title>
         <stype>1</stype>
         <level>1</level>
         <risk>1</risk>
@@ -457,7 +457,7 @@ Formats:
     </test>
 
     <test>
-        <title>AND boolean-based blind - WHERE or HAVING clauses (MySQL comment)</title>
+        <title>AND boolean-based blind - WHERE or HAVING clause (MySQL comment)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -474,7 +474,7 @@ Formats:
     </test>
 
     <test>
-        <title>AND boolean-based blind - WHERE or HAVING clauses (Generic comment)</title>
+        <title>AND boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -491,7 +491,7 @@ Formats:
     </test>
 
    <test>
-        <title>OR boolean-based blind - WHERE or HAVING clauses</title>
+        <title>OR boolean-based blind - WHERE or HAVING clause</title>
         <stype>1</stype>
         <level>2</level>
         <risk>3</risk>
@@ -507,7 +507,7 @@ Formats:
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE or HAVING clauses (MySQL comment)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clause (MySQL comment)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>3</risk>
@@ -527,7 +527,7 @@ Formats:
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE or HAVING clauses (Generic comment)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>3</risk>
@@ -542,7 +542,7 @@ Formats:
             <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
     </test>
-    <!-- End of boolean-based blind tests - WHERE or HAVING clauses -->
+    <!-- End of boolean-based blind tests - WHERE or HAVING clause -->
 
 
     <!-- Boolean-based blind tests - Parameter replace -->
@@ -771,9 +771,9 @@ Formats:
     <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
 
 
-    <!-- Error-based tests - WHERE or HAVING clauses -->
+    <!-- Error-based tests - WHERE or HAVING clause -->
     <test>
-        <title>MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clauses</title>
+        <title>MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -793,7 +793,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL AND error-based - WHERE or HAVING clauses</title>
+        <title>PostgreSQL AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -812,7 +812,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clauses</title>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -831,7 +831,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clauses (IN)</title>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (IN)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -850,7 +850,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE or HAVING clauses (XMLType)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clause (XMLType)</title>
         <stype>2</stype>
         <level>1</level>
         <risk>0</risk>
@@ -869,7 +869,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE or HAVING clauses (utl_inaddr.get_host_address)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clause (utl_inaddr.get_host_address)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -889,7 +889,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE or HAVING clauses (ctxsys.drithsx.sn)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clause (ctxsys.drithsx.sn)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
@@ -908,7 +908,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird AND error-based - WHERE or HAVING clauses</title>
+        <title>Firebird AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -927,7 +927,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 OR error-based - WHERE or HAVING clauses</title>
+        <title>MySQL &gt;= 5.0 OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -947,7 +947,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL OR error-based - WHERE or HAVING clauses</title>
+        <title>MySQL OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -967,7 +967,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL OR error-based - WHERE or HAVING clauses</title>
+        <title>PostgreSQL OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -986,7 +986,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clauses</title>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -1005,7 +1005,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clauses (IN)</title>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause (IN)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1024,7 +1024,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE or HAVING clauses (XMLType)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clause (XMLType)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>2</risk>
@@ -1043,7 +1043,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE or HAVING clauses (utl_inaddr.get_host_address)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clause (utl_inaddr.get_host_address)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1063,7 +1063,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE or HAVING clauses (ctxsys.drithsx.sn)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clause (ctxsys.drithsx.sn)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1082,7 +1082,7 @@ Formats:
     </test>
 
     <test>
-        <title>Firebird OR error-based - WHERE or HAVING clauses</title>
+        <title>Firebird OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1103,7 +1103,7 @@ Formats:
          TODO: if possible, add payload for SQLite, Microsoft Access,
          and SAP MaxDB - no known techniques at this time
     -->
-    <!-- End of error-based tests - WHERE or HAVING clauses -->
+    <!-- End of error-based tests - WHERE or HAVING clause -->
 
 
     <!-- Error-based tests - Parameter replace -->
