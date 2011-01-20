@@ -1417,7 +1417,7 @@ def getUnicode(value, encoding=None):
     if isinstance(value, unicode):
         return value
     elif isinstance(value, basestring):
-        return unicode(value, encoding or conf.dataEncoding)
+        return unicode(value, encoding or conf.dataEncoding, errors="replace")
     else:
         return unicode(value) # encoding ignored for non-basestring instances
 
@@ -2218,6 +2218,6 @@ def decodeIntToUnicode(value):
     Decodes inferenced integer value with usage of current page encoding
     """
     try:
-        return struct.pack('>H', value).decode(kb.pageEncoding)
+        return struct.pack('B' if value<256 else '>H', value).decode(kb.pageEncoding)
     except:
         return INFERENCE_UNKNOWN_CHAR
