@@ -18,7 +18,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
-from lib.core.common import backend
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import popValue
