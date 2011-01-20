@@ -12,8 +12,6 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import calculateDeltaSeconds
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
 from lib.core.common import backend
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
@@ -233,21 +231,10 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
                                 value += output
                                 parseUnionPage(output, limitedExpr)
 
-                            if conf.verbose in (1, 2):
-                                length = stopLimit - startLimit
-                                count = num - startLimit + 1
-                                status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
-                                dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
-
-                        dataToStdout("\n")
-
                     except KeyboardInterrupt:
                         print
                         warnMsg = "Ctrl+C detected in dumping phase"
                         logger.warn(warnMsg)
-
-                    finally:
-                        clearConsoleLine(True)
 
                     return value
 
