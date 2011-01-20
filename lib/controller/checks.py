@@ -58,31 +58,6 @@ from lib.request.templates import getPageTemplate
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.inband.union.use import configUnion
 
-def unescape(string, dbms):
-    if string is None:
-        return string
-
-    if dbms in unescaper and "WAITFOR DELAY " not in string:
-        return unescaper[dbms](string)
-    else:
-        return string
-
-def unescapeDbms(payload, injection, dbms):
-    # If this is a DBMS-specific test (dbms), sqlmap identified the
-    # DBMS during previous a test (injection.dbms) or the user
-    # provided a DBMS (conf.dbms), unescape the strings between single
-    # quotes in the payload
-    if injection.dbms is not None:
-        payload = unescape(payload, dbms=injection.dbms)
-    elif dbms is not None:
-        payload = unescape(payload, dbms=dbms)
-    elif conf.dbms is not None:
-        payload = unescape(payload, dbms=conf.dbms)
-    elif backend.getIdentifiedDbms() is not None:
-        payload = unescape(payload, dbms=backend.getIdentifiedDbms())
-
-    return payload
-
 def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to
     # successfully inject
@@ -211,7 +186,7 @@ def checkSqlInjection(place, parameter, value):
             # Parse test's <request>
             comment = agent.getComment(test.request)
             fstPayload = agent.cleanupPayload(test.request.payload, value)
-            fstPayload = unescapeDbms(fstPayload, injection, dbms)
+            fstPayload = unescaper.unescape(fstPayload, dbms=dbms)
 
             if conf.prefix is not None and conf.suffix is not None:
                 # Create a custom boundary object for user's supplied prefix
@@ -324,7 +299,7 @@ def checkSqlInjection(place, parameter, value):
                         # In case of boolean-based blind SQL injection
                         if method == PAYLOAD.METHOD.COMPARISON:
                             sndPayload = agent.cleanupPayload(test.response.comparison, value)
-                            sndPayload = unescapeDbms(sndPayload, injection, dbms)
+                            sndPayload = unescaper.unescape(sndPayload, dbms=dbms)
 
                             # Forge response payload by prepending with
                             # boundary's prefix and appending the boundary's
@@ -465,37 +440,12 @@ def checkSqlInjection(place, parameter, value):
 
                         if hasattr(test, "details"):
                             for dKey, dValue in test.details.items():
-                                # Little precaution, in theory this condition
-                                # should always be false
-                                if dKey == "dbms" and injection.dbms is not None and dValue != injection.dbms:
-                                    msg = "previous test(s) identified that the "
-                                    msg += "back-end DBMS possibly is %s. " % injection.dbms
-                                    msg += "However the last successful test "
-                                    msg += "fingerprinted %s. " % dValue
-                                    msg += "Please, specify which DBMS is "
-                                    msg += "correct [%s (default)/%s] " % (injection.dbms, dValue)
-
-                                    while True:
-                                        inp = readInput(msg, default=injection.dbms)
-
-                                        if inp == injection.dbms:
-                                            break
-                                        elif inp == dValue:
-                                            backend.setDbms(inp)
-                                            injection.dbms = aliasToDbmsEnum(inp)
-                                            injection.dbms_version = None
-                                            break
-                                        else:
-                                            warnMsg = "invalid value"
-                                            logger.warn(warnMsg)
-                                elif dKey == "dbms" and injection.dbms is None:
-                                    backend.setDbms(dValue)
-                                    injection.dbms = aliasToDbmsEnum(dValue)
+                                if dKey == "dbms":
+                                    injection.dbms = backend.setDbms(dValue)
                                 elif dKey == "dbms_version" and injection.dbms_version is None:
-                                    backend.setVersion(dValue)
-                                    injection.dbms_version = dValue
+                                    injection.dbms_version = backend.setVersion(dValue)
                                 elif dKey == "os" and injection.os is None:
-                                    injection.os = dValue
+                                    injection.os = backend.setOs(dValue)
 
                         if conf.beep or conf.realTest:
                             beep()

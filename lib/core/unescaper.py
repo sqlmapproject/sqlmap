@@ -14,10 +14,14 @@ class Unescaper(advancedDict):
     def unescape(self, expression, quote=True, dbms=None):
         identifiedDbms = backend.getIdentifiedDbms()
 
-        if identifiedDbms is not None:
-            return self[identifiedDbms](expression, quote=quote)
+        if not expression:
+            return expression
+        elif "WAITFOR DELAY " in expression:
+            return expression
         elif dbms is not None:
             return self[dbms](expression, quote=quote)
+        elif identifiedDbms is not None:
+            return self[identifiedDbms](expression, quote=quote)
         else:
             return expression
 
