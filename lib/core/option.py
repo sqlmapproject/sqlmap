@@ -80,8 +80,8 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
-from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import TIME_DELAY_CANDIDATES
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.update import update
@@ -775,6 +775,16 @@ def __setSafeUrl():
         errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe url feature"
         raise sqlmapSyntaxException, errMsg
 
+def __setPrefixSuffix():
+    if conf.prefix is not None and conf.suffix is None:
+        errMsg = "you specified the payload prefix, but did not provide "
+        errMsg += "the payload suffix"
+        raise sqlmapSyntaxException, errMsg
+    elif conf.prefix is None and conf.suffix is not None:
+        errMsg = "you specified the payload suffix, but did not provide "
+        errMsg += "the payload prefix"
+        raise sqlmapSyntaxException, errMsg
+
 def __setHTTPAuthentication():
     """
     Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or Certificate),
@@ -1405,6 +1415,7 @@ def init(inputOptions=advancedDict()):
         __setHTTPAuthentication()
         __setHTTPProxy()
         __setSafeUrl()
+        __setPrefixSuffix()
         __setGoogleDorking()
         __urllib2Opener()
         __findPageForms()
