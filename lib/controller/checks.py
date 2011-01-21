@@ -50,6 +50,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setDynamicMarkings
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import UNKNOWN_DBMS_VERSION
+from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
@@ -314,6 +315,11 @@ def checkSqlInjection(place, parameter, value):
                             # the False response content
                             kb.matchRatio = None
                             _ = Request.queryPage(cmpPayload, place, raise404=False)
+
+                            # If in the comparing stage there was an error
+                            # then anything non-error will be considered as True
+                            if kb.errorIsNone and kb.matchRatio is None:
+                                kb.matchRatio = LOWER_RATIO_BOUND
 
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
