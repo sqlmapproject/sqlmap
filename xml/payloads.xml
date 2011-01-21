@@ -1558,9 +1558,9 @@ Formats:
     <!-- End of stacked queries tests -->
 
 
-    <!-- Forced-error blind stacked queries tests -->
+    <!-- Stacked conditional-error blind queries tests -->
     <test>
-        <title>MySQL forced-error blind stacked queries</title>
+        <title>MySQL stacked conditional-error blind queries</title>
         <stype>1</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1580,7 +1580,7 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL forced-error blind stacked queries</title>
+        <title>PostgreSQL stacked conditional-error blind queries</title>
         <stype>1</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1597,7 +1597,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase forced-error blind stacked queries</title>
+        <title>Microsoft SQL Server/Sybase stacked conditional-error blind queries</title>
         <stype>1</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1616,7 +1616,7 @@ Formats:
             <os>Windows</os>
         </details>
     </test>
-    <!-- End of forced-error blind stacked queries tests -->
+    <!-- End of stacked conditional-error blind queries tests -->
 
 
     <!-- AND time-based blind tests -->
