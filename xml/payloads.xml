@@ -1594,6 +1594,9 @@ Formats:
         <response>
             <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/0 END);</comparison>
         </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
     </test>
 
     <test>
