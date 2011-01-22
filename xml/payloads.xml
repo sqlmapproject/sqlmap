@@ -554,7 +554,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL boolean-based blind - WHERE or HAVING clause (RLIKE - comment)</title>
+        <title>MySQL boolean-based blind - WHERE or HAVING clause (RLIKE)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -563,7 +563,6 @@ Formats:
         <vector>RLIKE IF([INFERENCE],[ORIGVALUE],0x28)</vector>
         <request>
             <payload>RLIKE IF([RANDNUM]=[RANDNUM],[ORIGVALUE],0x28)</payload>
-            <comment>#</comment>
         </request>
         <response>
             <comparison>RLIKE IF([RANDNUM]=[RANDNUM],[ORIGVALUE],0x28)</comparison>
