@@ -75,6 +75,10 @@ class Agent:
         paramDict = conf.paramDict[place]
         origValue = paramDict[parameter]
 
+        if place == PLACE.URI:
+            origValue = origValue.split('*')[0]
+            origValue = origValue[origValue.rfind('/') + 1:]
+
         if value is None:
             if where == 1:
                 value = origValue
@@ -101,7 +105,7 @@ class Agent:
 
             retValue = ET.tostring(root)
         elif place in (PLACE.UA, PLACE.URI):
-            retValue = paramString.replace("*", self.addPayloadDelimiters(newValue))
+            retValue = paramString.replace("%s*" % origValue, self.addPayloadDelimiters(newValue))
         else:
             retValue = paramString.replace("%s=%s" % (parameter, origValue),
                                            "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
