@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
 import time
 
 from lib.core.agent import agent
@@ -17,6 +18,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
 from lib.core.common import randomStr
+from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -48,7 +50,10 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         # Perform the request
         resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-        if resultPage and randQuery in resultPage and not extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
+        if wasLastRequestDBMSError() or extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
+            continue
+
+        if resultPage and randQuery in resultPage:
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, conf.uChar, where)
 
@@ -65,7 +70,10 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 # Perform the request
                 resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-                if resultPage and not extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I) and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
+                if wasLastRequestDBMSError() or extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
+                    continue
+
+                if resultPage and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
 
             break
