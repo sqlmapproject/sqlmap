@@ -13,6 +13,7 @@ from lib.core.agent import agent
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import backend
+from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
 from lib.core.common import randomStr
@@ -47,7 +48,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         # Perform the request
         resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-        if resultPage and randQuery in resultPage and " UNION ALL SELECT " not in resultPage:
+        if resultPage and randQuery in resultPage and not extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, conf.uChar, where)
 
@@ -64,7 +65,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 # Perform the request
                 resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-                if resultPage and " UNION ALL SELECT " not in resultPage and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
+                if resultPage and not extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I) and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
 
             break
