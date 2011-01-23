@@ -104,8 +104,10 @@ class Agent:
                 child.text = self.addPayloadDelimiters(newValue)
 
             retValue = ET.tostring(root)
-        elif place in (PLACE.UA, PLACE.URI):
+        elif place == PLACE.URI:
             retValue = paramString.replace("%s*" % origValue, self.addPayloadDelimiters(newValue))
+        elif place == PLACE.UA:
+            retValue = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
             retValue = paramString.replace("%s=%s" % (parameter, origValue),
                                            "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
