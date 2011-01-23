@@ -16,7 +16,6 @@ from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
-from lib.core.exception import sqlmapEndSAXParsing
 from lib.core.threads import getCurrentThreadData
 
 class htmlHandler(ContentHandler):
@@ -48,7 +47,6 @@ class htmlHandler(ContentHandler):
                 self.__match = None
                 threadData = getCurrentThreadData()
                 threadData.lastErrorPage = (threadData.lastRequestUID, self.__page)
-                raise sqlmapEndSAXParsing
 
 def htmlParser(page):
     """
@@ -61,10 +59,7 @@ def htmlParser(page):
     page = sanitizeStr(page)
     handler = htmlHandler(page)
 
-    try:
-        parseXmlFile(xmlfile, handler)
-    except sqlmapEndSAXParsing:
-        pass
+    parseXmlFile(xmlfile, handler)
 
     if handler.dbms and handler.dbms not in kb.htmlFp:
         kb.lastParserStatus = handler.dbms
