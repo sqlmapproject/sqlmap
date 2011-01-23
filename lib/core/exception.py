@@ -20,6 +20,9 @@ class sqlmapConnectionException(Exception):
 class sqlmapDataException(Exception):
     pass
 
+class sqlmapEndSAXParsing(Exception):
+    pass
+
 class sqlmapFilePathException(Exception):
     pass
 
