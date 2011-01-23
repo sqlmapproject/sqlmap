@@ -85,9 +85,9 @@
 
     <!-- Ingres -->
     <dbms value="Ingres">
-        <error regexp="Warning.*ingres.*"/>
+        <error regexp="Warning.*ingres_"/>
         <error regexp="Ingres SQLSTATE"/>
-        <error regexp="Ingres.*Driver"/>
+        <error regexp="Ingres\W.*Driver"/>
     </dbms>
 
 </root>
