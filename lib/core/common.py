@@ -204,17 +204,14 @@ def paramToDict(place, parameters=None):
 
     return testableParameters
 
-def getDocRoot(webApi=None):
+def getDocRoot():
     docRoot = None
     pagePath = directoryPath(conf.path)
 
     if kb.os == "Windows":
-        if webApi in ("php", "jsp"):
-            defaultDocRoot = "C:/xampp/htdocs/"
-        else:
-            defaultDocRoot = "C:/Inetpub/wwwroot/"
+        defaultDocRoot = ["C:/xampp/htdocs/", "C:/Inetpub/wwwroot/"]
     else:
-        defaultDocRoot = "/var/www/"
+        defaultDocRoot = ["/var/www/"]
 
     if kb.absFilePaths:
         for absFilePath in kb.absFilePaths:
@@ -227,7 +224,7 @@ def getDocRoot(webApi=None):
             if isWindowsPath(absFilePath):
                 absFilePathWin = posixToNtSlashes(absFilePath)
                 absFilePath = ntToPosixSlashes(absFilePath[2:])
-            elif isWindowsDriveLetterPath(absFilePath): # E.g. C:/xampp/htdocs
+            elif isWindowsDriveLetterPath(absFilePath):
                 absFilePath = absFilePath[2:]
 
             if pagePath in absFilePath:
@@ -252,53 +249,43 @@ def getDocRoot(webApi=None):
         logger.warn(warnMsg)
 
         message = "please provide the web server document root "
-        message += "[%s]: " % defaultDocRoot
+        message += "[%s]: " % ",".join(root for root in defaultDocRoot)
         inputDocRoot = readInput(message, default=defaultDocRoot)
 
         if inputDocRoot:
-            docRoot = inputDocRoot
+            if isinstance(inputDocRoot, basestring):
+                docRoot = inputDocRoot.split(',')
+            else:
+                docRoot = inputDocRoot
         else:
             docRoot = defaultDocRoot
 
     return docRoot
 
-def getDirs(webApi=None):
-    directories = set()
-
-    if kb.os == "Windows":
-        if webApi in ("php", "jsp"):
-            defaultDirs = ["C:/xampp/htdocs/"]
-        else:
-            defaultDirs = ["C:/Inetpub/wwwroot/"]
-    else:
-        defaultDirs = ["/var/www/"]
-
-    if kb.docRoot and kb.docRoot not in defaultDirs:
-        defaultDirs.append(kb.docRoot)
+def getDirs():
+    directories = set("/")
 
     if kb.absFilePaths:
         infoMsg = "retrieved web server full paths: "
-        infoMsg += "'%s'" % ", ".join(path for path in kb.absFilePaths)
+        infoMsg += "'%s'" % ", ".join(ntToPosixSlashes(path) for path in kb.absFilePaths)
         logger.info(infoMsg)
 
         for absFilePath in kb.absFilePaths:
             if absFilePath:
                 directory = directoryPath(absFilePath)
-
-                if isWindowsPath(directory):
-                    directory = ntToPosixSlashes(directory)
-
-                if directory == '/':
-                    continue
-
+                directory = ntToPosixSlashes(directory)
                 directories.add(directory)
     else:
         warnMsg = "unable to retrieve any web server path"
         logger.warn(warnMsg)
 
+    webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/.", conf.url)
+    if webDir:
+        directories.add(webDir)
+
     message = "please provide any additional web server full path to try "
-    message += "to upload the agent [%s]: " % ",".join(directory for directory in defaultDirs)
-    inputDirs = readInput(message, default=",".join(directory for directory in defaultDirs))
+    message += "to upload the agent [Enter for None]: "
+    inputDirs = readInput(message)
 
     if inputDirs:
         inputDirs = inputDirs.replace(", ", ",")
@@ -307,8 +294,6 @@ def getDirs(webApi=None):
         for inputDir in inputDirs:
             if inputDir:
                 directories.add(inputDir)
-    else:
-        [directories.add(directory) for directory in defaultDirs]
 
     return directories
 
