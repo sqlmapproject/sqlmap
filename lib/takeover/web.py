@@ -213,12 +213,21 @@ class Web:
                     localPath = directory
                     uriPath = directory[2:] if isWindowsDriveLetterPath(directory) else directory
                     docRoot = docRoot[2:] if isWindowsDriveLetterPath(docRoot) else docRoot
-                    uriPath = uriPath.replace(docRoot, "/")
-                    uriPath = "/%s" % normalizePath(uriPath)
-                    uriPath = uriPath.replace("//", "/")
+                    if docRoot in uriPath:
+                        uriPath = uriPath.replace(docRoot, "/")
+                        uriPath = "/%s" % normalizePath(uriPath)
+                    else:
+                        webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/.", conf.url)
+                        if webDir:
+                            uriPath = "/%s" % webDir
+                        else:
+                            continue
 
+                uriPath = uriPath.replace("//", "/").rstrip('/')
                 localPath = localPath.rstrip('/')
-                uriPath = uriPath.rstrip('/')
+
+                if not uriPath:
+                    uriPath = '/'
 
                 # Upload the file stager
                 self.__webFileInject(stagerContent, stagerName, localPath)
