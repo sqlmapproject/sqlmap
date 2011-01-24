@@ -526,7 +526,7 @@ def cmdLineParser():
                           default=False, help=SUPPRESS_HELP)
 
         parser.add_option("--technique", dest="technique", type="int",
-                          default=False, help=SUPPRESS_HELP)
+                          default=0, help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)

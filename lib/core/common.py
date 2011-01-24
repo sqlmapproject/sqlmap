@@ -1846,8 +1846,10 @@ def isTechniqueAvailable(technique=None):
     Returns True if there is injection data which sqlmap could use for
     technique specified
     """
-
-    return getTechniqueData(technique) is not None
+    if conf.technique and technique != conf.technique:
+        return False
+    else:
+        return getTechniqueData(technique) is not None
 
 def initTechnique(technique=None):
     """
