@@ -361,6 +361,12 @@
             <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT MIN(%s) FROM %s WHERE CVAR(%s) > '%s'" query2="SELECT TOP 1 %s FROM %s WHERE CVAR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s)"/>
         </dump_table>
+        <users/>
+        <privileges/>
+        <roles/>
+        <search_db/>
+        <search_table/>
+        <search_column/>
    </dbms>
 
    <!-- Firebird -->
