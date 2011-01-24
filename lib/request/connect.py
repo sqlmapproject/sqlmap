@@ -25,6 +25,7 @@ from lib.core.common import getFilteredPageContent
 from lib.core.common import unicodeToSafeHTMLValue
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
+from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
 from lib.core.common import stdev
 from lib.core.common import wasLastRequestDelayed
@@ -217,7 +218,11 @@ class Connect:
                         pass
                     else:
                         conf.url = choice
-                        return Connect.__getPageProxy(**kwargs)
+                        try:
+                            parseTargetUrl()
+                            return Connect.__getPageProxy(**kwargs)
+                        except sqlmapSyntaxException:
+                            continue
 
                     break
 
