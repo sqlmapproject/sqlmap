@@ -41,7 +41,7 @@ class xp_cmdshell:
 
         self.__randStr = randomStr(lowercase=True)
 
-        cmd += "declare @%s nvarchar(999); " % self.__randStr
+        cmd += "DECLARE @%s nvarchar(999); " % self.__randStr
         cmd += "set @%s='" % self.__randStr
         cmd += "CREATE PROCEDURE xp_cmdshell(@cmd varchar(255)) AS DECLARE @ID int "
         cmd += "EXEC sp_OACreate ''WScript.Shell'', @ID OUT "

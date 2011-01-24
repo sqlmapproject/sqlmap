@@ -481,6 +481,9 @@ Formats:
         <response>
             <comparison>AND [RANDNUM]=[RANDNUM1]</comparison>
         </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
     </test>
 
     <test>
