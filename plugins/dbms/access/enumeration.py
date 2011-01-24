@@ -42,6 +42,18 @@ class Enumeration(GenericEnumeration):
 
         return []
 
+    def searchTable(self):
+        warnMsg = "on Microsoft Access it is not possible to search tables"
+        logger.warn(warnMsg)
+
+        return []
+
+    def searchColumn(self):
+        warnMsg = "on Microsoft Access it is not possible to search columns"
+        logger.warn(warnMsg)
+
+        return []
+
     def getCurrentUser(self):
         warnMsg = "on Microsoft Access it is not possible to enumerate the current user"
         logger.warn(warnMsg)

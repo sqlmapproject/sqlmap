@@ -409,6 +409,9 @@
             <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT FIRST 1 SKIP %d %s FROM %s" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
+        <search_db/>
+        <search_table/>
+        <search_column/>
    </dbms>
 
    <!-- http://dev.mysql.com/tech-resources/articles/maxdb-php-ready-for-web.html -->
