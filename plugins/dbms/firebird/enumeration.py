@@ -33,13 +33,13 @@ class Enumeration(GenericEnumeration):
         return []
 
     def searchTable(self):
-        warnMsg = "on Firebird it is not possible to search tables"
+        warnMsg = "on Firebird searching of tables is not implemented"
         logger.warn(warnMsg)
 
         return []
 
     def searchColumn(self):
-        warnMsg = "on Firebird it is not possible to search columns"
+        warnMsg = "on Firebird searching of columns is not implemented"
         logger.warn(warnMsg)
 
         return []
