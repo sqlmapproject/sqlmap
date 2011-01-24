@@ -23,10 +23,7 @@ from lib.core.datatype import injectionDict
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.settings import METADB_SUFFIX
-from lib.core.settings import MSSQL_ALIASES
-from lib.core.settings import MYSQL_ALIASES
-from lib.core.settings import PGSQL_ALIASES
-from lib.core.settings import ORACLE_ALIASES
+from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 
 def safeFormatString(value):
@@ -79,7 +76,6 @@ def setDbms(dbms):
     base as fingerprint.
     @type dbms: C{str}
     """
-
     condition = (
                   not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
@@ -89,10 +85,7 @@ def setDbms(dbms):
     if condition:
         dataToSessionFile("[%s][%s][%s][DBMS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(dbms)))
 
-    firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
-                                     "|".join([alias for alias in MYSQL_ALIASES]),
-                                     "|".join([alias for alias in PGSQL_ALIASES]),
-                                     "|".join([alias for alias in ORACLE_ALIASES]))
+    firstRegExp = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
     dbmsRegExp = re.search("^%s" % firstRegExp, dbms, re.I)
 
     if dbmsRegExp:
@@ -186,10 +179,7 @@ def resumeConfKb(expression, url, value):
         logMsg += "from session file"
         logger.info(logMsg)
 
-        firstRegExp = "(%s|%s|%s|%s)" % ("|".join([alias for alias in MSSQL_ALIASES]),
-                                         "|".join([alias for alias in MYSQL_ALIASES]),
-                                         "|".join([alias for alias in PGSQL_ALIASES]),
-                                         "|".join([alias for alias in ORACLE_ALIASES]))
+        firstRegExp = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
         dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, dbms)
 
         if dbmsRegExp:

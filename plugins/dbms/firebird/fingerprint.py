@@ -22,6 +22,7 @@ from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import METADB_SUFFIX
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
@@ -44,10 +45,11 @@ class Fingerprint(GenericFingerprint):
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value  += "back-end DBMS: "
+        value += "back-end DBMS: "
+        actVer = format.getDbms()
 
         if not conf.extensiveFp:
-            value += DBMS.FIREBIRD
+            value += actVer
             return value
 
         actVer  = format.getDbms() + " (%s)" % (self.__dialectCheck())
@@ -106,13 +108,20 @@ class Fingerprint(GenericFingerprint):
         return retVal
 
     def checkDbms(self):
-        if not conf.extensiveFp and (backend.isDbmsWithin(FIREBIRD_ALIASES) or conf.dbms in FIREBIRD_ALIASES):
-            setDbms(DBMS.FIREBIRD)
+        if not conf.extensiveFp and (backend.isDbmsWithin(FIREBIRD_ALIASES) \
+           or conf.dbms in FIREBIRD_ALIASES) and backend.getVersion() and \
+           backend.getVersion() != UNKNOWN_DBMS_VERSION:
+            v = backend.getVersion().replace(">", "")
+            v = v.replace("=", "")
+            v = v.replace(" ", "")
+
+            backend.setVersion(v)
+
+            setDbms("%s %s" % (DBMS.FIREBIRD, backend.getVersion()))
 
             self.getBanner()
 
-            if not conf.extensiveFp:
-                return True
+            return True
 
         logMsg = "testing %s" % DBMS.FIREBIRD
         logger.info(logMsg)
@@ -141,6 +150,7 @@ class Fingerprint(GenericFingerprint):
 
             if version is not None:
                 backend.setVersion(version)
+                setDbms("%s %s" % (DBMS.FIREBIRD, version))
 
             self.getBanner()
 
