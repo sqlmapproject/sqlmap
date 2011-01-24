@@ -785,6 +785,32 @@ def __setPrefixSuffix():
         errMsg += "the payload prefix"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.prefix is not None and conf.suffix is not None:
+        # Create a custom boundary object for user's supplied prefix
+        # and suffix
+        boundary = advancedDict()
+
+        boundary.level = 1
+        boundary.clause = [ 0 ]
+        boundary.where = [ 1, 2, 3 ]
+        boundary.prefix = conf.prefix
+        boundary.suffix = conf.suffix
+
+        if " like" in boundary.suffix.lower():
+            if "'" in boundary.suffix.lower():
+                boundary.ptype = 3
+            elif '"' in boundary.suffix.lower():
+                boundary.ptype = 5
+        elif "'" in boundary.suffix:
+            boundary.ptype = 2
+        elif '"' in boundary.suffix:
+            boundary.ptype = 4
+        else:
+            boundary.ptype = 1
+
+        # Prepend user's provided boundaries to all others boundaries
+        conf.boundaries.insert(0, boundary)
+
 def __setHTTPAuthentication():
     """
     Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or Certificate),
@@ -1415,7 +1441,6 @@ def init(inputOptions=advancedDict()):
         __setHTTPAuthentication()
         __setHTTPProxy()
         __setSafeUrl()
-        __setPrefixSuffix()
         __setGoogleDorking()
         __urllib2Opener()
         __findPageForms()
@@ -1428,5 +1453,6 @@ def init(inputOptions=advancedDict()):
     __setMetasploit()
 
     loadPayloads()
+    __setPrefixSuffix()
     update()
     __loadQueries()

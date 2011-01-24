@@ -189,32 +189,6 @@ def checkSqlInjection(place, parameter, value):
             fstPayload = agent.cleanupPayload(test.request.payload, value)
             fstPayload = unescaper.unescape(fstPayload, dbms=dbms)
 
-            if conf.prefix is not None and conf.suffix is not None:
-                # Create a custom boundary object for user's supplied prefix
-                # and suffix
-                boundary = advancedDict()
-
-                boundary.level = 1
-                boundary.clause = [ 0 ]
-                boundary.where = [ 1, 2, 3 ]
-                boundary.prefix = conf.prefix
-                boundary.suffix = conf.suffix
-
-                if " like" in boundary.suffix.lower():
-                    if "'" in boundary.suffix.lower():
-                        boundary.ptype = 3
-                    elif '"' in boundary.suffix.lower():
-                        boundary.ptype = 5
-                elif "'" in boundary.suffix:
-                    boundary.ptype = 2
-                elif '"' in boundary.suffix:
-                    boundary.ptype = 4
-                else:
-                    boundary.ptype = 1
-
-                # Prepend user's provided boundaries to all others boundaries
-                conf.boundaries.insert(0, boundary)
-
             for boundary in conf.boundaries:
                 injectable = False
 
@@ -287,7 +261,7 @@ def checkSqlInjection(place, parameter, value):
                     # prefix and appending the boundary's suffix to the
                     # test's ' <payload><comment> ' string
                     boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
-                    boundPayload = agent.suffixQuery(boundPayload, comment, suffix)
+                    boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
                     boundPayload = agent.cleanupPayload(boundPayload, value)
                     reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
 
@@ -307,7 +281,7 @@ def checkSqlInjection(place, parameter, value):
                             # suffix to the test's ' <payload><comment> '
                             # string
                             boundPayload = agent.prefixQuery(sndPayload, prefix, where, clause)
-                            boundPayload = agent.suffixQuery(boundPayload, comment, suffix)
+                            boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
                             boundPayload = agent.cleanupPayload(boundPayload, value)
                             cmpPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
 

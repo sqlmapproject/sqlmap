@@ -139,25 +139,28 @@ class Agent:
 
         query = None
 
-        # Either if the technique is stacked queries (<stype>) or we are
-        # replacing (<where>) the parameter original value with our
-        # payload, do not put a space after the prefix
-        if kb.technique == PAYLOAD.TECHNIQUE.STACKED:
-            query = kb.injection.prefix
-        elif where == 3 or clause == [2, 3] or clause == [ 2 ] or clause == [ 3 ]:
-            query = prefix
-        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ] or kb.injection.clause == [ 3 ]:
-            query = kb.injection.prefix
-        elif kb.technique and kb.technique in kb.injection.data:
+        if where is None and kb.technique and kb.technique in kb.injection.data:
             where = kb.injection.data[kb.technique].where
 
-            if where == 3:
-                query = kb.injection.prefix
+        # If we are replacing (<where>) the parameter original value with
+        # our payload do not prepend with the prefix
+        if where == 3:
+            query = ""
 
-        if query is None:
-            query = kb.injection.prefix or prefix or ''
+        # If the technique is stacked queries (<stype>) do not put a space
+        # after the prefix or it is in GROUP BY / ORDER BY (<clause>)
+        elif kb.technique == PAYLOAD.TECHNIQUE.STACKED:
+            query = kb.injection.prefix
+        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ] or kb.injection.clause == [ 3 ]:
+            query = kb.injection.prefix
+        elif clause == [2, 3] or clause == [ 2 ] or clause == [ 3 ]:
+            query = prefix
 
-            if not (string and string[0] == ';'):
+        # In any other case prepend with the full prefix
+        else:
+            query = kb.injection.prefix or prefix or ""
+
+            if not (string and string[0] == ";"):
                 query += " "
 
         query = "%s%s" % (query, string)
@@ -165,7 +168,7 @@ class Agent:
 
         return query
 
-    def suffixQuery(self, string, comment=None, suffix=None):
+    def suffixQuery(self, string, comment=None, suffix=None, where=None):
         """
         This method appends the DBMS comment to the
         SQL injection request
@@ -177,10 +180,18 @@ class Agent:
         if comment is not None:
             string += comment
 
-        if kb.injection.suffix is None and suffix is not None:
-            string += " %s" % suffix
-        else:
+        if where is None and kb.technique and kb.technique in kb.injection.data:
+            where = kb.injection.data[kb.technique].where
+
+        # If we are replacing (<where>) the parameter original value with
+        # our payload do not append the suffix
+        if where == 3:
+            pass
+
+        elif kb.injection.suffix is not None:
             string += " %s" % kb.injection.suffix
+        elif suffix is not None:
+            string += " %s" % suffix
 
         string = self.cleanupPayload(string)
 
