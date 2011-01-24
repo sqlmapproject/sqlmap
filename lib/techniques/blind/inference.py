@@ -183,7 +183,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if CHAR_INFERENCE_MARK not in payload:
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
             else:
-                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(CHAR_INFERENCE_MARK, chr(posValue) if posValue < 128 else decodeIntToUnicode(posValue))
+                # e.g.: ... > '%c' -> ... > ORD(..)
+                markingValue = "'%s'" % CHAR_INFERENCE_MARK
+                unescapedCharValue = unescaper.unescape(markingValue % chr(posValue) if posValue < 128 else decodeIntToUnicode(posValue))
+                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
