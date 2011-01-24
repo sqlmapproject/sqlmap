@@ -729,7 +729,7 @@ Formats:
     <test>
         <title>PostgreSQL boolean-based blind - Parameter replace</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
