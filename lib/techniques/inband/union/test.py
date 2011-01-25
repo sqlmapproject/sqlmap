@@ -18,7 +18,6 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
 from lib.core.common import randomStr
-from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -50,7 +49,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         # Perform the request
         resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-        if wasLastRequestDBMSError() or extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
+        if extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
             continue
 
         if resultPage and randQuery in resultPage:
@@ -70,7 +69,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 # Perform the request
                 resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-                if wasLastRequestDBMSError() or extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
+                if extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
                     continue
 
                 if resultPage and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
