@@ -43,13 +43,13 @@ def configUnion(char=None, columns=None):
             raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
 
         columns = columns.replace(" ", "")
-        conf.uColsStart, conf.uColsStop = columns.split("-")
+        colsStart, colsStop = columns.split("-")
 
-        if not conf.uColsStart.isdigit() or not conf.uColsStop.isdigit():
+        if not colsStart.isdigit() or not colsStop.isdigit():
             raise sqlmapSyntaxException, "--union-cols must be a range of integers"
 
-        conf.uColsStart = int(conf.uColsStart)
-        conf.uColsStop = int(conf.uColsStop)
+        conf.uColsStart = int(colsStart)
+        conf.uColsStop = int(colsStop)
 
         if conf.uColsStart > conf.uColsStop:
             errMsg = "--union-cols range has to be from lower to "
