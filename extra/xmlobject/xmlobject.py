@@ -102,6 +102,9 @@ impl = getDOMImplementation()
 class MissingRootTag(Exception):
     """root tag name was not given"""
 
+class IncorrectRootTag(Exception):
+    """root tag is given but incorrect"""
+
 class InvalidXML(Exception):
     """failed to parse XML input"""
 
@@ -290,7 +293,7 @@ class XMLNode:
         parentDict = self._parent._childrenByName
         nodeName = node.nodeName
         if not parentDict.has_key(nodeName):
-            parentDict[nodeName] = parent.__dict__[nodeName] = self
+            parentDict[nodeName] = self._parent.__dict__[nodeName] = self
         else:
             if isinstance(parentDict[nodeName], XMLNode):
                 # this is the second child node of a given tag name, so convert
