@@ -16,7 +16,7 @@ def check(module):
     if module[-3:] == ".py":
 
         print "CHECKING ", module
-        pout = os.popen('pylint %s'% module, 'r')
+        pout = os.popen('pylint --rcfile=/dev/null %s'% module, 'r')
         for line in pout:
             if  re.match("E....:.", line):
                 print line
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         print "no directory specified, defaulting to current working directory"
         BASE_DIRECTORY = os.getcwd()
 
-    print "looking for *.py scripts in subdirectories of ", BASE_DIRECTORY 
+    print "looking for *.py scripts in subdirectories of ", BASE_DIRECTORY
     for root, dirs, files in os.walk(BASE_DIRECTORY):
         for name in files:
             filepath = os.path.join(root, name)
