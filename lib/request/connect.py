@@ -259,7 +259,7 @@ class Connect:
                 page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
             except socket.timeout:
                 warnMsg  = "connection timed out while trying "
-                warnMsg += "to get error page information (%d)" % code
+                warnMsg += "to get error page information (%d)" % e.code
                 logger.warn(warnMsg)
                 return None, None
             except:

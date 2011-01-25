@@ -368,6 +368,9 @@ Alessandro Tanasi <alessandro@tanasi.it>
 Andres Tarasco <atarasco@gmail.com>
     for providing me with good feedback
 
+Kazim Bugra Tombul <mhackmail@gmail.com>
+    for reporting a minor bug
+
 Efrain Torres <et@metasploit.com>
     for helping me out to improve the Metasploit Framework 3 sqlmap
     auxiliary module and for commiting it on the Metasploit official
