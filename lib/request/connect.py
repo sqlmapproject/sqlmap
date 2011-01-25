@@ -95,7 +95,7 @@ class Connect:
         requestMsg     += "%s" % urlparse.urlsplit(url)[2] or "/"
         responseMsg     = "HTTP response "
         requestHeaders  = ""
-        responseHeaders = ""
+        responseHeaders = None
         logHeaders      = ""
 
         try:
@@ -253,6 +253,7 @@ class Connect:
 
         except urllib2.HTTPError, e:
             page = None
+            responseHeaders = None
             try:
                 page = e.read()
                 responseHeaders = e.info()

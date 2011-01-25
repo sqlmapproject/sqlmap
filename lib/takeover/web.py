@@ -247,7 +247,7 @@ class Web:
 
                 elif "<%" in uplPage or "<?" in uplPage:
                     warnMsg  = "file stager uploaded "
-                    warnMsg += "on '%s' but not dynamically interpreted" % uriPage
+                    warnMsg += "on '%s' but not dynamically interpreted" % localPath
                     logger.warn(warnMsg)
                     continue
 
