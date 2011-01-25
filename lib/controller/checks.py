@@ -572,7 +572,13 @@ def checkDynamicContent(firstPage, secondPage):
         debugMsg += "because NULL connection used"
         logger.debug(debugMsg)
         return
-    
+
+    if any(page is None for page in (firstPage, secondPage)):
+        warnMsg = "can't check dynamic content "
+        warnMsg += "because of lack of page content"
+        logger.critical(warnMsg)
+        return
+
     seqMatcher = getCurrentThreadData().seqMatcher
     seqMatcher.set_seq1(firstPage)
     seqMatcher.set_seq2(secondPage)
@@ -779,7 +785,10 @@ def checkConnection(suppressOutput=False):
 
         kb.errorIsNone = False
 
-        if wasLastRequestDBMSError():
+        if not kb.originalPage:
+            errMsg = "unable to retrieve page content"
+            raise sqlmapConnectionException, errMsg
+        elif wasLastRequestDBMSError():
             warnMsg = "there is a DBMS error found in the HTTP response body"
             warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
