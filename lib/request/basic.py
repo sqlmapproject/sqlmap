@@ -145,7 +145,10 @@ def decodePage(page, contentEncoding, contentType):
     charset = checkCharEncoding(charset)
     kb.pageEncoding = charset or DEFAULT_PAGE_ENCODING
 
-    return getUnicode(page, kb.pageEncoding)
+    if contentType and any(map(lambda x: x in contentType, ('text/html', 'text/txt'))):
+        page = getUnicode(page, kb.pageEncoding)
+
+    return page
 
 def processResponse(page, responseHeaders):
     page = getUnicode(page)
