@@ -407,7 +407,7 @@ def checkSqlInjection(place, parameter, value):
                         # Feed with test details every time a test is successful
                         injection.data[stype] = advancedDict()
                         injection.data[stype].title = title
-                        injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload, False)
+                        injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload)
                         injection.data[stype].where = where
                         injection.data[stype].vector = vector
                         injection.data[stype].comment = comment

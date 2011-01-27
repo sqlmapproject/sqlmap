@@ -716,20 +716,14 @@ class Agent:
 
         return retVal
 
-    def removePayloadDelimiters(self, inpStr, urlencode_=True):
+    def removePayloadDelimiters(self, inpStr):
         """
         Removes payload delimiters from inside the input string
         """
         retVal = inpStr
 
         if inpStr:
-            if urlencode_:
-                regObj = getCompiledRegex("(?P<result>%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
-
-                for match in regObj.finditer(inpStr):
-                    retVal = retVal.replace(match.group("result"), urlencode(match.group("result").strip(PAYLOAD_DELIMITER), convall=True))
-            else:
-                retVal = retVal.replace(PAYLOAD_DELIMITER, '')
+            retVal = retVal.replace(PAYLOAD_DELIMITER, '')
 
         return retVal
 

@@ -400,25 +400,25 @@ class Connect:
             logger.log(9, payload)
 
         if place == PLACE.COOKIE and conf.cookieUrlencode:
-            value = agent.removePayloadDelimiters(value, False)
+            value = agent.removePayloadDelimiters(value)
             value = urlEncodeCookieValues(value)
         elif place:
-            value = agent.removePayloadDelimiters(value, URL_ENCODE_PAYLOAD[place])
+            value = agent.removePayloadDelimiters(value)
 
         if conf.checkPayload:
             checkPayload(value)
 
         if PLACE.GET in conf.parameters:
-            get = urlencode(conf.parameters[PLACE.GET]) if place != PLACE.GET or not value else value
+            get = urlencode(conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value)
 
         if PLACE.POST in conf.parameters:
-            post = urlencode(conf.parameters[PLACE.POST]) if place != PLACE.POST or not value else value
+            post = urlencode(conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value)
 
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
 
         if PLACE.UA in conf.parameters:
-            ua = urlencode(conf.parameters[PLACE.UA]) if place != PLACE.UA or not value else value
+            ua = urlencode(conf.parameters[PLACE.UA] if place != PLACE.UA or not value else value)
 
         if PLACE.URI in conf.parameters:
             uri = conf.url if place != PLACE.URI or not value else value

@@ -137,6 +137,6 @@ def unionTest(comment, place, parameter, value, prefix, suffix):
     validPayload, vector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     if validPayload:
-        validPayload = agent.removePayloadDelimiters(validPayload, False)
+        validPayload = agent.removePayloadDelimiters(validPayload)
 
     return validPayload, vector
