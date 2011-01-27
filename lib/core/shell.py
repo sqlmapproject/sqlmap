@@ -14,6 +14,7 @@ import rlcompleter
 from lib.core import readlineng as readline
 from lib.core.common import backend
 from lib.core.data import kb
+from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 
@@ -25,7 +26,11 @@ def loadHistory():
     historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
 
     if os.path.exists(historyPath):
-        readline.read_history_file(historyPath)
+        try:
+            readline.read_history_file(historyPath)
+        except IOError, msg:
+            warnMsg = "there was a problem with loading of history file '%s' (%s)" % (historyPath, msg)
+            logger.warn(warnMsg)
 
 def queriesForAutoCompletion():
     autoComplQueries = {}

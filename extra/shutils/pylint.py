@@ -10,6 +10,8 @@ import sys
 total = 0.0
 count = 0
 
+__RATING__ = False
+
 def check(module):
     global total, count
 
@@ -20,15 +22,15 @@ def check(module):
         for line in pout:
             if  re.match("E....:.", line):
                 print line
-            if "Your code has been rated at" in line:
-                print line
-                score = re.findall("\d.\d\d", line)[0]
-                total += float(score)
-                count += 1
+            if __RATING__ and "Your code has been rated at" in line:
+               print line
+               score = re.findall("\d.\d\d", line)[0]
+               total += float(score)
+               count += 1
 
 if __name__ == "__main__":
     try:
-        print sys.argv   
+        print sys.argv
         BASE_DIRECTORY = sys.argv[1]
     except IndexError:
         print "no directory specified, defaulting to current working directory"
@@ -40,6 +42,7 @@ if __name__ == "__main__":
             filepath = os.path.join(root, name)
             check(filepath)
 
-    print "==" * 50
-    print "%d modules found"% count
-    print "AVERAGE SCORE = %.02f"% (total / count)
+    if __RATING__:
+        print "==" * 50
+        print "%d modules found"% count
+        print "AVERAGE SCORE = %.02f"% (total / count)
