@@ -40,6 +40,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import URL_ENCODE_PAYLOAD
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
@@ -382,7 +383,6 @@ class Connect:
         pageLength  = None
         uri         = None
         raise404    = place != PLACE.URI if raise404 is None else raise404
-        toUrlencode = { PLACE.GET: True, PLACE.POST: True, PLACE.COOKIE: conf.cookieUrlencode, PLACE.UA: True, PLACE.URI: False }
 
         if not place:
             place = kb.injection.place
@@ -403,7 +403,7 @@ class Connect:
             value = agent.removePayloadDelimiters(value, False)
             value = urlEncodeCookieValues(value)
         elif place:
-            value = agent.removePayloadDelimiters(value, toUrlencode[place])
+            value = agent.removePayloadDelimiters(value, URL_ENCODE_PAYLOAD[place])
 
         if conf.checkPayload:
             checkPayload(value)

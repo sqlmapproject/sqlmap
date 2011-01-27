@@ -13,6 +13,7 @@ import subprocess
 import sys
 
 from lib.core.enums import DBMS
+from lib.core.enums import PLACE
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
@@ -204,3 +205,6 @@ WEBSCARAB_SPLITTER = "### Conversation"
 
 # Splitter used between requests in BURP log files
 BURP_SPLITTER = "======================================================"
+
+# Do the url-encoding based on parameter place
+URL_ENCODE_PAYLOAD = { PLACE.GET: True, PLACE.POST: True, PLACE.COOKIE: False, PLACE.UA: True, PLACE.URI: False }
