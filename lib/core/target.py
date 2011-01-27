@@ -16,6 +16,7 @@ import time
 from lib.core.common import dataToSessionFile
 from lib.core.common import paramToDict
 from lib.core.common import readInput
+from lib.core.convert import urldecode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
@@ -61,7 +62,7 @@ def __setRequestParams():
 
     if conf.data:
         conf.data = conf.data.replace("\n", " ")
-        conf.parameters[PLACE.POST] = conf.data
+        conf.parameters[PLACE.POST] = urldecode(conf.data)
 
         # Check if POST data is in xml syntax
         if re.match("[\n]*<(\?xml |soap\:|ns).*>", conf.data):
@@ -104,7 +105,7 @@ def __setRequestParams():
         for httpHeader, headerValue in conf.httpHeaders:
             if httpHeader == PLACE.UA:
                 # No need for url encoding/decoding the user agent
-                conf.parameters[PLACE.UA] = headerValue
+                conf.parameters[PLACE.UA] = urldecode(headerValue)
 
                 condition  = not conf.testParameter
                 condition |= PLACE.UA in conf.testParameter

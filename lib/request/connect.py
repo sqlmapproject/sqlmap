@@ -409,16 +409,16 @@ class Connect:
             checkPayload(value)
 
         if PLACE.GET in conf.parameters:
-            get = conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value
+            get = urlencode(conf.parameters[PLACE.GET]) if place != PLACE.GET or not value else value
 
         if PLACE.POST in conf.parameters:
-            post = conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value
+            post = urlencode(conf.parameters[PLACE.POST]) if place != PLACE.POST or not value else value
 
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
 
         if PLACE.UA in conf.parameters:
-            ua = conf.parameters[PLACE.UA] if place != PLACE.UA or not value else value
+            ua = urlencode(conf.parameters[PLACE.UA]) if place != PLACE.UA or not value else value
 
         if PLACE.URI in conf.parameters:
             uri = conf.url if place != PLACE.URI or not value else value

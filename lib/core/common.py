@@ -45,6 +45,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.convert import htmlunescape
+from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
 from lib.core.enums import PLACE
@@ -704,7 +705,7 @@ def parseTargetUrl():
         conf.port = 80
 
     if __urlSplit[3]:
-        conf.parameters[PLACE.GET] = __urlSplit[3]
+        conf.parameters[PLACE.GET] = urldecode(__urlSplit[3])
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
 

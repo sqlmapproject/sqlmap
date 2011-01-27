@@ -335,6 +335,9 @@ Sven Schluter <sschlueter@netzwerk.cc>
 Uemit Seren <uemit.seren@gmail.com>
     for reporting a minor adjustment when running with python 2.6
 
+Ahmed Shawky <ahmed@isecur1ty.org>
+    for reporting a major bug with improper handling of parameter values
+
 Brian Shura <bshura@appsecconsulting.com>
     for reporting a bug
 
