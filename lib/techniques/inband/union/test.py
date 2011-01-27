@@ -39,6 +39,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
     for position in range(0, count):
         # Prepare expression with delimiters
         randQuery = randomStr()
+        phrase = "%s%s%s" % (kb.misc.start, randQuery, kb.misc.stop)
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
@@ -49,16 +50,14 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         # Perform the request
         resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-        if extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
-            continue
-
-        if resultPage and randQuery in resultPage:
+        if resultPage and phrase in resultPage:
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, conf.uChar, where)
 
             if where == 1:
                 # Prepare expression with delimiters
                 randQuery2 = randomStr()
+                phrase2 = "%s%s%s" % (kb.misc.start, randQuery2, kb.misc.stop)
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 
@@ -69,10 +68,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 # Perform the request
                 resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
 
-                if extractRegexResult('(?P<result>UNION ALL SELECT)', resultPage, re.I):
-                    continue
-
-                if resultPage and ((randQuery in resultPage and randQuery2 not in resultPage) or (randQuery not in resultPage and randQuery2 in resultPage)):
+                if resultPage and ((phrase in resultPage and phrase2 not in resultPage) or (phrase not in resultPage and phrase2 in resultPage)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
 
             break
