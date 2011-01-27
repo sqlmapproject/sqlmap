@@ -13,7 +13,6 @@ from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
 from lib.core.common import parseXmlFile
-from lib.core.common import sanitizeStr
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.threads import getCurrentThreadData
@@ -56,7 +55,6 @@ def htmlParser(page):
 
     xmlfile = paths.ERRORS_XML
     checkFile(xmlfile)
-    page = sanitizeStr(page)
     handler = htmlHandler(page)
 
     parseXmlFile(xmlfile, handler)
