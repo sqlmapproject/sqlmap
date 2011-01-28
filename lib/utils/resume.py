@@ -23,6 +23,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
 from lib.core.settings import DUMP_START_MARKER
@@ -121,7 +122,10 @@ def resume(expression, payload):
             logValue = re.findall("%s(.*?)%s" % (DUMP_START_MARKER, DUMP_STOP_MARKER), resumedValue, re.S)
 
             if logValue:
-                logValue = ", ".join([value.replace(DUMP_DEL_MARKER, ", ") for value in logValue])
+                if kb.technique == PAYLOAD.TECHNIQUE.UNION:
+                    logValue = ", ".join([value.replace(DUMP_DEL_MARKER, ", ") for value in logValue])
+                else:
+                    return None
             else:
                 logValue = resumedValue
 
