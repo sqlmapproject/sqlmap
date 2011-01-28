@@ -71,6 +71,8 @@ EXTRA ATTRIBUTES AND METHODS
 """
 from httplib import _CS_REQ_STARTED, _CS_REQ_SENT, _CS_IDLE, CannotSendHeader
 
+from lib.core.common import unicodeToSafeHTMLValue
+
 import threading
 import urllib2
 import httplib
@@ -322,6 +324,9 @@ class HTTPConnection(httplib.HTTPConnection):
             self.__state = _CS_REQ_SENT
         else:
             raise CannotSendHeader()
+
+        for header in self._headers:
+            self._headers[header] = unicodeToSafeHTMLValue(self._headers[header])
 
         for header in ['Host', 'Accept-Encoding']:
             if header in self._headers:
