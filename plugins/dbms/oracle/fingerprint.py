@@ -10,8 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -29,13 +29,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -46,16 +46,16 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.ORACLE
             return value
 
-        actVer      = format.getDbms()
+        actVer      = Format.getDbms()
         blank       = " " * 15
         value      += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
-            banVer = format.getDbms([banVer])
+            banVer = Format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = format.getErrorParsedDBMSes()
+        htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -63,7 +63,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (backend.isDbmsWithin(ORACLE_ALIASES) or conf.dbms in ORACLE_ALIASES):
+        if not conf.extensiveFp and (Backend.isDbmsWithin(ORACLE_ALIASES) or conf.dbms in ORACLE_ALIASES):
             setDbms(DBMS.ORACLE)
 
             self.getBanner()
@@ -112,7 +112,7 @@ class Fingerprint(GenericFingerprint):
                 output = inject.checkBooleanExpression("%d=(SELECT SUBSTR((VERSION), 1, %d) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1)" % (number, 1 if number < 10 else 2))
 
                 if output:
-                    backend.setVersion(version)
+                    Backend.setVersion(version)
                     break
 
             return True

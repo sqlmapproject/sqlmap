@@ -9,7 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import getUnicode
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
@@ -26,7 +26,7 @@ def direct(query, content=True):
     select = True
     query = agent.payloadDirect(query)
 
-    if backend.getIdentifiedDbms() == DBMS.ORACLE and query.startswith("SELECT ") and " FROM " not in query:
+    if Backend.getIdentifiedDbms() == DBMS.ORACLE and query.startswith("SELECT ") and " FROM " not in query:
         query = "%s FROM DUAL" % query
 
     for sqlTitle, sqlStatements in SQL_STATEMENTS.items():

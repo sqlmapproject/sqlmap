@@ -8,8 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -28,13 +28,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -45,16 +45,16 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.SQLITE
             return value
 
-        actVer = format.getDbms()
+        actVer = Format.getDbms()
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"]
-            banVer = format.getDbms([banVer])
+            banVer = Format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = format.getErrorParsedDBMSes()
+        htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -69,7 +69,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
         """
 
-        if not conf.extensiveFp and (backend.isDbmsWithin(SQLITE_ALIASES) or conf.dbms in SQLITE_ALIASES):
+        if not conf.extensiveFp and (Backend.isDbmsWithin(SQLITE_ALIASES) or conf.dbms in SQLITE_ALIASES):
             setDbms(DBMS.SQLITE)
 
             self.getBanner()
@@ -98,7 +98,7 @@ class Fingerprint(GenericFingerprint):
 
                 result = inject.checkBooleanExpression("RANDOMBLOB(-1)>0")
                 version = '3' if result else '2'
-                backend.setVersion(version)
+                Backend.setVersion(version)
 
             setDbms(DBMS.SQLITE)
 

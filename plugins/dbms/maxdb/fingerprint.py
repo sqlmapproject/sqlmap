@@ -10,8 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.common import randomInt
 from lib.core.common import randomRange
 from lib.core.data import conf
@@ -66,13 +66,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -84,14 +84,14 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.MAXDB
             return value
 
-        actVer = format.getDbms() + " (%s)" % self.__versionCheck()
+        actVer = Format.getDbms() + " (%s)" % self.__versionCheck()
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             value += "\n%sbanner parsing fingerprint: -" % blank
 
-        htmlErrorFp = format.getErrorParsedDBMSes()
+        htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -99,7 +99,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (backend.isDbmsWithin(MAXDB_ALIASES) or conf.dbms in MAXDB_ALIASES):
+        if not conf.extensiveFp and (Backend.isDbmsWithin(MAXDB_ALIASES) or conf.dbms in MAXDB_ALIASES):
             setDbms(DBMS.MAXDB)
 
             self.getBanner()

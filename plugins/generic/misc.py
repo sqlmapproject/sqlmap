@@ -10,7 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.common import getCompiledRegex
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -57,19 +57,19 @@ class Miscellaneous:
         infoMsg = "detecting back-end DBMS version from its banner"
         logger.info(infoMsg)
 
-        if backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             first, last = 1, 6
 
-        elif backend.getIdentifiedDbms() == DBMS.PGSQL:
+        elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
             first, last = 12, 6
 
-        elif backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
             first, last = 29, 9
 
         else:
             raise sqlmapUnsupportedFeatureException, "unsupported DBMS"
 
-        query = queries[backend.getIdentifiedDbms()].substring.query % (queries[backend.getIdentifiedDbms()].banner.query, first, last)
+        query = queries[Backend.getIdentifiedDbms()].substring.query % (queries[Backend.getIdentifiedDbms()].banner.query, first, last)
 
         if conf.direct:
             query = "SELECT %s" % query
@@ -120,7 +120,7 @@ class Miscellaneous:
         if not onlyFileTbl:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
 
-            if backend.getIdentifiedDbms() == DBMS.MSSQL:
+            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
                 return
 
             if udfDict is None:
@@ -133,7 +133,7 @@ class Miscellaneous:
                 if not output or output in ("y", "Y"):
                     dropStr = "DROP FUNCTION %s" % udf
 
-                    if backend.getIdentifiedDbms() == DBMS.PGSQL:
+                    if Backend.getIdentifiedDbms() == DBMS.PGSQL:
                         inp      = ", ".join(i for i in inpRet["input"])
                         dropStr += "(%s)" % inp
 

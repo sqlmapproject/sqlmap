@@ -127,6 +127,279 @@ class DynamicContentItem:
         self.lineContentBefore = lineContentBefore
         self.lineContentAfter = lineContentAfter
 
+class Format:
+    @staticmethod
+    def humanize(values, chain=" or "):
+        strJoin = "|".join([v for v in values])
+
+        return strJoin.replace("|", chain)
+
+    # Get methods
+    @staticmethod
+    def getDbms(versions=None):
+        """
+        Format the back-end DBMS fingerprint value and return its
+        values formatted as a human readable string.
+
+        @return: detected back-end DBMS based upon fingerprint techniques.
+        @rtype: C{str}
+        """
+
+        if versions is None and Backend.getVersionList():
+            versions = Backend.getVersionList()
+
+        if versions is None:
+            return Backend.getDbms()
+        else:
+            return "%s %s" % (Backend.getDbms(), " and ".join([v for v in versions]))
+
+    @staticmethod
+    def getErrorParsedDBMSes():
+        """
+        Parses the knowledge base htmlFp list and return its values
+        formatted as a human readable string.
+
+        @return: list of possible back-end DBMS based upon error messages
+        parsing.
+        @rtype: C{str}
+        """
+
+        htmlParsed = ""
+
+        if len(kb.htmlFp) == 0:
+            return None
+        elif len(kb.htmlFp) == 1:
+            htmlParsed = kb.htmlFp[0]
+        elif len(kb.htmlFp) > 1:
+            htmlParsed = " or ".join([htmlFp for htmlFp in kb.htmlFp])
+
+        return htmlParsed
+
+    @staticmethod
+    def getOs(target, info):
+        """
+        Formats the back-end operating system fingerprint value
+        and return its values formatted as a human readable string.
+
+        Example of info (kb.headersFp) dictionary:
+
+        {
+          'distrib': set(['Ubuntu']),
+          'type': set(['Linux']),
+          'technology': set(['PHP 5.2.6', 'Apache 2.2.9']),
+          'release': set(['8.10'])
+        }
+
+        Example of info (kb.bannerFp) dictionary:
+
+        {
+          'sp': set(['Service Pack 4']),
+          'dbmsVersion': '8.00.194',
+          'dbmsServicePack': '0',
+          'distrib': set(['2000']),
+          'dbmsRelease': '2000',
+          'type': set(['Windows'])
+        }
+
+        @return: detected back-end operating system based upon fingerprint
+        techniques.
+        @rtype: C{str}
+        """
+
+        infoStr = ""
+
+        if info and "type" in info:
+            infoStr += "%s operating system: %s" % (target, Format.humanize(info["type"]))
+
+            if "distrib" in info:
+                infoStr += " %s" % Format.humanize(info["distrib"])
+
+            if "release" in info:
+                infoStr += " %s" % Format.humanize(info["release"])
+
+            if "sp" in info:
+                infoStr += " %s" % Format.humanize(info["sp"])
+
+            if "codename" in info:
+                infoStr += " (%s)" % Format.humanize(info["codename"])
+
+        if "technology" in info:
+            infoStr += "\nweb application technology: %s" % Format.humanize(info["technology"], ", ")
+
+        return infoStr
+
+class Backend:
+    # Set methods
+    @staticmethod
+    def setDbms(dbms):
+        dbms = aliasToDbmsEnum(dbms)
+
+        if dbms is None:
+            return None
+
+        # Little precaution, in theory this condition should always be false
+        elif kb.dbms is not None and kb.dbms != dbms:
+            msg = "sqlmap previously fingerprinted back-end DBMS "
+            msg += "%s. However now it has been fingerprinted " % kb.dbms
+            msg += "to be %s. " % dbms
+            msg += "Please, specify which DBMS is "
+            msg += "correct [%s (default)/%s] " % (kb.dbms, dbms)
+
+            while True:
+                inp = readInput(msg, default=kb.dbms)
+
+                if aliasToDbmsEnum(inp) == kb.dbms:
+                    break
+                elif aliasToDbmsEnum(inp) == dbms:
+                    kb.dbms = aliasToDbmsEnum(inp)
+                    break
+                else:
+                    warnMsg = "invalid value"
+                    logger.warn(warnMsg)
+
+        elif kb.dbms is None:
+            kb.dbms = aliasToDbmsEnum(dbms)
+
+        return kb.dbms
+
+    @staticmethod
+    def setVersion(version):
+        if isinstance(version, basestring):
+            kb.dbmsVersion = [ version ]
+
+        return kb.dbmsVersion
+
+    @staticmethod
+    def setVersionList(versionsList):
+        if isinstance(versionsList, list):
+            kb.dbmsVersion = versionsList
+        elif isinstance(version, basestring):
+            Backend.setVersion(versionsList)
+        else:
+            logger.error("invalid format of versionsList")
+
+    @staticmethod
+    def forceDbms(dbms):
+        kb.misc.forcedDbms = aliasToDbmsEnum(dbms)
+
+    @staticmethod
+    def flushForcedDbms():
+        kb.misc.forcedDbms = None
+
+    @staticmethod
+    def setOs(os):
+        if os is None:
+            return None
+
+        # Little precaution, in theory this condition should always be false
+        elif kb.os is not None and kb.os != os:
+            msg = "sqlmap previously fingerprinted back-end DBMS "
+            msg += "operating system %s. However now it has " % kb.os
+            msg += "been fingerprinted to be %s. " % os
+            msg += "Please, specify which OS is "
+            msg += "correct [%s (default)/%s] " % (kb.os, os)
+
+            while True:
+                inp = readInput(msg, default=kb.os)
+
+                if inp == kb.os:
+                    break
+                elif inp == os:
+                    kb.os = inp
+                    break
+                else:
+                    warnMsg = "invalid value"
+                    logger.warn(warnMsg)
+
+        elif kb.os is None:
+            kb.os = os
+
+        return kb.os
+
+    # Get methods
+    @staticmethod
+    def getForcedDbms():
+        return aliasToDbmsEnum(kb.misc.forcedDbms)
+
+    @staticmethod
+    def getDbms():
+        return aliasToDbmsEnum(kb.dbms)
+
+    @staticmethod
+    def getErrorParsedDBMSes():
+        """
+        Returns array with parsed DBMS names till now
+
+        This functions is called to:
+
+        1. Sort the tests, getSortedInjectionTests() - detection phase.
+        2. Ask user whether or not skip specific DBMS tests in detection phase,
+           lib/controller/checks.py - detection phase.
+        3. Sort the fingerprint of the DBMS, lib/controller/handler.py - 
+           fingerprint phase.
+        """
+
+        return kb.htmlFp
+
+    @staticmethod
+    def getIdentifiedDbms():
+        dbms = None
+
+        if Backend.getForcedDbms() is not None:
+            dbms = Backend.getForcedDbms()
+        elif Backend.getDbms() is not None:
+            dbms = kb.dbms
+        elif conf.dbms is not None:
+            dbms = conf.dbms
+        elif len(Backend.getErrorParsedDBMSes()) > 0:
+            dbms = Backend.getErrorParsedDBMSes()[0]
+
+        return aliasToDbmsEnum(dbms)
+
+    @staticmethod
+    def getVersion():
+        if len(kb.dbmsVersion) > 0:
+            return kb.dbmsVersion[0]
+        else:
+            return None
+
+    @staticmethod
+    def getVersionList():
+        if len(kb.dbmsVersion) > 0:
+            return kb.dbmsVersion
+        else:
+            return None
+
+    # Comparison methods
+    @staticmethod
+    def isDbms(dbms):
+        return Backend.getDbms() is not None and Backend.getDbms() == aliasToDbmsEnum(dbms)
+
+    @staticmethod
+    def isDbmsWithin(aliases):
+        return Backend.getDbms() is not None and Backend.getDbms().lower() in aliases
+
+    @staticmethod
+    def isVersion(version):
+        return Backend.getVersion() is not None and Backend.getVersion() == version
+
+    @staticmethod
+    def isVersionWithin(versionList):
+        if Backend.getVersionList() is None:
+            return False
+
+        for dbmsVersion in Backend.getVersionList():
+            if dbmsVersion == UNKNOWN_DBMS_VERSION:
+                continue
+            elif dbmsVersion in versionList:
+                return True
+
+        return False
+
+    @staticmethod
+    def isVersionGreaterOrEqualThan(version):
+        return Backend.getVersion() is not None and str(Backend.getVersion()) >= str(version)
+
 def paramToDict(place, parameters=None):
     """
     Split the parameters into names and values, check if these parameters
@@ -512,14 +785,14 @@ def parsePasswordHash(password):
     if not password or password == " ":
         password = "NULL"
 
-    if backend.getIdentifiedDbms() == DBMS.MSSQL and password != "NULL" and isHexEncodedString(password):
+    if Backend.getIdentifiedDbms() == DBMS.MSSQL and password != "NULL" and isHexEncodedString(password):
         hexPassword = password
         password = "%s\n" % hexPassword
         password += "%sheader: %s\n" % (blank, hexPassword[:6])
         password += "%ssalt: %s\n" % (blank, hexPassword[6:14])
         password += "%smixedcase: %s\n" % (blank, hexPassword[14:54])
 
-        if not backend.isVersionWithin(("2005", "2008")):
+        if not Backend.isVersionWithin(("2005", "2008")):
             password += "%suppercase: %s" % (blank, hexPassword[54:])
 
     return password
@@ -817,25 +1090,25 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 def getDelayQuery(andCond=False):
     query = None
 
-    if backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
         if not kb.data.banner:
             conf.dbmsHandler.getVersionFromBanner()
 
         banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
 
-        if banVer is None or (backend.getIdentifiedDbms() == DBMS.MYSQL and banVer >= "5.0.12") or (backend.getIdentifiedDbms() == DBMS.PGSQL and banVer >= "8.2"):
-            query = queries[backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
+        if banVer is None or (Backend.getIdentifiedDbms() == DBMS.MYSQL and banVer >= "5.0.12") or (Backend.getIdentifiedDbms() == DBMS.PGSQL and banVer >= "8.2"):
+            query = queries[Backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
         else:
-            query = queries[backend.getIdentifiedDbms()].timedelay.query2 % conf.timeSec
-    elif backend.getIdentifiedDbms() == DBMS.FIREBIRD:
-        query = queries[backend.getIdentifiedDbms()].timedelay.query
+            query = queries[Backend.getIdentifiedDbms()].timedelay.query2 % conf.timeSec
+    elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+        query = queries[Backend.getIdentifiedDbms()].timedelay.query
     else:
-        query = queries[backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
+        query = queries[Backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
 
     if andCond:
-        if backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.SQLITE ):
+        if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.SQLITE ):
             query = query.replace("SELECT ", "")
-        elif backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+        elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
             query = "(%s)>0" % query
 
     return query
@@ -1791,8 +2064,8 @@ def isDBMSVersionAtLeast(version):
 
     retVal = None
 
-    if backend.getVersion() and backend.getVersion() != UNKNOWN_DBMS_VERSION:
-        value = backend.getVersion().replace(" ", "").rstrip('.')
+    if Backend.getVersion() and Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        value = Backend.getVersion().replace(" ", "").rstrip('.')
 
         while True:
             index = value.find('.', value.find('.') + 1)
@@ -1910,14 +2183,14 @@ def getSortedInjectionTests():
             retVal = SORTORDER.LAST
 
         elif 'details' in test and 'dbms' in test.details:
-            if test.details.dbms in backend.getErrorParsedDBMSes():
+            if test.details.dbms in Backend.getErrorParsedDBMSes():
                 retVal = SORTORDER.SECOND
             else:
                 retVal = SORTORDER.THIRD
 
         return retVal
 
-    if backend.getErrorParsedDBMSes():
+    if Backend.getErrorParsedDBMSes():
         retVal = sorted(retVal, key=priorityFunction)
 
     return retVal
@@ -1954,279 +2227,6 @@ def unicodeToSafeHTMLValue(value):
                 retVal = retVal.replace(char, "&#%d;" % ord(char))
 
     return retVal
-
-class format:
-    @staticmethod
-    def humanize(values, chain=" or "):
-        strJoin = "|".join([v for v in values])
-
-        return strJoin.replace("|", chain)
-
-    # Get methods
-    @staticmethod
-    def getDbms(versions=None):
-        """
-        Format the back-end DBMS fingerprint value and return its
-        values formatted as a human readable string.
-
-        @return: detected back-end DBMS based upon fingerprint techniques.
-        @rtype: C{str}
-        """
-
-        if versions is None and backend.getVersionList():
-            versions = backend.getVersionList()
-
-        if versions is None:
-            return backend.getDbms()
-        else:
-            return "%s %s" % (backend.getDbms(), " and ".join([v for v in versions]))
-
-    @staticmethod
-    def getErrorParsedDBMSes():
-        """
-        Parses the knowledge base htmlFp list and return its values
-        formatted as a human readable string.
-
-        @return: list of possible back-end DBMS based upon error messages
-        parsing.
-        @rtype: C{str}
-        """
-
-        htmlParsed = ""
-
-        if len(kb.htmlFp) == 0:
-            return None
-        elif len(kb.htmlFp) == 1:
-            htmlParsed = kb.htmlFp[0]
-        elif len(kb.htmlFp) > 1:
-            htmlParsed = " or ".join([htmlFp for htmlFp in kb.htmlFp])
-
-        return htmlParsed
-
-    @staticmethod
-    def getOs(target, info):
-        """
-        Formats the back-end operating system fingerprint value
-        and return its values formatted as a human readable string.
-
-        Example of info (kb.headersFp) dictionary:
-
-        {
-          'distrib': set(['Ubuntu']),
-          'type': set(['Linux']),
-          'technology': set(['PHP 5.2.6', 'Apache 2.2.9']),
-          'release': set(['8.10'])
-        }
-
-        Example of info (kb.bannerFp) dictionary:
-
-        {
-          'sp': set(['Service Pack 4']),
-          'dbmsVersion': '8.00.194',
-          'dbmsServicePack': '0',
-          'distrib': set(['2000']),
-          'dbmsRelease': '2000',
-          'type': set(['Windows'])
-        }
-
-        @return: detected back-end operating system based upon fingerprint
-        techniques.
-        @rtype: C{str}
-        """
-
-        infoStr = ""
-
-        if info and "type" in info:
-            infoStr += "%s operating system: %s" % (target, format.humanize(info["type"]))
-
-            if "distrib" in info:
-                infoStr += " %s" % format.humanize(info["distrib"])
-
-            if "release" in info:
-                infoStr += " %s" % format.humanize(info["release"])
-
-            if "sp" in info:
-                infoStr += " %s" % format.humanize(info["sp"])
-
-            if "codename" in info:
-                infoStr += " (%s)" % format.humanize(info["codename"])
-
-        if "technology" in info:
-            infoStr += "\nweb application technology: %s" % format.humanize(info["technology"], ", ")
-
-        return infoStr
-
-class backend:
-    # Set methods
-    @staticmethod
-    def setDbms(dbms):
-        dbms = aliasToDbmsEnum(dbms)
-
-        if dbms is None:
-            return None
-
-        # Little precaution, in theory this condition should always be false
-        elif kb.dbms is not None and kb.dbms != dbms:
-            msg = "sqlmap previously fingerprinted back-end DBMS "
-            msg += "%s. However now it has been fingerprinted " % kb.dbms
-            msg += "to be %s. " % dbms
-            msg += "Please, specify which DBMS is "
-            msg += "correct [%s (default)/%s] " % (kb.dbms, dbms)
-
-            while True:
-                inp = readInput(msg, default=kb.dbms)
-
-                if aliasToDbmsEnum(inp) == kb.dbms:
-                    break
-                elif aliasToDbmsEnum(inp) == dbms:
-                    kb.dbms = aliasToDbmsEnum(inp)
-                    break
-                else:
-                    warnMsg = "invalid value"
-                    logger.warn(warnMsg)
-
-        elif kb.dbms is None:
-            kb.dbms = aliasToDbmsEnum(dbms)
-
-        return kb.dbms
-
-    @staticmethod
-    def setVersion(version):
-        if isinstance(version, basestring):
-            kb.dbmsVersion = [ version ]
-
-        return kb.dbmsVersion
-
-    @staticmethod
-    def setVersionList(versionsList):
-        if isinstance(versionsList, list):
-            kb.dbmsVersion = versionsList
-        elif isinstance(version, basestring):
-            backend.setVersion(versionsList)
-        else:
-            logger.error("invalid format of versionsList")
-
-    @staticmethod
-    def forceDbms(dbms):
-        kb.misc.forcedDbms = aliasToDbmsEnum(dbms)
-
-    @staticmethod
-    def flushForcedDbms():
-        kb.misc.forcedDbms = None
-
-    @staticmethod
-    def setOs(os):
-        if os is None:
-            return None
-
-        # Little precaution, in theory this condition should always be false
-        elif kb.os is not None and kb.os != os:
-            msg = "sqlmap previously fingerprinted back-end DBMS "
-            msg += "operating system %s. However now it has " % kb.os
-            msg += "been fingerprinted to be %s. " % os
-            msg += "Please, specify which OS is "
-            msg += "correct [%s (default)/%s] " % (kb.os, os)
-
-            while True:
-                inp = readInput(msg, default=kb.os)
-
-                if inp == kb.os:
-                    break
-                elif inp == os:
-                    kb.os = inp
-                    break
-                else:
-                    warnMsg = "invalid value"
-                    logger.warn(warnMsg)
-
-        elif kb.os is None:
-            kb.os = os
-
-        return kb.os
-
-    # Get methods
-    @staticmethod
-    def getForcedDbms():
-        return aliasToDbmsEnum(kb.misc.forcedDbms)
-
-    @staticmethod
-    def getDbms():
-        return aliasToDbmsEnum(kb.dbms)
-
-    @staticmethod
-    def getErrorParsedDBMSes():
-        """
-        Returns array with parsed DBMS names till now
-
-        This functions is called to:
-
-        1. Sort the tests, getSortedInjectionTests() - detection phase.
-        2. Ask user whether or not skip specific DBMS tests in detection phase,
-           lib/controller/checks.py - detection phase.
-        3. Sort the fingerprint of the DBMS, lib/controller/handler.py - 
-           fingerprint phase.
-        """
-
-        return kb.htmlFp
-
-    @staticmethod
-    def getIdentifiedDbms():
-        dbms = None
-
-        if backend.getForcedDbms() is not None:
-            dbms = backend.getForcedDbms()
-        elif backend.getDbms() is not None:
-            dbms = kb.dbms
-        elif conf.dbms is not None:
-            dbms = conf.dbms
-        elif len(backend.getErrorParsedDBMSes()) > 0:
-            dbms = backend.getErrorParsedDBMSes()[0]
-
-        return aliasToDbmsEnum(dbms)
-
-    @staticmethod
-    def getVersion():
-        if len(kb.dbmsVersion) > 0:
-            return kb.dbmsVersion[0]
-        else:
-            return None
-
-    @staticmethod
-    def getVersionList():
-        if len(kb.dbmsVersion) > 0:
-            return kb.dbmsVersion
-        else:
-            return None
-
-    # Comparison methods
-    @staticmethod
-    def isDbms(dbms):
-        return backend.getDbms() is not None and backend.getDbms() == aliasToDbmsEnum(dbms)
-
-    @staticmethod
-    def isDbmsWithin(aliases):
-        return backend.getDbms() is not None and backend.getDbms().lower() in aliases
-
-    @staticmethod
-    def isVersion(version):
-        return backend.getVersion() is not None and backend.getVersion() == version
-
-    @staticmethod
-    def isVersionWithin(versionList):
-        if backend.getVersionList() is None:
-            return False
-
-        for dbmsVersion in backend.getVersionList():
-            if dbmsVersion == UNKNOWN_DBMS_VERSION:
-                continue
-            elif dbmsVersion in versionList:
-                return True
-
-        return False
-
-    @staticmethod
-    def isVersionGreaterOrEqualThan(version):
-        return backend.getVersion() is not None and str(backend.getVersion()) >= str(version)
 
 def showHttpErrorCodes():
     """

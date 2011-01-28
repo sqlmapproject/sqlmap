@@ -24,7 +24,7 @@ from extra.clientform.clientform import ParseResponse
 from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
@@ -595,7 +595,7 @@ def __setDBMS():
     dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms, re.I)
 
     if dbmsRegExp:
-        backend.setVersion(str(dbmsRegExp.group(2)))
+        Backend.setVersion(str(dbmsRegExp.group(2)))
 
     if conf.dbms not in SUPPORTED_DBMS:
         errMsg  = "you provided an unsupported back-end database management "
@@ -1255,7 +1255,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 def __saveCmdline():
     """
     Saves the command line options on a sqlmap configuration INI file
-    format.
+    Format.
     """
 
     if not conf.saveCmdline:

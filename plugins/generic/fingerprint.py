@@ -7,7 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
@@ -19,7 +19,7 @@ class Fingerprint:
     """
 
     def __init__(self, dbms):
-        backend.forceDbms(dbms)
+        Backend.forceDbms(dbms)
 
     def getFingerprint(self):
         errMsg  = "'getFingerprint' method must be defined "

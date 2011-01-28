@@ -8,8 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
@@ -28,13 +28,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -45,16 +45,16 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.SYBASE
             return value
 
-        actVer = format.getDbms()
+        actVer = Format.getDbms()
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"]
-            banVer = format.getDbms([banVer])
+            banVer = Format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = format.getErrorParsedDBMSes()
+        htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -62,10 +62,10 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (backend.isDbmsWithin(SYBASE_ALIASES) \
-           or conf.dbms in SYBASE_ALIASES) and backend.getVersion() and \
-           backend.getVersion().isdigit():
-            setDbms("%s %s" % (DBMS.SYBASE, backend.getVersion()))
+        if not conf.extensiveFp and (Backend.isDbmsWithin(SYBASE_ALIASES) \
+           or conf.dbms in SYBASE_ALIASES) and Backend.getVersion() and \
+           Backend.getVersion().isdigit():
+            setDbms("%s %s" % (DBMS.SYBASE, Backend.getVersion()))
 
             self.getBanner()
 
@@ -107,7 +107,7 @@ class Fingerprint(GenericFingerprint):
                 result = inject.checkBooleanExpression("@@VERSION_NUMBER/1000=%d" % version)
 
                 if result:
-                    backend.setVersion(str(version))
+                    Backend.setVersion(str(version))
                     break
 
             return True

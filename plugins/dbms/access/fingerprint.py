@@ -10,8 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.common import getCurrentThreadData
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -38,9 +38,9 @@ class Fingerprint(GenericFingerprint):
         retVal = None
         table = None
 
-        if backend.isVersionWithin(("97", "2000")):
+        if Backend.isVersionWithin(("97", "2000")):
             table = "MSysAccessObjects"
-        elif backend.isVersionWithin(("2002-2003", "2007")):
+        elif Backend.isVersionWithin(("2002-2003", "2007")):
             table = "MSysAccessStorage"
 
         if table is not None:
@@ -115,13 +115,13 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
@@ -132,7 +132,7 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.ACCESS
             return value
 
-        actVer = format.getDbms() + " (%s)" % (self.__sandBoxCheck())
+        actVer = Format.getDbms() + " (%s)" % (self.__sandBoxCheck())
         blank  = " " * 15
         value += "active fingerprint: %s" % actVer
 
@@ -142,10 +142,10 @@ class Fingerprint(GenericFingerprint):
             if re.search("-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
-            banVer = format.getDbms([banVer])
+            banVer = Format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = format.getErrorParsedDBMSes()
+        htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -155,7 +155,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (backend.isDbmsWithin(ACCESS_ALIASES) or conf.dbms in ACCESS_ALIASES):
+        if not conf.extensiveFp and (Backend.isDbmsWithin(ACCESS_ALIASES) or conf.dbms in ACCESS_ALIASES):
             setDbms(DBMS.ACCESS)
 
             return True
@@ -187,7 +187,7 @@ class Fingerprint(GenericFingerprint):
             version = self.__sysTablesCheck()
 
             if version is not None:
-                backend.setVersion(version)
+                Backend.setVersion(version)
 
             return True
         else:

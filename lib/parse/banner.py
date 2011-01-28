@@ -13,7 +13,7 @@ from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
 from lib.core.common import getCompiledRegex
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
 from lib.core.data import kb
@@ -97,13 +97,13 @@ def bannerParser(banner):
 
     xmlfile = None
 
-    if backend.getIdentifiedDbms() == DBMS.MSSQL:
+    if Backend.getIdentifiedDbms() == DBMS.MSSQL:
         xmlfile = paths.MSSQL_XML
-    elif backend.getIdentifiedDbms() == DBMS.MYSQL:
+    elif Backend.getIdentifiedDbms() == DBMS.MYSQL:
         xmlfile = paths.MYSQL_XML
-    elif backend.getIdentifiedDbms() == DBMS.ORACLE:
+    elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
         xmlfile = paths.ORACLE_XML
-    elif backend.getIdentifiedDbms() == DBMS.PGSQL:
+    elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
         xmlfile = paths.PGSQL_XML
 
     if not xmlfile:
@@ -111,7 +111,7 @@ def bannerParser(banner):
 
     checkFile(xmlfile)
 
-    if backend.getIdentifiedDbms() == DBMS.MSSQL:
+    if Backend.getIdentifiedDbms() == DBMS.MSSQL:
         handler = MSSQLBannerHandler(banner, kb.bannerFp)
         parseXmlFile(xmlfile, handler)
 

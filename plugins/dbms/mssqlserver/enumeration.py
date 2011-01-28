@@ -9,7 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import getRange
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -41,7 +41,7 @@ class Enumeration(GenericEnumeration):
             infoMsg += " for database '%s'" % conf.db
         logger.info(infoMsg)
 
-        rootQuery = queries[backend.getIdentifiedDbms()].tables
+        rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         if not conf.db:
             if not len(kb.data.cachedDbs):
@@ -111,7 +111,7 @@ class Enumeration(GenericEnumeration):
         return kb.data.cachedTables
 
     def searchTable(self):
-        rootQuery = queries[backend.getIdentifiedDbms()].search_table
+        rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         foundTbls = {}
         tblList = conf.tbl.split(",")
         tblCond = rootQuery.inband.condition
@@ -198,7 +198,7 @@ class Enumeration(GenericEnumeration):
         return foundTbls
 
     def searchColumn(self):
-        rootQuery = queries[backend.getIdentifiedDbms()].search_column
+        rootQuery = queries[Backend.getIdentifiedDbms()].search_column
         foundCols = {}
         dbs = {}
         colList = conf.col.split(",")

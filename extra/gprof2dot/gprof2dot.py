@@ -1036,7 +1036,7 @@ class CallgrindParser(LineParser):
     """Parser for valgrind's callgrind tool.
 
     See also:
-    - http://valgrind.org/docs/manual/cl-format.html
+    - http://valgrind.org/docs/manual/cl-Format.html
     """
 
     _call_re = re.compile('^calls=\s*(\d+)\s+((\d+|\+\d+|-\d+|\*)\s+)+$')

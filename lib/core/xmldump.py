@@ -76,7 +76,7 @@ ENTITIES  = {'"':'&quot;',"'":"&apos;"}
 
 class XMLDump:
     '''
-    This class purpose is to dump the data into an xml format.
+    This class purpose is to dump the data into an xml Format.
     The format of the xml file is described in the scheme file xml/sqlmap.xsd
     '''
 
@@ -118,7 +118,7 @@ class XMLDump:
     def __createTextNode(self,data):
         '''
         Creates a text node with utf8 data inside.
-        The text is escaped to an fit the xml text format.
+        The text is escaped to an fit the xml text Format.
         '''
         if data is None :
             return self.__doc.createTextNode(u'')
@@ -129,7 +129,7 @@ class XMLDump:
     def __createAttribute(self,attrName,attrValue):
         '''
         Creates an attribute node with utf8 data inside.
-        The text is escaped to an fit the xml text format.
+        The text is escaped to an fit the xml text Format.
         '''
         attr = self.__doc.createAttribute(attrName)
         if attrValue is None :

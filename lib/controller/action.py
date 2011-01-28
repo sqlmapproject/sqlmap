@@ -8,8 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.controller.handler import setHandler
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import kb
@@ -31,8 +31,8 @@ def action():
     # system to be able to go ahead with the injection
     setHandler()
 
-    if not backend.getDbms() or not conf.dbmsHandler:
-        htmlParsed = format.getErrorParsedDBMSes()
+    if not Backend.getDbms() or not conf.dbmsHandler:
+        htmlParsed = Format.getErrorParsedDBMSes()
 
         errMsg  = "sqlmap was not able to fingerprint the "
         errMsg += "back-end database management system"

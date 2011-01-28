@@ -10,8 +10,8 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.common import randomRange
@@ -34,25 +34,25 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value  = ""
-        wsOsFp = format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
-        actVer = format.getDbms()
+        actVer = Format.getDbms()
 
         if not conf.extensiveFp:
             value += actVer
             return value
 
-        actVer  = format.getDbms() + " (%s)" % (self.__dialectCheck())
+        actVer  = Format.getDbms() + " (%s)" % (self.__dialectCheck())
         blank       = " " * 15
         value      += "active fingerprint: %s" % actVer
 
@@ -62,10 +62,10 @@ class Fingerprint(GenericFingerprint):
             if re.search("-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
-            banVer = format.getDbms([banVer])
+            banVer = Format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = format.getErrorParsedDBMSes()
+        htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -101,23 +101,23 @@ class Fingerprint(GenericFingerprint):
     def __dialectCheck(self):
         retVal = None
 
-        if backend.getIdentifiedDbms():
+        if Backend.getIdentifiedDbms():
             result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_DATE FROM RDB$DATABASE)")
             retVal = "dialect 3" if result else "dialect 1"
 
         return retVal
 
     def checkDbms(self):
-        if not conf.extensiveFp and (backend.isDbmsWithin(FIREBIRD_ALIASES) \
-           or conf.dbms in FIREBIRD_ALIASES) and backend.getVersion() and \
-           backend.getVersion() != UNKNOWN_DBMS_VERSION:
-            v = backend.getVersion().replace(">", "")
+        if not conf.extensiveFp and (Backend.isDbmsWithin(FIREBIRD_ALIASES) \
+           or conf.dbms in FIREBIRD_ALIASES) and Backend.getVersion() and \
+           Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+            v = Backend.getVersion().replace(">", "")
             v = v.replace("=", "")
             v = v.replace(" ", "")
 
-            backend.setVersion(v)
+            Backend.setVersion(v)
 
-            setDbms("%s %s" % (DBMS.FIREBIRD, backend.getVersion()))
+            setDbms("%s %s" % (DBMS.FIREBIRD, Backend.getVersion()))
 
             self.getBanner()
 
@@ -149,7 +149,7 @@ class Fingerprint(GenericFingerprint):
             version = self.__sysTablesCheck()
 
             if version is not None:
-                backend.setVersion(version)
+                Backend.setVersion(version)
                 setDbms("%s %s" % (DBMS.FIREBIRD, version))
 
             self.getBanner()

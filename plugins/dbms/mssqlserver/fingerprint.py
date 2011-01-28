@@ -8,8 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.common import getUnicode
 from lib.core.common import randomInt
 from lib.core.data import conf
@@ -30,19 +30,19 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
-        actVer = format.getDbms()
+        actVer = Format.getDbms()
 
         if not conf.extensiveFp:
             value += actVer
@@ -63,7 +63,7 @@ class Fingerprint(GenericFingerprint):
 
                 value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
-        htmlErrorFp = format.getErrorParsedDBMSes()
+        htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
@@ -71,10 +71,10 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (backend.isDbmsWithin(MSSQL_ALIASES) \
-           or conf.dbms in MSSQL_ALIASES) and backend.getVersion() and \
-           backend.getVersion().isdigit():
-            setDbms("%s %s" % (DBMS.MSSQL, backend.getVersion()))
+        if not conf.extensiveFp and (Backend.isDbmsWithin(MSSQL_ALIASES) \
+           or conf.dbms in MSSQL_ALIASES) and Backend.getVersion() and \
+           Backend.getVersion().isdigit():
+            setDbms("%s %s" % (DBMS.MSSQL, Backend.getVersion()))
 
             self.getBanner()
 
@@ -103,10 +103,10 @@ class Fingerprint(GenericFingerprint):
                 result = inject.checkBooleanExpression(check)
 
                 if result:
-                    backend.setVersion(version)
+                    Backend.setVersion(version)
 
-            if backend.getVersion():
-                setDbms("%s %s" % (DBMS.MSSQL, backend.getVersion()))
+            if Backend.getVersion():
+                setDbms("%s %s" % (DBMS.MSSQL, Backend.getVersion()))
             else:
                 setDbms(DBMS.MSSQL)
 

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-'''Visualize dot graphs via the xdot format.'''
+'''Visualize dot graphs via the xdot Format.'''
 
 __author__ = "Jose Fonseca"
 

@@ -13,7 +13,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import parseUnionPage
@@ -102,14 +102,14 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
 
     for count in range(conf.uColsStart, conf.uColsStop+1):
-        if backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[backend.getIdentifiedDbms()]):
-            query = query[:-len(FROM_TABLE[backend.getIdentifiedDbms()])]
+        if Backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+            query = query[:-len(FROM_TABLE[Backend.getIdentifiedDbms()])]
 
         if count:
             query += ", %s" % conf.uChar
 
-        if backend.getIdentifiedDbms() in FROM_TABLE:
-            query += FROM_TABLE[backend.getIdentifiedDbms()]
+        if Backend.getIdentifiedDbms() in FROM_TABLE:
+            query += FROM_TABLE[Backend.getIdentifiedDbms()]
 
         status = "%d/%d" % (count, conf.uColsStop)
         debugMsg = "testing %s columns (%d%%)" % (status, round(100.0*count/conf.uColsStop))

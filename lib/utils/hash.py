@@ -22,7 +22,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
-from lib.core.common import backend
+from lib.core.common import Backend
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
 from lib.core.common import paths
@@ -270,9 +270,9 @@ def hashRecognition(value):
     if value:
         for name, regex in getPublicTypeMembers(HASH):
             # Hashes for Oracle and old MySQL look the same hence these checks
-            if backend.getIdentifiedDbms() == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
+            if Backend.getIdentifiedDbms() == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
                 continue
-            elif backend.getIdentifiedDbms() == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
+            elif Backend.getIdentifiedDbms() == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
                 continue
             elif getCompiledRegex(regex).match(value):
                 retVal = regex
@@ -454,7 +454,7 @@ def dictionaryAttack(attack_dict):
                 clearConsoleLine()
 
     if len(hash_regexes) == 0:
-        warnMsg  = "unknown hash format. "
+        warnMsg  = "unknown hash Format. "
         warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
         logger.warn(warnMsg)
 

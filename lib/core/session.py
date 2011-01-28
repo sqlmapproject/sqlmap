@@ -9,8 +9,8 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import backend
-from lib.core.common import format
+from lib.core.common import Backend
+from lib.core.common import Format
 from lib.core.common import dataToSessionFile
 from lib.core.common import getFilteredPageContent
 from lib.core.common import readInput
@@ -91,9 +91,9 @@ def setDbms(dbms):
     if dbmsRegExp:
         dbms = dbmsRegExp.group(1)
 
-    backend.setDbms(dbms)
+    Backend.setDbms(dbms)
 
-    logger.info("the back-end DBMS is %s" % backend.getDbms())
+    logger.info("the back-end DBMS is %s" % Backend.getDbms())
 
 def setOs():
     """
@@ -120,15 +120,15 @@ def setOs():
         return
 
     if "type" in kb.bannerFp:
-        kb.os = format.humanize(kb.bannerFp["type"])
+        kb.os = Format.humanize(kb.bannerFp["type"])
         infoMsg = "the back-end DBMS operating system is %s" % kb.os
 
     if "distrib" in kb.bannerFp:
-        kb.osVersion = format.humanize(kb.bannerFp["distrib"])
+        kb.osVersion = Format.humanize(kb.bannerFp["distrib"])
         infoMsg += " %s" % kb.osVersion
 
     if "sp" in kb.bannerFp:
-        kb.osSP = int(format.humanize(kb.bannerFp["sp"]).replace("Service Pack ", ""))
+        kb.osSP = int(Format.humanize(kb.bannerFp["sp"]).replace("Service Pack ", ""))
 
     elif "sp" not in kb.bannerFp and kb.os == "Windows":
         kb.osSP = 0
@@ -195,11 +195,11 @@ def resumeConfKb(expression, url, value):
             test = readInput(message, default="N")
 
             if not test or test[0] in ("n", "N"):
-                backend.setDbms(dbms)
-                backend.setVersionList(dbmsVersion)
+                Backend.setDbms(dbms)
+                Backend.setVersionList(dbmsVersion)
         else:
-            backend.setDbms(dbms)
-            backend.setVersionList(dbmsVersion)
+            Backend.setDbms(dbms)
+            Backend.setVersionList(dbmsVersion)
 
     elif expression == "OS" and url == conf.url:
         os = unSafeFormatString(value[:-1])
@@ -236,7 +236,7 @@ def resumeConfKb(expression, url, value):
         if '.' in table:
             db, table = table.split('.')
         else:
-            db = "%s%s" % (backend.getIdentifiedDbms(), METADB_SUFFIX)
+            db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
 
         logMsg = "resuming brute forced table name "
         logMsg += "'%s' from session file" % table
@@ -251,7 +251,7 @@ def resumeConfKb(expression, url, value):
         if '.' in table:
             db, table = table.split('.')
         else:
-            db = "%s%s" % (backend.getIdentifiedDbms(), METADB_SUFFIX)
+            db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
 
         logMsg = "resuming brute forced column name "
         logMsg += "'%s' for table '%s' from session file" % (colName, table)
