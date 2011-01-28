@@ -62,13 +62,16 @@ from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
+from lib.core.settings import PYVERSION
+from lib.core.settings import VERSION
+from lib.core.settings import REVISION
+from lib.core.settings import VERSION_STRING
 from lib.core.settings import SITE
 from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import NON_CONTROL_CHAR_REGEX
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import VERSION_STRING
 from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
 from lib.core.settings import DUMP_DEL_MARKER
@@ -2273,3 +2276,18 @@ def decodeIntToUnicode(value):
         return struct.pack('B' if value<256 else '>H', value).decode(kb.pageEncoding)
     except:
         return INFERENCE_UNKNOWN_CHAR
+
+def unhandledExceptionMessage():
+    errMsg  = "unhandled exception in %s, retry your " % VERSION_STRING
+    errMsg += "run with the latest development version from the Subversion "
+    errMsg += "repository. If the exception persists, please send by e-mail "
+    errMsg += "to sqlmap-users@lists.sourceforge.net the command line, the "
+    errMsg += "following text and any information needed to reproduce the "
+    errMsg += "bug. The developers will try to reproduce the bug, fix it "
+    errMsg += "accordingly and get back to you.\n"
+    errMsg += "sqlmap version: %s%s\n" % (VERSION, " (r%d)" % REVISION if REVISION else "")
+    errMsg += "Python version: %s\n" % PYVERSION
+    errMsg += "Operating system: %s\n" % PLATFORM
+    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.technique else None)
+    errMsg += "Back-end DBMS: %s" % kb.dbms
+    return errMsg

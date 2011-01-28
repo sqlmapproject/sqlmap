@@ -34,10 +34,10 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.exception import unhandledException
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.testing import smokeTest
@@ -109,7 +109,7 @@ def main():
 
     except:
         print
-        errMsg = unhandledException()
+        errMsg = unhandledExceptionMessage()
         logger.critical(errMsg)
         traceback.print_exc()
         closeDumper(False, errMsg)
