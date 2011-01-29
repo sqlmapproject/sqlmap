@@ -14,7 +14,7 @@ from optparse import OptionGroup
 from optparse import OptionParser
 from optparse import SUPPRESS_HELP
 
-from lib.core.convert import utf8decode
+from lib.core.common import getUnicode
 from lib.core.data import logger
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import VERSION_STRING
@@ -547,9 +547,9 @@ def cmdLineParser():
         args = []
         for arg in sys.argv:
             try:
-                args.append(utf8decode(arg))
+                args.append(getUnicode(arg, sys.getfilesystemencoding()))
             except:
-                args.append(unicode(arg, sys.getfilesystemencoding()))
+                args.append(getUnicode(arg), "utf8")
         (args, _) = parser.parse_args(args)
 
         if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile\
