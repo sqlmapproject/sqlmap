@@ -549,7 +549,7 @@ def cmdLineParser():
             try:
                 args.append(getUnicode(arg, sys.getfilesystemencoding()))
             except:
-                args.append(getUnicode(arg), "utf8")
+                args.append(getUnicode(arg, "utf8"))
         (args, _) = parser.parse_args(args)
 
         if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile\
