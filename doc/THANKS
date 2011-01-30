@@ -399,7 +399,7 @@ Bedirhan Urgun <bedirhanurgun@gmail.com>
     benchmark project, OWASP SQLiBench, http://code.google.com/p/sqlibench
 
 Kyprianos Vasilopoulos <kyprianos.vasilopoulos@gmail.com>
-    for reporting an unhandled connection exception
+    for reporting a couple of minor bugs
 
 Carlos Gabriel Vergara <carlosgabrielvergara@gmail.com>
     for suggesting couple of good features

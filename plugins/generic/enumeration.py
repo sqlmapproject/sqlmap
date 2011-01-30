@@ -267,7 +267,10 @@ class Enumeration:
                     if parsedUser:
                         user = parsedUser.groups()[0]
 
-                if user in retrievedUsers:
+                if isinstance(user, list):
+                    user = user[0]
+
+                if not user or user in retrievedUsers:
                     continue
 
                 infoMsg  = "fetching number of password hashes "
@@ -536,7 +539,10 @@ class Enumeration:
                 if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
                     unescapedUser = unescaper.unescape(user, quote=False)
 
-                if user in retrievedUsers:
+                if isinstance(user, list):
+                    user = user[0]
+
+                if not user or user in retrievedUsers:
                     continue
 
                 infoMsg  = "fetching number of privileges "
