@@ -270,6 +270,6 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
                 return outputs
     else:
-        return __oneShotErrorUse(expression, expressionFields)
+        return __errorFields(expression, expressionFields, expressionFieldsList)
 
     return outputs
