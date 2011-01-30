@@ -96,38 +96,6 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     SQL injection vulnerability. The test is done up to 50 columns
     on the target database table
     """
-    ratios = []
-    from lib.core.common import popValue
-    from lib.core.common import pushValue
-    from lib.request.comparison import comparison
-    from lib.core.common import stdev
-    from lib.core.common import average
-    pushValue(kb.errorIsNone)
-    kb.errorIsNone = False
-    #for count in range(conf.uColsStart, conf.uColsStop+1):
-    for count in range(conf.uColsStart, conf.uColsStop+1):
-        query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, conf.uChar)
-        payload = agent.payload(place=place, parameter=parameter, newValue=query, where=1)
-        page, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
-        ratios.append(comparison(page, True))
-    min_, max_ = min(ratios), max(ratios)
-
-    minIndex = ratios.index(min_)
-    maxIndex = ratios.index(max_)
-    ratios.pop(ratios.index(min_))
-    ratios.pop(ratios.index(max_))
-    deviation = stdev(ratios)
-    lower, upper = average(ratios) - 7 * deviation, average(ratios) + 7 * deviation
-    if min_ < lower:
-        print "NULL count is vulnerable: %d" % (minIndex + conf.uColsStart + 1)
-        pass
-    elif max_ > upper:
-        print "NULL count is vulnerable: %d" % (maxIndex + conf.uColsStart + 1)
-
-    kb.errorIsNone = popValue()
-    return None, None
-
-    #---------------------------------------------------------
 
     validPayload = None
     vector = None
