@@ -181,6 +181,14 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
+            # Skip test if the user provided custom column
+            # range and this is not a custom UNION test
+            if conf.uCols is not None and hasattr(test.request, "columns") and test.request.columns != "[COLSTART]-[COLSTOP]":
+                debugMsg = "skipping test '%s' because custom " % title
+                debugMsg += "UNION columns range was provided"
+                logger.debug(debugMsg)
+                continue
+
             infoMsg = "testing '%s'" % title
             logger.info(infoMsg)
 
@@ -351,14 +359,6 @@ def checkSqlInjection(place, parameter, value):
                             # Force back-end DBMS according to the current
                             # test value for proper payload unescaping
                             Backend.forceDbms(dbms)
-
-                            # Skip test if the user provided custom column
-                            # range and this is not a custom UNION test
-                            if conf.uCols is not None and test.request.columns != "[COLSTART]-[COLSTOP]":
-                                debugMsg = "skipping test '%s' because custom " % title
-                                debugMsg += "UNION columns range was provided"
-                                logger.debug(debugMsg)
-                                continue
 
                             configUnion(test.request.char, test.request.columns)
 
