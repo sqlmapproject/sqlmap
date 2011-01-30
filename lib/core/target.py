@@ -31,6 +31,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.xmldump import dumper as xmldumper
 from lib.request.connect import Connect as Request
 
@@ -139,7 +140,7 @@ def __setOutputResume():
 
     if os.path.exists(conf.sessionFile):
         if not conf.flushSession:
-            readSessionFP = codecs.open(conf.sessionFile, "r", conf.dataEncoding, 'replace')
+            readSessionFP = codecs.open(conf.sessionFile, "r", UNICODE_ENCODING, 'replace')
             __url_cache = set()
             __expression_cache = {}
 
@@ -190,7 +191,7 @@ def __setOutputResume():
                 raise sqlmapFilePathException, errMsg
 
     try:
-        conf.sessionFP = codecs.open(conf.sessionFile, "a", conf.dataEncoding)
+        conf.sessionFP = codecs.open(conf.sessionFile, "a", UNICODE_ENCODING)
         dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
     except IOError:
         errMsg = "unable to write on the session file specified"

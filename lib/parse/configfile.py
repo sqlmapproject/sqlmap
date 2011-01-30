@@ -13,10 +13,10 @@ from ConfigParser import NoSectionError
 
 from lib.core.common import checkFile
 from lib.core.common import UnicodeRawConfigParser
-from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.optiondict import optDict
+from lib.core.settings import UNICODE_ENCODING
 
 config = None
 
@@ -58,7 +58,7 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    configFP = codecs.open(configFile, "rb", conf.dataEncoding)
+    configFP = codecs.open(configFile, "rb", UNICODE_ENCODING)
     config = UnicodeRawConfigParser()
     config.readfp(configFP)
 

@@ -34,6 +34,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
 from lib.core.subprocessng import pollProcess
@@ -142,7 +143,7 @@ class Metasploit:
 
         if not choice:
             if lst:
-                choice = getUnicode(default, conf.dataEncoding)
+                choice = getUnicode(default, UNICODE_ENCODING)
             else:
                 return default
 
@@ -341,7 +342,7 @@ class Metasploit:
 
         self.__resource += "exploit\n"
 
-        self.resourceFp = codecs.open(self.resourceFile, "w", conf.dataEncoding)
+        self.resourceFp = codecs.open(self.resourceFile, "w", UNICODE_ENCODING)
         self.resourceFp.write(self.__resource)
         self.resourceFp.close()
 

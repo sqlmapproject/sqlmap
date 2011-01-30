@@ -19,6 +19,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.settings import SQL_STATEMENTS
+from lib.core.settings import UNICODE_ENCODING
 from lib.utils.timeout import timeout
 
 def direct(query, content=True):
@@ -49,7 +50,7 @@ def direct(query, content=True):
             output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
 
         infoMsg  = "resumed from file '%s': " % conf.sessionFile
-        infoMsg += "%s..." % getUnicode(output, conf.dataEncoding)[:20]
+        infoMsg += "%s..." % getUnicode(output, UNICODE_ENCODING)[:20]
         logger.info(infoMsg)
     else:
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
@@ -65,7 +66,7 @@ def direct(query, content=True):
                 out = list(output)[0][0]
                 if isinstance(out, str):
                     out = utf8decode(out)
-                return getUnicode(out, conf.dataEncoding)
+                return getUnicode(out, UNICODE_ENCODING)
             else:
                 return list(output)
         else:

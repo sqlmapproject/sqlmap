@@ -17,7 +17,6 @@ from zipfile import ZipFile
 from extra.pydes.pyDes import des
 from extra.pydes.pyDes import CBC
 from lib.core.common import checkFile
-from lib.core.common import conf
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
@@ -36,6 +35,7 @@ from lib.core.enums import HASH
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import DUMMY_USER_PREFIX
+from lib.core.settings import UNICODE_ENCODING
 
 def mysql_passwd(password, uppercase=True):
     """
@@ -151,7 +151,7 @@ def oracle_old_passwd(password, username, uppercase=True): # prior to version '1
     IV, pad = "\0"*8, "\0"
 
     if isinstance(username, unicode):
-        username = unicode.encode(username, conf.dataEncoding) #pyDes has issues with unicode strings
+        username = unicode.encode(username, UNICODE_ENCODING) #pyDes has issues with unicode strings
 
     unistr = "".join("\0%s" % c for c in (username + password).upper())
 

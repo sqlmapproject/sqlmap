@@ -12,9 +12,9 @@ try:
 except ImportError, _:
     pass
 
-from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
+from lib.core.settings import UNICODE_ENCODING
 
 from plugins.generic.connector import Connector as GenericConnector
 
@@ -39,8 +39,8 @@ class Connector(GenericConnector):
             self.checkFileDb()
 
         try:
-            self.connector = kinterbasdb.connect(host=self.hostname.encode(conf.dataEncoding), database=self.db.encode(conf.dataEncoding), \
-                user=self.user.encode(conf.dataEncoding), password=self.password.encode(conf.dataEncoding), charset="UTF8") #http://www.daniweb.com/forums/thread248499.html
+            self.connector = kinterbasdb.connect(host=self.hostname.encode(UNICODE_ENCODING), database=self.db.encode(UNICODE_ENCODING), \
+                user=self.user.encode(UNICODE_ENCODING), password=self.password.encode(UNICODE_ENCODING), charset="UTF8") #http://www.daniweb.com/forums/thread248499.html
         except kinterbasdb.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
         self.setCursor()

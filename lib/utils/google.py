@@ -21,6 +21,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
+from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
 
 class Google:
@@ -111,7 +112,7 @@ class Google:
             responseMsg = "HTTP response (%s - %d):\n" % (status, code)
 
             if conf.verbose <= 4:
-                responseMsg += getUnicode(responseHeaders, conf.dataEncoding)
+                responseMsg += getUnicode(responseHeaders, UNICODE_ENCODING)
             elif conf.verbose > 4:
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
 

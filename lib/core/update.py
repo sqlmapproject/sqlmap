@@ -31,6 +31,7 @@ from lib.core.data import paths
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.settings import MSSQL_VERSIONS_URL
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import pollProcess
 from lib.request.connect import Connect as Request
 
@@ -130,7 +131,7 @@ def __updateMSSQLXML():
                 servicepackElement.appendChild(servicepackText)
 
     # Get the XML old file content to a local variable
-    mssqlXml = codecs.open(paths.MSSQL_XML, "r", conf.dataEncoding)
+    mssqlXml = codecs.open(paths.MSSQL_XML, "r", UNICODE_ENCODING)
     oldMssqlXml = mssqlXml.read()
     oldMssqlXmlSignatures = oldMssqlXml.count("<signature>")
     oldMssqlXmlList = oldMssqlXml.splitlines(1)
@@ -140,12 +141,12 @@ def __updateMSSQLXML():
     shutil.copy(paths.MSSQL_XML, "%s.bak" % paths.MSSQL_XML)
 
     # Save our newly created XML to the signatures file
-    mssqlXml = codecs.open(paths.MSSQL_XML, "w", conf.dataEncoding)
+    mssqlXml = codecs.open(paths.MSSQL_XML, "w", UNICODE_ENCODING)
     doc.writexml(writer=mssqlXml, addindent="    ", newl="\n")
     mssqlXml.close()
 
     # Get the XML new file content to a local variable
-    mssqlXml = codecs.open(paths.MSSQL_XML, "r", conf.dataEncoding)
+    mssqlXml = codecs.open(paths.MSSQL_XML, "r", UNICODE_ENCODING)
     newMssqlXml = mssqlXml.read()
     newMssqlXmlSignatures = newMssqlXml.count("<signature>")
     newMssqlXmlList = newMssqlXml.splitlines(1)
@@ -199,7 +200,7 @@ def __updateSqlmap():
         logger.debug(debugMsg)
 
         def notify(event_dict):
-            action = getUnicode(event_dict['action'], conf.dataEncoding)
+            action = getUnicode(event_dict['action'])
             index = action.find('_')
             prefix = action[index + 1].upper() if index != -1 else action.capitalize()
 
@@ -209,7 +210,7 @@ def __updateSqlmap():
             if action.find('_completed') == -1:
                 dataToStdout("%s\t%s\n" % (prefix, event_dict['path']))
             else:
-                revision = getUnicode(event_dict['revision'], conf.dataEncoding)
+                revision = getUnicode(event_dict['revision'], UNICODE_ENCODING)
                 index = revision.find('number ')
 
                 if index != -1:

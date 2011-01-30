@@ -12,9 +12,9 @@ import os
 import cProfile
 
 from lib.core.common import getUnicode
-from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.settings import UNICODE_ENCODING
 
 def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     """
@@ -27,7 +27,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        errMsg = "profiling requires third-party libraries (%s)" % getUnicode(e, conf.dataEncoding)
+        errMsg = "profiling requires third-party libraries (%s)" % getUnicode(e, UNICODE_ENCODING)
         logger.error(errMsg)
         return
 
@@ -60,7 +60,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
 
     # Create dot file by using extra/gprof2dot/gprof2dot.py
     # http://code.google.com/p/jrfonseca/wiki/Gprof2Dot
-    dotFilePointer = codecs.open(dotOutputFile, 'wt', conf.dataEncoding)
+    dotFilePointer = codecs.open(dotOutputFile, 'wt', UNICODE_ENCODING)
     parser = gprof2dot.PstatsParser(profileOutputFile)
     profile = parser.parse()
     profile.prune(0.5/100.0, 0.1/100.0)

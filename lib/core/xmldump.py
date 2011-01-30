@@ -16,6 +16,7 @@ from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapFilePathException
+from lib.core.settings import UNICODE_ENCODING
 
 TECHNIC_ELEM_NAME = "Technic"
 TECHNICS_ELEM_NAME = "Technics"
@@ -489,7 +490,7 @@ class XMLDump:
                     except ExpatError:
                         self.__doc = Document()
 
-                self.__outputFP = codecs.open(self.__outputFile, "w+", conf.dataEncoding)
+                self.__outputFP = codecs.open(self.__outputFile, "w+", UNICODE_ENCODING)
 
                 if self.__root is None:
                     self.__root = self.__doc.createElementNS(NAME_SPACE_ATTR, RESULTS_ELEM_NAME)
@@ -525,7 +526,7 @@ class XMLDump:
                 statusElem.appendChild(errorElem)
 
             self.__addToRoot(statusElem)
-            self.__write(prettyprint.formatXML(self.__doc, encoding=conf.dataEncoding))
+            self.__write(prettyprint.formatXML(self.__doc, encoding=UNICODE_ENCODING))
             self.__outputFP.close()
 
 def closeDumper(status, msg=""):

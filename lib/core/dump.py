@@ -20,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.replication import Replication
+from lib.core.settings import UNICODE_ENCODING
 
 class Dump:
     """
@@ -46,7 +47,7 @@ class Dump:
 
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
-        self.__outputFP = codecs.open(self.__outputFile, "ab", conf.dataEncoding)
+        self.__outputFP = codecs.open(self.__outputFile, "ab", UNICODE_ENCODING)
 
     def getOutputFile(self):
         return self.__outputFile

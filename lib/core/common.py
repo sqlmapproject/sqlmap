@@ -59,6 +59,7 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -99,7 +100,7 @@ class UnicodeRawConfigParser(RawConfigParser):
             fp.write("[%s]\n" % DEFAULTSECT)
 
             for (key, value) in self._defaults.items():
-                fp.write("%s = %s\n" % (key, getUnicode(value, conf.dataEncoding).replace('\n', '\n\t')))
+                fp.write("%s = %s\n" % (key, getUnicode(value, UNICODE_ENCODING).replace('\n', '\n\t')))
 
             fp.write("\n")
 
@@ -111,7 +112,7 @@ class UnicodeRawConfigParser(RawConfigParser):
                     if value is None:
                         fp.write("%s\n" % (key))
                     else:
-                        fp.write("%s = %s\n" % (key, getUnicode(value, conf.dataEncoding).replace('\n', '\n\t')))
+                        fp.write("%s = %s\n" % (key, getUnicode(value, UNICODE_ENCODING).replace('\n', '\n\t')))
 
             fp.write("\n")
 
@@ -584,9 +585,9 @@ def dataToStdout(data, forceOutput=False):
     if not ('threadException' in kb and kb.threadException):
         if forceOutput or (conf.verbose > 0) and not getCurrentThreadData().disableStdOut:
             try:
-                sys.stdout.write(data)
-            except UnicodeEncodeError:
-                sys.stdout.write(data.encode(conf.dataEncoding))
+                sys.stdout.write(data.encode(sys.stdout.encoding))
+            except:
+                sys.stdout.write(data.encode(UNICODE_ENCODING, errors="replace"))
             finally:
                 sys.stdout.flush()
 
@@ -660,7 +661,7 @@ def readInput(message, default=None):
         message += " "
 
     if conf.batch and default:
-        infoMsg = "%s%s" % (message, getUnicode(default, conf.dataEncoding))
+        infoMsg = "%s%s" % (message, getUnicode(default, UNICODE_ENCODING))
         logger.info(infoMsg)
 
         debugMsg = "used the default behaviour, running in batch mode"
@@ -668,7 +669,7 @@ def readInput(message, default=None):
 
         data = default
     else:
-        data = raw_input(message.encode(sys.stdout.encoding or conf.dataEncoding))
+        data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
 
         if not data:
             data = default
@@ -1438,7 +1439,7 @@ def readCachedFileContent(filename, mode='rb'):
 
         if filename not in kb.cache.content:
             checkFile(filename)
-            xfile = codecs.open(filename, mode, conf.dataEncoding)
+            xfile = codecs.open(filename, mode, UNICODE_ENCODING)
             content = xfile.read()
             kb.cache.content[filename] = content
             xfile.close()
@@ -1450,7 +1451,7 @@ def readCachedFileContent(filename, mode='rb'):
 def readXmlFile(xmlFile):
     checkFile(xmlFile)  
 
-    xfile = codecs.open(xmlFile, 'r', conf.dataEncoding)
+    xfile = codecs.open(xmlFile, 'r', UNICODE_ENCODING)
     retVal = minidom.parse(xfile).documentElement
 
     xfile.close()
@@ -1502,7 +1503,7 @@ def initCommonOutputs():
     kb.commonOutputs = {}
     key = None
 
-    cfile = codecs.open(paths.COMMON_OUTPUTS, 'r', conf.dataEncoding)
+    cfile = codecs.open(paths.COMMON_OUTPUTS, 'r', UNICODE_ENCODING)
 
     for line in cfile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
         if line.find('#') != -1:
@@ -1528,7 +1529,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     checkFile(filename)
 
     if unicode_:
-        ifile = codecs.open(filename, 'r', conf.dataEncoding)
+        ifile = codecs.open(filename, 'r', UNICODE_ENCODING)
     else:
         ifile = open(filename, 'r')
 
@@ -1683,7 +1684,7 @@ def getUnicode(value, encoding=None):
     if isinstance(value, unicode):
         return value
     elif isinstance(value, basestring):
-        return unicode(value, encoding or conf.dataEncoding, errors="replace")
+        return unicode(value, encoding or UNICODE_ENCODING, errors="replace")
     else:
         return unicode(value) # encoding ignored for non-basestring instances
 
@@ -2260,7 +2261,7 @@ def openFile(filename, mode='r'):
     """
 
     try:
-        return codecs.open(filename, mode, conf.dataEncoding)
+        return codecs.open(filename, mode, UNICODE_ENCODING)
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
         errMsg += "Please check %s permissions on a file " % ("write" if \

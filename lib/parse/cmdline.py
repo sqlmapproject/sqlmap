@@ -18,6 +18,7 @@ from lib.core.common import getUnicode
 from lib.core.data import logger
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import VERSION_STRING
+from lib.core.settings import UNICODE_ENCODING
 
 def cmdLineParser():
     """
@@ -545,11 +546,12 @@ def cmdLineParser():
         parser.add_option_group(miscellaneous)
 
         args = []
+        from lib.core.common import dataToStdout
         for arg in sys.argv:
             try:
-                args.append(getUnicode(arg, sys.stdin.encoding or sys.getfilesystemencoding()))
+                args.append(getUnicode(arg, sys.getfilesystemencoding() or sys.stdin.encoding))
             except:
-                args.append(getUnicode(arg, "utf8"))
+                args.append(getUnicode(arg, UNICODE_ENCODING))
         (args, _) = parser.parse_args(args)
 
         if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile\

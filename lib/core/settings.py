@@ -208,3 +208,6 @@ BURP_SPLITTER = "======================================================"
 
 # Do the url-encoding based on parameter place
 URL_ENCODE_PAYLOAD = { PLACE.GET: True, PLACE.POST: True, PLACE.COOKIE: False, PLACE.UA: True, PLACE.URI: False }
+
+# Encoding used for Unicode data
+UNICODE_ENCODING = "utf8"

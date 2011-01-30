@@ -1137,7 +1137,6 @@ def __setConfAttributes():
 
     conf.boundaries       = []
     conf.cj               = None
-    conf.dataEncoding     = "utf-8"
     conf.dbmsConnector    = None
     conf.dbmsHandler      = None
     conf.dumpPath         = None
