@@ -29,7 +29,7 @@ def loadHistory():
         try:
             readline.read_history_file(historyPath)
         except IOError, msg:
-            warnMsg = "there was a problem with loading of history file '%s' (%s)" % (historyPath, msg)
+            warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, msg)
             logger.warn(warnMsg)
 
 def queriesForAutoCompletion():
