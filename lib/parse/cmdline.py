@@ -547,10 +547,9 @@ def cmdLineParser():
         args = []
         for arg in sys.argv:
             try:
-                args.append(getUnicode(arg, sys.getfilesystemencoding()))
+                args.append(getUnicode(arg, sys.stdin.encoding or sys.getfilesystemencoding()))
             except:
                 args.append(getUnicode(arg, "utf8"))
-        (args, _) = parser.parse_args(args)
 
         if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile\
             and not args.requestFile and not args.updateAll and not args.smokeTest and not args.liveTest\
