@@ -348,18 +348,18 @@ def __goError(expression, expected=None, resumeValue=True, dump=False):
     SQL injection vulnerability on the affected parameter.
     """
 
-    result = None
-
-    if conf.direct:
-        return direct(expression), None
+    output = None
 
     if resumeValue:
-        result = resume(expression, None)
+        output = resume(expression, None)
 
-    if not result:
-        result = errorUse(expression, expected, resumeValue, dump)
+        if output and expected == EXPECTED.INT and not output.isdigit():
+            output = None
 
-    return result
+    if output is None:
+        output = errorUse(expression, expected, resumeValue, dump)
+
+    return output
 
 def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=True, dump=False):
     """
@@ -374,10 +374,10 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     if resumeValue:
         output = resume(expression, None)
 
-        if not output or (expected == EXPECTED.INT and not output.isdigit()):
+        if not output or (output and (expected == EXPECTED.INT and not output.isdigit())):
             partial = True
 
-    if not output:
+    if output is None:
         output = unionUse(expression, resetCounter=True, unpack=unpack, dump=dump)
 
     if output:
@@ -490,7 +490,7 @@ def goStacked(expression, silent=False):
     expression = cleanQuery(expression)
 
     if conf.direct:
-        return direct(expression), None
+        return direct(expression)
 
     comment = queries[Backend.getIdentifiedDbms()].comment.query
     query = agent.prefixQuery("; %s" % expression)

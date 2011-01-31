@@ -63,7 +63,6 @@ def main():
 
     paths.SQLMAP_ROOT_PATH = modulePath()
     setPaths()
-
     banner()
 
     # Store original command line options for possible later restoration
