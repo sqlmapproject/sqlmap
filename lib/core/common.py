@@ -274,7 +274,7 @@ class Backend:
     def setVersionList(versionsList):
         if isinstance(versionsList, list):
             kb.dbmsVersion = versionsList
-        elif isinstance(version, basestring):
+        elif isinstance(versionsList, basestring):
             Backend.setVersion(versionsList)
         else:
             logger.error("invalid format of versionsList")
