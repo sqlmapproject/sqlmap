@@ -80,6 +80,12 @@ INFERENCE_BLANK_BREAK = 15
 # use this replacement character for cases when inference is not able to retrieve the proper character value
 INFERENCE_UNKNOWN_CHAR = '?'
 
+# character used for operation "greater" in inference
+INFERENCE_GREATER_CHAR = ">"
+
+# character used for operation "equals" in inference
+INFERENCE_EQUALS_CHAR = "="
+
 # string used for representation of unknown dbms version
 UNKNOWN_DBMS_VERSION = "Unknown"
 

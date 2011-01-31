@@ -38,6 +38,8 @@ from lib.core.progress import ProgressBar
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
+from lib.core.settings import INFERENCE_GREATER_CHAR
+from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -129,7 +131,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 posValue = ord(hintValue[idx-1])
 
-            forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, posValue))
+            forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
@@ -163,7 +165,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             charTbl.remove(ord('\n'))
 
         if len(charTbl) == 1:
-            forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, charTbl[0]))
+            forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
             queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
@@ -239,7 +241,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     # both minValue and character afterwards are possible
                     # candidates
                     for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
-                        forgedPayload = safeStringFormat(payload.replace('%3E', '%3D'), (expressionUnescaped, idx, retVal))
+                        forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, retVal))
                         queriesCount[0] += 1
                         result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
