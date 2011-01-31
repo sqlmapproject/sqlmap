@@ -1121,7 +1121,7 @@ def __cleanupOptions():
         #conf.predictOutput = True
         conf.keepAlive = True
         conf.nullConnection = not conf.textOnly
-        conf.threads = 4 if conf.threads < 2 else conf.threads
+        conf.threads = 4 if conf.threads < 4 else conf.threads
 
     if conf.realTest:
         conf.userAgentsFile = paths.USER_AGENTS
