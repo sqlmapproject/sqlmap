@@ -97,7 +97,9 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
                 logger.warn(warnMsg)
 
             output = __oneShotErrorUse(expressionReplaced, field)
-            logger.info("retrieved: %s" % output)
+
+            if output is not None:
+                logger.info("retrieved: %s" % output)
 
         if isinstance(num, int):
             expression = origExpr
@@ -145,7 +147,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
     # entry per time
     # NOTE: I assume that only queries that get data from a table can
     # return multiple entries
-    if " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) and "EXISTS(" not in expression.upper():
+    if " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) and "EXISTS(" not in expression.upper() and "(CASE" not in expression.upper():
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
@@ -258,6 +260,9 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 try:
                     for num in xrange(startLimit, stopLimit):
                         output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
+                        if output and isinstance(output, list) and len(output) == 1:
+                            output = output[0]
+
                         outputs.append(output)
 
                 except KeyboardInterrupt:
@@ -270,8 +275,10 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
                 logger.debug(debugMsg)
 
-                return outputs
-    else:
-        return __errorFields(expression, expressionFields, expressionFieldsList)
+    if not outputs:
+        outputs = __errorFields(expression, expressionFields, expressionFieldsList)
+
+    if outputs and isinstance(outputs, list) and len(outputs) == 1:
+        outputs = outputs[0]
 
     return outputs

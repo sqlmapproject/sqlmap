@@ -254,7 +254,7 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
         reqCount += 1
 
         if kb.misc.start not in content or kb.misc.stop not in content:
-            return
+            return None
 
         # Parse the returned page to get the exact inband
         # sql injection output
