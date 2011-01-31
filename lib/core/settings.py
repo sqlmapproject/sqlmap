@@ -100,9 +100,6 @@ IS_WIN             = subprocess.mswindows
 PLATFORM           = os.name
 PYVERSION          = sys.version.split()[0]
 
-# Url to update Microsoft SQL Server XML versions file from
-MSSQL_VERSIONS_URL = "http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx"
-
 # Database management system specific variables
 MSSQL_SYSTEM_DBS    = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
 MYSQL_SYSTEM_DBS    = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
