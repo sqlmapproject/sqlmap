@@ -257,6 +257,7 @@ class Connect:
         except urllib2.HTTPError, e:
             page = None
             responseHeaders = None
+
             try:
                 page = e.read()
                 responseHeaders = e.info()

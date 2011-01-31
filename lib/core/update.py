@@ -83,5 +83,6 @@ def update():
             logger.error(errMsg)
         elif svnStdout:
             revision = re.search("revision\s+([\d]+)", svnStdout, re.I)
+
             if revision:
                 logger.info('updated to the latest revision %s' % revision.group(1))

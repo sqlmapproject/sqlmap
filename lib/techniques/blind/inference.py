@@ -147,8 +147,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     def validateChar(idx, value):
         """
-        used in time based inference (in case that original and retrieved value are not equal there will be deliberate delay)
+        Used in time-based inference (in case that original and retrieved
+        value are not equal there will be a deliberate delay).
         """
+
         forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
         queriesCount[0] += 1
         result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
@@ -240,9 +242,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             return None
                     else:
                         retVal = minValue + 1
+
                         if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
                             if timeBasedCompare and not validateChar(idx, retVal):
-                                errMsg = "invalid character detected. retrying..."
+                                errMsg = "invalid character detected. retrying.."
                                 logger.error(errMsg)
 
                                 conf.timeSec += 1

@@ -2300,6 +2300,10 @@ def listToStrValue(value):
     >>> listToStrValue([1,2,3])
     '1, 2, 3'
     """
+
+    if isinstance(value, (set, tuple)):
+        value = list(value)
+
     if isinstance(value, list):
         retValue = value.__str__().lstrip('[').rstrip(']')
     else:

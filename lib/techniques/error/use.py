@@ -61,8 +61,9 @@ def __oneShotErrorUse(expression, field):
 
     # Parse the returned page to get the exact error-based
     # sql injection output
-    output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE)\
-      or extractRegexResult(check, listToStrValue(headers.headers if headers else None), re.DOTALL | re.IGNORECASE)
+    output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
+             or extractRegexResult(check, listToStrValue(headers.headers \
+             if headers else None), re.DOTALL | re.IGNORECASE)
 
     dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(output)))
 
