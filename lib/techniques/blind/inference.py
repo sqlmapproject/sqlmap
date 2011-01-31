@@ -40,6 +40,7 @@ from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
+from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -144,6 +145,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return None
 
+    def validateChar(idx, value):
+        """
+        used in time based inferences (in case of delay compared values are not equal)
+        """
+        forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
+        queriesCount[0] += 1
+        result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+
+        return not result
+
     def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None):
         """
         continuousOrder means that distance between each two neighbour's
@@ -171,7 +182,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if result:
                 return chr(charTbl[0]) if charTbl[0] < 128 else decodeIntToUnicode(charTbl[0])
-            else: 
+            else:
                 return None
 
         maxChar = maxValue = charTbl[-1]
@@ -230,7 +241,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         retVal = minValue + 1
                         if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                            return chr(retVal) if retVal < 128 else decodeIntToUnicode(retVal)
+                            if timeBasedCompare and not validateChar(idx, retVal):
+                                logger.error("invalid character detected. retrying...")
+                                return getChar(idx, originalTbl, continuousOrder, expand)
+                            else:
+                                return chr(retVal) if retVal < 128 else decodeIntToUnicode(retVal)
                         else:
                             return None
                 else:

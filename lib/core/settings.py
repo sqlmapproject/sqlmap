@@ -86,6 +86,9 @@ INFERENCE_GREATER_CHAR = ">"
 # character used for operation "equals" in inference
 INFERENCE_EQUALS_CHAR = "="
 
+# character used for operation "not-equals" in inference
+INFERENCE_NOT_EQUALS_CHAR = "!="
+
 # string used for representation of unknown dbms version
 UNKNOWN_DBMS_VERSION = "Unknown"
 
