@@ -119,6 +119,7 @@ class Connect:
                 conn = multipartOpener.open(url, multipart)
                 page = conn.read()
                 responseHeaders = conn.info()
+                responseHeaders[URI_HTTP_HEADER] = conn.geturl()
                 page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
                 return page
@@ -240,6 +241,7 @@ class Connect:
             page = conn.read()
             code = conn.code
             responseHeaders = conn.info()
+            responseHeaders[URI_HTTP_HEADER] = conn.geturl()
             page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
             status = getUnicode(conn.msg)
 
