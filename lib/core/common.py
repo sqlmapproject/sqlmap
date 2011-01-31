@@ -2282,15 +2282,16 @@ def unhandledExceptionMessage():
     errMsg  = "unhandled exception in %s, retry your " % VERSION_STRING
     errMsg += "run with the latest development version from the Subversion "
     errMsg += "repository. If the exception persists, please send by e-mail "
-    errMsg += "to sqlmap-users@lists.sourceforge.net the command line, the "
-    errMsg += "following text and any information needed to reproduce the "
-    errMsg += "bug. The developers will try to reproduce the bug, fix it "
-    errMsg += "accordingly and get back to you.\n"
+    errMsg += "to sqlmap-users@lists.sourceforge.net the following text "
+    errMsg += "and any information required to reproduce the bug. The "
+    errMsg += "developers will try to reproduce the bug, fix it accordingly "
+    errMsg += "and get back to you.\n"
     errMsg += "sqlmap version: %s%s\n" % (VERSION, " (r%d)" % REVISION if REVISION else "")
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
+    errMsg += "Command line: %s\n" % " ".join(arg.replace(conf.hostname, "*"*len(conf.hostname)) for arg in sys.argv)
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.technique else None)
-    errMsg += "Back-end DBMS: %s" % kb.dbms
+    errMsg += "Back-end DBMS: %s" % "%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms()
     return errMsg
 
 def listToStrValue(value):
