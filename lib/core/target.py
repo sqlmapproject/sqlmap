@@ -32,6 +32,7 @@ from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.xmldump import dumper as xmldumper
 from lib.request.connect import Connect as Request
 
@@ -77,6 +78,9 @@ def __setRequestParams():
             __testableParameters = True
 
         conf.method = HTTPMETHOD.POST
+
+    if re.search(URI_INJECTABLE_REGEX, conf.url, re.I):
+        conf.url = "%s*" % conf.url
 
     if "*" in conf.url:
         conf.parameters[PLACE.URI] = conf.url

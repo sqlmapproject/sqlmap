@@ -22,6 +22,7 @@ from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.request.basic import decodePage
 
 class Google:
@@ -59,8 +60,10 @@ class Google:
         """
 
         for match in self.__matches:
-            if re.search("(.*?)\?(.+)", match, re.I):
+            if re.search(r"(.*?)\?(.+)", match, re.I):
                 kb.targetUrls.add(( htmlunescape(htmlunescape(match)), None, None, None ))
+            elif re.search(URI_INJECTABLE_REGEX, match, re.I):
+                kb.targetUrls.add(( htmlunescape(htmlunescape("%s" % match)), None, None, None ))
 
     def getCookie(self):
         """

@@ -217,3 +217,6 @@ UNICODE_ENCODING = "utf8"
 
 # Reference: http://www.w3.org/Protocols/HTTP/Object_Headers.html#uri
 URI_HTTP_HEADER = "URI"
+
+# Uri format which could be injectable (e.g. www.site.com/id82)
+URI_INJECTABLE_REGEX = r".*/([^\.*?]+)\Z"
