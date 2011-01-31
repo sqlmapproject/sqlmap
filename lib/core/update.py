@@ -105,6 +105,8 @@ def __updateMSSQLXML():
             servicePack = servicePack.replace("Service Pack", "")
             servicePack = servicePack.replace("<a href=\"http:", "")
             servicePack = servicePack.replace("  ", " ")
+            servicePack = servicePack.replace("+ ", "+")
+            servicePack = servicePack.replace(" +", "+")
 
             if servicePack.endswith(" "):
                 servicePack = servicePack[:-1]
