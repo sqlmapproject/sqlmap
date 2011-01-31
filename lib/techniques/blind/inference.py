@@ -147,7 +147,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     def validateChar(idx, value):
         """
-        used in time based inferences (in case of delay compared values are not equal)
+        used in time based inference (in case that original and retrieved value are not equal there will be deliberate delay)
         """
         forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
         queriesCount[0] += 1
