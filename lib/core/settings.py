@@ -205,3 +205,6 @@ BURP_SPLITTER = "======================================================"
 
 # Encoding used for Unicode data
 UNICODE_ENCODING = "utf8"
+
+# Reference: http://www.w3.org/Protocols/HTTP/Object_Headers.html#uri
+URI_HTTP_HEADER = "URI"

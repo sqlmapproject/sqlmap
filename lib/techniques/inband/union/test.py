@@ -11,11 +11,12 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import Backend
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
+from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import randomStr
 from lib.core.data import conf
@@ -48,9 +49,10 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
         # Perform the request
-        resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
+        page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+        content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
-        if resultPage and phrase in resultPage:
+        if content and phrase in content:
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, conf.uChar, where)
 
@@ -66,9 +68,10 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 payload = agent.payload(place=place, parameter=parameter, newValue=query, where=2)
 
                 # Perform the request
-                resultPage, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
+                page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+                content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
-                if resultPage and ((phrase in resultPage and phrase2 not in resultPage) or (phrase not in resultPage and phrase2 in resultPage)):
+                if content and ((phrase in content and phrase2 not in content) or (phrase not in content and phrase2 in content)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
 
             break

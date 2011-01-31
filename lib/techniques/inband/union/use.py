@@ -11,11 +11,12 @@ import re
 import time
 
 from lib.core.agent import agent
-from lib.core.common import calculateDeltaSeconds
 from lib.core.common import Backend
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
+from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -247,17 +248,19 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
         payload = agent.payload(newValue=query)
 
         # Perform the request
-        resultPage, _ = Request.queryPage(payload, content=True)
+        page, headers = Request.queryPage(payload, content=True, raise404=False)
+        content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
+
         reqCount += 1
 
-        if kb.misc.start not in resultPage or kb.misc.stop not in resultPage:
+        if kb.misc.start not in content or kb.misc.stop not in content:
             return
 
         # Parse the returned page to get the exact inband
         # sql injection output
-        startPosition = resultPage.index(kb.misc.start)
-        endPosition = resultPage.rindex(kb.misc.stop) + len(kb.misc.stop)
-        value = getUnicode(resultPage[startPosition:endPosition])
+        startPosition = content.index(kb.misc.start)
+        endPosition = content.rindex(kb.misc.stop) + len(kb.misc.stop)
+        value = getUnicode(content[startPosition:endPosition])
 
         duration = calculateDeltaSeconds(start)
 

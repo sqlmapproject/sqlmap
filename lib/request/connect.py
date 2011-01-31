@@ -40,6 +40,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
@@ -257,6 +258,7 @@ class Connect:
             try:
                 page = e.read()
                 responseHeaders = e.info()
+                responseHeaders[URI_HTTP_HEADER] = e.geturl()
                 page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
             except socket.timeout:
                 warnMsg  = "connection timed out while trying "
