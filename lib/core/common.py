@@ -2291,7 +2291,7 @@ def unhandledExceptionMessage():
     errMsg += "Operating system: %s\n" % PLATFORM
     errMsg += "Command line: %s\n" % " ".join(arg.replace(conf.hostname, "*"*len(conf.hostname)) for arg in sys.argv)
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.technique else None)
-    errMsg += "Back-end DBMS: %s" % "%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms()
+    errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
     return errMsg
 
 def listToStrValue(value):
