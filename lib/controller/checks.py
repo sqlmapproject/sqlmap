@@ -22,6 +22,7 @@ from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
+from lib.core.common import listToStrValue
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
@@ -320,8 +321,9 @@ def checkSqlInjection(place, parameter, value):
                         elif method == PAYLOAD.METHOD.GREP:
                             # Perform the test's request and grep the response
                             # body for the test's <grep> regular expression
-                            reqBody, _ = Request.queryPage(reqPayload, place, content=True, raise404=False)
-                            output = extractRegexResult(check, reqBody, re.DOTALL | re.IGNORECASE)
+                            page, headers = Request.queryPage(reqPayload, place, content=True, raise404=False)
+                            output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE)\
+                              or extractRegexResult(check, listToStrValue(headers.headers if headers else None), re.DOTALL | re.IGNORECASE)
 
                             if output:
                                 result = output.replace(kb.misc.space, " ") == "1"

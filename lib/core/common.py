@@ -2292,3 +2292,16 @@ def unhandledExceptionMessage():
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.technique else None)
     errMsg += "Back-end DBMS: %s" % kb.dbms
     return errMsg
+
+def listToStrValue(value):
+    """
+    Flattens list to a string value
+    >>> listToStrValue([1,2,3])
+    '1, 2, 3'
+    """
+    if isinstance(value, list):
+        retValue = value.__str__().lstrip('[').rstrip(']')
+    else:
+        retValue = value
+
+    return retValue

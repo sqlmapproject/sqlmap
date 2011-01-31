@@ -11,12 +11,13 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import extractRegexResult
-from lib.core.common import Backend
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
+from lib.core.common import listToStrValue
 from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
@@ -55,12 +56,13 @@ def __oneShotErrorUse(expression, field):
     payload = agent.payload(newValue=injExpression)
 
     # Perform the request
-    page, _ = Request.queryPage(payload, content=True)
+    page, headers = Request.queryPage(payload, content=True)
     reqCount += 1
 
     # Parse the returned page to get the exact error-based
     # sql injection output
-    output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE)
+    output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE)\
+      or extractRegexResult(check, listToStrValue(headers.headers if headers else None), re.DOTALL | re.IGNORECASE)
 
     dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(output)))
 
