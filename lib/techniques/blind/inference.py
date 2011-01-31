@@ -241,8 +241,15 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         retVal = minValue + 1
                         if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                            if timeBasedCompare and not validateChar(idx, retVal):
-                                logger.error("invalid character detected. retrying...")
+                            #if timeBasedCompare and not validateChar(idx, retVal):
+                            if True:
+                                errMsg = "invalid character detected. retrying..."
+                                logger.error(errMsg)
+
+                                conf.timeSec += 1
+                                warnMsg = "adjusting time delay to %d seconds" % conf.timeSec
+                                logger.warn(warnMsg)
+
                                 return getChar(idx, originalTbl, continuousOrder, expand)
                             else:
                                 return chr(retVal) if retVal < 128 else decodeIntToUnicode(retVal)
