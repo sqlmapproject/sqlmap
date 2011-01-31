@@ -241,8 +241,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         retVal = minValue + 1
                         if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                            #if timeBasedCompare and not validateChar(idx, retVal):
-                            if True:
+                            if timeBasedCompare and not validateChar(idx, retVal):
                                 errMsg = "invalid character detected. retrying..."
                                 logger.error(errMsg)
 
