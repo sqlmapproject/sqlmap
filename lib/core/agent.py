@@ -385,7 +385,8 @@ class Agent:
         elif fieldsNoSelect:
             fieldsToCastStr = fieldsNoSelect
 
-        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I): # Function
+        # Function
+        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or fieldsSelectCase:
             fieldsToCastList = [fieldsToCastStr]
         else:
             fieldsToCastList = fieldsToCastStr.replace(", ", ",")
@@ -700,10 +701,15 @@ class Agent:
         @rtype: C{str}
         """
 
+        caseExpression = expression
+
         if Backend.getIdentifiedDbms() is not None and hasattr(queries[Backend.getIdentifiedDbms()], "case"):
-            return queries[Backend.getIdentifiedDbms()].case.query % expression
-        else:
-            return expression
+            caseExpression = queries[Backend.getIdentifiedDbms()].case.query % expression
+
+            if Backend.getIdentifiedDbms() in FROM_TABLE and not caseExpression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+                caseExpression += FROM_TABLE[Backend.getIdentifiedDbms()]
+
+        return caseExpression
 
     def addPayloadDelimiters(self, inpStr):
         """

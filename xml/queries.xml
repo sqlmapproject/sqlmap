@@ -225,7 +225,7 @@
         <comment query="--"/>
         <timedelay query="BEGIN DBMS_LOCK.SLEEP(%d); END" query2="EXEC DBMS_LOCK.SLEEP(%d.00)" query3="EXEC USER_LOCK.SLEEP(%d.00)"/>
         <substring query="SUBSTR((%s), %d, %d)"/>
-        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END) FROM DUAL"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="ASCII(SUBSTR((%s), %d, 1)) > %d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>
@@ -386,7 +386,7 @@
         <count query="COUNT(%s)"/>
         <timedelay query="SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6"/>
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
-        <case query="SELECT IIF(%s,1,0) FROM RDB$DATABASE"/>
+        <case query="SELECT IIF(%s,1,0)"/>
         <banner query="SELECT RDB$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM', 'DB_NAME') FROM RDB$DATABASE"/>
