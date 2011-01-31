@@ -17,6 +17,7 @@ import urlparse
 
 from xml.dom.minidom import Document
 
+# Path to the XML file with signatures
 MSSQL_XML = os.path.abspath("../../xml/banner/mssql.xml")
 
 # Url to update Microsoft SQL Server XML versions file from
