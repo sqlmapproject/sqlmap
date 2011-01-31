@@ -587,7 +587,7 @@ def dataToStdout(data, forceOutput=False):
             try:
                 sys.stdout.write(data.encode(sys.stdout.encoding))
             except:
-                sys.stdout.write(data.encode(UNICODE_ENCODING, errors="replace"))
+                sys.stdout.write(data.encode(UNICODE_ENCODING))
             finally:
                 sys.stdout.flush()
 
