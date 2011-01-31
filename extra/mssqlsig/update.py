@@ -23,6 +23,11 @@ MSSQL_XML = os.path.abspath("../../xml/banner/mssql.xml")
 MSSQL_VERSIONS_URL = "http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx"
 
 def updateMSSQLXML():
+    if not os.path.exists(MSSQL_XML):
+        errMsg = "[ERROR] file '%s' does not exist. please run the script from it's parent directory." % MSSQL_XML
+        print errMsg
+        return
+
     infoMsg = "[INFO] retrieving data from '%s'" % MSSQL_VERSIONS_URL
     print infoMsg
 
