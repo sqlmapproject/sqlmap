@@ -546,7 +546,6 @@ def cmdLineParser():
         parser.add_option_group(miscellaneous)
 
         args = []
-        from lib.core.common import dataToStdout
         for arg in sys.argv:
             try:
                 args.append(getUnicode(arg, sys.getfilesystemencoding() or sys.stdin.encoding))
