@@ -17,6 +17,8 @@ from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
+from lib.core.settings import MAXDB_ALIASES
+from lib.core.settings import SYBASE_ALIASES
 
 # sqlmap paths
 paths = advancedDict()
@@ -43,4 +45,7 @@ dbmsDict = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourc
              DBMS.ORACLE: [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
              DBMS.SQLITE: [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
              DBMS.ACCESS: [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
-             DBMS.FIREBIRD: [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"] }
+             DBMS.FIREBIRD: [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"],
+             DBMS.MAXDB: [MAXDB_ALIASES, None, None],
+             DBMS.SYBASE: [SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"]
+            }
