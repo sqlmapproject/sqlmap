@@ -2309,11 +2309,11 @@ def listToStrValue(value):
         value = list(value)
 
     if isinstance(value, list):
-        retValue = value.__str__().lstrip('[').rstrip(']')
+        retVal = value.__str__().lstrip('[').rstrip(']')
     else:
-        retValue = value
+        retVal = value
 
-    return retValue
+    return retVal
 
 def getExceptionFrameLocals():
     """
@@ -2322,9 +2322,11 @@ def getExceptionFrameLocals():
     """
 
     retVal = {}
+
     if sys.exc_info():
         trace = sys.exc_info()[2]
         while trace.tb_next:
             trace = trace.tb_next
         retVal = trace.tb_frame.f_locals
+
     return retVal
