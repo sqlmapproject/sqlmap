@@ -1039,6 +1039,9 @@ def getRange(count, dump=False, plusOne=False):
     return indexRange
 
 def parseUnionPage(output, expression, partial=False, condition=None, sort=True):
+    if output is None:
+        return None
+
     data = []
 
     outCond1 = ( output.startswith(kb.misc.start) and output.endswith(kb.misc.stop) )
@@ -2124,6 +2127,7 @@ def isTechniqueAvailable(technique=None):
     Returns True if there is injection data which sqlmap could use for
     technique specified
     """
+
     if conf.technique and technique != conf.technique:
         return False
     else:
