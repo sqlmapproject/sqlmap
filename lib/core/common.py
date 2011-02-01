@@ -2279,6 +2279,10 @@ def decodeIntToUnicode(value):
         return INFERENCE_UNKNOWN_CHAR
 
 def unhandledExceptionMessage():
+    """
+    Returns detailed message about occured unhandled exception
+    """
+
     errMsg  = "unhandled exception in %s, retry your " % VERSION_STRING
     errMsg += "run with the latest development version from the Subversion "
     errMsg += "repository. If the exception persists, please send by e-mail "
@@ -2310,3 +2314,17 @@ def listToStrValue(value):
         retValue = value
 
     return retValue
+
+def getExceptionFrameLocals():
+    """
+    Returns dictionary with local variable content from frame
+    where exception was raised
+    """
+
+    retVal = {}
+    if sys.exc_info():
+        trace = sys.exc_info()[2]
+        while trace.tb_next:
+            trace = trace.tb_next
+        retVal = trace.tb_frame.f_locals
+    return retVal
