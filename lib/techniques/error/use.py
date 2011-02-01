@@ -120,17 +120,15 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
     initTechnique(PAYLOAD.TECHNIQUE.ERROR)
 
+    global reqCount
+
     count = None
     start = time.time()
     startLimit = 0
     stopLimit = None
     outputs = []
-    test = None
     untilLimitChar = None
     untilOrderChar = None
-
-    global reqCount
-
     reqCount = 0
 
     if resumeValue:
@@ -148,7 +146,12 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
     # entry per time
     # NOTE: I assume that only queries that get data from a table can
     # return multiple entries
-    if " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) and "EXISTS(" not in expression.upper() and "(CASE" not in expression.upper():
+    if (dump and (conf.limitStart or conf.limitStop)) or (" FROM " in \
+       expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) \
+       or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
+       expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
+       and "EXISTS(" not in expression.upper() and "(CASE" not in expression.upper()):
+
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
@@ -205,81 +208,61 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 if conf.limitStop:
                     stopLimit = conf.limitStop
 
-            if not stopLimit or stopLimit <= 1:
-                if Backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
-                    test = False
+            # Count the number of SQL query entries output
+            countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
+            countedExpression = expression.replace(expressionFields, countFirstField, 1)
+
+            if re.search(" ORDER BY ", expression, re.I):
+                untilOrderChar = countedExpression.index(" ORDER BY ")
+                countedExpression = countedExpression[:untilOrderChar]
+
+            count = resume(countedExpression, None)
+
+            if not count or not count.isdigit():
+                _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
+                count = __oneShotErrorUse(countedExpression, countedExpressionFields)
+
+            if (not count or (count.isdigit() and int(count) == 0)):
+                warnMsg = "it was not possible to count the number "
+                warnMsg += "of entries for the used SQL query. "
+                warnMsg += "sqlmap will assume that it returns only "
+                warnMsg += "one entry"
+                logger.warn(warnMsg)
+
+                stopLimit = 1
+            elif isNumPosStrValue(count):
+                if isinstance(stopLimit, int) and stopLimit > 0:
+                    stopLimit = min(int(count), int(stopLimit))
                 else:
-                    test = True
+                    stopLimit = int(count)
 
-            if test:
-                # Count the number of SQL query entries output
-                countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
-                countedExpression = expression.replace(expressionFields, countFirstField, 1)
+                    infoMsg = "the SQL query used returns "
+                    infoMsg += "%d entries" % stopLimit
+                    logger.info(infoMsg)
 
-                if re.search(" ORDER BY ", expression, re.I):
-                    untilOrderChar = countedExpression.index(" ORDER BY ")
-                    countedExpression = countedExpression[:untilOrderChar]
+            try:
+                for num in xrange(startLimit, stopLimit):
+                    output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
 
-                if resumeValue:
-                    count = resume(countedExpression, None)
+                    if output and isinstance(output, list) and len(output) == 1:
+                        output = output[0]
 
-                if not stopLimit:
-                    if not count or not count.isdigit():
-                        _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
-                        count = __oneShotErrorUse(countedExpression, countedExpressionFields)
+                    outputs.append(output)
 
-                    if isNumPosStrValue(count):
-                        stopLimit = int(count)
-
-                        infoMsg = "the SQL query used returns "
-                        infoMsg += "%d entries" % stopLimit
-                        logger.info(infoMsg)
-
-                    elif count and not count.isdigit():
-                        warnMsg = "it was not possible to count the number "
-                        warnMsg += "of entries for the used SQL query. "
-                        warnMsg += "sqlmap will assume that it returns only "
-                        warnMsg += "one entry"
-                        logger.warn(warnMsg)
-
-                        stopLimit = 1
-
-                    elif (not count or int(count) == 0):
-                        warnMsg = "the SQL query used does not "
-                        warnMsg += "return any output"
-                        logger.warn(warnMsg)
-
-                        return None
-
-                elif (not count or int(count) == 0) and (not stopLimit or stopLimit == 0):
-                    warnMsg = "the SQL query used does not "
-                    warnMsg += "return any output"
-                    logger.warn(warnMsg)
-
-                    return None
-
-                try:
-                    for num in xrange(startLimit, stopLimit):
-                        output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
-                        if output and isinstance(output, list) and len(output) == 1:
-                            output = output[0]
-
-                        outputs.append(output)
-
-                except KeyboardInterrupt:
-                    print
-                    warnMsg = "Ctrl+C detected in dumping phase"
-                    logger.warn(warnMsg)
-
-                duration = calculateDeltaSeconds(start)
-
-                debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
-                logger.debug(debugMsg)
+            except KeyboardInterrupt:
+                print
+                warnMsg = "Ctrl+C detected in dumping phase"
+                logger.warn(warnMsg)
 
     if not outputs:
         outputs = __errorFields(expression, expressionFields, expressionFieldsList)
 
-    if outputs and isinstance(outputs, list) and len(outputs) == 1:
+    if outputs and isinstance(outputs, list) and len(outputs) == 1 and isinstance(outputs[0], basestring):
         outputs = outputs[0]
+
+    duration = calculateDeltaSeconds(start)
+
+    debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
+    logger.debug(debugMsg)
 
     return outputs

