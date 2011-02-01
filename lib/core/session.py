@@ -44,12 +44,14 @@ def setInjection(inj):
     session file.
     """
 
-    condition = (
-                  ( not kb.resumedQueries
+    condition = ( not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Injection data")
-                  ) )
-                )
+                  ( not kb.resumedQueries[conf.url].has_key("Injection data")
+                  or ( kb.resumedQueries[conf.url].has_key("Injection data")
+                  and isinstance(conf.technique, int) and conf.technique > 0
+                  and conf.technique not in
+                  base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data
+                ) ) ) )
 
     if condition:
         dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
@@ -154,12 +156,15 @@ def setRemoteTempPath():
 def resumeConfKb(expression, url, value):
     if expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
+
         logMsg = "resuming injection data from session file"
         logger.info(logMsg)
 
-        if injection.place in conf.paramDict and\
-          injection.parameter in conf.paramDict[injection.place]:
-            kb.injections.append(injection)
+        if injection.place in conf.paramDict and \
+           injection.parameter in conf.paramDict[injection.place]:
+
+            if not conf.technique or ( conf.technique in injection.data ):
+                kb.injections.append(injection)
         else:
             warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
             warnMsg += "but you did not provided it this time"
