@@ -102,7 +102,7 @@ def configUnion(char=None, columns=None):
     elif isinstance(columns, basestring):
         __configUnionCols(columns)
 
-def unionUse(expression, direct=False, unescape=True, unpack=True, dump=False):
+def unionUse(expression, unescape=True, unpack=True, dump=False):
     """
     This function tests for an inband SQL injection on the target
     url then call its subsidiary function to effectively perform an

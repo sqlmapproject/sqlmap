@@ -155,7 +155,10 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     # forge the SQL limiting the query output one entry per time
     # NOTE: I assume that only queries that get data from a table
     # can return multiple entries
-    if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))):
+    if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
+      not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
+      expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))):
+
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
