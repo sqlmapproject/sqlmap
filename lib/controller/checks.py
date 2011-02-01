@@ -99,6 +99,15 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
+            # Skip test if it is the same SQL injection type already
+            # identified by another test
+            if injection.data and stype in injection.data:
+                debugMsg = "skipping test '%s' because " % title
+                debugMsg += "the payload for %s has " % PAYLOAD.SQLINJECTION[stype]
+                debugMsg += "already been identified"
+                logger.debug(debugMsg)
+                continue
+
             # Skip test if the risk is higher than the provided (or default)
             # value
             # Parse test's <risk>
@@ -157,15 +166,6 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
 
                     continue
-
-            # Skip test if it is the same SQL injection type already
-            # identified by another test
-            if injection.data and stype in injection.data:
-                debugMsg = "skipping test '%s' because " % title
-                debugMsg += "the payload for %s has " % PAYLOAD.SQLINJECTION[stype]
-                debugMsg += "already been identified"
-                logger.debug(debugMsg)
-                continue
 
             # Skip test if it does not match the same SQL injection clause
             # already identified by another test
