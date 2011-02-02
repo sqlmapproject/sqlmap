@@ -83,6 +83,7 @@ from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
+from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.threads import getCurrentThreadData
 
@@ -2297,10 +2298,26 @@ def unhandledExceptionMessage():
     errMsg += "sqlmap version: %s%s\n" % (VERSION, " (r%d)" % REVISION if REVISION else "")
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
-    errMsg += "Command line: %s\n" % " ".join(arg.replace(conf.hostname, "*"*len(conf.hostname)) for arg in sys.argv)
+    errMsg += "Command line: %s\n" % " ".join(sys.argv)
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.technique else None)
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
-    return errMsg
+    return maskSensitiveData(errMsg)
+
+def maskSensitiveData(msg):
+    """
+    Masks sensitive data in the supplied message
+    """
+
+    retVal = msg
+
+    if retVal:
+        for item in filter(lambda x: x, [conf.hostname, conf.googleDork]):
+            regex = SENSITIVE_DATA_REGEX % item
+            while extractRegexResult(regex, retVal):
+                value = extractRegexResult(regex, retVal)
+                retVal = retVal.replace(value, '*'*len(value))
+
+    return retVal
 
 def listToStrValue(value):
     """

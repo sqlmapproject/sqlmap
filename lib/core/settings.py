@@ -227,5 +227,8 @@ URI_HTTP_HEADER = "URI"
 # Uri format which could be injectable (e.g. www.site.com/id82)
 URI_INJECTABLE_REGEX = r".*/([^\.*?]+)\Z"
 
+# Regex used for masking sensitive data
+SENSITIVE_DATA_REGEX = "\s(?P<result>[^\s]*%s[^\s]*)\s"
+
 # Maximum number of threads (avoiding connection issues and/or DoS)
 MAX_NUMBER_OF_THREADS = 10
