@@ -11,6 +11,7 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.common import average
 from lib.core.common import Backend
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
@@ -18,7 +19,10 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import randomStr
+from lib.core.common import stdev
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -26,9 +30,54 @@ from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
+from lib.core.settings import UNION_STDEV_COEFF
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
+from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request
+
+def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=1):
+    """
+    Finds number of columns affected by UNION based injection
+    """
+    retVal = None
+
+    items = []
+    ratios = []
+    pushValue(kb.errorIsNone)
+    kb.errorIsNone = False
+
+    min_, max_ = None, None
+    for count in range(conf.uColsStart, conf.uColsStop+1):
+        query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, conf.uChar)
+        payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
+        page, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
+        ratio = comparison(page, True)
+        ratios.append(ratio)
+        min_, max_ = min(min_ or ratio, ratio), max(max_ or ratio, ratio)
+        items.append((count, ratio))
+
+    ratios.pop(ratios.index(min_))
+    ratios.pop(ratios.index(max_))
+
+    deviation = stdev(ratios)
+    lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
+
+    minItem, maxItem = None, None
+    for item in ratios:
+        if item[1] == min_:
+            minItem = item
+        elif item[1] == max_:
+            maxItem = item
+
+    if min_ < lower:
+        retVal = minItem[0]
+    elif max_ > upper:
+        retVal = maxItem[0]
+
+    kb.errorIsNone = popValue()
+
+    return retVal
 
 def __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=1):
     validPayload = None

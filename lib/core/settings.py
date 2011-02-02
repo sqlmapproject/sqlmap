@@ -59,6 +59,9 @@ NON_CONTROL_CHAR_REGEX = r'[^\x00-\x1f]'
 # coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF = 10
 
+# coefficient used for a union-based number of columns checking (must be >= 7)
+UNION_STDEV_COEFF = 7
+
 # length of queue for candidates for time delay adjustment
 TIME_DELAY_CANDIDATES = 3
 
