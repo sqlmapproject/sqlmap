@@ -80,14 +80,14 @@ class Agent:
             origValue = origValue[origValue.rfind('/') + 1:]
 
         if value is None:
-            if where == 1:
+            if where == PAYLOAD.WHERE.ORIGINAL:
                 value = origValue
-            elif where == 2:
+            elif where == PAYLOAD.WHERE.NEGATIVE:
                 if newValue.startswith("-"):
                     value = ""
                 else:
                     value = "-%s" % randomInt()
-            elif where == 3:
+            elif where == PAYLOAD.WHERE.REPLACE:
                 value = ""
             else:
                 value = origValue
@@ -144,7 +144,7 @@ class Agent:
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not prepend with the prefix
-        if where == 3:
+        if where == PAYLOAD.WHERE.REPLACE:
             query = ""
 
         # If the technique is stacked queries (<stype>) do not put a space
@@ -185,7 +185,7 @@ class Agent:
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not append the suffix
-        if where == 3:
+        if where == PAYLOAD.WHERE.REPLACE:
             pass
 
         elif kb.injection.suffix is not None:

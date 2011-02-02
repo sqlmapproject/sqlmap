@@ -253,15 +253,15 @@ def checkSqlInjection(place, parameter, value):
 
                     # Threat the parameter original value according to the
                     # test's <where> tag
-                    if where == 1:
+                    if where == PAYLOAD.WHERE.ORIGINAL:
                         origValue = value
-                    elif where == 2:
+                    elif where == PAYLOAD.WHERE.NEGATIVE:
                         # Use different page template than the original
                         # one as we are changing parameters value, which
                         # will likely result in a different content
                         origValue = "-%s" % randomInt()
                         templatePayload = agent.payload(place, parameter, newValue=origValue, where=where)
-                    elif where == 3:
+                    elif where == PAYLOAD.WHERE.REPLACE:
                         origValue = ""
 
                     kb.pageTemplate, kb.errorIsNone = getPageTemplate(templatePayload, place)

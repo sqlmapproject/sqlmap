@@ -41,7 +41,7 @@ def __oneShotUnionUse(expression, unpack=True, unescape=True):
         expression = unescaper.unescape(expression)
 
     if conf.limitStart or conf.limitStop:
-        where = 2
+        where = PAYLOAD.WHERE.NEGATIVE
     else:
         where = None
 
@@ -129,7 +129,7 @@ def unionUse(expression, unescape=True, unpack=True, dump=False):
     # entry per time
     # NOTE: I assume that only queries that get data from a table can
     # return multiple entries
-    if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == 2 or \
+    if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
        (dump and (conf.limitStart or conf.limitStop))) and \
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
        not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE \

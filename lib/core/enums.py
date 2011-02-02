@@ -115,3 +115,8 @@ class PAYLOAD:
         UNION = 3
         STACKED = 4
         TIME = 5
+
+    class WHERE:
+        ORIGINAL = 1
+        NEGATIVE = 2
+        REPLACE = 3

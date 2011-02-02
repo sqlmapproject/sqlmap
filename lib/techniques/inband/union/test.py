@@ -37,7 +37,7 @@ from lib.parse.html import htmlParser
 from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request
 
-def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=1):
+def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=PAYLOAD.WHERE.ORIGINAL):
     """
     Finds number of columns affected by UNION based injection
     """
@@ -83,7 +83,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
     return retVal
 
-def __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=1):
+def __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=PAYLOAD.WHERE.ORIGINAL):
     validPayload = None
     vector = None
 
@@ -109,7 +109,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, conf.uChar, where)
 
-            if where == 1:
+            if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
                 randQuery2 = randomStr()
                 phrase2 = "%s%s%s" % (kb.misc.start, randQuery2, kb.misc.stop)
@@ -118,14 +118,14 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
 
                 # Confirm that it is a full inband SQL injection
                 query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, conf.uChar, multipleUnions=randQueryUnescaped2)
-                payload = agent.payload(place=place, parameter=parameter, newValue=query, where=2)
+                payload = agent.payload(place=place, parameter=parameter, newValue=query, where=PAYLOAD.WHERE.NEGATIVE)
 
                 # Perform the request
                 page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
                 content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
                 if content and ((phrase in content and phrase2 not in content) or (phrase not in content and phrase2 in content)):
-                    vector = (position, count, comment, prefix, suffix, conf.uChar, 2)
+                    vector = (position, count, comment, prefix, suffix, conf.uChar, PAYLOAD.WHERE.NEGATIVE)
 
             break
 

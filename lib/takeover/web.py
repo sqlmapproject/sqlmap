@@ -31,6 +31,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.shell import autoCompletion
 from lib.request.connect import Connect as Request
@@ -108,7 +109,7 @@ class Web:
         if isTechniqueAvailable(kb.technique):
             where = kb.injection.data[kb.technique].where
 
-            if where == 2:
+            if where == PAYLOAD.WHERE.NEGATIVE:
                 randInt = randomInt()
                 query += "OR %d=%d " % (randInt, randInt)
 
