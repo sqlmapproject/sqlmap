@@ -13,6 +13,7 @@ from ConfigParser import NoSectionError
 
 from lib.core.common import checkFile
 from lib.core.common import UnicodeRawConfigParser
+from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.optiondict import optDict
