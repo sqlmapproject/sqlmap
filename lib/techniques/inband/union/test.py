@@ -42,9 +42,8 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     """
     retVal = None
 
-    items = []
-    ratios = []
     pushValue(kb.errorIsNone)
+    items, ratios = [], []
     kb.errorIsNone = False
 
     min_, max_ = None, None
@@ -64,7 +63,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
 
     minItem, maxItem = None, None
-    for item in ratios:
+    for item in items:
         if item[1] == min_:
             minItem = item
         elif item[1] == max_:
