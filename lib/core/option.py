@@ -21,6 +21,7 @@ import urllib2
 import urlparse
 
 from extra.clientform.clientform import ParseResponse
+from extra.clientform.clientform import ParseError
 from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
@@ -426,7 +427,11 @@ def __findPageForms():
     logger.info(infoMsg)
 
     response, _ = Request.queryPage(response=True)
-    forms = ParseResponse(response, backwards_compat=False)
+    try:
+        forms = ParseResponse(response, backwards_compat=False)
+    except ParseError:
+        errMsg  = "badly formed HTML at the target url. can't parse forms"
+        raise sqlmapGenericException, errMsg
 
     if forms:
         for form in forms:
