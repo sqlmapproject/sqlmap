@@ -78,9 +78,9 @@ def cmdLineParser():
         request.add_option("--user-agent", dest="agent",
                            help="HTTP User-Agent header")
 
-        request.add_option("-a", dest="userAgentsFile",
-                           help="Load a random HTTP User-Agent "
-                                "header from file")
+        request.add_option("--random-agent", dest="randomAgent",
+                           action="store_true", default=False,
+                           help="Use randomly selected HTTP User-Agent header")
 
         request.add_option("--referer", dest="referer",
                            help="HTTP Referer header")

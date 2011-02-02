@@ -981,7 +981,7 @@ def __setHTTPUserAgent():
         conf.httpHeaders.append(("User-Agent", conf.agent))
         return
 
-    if not conf.userAgentsFile:
+    if not conf.randomAgent:
         addDefaultUserAgent = True
 
         for header, _ in conf.httpHeaders:
@@ -996,14 +996,14 @@ def __setHTTPUserAgent():
 
     if not kb.userAgents:
         debugMsg  = "loading random HTTP User-Agent header(s) from "
-        debugMsg += "file '%s'" % conf.userAgentsFile
+        debugMsg += "file '%s'" % paths.USER_AGENTS
         logger.debug(debugMsg)
 
         try:
-            kb.userAgents = getFileItems(conf.userAgentsFile)
+            kb.userAgents = getFileItems(paths.USER_AGENTS)
         except IOError:
             warnMsg  = "unable to read HTTP User-Agent header "
-            warnMsg += "file '%s'" % conf.userAgentsFile
+            warnMsg += "file '%s'" % paths.USER_AGENTS
             logger.warn(warnMsg)
 
             conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
@@ -1021,7 +1021,7 @@ def __setHTTPUserAgent():
     conf.httpHeaders.append(("User-Agent", __userAgent))
 
     logMsg  = "fetched random HTTP User-Agent header from "
-    logMsg += "file '%s': %s" % (conf.userAgentsFile, __userAgent)
+    logMsg += "file '%s': %s" % (paths.USER_AGENTS, __userAgent)
     logger.info(logMsg)
 
 def __setHTTPReferer():
@@ -1128,9 +1128,6 @@ def __cleanupOptions():
         conf.keepAlive = True
         conf.nullConnection = not conf.textOnly
         conf.threads = 4 if conf.threads < 4 else conf.threads
-
-    if conf.realTest:
-        conf.userAgentsFile = paths.USER_AGENTS
 
 def __setConfAttributes():
     """

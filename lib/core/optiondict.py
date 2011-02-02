@@ -28,7 +28,7 @@ optDict = {
                                "cookieUrlencode":   "boolean",
                                "dropSetCookie":     "boolean",
                                "agent":             "string",
-                               "userAgentsFile":    "string",
+                               "randomAgent":       "boolean",
                                "referer":           "string",
                                "headers":           "string",
                                "aType":             "string",
