@@ -422,7 +422,7 @@ class Connect:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
 
         if PLACE.UA in conf.parameters:
-            ua = urlencode(conf.parameters[PLACE.UA] if place != PLACE.UA or not value else value)
+            ua = conf.parameters[PLACE.UA] if place != PLACE.UA or not value else value
 
         if PLACE.URI in conf.parameters:
             uri = conf.url if place != PLACE.URI or not value else value
