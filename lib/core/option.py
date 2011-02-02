@@ -80,9 +80,10 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
+from lib.core.settings import BURP_SPLITTER
+from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import TIME_DELAY_CANDIDATES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
@@ -1397,8 +1398,8 @@ def __basicOptionValidation():
         errMsg = "switch --predict-output is incompatible with switch --threads"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.threads > 10:
-        errMsg = "maximum number of used threads is 10 avoiding possible stability issues"
+    if conf.threads > MAX_NUMBER_OF_THREADS:
+        errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
         raise sqlmapSyntaxException, errMsg
 
     if conf.forms and not conf.url:

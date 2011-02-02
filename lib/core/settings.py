@@ -220,3 +220,6 @@ URI_HTTP_HEADER = "URI"
 
 # Uri format which could be injectable (e.g. www.site.com/id82)
 URI_INJECTABLE_REGEX = r".*/([^\.*?]+)\Z"
+
+# Maximum number of threads (avoiding connection issues and/or DoS)
+MAX_NUMBER_OF_THREADS = 10
