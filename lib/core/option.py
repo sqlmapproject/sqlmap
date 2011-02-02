@@ -1397,6 +1397,10 @@ def __basicOptionValidation():
         errMsg = "switch --predict-output is incompatible with switch --threads"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.threads > 10:
+        errMsg = "maximum number of used threads is 10 avoiding possible stability issues"
+        raise sqlmapSyntaxException, errMsg
+
     if conf.forms and not conf.url:
         errMsg = "switch --forms requires usage of -u (--url) switch"
         raise sqlmapSyntaxException, errMsg
