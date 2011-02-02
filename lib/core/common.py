@@ -2310,12 +2310,11 @@ def maskSensitiveData(msg):
 
     retVal = msg
 
-    if retVal:
-        for item in filter(lambda x: x, [conf.hostname, conf.googleDork]):
-            regex = SENSITIVE_DATA_REGEX % item
-            while extractRegexResult(regex, retVal):
-                value = extractRegexResult(regex, retVal)
-                retVal = retVal.replace(value, '*'*len(value))
+    for item in filter(lambda x: x, [conf.hostname, conf.googleDork]):
+        regex = SENSITIVE_DATA_REGEX % item
+        while extractRegexResult(regex, retVal):
+            value = extractRegexResult(regex, retVal)
+            retVal = retVal.replace(value, '*'*len(value))
 
     return retVal
 
