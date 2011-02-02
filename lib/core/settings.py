@@ -77,6 +77,9 @@ METADB_SUFFIX = "_masterdb"
 # minimum time response set needed for time-comparison based on standard deviation
 MIN_TIME_RESPONSES = 15
 
+# minimum comparison ratio set needed for searching valid union column number based on standard deviation
+MIN_UNION_RESPONSES = 5
+
 # after these number of blanks at the end inference should stop (just in case)
 INFERENCE_BLANK_BREAK = 15
 

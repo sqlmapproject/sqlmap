@@ -31,6 +31,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import UNION_STDEV_COEFF
+from lib.core.settings import MIN_UNION_RESPONSES
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.comparison import comparison
@@ -45,9 +46,13 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     pushValue(kb.errorIsNone)
     items, ratios = [], []
     kb.errorIsNone = False
+    lowerCount, upperCount = conf.uColsStart, conf.uColsStop
+
+    if abs(upperCount - lowerCount) < MIN_UNION_RESPONSES:
+        upperCount = lowerCount + MIN_UNION_RESPONSES
 
     min_, max_ = None, None
-    for count in range(conf.uColsStart, conf.uColsStop+1):
+    for count in range(lowerCount, upperCount+1):
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, conf.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
