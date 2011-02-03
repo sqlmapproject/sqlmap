@@ -155,7 +155,7 @@ optDict = {
                                "flushSession":      "boolean",
                                "forms":             "boolean",
                                "eta":               "boolean",
-                               "updateAll":         "boolean",
+                               "update":            "boolean",
                                "batch":             "boolean"
                              },
 
