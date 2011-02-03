@@ -81,6 +81,10 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
     kb.errorIsNone = popValue()
 
+    if retVal:
+        infoMsg = "target url is UNION injectable with %d columns" % retVal
+        logger.info(infoMsg)
+
     return retVal
 
 def __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=PAYLOAD.WHERE.ORIGINAL):
@@ -157,9 +161,10 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     vector = None
     query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
     total = conf.uColsStop+1 - conf.uColsStart
-    index = 1
 
-    for count in range(conf.uColsStart, conf.uColsStop+1):
+    count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix)
+
+    if count:
         if Backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
             query = query[:-len(FROM_TABLE[Backend.getIdentifiedDbms()])]
 
@@ -169,18 +174,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         if Backend.getIdentifiedDbms() in FROM_TABLE:
             query += FROM_TABLE[Backend.getIdentifiedDbms()]
 
-        status = "%d/%d" % (count, conf.uColsStop)
-        debugMsg = "testing %s columns (%d%%)" % (status, round(100.0*index/total))
-        logger.debug(debugMsg)
-
         validPayload, vector = __unionConfirm(comment, place, parameter, value, prefix, suffix, count)
-
-        if validPayload:
-            break
-
-        index += 1
-
-    clearConsoleLine(True)
 
     return validPayload, vector
 
