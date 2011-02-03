@@ -2273,7 +2273,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 1 to 3 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2284,7 +2284,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>1-3</columns>
+            <columns>1-10</columns>
         </request>
         <response>
             <union/>
@@ -2295,7 +2295,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 4 to 7 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -2306,7 +2306,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>4-7</columns>
+            <columns>11-20</columns>
         </request>
         <response>
             <union/>
@@ -2317,7 +2317,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 8 to 12 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -2328,7 +2328,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>8-12</columns>
+            <columns>21-30</columns>
         </request>
         <response>
             <union/>
@@ -2339,7 +2339,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 13 to 18 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -2350,7 +2350,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>13-18</columns>
+            <columns>31-40</columns>
         </request>
         <response>
             <union/>
@@ -2361,7 +2361,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 19 to 25 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -2372,7 +2372,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>19-25</columns>
+            <columns>41-50</columns>
         </request>
         <response>
             <union/>
@@ -2402,7 +2402,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 1 to 3 columns</title>
+        <title>Generic UNION query ([CHAR]) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2413,7 +2413,7 @@ Formats:
             <payload/>
             <comment>--</comment>
             <char>NULL</char>
-            <columns>1-3</columns>
+            <columns>1-10</columns>
         </request>
         <response>
             <union/>
@@ -2421,7 +2421,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 4 to 7 columns</title>
+        <title>Generic UNION query ([CHAR]) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -2432,7 +2432,7 @@ Formats:
             <payload/>
             <comment>--</comment>
             <char>NULL</char>
-            <columns>4-7</columns>
+            <columns>11-20</columns>
         </request>
         <response>
             <union/>
@@ -2440,7 +2440,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 8 to 12 columns</title>
+        <title>Generic UNION query ([CHAR]) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -2451,7 +2451,7 @@ Formats:
             <payload/>
             <comment>--</comment>
             <char>NULL</char>
-            <columns>8-12</columns>
+            <columns>21-30</columns>
         </request>
         <response>
             <union/>
@@ -2459,7 +2459,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 13 to 18 columns</title>
+        <title>Generic UNION query ([CHAR]) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -2470,7 +2470,7 @@ Formats:
             <payload/>
             <comment>--</comment>
             <char>NULL</char>
-            <columns>13-18</columns>
+            <columns>31-40</columns>
         </request>
         <response>
             <union/>
@@ -2478,7 +2478,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 19 to 25 columns</title>
+        <title>Generic UNION query ([CHAR]) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -2489,7 +2489,7 @@ Formats:
             <payload/>
             <comment>--</comment>
             <char>NULL</char>
-            <columns>19-25</columns>
+            <columns>41-50</columns>
         </request>
         <response>
             <union/>
