@@ -54,16 +54,13 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
         if not pageLength:
             pageLength = len(page)
 
-    if conf.textOnly:
-        (seqMatcher.a, page) = map(getFilteredPageContent, (seqMatcher.a, page))
-
     if kb.nullConnection and pageLength:
         ratio = 1. * pageLength / len(seqMatcher.a)
 
         if ratio > 1.:
             ratio = 1. / ratio
     else:
-        seqMatcher.set_seq2(page)
+        (seqMatcher.a, seqMatcher.b) = map(lambda x: getFilteredPageContent(x, conf.textOnly), (seqMatcher.a, page))
         ratio = round(seqMatcher.quick_ratio(), 3)
 
     # If the url is stable and we did not set yet the match ratio and the
