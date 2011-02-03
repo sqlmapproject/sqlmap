@@ -204,7 +204,7 @@ def unionUse(expression, unescape=True, unpack=True, dump=False):
             count = parseUnionPage(count, countedExpression)
 
             if not count or not count.isdigit():
-                output = __oneShotUnionUse(countedExpression)
+                output = __oneShotUnionUse(countedExpression, unpack=unpack)
 
                 if output:
                     count = parseUnionPage(output, countedExpression)
@@ -239,7 +239,7 @@ def unionUse(expression, unescape=True, unpack=True, dump=False):
                     output = resume(limitedExpr, None)
 
                     if not output:
-                        output = __oneShotUnionUse(limitedExpr, unescape=unescape)
+                        output = __oneShotUnionUse(limitedExpr, unescape=unescape, unpack=unpack)
 
                     if output:
                         value += output
@@ -251,7 +251,7 @@ def unionUse(expression, unescape=True, unpack=True, dump=False):
                 logger.warn(warnMsg)
 
     if not value:
-        value = __oneShotUnionUse(expression, unescape=unescape)
+        value = __oneShotUnionUse(expression, unescape=unescape, unpack=unpack)
 
     duration = calculateDeltaSeconds(start)
 
