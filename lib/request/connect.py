@@ -369,7 +369,7 @@ class Connect:
         return page, responseHeaders
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getSeqMatcher=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None):
+    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -481,9 +481,9 @@ class Connect:
 
         if content or response:
             return page, headers
-        elif getSeqMatcher:
-            return comparison(page, getSeqMatcher=False, pageLength=pageLength), comparison(page, getSeqMatcher=True, pageLength=pageLength)
+        elif getRatioValue:
+            return comparison(page, getRatioValue=False, pageLength=pageLength), comparison(page, getRatioValue=True, pageLength=pageLength)
         elif pageLength or page:
-            return comparison(page, getSeqMatcher, pageLength)
+            return comparison(page, getRatioValue, pageLength)
         else:
             return False

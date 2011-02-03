@@ -235,3 +235,9 @@ MAX_NUMBER_OF_THREADS = 10
 
 # Minimum range between minimum and maximum of statistical set
 MIN_STATISTICAL_RANGE = 0.01
+
+# Minimum value for comparison ratio
+MIN_RATIO = 0.0
+
+# Maximum value for comparison ratio
+MAX_RATIO = 1.0

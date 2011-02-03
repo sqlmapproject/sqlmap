@@ -20,11 +20,13 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import DIFF_TOLERANCE
+from lib.core.settings import MIN_RATIO
+from lib.core.settings import MAX_RATIO
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 
-def comparison(page, getSeqMatcher=False, pageLength=None):
+def comparison(page, getRatioValue=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 
@@ -36,11 +38,13 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
     if page:
         # String to match in page when the query is valid
         if conf.string:
-            return conf.string in page
+            condition = conf.string in page
+            return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
 
         # Regular expression to match in page when the query is valid
         if conf.regexp:
-            return re.search(conf.regexp, page, re.I | re.M) is not None
+            condition = re.search(conf.regexp, page, re.I | re.M) is not None
+            return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
 
         # In case of an DBMS error page return None
         if kb.errorIsNone and (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
@@ -76,7 +80,7 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
 
     # If it has been requested to return the ratio and not a comparison
     # response
-    if getSeqMatcher:
+    if getRatioValue:
         return ratio
 
     elif ratio > UPPER_RATIO_BOUND:
