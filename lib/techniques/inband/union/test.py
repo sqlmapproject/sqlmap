@@ -31,6 +31,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import UNION_STDEV_COEFF
+from lib.core.settings import MIN_STATISTICAL_RANGE
 from lib.core.settings import MIN_UNION_RESPONSES
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
@@ -65,6 +66,10 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     ratios.pop(ratios.index(max_))
 
     deviation = stdev(ratios)
+
+    if abs(max_ - min_) < MIN_STATISTICAL_RANGE:
+        return None
+
     lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
 
     minItem, maxItem = None, None
