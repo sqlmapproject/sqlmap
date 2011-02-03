@@ -25,6 +25,7 @@ from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
+from lib.core.common import unhandledExceptionMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -394,7 +395,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             except:
                 print
                 kb.threadException = True
-                errMsg = unhandledException()
+                errMsg = unhandledExceptionMessage()
                 logger.error("thread %d: %s" % (numThread + 1, errMsg))
                 traceback.print_exc()
 
