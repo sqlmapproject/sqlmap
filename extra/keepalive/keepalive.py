@@ -97,8 +97,8 @@ class HTTPHandler(urllib2.HTTPHandler):
         """return a list of connected hosts"""
         retVal = []
         currentThread = threading.currentThread()
-        for thread, host in self._connections.keys():
-            if thread == currentThread:
+        for name, host in self._connections.keys():
+            if name == currentThread.getName():
                 retVal.append(host)
         return retVal
 
@@ -115,7 +115,7 @@ class HTTPHandler(urllib2.HTTPHandler):
             del self._connections[key]
 
     def _get_connection_key(self, host):
-        return (threading.currentThread(), host)
+        return (threading.currentThread().getName(), host)
 
     def _start_connection(self, h, req):
         h.clearheaders()
