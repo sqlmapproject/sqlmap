@@ -147,7 +147,7 @@
 
     <!-- Microsoft SQL Server -->
     <dbms value="Microsoft SQL Server">
-        <cast query="CAST(%s AS VARCHAR(8000))"/>
+        <cast query="CAST(%s AS NVARCHAR)"/>
         <length query="LTRIM(STR(LEN(%s)))"/>
         <isnull query="ISNULL(%s, ' ')"/>
         <delimiter query="+"/>
