@@ -1384,10 +1384,6 @@ def __basicOptionValidation():
         errMsg = "value for --cpu-throttle (cpuThrottle) option must be in range [0,100]"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.thold is not None and isinstance(conf.thold, float) and (conf.thold > 1 or conf.cpuThrottle < 0):
-        errMsg = "value for --threshold (thold) option must be in range [0,1]"
-        raise sqlmapSyntaxException, errMsg
-
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch --text-only is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg

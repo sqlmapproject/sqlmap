@@ -34,26 +34,6 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
     seqMatcher.set_seq1(kb.pageTemplate)
 
     if page:
-        # String to be excluded before calculating page hash
-        if conf.eString and conf.eString in page:
-            index              = page.index(conf.eString)
-            length             = len(conf.eString)
-            pageWithoutString  = page[:index]
-            pageWithoutString += page[index+length:]
-            page               = pageWithoutString
-
-        # Regular expression matches to be excluded before calculating page hash
-        if conf.eRegexp:
-            regExpResults = re.findall(conf.eRegexp, page, re.I | re.M)
-
-            if regExpResults:
-                for regExpResult in regExpResults:
-                    index              = page.index(regExpResult)
-                    length             = len(regExpResult)
-                    pageWithoutRegExp  = page[:index]
-                    pageWithoutRegExp += page[index+length:]
-                    page               = pageWithoutRegExp
-
         # String to match in page when the query is valid
         if conf.string:
             return conf.string in page
@@ -77,7 +57,7 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
     if conf.textOnly:
         (seqMatcher.a, page) = map(getFilteredPageContent, (seqMatcher.a, page))
 
-    if not conf.eRegexp and not conf.eString and kb.nullConnection and pageLength:
+    if kb.nullConnection and pageLength:
         ratio = 1. * pageLength / len(seqMatcher.a)
 
         if ratio > 1.:
@@ -89,10 +69,7 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
     if kb.matchRatio is None:
-        if conf.thold:
-            kb.matchRatio = conf.thold
-
-        elif kb.pageStable and ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
+        if kb.pageStable and ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
             kb.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
 
@@ -112,7 +89,7 @@ def comparison(page, getSeqMatcher=False, pageLength=None):
         return None
 
     else:
-        if kb.matchRatio == CONSTANT_RATIO or conf.thold:
+        if kb.matchRatio == CONSTANT_RATIO:
             return ratio > kb.matchRatio
         else:
             return (ratio - kb.matchRatio) > DIFF_TOLERANCE

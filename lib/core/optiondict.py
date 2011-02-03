@@ -67,9 +67,6 @@ optDict = {
                                "risk":              "integer",
                                "string":            "string",
                                "regexp":            "string",
-                               "eString":           "string",
-                               "eRegexp":           "string",
-                               "thold":             "float",
                                "textOnly":          "boolean"
                              },
 

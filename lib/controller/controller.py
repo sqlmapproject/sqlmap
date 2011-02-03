@@ -286,7 +286,7 @@ def start():
 
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
                 and (kb.injection.place is None or kb.injection.parameter is None):
-                if not conf.string and not conf.regexp and not conf.eRegexp:
+                if not conf.string and not conf.regexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
                     checkStability()

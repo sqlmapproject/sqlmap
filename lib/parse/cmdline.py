@@ -201,17 +201,6 @@ def cmdLineParser():
                              help="Regexp to match in page when the "
                                   "query is valid")
 
-        detection.add_option("--excl-str", dest="eString",
-                             help="String to be excluded before comparing "
-                                  "page contents")
-
-        detection.add_option("--excl-reg", dest="eRegexp",
-                             help="Matches to be excluded before "
-                                  "comparing page contents")
-
-        detection.add_option("--threshold", dest="thold", type="float",
-                             help="Page comparison threshold value (0.0-1.0)")
-
         detection.add_option("--text-only", dest="textOnly",
                              action="store_true", default=False,
                              help="Compare pages based only on their textual content")
