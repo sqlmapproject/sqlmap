@@ -30,7 +30,7 @@ from lib.core.subprocessng import pollProcess
 from lib.request.connect import Connect as Request
 
 def update():
-    if not conf.update:
+    if not conf.updateAll:
         return
 
     rootDir = paths.SQLMAP_ROOT_PATH
