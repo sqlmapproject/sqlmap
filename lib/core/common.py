@@ -1286,8 +1286,7 @@ def getFilteredPageContent(page, onlyText=True):
     retVal = page
 
     if isinstance(page, basestring):
-        retVal = re.sub(r"(?s)<script.+?</script>|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page)
-
+        retVal = re.sub(r"(?s)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page)
         while retVal.find("  ") != -1:
             retVal = retVal.replace("  ", " ")
 
