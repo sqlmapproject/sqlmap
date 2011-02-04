@@ -80,7 +80,7 @@ def __setRequestParams():
 
         conf.method = HTTPMETHOD.POST
 
-    if re.search(URI_INJECTABLE_REGEX, conf.url, re.I):
+    if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not conf.parameters.has_key(PLACE.GET):
         conf.url = "%s%s" % (conf.url, URI_INJECTION_MARK_CHAR)
 
     if URI_INJECTION_MARK_CHAR in conf.url:
