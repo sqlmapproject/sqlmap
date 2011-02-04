@@ -29,6 +29,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
+from lib.core.settings import MYSQL_ERROR_TRIM_LENGTH
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -43,7 +44,7 @@ def __oneShotErrorUse(expression, field):
 
     if Backend.getIdentifiedDbms() == DBMS.MYSQL:
         # Fix for MySQL odd behaviour ('Subquery returns more than 1 row')
-        nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(100))")
+        nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(%d))" % MYSQL_ERROR_TRIM_LENGTH)
 
     # Forge the error-based SQL injection request
     vector = agent.cleanupPayload(kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector)
