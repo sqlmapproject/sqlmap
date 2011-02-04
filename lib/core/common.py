@@ -85,6 +85,8 @@ from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
+from lib.core.settings import URI_INJECTION_MARK_CHAR
+from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.threads import getCurrentThreadData
 
 class UnicodeRawConfigParser(RawConfigParser):
@@ -950,7 +952,6 @@ def parseTargetUrl():
     """
     Parse target url and set some attributes into the configuration singleton.
     """
-
     if not conf.url:
         return
 
@@ -959,6 +960,9 @@ def parseTargetUrl():
             conf.url = "https://" + conf.url
         else:
             conf.url = "http://" + conf.url
+
+    if URI_INJECTION_MARK_CHAR in conf.url:
+        conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     __urlSplit = urlparse.urlsplit(conf.url)
     __hostnamePort = __urlSplit[1].split(":")
@@ -986,6 +990,7 @@ def parseTargetUrl():
         conf.parameters[PLACE.GET] = urldecode(__urlSplit[3])
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
+    conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
 def expandAsteriskForColumns(expression):
     # If the user provided an asterisk rather than the column(s)
