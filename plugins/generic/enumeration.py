@@ -806,6 +806,8 @@ class Enumeration:
                 query = safeStringFormat(query, conf.db)
             value = inject.getValue(query, blind=False)
 
+            value = filter(lambda x: x, value)
+
             if value:
                 if Backend.getIdentifiedDbms() == DBMS.SQLITE:
                     if isinstance(value, basestring):
