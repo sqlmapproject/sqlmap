@@ -64,7 +64,8 @@ def comparison(page, getRatioValue=False, pageLength=None):
         if ratio > 1.:
             ratio = 1. / ratio
     else:
-        (seqMatcher.a, seqMatcher.b) = map(lambda x: getFilteredPageContent(x, conf.textOnly), (seqMatcher.a, page))
+        seqMatcher.set_seq1(getFilteredPageContent(seqMatcher.a, conf.textOnly))
+        seqMatcher.set_seq2(getFilteredPageContent(page, conf.textOnly))
         ratio = round(seqMatcher.quick_ratio(), 3)
 
     # If the url is stable and we did not set yet the match ratio and the
