@@ -37,6 +37,7 @@ from xml.dom import minidom
 from xml.sax import parse
 
 from extra.cloak.cloak import decloak
+from extra.odict.odict import OrderedDict
 from lib.contrib import magic
 from lib.core.data import conf
 from lib.core.data import dbmsDict
@@ -420,7 +421,7 @@ def paramToDict(place, parameters=None):
     @rtype: C{str}
     """
 
-    testableParameters = {}
+    testableParameters = OrderedDict()
 
     if conf.parameters.has_key(place) and not parameters:
         parameters = conf.parameters[place]
