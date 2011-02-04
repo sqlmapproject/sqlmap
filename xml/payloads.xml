@@ -358,7 +358,7 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>3</level>
+        <level>4</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>3</ptype>
@@ -376,7 +376,7 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>3</level>
+        <level>2</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>4</ptype>
@@ -385,7 +385,7 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>4</level>
+        <level>3</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>4</ptype>
@@ -412,7 +412,7 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>4</level>
+        <level>3</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>5</ptype>
@@ -421,7 +421,7 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>5</level>
+        <level>4</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>5</ptype>
