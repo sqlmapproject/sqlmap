@@ -920,7 +920,7 @@ def parseTargetDirect():
                         errMsg = "missing remote connection details"
                         raise sqlmapSyntaxException, errMsg
 
-                if dbmsName == DBMS.MSSQL:
+                if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
                     import _mssql
                     import pymssql
 

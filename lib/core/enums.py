@@ -25,15 +25,15 @@ class SORTORDER:
     LAST    = 100
 
 class DBMS:
-    ACCESS      = "Microsoft Access"
-    FIREBIRD    = "Firebird"
-    MAXDB       = "SAP MaxDB"
-    MSSQL       = "Microsoft SQL Server"
-    MYSQL       = "MySQL"
-    ORACLE      = "Oracle"
-    PGSQL       = "PostgreSQL"
-    SQLITE      = "SQLite"
-    SYBASE      = "Sybase"
+    ACCESS   = "Microsoft Access"
+    FIREBIRD = "Firebird"
+    MAXDB    = "SAP MaxDB"
+    MSSQL    = "Microsoft SQL Server"
+    MYSQL    = "MySQL"
+    ORACLE   = "Oracle"
+    PGSQL    = "PostgreSQL"
+    SQLITE   = "SQLite"
+    SYBASE   = "Sybase"
 
 class PLACE:
     GET     = "GET"
