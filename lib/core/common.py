@@ -964,7 +964,7 @@ def parseTargetUrl():
     __hostnamePort = __urlSplit[1].split(":")
 
     conf.scheme = __urlSplit[0].strip()
-    conf.path = conf.url[conf.url.index(__urlSplit[2]):].strip()
+    conf.path = __urlSplit[2].strip()
     conf.hostname = __hostnamePort[0].strip()
 
     if re.search(r'\s', conf.hostname):
