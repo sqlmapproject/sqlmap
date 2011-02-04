@@ -269,15 +269,6 @@ Formats:
     <!-- WHERE/HAVING clause boundaries -->
     <boundary>
         <level>1</level>
-        <clause>0</clause>
-        <where>1,2,3</where>
-        <ptype>1</ptype>
-        <prefix></prefix>
-        <suffix></suffix>
-    </boundary>
-
-    <boundary>
-        <level>1</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>1</ptype>
@@ -301,6 +292,15 @@ Formats:
         <ptype>1</ptype>
         <prefix>)))</prefix>
         <suffix>AND ((([RANDNUM]=[RANDNUM]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>0</clause>
+        <where>1,2,3</where>
+        <ptype>1</ptype>
+        <prefix></prefix>
+        <suffix></suffix>
     </boundary>
 
     <boundary>
