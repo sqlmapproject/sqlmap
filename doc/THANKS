@@ -288,6 +288,9 @@ Adrian Pastor <ap@gnucitizen.org>
 Chris Patten <cpatten@sunera.com>
     for reporting a bug in the blind SQL injection bisection algorithm
 
+Zack Payton <zack.payton@executiveinstruments.com>
+    for reporting a minor bug
+
 Steve Pinkham <steve.pinkham@gmail.com>
     for suggesting a feature
     for providing a new sql injection vector (MSSQL time based)
