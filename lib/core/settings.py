@@ -241,3 +241,6 @@ MIN_RATIO = 0.0
 
 # Maximum value for comparison ratio
 MAX_RATIO = 1.0
+
+# Character used for marking injectable position inside URI
+URI_INJECTION_MARK_CHAR = '*'

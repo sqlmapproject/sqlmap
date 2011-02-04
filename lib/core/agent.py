@@ -28,6 +28,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.settings import URI_INJECTION_MARK_CHAR
 
 class Agent:
     """
@@ -76,7 +77,7 @@ class Agent:
         origValue = paramDict[parameter]
 
         if place == PLACE.URI:
-            origValue = origValue.split('*')[0]
+            origValue = origValue.split(URI_INJECTION_MARK_CHAR)[0]
             origValue = origValue[origValue.rfind('/') + 1:]
 
         if value is None:
@@ -105,7 +106,7 @@ class Agent:
 
             retValue = ET.tostring(root)
         elif place == PLACE.URI:
-            retValue = paramString.replace("%s*" % origValue, self.addPayloadDelimiters(newValue))
+            retValue = paramString.replace("%s%s" % (origValue, URI_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue))
         elif place == PLACE.UA:
             retValue = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
