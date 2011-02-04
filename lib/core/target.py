@@ -83,18 +83,18 @@ def __setRequestParams():
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I):
         conf.url = "%s%s" % (conf.url, URI_INJECTION_MARK_CHAR)
 
-    if "*" in conf.url:
+    if URI_INJECTION_MARK_CHAR in conf.url:
         conf.parameters[PLACE.URI] = conf.url
         conf.paramDict[PLACE.URI] = {}
-        parts = conf.url.split("*")
+        parts = conf.url.split(URI_INJECTION_MARK_CHAR)
         for i in range(len(parts)-1):
             result = str()
             for j in range(len(parts)):
                 result += parts[j]
                 if i == j:
-                    result += "*"
-            conf.paramDict[PLACE.URI]["#%d*" % (i+1)] = result
-        conf.url = conf.url.replace("*", str())
+                    result += URI_INJECTION_MARK_CHAR
+            conf.paramDict[PLACE.URI]["#%d%s" % (i+1, URI_INJECTION_MARK_CHAR)] = result
+        conf.url = conf.url.replace(URI_INJECTION_MARK_CHAR, str())
         __testableParameters = True
 
     # Perform checks on Cookie parameters
