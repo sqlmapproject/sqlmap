@@ -31,6 +31,8 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import UNION_STDEV_COEFF
+from lib.core.settings import MIN_RATIO
+from lib.core.settings import MAX_RATIO
 from lib.core.settings import MIN_STATISTICAL_RANGE
 from lib.core.settings import MIN_UNION_RESPONSES
 from lib.core.unescaper import unescaper
@@ -52,14 +54,14 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     if abs(upperCount - lowerCount) < MIN_UNION_RESPONSES:
         upperCount = lowerCount + MIN_UNION_RESPONSES
 
-    min_, max_ = None, None
+    min_, max_ = MAX_RATIO, MIN_RATIO
     for count in range(lowerCount, upperCount+1):
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, conf.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
-        ratio = comparison(page, True)
+        ratio = comparison(page, True) or MIN_RATIO
         ratios.append(ratio)
-        min_, max_ = min(min_ or ratio, ratio), max(max_ or ratio, ratio)
+        min_, max_ = min(min_, ratio), max(max_, ratio)
         items.append((count, ratio))
 
     ratios.pop(ratios.index(min_))
