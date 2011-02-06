@@ -241,7 +241,7 @@ class Agent:
                 errMsg += "knowledge of underlying DBMS"
                 raise sqlmapNoneDataException, errMsg
 
-        #payload = unescaper.unescape(payload)
+        payload = unescaper.unescape(payload)
 
         return payload
 

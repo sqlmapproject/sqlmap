@@ -48,7 +48,6 @@ def __oneShotErrorUse(expression, field):
 
     # Forge the error-based SQL injection request
     vector = agent.cleanupPayload(kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector)
-    query = unescaper.unescape(vector)
     query = agent.prefixQuery(query)
     query = agent.suffixQuery(query)
     injExpression = expression.replace(field, nulledCastedField, 1)
