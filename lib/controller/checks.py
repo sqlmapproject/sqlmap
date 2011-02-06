@@ -200,6 +200,7 @@ def checkSqlInjection(place, parameter, value):
             # Parse test's <request>
             comment = agent.getComment(test.request)
             fstPayload = agent.cleanupPayload(test.request.payload, value)
+            fstPayload = unescaper.unescape(fstPayload, dbms=dbms)
 
             for boundary in conf.boundaries:
                 injectable = False
@@ -286,6 +287,7 @@ def checkSqlInjection(place, parameter, value):
                         # In case of boolean-based blind SQL injection
                         if method == PAYLOAD.METHOD.COMPARISON:
                             sndPayload = agent.cleanupPayload(test.response.comparison, value)
+                            sndPayload = unescaper.unescape(sndPayload, dbms=dbms)
 
                             # Forge response payload by prepending with
                             # boundary's prefix and appending the boundary's
