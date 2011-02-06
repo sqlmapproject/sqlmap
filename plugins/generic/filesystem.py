@@ -277,6 +277,8 @@ class Filesystem:
 
             fileContent = self.unionReadFile(rFile)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and Backend.isDbms(DBMS.MYSQL):
+            # TODO: edit this as soon as the MySQL/trim/error-based bug
+            # is fixed
             errMsg = "file retrieval via error-based SQL injection will "
             errMsg += "be implemented soon"
             logger.error(errMsg)
@@ -284,8 +286,8 @@ class Filesystem:
             return None
         else:
             errMsg = "none of the SQL injection techniques detected can "
-            errMsg += "be used to read files from the file system on "
-            errMsg += "%s" % Backend.getDbms()
+            errMsg += "be used to read files from the underlying file "
+            errMsg += "system of the back-end %s server" % Backend.getDbms()
             logger.error(errMsg)
 
             return None
@@ -332,8 +334,8 @@ class Filesystem:
             self.unionWriteFile(wFile, dFile, fileType, confirm)
         else:
             errMsg = "none of the SQL injection techniques detected can "
-            errMsg += "be used to write files on the file system on "
-            errMsg += "%s" % Backend.getDbms()
+            errMsg += "be used to write files to the underlying file "
+            errMsg += "system of the back-end %s server" % Backend.getDbms()
             logger.error(errMsg)
 
             return None
