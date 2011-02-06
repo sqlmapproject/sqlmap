@@ -167,6 +167,10 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
+            # Force back-end DBMS according to the current
+            # test value for proper payload unescaping
+            Backend.forceDbms(dbms)
+
             # Skip test if it does not match the same SQL injection clause
             # already identified by another test
             clauseMatch = False
@@ -359,10 +363,6 @@ def checkSqlInjection(place, parameter, value):
                             # used afterwards by Agent.forgeInbandQuery()
                             # method to forge the UNION query payload
 
-                            # Force back-end DBMS according to the current
-                            # test value for proper payload unescaping
-                            Backend.forceDbms(dbms)
-
                             configUnion(test.request.char, test.request.columns)
 
                             if not Backend.getIdentifiedDbms():
@@ -383,9 +383,6 @@ def checkSqlInjection(place, parameter, value):
                                 # Overwrite 'where' because it can be set
                                 # by unionTest() directly
                                 where = vector[6]
-
-                            # Reset forced back-end DBMS value
-                            Backend.flushForcedDbms()
 
                     # If the injection test was successful feed the injection
                     # object with the test's details
@@ -442,6 +439,9 @@ def checkSqlInjection(place, parameter, value):
                     # boundaries
                     break
 
+            # Reset forced back-end DBMS value
+            Backend.flushForcedDbms()
+
         except KeyboardInterrupt:
             warnMsg = "Ctrl+C detected in detection phase"
             logger.warn(warnMsg)
@@ -457,6 +457,10 @@ def checkSqlInjection(place, parameter, value):
                 kb.endDetection = True
             elif test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
+
+        finally:
+            # Reset forced back-end DBMS value
+            Backend.flushForcedDbms()
 
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:
