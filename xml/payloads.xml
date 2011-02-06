@@ -649,7 +649,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace</title>
+        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -669,7 +669,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace</title>
+        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -688,7 +688,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase boolean-based blind - Parameter replace</title>
+        <title>Microsoft SQL Server/Sybase boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -708,7 +708,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle boolean-based blind - Parameter replace</title>
+        <title>Oracle boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
