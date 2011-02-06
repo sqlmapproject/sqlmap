@@ -48,7 +48,13 @@ class Filesystem:
 
             return hexStr
 
-        return binascii.unhexlify(hexStr)
+        try:
+            cleanStr = binascii.unhexlify(hexStr)
+        except TypeError, e:
+            logger.critical("unable to unhex the string ('%s')" % e)
+            return None
+
+        return cleanStr
 
     def __binDataToScr(self, binaryData, chunkName):
         """
@@ -264,12 +270,25 @@ class Filesystem:
                 logger.debug(debugMsg)
 
             fileContent = self.stackedReadFile(rFile)
-        else:
-            debugMsg  = "going to read the file with UNION query SQL "
+        elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
+            debugMsg = "going to read the file with UNION query SQL "
             debugMsg += "injection technique"
             logger.debug(debugMsg)
 
             fileContent = self.unionReadFile(rFile)
+        elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and Backend.isDbms(DBMS.MYSQL):
+            errMsg = "file retrieval via error-based SQL injection will "
+            errMsg += "be implemented soon"
+            logger.error(errMsg)
+
+            return None
+        else:
+            errMsg = "none of the SQL injection techniques detected can "
+            errMsg += "be used to read files from the file system on "
+            errMsg += "%s" % Backend.getDbms()
+            logger.error(errMsg)
+
+            return None
 
         if fileContent in ( None, "" ) and Backend.getIdentifiedDbms() != DBMS.PGSQL:
             self.cleanup(onlyFileTbl=True)
@@ -305,9 +324,16 @@ class Filesystem:
 
             self.stackedWriteFile(wFile, dFile, fileType, confirm)
             self.cleanup(onlyFileTbl=True)
-        else:
-            debugMsg  = "going to upload the %s file with " % fileType
+        elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
+            debugMsg = "going to upload the %s file with " % fileType
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)
 
             self.unionWriteFile(wFile, dFile, fileType, confirm)
+        else:
+            errMsg = "none of the SQL injection techniques detected can "
+            errMsg += "be used to write files on the file system on "
+            errMsg += "%s" % Backend.getDbms()
+            logger.error(errMsg)
+
+            return None
