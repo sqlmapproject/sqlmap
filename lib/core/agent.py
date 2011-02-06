@@ -139,6 +139,7 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(expression)
 
+        expression = self.cleanupPayload(expression)
         expression = unescaper.unescape(expression)
         query = None
 
@@ -167,7 +168,6 @@ class Agent:
                 query += " "
 
         query = "%s%s" % (query, expression)
-        query = self.cleanupPayload(query)
 
         return query
 
@@ -180,6 +180,7 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(expression)
 
+        expression = self.cleanupPayload(expression)
         expression = unescaper.unescape(expression)
 
         if comment is not None:
@@ -198,11 +199,9 @@ class Agent:
         elif suffix is not None:
             expression += " %s" % suffix
 
-        expression = self.cleanupPayload(expression)
-
         return expression.rstrip()
 
-    def cleanupPayload(self, payload, origvalue=None, query=None):
+    def cleanupPayload(self, payload, origValue=None):
         if payload is None:
             return
 
@@ -220,11 +219,8 @@ class Agent:
         payload = payload.replace("[SPACE_REPLACE]", kb.misc.space)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
 
-        if query is not None:
-            payload = payload.replace("[QUERY]", query.lstrip())
-
-        if origvalue is not None:
-            payload = payload.replace("[ORIGVALUE]", origvalue)
+        if origValue is not None:
+            payload = payload.replace("[ORIGVALUE]", origValue)
 
         if "[INFERENCE]" in payload:
             if Backend.getIdentifiedDbms() is not None:

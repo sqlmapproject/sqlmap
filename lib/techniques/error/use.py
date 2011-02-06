@@ -47,7 +47,7 @@ def __oneShotErrorUse(expression, field):
         nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(%d))" % MYSQL_ERROR_TRIM_LENGTH)
 
     # Forge the error-based SQL injection request
-    vector = agent.cleanupPayload(kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector)
+    vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     injExpression = expression.replace(field, nulledCastedField, 1)

@@ -166,10 +166,6 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-            # Force back-end DBMS according to the current
-            # test value for proper payload unescaping
-            Backend.forceDbms(dbms)
-
             # Skip test if it does not match the same SQL injection clause
             # already identified by another test
             clauseMatch = False
@@ -196,9 +192,13 @@ def checkSqlInjection(place, parameter, value):
             infoMsg = "testing '%s'" % title
             logger.info(infoMsg)
 
+            # Force back-end DBMS according to the current
+            # test value for proper payload unescaping
+            Backend.forceDbms(dbms)
+
             # Parse test's <request>
             comment = agent.getComment(test.request)
-            fstPayload = agent.cleanupPayload(test.request.payload, value)
+            fstPayload = agent.cleanupPayload(test.request.payload, origValue=value)
 
             for boundary in conf.boundaries:
                 injectable = False
@@ -279,11 +279,11 @@ def checkSqlInjection(place, parameter, value):
                     # payload was successful
                     # Parse test's <response>
                     for method, check in test.response.items():
-                        check = agent.cleanupPayload(check, value)
+                        check = agent.cleanupPayload(check, origValue=value)
 
                         # In case of boolean-based blind SQL injection
                         if method == PAYLOAD.METHOD.COMPARISON:
-                            sndPayload = agent.cleanupPayload(test.response.comparison, value)
+                            sndPayload = agent.cleanupPayload(test.response.comparison, origValue=value)
 
                             # Forge response payload by prepending with
                             # boundary's prefix and appending the boundary's
