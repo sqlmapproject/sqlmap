@@ -29,6 +29,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import URI_INJECTION_MARK_CHAR
+from lib.core.unescaper import unescaper
 
 class Agent:
     """
@@ -239,6 +240,8 @@ class Agent:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
                 raise sqlmapNoneDataException, errMsg
+
+        payload = unescaper.unescape(payload)
 
         return payload
 
