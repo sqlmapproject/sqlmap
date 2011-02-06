@@ -181,7 +181,6 @@ class Agent:
             return self.payloadDirect(expression)
 
         expression = self.cleanupPayload(expression)
-        expression = unescaper.unescape(expression)
 
         if comment is not None:
             expression += comment
