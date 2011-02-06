@@ -129,16 +129,17 @@ class Agent:
 
         return payload
 
-    def prefixQuery(self, string, prefix=None, where=None, clause=None):
+    def prefixQuery(self, expression, prefix=None, where=None, clause=None):
         """
-        This method defines how the input string has to be escaped
+        This method defines how the input expression has to be escaped
         to perform the injection depending on the injection type
         identified as valid
         """
 
         if conf.direct:
-            return self.payloadDirect(string)
+            return self.payloadDirect(expression)
 
+        expression = unescaper.unescape(expression)
         query = None
 
         if where is None and kb.technique and kb.technique in kb.injection.data:
@@ -162,25 +163,27 @@ class Agent:
         else:
             query = kb.injection.prefix or prefix or ""
 
-            if not (string and string[0] == ";"):
+            if not (expression and expression[0] == ";"):
                 query += " "
 
-        query = "%s%s" % (query, string)
+        query = "%s%s" % (query, expression)
         query = self.cleanupPayload(query)
 
         return query
 
-    def suffixQuery(self, string, comment=None, suffix=None, where=None):
+    def suffixQuery(self, expression, comment=None, suffix=None, where=None):
         """
         This method appends the DBMS comment to the
         SQL injection request
         """
 
         if conf.direct:
-            return self.payloadDirect(string)
+            return self.payloadDirect(expression)
+
+        expression = unescaper.unescape(expression)
 
         if comment is not None:
-            string += comment
+            expression += comment
 
         if where is None and kb.technique and kb.technique in kb.injection.data:
             where = kb.injection.data[kb.technique].where
@@ -191,13 +194,13 @@ class Agent:
             pass
 
         elif kb.injection.suffix is not None:
-            string += " %s" % kb.injection.suffix
+            expression += " %s" % kb.injection.suffix
         elif suffix is not None:
-            string += " %s" % suffix
+            expression += " %s" % suffix
 
-        string = self.cleanupPayload(string)
+        expression = self.cleanupPayload(expression)
 
-        return string.rstrip()
+        return expression.rstrip()
 
     def cleanupPayload(self, payload, origvalue=None, query=None):
         if payload is None:
@@ -240,8 +243,6 @@ class Agent:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
                 raise sqlmapNoneDataException, errMsg
-
-        #payload = unescaper.unescape(payload)
 
         return payload
 

@@ -54,7 +54,6 @@ from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
-from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.templates import getPageTemplate
 from lib.techniques.inband.union.test import unionTest
@@ -200,7 +199,6 @@ def checkSqlInjection(place, parameter, value):
             # Parse test's <request>
             comment = agent.getComment(test.request)
             fstPayload = agent.cleanupPayload(test.request.payload, value)
-            fstPayload = unescaper.unescape(fstPayload, dbms=dbms)
 
             for boundary in conf.boundaries:
                 injectable = False
@@ -275,7 +273,6 @@ def checkSqlInjection(place, parameter, value):
                     # test's ' <payload><comment> ' string
                     boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
                     boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
-                    boundPayload = agent.cleanupPayload(boundPayload, value)
                     reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
 
                     # Perform the test's request and check whether or not the
@@ -287,7 +284,6 @@ def checkSqlInjection(place, parameter, value):
                         # In case of boolean-based blind SQL injection
                         if method == PAYLOAD.METHOD.COMPARISON:
                             sndPayload = agent.cleanupPayload(test.response.comparison, value)
-                            sndPayload = unescaper.unescape(sndPayload, dbms=dbms)
 
                             # Forge response payload by prepending with
                             # boundary's prefix and appending the boundary's
@@ -295,7 +291,6 @@ def checkSqlInjection(place, parameter, value):
                             # string
                             boundPayload = agent.prefixQuery(sndPayload, prefix, where, clause)
                             boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
-                            boundPayload = agent.cleanupPayload(boundPayload, value)
                             cmpPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
 
                             # Useful to set kb.matchRatio at first based on

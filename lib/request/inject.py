@@ -114,8 +114,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
     initTechnique(kb.technique)
 
-    vector = agent.cleanupPayload(kb.injection.data[kb.technique].vector)
-    query = agent.prefixQuery(vector)
+    query = agent.prefixQuery(kb.injection.data[kb.technique].vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
     count = None
@@ -329,7 +328,6 @@ def __goBooleanProxy(expression, resumeValue=True):
 
     vector = kb.injection.data[kb.technique].vector
     vector = vector.replace("[INFERENCE]", expression)
-    vector = agent.cleanupPayload(vector)
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
