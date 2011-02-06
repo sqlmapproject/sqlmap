@@ -9,16 +9,20 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.datatype import advancedDict
+from lib.core.settings import EXCLUDE_UNESCAPE
 
 class Unescaper(advancedDict):
     def unescape(self, expression, quote=True, dbms=None):
+        if expression is None:
+            return expression
+
+        for exclude in EXCLUDE_UNESCAPE:
+            if exclude in expression:
+                return expression
+
         identifiedDbms = Backend.getIdentifiedDbms()
 
-        if not expression:
-            return expression
-        elif "WAITFOR DELAY " in expression:
-            return expression
-        elif dbms is not None:
+        if dbms is not None:
             return self[dbms](expression, quote=quote)
         elif identifiedDbms is not None:
             return self[identifiedDbms](expression, quote=quote)

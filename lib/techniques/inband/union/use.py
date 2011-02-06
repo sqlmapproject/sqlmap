@@ -32,13 +32,12 @@ from lib.utils.resume import resume
 
 reqCount = 0
 
-def __oneShotUnionUse(expression, unpack=True, unescape=True):
+def __oneShotUnionUse(expression, unpack=True):
     global reqCount
 
     # Prepare expression with delimiters
-    if unescape:
-        expression = agent.concatQuery(expression, unpack)
-        expression = unescaper.unescape(expression)
+    expression = agent.concatQuery(expression, unpack)
+    expression = unescaper.unescape(expression)
 
     if conf.limitStart or conf.limitStop:
         where = PAYLOAD.WHERE.NEGATIVE
@@ -102,7 +101,7 @@ def configUnion(char=None, columns=None):
     elif isinstance(columns, basestring):
         __configUnionCols(columns)
 
-def unionUse(expression, unescape=True, unpack=True, dump=False):
+def unionUse(expression, unpack=True, dump=False):
     """
     This function tests for an inband SQL injection on the target
     url then call its subsidiary function to effectively perform an
@@ -204,7 +203,7 @@ def unionUse(expression, unescape=True, unpack=True, dump=False):
             count = parseUnionPage(count, countedExpression)
 
             if not count or not count.isdigit():
-                output = __oneShotUnionUse(countedExpression, unpack=unpack)
+                output = __oneShotUnionUse(countedExpression, unpack)
 
                 if output:
                     count = parseUnionPage(output, countedExpression)
@@ -239,7 +238,7 @@ def unionUse(expression, unescape=True, unpack=True, dump=False):
                     output = resume(limitedExpr, None)
 
                     if not output:
-                        output = __oneShotUnionUse(limitedExpr, unescape=unescape, unpack=unpack)
+                        output = __oneShotUnionUse(limitedExpr, unpack)
 
                     if output:
                         value += output
@@ -251,7 +250,7 @@ def unionUse(expression, unescape=True, unpack=True, dump=False):
                 logger.warn(warnMsg)
 
     if not value:
-        value = __oneShotUnionUse(expression, unescape=unescape, unpack=unpack)
+        value = __oneShotUnionUse(expression, unpack)
 
     duration = calculateDeltaSeconds(start)
 
