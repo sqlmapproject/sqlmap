@@ -14,7 +14,6 @@ from lib.core.data import logger
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
-from lib.techniques.inband.union.test import unionTest
 from lib.techniques.inband.union.use import unionUse
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
@@ -85,8 +84,6 @@ class Filesystem(GenericFilesystem):
             warnMsg += "bytes, this might cause errors in the file "
             warnMsg += "writing process"
             logger.warn(warnMsg)
-
-        unionTest()
 
         debugMsg = "exporting the %s file content to file '%s'" % (fileType, dFile)
         logger.debug(debugMsg)
