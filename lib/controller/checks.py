@@ -404,10 +404,19 @@ def checkSqlInjection(place, parameter, value):
                             injection.suffix = suffix
                             injection.clause = clause
 
+                        # Feed with test details every time a test is successful
+                        if hasattr(test, "details"):
+                            for dKey, dValue in test.details.items():
+                                if dKey == "dbms":
+                                    injection.dbms = Backend.setDbms(dValue)
+                                elif dKey == "dbms_version" and injection.dbms_version is None:
+                                    injection.dbms_version = Backend.setVersion(dValue)
+                                elif dKey == "os" and injection.os is None:
+                                    injection.os = Backend.setOs(dValue)
+
                         if vector is None and "vector" in test and test.vector is not None:
                             vector = "%s%s" % (test.vector, comment)
 
-                        # Feed with test details every time a test is successful
                         injection.data[stype] = advancedDict()
                         injection.data[stype].title = title
                         injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload)
@@ -420,15 +429,6 @@ def checkSqlInjection(place, parameter, value):
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.string = conf.string
                         injection.conf.regexp = conf.regexp
-
-                        if hasattr(test, "details"):
-                            for dKey, dValue in test.details.items():
-                                if dKey == "dbms":
-                                    injection.dbms = Backend.setDbms(dValue)
-                                elif dKey == "dbms_version" and injection.dbms_version is None:
-                                    injection.dbms_version = Backend.setVersion(dValue)
-                                elif dKey == "os" and injection.os is None:
-                                    injection.os = Backend.setOs(dValue)
 
                         if conf.beep or conf.realTest:
                             beep()
