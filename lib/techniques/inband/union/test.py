@@ -7,6 +7,7 @@ Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import random
 import re
 import time
 
@@ -98,10 +99,15 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
     validPayload = None
     vector = None
 
+    positions = range(0, count)
+
+    # Unbiased approach for searching appropriate usable column
+    random.shuffle(positions)
+
     # For each column of the table (# of NULL) perform a request using
     # the UNION ALL SELECT statement to test it the target url is
     # affected by an exploitable inband SQL injection vulnerability
-    for position in range(count-1, 0, -1):
+    for position in positions:
         # Prepare expression with delimiters
         randQuery = randomStr()
         phrase = "%s%s%s" % (kb.misc.start, randQuery, kb.misc.stop)
