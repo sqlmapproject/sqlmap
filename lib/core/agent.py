@@ -592,7 +592,7 @@ class Agent:
 
         return inbandQuery
 
-    def limitQuery(self, num, query, field=None):
+    def limitQuery(self, num, query, field=None, uniqueField=None):
         """
         Take in input a query string and return its limited query string.
 
@@ -672,12 +672,12 @@ class Agent:
                 limitedQuery = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
 
                 if " WHERE " in limitedQuery:
-                    limitedQuery = "%s AND %s " % (limitedQuery, field)
+                    limitedQuery = "%s AND %s " % (limitedQuery, field if not uniqueField else uniqueField)
                 else:
-                    limitedQuery = "%s WHERE %s " % (limitedQuery, field)
+                    limitedQuery = "%s WHERE %s " % (limitedQuery, field if not uniqueField else uniqueField)
 
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
-                limitedQuery += "%s %s)" % (field, fromFrom)
+                limitedQuery += "%s %s)" % (field if not uniqueField else uniqueField, fromFrom)
 
         if orderBy:
             limitedQuery += orderBy
