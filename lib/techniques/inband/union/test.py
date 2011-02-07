@@ -101,7 +101,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
     # For each column of the table (# of NULL) perform a request using
     # the UNION ALL SELECT statement to test it the target url is
     # affected by an exploitable inband SQL injection vulnerability
-    for position in range(0, count):
+    for position in range(count-1, 0, -1):
         # Prepare expression with delimiters
         randQuery = randomStr()
         phrase = "%s%s%s" % (kb.misc.start, randQuery, kb.misc.stop)
