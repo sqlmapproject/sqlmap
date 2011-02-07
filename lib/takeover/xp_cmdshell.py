@@ -93,7 +93,12 @@ class xp_cmdshell:
 
         inject.goStacked(cmd)
 
-        return wasLastRequestDelayed()
+        delayed = wasLastRequestDelayed()
+
+        if isinstance(delayed, bool):
+            return delayed
+        else:
+            return None
 
     def xpCmdshellForgeCmd(self, cmd):
         self.__randStr = randomStr(lowercase=True)

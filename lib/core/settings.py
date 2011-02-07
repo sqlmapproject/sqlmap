@@ -251,4 +251,4 @@ URI_INJECTION_MARK_CHAR = '*'
 MYSQL_ERROR_TRIM_LENGTH = 100
 
 # Do not unescape the injected statement if it contains any of the following SQL words
-EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ")
+EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ")
