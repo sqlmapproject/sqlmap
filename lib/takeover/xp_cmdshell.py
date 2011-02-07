@@ -123,10 +123,10 @@ class xp_cmdshell:
         output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, sort=False, firstChar=first, lastChar=last)
         inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
-        if isinstance(output, (list, tuple)):
+        if output and isinstance(output, (list, tuple)):
             output = output[0]
 
-            if isinstance(output, (list, tuple)):
+            if output and isinstance(output, (list, tuple)):
                 output = output[0]
 
         return output
