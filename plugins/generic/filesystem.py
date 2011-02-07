@@ -164,14 +164,14 @@ class Filesystem:
         if not single:
             fcLength = len(fcEncodedStr)
 
-            if fcLength > 1024:
-                for i in range(0, fcLength, 1024):
+            if fcLength > 256:
+                for i in range(0, fcLength, 256):
                     string = ""
 
                     if encoding == "hex":
                         string += "0x"
 
-                    string += fcEncodedStr[i:i+1024]
+                    string += fcEncodedStr[i:i+256]
 
                     if encoding == "base64":
                         string = "'%s'" % string
