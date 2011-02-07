@@ -375,6 +375,10 @@ class Backend:
         else:
             return None
 
+    @staticmethod
+    def getOs():
+        return kb.os
+
     # Comparison methods
     @staticmethod
     def isDbms(dbms):
@@ -404,6 +408,10 @@ class Backend:
     @staticmethod
     def isVersionGreaterOrEqualThan(version):
         return Backend.getVersion() is not None and str(Backend.getVersion()) >= str(version)
+
+    @staticmethod
+    def isOs(os):
+        return Backend.getOs() is not None and Backend.getOs().lower() == kb.os.lower()
 
 def paramToDict(place, parameters=None):
     """
