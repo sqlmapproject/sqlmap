@@ -286,20 +286,24 @@ def checkSqlInjection(place, parameter, value):
 
                         # In case of boolean-based blind SQL injection
                         if method == PAYLOAD.METHOD.COMPARISON:
-                            sndPayload = agent.cleanupPayload(test.response.comparison, origValue=value)
+                            # Generate payload used for comparison
+                            def genCmpPayload():
+                                sndPayload = agent.cleanupPayload(test.response.comparison, origValue=value)
 
-                            # Forge response payload by prepending with
-                            # boundary's prefix and appending the boundary's
-                            # suffix to the test's ' <payload><comment> '
-                            # string
-                            boundPayload = agent.prefixQuery(sndPayload, prefix, where, clause)
-                            boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
-                            cmpPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                                # Forge response payload by prepending with
+                                # boundary's prefix and appending the boundary's
+                                # suffix to the test's ' <payload><comment> '
+                                # string
+                                boundPayload = agent.prefixQuery(sndPayload, prefix, where, clause)
+                                boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
+                                cmpPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                                
+                                return cmpPayload
 
                             # Useful to set kb.matchRatio at first based on
                             # the False response content
                             kb.matchRatio = None
-                            _ = Request.queryPage(cmpPayload, place, raise404=False)
+                            _ = Request.queryPage(genCmpPayload(), place, raise404=False)
 
                             # If in the comparing stage there was an error
                             # then anything non-error will be considered as True
@@ -310,7 +314,7 @@ def checkSqlInjection(place, parameter, value):
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
 
                             if trueResult:
-                                falseResult = Request.queryPage(cmpPayload, place, raise404=False)
+                                falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
 
                                 # Perform the test's False request
                                 if not falseResult:
