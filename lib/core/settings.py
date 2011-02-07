@@ -77,7 +77,7 @@ MAX_TECHNIQUES_PER_VALUE = 2
 METADB_SUFFIX = "_masterdb"
 
 # minimum time response set needed for time-comparison based on standard deviation
-MIN_TIME_RESPONSES = 15
+MIN_TIME_RESPONSES = 10
 
 # minimum comparison ratio set needed for searching valid union column number based on standard deviation
 MIN_UNION_RESPONSES = 5
