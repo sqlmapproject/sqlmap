@@ -1782,7 +1782,7 @@ def wasLastRequestDelayed():
 
         return retVal
     else:
-        return threadData.lastQueryDuration - conf.timeSec
+        return (threadData.lastQueryDuration - conf.timeSec) >= 0
 
 def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     """
