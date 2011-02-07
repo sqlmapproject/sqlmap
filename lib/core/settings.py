@@ -250,5 +250,5 @@ URI_INJECTION_MARK_CHAR = '*'
 # Maximum length used for retrieving data over MySQL error based payload due to "known" problems with longer result strings
 MYSQL_ERROR_TRIM_LENGTH = 100
 
-#
-EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ")
+# Do not unescape the injected statement if it contains any of the following SQL words
+EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ")
