@@ -15,7 +15,7 @@ import urllib2
 import urlparse
 import traceback
 
-from lib.contrib import multipartpost
+from extra.multipart import multipartpost
 from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
