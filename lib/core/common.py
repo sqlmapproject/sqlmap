@@ -673,7 +673,12 @@ def readInput(message, default=None):
         message += " "
 
     if conf.batch and default:
-        infoMsg = "%s%s" % (message, getUnicode(default, UNICODE_ENCODING))
+        if isinstance(default, (list, tuple, set)):
+            options = ",".join([getUnicode(opt, UNICODE_ENCODING) for opt in default])
+        else:
+            options = getUnicode(default, UNICODE_ENCODING)
+
+        infoMsg = "%s%s" % (message, options)
         logger.info(infoMsg)
 
         debugMsg = "used the default behaviour, running in batch mode"
