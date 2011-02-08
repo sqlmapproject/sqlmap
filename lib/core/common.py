@@ -37,8 +37,8 @@ from xml.dom import minidom
 from xml.sax import parse
 
 from extra.cloak.cloak import decloak
+from extra.magic import magic
 from extra.odict.odict import OrderedDict
-from lib.contrib import magic
 from lib.core.data import conf
 from lib.core.data import dbmsDict
 from lib.core.data import kb
@@ -540,7 +540,7 @@ def getDocRoot():
 
         message = "please provide the web server document root "
         message += "[%s]: " % ",".join(root for root in defaultDocRoot)
-        inputDocRoot = readInput(message, default=defaultDocRoot)
+        inputDocRoot = readInput(message, default=defaultDocRoot[0])
 
         if inputDocRoot:
             if isinstance(inputDocRoot, basestring):
