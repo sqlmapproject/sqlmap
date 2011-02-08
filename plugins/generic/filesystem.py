@@ -270,20 +270,12 @@ class Filesystem:
                 logger.debug(debugMsg)
 
             fileContent = self.stackedReadFile(rFile)
-        elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
+        elif Backend.isDbms(DBMS.MYSQL):
             debugMsg = "going to read the file with UNION query SQL "
             debugMsg += "injection technique"
             logger.debug(debugMsg)
 
             fileContent = self.unionReadFile(rFile)
-        elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and Backend.isDbms(DBMS.MYSQL):
-            # TODO: edit this as soon as the MySQL/trim/error-based bug
-            # is fixed
-            errMsg = "file retrieval via error-based SQL injection will "
-            errMsg += "be implemented soon"
-            logger.error(errMsg)
-
-            return None
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to read files from the underlying file "
