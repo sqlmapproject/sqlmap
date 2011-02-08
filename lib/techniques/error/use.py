@@ -39,8 +39,8 @@ reqCount = 0
 def __oneShotErrorUse(expression, field):
     global reqCount
 
-    offset = 1
     retVal = None
+    offset = 1
 
     while True:
         check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
@@ -56,7 +56,6 @@ def __oneShotErrorUse(expression, field):
         injExpression = unescaper.unescape(injExpression)
         injExpression = query.replace("[QUERY]", injExpression)
         payload = agent.payload(newValue=injExpression)
-        print payload
 
         # Perform the request
         page, headers = Request.queryPage(payload, content=True)
