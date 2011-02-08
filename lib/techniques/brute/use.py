@@ -37,7 +37,7 @@ def tableExists(tableFile, regex=None):
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
-    
+
     infoMsg = "adding words used on web page to the check list"
     logger.info(infoMsg)
     pageWords = getPageTextWordsSet(kb.originalPage)

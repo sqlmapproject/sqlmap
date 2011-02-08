@@ -22,7 +22,7 @@ def get_pagerank(url):
     if rank == '':
         rank = '0'
     return rank
-   
+
 def int_str(string, integer, factor):
     for i in range(len(string)) :
         integer *= factor

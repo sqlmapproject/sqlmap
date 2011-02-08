@@ -678,7 +678,7 @@ class Agent:
 
                 limitedQuery += "NOT IN (%s" % (limitStr % num)
                 limitedQuery += "%s %s%s)" % (field if not uniqueField else uniqueField, fromFrom, (" ORDER BY %s" % uniqueField) if uniqueField else "")
-                
+
 
         if orderBy:
             limitedQuery += orderBy

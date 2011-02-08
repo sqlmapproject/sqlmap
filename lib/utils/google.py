@@ -133,7 +133,7 @@ class Google:
             raise sqlmapConnectionException, errMsg
 
         self.__matches = self.__parsePage(page)
-        
+
         if not self.__matches and "detected unusual traffic" in page:
             warnMsg  = "Google has detected 'unusual' traffic from "
             warnMsg  += "this computer disabling further searches"

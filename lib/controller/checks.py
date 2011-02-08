@@ -297,7 +297,7 @@ def checkSqlInjection(place, parameter, value):
                                 boundPayload = agent.prefixQuery(sndPayload, prefix, where, clause)
                                 boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
                                 cmpPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
-                                
+
                                 return cmpPayload
 
                             # Useful to set kb.matchRatio at first based on
