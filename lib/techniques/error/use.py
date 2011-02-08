@@ -73,7 +73,7 @@ def __oneShotErrorUse(expression, field):
             else:
                 retVal += output if output else ''
 
-            if not (output and len(output) >= MYSQL_ERROR_CHUNK_LENGTH):
+            if not (output and len(output) == MYSQL_ERROR_CHUNK_LENGTH):
                 break
             else:
                 offset += MYSQL_ERROR_CHUNK_LENGTH
