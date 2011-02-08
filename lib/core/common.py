@@ -540,7 +540,7 @@ def getDocRoot():
 
         message = "please provide the web server document root "
         message += "[%s]: " % ",".join(root for root in defaultDocRoot)
-        inputDocRoot = readInput(message, default=defaultDocRoot[0])
+        inputDocRoot = readInput(message, default=defaultDocRoot)
 
         if inputDocRoot:
             if isinstance(inputDocRoot, basestring):
