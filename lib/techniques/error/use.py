@@ -45,8 +45,9 @@ def __oneShotErrorUse(expression, field):
     while True:
         check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
         nulledCastedField = agent.nullAndCastField(field)
+
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-            nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, MYSQL_ERROR_CHUNK_LENGTH)
+            nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, MYSQL_ERROR_CHUNK_LENGTH)
 
         # Forge the error-based SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
