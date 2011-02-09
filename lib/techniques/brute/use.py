@@ -157,7 +157,7 @@ def columnExists(columnFile, regex=None):
     columns = filterListValue(columns, regex)
 
     if conf.db and not conf.db.endswith(METADB_SUFFIX):
-        table = "%s.%s" % (conf.db, conf.tbl)
+        table = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', conf.tbl)
     else:
         table = conf.tbl
 
