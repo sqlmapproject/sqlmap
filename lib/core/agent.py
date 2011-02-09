@@ -671,13 +671,22 @@ class Agent:
             if forgeNotIn:
                 limitedQuery = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
 
-                if " WHERE " in limitedQuery:
-                    limitedQuery = "%s AND %s " % (limitedQuery, field if not uniqueField else uniqueField)
-                else:
-                    limitedQuery = "%s WHERE %s " % (limitedQuery, field if not uniqueField else uniqueField)
+                if uniqueField and " ORDER BY " not in fromFrom:
+                    if " WHERE " in limitedQuery:
+                        limitedQuery = "%s AND %s " % (limitedQuery, uniqueField)
+                    else:
+                        limitedQuery = "%s WHERE %s " % (limitedQuery, uniqueField)
 
-                limitedQuery += "NOT IN (%s" % (limitStr % num)
-                limitedQuery += "%s %s%s)" % (field if not uniqueField else uniqueField, fromFrom, (" ORDER BY %s" % uniqueField) if uniqueField else "")
+                    limitedQuery += "NOT IN (%s" % (limitStr % num)
+                    limitedQuery += "%s %s%s)" % (uniqueField, fromFrom, (" ORDER BY %s" % uniqueField))
+                else:
+                    if " WHERE " in limitedQuery:
+                        limitedQuery = "%s AND %s " % (limitedQuery, field)
+                    else:
+                        limitedQuery = "%s WHERE %s " % (limitedQuery, field)
+
+                    limitedQuery += "NOT IN (%s" % (limitStr % num)
+                    limitedQuery += "%s %s)" % (field, fromFrom)
 
 
         if orderBy:
