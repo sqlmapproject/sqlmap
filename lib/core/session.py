@@ -250,7 +250,7 @@ def resumeConfKb(expression, url, value):
         kb.brute.tables.append((db, table))
 
     elif expression == "COLUMN_EXISTS" and url == conf.url:
-        table, column = unSafeFormatString(value[:-1]).split('..')
+        table, column = unSafeFormatString(value[:-1]).split('|')
         colName, colType = column.split(' ')
 
         if '.' in table:

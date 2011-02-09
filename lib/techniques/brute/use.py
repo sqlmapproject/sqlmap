@@ -257,7 +257,7 @@ def columnExists(columnFile, regex=None):
             else:
                 columns[column] = 'non-numeric'
 
-            dataToSessionFile("[%s][%s][%s][COLUMN_EXISTS][%s..%s %s]\n" % (conf.url, kb.injection.place,\
+            dataToSessionFile("[%s][%s][%s][COLUMN_EXISTS][%s|%s %s]\n" % (conf.url, kb.injection.place,\
               safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(table),\
               safeFormatString(column), safeFormatString(columns[column])))
 
