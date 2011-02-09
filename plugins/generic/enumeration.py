@@ -721,22 +721,29 @@ class Enumeration:
 
         return kb.data.cachedDbs
 
-    def getTables(self):
-        bruteForce = False
-
+    def getTables(self, bruteForce=None):
         self.forceDbmsEnum()
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-            errMsg  = "information_schema not available, "
-            errMsg += "back-end DBMS is MySQL < 5.0"
-            logger.error(errMsg)
-            bruteForce = True
+        if bruteForce is None:
+            if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                errMsg  = "information_schema not available, "
+                errMsg += "back-end DBMS is MySQL < 5.0"
+                logger.error(errMsg)
+                bruteForce = True
 
-        elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
-            errMsg  = "cannot retrieve table names, "
-            errMsg += "back-end DBMS is Access"
-            logger.error(errMsg)
-            bruteForce = True
+            elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
+                try:
+                    tables = self.getTables(False)
+                except sqlmapNoneDataException:
+                    tables = None
+
+                if not tables:
+                    errMsg  = "cannot retrieve table names, "
+                    errMsg += "back-end DBMS is Access"
+                    logger.error(errMsg)
+                    bruteForce = True
+                else:
+                    return tables
 
         if bruteForce:
             resumeAvailable = False
