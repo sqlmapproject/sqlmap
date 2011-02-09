@@ -483,6 +483,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 value = value != "0"
         elif isinstance(value, int):
             value = bool(value)
+        elif value == [None]:
+            value = None
 
     return value
 
