@@ -125,8 +125,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
         if output:
             output = output.replace(kb.misc.space, " ")
 
-        if output is not None:
-            outputs.append(output)
+        outputs.append(output)
 
     return outputs
 
