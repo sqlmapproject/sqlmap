@@ -672,6 +672,7 @@ class Agent:
                 limitedQuery = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
 
                 if uniqueField and " ORDER BY " not in fromFrom:
+                    # Reference: http://vorg.ca/626-the-MS-SQL-equivalent-to-MySQLs-limit-command
                     if " WHERE " in limitedQuery:
                         limitedQuery = "%s AND %s " % (limitedQuery, uniqueField)
                     else:
