@@ -1190,7 +1190,7 @@ class Enumeration:
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if Backend.getIdentifiedDbms() == DBMS.ORACLE:
-                query = rootQuery.inband.query % (colString, conf.tbl.upper())
+                query = rootQuery.inband.query % (colString, conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                 query = rootQuery.inband.query % (colString, conf.tbl)
             else:
@@ -1238,7 +1238,7 @@ class Enumeration:
             logger.info(infoMsg)
 
             if Backend.getIdentifiedDbms() == DBMS.ORACLE:
-                query = rootQuery.blind.count % conf.tbl.upper()
+                query = rootQuery.blind.count % (conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                 query = rootQuery.blind.count % conf.tbl
             else:
@@ -1348,7 +1348,7 @@ class Enumeration:
                                                                        conf.tbl, index)
                             elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
                                 query = rootQuery.blind.query % (column, column,
-                                                                       conf.tbl.upper(),
+                                                                       conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())),
                                                                        index)
                             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                                 query = rootQuery.blind.query % (column, index, conf.db,
