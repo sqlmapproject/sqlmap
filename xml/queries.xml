@@ -356,10 +356,12 @@
         <is_dba/>
         <dbs/>
         <!--MSysObjects have no read permission by default-->
-        <tables/>
+        <tables>
+            <blind query="SELECT MIN(Name) FROM MSysObjects WHERE Type=1 AND Name>'%s'" count="SELECT COUNT(Name) FROM MSysObjects WHERE Type=1"/>
+        </tables>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT MIN(%s) FROM %s WHERE CVAR(%s) > '%s'" query2="SELECT TOP 1 %s FROM %s WHERE CVAR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s)"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CVAR(%s)>'%s'" query2="SELECT TOP 1 %s FROM %s WHERE CVAR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s)"/>
         </dump_table>
         <users/>
         <privileges/>
