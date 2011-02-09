@@ -65,7 +65,7 @@ def tableExists(tableFile, regex=None):
             tbllock.release()
 
             if conf.db and not conf.db.endswith(METADB_SUFFIX):
-                fullTableName = "%s.%s" % (conf.db, table)
+                fullTableName = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', table)
             else:
                 fullTableName = table
 
