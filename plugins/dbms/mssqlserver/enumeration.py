@@ -157,6 +157,9 @@ class Enumeration(GenericEnumeration):
                             values = [ values ]
 
                         for foundTbl in values:
+                            if foundTbl is None:
+                                continue
+
                             foundTbls[db].append(foundTbl)
                 else:
                     infoMsg = "fetching number of table"

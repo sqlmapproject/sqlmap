@@ -1649,6 +1649,9 @@ class Enumeration:
                         values = [ values ]
 
                     for foundDb, foundTbl in values:
+                        if foundDb is None or foundTbl is None:
+                            continue
+
                         if foundDb in foundTbls:
                             foundTbls[foundDb].append(foundTbl)
                         else:
@@ -1682,6 +1685,7 @@ class Enumeration:
                     query += exclDbsQuery
                     query = agent.limitQuery(index, query)
                     foundDb = inject.getValue(query, inband=False, error=False)
+
                     if foundDb not in foundTbls:
                         foundTbls[foundDb] = []
 
@@ -1799,6 +1803,9 @@ class Enumeration:
                         values = [ values ]
 
                     for foundDb, foundTbl in values:
+                        if foundDb is None or foundTbl is None:
+                            continue
+
                         if foundDb not in dbs:
                             dbs[foundDb] = {}
 
