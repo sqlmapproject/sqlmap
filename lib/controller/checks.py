@@ -156,6 +156,8 @@ def checkSqlInjection(place, parameter, value):
 
                     if conf.realTest or readInput(msg, default="Y") in ("y", "Y"):
                         kb.skipOthersDbms = Backend.getErrorParsedDBMSes()
+                    else:
+                        kb.skipOthersDbms = []
 
                 if kb.skipOthersDbms and dbms not in kb.skipOthersDbms:
                     debugMsg = "skipping test '%s' because " % title
