@@ -502,4 +502,8 @@ def goStacked(expression, silent=False):
     Request.queryPage(payload, content=False, silent=silent, noteResponseTime=False, timeBasedCompare=True)
 
 def checkBooleanExpression(expression, expectingNone=True):
-    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, suppressOutput=True, expectingNone=expectingNone)
+    kb.suppressSession = True
+    value = getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, suppressOutput=True, expectingNone=expectingNone)
+    kb.suppressSession = False
+
+    return value

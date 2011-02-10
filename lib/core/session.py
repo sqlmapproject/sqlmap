@@ -20,6 +20,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import injectionDict
+from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.settings import METADB_SUFFIX
@@ -237,9 +238,10 @@ def resumeConfKb(expression, url, value):
 
     elif expression == "TABLE_EXISTS" and url == conf.url:
         table = unSafeFormatString(value[:-1])
+        split = '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.'
 
-        if '.' in table:
-            db, table = table.split('.')
+        if split in table:
+            db, table = table.split(split)
         else:
             db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
 
@@ -252,9 +254,10 @@ def resumeConfKb(expression, url, value):
     elif expression == "COLUMN_EXISTS" and url == conf.url:
         table, column = unSafeFormatString(value[:-1]).split('|')
         colName, colType = column.split(' ')
+        split = '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.'
 
-        if '.' in table:
-            db, table = table.split('.')
+        if split in table:
+            db, table = table.split(split)
         else:
             db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
 

@@ -55,7 +55,6 @@ def tableExists(tableFile, regex=None):
     tbllock = threading.Lock()
     iolock = threading.Lock()
     kb.threadContinue = True
-    kb.suppressSession = True
 
     def tableExistsThread():
         while count[0] < length and kb.threadContinue:
@@ -131,7 +130,6 @@ def tableExists(tableFile, regex=None):
     finally:
         kb.threadContinue = True
         kb.threadException = False
-        kb.suppressSession = False
 
     clearConsoleLine(True)
     dataToStdout("\n")
@@ -171,7 +169,6 @@ def columnExists(columnFile, regex=None):
     collock = threading.Lock()
     iolock = threading.Lock()
     kb.threadContinue = True
-    kb.suppressSession = True
 
     def columnExistsThread():
         while count[0] < length and kb.threadContinue:
@@ -238,7 +235,6 @@ def columnExists(columnFile, regex=None):
     finally:
         kb.threadContinue = True
         kb.threadException = False
-        kb.suppressSession = False
 
     clearConsoleLine(True)
     dataToStdout("\n")
