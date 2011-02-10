@@ -166,7 +166,7 @@
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
         <current_db query="SELECT DB_NAME()"/>
-        <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1"/>
+        <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1" query2="IS_SRVROLEMEMBER('sysadmin', '%s')=1"/>
         <users>
             <inband query="SELECT name FROM master..syslogins ORDER BY 1" query2="SELECT name FROM sys.sql_logins ORDER BY 1"/>
             <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
