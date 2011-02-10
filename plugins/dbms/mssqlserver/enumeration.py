@@ -29,11 +29,33 @@ class Enumeration(GenericEnumeration):
         GenericEnumeration.__init__(self)
 
     def getPrivileges(self, *args):
-        warnMsg  = "on Microsoft SQL Server it is not possible to fetch "
-        warnMsg += "database users privileges"
+        warnMsg = "on Microsoft SQL Server it is not possible to fetch "
+        warnMsg += "database users privileges, sqlmap will check whether "
+        warnMsg += "or not the database users are database administrators"
         logger.warn(warnMsg)
 
-        return {}
+        users = []
+        areAdmins = set()
+
+        if conf.user:
+            users = [ conf.user ]
+        elif not len(kb.data.cachedUsers):
+            users = self.getUsers()
+        else:
+            users = kb.data.cachedUsers
+
+        for user in users:
+            if user is None:
+                continue
+
+            isDba = self.isDba(user)
+
+            if isDba is True:
+                areAdmins.add(user)
+
+            kb.data.cachedUsersPrivileges[user] = None
+
+        return ( kb.data.cachedUsersPrivileges, areAdmins )
 
     def getTables(self):
         infoMsg = "fetching tables"

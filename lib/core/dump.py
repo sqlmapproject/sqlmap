@@ -125,15 +125,21 @@ class Dump:
         for user in users:
             settings = userSettings[user]
 
-            if user in self.__areAdmins:
-                self.__write("[*] %s (administrator) [%d]:" % (user, len(settings)))
+            if settings is None:
+                stringSettings = ""
             else:
-                self.__write("[*] %s [%d]:" % (user, len(settings)))
+                stringSettings = " [%d]:" % len(settings)
 
-            settings.sort()
+            if user in self.__areAdmins:
+                self.__write("[*] %s (administrator)%s" % (user, stringSettings))
+            else:
+                self.__write("[*] %s%s" % (user, stringSettings))
 
-            for setting in settings:
-                self.__write("    %s: %s" % (subHeader, setting))
+            if settings:
+                settings.sort()
+
+                for setting in settings:
+                    self.__write("    %s: %s" % (subHeader, setting))
         print
 
     def dbs(self,dbs):

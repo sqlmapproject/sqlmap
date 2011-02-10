@@ -126,21 +126,25 @@ class Enumeration:
 
         return kb.data.currentDb
 
-    def isDba(self):
+    def isDba(self, user=None):
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             self.getCurrentUser()
             query = queries[Backend.getIdentifiedDbms()].is_dba.query % kb.data.currentUser.split("@")[0]
+        elif Backend.getIdentifiedDbms() == DBMS.MSSQL and user is not None:
+            query = queries[Backend.getIdentifiedDbms()].is_dba.query2 % user
         else:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query
 
         query = agent.forgeCaseStatement(query)
+        isDba = inject.getValue(query, unpack=False, charsetType=1)
 
-        kb.data.isDba = inject.getValue(query, unpack=False, charsetType=1)
+        if user is None:
+            kb.data.isDba = isDba
 
-        return kb.data.isDba == "1"
+        return isDba == "1"
 
     def getUsers(self):
         infoMsg = "fetching database users"
