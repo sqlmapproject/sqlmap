@@ -349,15 +349,15 @@ def cmdLineParser():
                                  "can be used to access the back-end database "
                                  "management system underlying file system.")
 
-        filesystem.add_option("--read-file", dest="rFile",
+        filesystem.add_option("--file-read", dest="rFile",
                               help="Read a file from the back-end DBMS "
                                    "file system")
 
-        filesystem.add_option("--write-file", dest="wFile",
+        filesystem.add_option("--file-write", dest="wFile",
                               help="Write a local file on the back-end "
                                    "DBMS file system")
 
-        filesystem.add_option("--dest-file", dest="dFile",
+        filesystem.add_option("--file-dest", dest="dFile",
                               help="Back-end DBMS absolute filepath to "
                                    "write to")
 
