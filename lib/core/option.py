@@ -69,6 +69,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
+from lib.core.settings import DEFAULT_TOR_PROXY
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING
@@ -1128,6 +1129,9 @@ def __cleanupOptions():
         conf.keepAlive = True
         conf.nullConnection = not conf.textOnly
         conf.threads = 4 if conf.threads < 4 else conf.threads
+
+    if conf.tor:
+        conf.proxy = DEFAULT_TOR_PROXY
 
 def __setConfAttributes():
     """
