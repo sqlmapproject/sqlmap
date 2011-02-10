@@ -242,6 +242,9 @@ class Enumeration(GenericEnumeration):
                             values = [ values ]
 
                         for foundTbl in values:
+                            if foundTbl is None:
+                                continue
+
                             if foundTbl not in dbs[db]:
                                 dbs[db][foundTbl] = {}
 
