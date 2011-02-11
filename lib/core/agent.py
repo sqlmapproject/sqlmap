@@ -434,13 +434,8 @@ class Agent:
         @rtype: C{str}
         """
 
-        if unpack:
-            concatenatedQuery = ""
-            query = query.replace(", ", ",")
-
-            fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
-            castedFields = self.nullCastConcatFields(fieldsToCastStr)
-            concatenatedQuery = query.replace(fieldsToCastStr, castedFields, 1)
+        if not unpack:
+            return query
         else:
             concatenatedQuery = query
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
