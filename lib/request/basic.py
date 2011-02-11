@@ -30,9 +30,9 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
-def forgeHeaders(cookie, ua):
+def forgeHeaders(cookie, ua, referer):
     """
-    Prepare HTTP Cookie and HTTP User-Agent headers to use when performing
+    Prepare HTTP Cookie, HTTP User-Agent and HTTP Referer headers to use when performing
     the HTTP requests
     """
 
@@ -43,6 +43,8 @@ def forgeHeaders(cookie, ua):
             headers[header] = cookie
         elif ua and header == "User-Agent":
             headers[header] = ua
+        elif referer and header == "Referer":
+            headers[header] = referer
         else:
             headers[header] = value
 

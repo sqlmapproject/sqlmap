@@ -123,6 +123,20 @@ def __setRequestParams():
                     conf.paramDict[PLACE.UA] = { PLACE.UA: headerValue }
                     __testableParameters = True
 
+            elif httpHeader == PLACE.REFERER:
+                # No need for url encoding/decoding the referer
+                conf.parameters[PLACE.REFERER] = urldecode(headerValue)
+
+                condition  = not conf.testParameter
+                condition |= PLACE.REFERER in conf.testParameter
+                condition |= "referer" in conf.testParameter
+                condition |= "referrer" in conf.testParameter
+                condition |= "ref" in conf.testParameter
+
+                if condition:
+                    conf.paramDict[PLACE.REFERER] = { PLACE.REFERER: headerValue }
+                    __testableParameters = True
+
     if not conf.parameters:
         errMsg  = "you did not provide any GET, POST and Cookie "
         errMsg += "parameter, neither an User-Agent header"

@@ -41,6 +41,7 @@ class PLACE:
     URI     = "URI"
     COOKIE  = "Cookie"
     UA      = "User-Agent"
+    REFERER = "Referer"
 
 class HTTPMETHOD:
     GET     = "GET"

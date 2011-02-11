@@ -399,6 +399,8 @@ def checkSqlInjection(place, parameter, value):
                         if injection.place is None or injection.parameter is None:
                             if place == PLACE.UA:
                                 injection.parameter = conf.agent
+                            elif place == PLACE.REFERER:
+                                injection.parameter = conf.referer
                             else:
                                 injection.parameter = parameter
 
