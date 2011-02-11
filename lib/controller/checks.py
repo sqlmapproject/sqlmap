@@ -397,10 +397,8 @@ def checkSqlInjection(place, parameter, value):
                         # Feed with the boundaries details only the first time a
                         # test has been successful
                         if injection.place is None or injection.parameter is None:
-                            if place == PLACE.UA:
-                                injection.parameter = conf.agent
-                            elif place == PLACE.REFERER:
-                                injection.parameter = conf.referer
+                            if place in (PLACE.UA, PLACE.REFERER):
+                                injection.parameter = place
                             else:
                                 injection.parameter = parameter
 
