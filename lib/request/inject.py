@@ -478,10 +478,10 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             value = value.strip()
             if value.lower() in ("true", "false"):
                 value = bool(value)
-            elif value.capitalize() == "None":
-                value = None
             elif value in ("1", "-1"):
                 value = True
+            elif value in ("0"):
+                value = False
             else:
                 value = None
         elif isinstance(value, int):
