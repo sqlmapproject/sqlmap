@@ -14,6 +14,7 @@ from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
+from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
@@ -117,7 +118,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
             output = __oneShotErrorUse(expressionReplaced, field)
 
             if output is not None:
-                logger.info("retrieved: %s" % output)
+                dataToStdout("[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
 
         if isinstance(num, int):
             expression = origExpr
