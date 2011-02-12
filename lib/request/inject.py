@@ -475,12 +475,15 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
     if value and expected == EXPECTED.BOOL:
         if isinstance(value, basestring):
+            value = value.strip()
             if value.lower() in ("true", "false"):
                 value = bool(value)
             elif value.capitalize() == "None":
                 value = None
+            elif value in ("1", "-1"):
+                value = True
             else:
-                value = value != "0"
+                value = None
         elif isinstance(value, int):
             value = bool(value)
         elif value == [None]:
