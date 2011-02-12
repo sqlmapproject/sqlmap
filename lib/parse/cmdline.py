@@ -58,9 +58,6 @@ def cmdLineParser():
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target url.")
 
-        request.add_option("--method", dest="method", default="GET",
-                           help="HTTP method, GET or POST (default GET)")
-
         request.add_option("--data", dest="data",
                            help="Data string to be sent through POST")
 

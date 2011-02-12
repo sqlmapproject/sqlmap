@@ -913,16 +913,8 @@ def __setHTTPMethod():
     Check and set the HTTP method to perform HTTP requests through.
     """
 
-    if conf.method:
-        conf.method = conf.method.upper()
-
-        if conf.method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
-            warnMsg  = "'%s' " % conf.method
-            warnMsg += "is an unsupported HTTP method, "
-            warnMsg += "setting to default method, %s" % HTTPMETHOD.GET
-            logger.warn(warnMsg)
-
-            conf.method = HTTPMETHOD.GET
+    if conf.data:
+        conf.method = HTTPMETHOD.POST
     else:
         conf.method = HTTPMETHOD.GET
 

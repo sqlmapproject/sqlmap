@@ -22,7 +22,6 @@ optDict = {
                              },
 
             "Request":       {
-                               "method":            "string",
                                "data":              "string",
                                "cookie":            "string",
                                "cookieUrlencode":   "boolean",
