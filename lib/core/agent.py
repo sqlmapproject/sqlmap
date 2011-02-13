@@ -434,11 +434,14 @@ class Agent:
         @rtype: C{str}
         """
 
-        if not unpack:
-            return query
-        else:
-            concatenatedQuery = query
+        if unpack:
+            concatenatedQuery = ""
+            query = query.replace(", ", ",")
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
+            castedFields = self.nullCastConcatFields(fieldsToCastStr)
+            concatenatedQuery = query.replace(fieldsToCastStr, castedFields, 1)
+        else:
+            return query
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             if fieldsExists:
