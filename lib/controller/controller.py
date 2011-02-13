@@ -22,6 +22,7 @@ from lib.controller.checks import simpletonCheckSqlInjection
 from lib.core.agent import agent
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
+from lib.core.common import intersect
 from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
@@ -38,6 +39,8 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
+from lib.core.settings import REFERER_ALIASES
+from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from extra.pagerank.pagerank import get_pagerank
@@ -308,6 +311,9 @@ def start():
                     condition |= (place == PLACE.REFERER and conf.level < 3)
                     # Test Cookie header only if --level >= 2
                     condition |= (place == PLACE.COOKIE and conf.level < 2)
+
+                    condition &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter))
+                    condition &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter))
 
                     if condition:
                         continue

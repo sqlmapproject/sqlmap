@@ -14,6 +14,7 @@ import tempfile
 import time
 
 from lib.core.common import dataToSessionFile
+from lib.core.common import intersect
 from lib.core.common import paramToDict
 from lib.core.common import readInput
 from lib.core.convert import urldecode
@@ -31,9 +32,11 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
+from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import URI_INJECTION_MARK_CHAR
+from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.xmldump import dumper as xmldumper
 from lib.request.connect import Connect as Request
 
@@ -113,11 +116,7 @@ def __setRequestParams():
                 # No need for url encoding/decoding the user agent
                 conf.parameters[PLACE.UA] = urldecode(headerValue)
 
-                condition  = not conf.testParameter
-                condition |= PLACE.UA in conf.testParameter
-                condition |= "user-agent" in conf.testParameter
-                condition |= "useragent" in conf.testParameter
-                condition |= "ua" in conf.testParameter
+                condition = any([not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)])
 
                 if condition:
                     conf.paramDict[PLACE.UA] = { PLACE.UA: headerValue }
@@ -127,11 +126,7 @@ def __setRequestParams():
                 # No need for url encoding/decoding the referer
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
-                condition  = not conf.testParameter
-                condition |= PLACE.REFERER in conf.testParameter
-                condition |= "referer" in conf.testParameter
-                condition |= "referrer" in conf.testParameter
-                condition |= "ref" in conf.testParameter
+                condition = any([not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)])
 
                 if condition:
                     conf.paramDict[PLACE.REFERER] = { PLACE.REFERER: headerValue }

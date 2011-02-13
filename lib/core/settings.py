@@ -147,6 +147,9 @@ SYBASE_ALIASES      = [ "sybase", "sybase sql server" ]
 SUPPORTED_DBMS      = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES
 SUPPORTED_OS        = ( "linux", "windows" )
 
+REFERER_ALIASES     = ( "ref", "referer", "referrer" )
+USER_AGENT_ALIASES  = ( "ua", "useragent", "user-agent" )
+
 FROM_TABLE          = {
                         DBMS.ORACLE: " FROM DUAL",
                         DBMS.ACCESS: " FROM MSysObjects",
