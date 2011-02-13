@@ -302,10 +302,12 @@ def start():
                 proceed = True
 
                 for place in parameters:
-                    # Test User-Agent header only if --level >= 4
-                    condition = (place == "User-Agent" and conf.level < 4)
-                    # Test Cookie header only if --level >= 3
-                    condition |= (place == "Cookie" and conf.level < 3)
+                    # Test User-Agent and Referer headers only if
+                    # --level >= 3
+                    condition = (place == PLACE.UA and conf.level < 3)
+                    condition |= (place == PLACE.REFERER and conf.level < 3)
+                    # Test Cookie header only if --level >= 2
+                    condition |= (place == PLACE.COOKIE and conf.level < 2)
 
                     if condition:
                         continue
