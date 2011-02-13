@@ -13,6 +13,7 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import aliasToDbmsEnum
+from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
@@ -22,6 +23,7 @@ from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
+from lib.core.common import intersect
 from lib.core.common import listToStrValue
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -134,7 +136,7 @@ def checkSqlInjection(place, parameter, value):
                 dbms = None
 
             if dbms is not None:
-                if injection.dbms is not None and injection.dbms != dbms:
+                if injection.dbms is not None and not intersect(injection.dbms, dbms):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the back-end DBMS identified is "
                     debugMsg += "%s" % injection.dbms
@@ -142,14 +144,14 @@ def checkSqlInjection(place, parameter, value):
 
                     continue
 
-                if conf.dbms is not None and conf.dbms.lower() != dbms.lower():
+                if conf.dbms is not None and not intersect(conf.dbms.lower(), [value.lower() for value in arrayizeValue(dbms)]):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the provided DBMS is %s" % conf.dbms
                     logger.debug(debugMsg)
 
                     continue
 
-                if len(Backend.getErrorParsedDBMSes()) > 0 and dbms not in Backend.getErrorParsedDBMSes() and kb.skipOthersDbms is None:
+                if len(Backend.getErrorParsedDBMSes()) > 0 and not intersect(dbms, Backend.getErrorParsedDBMSes()) and kb.skipOthersDbms is None:
                     msg = "parsed error message(s) showed that the "
                     msg += "back-end DBMS could be %s. " % Format.getErrorParsedDBMSes()
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
@@ -159,7 +161,7 @@ def checkSqlInjection(place, parameter, value):
                     else:
                         kb.skipOthersDbms = []
 
-                if kb.skipOthersDbms and dbms not in kb.skipOthersDbms:
+                if kb.skipOthersDbms and not intersect(dbms, kb.skipOthersDbms):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the parsed error message(s) showed "
                     debugMsg += "that the back-end DBMS could be "
@@ -199,7 +201,7 @@ def checkSqlInjection(place, parameter, value):
 
             # Force back-end DBMS according to the current
             # test value for proper payload unescaping
-            Backend.forceDbms(dbms)
+            Backend.forceDbms(dbms[0] if isinstance(dbms, list) else dbms)
 
             # Parse test's <request>
             comment = agent.getComment(test.request)
@@ -411,7 +413,7 @@ def checkSqlInjection(place, parameter, value):
                         # Feed with test details every time a test is successful
                         if hasattr(test, "details"):
                             for dKey, dValue in test.details.items():
-                                if dKey == "dbms":
+                                if dKey == "dbms" and not isinstance(dValue, list):
                                     injection.dbms = Backend.setDbms(dValue)
                                 elif dKey == "dbms_version" and injection.dbms_version is None:
                                     injection.dbms_version = Backend.setVersion(dValue)

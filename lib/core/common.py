@@ -2368,3 +2368,14 @@ def getExceptionFrameLocals():
         retVal = trace.tb_frame.f_locals
 
     return retVal
+
+def intersect(valueA, valueB):
+    """
+    Returns intersection of the array-ized values
+    """
+    retVal = None
+
+    if valueA and valueB:
+        retVal = [val for val in arrayizeValue(valueA) if val in arrayizeValue(valueB)]
+
+    return retVal
