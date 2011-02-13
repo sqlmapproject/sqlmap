@@ -134,7 +134,7 @@ def __setRequestParams():
 
     if not conf.parameters:
         errMsg  = "you did not provide any GET, POST and Cookie "
-        errMsg += "parameter, neither an User-Agent header"
+        errMsg += "parameter, neither an User-Agent or Referer header"
         raise sqlmapGenericException, errMsg
 
     elif not __testableParameters:
