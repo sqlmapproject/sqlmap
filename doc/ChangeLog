@@ -3,14 +3,14 @@ sqlmap (0.9-1) stable; urgency=low
   * Support to directly connect to the database without passing via a
     SQL injection, -d switch (Bernardo and Miroslav).
   * Implemented support for SQLite 2 and 3 (Bernardo and Miroslav).
-  * Initial support for SAP MaxDB (Miroslav).
-  * Added support to enumerate roles on Oracle, --roles switch (Bernardo).
+  * Initial support for Firebird, Sybase and SAP MaxDB (Miroslav).
   * Extended old '--dump -C' functionality to be able to search for
     specific database(s), table(s) and column(s), --search switch
     (Bernardo).
-  * Added support for SOAP based web services requests (Bernardo).
   * Added support to tamper injection data with --tamper switch (Bernardo
     and Miroslav).
+  * Added support to enumerate roles on Oracle, --roles switch (Bernardo).
+  * Added support for SOAP based web services requests (Bernardo).
   * Added support to fetch unicode data (Bernardo and Miroslav).
   * Added support to use persistent HTTP(s) connection for speed
     improvement, --keep-alive switch (Miroslav).
@@ -20,8 +20,9 @@ sqlmap (0.9-1) stable; urgency=low
     (Miroslav).
   * Support for customizable HTTP redirections (Bernardo).
   * Support to replicate the back-end DBMS tables structure and entries
-    in a local SQLite 3 database (Miroslav). IN PROGRESS
-  * Support to parse and test forms on target url (Miroslav).
+    in a local SQLite 3 database, --replicate switch (Miroslav).
+  * Support to parse and test forms on target url, --forms switch
+    (Miroslav).
   * Added switches to brute-force table names with a dictionary attack,
     --common-exists and --exists. Useful for instance when system table
     'information_schema' is not available on MySQL (Miroslav).
