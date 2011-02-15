@@ -149,6 +149,9 @@ def cmdLineParser():
                            help="Max number of concurrent HTTP(s) "
                                 "requests (default 1)")
 
+        optimization.add_option("--group-concat", dest="groupConcat", action="store_true",
+                           default=False, help="Use GROUP_CONCAT MySQL technique in dumping phase")
+
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
                                 "used to specify which parameters to test "

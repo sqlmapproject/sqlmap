@@ -58,6 +58,10 @@ PAYLOAD_DELIMITER   = "\x00"
 CHAR_INFERENCE_MARK = "%c"
 NON_CONTROL_CHAR_REGEX = r'[^\x00-\x1f]'
 
+# dumping characters used in GROUP_CONCAT MySQL technique
+CONCAT_ROW_DELIMITER     = ','
+CONCAT_VALUE_DELIMITER   = '|'
+
 # coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF = 10
 
