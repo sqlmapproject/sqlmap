@@ -2147,7 +2147,7 @@ def isTechniqueAvailable(technique=None):
     technique specified
     """
 
-    if isinstance(conf.technique, list) and technique not in conf.technique:
+    if conf.technique and isinstance(conf.technique, list) and technique not in conf.technique:
         return False
     else:
         return getTechniqueData(technique) is not None
