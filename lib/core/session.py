@@ -13,6 +13,7 @@ from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import dataToSessionFile
 from lib.core.common import getFilteredPageContent
+from lib.core.common import intersect
 from lib.core.common import readInput
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
@@ -49,9 +50,8 @@ def setInjection(inj):
                   or ( kb.resumedQueries.has_key(conf.url) and
                   ( not kb.resumedQueries[conf.url].has_key("Injection data")
                   or ( kb.resumedQueries[conf.url].has_key("Injection data")
-                  and isinstance(conf.technique, int) and conf.technique > 0
-                  and conf.technique not in
-                  base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data
+                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data,\
+                    inj.data.keys()) != inj.data.keys()
                 ) ) ) )
 
     if condition:
@@ -164,7 +164,7 @@ def resumeConfKb(expression, url, value):
         if injection.place in conf.paramDict and \
            injection.parameter in conf.paramDict[injection.place]:
 
-            if not conf.technique or ( conf.technique in injection.data ):
+            if not conf.technique or intersect(conf.technique, injection.data):
                 kb.injections.append(injection)
         else:
             warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
