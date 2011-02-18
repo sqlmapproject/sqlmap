@@ -578,15 +578,10 @@ def __setOS():
         raise sqlmapUnsupportedDBMSException, errMsg
 
 def __setTechnique():
-    if not isinstance(conf.technique, int):
-        return
-
-    techniques = []
-    while conf.technique > 0:
-        techniques.append(conf.technique % 10)
-        conf.technique /= 10
-
-    conf.technique = techniques
+    if not conf.technique or not isinstance(conf.technique, int):
+        conf.technique = []
+    else:
+        conf.technique = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.technique)])
 
 def __setDBMS():
     """
