@@ -177,7 +177,6 @@ def cmdLineParser():
         injection.add_option("--tamper", dest="tamper",
                              help="Use given script(s) for tampering injection data")
 
-
         # Detection options
         detection = OptionGroup(parser, "Detection", "These options can be "
                                 "used to specify how to parse "
@@ -205,13 +204,10 @@ def cmdLineParser():
                              action="store_true", default=False,
                              help="Compare pages based only on their textual content")
 
-
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can "
-                                 "be used to test for specific SQL injection "
-                                 "technique or to use one of them to exploit "
-                                 "the affected parameter(s) rather than using "
-                                 "the default blind SQL injection technique.")
+                                 "be used to tweak how specific SQL injection "
+                                 "techniques are tested.")
 
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int", default=TIME_DEFAULT_DELAY,
@@ -538,15 +534,17 @@ def cmdLineParser():
         parser.add_option_group(miscellaneous)
 
         args = []
+
         for arg in sys.argv:
             try:
                 args.append(getUnicode(arg, sys.getfilesystemencoding() or sys.stdin.encoding))
             except:
                 args.append(getUnicode(arg, UNICODE_ENCODING))
+
         (args, _) = parser.parse_args(args)
 
-        if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile\
-            and not args.requestFile and not args.updateAll and not args.smokeTest and not args.liveTest\
+        if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile \
+            and not args.requestFile and not args.updateAll and not args.smokeTest and not args.liveTest \
             and not args.realTest:
             errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c' or '--update'), "
             errMsg += "-h for help"
