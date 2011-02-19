@@ -1021,20 +1021,39 @@ class Enumeration:
             if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                 query = rootQuery.blind.count % (conf.tbl, conf.db)
                 query += condQuery
+
             elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
                 query = rootQuery.blind.count % conf.tbl.upper()
                 query += condQuery
-            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+
+            elif Backend.getIdentifiedDbms() in DBMS.MSSQL:
                 query = rootQuery.blind.count % (conf.db, conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
+
             elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
                 query = rootQuery.blind.count % (conf.tbl)
                 query += condQuery
+
             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                 query = rootQuery.blind.query % conf.tbl
                 value = inject.getValue(query, inband=False, error=False)
-
                 parseSqliteTableSchema(value)
+                return kb.data.cachedColumns
+
+            elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                randStr = randomStr()
+                query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.tbl)
+                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.usertype' % randStr], blind=True)
+
+                if retVal:
+                    table = {}
+                    columns = {}
+
+                    for name, type_ in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr]):
+                        columns[name] = sybaseTypes[type_] if type_ else None
+
+                    table[conf.tbl] = columns
+                    kb.data.cachedColumns[conf.db] = table
 
                 return kb.data.cachedColumns
 
@@ -1108,12 +1127,21 @@ class Enumeration:
 
         return kb.data.cachedColumns
 
-    def __pivotDumpTable(self, dumpNode, table, colList, count, blind=True):
+    def __pivotDumpTable(self, table, colList, count=None, blind=True):
         lengths = {}
         entries = {}
 
+        dumpNode = queries[Backend.getIdentifiedDbms()].dump_table.blind
+
         validColumnList = False
         validPivotValue = False
+
+        if not count:
+            query = dumpNode.count % table
+            if blind:
+                count = inject.getValue(query, inband=False, error=False)
+            else:
+                count = inject.getValue(query, blind=False)
 
         for column in colList:
             infoMsg = "fetching number of distinct "
@@ -1121,6 +1149,7 @@ class Enumeration:
             logger.info(infoMsg)
 
             query = dumpNode.count2 % (column, table)
+
             if blind:
                 value = inject.getValue(query, inband=False, error=False)
             else:
@@ -1360,7 +1389,7 @@ class Enumeration:
                     elif DBMS.SYBASE:
                         table = "%s..%s" % (conf.db, conf.tbl)
 
-                    entries, lengths = self.__pivotDumpTable(rootQuery.blind, table, colList, count, blind=True)
+                    entries, lengths = self.__pivotDumpTable(table, colList, count, blind=True)
 
                 else:
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MSSQL, DBMS.SYBASE):
