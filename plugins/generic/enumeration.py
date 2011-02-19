@@ -36,6 +36,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.dicts import firebirdTypes
+from lib.core.dicts import sybaseTypes
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
@@ -956,23 +958,6 @@ class Enumeration:
                 raise sqlmapUserQuitException
             else:
                 return columnExists(paths.COMMON_COLUMNS)
-
-        firebirdTypes = {
-                            "261":"BLOB",
-                            "14":"CHAR",
-                            "40":"CSTRING",
-                            "11":"D_FLOAT",
-                            "27":"DOUBLE",
-                            "10":"FLOAT",
-                            "16":"INT64",
-                            "8":"INTEGER",
-                            "9":"QUAD",
-                            "7":"SMALLINT",
-                            "12":"DATE",
-                            "13":"TIME",
-                            "35":"TIMESTAMP",
-                            "37":"VARCHAR"
-                        }
 
         rootQuery = queries[Backend.getIdentifiedDbms()].columns
         condition = rootQuery.blind.condition if 'condition' in rootQuery.blind else None

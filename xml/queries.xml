@@ -507,8 +507,8 @@
             <blind query="SELECT MIN(name) FROM %s..sysobjects WHERE type IN ('U') AND name > '%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE type IN ('U')"/>
         </tables>
         <columns>
-            <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
-            <blind query="SELECT %s..syscolumns.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
+            <inband query="SELECT %s..syscolumns.name,%s..syscolumns.usertype FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
+            <blind/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s..%s"/>
