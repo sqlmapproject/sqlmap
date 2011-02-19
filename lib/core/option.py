@@ -150,12 +150,15 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         """
         Parses web scarab logs (POST method not supported)
         """
+
         reqResList = content.split(WEBSCARAB_SPLITTER)
+        getPostReq = False
 
         for request in reqResList:
             url    = extractRegexResult(r"URL: (?P<result>.+?)\n", request, re.I)
             method = extractRegexResult(r"METHOD: (?P<result>.+?)\n", request, re.I)
             cookie = extractRegexResult(r"COOKIE: (?P<result>.+?)\n", request, re.I)
+            getPostReq = True
 
             if not method or not url:
                 logger.debug("Invalid log data")
@@ -168,9 +171,13 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 logger.warning(warnMsg)
                 continue
 
-            if not kb.targetUrls or url not in addedTargetUrls:
-                kb.targetUrls.add((url, method, None, cookie))
-                addedTargetUrls.add(url)
+            if conf.scope:
+                getPostReq &= re.search(conf.scope, url) is not None
+
+            if getPostReq:
+                if not kb.targetUrls or url not in addedTargetUrls:
+                    kb.targetUrls.add((url, method, None, cookie))
+                    addedTargetUrls.add(url)
 
     def __parseBurpLog(content):
         """
