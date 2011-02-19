@@ -1039,7 +1039,7 @@ class Enumeration:
             elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
                 query = rootQuery.blind.count % conf.tbl.upper()
                 query += condQuery
-            elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                 query = rootQuery.blind.count % (conf.db, conf.db, conf.tbl)
                 query += condQuery.replace("[DB]", conf.db)
             elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
@@ -1075,7 +1075,7 @@ class Enumeration:
                     query = rootQuery.blind.query % (conf.tbl.upper())
                     query += condQuery
                     field = None
-                elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                     query = rootQuery.blind.query % (conf.db, conf.db,
                                                            conf.db, conf.db,
                                                            conf.db, conf.db,
@@ -1122,6 +1122,86 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedColumns
+
+    def __pivotDumpTable(dumpNode, table, colList, indexRange, blind=True):
+        lengths = {}
+        entries = {}
+
+        validColumnList = False
+        validPivotValue = False
+
+        count = len(indexRange)
+
+        for column in colList:
+            infoMsg = "fetching number of distinct "
+            infoMsg += "values for column '%s'" % column
+            logger.info(infoMsg)
+
+            query = dumpNode.count2 % (column, table)
+            if blind:
+                value = inject.getValue(query, inband=False, error=False)
+            else:
+                value = inject.getValue(query, blind=False)
+
+            if isNumPosStrValue(value):
+                validColumnList = True
+                if value == count:
+                    infoMsg = "using column '%s' as a pivot " % column
+                    infoMsg += "for retrieving row data"
+                    logger.info(infoMsg)
+
+                    validPivotValue = True
+
+                    colList.remove(column)
+                    colList.insert(0, column)
+                    break
+
+        if not validColumnList:
+            errMsg = "all column name(s) provided are non-existent"
+            raise sqlmapNoneDataException, errMsg
+
+        if not validPivotValue:
+            warnMsg = "no proper pivot column provided (with unique values)." 
+            warnMsg += " all rows can't be retrieved."
+            logger.warn(warnMsg)
+
+        pivotValue = " "
+        breakRetrieval = False
+
+        for index in indexRange:
+            if breakRetrieval:
+                break
+
+            for column in colList:
+                if column not in lengths:
+                    lengths[column] = 0
+
+                if column not in entries:
+                    entries[column] = []
+
+                if column == colList[0]:
+                    # Correction for pivotValues with unrecognized chars
+                    if pivotValue and '?' in pivotValue and pivotValue[0]!='?':
+                        pivotValue = pivotValue.split('?')[0]
+                        pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
+                    query = dumpNode.query % (column, table, column, pivotValue)
+                else:
+                    query = dumpNode.query2 % (column, table, colList[0], pivotValue)
+
+                if blind:
+                    value = inject.getValue(query, inband=False, error=False)
+                else:
+                    value = inject.getValue(query, blind=False)
+
+                if column == colList[0]:
+                    if not value:
+                        breakRetrieval = True
+                        break
+                    else:
+                        pivotValue = value
+
+                lengths[column] = max(lengths[column], len(value) if value else 0)
+                entries[column].append(value)
 
     def dumpTable(self):
         if not conf.tbl and not conf.col:
@@ -1265,6 +1345,8 @@ class Enumeration:
                 query = rootQuery.blind.count % (conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                 query = rootQuery.blind.count % conf.tbl
+            elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                query = rootQuery.blind.count % ("%s..%s" % (conf.db, conf.tbl))
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
             count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
@@ -1290,16 +1372,21 @@ class Enumeration:
             indexRange = getRange(count, dump=True, plusOne=plusOne)
 
             try:
-                if Backend.getIdentifiedDbms() == DBMS.ACCESS:
+                if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE):
                     validColumnList = False
                     validPivotValue = False
+
+                    if DBMS.ACCESS:
+                        table = conf.tbl
+                    elif DBMS.SYBASE:
+                        table = "%s..%s" % (conf.db, conf.tbl)
 
                     for column in colList:
                         infoMsg = "fetching number of distinct "
                         infoMsg += "values for column '%s'" % column
                         logger.info(infoMsg)
 
-                        query = rootQuery.blind.count2 % (column, conf.tbl)
+                        query = rootQuery.blind.count2 % (column, table)
                         value = inject.getValue(query, inband=False, error=False)
 
                         if isNumPosStrValue(value):
@@ -1343,9 +1430,9 @@ class Enumeration:
                                 if pivotValue and '?' in pivotValue and pivotValue[0]!='?':
                                     pivotValue = pivotValue.split('?')[0]
                                     pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
-                                query = rootQuery.blind.query % (column, conf.tbl, column, pivotValue)
+                                query = rootQuery.blind.query % (column, table, column, pivotValue)
                             else:
-                                query = rootQuery.blind.query2 % (column, conf.tbl, colList[0], pivotValue)
+                                query = rootQuery.blind.query2 % (column, table, colList[0], pivotValue)
 
                             value = inject.getValue(query, inband=False, error=False)
 
