@@ -1130,30 +1130,29 @@ class Enumeration:
         validColumnList = False
         validPivotValue = False
 
-        if len(colList) > 1:
-            for column in colList:
-                infoMsg = "fetching number of distinct "
-                infoMsg += "values for column '%s'" % column
-                logger.info(infoMsg)
+        for column in colList:
+            infoMsg = "fetching number of distinct "
+            infoMsg += "values for column '%s'" % column
+            logger.info(infoMsg)
 
-                query = dumpNode.count2 % (column, table)
-                if blind:
-                    value = inject.getValue(query, inband=False, error=False)
-                else:
-                    value = inject.getValue(query, blind=False)
+            query = dumpNode.count2 % (column, table)
+            if blind:
+                value = inject.getValue(query, inband=False, error=False)
+            else:
+                value = inject.getValue(query, blind=False)
 
-                if isNumPosStrValue(value):
-                    validColumnList = True
-                    if value == count:
-                        infoMsg = "using column '%s' as a pivot " % column
-                        infoMsg += "for retrieving row data"
-                        logger.info(infoMsg)
+            if isNumPosStrValue(value):
+                validColumnList = True
+                if value == count:
+                    infoMsg = "using column '%s' as a pivot " % column
+                    infoMsg += "for retrieving row data"
+                    logger.info(infoMsg)
 
-                        validPivotValue = True
+                    validPivotValue = True
 
-                        colList.remove(column)
-                        colList.insert(0, column)
-                        break
+                    colList.remove(column)
+                    colList.insert(0, column)
+                    break
 
         if not validColumnList:
             errMsg = "all column name(s) provided are non-existent"
@@ -1167,7 +1166,7 @@ class Enumeration:
         pivotValue = " "
         breakRetrieval = False
 
-        for i in xrange(count):
+        for i in xrange(int(count)):
             if breakRetrieval:
                 break
 
@@ -1376,7 +1375,7 @@ class Enumeration:
                     elif DBMS.SYBASE:
                         table = "%s..%s" % (conf.db, conf.tbl)
 
-                    entries, lengths = self.__pivotDumpTable(rootQuery.blind, table, colList, int(count), blind=True)
+                    entries, lengths = self.__pivotDumpTable(rootQuery.blind, table, colList, count, blind=True)
 
                 else:
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MSSQL, DBMS.SYBASE):
