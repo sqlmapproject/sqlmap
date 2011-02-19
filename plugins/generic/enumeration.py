@@ -816,7 +816,7 @@ class Enumeration:
                     infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
                     logger.info(infoMsg)
 
-            if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
                 query = safeStringFormat(query, conf.db)
             value = inject.getValue(query, blind=False)
 

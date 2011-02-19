@@ -90,3 +90,68 @@ class Enumeration(GenericEnumeration):
                 break
 
         return kb.data.cachedColumns
+
+    def getTables(self, bruteForce=None):
+        self.forceDbmsEnum()
+
+        infoMsg = "fetching tables"
+        if conf.db:
+            infoMsg += " for database '%s'" % conf.db
+        logger.info(infoMsg)
+
+        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+
+        if conf.db:
+            if "," in conf.db:
+                dbs = conf.db.split(",")
+            else:
+                dbs = [conf.db]
+        else:
+            if not len(kb.data.cachedDbs):
+                dbs = self.getDbs()
+            else:
+                dbs = kb.data.cachedDbs
+
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+            blinds = [False, True]
+        else:
+            blinds = [True]
+
+        for db in dbs:
+            for blind in blinds:
+                randStr = randomStr()
+                query = rootQuery.inband.query % db
+                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+
+                if retVal:
+                    for table in retVal[0].values()[0]:
+                        if not kb.data.cachedTables.has_key(db):
+                            kb.data.cachedTables[db] = [table]
+                        else:
+                            kb.data.cachedTables[db].append(table)
+                    break
+
+        return kb.data.cachedTables
+
+    def getDbs(self):
+        infoMsg = "fetching database names"
+        logger.info(infoMsg)
+
+        rootQuery = queries[Backend.getIdentifiedDbms()].dbs
+
+        randStr = randomStr()
+        query = rootQuery.inband.query
+
+        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+            blinds = [False, True]
+        else:
+            blinds = [True]
+
+        for blind in blinds:
+            retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+
+            if retVal:
+                kb.data.cachedDbs = retVal[0].values()[0]
+                break
+
+        return kb.data.cachedDbs

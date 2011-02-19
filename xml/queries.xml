@@ -499,11 +499,11 @@
         <privileges/>
         <roles/>
         <dbs>
-            <inband query="SELECT name FROM master..sysdatabases ORDER BY 1"/>
+            <inband query="SELECT name FROM master..sysdatabases"/>
             <blind/>
         </dbs>
         <tables>
-            <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') ORDER BY 1"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U')"/>
             <blind/>
         </tables>
         <columns>
