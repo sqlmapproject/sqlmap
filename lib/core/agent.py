@@ -639,7 +639,7 @@ class Agent:
             limitedQuery = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
             forgeNotIn = True
 
             if " ORDER BY " in limitedQuery:

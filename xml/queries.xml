@@ -489,22 +489,22 @@
         <current_db query="SELECT DB_NAME()"/>
         <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0"/>
         <users>
-            <inband query="SELECT name FROM master..syslogins ORDER BY 1"/>
-            <blind query="SELECT MIN(name) FROM master..syslogins WHERE name > '%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins"/>
+            <inband query="SELECT name FROM master..syslogins"/>
+            <blind/>
         </users>
         <passwords>
             <inband query="SELECT name, password FROM master..syslogins" condition="name"/>
-            <blind query="SELECT MIN(password) FROM master..syslogins WHERE name='%s'" count="SELECT LTRIM(STR(COUNT(password))) FROM master..syslogins WHERE name='%s'"/>
+            <blind/>
         </passwords>
         <privileges/>
         <roles/>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases ORDER BY 1"/>
-            <blind query="SELECT MIN(name) FROM master..sysdatabases WHERE name > '%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
+            <blind/>
         </dbs>
         <tables>
             <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') ORDER BY 1"/>
-            <blind query="SELECT MIN(name) FROM %s..sysobjects WHERE type IN ('U') AND name > '%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE type IN ('U')"/>
+            <blind/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,%s..syscolumns.usertype FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
@@ -516,15 +516,15 @@
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
-            <blind query="SELECT name FROM master..sysdatabases WHERE " count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE " condition="name"/>
+            <blind/>
         </search_db>
         <search_table>
             <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') AND " condition="name" condition2="name"/>
-            <blind query="" query2="SELECT name FROM %s..sysobjects WHERE type IN ('U') " count="" count2="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE type IN ('U')" condition="name" condition2="name"/>
+            <blind/>
         </search_table>
         <search_column>
             <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
-            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+            <blind/>
         </search_column>
     </dbms>
 </root>

@@ -37,7 +37,6 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.dicts import firebirdTypes
-from lib.core.dicts import sybaseTypes
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
@@ -1040,23 +1039,6 @@ class Enumeration:
                 parseSqliteTableSchema(value)
                 return kb.data.cachedColumns
 
-            elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                randStr = randomStr()
-                query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.tbl)
-                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.usertype' % randStr], blind=True)
-
-                if retVal:
-                    table = {}
-                    columns = {}
-
-                    for name, type_ in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr]):
-                        columns[name] = sybaseTypes[type_] if type_ else None
-
-                    table[conf.tbl] = columns
-                    kb.data.cachedColumns[conf.db] = table
-
-                return kb.data.cachedColumns
-
             count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
@@ -1149,7 +1131,6 @@ class Enumeration:
             logger.info(infoMsg)
 
             query = dumpNode.count2 % (column, table)
-
             if blind:
                 value = inject.getValue(query, inband=False, error=False)
             else:
@@ -1312,7 +1293,7 @@ class Enumeration:
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
 
-            if not (Backend.getIdentifiedDbms() == DBMS.MYSQL and entries):
+            if not entries:
                 entries = inject.getValue(query, blind=False, dump=True)
 
             if entries:
@@ -1381,14 +1362,10 @@ class Enumeration:
 
             try:
                 if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE):
-                    validColumnList = False
-                    validPivotValue = False
-
                     if DBMS.ACCESS:
                         table = conf.tbl
                     elif DBMS.SYBASE:
                         table = "%s..%s" % (conf.db, conf.tbl)
-
                     entries, lengths = self.__pivotDumpTable(table, colList, count, blind=True)
 
                 else:
