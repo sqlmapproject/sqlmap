@@ -2,13 +2,13 @@
 
 <article>
 
-<title>sqlmap FAQ
-<author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
-<date>May 10, 2010
+<title>sqlmap - Frequently Asked Questions
+<author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">,
+<htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
+<date>March 10, 2011
 <abstract>
-This document contains frequently asked questions for <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
-Check the project <htmlurl url="http://sqlmap.sourceforge.net" name="homepage">
-for the latest version.
+This document contains frequently asked questions for <htmlurl
+url="http://sqlmap.sourceforge.net" name="sqlmap">.
 </abstract>
 
 <toc>
@@ -18,15 +18,9 @@ for the latest version.
 <sect1>What is sqlmap?
 
 <p>
-sqlmap is an open source penetration testing tool that automates the
-process of detecting and exploiting SQL injection flaws and taking over of
-back-end database servers.
-It comes with a broad range of features lasting from database
-fingerprinting, over data fetching from the database, to accessing the
-underlying file system and executing commands on the operating system via
-out-of-band connections.
+sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a kick-ass detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.
 
-<sect1>How to run sqlmap?
+<sect1>How do I execute sqlmap?
 
 <p>
 If you are running on a Unix/Linux system type the following command
@@ -42,6 +36,10 @@ from a terminal:
 C:\Python26\python.exe sqlmap.py -h
 </verb></tscreen>
 
+<p>
+Where <tt>C:\Python26</tt> is the path where you installed <htmlurl
+url="http://www.python.org" name="Python"> <bf>>= 2.6</bf>.
+
 <sect1>Can I integrate sqlmap with a security tool I am developing?
 
 <p>
@@ -50,38 +48,47 @@ derivative work must be distributed without further restrictions on the
 rights granted by the GPL itself. If this constitutes a problem, feel free
 to contact us so we can find a solution.
 
+<sect1>How can I integrate sqlmap with my own tool?
+
+<p>
+TODO
+
 <sect1>Will you support other database management systems?
 
 <p>
-Yes. There are plans to support also IBM DB2, Informix and others in the
-long term.
+Yes. There are plans to support also IBM DB2, Informix and Ingres at some
+point.
 
 <sect1>How can I occasionally contribute?
 
 <p>
-All help is greatly appreciated. First of all download the tool, read the
-user's manual, have fun with it during your penetration tests. If you find
-bugs or have ideas for possible improvements, feel free to get in touch.
-Many people <htmlurl url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/doc/THANKS"
-name="have contributed"> in different ways to the sqlmap development.
-You can be the next!
+All help is greatly appreciated. First of all download the tool, make sure
+you are running the latest development version from the Subversion
+repository, read the user's manual carefully, have fun with it during your
+penetration tests.
+If you find bugs or have ideas for possible improvements, feel free to
+<htmlurl url="http://sqlmap.sourceforge.net/#ml" name="get in touch on the
+mailing list">. Many people have <htmlurl
+url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/doc/THANKS"
+name="contributed"> in different ways to the sqlmap development.
+<bf>You</bf> can be the next!
 
 <sect1>Can I actively contribute in the long-term development?
 
 <p>
-Yes, we are looking for security geeks who can write some clean Python
-code, are up to do security research, know about web application security,
-database assessment and takeover, post-exploitation techniques, software
-refactoring and are motivated to join the development team. If you are
-interested, feel free to <htmlurl url="http://sqlmap.sourceforge.net/#author"
-name="get in touch">.
+Yes, we are looking for people who can write some clean Python code, are
+up to do security research, know about web application security, database
+assessment and takeover, software refactoring and are motivated to join
+the development team.
+If this sounds interesting to you, <htmlurl
+url="http://sqlmap.sourceforge.net/#developers" name="get in touch">!
 
 <sect1>How can I support the development?
 
 <p>
-If you think that sqlmap is awesome, it really played well during your
-penetration tests, or you simply like it, you, or your boss, can <htmlurl
-url="http://sourceforge.net/donate/index.php?group_id=171598" name="donate
+If you think that sqlmap is a great tool, it really played well during
+your penetration tests, or you simply like it, you, or your boss, can
+<htmlurl url="http://sqlmap.sourceforge.net/#donate" name="donate
 some money"> to the developers via PayPal.
 
 <sect1>Can you hack a site for me?
@@ -92,6 +99,6 @@ some money"> to the developers via PayPal.
 <sect1>How sqlmap decides this and that?
 
 <p>
-That's how.
+TODO
 
 </article>
