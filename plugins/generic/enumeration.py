@@ -1364,6 +1364,8 @@ class Enumeration:
                 query = rootQuery.blind.count % conf.tbl
             elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
                 query = rootQuery.blind.count % ("%s..%s" % (conf.db, conf.tbl))
+            elif Backend.getIdentifiedDbms() == DBMS.MAXDB:
+                query = rootQuery.blind.count % ("%s" % conf.tbl)
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
             count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
@@ -1383,10 +1385,10 @@ class Enumeration:
             entries = {}
 
             try:
-                if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE):
-                    if DBMS.ACCESS:
+                if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB):
+                    if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MAXDB):
                         table = conf.tbl
-                    elif DBMS.SYBASE:
+                    elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
                         table = "%s..%s" % (conf.db, conf.tbl)
                     entries, lengths = self.__pivotDumpTable(table, colList, count, blind=True)
 

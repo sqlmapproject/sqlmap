@@ -437,7 +437,7 @@
         <comment query="--" query2="#"/>
         <count query="COUNT(%s)"/>
         <!-- No real cast on SAP MaxDB -->
-        <cast query="REPLACE(%s, ' ', '_')"/>
+        <cast query="REPLACE(CHR(%s), ' ', '_')"/>
         <current_user query="SELECT USER() FROM DUAL"/>
         <current_db query="SELECT DATABASE() FROM DUAL"/>
         <order query="ORDER BY %s ASC"/>
@@ -450,7 +450,7 @@
             <blind query="SELECT MIN(username) FROM domain.users WHERE username > '%s'" count="SELECT CHR(COUNT(*)) FROM domain.users"/>
         </users>
         <columns>
-            <inband query="SELECT columnname, datatype, len FROM domain.columns WHERE tablename = '%s' AND schemaname=user ORDER BY pos"/>
+            <inband query="SELECT columnname, datatype, len FROM domain.columns WHERE tablename = '%s' AND schemaname=user"/>
             <blind query="SELECT columnname FROM domain.columns WHERE tablename = '%s' AND schemaname=user ORDER BY pos" query2="SELECT datatype FROM domain.columns WHERE tablename = '%s' AND schemaname=user ORDER BY pos"/>
         </columns>
         <tables>
@@ -461,8 +461,8 @@
             <inband query="SELECT owner, role FROM domain.roles" condition="owner"/>
         </roles>
         <dump_table>
-            <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT MIN(%s) FROM %s WHERE %s > '%s'" count="SELECT CHR(COUNT(*)) FROM %s"/>
+            <inband query="SELECT %s FROM %%s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CHR(%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CHR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s) AS value_table"/>
         </dump_table>
    </dbms>
 
