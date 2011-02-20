@@ -11,6 +11,7 @@ import codecs
 import re
 import os
 
+from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
@@ -19,6 +20,7 @@ from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import DBMS
 from lib.core.replication import Replication
 from lib.core.settings import UNICODE_ENCODING
 
@@ -101,7 +103,10 @@ class Dump:
         self.string("current user", data)
 
     def currentDb(self,data):
-        self.string("current database", data)
+        if Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ORACLE):
+            self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data)
+        else:
+            self.string("current database", data)
 
     def dba(self,data):
         self.string("current user is DBA", data)

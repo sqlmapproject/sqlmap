@@ -1386,10 +1386,12 @@ class Enumeration:
 
             try:
                 if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB):
-                    if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MAXDB):
+                    if Backend.getIdentifiedDbms() == DBMS.ACCESS:
                         table = conf.tbl
                     elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
                         table = "%s..%s" % (conf.db, conf.tbl)
+                    elif Backend.getIdentifiedDbms() == DBMS.MAXDB:
+                        table = "%s.%s" % (conf.db, conf.tbl)
                     entries, lengths = self.__pivotDumpTable(table, colList, count, blind=True)
 
                 else:

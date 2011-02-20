@@ -135,7 +135,10 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "%s%s" % (DBMS.MAXDB, METADB_SUFFIX)
+        if conf.db:
+            conf.db = conf.db.upper()
+        else:
+            conf.db = "USER"
 
         if conf.tbl:
             conf.tbl = conf.tbl.upper() 

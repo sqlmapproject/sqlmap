@@ -60,7 +60,6 @@ class Enumeration(GenericEnumeration):
 
             conf.db = self.getCurrentDb()
         rootQuery = queries[Backend.getIdentifiedDbms()].columns
-        condition = rootQuery.blind.condition if 'condition' in rootQuery.blind else None
 
         infoMsg = "fetching columns "
         infoMsg += "for table '%s' " % conf.tbl
