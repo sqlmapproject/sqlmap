@@ -1308,6 +1308,10 @@ class Enumeration:
                 query = rootQuery.inband.query % (colString, conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                 query = rootQuery.inband.query % (colString, conf.tbl)
+            elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                table = "%s..%s" % (conf.db, conf.tbl)
+                entries, _ = self.__pivotDumpTable(table, colList, blind=False)
+                entries = zip(*[entries[colName] for colName in colList])
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
 
