@@ -251,21 +251,20 @@ class Enumeration:
                         else:
                             kb.data.cachedUsersPasswords[user].append(password)
                 getCurrentThreadData().disableStdOut = False
-                return kb.data.cachedUsersPasswords
             else:
                 value = inject.getValue(query, blind=False)
 
-            if value:
-                for user, password in value:
-                    if not user or user == " ":
-                        continue
+                if value:
+                    for user, password in value:
+                        if not user or user == " ":
+                            continue
 
-                    password = parsePasswordHash(password)
+                        password = parsePasswordHash(password)
 
-                    if not kb.data.cachedUsersPasswords.has_key(user):
-                        kb.data.cachedUsersPasswords[user] = [password]
-                    else:
-                        kb.data.cachedUsersPasswords[user].append(password)
+                        if not kb.data.cachedUsersPasswords.has_key(user):
+                            kb.data.cachedUsersPasswords[user] = [password]
+                        else:
+                            kb.data.cachedUsersPasswords[user].append(password)
 
         if not kb.data.cachedUsersPasswords and not conf.direct:
             if conf.user:
@@ -280,10 +279,13 @@ class Enumeration:
                     users = kb.data.cachedUsers
 
             if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                getCurrentThreadData().disableStdOut = True
+
                 randStr = randomStr()
                 query = rootQuery.inband.query
-                getCurrentThreadData().disableStdOut = True
+
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=True)
+
                 if retVal:
                     for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
                         password = "0x%s" % strToHex(password)
@@ -291,68 +293,69 @@ class Enumeration:
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
                             kb.data.cachedUsersPasswords[user].append(password)
+
                 getCurrentThreadData().disableStdOut = False
-                return kb.data.cachedUsersPasswords
 
-            retrievedUsers = set()
+            else:
+                retrievedUsers = set()
 
-            for user in users:
-                if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-                    parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+                for user in users:
+                    if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
 
-                    if parsedUser:
-                        user = parsedUser.groups()[0]
+                        if parsedUser:
+                            user = parsedUser.groups()[0]
 
-                if not user or user in retrievedUsers:
-                    continue
+                    if not user or user in retrievedUsers:
+                        continue
 
-                infoMsg  = "fetching number of password hashes "
-                infoMsg += "for user '%s'" % user
-                logger.info(infoMsg)
+                    infoMsg  = "fetching number of password hashes "
+                    infoMsg += "for user '%s'" % user
+                    logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
-                    query = rootQuery.blind.count2 % user
-                else:
-                    query = rootQuery.blind.count % user
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
-
-                if not isNumPosStrValue(count):
-                    warnMsg  = "unable to retrieve the number of password "
-                    warnMsg += "hashes for user '%s'" % user
-                    logger.warn(warnMsg)
-                    continue
-
-                infoMsg = "fetching password hashes for user '%s'" % user
-                logger.info(infoMsg)
-
-                passwords  = []
-
-                if Backend.getIdentifiedDbms() == DBMS.ORACLE:
-                    plusOne = True
-                else:
-                    plusOne = False
-                indexRange = getRange(count, plusOne=plusOne)
-
-                for index in indexRange:
-                    if Backend.getIdentifiedDbms() == DBMS.MSSQL:
-                        if Backend.isVersionWithin(("2005", "2008")):
-                            query = rootQuery.blind.query2 % (user, index, user)
-                        else:
-                            query = rootQuery.blind.query % (user, index, user)
+                    if Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
+                        query = rootQuery.blind.count2 % user
                     else:
-                        query = rootQuery.blind.query % (user, index)
-                    password = inject.getValue(query, inband=False, error=False)
-                    password = parsePasswordHash(password)
-                    passwords.append(password)
+                        query = rootQuery.blind.count % user
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
-                if passwords:
-                    kb.data.cachedUsersPasswords[user] = passwords
-                else:
-                    warnMsg  = "unable to retrieve the password "
-                    warnMsg += "hashes for user '%s'" % user
-                    logger.warn(warnMsg)
+                    if not isNumPosStrValue(count):
+                        warnMsg  = "unable to retrieve the number of password "
+                        warnMsg += "hashes for user '%s'" % user
+                        logger.warn(warnMsg)
+                        continue
 
-                retrievedUsers.add(user)
+                    infoMsg = "fetching password hashes for user '%s'" % user
+                    logger.info(infoMsg)
+
+                    passwords  = []
+
+                    if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                        plusOne = True
+                    else:
+                        plusOne = False
+                    indexRange = getRange(count, plusOne=plusOne)
+
+                    for index in indexRange:
+                        if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+                            if Backend.isVersionWithin(("2005", "2008")):
+                                query = rootQuery.blind.query2 % (user, index, user)
+                            else:
+                                query = rootQuery.blind.query % (user, index, user)
+                        else:
+                            query = rootQuery.blind.query % (user, index)
+                        password = inject.getValue(query, inband=False, error=False)
+                        password = parsePasswordHash(password)
+                        passwords.append(password)
+
+                    if passwords:
+                        kb.data.cachedUsersPasswords[user] = passwords
+                    else:
+                        warnMsg  = "unable to retrieve the password "
+                        warnMsg += "hashes for user '%s'" % user
+                        logger.warn(warnMsg)
+
+                    retrievedUsers.add(user)
 
         if not kb.data.cachedUsersPasswords:
             errMsg  = "unable to retrieve the password "
