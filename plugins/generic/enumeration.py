@@ -239,7 +239,21 @@ class Enumeration:
 
                     query += " WHERE %s = '%s'" % (condition, conf.user)
 
-            value = inject.getValue(query, blind=False)
+            if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                randStr = randomStr()
+                getCurrentThreadData().disableStdOut = True
+                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=False)
+                if retVal:
+                    for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
+                        password = "0x%s" % strToHex(password)
+                        if not kb.data.cachedUsersPasswords.has_key(user):
+                            kb.data.cachedUsersPasswords[user] = [password]
+                        else:
+                            kb.data.cachedUsersPasswords[user].append(password)
+                getCurrentThreadData().disableStdOut = False
+                return kb.data.cachedUsersPasswords
+            else:
+                value = inject.getValue(query, blind=False)
 
             if value:
                 for user, password in value:
@@ -264,6 +278,21 @@ class Enumeration:
                     users = self.getUsers()
                 else:
                     users = kb.data.cachedUsers
+
+            if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                randStr = randomStr()
+                query = rootQuery.inband.query
+                getCurrentThreadData().disableStdOut = True
+                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=True)
+                if retVal:
+                    for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
+                        password = "0x%s" % strToHex(password)
+                        if not kb.data.cachedUsersPasswords.has_key(user):
+                            kb.data.cachedUsersPasswords[user] = [password]
+                        else:
+                            kb.data.cachedUsersPasswords[user].append(password)
+                getCurrentThreadData().disableStdOut = False
+                return kb.data.cachedUsersPasswords
 
             retrievedUsers = set()
 
@@ -305,16 +334,7 @@ class Enumeration:
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                        if index > 0:
-                            warnMsg  = "unable to retrieve other password "
-                            warnMsg += "hashes for user '%s'" % user
-                            logger.warn(warnMsg)
-                            break
-                        else:
-                            query = rootQuery.blind.query % user
-                            getCurrentThreadData().disableStdOut = True
-                    elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+                    if Backend.getIdentifiedDbms() == DBMS.MSSQL:
                         if Backend.isVersionWithin(("2005", "2008")):
                             query = rootQuery.blind.query2 % (user, index, user)
                         else:
@@ -322,11 +342,6 @@ class Enumeration:
                     else:
                         query = rootQuery.blind.query % (user, index)
                     password = inject.getValue(query, inband=False, error=False)
-                    if Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                        getCurrentThreadData().disableStdOut = False
-                        password = "0x%s" % strToHex(password)
-                        infoMsg = "retrieved: %s" % password
-                        logger.info(infoMsg)
                     password = parsePasswordHash(password)
                     passwords.append(password)
 
