@@ -487,7 +487,7 @@
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>
         <current_db query="SELECT DB_NAME()"/>
-        <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0"/>
+        <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0" query2="EXISTS(SELECT * FROM master..syslogins, master..sysloginroles WHERE srid=0 and name='%s')"/>
         <users>
             <inband query="SELECT name FROM master..syslogins"/>
             <blind/>
