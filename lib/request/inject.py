@@ -386,7 +386,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
 
     return data
 
-def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=False, expectingNone=False):
+def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -394,7 +394,9 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     (if selected).
     """
 
-    getCurrentThreadData().disableStdOut = suppressOutput
+    if suppressOutput is not None:
+        pushValue(getCurrentThreadData().disableStdOut)
+        getCurrentThreadData().disableStdOut = suppressOutput
 
     try:
         if conf.direct:
@@ -471,7 +473,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             raise sqlmapNotVulnerableException, errMsg
 
     finally:
-        getCurrentThreadData().disableStdOut = False
+        if suppressOutput is not None:
+            getCurrentThreadData().disableStdOut = popValue()
 
     if value and expected == EXPECTED.BOOL:
         if isinstance(value, basestring):
