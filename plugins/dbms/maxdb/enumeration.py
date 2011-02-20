@@ -15,6 +15,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import PAYLOAD
+from lib.core.exception import sqlmapMissingMandatoryOptionException
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
@@ -36,6 +37,10 @@ class Enumeration(GenericEnumeration):
         return []
 
     def getColumns(self, onlyColNames=False):
+        if not conf.tbl:
+            errMsg = "missing table parameter"
+            raise sqlmapMissingMandatoryOptionException, errMsg
+
         if "." in conf.tbl:
             conf.db, conf.tbl = conf.tbl.split(".")
 

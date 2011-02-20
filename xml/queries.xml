@@ -446,7 +446,7 @@
         <delimiter query=","/>
         <substring query="SUBSTR((%s), %d, %d)"/>
         <users>
-            <inband query="SELECT username FROM domain.users ORDER BY 1"/>
+            <inband query="SELECT username FROM domain.users"/>
             <blind query="SELECT MIN(username) FROM domain.users WHERE username > '%s'" count="SELECT CHR(COUNT(*)) FROM domain.users"/>
         </users>
         <columns>
