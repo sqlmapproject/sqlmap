@@ -109,8 +109,7 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing %s" % DBMS.MAXDB
         logger.info(logMsg)
 
-        randInt = randomInt()
-        result = inject.checkBooleanExpression("%d=NOROUND(%d)" % (randInt, randInt))
+        result = inject.checkBooleanExpression("ALPHA(NULL) IS NULL")
 
         if result:
             logMsg = "confirming %s" % DBMS.MAXDB
