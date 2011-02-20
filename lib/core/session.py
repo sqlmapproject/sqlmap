@@ -48,11 +48,11 @@ def setInjection(inj):
 
     condition = ( not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
-                  ( not kb.resumedQueries[conf.url].has_key("Injection data")
+                  not kb.resumedQueries[conf.url].has_key("Injection data"))
                   or ( kb.resumedQueries[conf.url].has_key("Injection data")
-                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data,\
+                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(),\
                     inj.data.keys()) != inj.data.keys()
-                ) ) ) )
+                ) ) 
 
     if condition:
         dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
