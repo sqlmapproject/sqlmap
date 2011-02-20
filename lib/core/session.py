@@ -165,7 +165,8 @@ def resumeConfKb(expression, url, value):
            injection.parameter in conf.paramDict[injection.place]:
 
             if not conf.technique or intersect(conf.technique, injection.data):
-                kb.injections.append(injection)
+                if injection not in kb.injections:
+                    kb.injections.append(injection)
         else:
             warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
             warnMsg += "but you did not provided it this time"
