@@ -155,3 +155,50 @@ class Enumeration(GenericEnumeration):
                 break
 
         return kb.data.cachedDbs
+
+    def getPrivileges(self, *args):
+        warnMsg = "on Sybase it is not possible to fetch "
+        warnMsg += "database users privileges, sqlmap will check whether "
+        warnMsg += "or not the database users are database administrators"
+        logger.warn(warnMsg)
+
+        users = []
+        areAdmins = set()
+
+        if conf.user:
+            users = [ conf.user ]
+        elif not len(kb.data.cachedUsers):
+            users = self.getUsers()
+        else:
+            users = kb.data.cachedUsers
+
+        for user in users:
+            if user is None:
+                continue
+
+            isDba = self.isDba(user)
+
+            if isDba is True:
+                areAdmins.add(user)
+
+            kb.data.cachedUsersPrivileges[user] = None
+
+        return ( kb.data.cachedUsersPrivileges, areAdmins )
+
+    def searchDb(self):
+        warnMsg = "on Sybase searching of databases is not implemented"
+        logger.warn(warnMsg)
+
+        return []
+
+    def searchTable(self):
+        warnMsg = "on Sybase searching of tables is not implemented"
+        logger.warn(warnMsg)
+
+        return []
+
+    def searchColumn(self):
+        warnMsg = "on Sybase searching of columns is not implemented"
+        logger.warn(warnMsg)
+
+        return []

@@ -497,7 +497,10 @@
             <blind/>
         </passwords>
         <privileges/>
-        <roles/>
+        <roles>
+            <inband query="SELECT name, srid FROM master..syslogins, master..sysloginroles" condition="name"/>
+            <blind/>
+        </roles>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases"/>
             <blind/>
