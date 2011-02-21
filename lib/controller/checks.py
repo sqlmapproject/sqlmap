@@ -456,15 +456,15 @@ def checkSqlInjection(place, parameter, value):
             logger.warn(warnMsg)
 
             message = "How do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
-            test = readInput(message, default="S")
+            choice = readInput(message, default="S")
 
-            if not test or test[0] in ("s", "S"):
+            if not choice or choice[0] in ("s", "S"):
                 pass
-            elif test[0] in ("n", "N"):
+            elif choice[0] in ("n", "N"):
                 return None
-            elif test[0] in ("e", "E"):
+            elif choice[0] in ("e", "E"):
                 kb.endDetection = True
-            elif test[0] in ("q", "Q"):
+            elif choice[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
 
         finally:
