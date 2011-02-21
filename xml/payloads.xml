@@ -745,7 +745,25 @@ Formats:
             <dbms>Microsoft Access</dbms>
         </details>
     </test>
-    <!-- TODO: check against SAP MaxDB -->
+
+    <test>
+        <title>SAP MaxDB boolean-based blind - Parameter replace (original value)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(CASE WHEN [INFERENCE] THEN [ORIGVALUE] ELSE NULL END)</vector>
+        <request>
+            <payload>(CASE WHEN [RANDNUM]=[RANDNUM] THEN [ORIGVALUE] ELSE NULL END)</payload>
+        </request>
+        <response>
+            <comparison>(CASE WHEN [RANDNUM]=[RANDNUM1] THEN [ORIGVALUE] ELSE NULL END)</comparison>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
     <!-- End of boolean-based blind tests - Parameter replace -->
 
 
