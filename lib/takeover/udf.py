@@ -51,8 +51,8 @@ class UDF:
     def __checkExistUdf(self, udf):
         logger.info("checking if UDF '%s' already exist" % udf)
 
-        query  = agent.forgeCaseStatement(queries[Backend.getIdentifiedDbms()].check_udf.query % (udf, udf))
-        exists = inject.getValue(query, resumeValue=False, unpack=False, charsetType=2)
+        query = agent.forgeCaseStatement(queries[Backend.getIdentifiedDbms()].check_udf.query % (udf, udf))
+        exists = inject.getValue(query, resumeValue=False, charsetType=2)
 
         if exists == "1":
             return True

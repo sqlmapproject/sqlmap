@@ -95,7 +95,7 @@
         -->
         <timedelay query="SELECT PG_SLEEP(%d)" query2="SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1, 300000%d))" query3="CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep(%d)"/>
         <substring query="SUBSTR((%s)::text, %d, %d)"/>
-        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <inference query="ASCII(SUBSTR((%s)::text, %d, 1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER"/>

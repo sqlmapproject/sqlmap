@@ -328,7 +328,7 @@ class Agent:
         if not Backend.getDbms():
             return fields
 
-        if fields.startswith("(CASE"):
+        if fields.startswith("(CASE") or fields.startswith("SUBSTR"):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ",")
@@ -368,9 +368,12 @@ class Agent:
         fieldsSelectFrom = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
         fieldsExists = re.search("EXISTS(.*)", query, re.I)
         fieldsSelect = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
+        fieldsSubstr = re.search("\ASUBSTR", query, re.I)
         fieldsNoSelect = query
 
-        if fieldsExists:
+        if fieldsSubstr:
+            fieldsToCastStr = query
+        elif fieldsExists:
             fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsSelectTop:
             fieldsToCastStr = fieldsSelectTop.groups()[0]
@@ -386,7 +389,7 @@ class Agent:
             fieldsToCastStr = fieldsNoSelect
 
         # Function
-        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or fieldsSelectCase:
+        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or fieldsSelectCase or fieldsSubstr:
             fieldsToCastList = [fieldsToCastStr]
         else:
             fieldsToCastList = fieldsToCastStr.replace(", ", ",")

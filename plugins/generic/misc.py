@@ -74,7 +74,7 @@ class Miscellaneous:
         if conf.direct:
             query = "SELECT %s" % query
 
-        kb.bannerFp["dbmsVersion"] = inject.getValue(query, unpack=False)
+        kb.bannerFp["dbmsVersion"] = inject.getValue(query)
         kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
 
     def delRemoteFile(self, tempFile):
