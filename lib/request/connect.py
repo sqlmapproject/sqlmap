@@ -20,6 +20,7 @@ from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
+from lib.core.common import cpuThrottle
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
 from lib.core.common import unicodeToSafeHTMLValue
@@ -70,8 +71,7 @@ class Connect:
         if conf.delay is not None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
         elif conf.cpuThrottle:
-            delay = 0.00001 * (conf.cpuThrottle ** 2)
-            time.sleep(delay)
+            cpuThrottle(conf.cpuThrottle)
 
         threadData = getCurrentThreadData()
         threadData.lastRequestUID += 1

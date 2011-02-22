@@ -2379,3 +2379,10 @@ def intersect(valueA, valueB):
         retVal = [val for val in arrayizeValue(valueA) if val in arrayizeValue(valueB)]
 
     return retVal
+
+def cpuThrottle(value):
+    """
+    Does a CPU throttling for a lesser CPU consumption
+    """
+    delay = 0.00001 * (value ** 2)
+    time.sleep(delay)
