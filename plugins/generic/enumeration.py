@@ -1287,10 +1287,10 @@ class Enumeration:
 
         entriesCount = 0
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any([isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION), isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR), conf.direct]):
             entries = []
 
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and conf.groupConcat:
+            if all([Backend.getIdentifiedDbms() == DBMS.MYSQL, isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR), conf.groupConcat]):
                 randStr, randStr2 = randomStr(), randomStr()
                 filterFunction = "REPLACE(REPLACE(IFNULL(%s, ' '),'%s','%s'),'%s','%s')"\
                   % ('%s', CONCAT_VALUE_DELIMITER, randStr, CONCAT_ROW_DELIMITER, randStr2)
