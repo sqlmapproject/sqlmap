@@ -154,8 +154,6 @@ def decodePage(page, contentEncoding, contentType):
     return page
 
 def processResponse(page, responseHeaders):
-    page = getUnicode(page)
-
     parseResponse(page, responseHeaders)
 
     if conf.parseErrors:

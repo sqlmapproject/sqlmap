@@ -285,7 +285,7 @@ class Connect:
             if responseHeaders:
                 logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items()])
 
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
+            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page if isinstance(page, unicode) else getUnicode(page)))
 
             if conf.verbose <= 5:
                 responseMsg += getUnicode(logHeaders)
@@ -358,7 +358,7 @@ class Connect:
         responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
         if responseHeaders:
             logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items()])
-        logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
+        logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page if isinstance(page, unicode) else getUnicode(page)))
 
         if conf.verbose <= 5:
             responseMsg += getUnicode(logHeaders)
