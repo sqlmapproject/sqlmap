@@ -941,7 +941,6 @@ def __setHTTPExtraHeaders():
             if header and value:
                 conf.httpHeaders.append((header, value))
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
-        conf.httpHeaders.append(("Accept", "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5"))
         conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
         conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
 
