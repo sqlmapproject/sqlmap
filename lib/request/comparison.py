@@ -18,6 +18,7 @@ from lib.core.common import wasLastRequestHTTPError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import MIN_RATIO
@@ -59,6 +60,12 @@ def comparison(page, getRatioValue=False, pageLength=None):
             pageLength = len(page)
 
     if kb.nullConnection and pageLength:
+        if not seqMatcher.a:
+            errMsg = "problem occured while retrieving original page content "
+            errMsg += "which prevents sqlmap from continuation. please rerun, "
+            errMsg += "and if problem persists please turn off optimization switches"
+            raise sqlmapNoneDataException, errMsg
+
         ratio = 1. * pageLength / len(seqMatcher.a)
 
         if ratio > 1.:
