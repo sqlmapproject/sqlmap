@@ -1301,7 +1301,7 @@ class Enumeration:
                 if isinstance(value, basestring):
                     for line in value.split(CONCAT_ROW_DELIMITER):
                         row = line.split(CONCAT_VALUE_DELIMITER)
-                        row = filter(lambda x: x.replace(randStr, CONCAT_VALUE_DELIMITER).replace(randStr2, CONCAT_ROW_DELIMITER), row)
+                        row = map(lambda x: x.replace(randStr, CONCAT_VALUE_DELIMITER).replace(randStr2, CONCAT_ROW_DELIMITER), row)
                         entries.append(row)
 
             if Backend.getIdentifiedDbms() == DBMS.ORACLE:
