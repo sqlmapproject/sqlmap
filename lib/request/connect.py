@@ -40,6 +40,7 @@ from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
@@ -102,7 +103,7 @@ class Connect:
 
         try:
             if silent:
-                socket.setdefaulttimeout(3)
+                socket.setdefaulttimeout(HTTP_SILENT_TIMEOUT)
 
             if direct:
                 if "?" in url:

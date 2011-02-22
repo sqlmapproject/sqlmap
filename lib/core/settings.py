@@ -74,6 +74,9 @@ TIME_DELAY_CANDIDATES = 3
 # default time delay in seconds
 TIME_DEFAULT_DELAY = 5
 
+# HTTP timeout in silent mode
+HTTP_SILENT_TIMEOUT = 3
+
 # maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2
 
