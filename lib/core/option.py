@@ -1125,7 +1125,6 @@ def __cleanupOptions():
         conf.keepAlive = True
         conf.nullConnection = not conf.textOnly
         conf.threads = 4 if conf.threads < 4 else conf.threads
-        conf.groupConcat = True
 
     if conf.tor:
         conf.proxy = DEFAULT_TOR_PROXY
