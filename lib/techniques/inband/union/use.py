@@ -13,6 +13,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import filterStringValue
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
@@ -26,6 +27,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
+from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -52,6 +54,13 @@ def __oneShotUnionUse(expression, unpack=True):
     # Perform the request
     page, headers = Request.queryPage(payload, content=True, raise404=False)
     content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
+
+    reflective = filterStringValue(agent.removePayloadDelimiters(payload), r'[A-Za-z0-9]', r'[^\s]+')
+    filtered = re.sub(reflective, REFLECTED_VALUE_MARKER, content)
+    if filtered != content:
+        warnMsg = "reflective value found and filtered"
+        logger.warn(warnMsg)
+        content = filtered
 
     reqCount += 1
 

@@ -265,3 +265,6 @@ MYSQL_ERROR_CHUNK_LENGTH = 50
 
 # Do not unescape the injected statement if it contains any of the following SQL words
 EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", CHAR_INFERENCE_MARK)
+
+# Mark used for replacement of reflected values
+REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
