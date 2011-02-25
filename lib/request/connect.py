@@ -158,7 +158,8 @@ class Connect:
                     headers[key] = item
 
             for key, item in headers.items():
-                headers[key] = unicodeToSafeHTMLValue(item)
+                del headers[key]
+                headers[unicodeToSafeHTMLValue(key)] = unicodeToSafeHTMLValue(item)
 
             post = unicodeToSafeHTMLValue(post)
 
