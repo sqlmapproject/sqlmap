@@ -66,7 +66,12 @@ def urldecode(value):
     result = None
 
     if value:
-        result = urllib.unquote_plus(value)
+        try:
+            # for cases like T%C3%BCrk%C3%A7e
+            value = str(value)
+            result = utf8decode(urllib.unquote_plus(value))
+        except ValueError:
+            result = urllib.unquote_plus(value)
 
     return result
 
