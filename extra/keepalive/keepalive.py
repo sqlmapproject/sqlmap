@@ -325,18 +325,15 @@ class HTTPConnection(httplib.HTTPConnection):
         else:
             raise CannotSendHeader()
 
-        for header in self._headers:
-            self._headers[header] = unicodeToSafeHTMLValue(self._headers[header])
-
         for header in ['Host', 'Accept-Encoding']:
             if header in self._headers:
                 str = '%s: %s' % (header, self._headers[header])
-                self._output(str)
+                self._output(unicodeToSafeHTMLValue(str))
                 del self._headers[header]
 
         for header, value in self._headers.items():
             str = '%s: %s' % (header, value)
-            self._output(str)
+            self._output(unicodeToSafeHTMLValue(str))
 
         self._send_output()
 

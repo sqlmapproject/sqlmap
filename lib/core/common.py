@@ -2395,13 +2395,16 @@ def removeReflectiveValues(content, payload):
     (e.g. ?search=sql injection ---> ...value="sql%20injection")
     """
 
-    payload = payload.replace(PAYLOAD_DELIMITER, '')
+    retVal = content
 
-    regex = filterStringValue(payload, r'[A-Za-z0-9]', r'[^\s]+')
-    retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content)
+    if all([content, payload]):
+        payload = payload.replace(PAYLOAD_DELIMITER, '')
 
-    if retVal != content:
-        warnMsg = "reflective value found and filtered out"
-        logger.warn(warnMsg)
+        regex = filterStringValue(payload, r'[A-Za-z0-9]', r'[^\s]+')
+        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content)
+
+        if retVal != content:
+            debugMsg = "reflective value found and filtered out"
+            logger.debug(debugMsg)
 
     return retVal
