@@ -81,6 +81,8 @@ from lib.core.settings import DUMP_TAB_MARKER
 from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
@@ -2386,3 +2388,20 @@ def cpuThrottle(value):
     """
     delay = 0.00001 * (value ** 2)
     time.sleep(delay)
+
+def removeReflectiveValues(content, payload):
+    """
+    Neutralizes (static/marked) reflective values in a given content based on a payload
+    (e.g. ?search=sql injection ---> ...value="sql%20injection")
+    """
+
+    payload = payload.replace(PAYLOAD_DELIMITER, '')
+
+    regex = filterStringValue(payload, r'[A-Za-z0-9]', r'[^\s]+')
+    retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content)
+
+    if retVal != content:
+        warnMsg = "reflective value found and filtered out"
+        logger.warn(warnMsg)
+
+    return retVal

@@ -19,6 +19,7 @@ from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
+from lib.core.common import removeReflectiveValues
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -27,7 +28,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
-from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -55,12 +55,8 @@ def __oneShotUnionUse(expression, unpack=True):
     page, headers = Request.queryPage(payload, content=True, raise404=False)
     content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
-    reflective = filterStringValue(agent.removePayloadDelimiters(payload), r'[A-Za-z0-9]', r'[^\s]+')
-    filtered = re.sub(reflective, REFLECTED_VALUE_MARKER, content)
-    if filtered != content:
-        warnMsg = "reflective value found and filtered"
-        logger.warn(warnMsg)
-        content = filtered
+    # Remove possible reflective values from content (especially headers part)
+    content = removeReflectiveValues(content, payload)
 
     reqCount += 1
 
@@ -168,6 +164,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                     stopLimit = limitRegExp.group(int(limitGroupStop))
                     limitCond = int(stopLimit) > 1
+
                 elif topLimit:
                     startLimit = 0
                     stopLimit = int(topLimit.group(1))
@@ -225,6 +222,7 @@ def unionUse(expression, unpack=True, dump=False):
                 logger.warn(warnMsg)
 
                 stopLimit = 1
+
             elif isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
                     stopLimit = min(int(count), int(stopLimit))
@@ -234,6 +232,7 @@ def unionUse(expression, unpack=True, dump=False):
                     infoMsg = "the SQL query used returns "
                     infoMsg += "%d entries" % stopLimit
                     logger.info(infoMsg)
+
             try:
                 for num in xrange(startLimit, stopLimit):
                     if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):

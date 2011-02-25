@@ -23,6 +23,7 @@ from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomStr
+from lib.core.common import removeReflectiveValues
 from lib.core.common import stdev
 from lib.core.data import conf
 from lib.core.data import kb
@@ -121,6 +122,9 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         # Perform the request
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
         content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
+
+        # Remove possible reflective values from content (especially headers part)
+        content = removeReflectiveValues(content, payload)
 
         if content and phrase in content:
             validPayload = payload

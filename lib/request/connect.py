@@ -28,6 +28,7 @@ from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
+from lib.core.common import removeReflectiveValues
 from lib.core.common import stdev
 from lib.core.common import wasLastRequestDelayed
 from lib.core.convert import urlencode
@@ -487,7 +488,10 @@ class Connect:
 
         if content or response:
             return page, headers
-        elif getRatioValue:
+
+        page = removeReflectiveValues(page, value)
+
+        if getRatioValue:
             return comparison(page, getRatioValue=False, pageLength=pageLength), comparison(page, getRatioValue=True, pageLength=pageLength)
         elif pageLength or page:
             return comparison(page, getRatioValue, pageLength)
