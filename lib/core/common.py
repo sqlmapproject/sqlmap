@@ -2401,7 +2401,11 @@ def removeReflectiveValues(content, payload):
         payload = payload.replace(PAYLOAD_DELIMITER, '')
 
         regex = filterStringValue(payload, r'[A-Za-z0-9]', r'[^\s]+')
-        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content)
+
+        while r'[^\s]+[^\s]+' in regex:
+            regex = regex.replace(r'[^\s]+[^\s]+', r'[^\s]+')
+
+        retVal = re.compile(regex).sub(REFLECTED_VALUE_MARKER, content)
 
         if retVal != content:
             debugMsg = "reflective value found and filtered out"
