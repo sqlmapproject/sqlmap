@@ -145,9 +145,9 @@ optDict = {
                              },
 
             "General":       {
-                               "xmlFile":           "string",
-                               "sessionFile":       "string",
+                               #"xmlFile":           "string",
                                "trafficFile":       "string",
+                               "sessionFile":       "string",
                                "flushSession":      "boolean",
                                "forms":             "boolean",
                                "eta":               "boolean",

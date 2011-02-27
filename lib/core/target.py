@@ -238,7 +238,7 @@ def __createDumpDir():
         os.makedirs(conf.dumpPath, 0755)
 
 def __configureDumper():
-    if conf.xmlFile:
+    if hasattr(conf, 'xmlFile') and conf.xmlFile:
         conf.dumper = xmldumper
     else:
         conf.dumper = dumper
