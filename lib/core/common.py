@@ -2406,7 +2406,7 @@ def removeReflectiveValues(content, payload):
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content)
+        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
 
         if retVal != content:
             debugMsg = "reflective value found and filtered out"
