@@ -45,7 +45,7 @@ from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
-def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None):
+def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
     Bisection algorithm that can be used to perform blind SQL injection
     on an affected host
@@ -62,7 +62,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     if "LENGTH(" in expression or "LEN(" in expression:
         firstChar = 0
-    elif conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit() ) ):
+    elif dump and conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit() ) ):
         firstChar = int(conf.firstChar) - 1
     elif firstChar is None:
         firstChar = 0
@@ -71,7 +71,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     if "LENGTH(" in expression or "LEN(" in expression:
         lastChar = 0
-    elif conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit() ) ):
+    elif dump and conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit() ) ):
         lastChar = int(conf.lastChar)
     elif lastChar in ( None, "0" ):
         lastChar = 0

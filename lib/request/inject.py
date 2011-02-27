@@ -49,7 +49,7 @@ from lib.techniques.error.use import errorUse
 from lib.utils.resume import queryOutputLength
 from lib.utils.resume import resume
 
-def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None):
+def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None, dump=False):
     start = time.time()
 
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
@@ -61,14 +61,14 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression))
 
-    count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar)
+    count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)
 
     debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
     logger.debug(debugMsg)
 
     return value
 
-def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None, resumeValue=True, charsetType=None, firstChar=None, lastChar=None):
+def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
     outputs = []
     origExpr = None
 
@@ -96,7 +96,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
                 warnMsg += "sqlmap is going to retrieve the value again"
                 logger.warn(warnMsg)
 
-            output = __goInference(payload, expressionReplaced, charsetType, firstChar, lastChar)
+            output = __goInference(payload, expressionReplaced, charsetType, firstChar, lastChar, dump)
 
         if isinstance(num, int):
             expression = origExpr
@@ -105,7 +105,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
 
     return outputs
 
-def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None, firstChar=None, lastChar=None):
+def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, resumeValue=True, unpack=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
     Retrieve the output of a SQL query characted by character taking
     advantage of an blind SQL injection vulnerability on the affected
@@ -134,7 +134,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         return output
 
     if not unpack:
-        return __goInference(payload, expression, charsetType, firstChar, lastChar)
+        return __goInference(payload, expression, charsetType, firstChar, lastChar, dump)
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
@@ -301,7 +301,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                 try:
                     for num in xrange(startLimit, stopLimit):
-                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
+                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
                         outputs.append(output)
 
                 except KeyboardInterrupt:
@@ -314,7 +314,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     elif Backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
         expression += FROM_TABLE[Backend.getIdentifiedDbms()]
 
-    outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar)
+    outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
     returnValue = ", ".join([output for output in outputs])
 
     return returnValue
@@ -449,7 +449,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(booleanExpression, resumeValue)
                 else:
-                    value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                    value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar, dump)
 
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
@@ -463,7 +463,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(booleanExpression, resumeValue)
                 else:
-                    value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar)
+                    value = __goInferenceProxy(query, fromUser, expected, batch, resumeValue, unpack, charsetType, firstChar, lastChar, dump)
 
             if value and isinstance(value, basestring):
                 value = value.strip()

@@ -1427,7 +1427,7 @@ class Enumeration:
                             elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
                                 query = rootQuery.blind.query % (index, column, conf.tbl)
 
-                            value = inject.getValue(query, inband=False, error=False)
+                            value = inject.getValue(query, inband=False, error=False, dump=True)
 
                             lengths[column] = max(lengths[column], len(value) if value else 0)
                             entries[column].append(value)
