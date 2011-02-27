@@ -82,6 +82,7 @@ from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.settings import REFLECTED_NON_ALPHA_NUM_REGEX
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_STDEV_COEFF
@@ -2400,12 +2401,12 @@ def removeReflectiveValues(content, payload):
     if all([content, payload]):
         payload = payload.replace(PAYLOAD_DELIMITER, '')
 
-        regex = filterStringValue(payload, r'[A-Za-z0-9]', r'[^\s]+')
+        regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        while r'[^\s]+[^\s]+' in regex:
-            regex = regex.replace(r'[^\s]+[^\s]+', r'[^\s]+')
+        while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
+            regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        retVal = re.compile(regex).sub(REFLECTED_VALUE_MARKER, content)
+        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content)
 
         if retVal != content:
             debugMsg = "reflective value found and filtered out"

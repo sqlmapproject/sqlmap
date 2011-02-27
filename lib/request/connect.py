@@ -490,7 +490,7 @@ class Connect:
         if content or response:
             return page, headers
 
-        page = removeReflectiveValues(page, value)
+        page = removeReflectiveValues(page, payload)
 
         if getRatioValue:
             return comparison(page, getRatioValue=False, pageLength=pageLength), comparison(page, getRatioValue=True, pageLength=pageLength)
