@@ -1,37 +1,47 @@
 sqlmap (0.9-1) stable; urgency=low
 
+  * Rewritten SQL injection detection engine (Bernardo and Miroslav).
   * Support to directly connect to the database without passing via a
     SQL injection, -d switch (Bernardo and Miroslav).
+  * Added full support for both time-based blind SQL injection and
+    error-based SQL injection techniques (Bernardo and Miroslav).
   * Implemented support for SQLite 2 and 3 (Bernardo and Miroslav).
-  * Initial support for Firebird, Sybase and SAP MaxDB (Miroslav).
+  * Implemented support for Firebird (Bernardo and Miroslav).
+  * Implemented support for Microsoft Access, Sybase and SAP MaxDB
+    (Miroslav).
   * Extended old '--dump -C' functionality to be able to search for
     specific database(s), table(s) and column(s), --search switch
     (Bernardo).
   * Added support to tamper injection data with --tamper switch (Bernardo
     and Miroslav).
+  * Added automatic recognition of password hashes format and support to
+    crack them with a dictionary-based attack (Miroslav).
   * Added support to enumerate roles on Oracle, --roles switch (Bernardo).
   * Added support for SOAP based web services requests (Bernardo).
   * Added support to fetch unicode data (Bernardo and Miroslav).
   * Added support to use persistent HTTP(s) connection for speed
     improvement, --keep-alive switch (Miroslav).
-  * Implemented HTTP proxy authentication support, --proxy-cred switch
+  * Support to test and inject against HTTP Referer header (Miroslav).
+  * Implemented HTTP(s) proxy authentication support, --proxy-cred switch
     (Miroslav).
   * Implemented feature to speedup the enumeration of table names
     (Miroslav).
-  * Support for customizable HTTP redirections (Bernardo).
+  * Support for customizable HTTP(s) redirections (Bernardo).
   * Support to replicate the back-end DBMS tables structure and entries
     in a local SQLite 3 database, --replicate switch (Miroslav).
   * Support to parse and test forms on target url, --forms switch
-    (Miroslav).
-  * Added switches to brute-force table names with a dictionary attack,
-    --common-exists and --exists. Useful for instance when system table
-    'information_schema' is not available on MySQL (Miroslav).
+    (Bernardo and Miroslav).
+  * Added switches to brute-force tables names and columns names with a
+    dictionary attack, --common-tables and --common-columns. Useful for
+    instance when system table 'information_schema' is not available on
+    MySQL (Miroslav).
   * Basic support for REST-style URL parameters by using the asterisk (*)
     to mark where to test for and exploit SQL injection (Miroslav).
   * Added safe URL feature, --safe-url and --safe-freq (Miroslav).
-  * Added --text-only switch to strip from the HTTP body the HTML/JS code
-    and compare pages based only on their textual content (Miroslav).
-  * Several bugs fixed (Bernardo and Miroslav).
+  * Added --text-only switch to strip from the HTTP response body the
+    HTML/JS code and compare pages based only on their textual content
+    (Miroslav).
+  * Over 100 bugs fixed (Bernardo and Miroslav).
   * Major code refactoring (Bernardo and Miroslav).
   * User's manual updated (Bernardo).
 
