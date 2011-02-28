@@ -359,8 +359,9 @@ list of specific parameter(s) to test.
 </LI>
 <LI>Option to specify the <B>maximum number of concurrent HTTP(S)
 requests (multi-threading)</B> to speed up the blind SQL injection
-techniques. It is also possible to specify the number of seconds to
-hold between each HTTP(S) request.
+techniques. Vice versa, it is also possible to specify the number of
+seconds to hold between each HTTP(S) request. Others optimization switches
+to speed up the exploitation are implemented as well.
 </LI>
 <LI><B>HTTP <CODE>Cookie</CODE> header</B> string support, useful when the
 web application requires authentication based upon cookies and you have
@@ -1051,21 +1052,28 @@ Options:
 
 <P>This switch can be used to set the verbosity level of output messages.
 There exist <B>seven</B> levels of verbosity.
-The default level is <B>1</B> in which information, warning, error and critical messages and Python tracebacks (if any occur) will be displayed.</P>
+The default level is <B>1</B> in which information, warning, error and
+critical messages and Python tracebacks (if any occur) will be displayed.</P>
 <P>
 <UL>
-<LI><CODE>0</CODE>: Show only Python tracebacks, error and critical messages.</LI>
-<LI><CODE>1</CODE>: Show also information and warning messages.</LI>
-<LI><CODE>2</CODE>: Show also debug messages.</LI>
-<LI><CODE>3</CODE>: Show also payloads injected.</LI>
-<LI><CODE>4</CODE>: Show also HTTP requests.</LI>
-<LI><CODE>5</CODE>: Show also HTTP responses' headers.</LI>
-<LI><CODE>6</CODE>: Show also HTTP responses' page content.</LI>
+<LI><B>0</B>: Show only Python tracebacks, error and critical messages.</LI>
+<LI><B>1</B>: Show also information and warning messages.</LI>
+<LI><B>2</B>: Show also debug messages.</LI>
+<LI><B>3</B>: Show also payloads injected.</LI>
+<LI><B>4</B>: Show also HTTP requests.</LI>
+<LI><B>5</B>: Show also HTTP responses' headers.</LI>
+<LI><B>6</B>: Show also HTTP responses' page content.</LI>
 </UL>
 </P>
 
-<P>A reasonable level of verbosity to further understand what sqlmap does under the hood is level <B>2</B>, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level <B>3</B> is your best choice.
-In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level <B>4</B> or above. This level is recommended to be used when you feed the developers with a bug report too.</P>
+<P>A reasonable level of verbosity to further understand what sqlmap does
+under the hood is level <B>2</B>, primarily for the detection phase and
+the take-over functionalities. Whereas if you want to see the SQL payloads
+the tools sends, level <B>3</B> is your best choice.
+In order to further debug potential bugs or unexpected behaviours, we
+recommend you to set the verbosity to level <B>4</B> or above. This
+level is recommended to be used when you feed the developers with a bug
+report too.</P>
 
 
 <H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Target</A>
@@ -1078,7 +1086,7 @@ In order to further debug potential bugs or unexpected behaviours, we recommend 
 <P>Switch: <CODE>-u</CODE> or <CODE>-</CODE><CODE>-url</CODE></P>
 
 <P>Run sqlmap against a single target URL. This switch requires an argument
-which is the target URL in the form <CODE>http(s)://targeturl/[...]</CODE>.</P>
+which is the target URL in the form <CODE>http(s)://targeturl[:port]/[...]</CODE>.</P>
 
 <H3>Parse targets from Burp or WebScarab proxy logs</H3>
 
@@ -1441,7 +1449,7 @@ it.</P>
 
 <P>Switch: <CODE>-o</CODE></P>
 
-<P>This switch is an alias that implicitly sets the following:</P>
+<P>This switch is an alias that implicitly sets the following switches:</P>
 <P>
 <UL>
 <LI><CODE>-</CODE><CODE>-keep-alive</CODE></LI>
@@ -1451,7 +1459,7 @@ it.</P>
 </UL>
 </P>
 
-<P>Read below for details about every single switch.</P>
+<P>Read below for details about each switch.</P>
 
 
 <H3>Output prediction</H3>
@@ -2654,12 +2662,15 @@ counts the number of retrieved output characters.</P>
 version directly from the subversion repository. You obviously need
 Internet access.</P>
 
-<P>If, for any reason, this operation fails, try with a manual <CODE>svn
-update</CODE> from your sqlmap working copy. It will perform the exact same
-operation of switch <CODE>-</CODE><CODE>-update</CODE>.
+<P>If, for any reason, this operation fails, run <CODE>svn update</CODE> from
+your sqlmap working copy. It will perform the exact same operation of
+switch <CODE>-</CODE><CODE>-update</CODE>.
 If you are running sqlmap on Windows, you can use the TartoiseSVN client
-by right-clicking in Windows Explorer into your local sqlmap working copy
-and <CODE>Update</CODE>.</P>
+by right-clicking in Windows Explorer into your sqlmap working copy and
+clicking on <CODE>Update</CODE>.</P>
+
+<P>This is strongly recommended <B>before</B> reporting any bug to the
+<A HREF="http://sqlmap.sourceforge.net/#ml">mailing lists</A>.</P>
 
 
 <H3>Save options in a configuration INI file</H3>

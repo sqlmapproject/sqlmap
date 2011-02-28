@@ -21,6 +21,8 @@ sqlmap (0.9-1) stable; urgency=low
   * Added support to fetch unicode data (Bernardo and Miroslav).
   * Added support to use persistent HTTP(s) connection for speed
     improvement, --keep-alive switch (Miroslav).
+  * Implemented several optimization switches to speed up the exploitation
+    of SQL injections (Bernardo and Miroslav).
   * Support to test and inject against HTTP Referer header (Miroslav).
   * Implemented HTTP(s) proxy authentication support, --proxy-cred switch
     (Miroslav).

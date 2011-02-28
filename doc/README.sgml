@@ -287,8 +287,9 @@ list of specific parameter(s) to test.
 
 <item>Option to specify the <bf>maximum number of concurrent HTTP(S)
 requests (multi-threading)</bf> to speed up the blind SQL injection
-techniques. It is also possible to specify the number of seconds to
-hold between each HTTP(S) request.
+techniques. Vice versa, it is also possible to specify the number of
+seconds to hold between each HTTP(S) request. Others optimization switches
+to speed up the exploitation are implemented too.
 
 <item><bf>HTTP <tt>Cookie</tt> header</bf> string support, useful when the
 web application requires authentication based upon cookies and you have
@@ -964,21 +965,28 @@ Switch: <tt>-v</tt>
 <p>
 This switch can be used to set the verbosity level of output messages.
 There exist <bf>seven</bf> levels of verbosity.
-The default level is <bf>1</bf> in which information, warning, error and critical messages and Python tracebacks (if any occur) will be displayed.
+The default level is <bf>1</bf> in which information, warning, error and
+critical messages and Python tracebacks (if any occur) will be displayed.
 
 <itemize>
-<item><tt>0</tt>: Show only Python tracebacks, error and critical messages.
-<item><tt>1</tt>: Show also information and warning messages.
-<item><tt>2</tt>: Show also debug messages.
-<item><tt>3</tt>: Show also payloads injected.
-<item><tt>4</tt>: Show also HTTP requests.
-<item><tt>5</tt>: Show also HTTP responses' headers.
-<item><tt>6</tt>: Show also HTTP responses' page content.
+<item><bf>0</bf>: Show only Python tracebacks, error and critical messages.
+<item><bf>1</bf>: Show also information and warning messages.
+<item><bf>2</bf>: Show also debug messages.
+<item><bf>3</bf>: Show also payloads injected.
+<item><bf>4</bf>: Show also HTTP requests.
+<item><bf>5</bf>: Show also HTTP responses' headers.
+<item><bf>6</bf>: Show also HTTP responses' page content.
 </itemize>
 
 <p>
-A reasonable level of verbosity to further understand what sqlmap does under the hood is level <bf>2</bf>, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level <bf>3</bf> is your best choice.
-In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level <bf>4</bf> or above. This level is recommended to be used when you feed the developers with a bug report too.
+A reasonable level of verbosity to further understand what sqlmap does
+under the hood is level <bf>2</bf>, primarily for the detection phase and
+the take-over functionalities. Whereas if you want to see the SQL payloads
+the tools sends, level <bf>3</bf> is your best choice.
+In order to further debug potential bugs or unexpected behaviours, we
+recommend you to set the verbosity to level <bf>4</bf> or above. This
+level is recommended to be used when you feed the developers with a bug
+report too.
 
 
 <sect1>Target
@@ -993,7 +1001,7 @@ Switch: <tt>-u</tt> or <tt>-</tt><tt>-url</tt>
 
 <p>
 Run sqlmap against a single target URL. This switch requires an argument
-which is the target URL in the form <tt>http(s)://targeturl/[...]</tt>.
+which is the target URL in the form <tt>http(s)://targeturl[:port]/[...]</tt>.
 
 <sect2>Parse targets from Burp or WebScarab proxy logs
 
@@ -1395,7 +1403,7 @@ These switches can be used to optimize the performance of sqlmap.
 Switch: <tt>-o</tt>
 
 <p>
-This switch is an alias that implicitly sets the following:
+This switch is an alias that implicitly sets the following switches:
 
 <itemize>
 <item><tt>-</tt><tt>-keep-alive</tt>
@@ -1405,7 +1413,7 @@ This switch is an alias that implicitly sets the following:
 </itemize>
 
 <p>
-Read below for details about every single switch.
+Read below for details about each switch.
 
 
 <sect2>Output prediction
@@ -2742,12 +2750,16 @@ version directly from the subversion repository. You obviously need
 Internet access.
 
 <p>
-If, for any reason, this operation fails, try with a manual <tt>svn
-update</tt> from your sqlmap working copy. It will perform the exact same
-operation of switch <tt>-</tt><tt>-update</tt>.
+If, for any reason, this operation fails, run <tt>svn update</tt> from
+your sqlmap working copy. It will perform the exact same operation of
+switch <tt>-</tt><tt>-update</tt>.
 If you are running sqlmap on Windows, you can use the TartoiseSVN client
-by right-clicking in Windows Explorer into your local sqlmap working copy
-and <tt>Update</tt>.
+by right-clicking in Windows Explorer into your sqlmap working copy and
+clicking on <tt>Update</tt>.
+
+<p>
+This is strongly recommended <bf>before</bf> reporting any bug to the
+<htmlurl name="mailing lists" url="http://sqlmap.sourceforge.net/#ml">.
 
 
 <sect2>Save options in a configuration INI file
