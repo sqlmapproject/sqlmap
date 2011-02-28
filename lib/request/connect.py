@@ -78,7 +78,10 @@ class Connect:
         threadData = getCurrentThreadData()
         threadData.lastRequestUID += 1
 
-        url             = kwargs.get('url',           conf.url)
+        # dirty hack because urllib2 just skips the other part of provided url
+        # splitted with space char while urlencoding it in the later phase
+        url             = kwargs.get('url',           conf.url).replace(" ", "%20")
+
         get             = kwargs.get('get',           None)
         post            = kwargs.get('post',          None)
         method          = kwargs.get('method',        None)
