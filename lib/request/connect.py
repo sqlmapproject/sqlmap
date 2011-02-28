@@ -78,7 +78,7 @@ class Connect:
         threadData = getCurrentThreadData()
         threadData.lastRequestUID += 1
 
-        url             = kwargs.get('url',           conf.url).replace(" ", "%20")
+        url             = kwargs.get('url',           conf.url)
         get             = kwargs.get('get',           None)
         post            = kwargs.get('post',          None)
         method          = kwargs.get('method',        None)
