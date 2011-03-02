@@ -243,7 +243,7 @@ DEFAULT_TOR_PROXY = "http://127.0.0.1:8118"
 URI_INJECTABLE_REGEX = r".*/([^\.*?]+)\Z"
 
 # Regex used for masking sensitive data
-SENSITIVE_DATA_REGEX = "\s(?P<result>[^\s]*%s[^\s]*)\s"
+SENSITIVE_DATA_REGEX = "(\s|=)(?P<result>[^\s=]*%s[^\s]*)\s"
 
 # Maximum number of threads (avoiding connection issues and/or DoS)
 MAX_NUMBER_OF_THREADS = 10
