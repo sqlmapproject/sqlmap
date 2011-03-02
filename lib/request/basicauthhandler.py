@@ -29,5 +29,12 @@ class SmartHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
         if hash(req) not in self.retried_req:
             self.retried_req.add(hash(req))
             self.retried = 0
+        else:
+            if self.retried > 5:
+                raise urllib2.HTTPError(req.get_full_url(), 401, "basic auth failed",
+                                headers, None)
+            else:
+                self.retried += 1
+
         return urllib2.HTTPBasicAuthHandler.http_error_auth_reqed(
                         self, auth_header, host, req, headers)
