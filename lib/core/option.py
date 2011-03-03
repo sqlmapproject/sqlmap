@@ -30,6 +30,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
+from lib.core.common import getUnicode
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import openFile
@@ -43,6 +44,7 @@ from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
 from lib.core.common import UnicodeRawConfigParser
+from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -444,10 +446,9 @@ def __findPageForms():
     if forms:
         for form in forms:
             request = form.click()
-            url = request.get_full_url()
+            url = urldecode(request.get_full_url())
             method = request.get_method()
-            data = request.get_data() if request.has_data() else None
-
+            data = urldecode(getUnicode(request.get_data(), kb.pageEncoding)) if request.has_data() else None
             target = (url, method, data, conf.cookie)
             kb.targetUrls.add(target)
             kb.formNames.append(target)
