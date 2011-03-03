@@ -19,6 +19,7 @@ import struct
 import urllib
 
 from lib.core.data import conf
+from lib.core.settings import UNICODE_ENCODING
 
 def base64decode(value):
     return value.decode("base64")
@@ -62,16 +63,20 @@ def sha1hash(value):
     else:
         return sha.new(value).hexdigest()
 
-def urldecode(value):
+def urldecode(value, encoding=None):
     result = None
 
     if value:
         try:
             # for cases like T%C3%BCrk%C3%A7e
             value = str(value)
-            result = utf8decode(urllib.unquote_plus(value))
         except ValueError:
+            pass
+        finally:
             result = urllib.unquote_plus(value)
+
+    if isinstance(result, str):
+        result = unicode(result, encoding or UNICODE_ENCODING, errors="replace")
 
     return result
 

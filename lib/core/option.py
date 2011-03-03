@@ -446,9 +446,9 @@ def __findPageForms():
     if forms:
         for form in forms:
             request = form.click()
-            url = urldecode(request.get_full_url())
+            url = urldecode(request.get_full_url(), kb.pageEncoding)
             method = request.get_method()
-            data = urldecode(getUnicode(request.get_data(), kb.pageEncoding)) if request.has_data() else None
+            data = urldecode(request.get_data(), kb.pageEncoding) if request.has_data() else None
             target = (url, method, data, conf.cookie)
             kb.targetUrls.add(target)
             kb.formNames.append(target)

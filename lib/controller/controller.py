@@ -27,6 +27,8 @@ from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
 from lib.core.common import showHttpErrorCodes
+from lib.core.convert import urlencode
+from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -205,7 +207,7 @@ def start():
                     message += "\nCookie: %s" % conf.cookie
 
                 if conf.data:
-                    message += "\nPOST data: %s" % repr(conf.data) if conf.data else ""
+                    message += "\nPOST data: %s" % urlencode(conf.data) if conf.data else ""
 
                 if conf.forms:
                     if conf.method == HTTPMETHOD.GET and targetUrl.find("?") == -1:
@@ -216,8 +218,8 @@ def start():
 
                     if not test or test[0] in ("y", "Y"):
                         if conf.method == HTTPMETHOD.POST:
-                            message = "Edit POST data [default: %s]: " % (conf.data if conf.data else "")
-                            conf.data = readInput(message, default=conf.data)
+                            message = "Edit POST data [default: %s]%s: " % (urlencode(conf.data) if conf.data else "", " (Warning: blank fields detected)" if conf.data and '=&' in conf.data else "")
+                            conf.data = urldecode(readInput(message, default=conf.data))
 
                         elif conf.method == HTTPMETHOD.GET:
                             if conf.url.find("?") > -1:
