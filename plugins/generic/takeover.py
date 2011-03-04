@@ -235,8 +235,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     self.uploadIcmpshSlave(web=web)
                     self.icmpPwn()
         else:
-            errMsg  = "unable to prompt for an out-of-band session via "
-            errMsg += "the back-end DBMS"
+            errMsg = "unable to prompt for an out-of-band session because "
+            errMsg += "stacked queries SQL injection is not supported"
             raise sqlmapNotVulnerableException(errMsg)
 
         if tunnel == 1:
