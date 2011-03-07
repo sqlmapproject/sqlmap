@@ -33,6 +33,25 @@ def getRevisionNumber():
             if revision:
                 retVal = revision.group(1)
 
+    if not retVal:
+        # Reference: http://stackoverflow.com/questions/242295/how-does-one-add-a-svn-repository-build-number-to-python-code
+        entriesPath = '%s/.svn/entries' % curDir
+
+        if os.path.exists(entriesPath):
+            entries = open(entriesPath, 'r').read()
+            # Versions >= 7 of the entries file are flat text.  The first line is
+            # the version number. The next set of digits after 'dir' is the revision.
+            if re.match('(\d+)', entries):
+                match = re.search('\d+\s+dir\s+(\d+)', entries)
+                if match:
+                    retVal = match.groups()[0]
+            # Older XML versions of the file specify revision as an attribute of
+            # the first entries node.
+            else:
+                from xml.dom import minidom
+                dom = minidom.parse(entriesPath)
+                retVal = dom.getElementsByTagName('entry')[0].getAttribute('revision')
+
     if retVal:
         try:
             retVal = int(retVal)
