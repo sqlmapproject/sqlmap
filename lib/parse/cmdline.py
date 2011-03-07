@@ -202,12 +202,12 @@ def cmdLineParser():
 
         detection.add_option("--text-only", dest="textOnly",
                              action="store_true", default=False,
-                             help="Compare pages based only on their textual content")
+                             help="Compare pages based only on the textual content")
 
         # Techniques options
-        techniques = OptionGroup(parser, "Techniques", "These options can "
-                                 "be used to tweak how specific SQL injection "
-                                 "techniques are tested.")
+        techniques = OptionGroup(parser, "Techniques", "These options can be used"
+                                 "to tweak testing of specific SQL injection "
+                                 "techniques.")
 
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int", default=TIME_DEFAULT_DELAY,
@@ -218,7 +218,7 @@ def cmdLineParser():
                               help="Range of columns to test for UNION query SQL injection")
 
         techniques.add_option("--union-char", dest="uChar",
-                              help="Character to use to bruteforce number of columns")
+                              help="Character to use for bruteforcing number of columns")
 
         # Fingerprint options
         fingerprint = OptionGroup(parser, "Fingerprint")
@@ -473,7 +473,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--check-payload", dest="checkPayload",
                                   action="store_true", default=False,
-                                  help="IDS detection testing of injection payload")
+                                  help="IDS detection testing of injection payloads")
 
         miscellaneous.add_option("--cleanup", dest="cleanup",
                                   action="store_true", default=False,
