@@ -17,6 +17,9 @@ Otavio Augusto <otavioarj@gmail.com>
 Simon Baker <simonb@sec-1.com>
     for reporting some bugs
 
+Emiliano Bazaes <emiliano@7espejos.com>
+    for reporting a minor bug
+
 Daniele Bellucci <daniele.bellucci@gmail.com>
     for starting sqlmap project and developing it between July and August
     2006
@@ -431,6 +434,9 @@ abc abc <biedimc@gmx.net>
 
 Brandon E. <brandonpoc@gmail.com>
     for reporting a bug
+
+black zero <timeisflowing@gmail.com>
+    for reporting a minor bug
 
 buawig <buawig@gmail.com>
     for reporting a major bug
