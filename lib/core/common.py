@@ -2195,6 +2195,17 @@ def arrayizeValue(value):
 
     return value
 
+def unArrayizeValue(value):
+    """
+    Makes a value out of iterable if it is a list, tuple or set
+    itself
+    """
+
+    if isinstance(value, (list, tuple, set)):
+        value = value[0] if len(value) > 0 else None
+
+    return value
+
 def getSortedInjectionTests():
     """
     Returns prioritized test list by eventually detected DBMS from error

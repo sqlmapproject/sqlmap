@@ -30,6 +30,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import strToHex
+from lib.core.common import unArrayizeValue
 from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -90,7 +91,7 @@ class Enumeration:
             logger.info(infoMsg)
 
             query = queries[Backend.getIdentifiedDbms()].banner.query
-            kb.data.banner = inject.getValue(query)
+            kb.data.banner = unArrayizeValue(inject.getValue(query))
             bannerParser(kb.data.banner)
 
             if conf.os and conf.os == "windows":
@@ -114,7 +115,7 @@ class Enumeration:
         query = queries[Backend.getIdentifiedDbms()].current_user.query
 
         if not kb.data.currentUser:
-            kb.data.currentUser = inject.getValue(query)
+            kb.data.currentUser = unArrayizeValue(inject.getValue(query))
 
         return kb.data.currentUser
 
@@ -125,7 +126,7 @@ class Enumeration:
         query = queries[Backend.getIdentifiedDbms()].current_db.query
 
         if not kb.data.currentDb:
-            kb.data.currentDb = inject.getValue(query)
+            kb.data.currentDb = unArrayizeValue(inject.getValue(query))
 
         return kb.data.currentDb
 
@@ -145,7 +146,7 @@ class Enumeration:
         isDba = inject.getValue(query, charsetType=1)
 
         if user is None:
-            kb.data.isDba = isDba
+            kb.data.isDba = unArrayizeValue(isDba)
 
         return isDba == "1"
 
