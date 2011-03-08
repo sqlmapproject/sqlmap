@@ -69,7 +69,7 @@ class Takeover(GenericTakeover):
             ret = inpRet["return"]
 
             # Reference: http://www.postgresql.org/docs/8.3/interactive/sql-createfunction.html
-            inject.goStacked("DROP FUNCTION %s" % udf)
+            inject.goStacked("DROP FUNCTION %s(%s)" % (udf, inp))
             inject.goStacked("CREATE OR REPLACE FUNCTION %s(%s) RETURNS %s AS '%s', '%s' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE" % (udf, inp, ret, self.udfRemoteFile, udf))
 
             self.createdUdf.add(udf)
