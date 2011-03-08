@@ -5,9 +5,9 @@
     <dbms value="MySQL">
         <cast query="CAST(%s AS CHAR)"/>
         <length query="LENGTH(%s)"/>
-        <isnull query="IFNULL(%s, ' ')"/>
+        <isnull query="IFNULL(%s,' ')"/>
         <delimiter query=","/>
-        <limit query="LIMIT %d, %d"/>
+        <limit query="LIMIT %d,%d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
@@ -21,54 +21,54 @@
                    * http://dev.mysql.com/doc/refman/5.0/en/news-5-0-12.html
                    * http://dev.mysql.com/doc/refman/5.1/en/miscellaneous-functions.html#function_sleep
         -->
-        <timedelay query="SELECT SLEEP(%d)" query2="SELECT BENCHMARK(5000000, MD5('%d'))"/>
-        <substring query="MID((%s), %d, %d)"/>
+        <timedelay query="SELECT SLEEP(%d)" query2="SELECT BENCHMARK(5000000,MD5('%d'))"/>
+        <substring query="MID((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <inference query="ORD(MID((%s), %d, 1)) > %d"/>
+        <inference query="ORD(MID((%s),%d,1)) > %d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="DATABASE()"/>
-        <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0, 1)='Y'"/>
-        <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0, 1)='%s'"/>
+        <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0,1)='Y'"/>
+        <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0,1)='%s'"/>
         <users>
             <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES ORDER BY 1" query2="SELECT user FROM mysql.user ORDER BY 1"/>
-            <blind query="SELECT DISTINCT(grantee) FROM information_schema.USER_PRIVILEGES LIMIT %d, 1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d, 1" count="SELECT COUNT(DISTINCT(grantee)) FROM information_schema.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
+            <blind query="SELECT DISTINCT(grantee) FROM information_schema.USER_PRIVILEGES LIMIT %d,1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d,1" count="SELECT COUNT(DISTINCT(grantee)) FROM information_schema.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
         </users>
         <passwords>
-            <inband query="SELECT user, password FROM mysql.user" condition="user"/>
-            <blind query="SELECT DISTINCT(password) FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(password)) FROM mysql.user WHERE user='%s'"/>
+            <inband query="SELECT user,password FROM mysql.user" condition="user"/>
+            <blind query="SELECT DISTINCT(password) FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(password)) FROM mysql.user WHERE user='%s'"/>
         </passwords>
         <privileges>
-            <inband query="SELECT grantee, privilege_type FROM information_schema.USER_PRIVILEGES" condition="grantee" query2="SELECT user, select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user" condition2="user"/>
-            <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s LIMIT %d, 1" query2="SELECT select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv, reload_priv, shutdown_priv, process_priv, file_priv, grant_priv, references_priv, index_priv, alter_priv, show_db_priv, super_priv, create_tmp_table_priv, lock_tables_priv, execute_priv, repl_slave_priv, repl_client_priv, create_view_priv, show_view_priv, create_routine_priv, alter_routine_priv, create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d, 1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
+            <inband query="SELECT grantee,privilege_type FROM information_schema.USER_PRIVILEGES" condition="grantee" query2="SELECT user,select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user" condition2="user"/>
+            <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s LIMIT %d,1" query2="SELECT select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee%s%s" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
         </privileges>
         <roles/>
         <dbs>
             <inband query="SELECT schema_name FROM information_schema.SCHEMATA ORDER BY 1" query2="SELECT db FROM mysql.db ORDER BY 1"/>
-            <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA LIMIT %d, 1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d, 1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
         </dbs>
         <tables>
-            <inband query="SELECT table_schema, table_name FROM information_schema.TABLES" condition="table_schema"/>
-            <blind query="SELECT table_name FROM information_schema.TABLES WHERE table_schema='%s' LIMIT %d, 1" count="SELECT COUNT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'"/>
+            <inband query="SELECT table_schema,table_name FROM information_schema.TABLES" condition="table_schema"/>
+            <blind query="SELECT table_name FROM information_schema.TABLES WHERE table_schema='%s' LIMIT %d,1" count="SELECT COUNT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT column_name, column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <inband query="SELECT column_name,column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
             <blind query="SELECT column_name FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" query2="SELECT column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT %s FROM %s.%s LIMIT %d, 1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schema_name FROM information_schema.SCHEMATA WHERE " query2="SELECT db FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
             <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA WHERE " query2="SELECT DISTINCT(db) FROM mysql.db WHERE " count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA WHERE " count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
         </search_db>
         <search_table>
-            <inband query="SELECT table_schema, table_name FROM information_schema.TABLES WHERE " condition="table_name" condition2="table_schema"/>
+            <inband query="SELECT table_schema,table_name FROM information_schema.TABLES WHERE " condition="table_name" condition2="table_schema"/>
             <blind query="SELECT DISTINCT(table_schema) FROM information_schema.TABLES WHERE " query2="SELECT DISTINCT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM information_schema.TABLES WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM information_schema.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
         </search_table>
         <search_column>
-            <inband query="SELECT table_schema, table_name FROM information_schema.COLUMNS WHERE " condition="column_name" condition2="table_schema"/>
+            <inband query="SELECT table_schema,table_name FROM information_schema.COLUMNS WHERE " condition="column_name" condition2="table_schema"/>
             <blind query="SELECT DISTINCT(table_schema) FROM information_schema.COLUMNS WHERE " query2="SELECT DISTINCT(table_name) FROM information_schema.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM information_schema.COLUMNS WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM information_schema.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema"/>
         </search_column>
     </dbms>
@@ -77,7 +77,7 @@
     <dbms value="PostgreSQL">
         <cast query="CAST(%s AS CHARACTER(10000))"/>
         <length query="LENGTH(%s)"/>
-        <isnull query="COALESCE(%s, ' ')"/>
+        <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="OFFSET %d LIMIT %d"/>
         <limitregexp query="\s+OFFSET\s+([\d]+)\s+LIMIT\s+([\d]+)"/>
@@ -93,10 +93,10 @@
                    * http://www.postgresql.org/docs/8.3/interactive/release-8-2.html
                    * http://www.postgresql.org/docs/8.3/interactive/functions-datetime.html#FUNCTIONS-DATETIME-DELAY
         -->
-        <timedelay query="SELECT PG_SLEEP(%d)" query2="SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1, 300000%d))" query3="CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep(%d)"/>
-        <substring query="SUBSTR((%s)::text, %d, %d)"/>
+        <timedelay query="SELECT PG_SLEEP(%d)" query2="SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1,300000%d))" query3="CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6','sleep' language 'C' STRICT; SELECT sleep(%d)"/>
+        <substring query="SUBSTR((%s)::text,%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <inference query="ASCII(SUBSTR((%s)::text, %d, 1)) > %d"/>
+        <inference query="ASCII(SUBSTR((%s)::text,%d,1)) > %d"/>
         <banner query="SELECT VERSION()"/>
         <current_user query="SELECT CURRENT_USER"/>
         <current_db query="SELECT CURRENT_DATABASE()"/>
@@ -107,12 +107,12 @@
             <blind query="SELECT DISTINCT(usename) FROM pg_user OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
         </users>
         <passwords>
-            <inband query="SELECT usename, passwd FROM pg_shadow" condition="usename"/>
+            <inband query="SELECT usename,passwd FROM pg_shadow" condition="usename"/>
             <blind query="SELECT DISTINCT(passwd) FROM pg_shadow WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(passwd)) FROM pg_shadow WHERE usename='%s'"/>
         </passwords>
         <privileges>
-            <inband query="SELECT usename, (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user" condition="usename"/>
-            <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END), (CASE WHEN usesuper THEN 1 ELSE 0 END), (CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
+            <inband query="SELECT usename,(CASE WHEN usecreatedb THEN 1 ELSE 0 END),(CASE WHEN usesuper THEN 1 ELSE 0 END),(CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user" condition="usename"/>
+            <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END),(CASE WHEN usesuper THEN 1 ELSE 0 END),(CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
         </privileges>
         <roles/>
         <dbs>
@@ -120,12 +120,12 @@
             <blind query="SELECT DISTINCT(datname) FROM pg_database OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database"/>
         </dbs>
         <tables>
-            <inband query="SELECT schemaname, tablename FROM pg_tables" condition="schemaname"/>
+            <inband query="SELECT schemaname,tablename FROM pg_tables" condition="schemaname"/>
             <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT attname, typname FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
-            <blind query="SELECT attname FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" query2="SELECT typname FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relname='%s' AND a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND attname='%s' AND nspname='%s'" count="SELECT COUNT(attname) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
+            <inband query="SELECT attname,typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
+            <blind query="SELECT attname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" query2="SELECT typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relname='%s' AND a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND attname='%s' AND nspname='%s'" count="SELECT COUNT(attname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
@@ -136,12 +136,12 @@
             <blind query="SELECT DISTINCT(datname) FROM pg_database WHERE " query2="" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database WHERE " count2="" condition="datname" condition2=""/>
         </search_db>
         <search_table>
-            <inband query="SELECT schemaname, tablename FROM pg_tables WHERE " condition="tablename" condition2="schemaname"/>
+            <inband query="SELECT schemaname,tablename FROM pg_tables WHERE " condition="tablename" condition2="schemaname"/>
             <blind query="SELECT DISTINCT(schemaname) FROM pg_tables WHERE " query2="SELECT tablename FROM pg_tables WHERE schemaname='%s'" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables WHERE " count2="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'" condition="tablename" condition2="schemaname"/>
         </search_table>
         <search_column>
-            <inband query="SELECT nspname, relname FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " condition="attname" condition2="nspname"/>
-            <blind query="SELECT DISTINCT(nspname) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " query2="SELECT DISTINCT(relname) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" count="SELECT COUNT(DISTINCT(nspname)) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " count2="SELECT COUNT(DISTINCT(relname)) FROM pg_namespace, pg_type, pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" condition="attname" condition2="nspname"/>
+            <inband query="SELECT nspname,relname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " condition="attname" condition2="nspname"/>
+            <blind query="SELECT DISTINCT(nspname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " query2="SELECT DISTINCT(relname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" count="SELECT COUNT(DISTINCT(nspname)) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND " count2="SELECT COUNT(DISTINCT(relname)) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" condition="attname" condition2="nspname"/>
         </search_column>
     </dbms>
 
@@ -149,7 +149,7 @@
     <dbms value="Microsoft SQL Server">
         <cast query="CAST(%s AS NVARCHAR(4000))"/>
         <length query="LTRIM(STR(LEN(%s)))"/>
-        <isnull query="ISNULL(%s, ' ')"/>
+        <isnull query="ISNULL(%s,' ')"/>
         <delimiter query="+"/>
         <limit query="SELECT TOP %d "/>
         <limitregexp query="TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+"/>
@@ -160,19 +160,19 @@
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
-        <substring query="SUBSTRING((%s), %d, %d)"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <inference query="ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
+        <inference query="ASCII(SUBSTRING((%s),%d,1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
         <current_db query="SELECT DB_NAME()"/>
-        <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1" query2="IS_SRVROLEMEMBER('sysadmin', '%s')=1"/>
+        <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1" query2="IS_SRVROLEMEMBER('sysadmin','%s')=1"/>
         <users>
             <inband query="SELECT name FROM master..syslogins ORDER BY 1" query2="SELECT name FROM sys.sql_logins ORDER BY 1"/>
             <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
         </users>
         <passwords>
-            <inband query="SELECT name, master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins" query2="SELECT name, master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins" condition="name"/>
+            <inband query="SELECT name,master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins" query2="SELECT name,master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins" condition="name"/>
             <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM master..sysxlogins WHERE name='%s')" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND password_hash NOT IN (SELECT TOP %d password_hash FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
         </passwords>
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
@@ -183,12 +183,12 @@
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v') ORDER BY 1"/>
-            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u', 'v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v') ORDER BY 1"/>
+            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u','v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u','v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
         </tables>
         <columns>
-            <inband query="SELECT %s..syscolumns.name, TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
-            <blind query="SELECT %s..syscolumns.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
+            <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
+            <blind query="SELECT %s..syscolumns.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s..%s"/>
@@ -200,12 +200,12 @@
             <blind query="SELECT name FROM master..sysdatabases WHERE " count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE " condition="name"/>
         </search_db>
         <search_table>
-            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v') AND " condition="name" condition2="name"/>
-            <blind query="" query2="SELECT name FROM %s..sysobjects WHERE xtype IN ('u', 'v') " count="" count2="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u', 'v')" condition="name" condition2="name"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v') AND " condition="name" condition2="name"/>
+            <blind query="" query2="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v') " count="" count2="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')" condition="name" condition2="name"/>
         </search_table>
         <search_column>
-            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
-            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
         </search_column>
     </dbms>
 
@@ -213,7 +213,7 @@
     <dbms value="Oracle">
         <cast query="CAST(%s AS VARCHAR(4000))"/>
         <length query="LENGTH(%s)"/>
-        <isnull query="NVL(%s, ' ')"/>
+        <isnull query="NVL(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="ROWNUM AS LIMIT %s) WHERE LIMIT"/>
         <limitregexp query="ROWNUM\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+|ROWNUM\s*=\s*[\d]+"/>
@@ -224,9 +224,9 @@
         <count query="COUNT(%s)"/>
         <comment query="--"/>
         <timedelay query="BEGIN DBMS_LOCK.SLEEP(%d); END" query2="EXEC DBMS_LOCK.SLEEP(%d.00)" query3="EXEC USER_LOCK.SLEEP(%d.00)"/>
-        <substring query="SUBSTR((%s), %d, %d)"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <inference query="ASCII(SUBSTR((%s), %d, 1)) > %d"/>
+        <inference query="ASCII(SUBSTR((%s),%d,1)) > %d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>
         <current_db query="SELECT SYS.DATABASE_NAME FROM DUAL"/>
@@ -237,47 +237,47 @@
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS ORDER BY 1"/>
-            <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME), ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
+            <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME),ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
         </users>
         <passwords>
-            <inband query="SELECT NAME, PASSWORD FROM SYS.USER$" condition="NAME"/>
-            <blind query="SELECT DISTINCT(PASSWORD) FROM (SELECT DISTINCT(PASSWORD), ROWNUM AS LIMIT FROM SYS.USER$ WHERE NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PASSWORD)) FROM SYS.USER$ WHERE NAME='%s'"/>
+            <inband query="SELECT NAME,PASSWORD FROM SYS.USER$" condition="NAME"/>
+            <blind query="SELECT DISTINCT(PASSWORD) FROM (SELECT DISTINCT(PASSWORD),ROWNUM AS LIMIT FROM SYS.USER$ WHERE NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PASSWORD)) FROM SYS.USER$ WHERE NAME='%s'"/>
         </passwords>
         <!--
              NOTE: in Oracle to enumerate the privileges for the session user you can use:
              SELECT * FROM SESSION_PRIVS
         -->
         <privileges>
-            <inband query="SELECT GRANTEE, PRIVILEGE FROM DBA_SYS_PRIVS" query2="SELECT USERNAME, PRIVILEGE FROM USER_SYS_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
-            <blind query="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM DBA_SYS_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE), ROWNUM AS LIMIT FROM USER_SYS_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM DBA_SYS_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM USER_SYS_PRIVS WHERE USERNAME='%s'"/>
+            <inband query="SELECT GRANTEE,PRIVILEGE FROM DBA_SYS_PRIVS" query2="SELECT USERNAME,PRIVILEGE FROM USER_SYS_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
+            <blind query="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE),ROWNUM AS LIMIT FROM DBA_SYS_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(PRIVILEGE) FROM (SELECT DISTINCT(PRIVILEGE),ROWNUM AS LIMIT FROM USER_SYS_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM DBA_SYS_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(PRIVILEGE)) FROM USER_SYS_PRIVS WHERE USERNAME='%s'"/>
         </privileges>
         <!--
              NOTE: in Oracle to enumerate the roles for the session user you can use:
              SELECT * FROM SESSION_ROLES
         -->
         <roles>
-            <inband query="SELECT GRANTEE, GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME, GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
-            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE), ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
+            <inband query="SELECT GRANTEE,GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME,GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
+            <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE),ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE),ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
         </roles>
         <!-- NOTE: in Oracle there is no query to enumerate DBMS databases. It is possible only through a STATUS request to the Oracle TNS Listener negotiating its protocol -->
         <dbs/>
         <tables>
-            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
-            <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES" condition="TABLESPACE_NAME"/>
-            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME, ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'"/>
+            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS,SYSDBA,USERS. It is NOT the database name -->
+            <inband query="SELECT TABLESPACE_NAME,TABLE_NAME FROM SYS.ALL_TABLES" condition="TABLESPACE_NAME"/>
+            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME,ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT COLUMN_NAME, DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
+            <inband query="SELECT COLUMN_NAME,DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
             <blind query="SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM (SELECT %s, ROWNUM AS LIMIT FROM %s) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT %s,ROWNUM AS LIMIT FROM %s) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db/>
         <search_table>
-            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS, SYSDBA, USERS. It is NOT the database name -->
-            <inband query="SELECT TABLESPACE_NAME, TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
+            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS,SYSDBA,USERS. It is NOT the database name -->
+            <inband query="SELECT TABLESPACE_NAME,TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
             <blind query="SELECT DISTINCT(TABLESPACE_NAME) FROM SYS.ALL_TABLES WHERE " query2="SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" count="SELECT COUNT(DISTINCT(TABLESPACE_NAME)) FROM SYS.ALL_TABLES WHERE " count2="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
         </search_table>
         <search_column>
@@ -290,9 +290,9 @@
     <dbms value="SQLite">
         <cast query="CAST(%s AS VARCHAR(8000))" dbms_version="&gt;=3.0"/>
         <length query="LENGTH(%s)"/>
-        <isnull query="IFNULL(%s, ' ')"/>
+        <isnull query="IFNULL(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="LIMIT %d, %d"/>
+        <limit query="LIMIT %d,%d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
@@ -300,10 +300,10 @@
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
-        <timedelay query="SELECT LIKE('ABCDEFG', UPPER(HEX(RANDOMBLOB(1000000%d))))" dbms_version="&gt;=3.0"/>
-        <substring query="SUBSTR((%s), %d, %d)"/>
+        <timedelay query="SELECT LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB(1000000%d))))" dbms_version="&gt;=3.0"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <inference query="SUBSTR((%s), %d, 1) > '%c'"/>
+        <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <banner query="SELECT SQLITE_VERSION()"/>
         <current_user/>
         <current_db/>
@@ -316,7 +316,7 @@
         <dbs/>
         <tables>
             <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY 1"/>
-            <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' LIMIT %d, 1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
+            <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' LIMIT %d,1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
         </tables>
         <columns>
             <inband query="SELECT MIN(sql) FROM sqlite_master WHERE tbl_name='%s'"/>
@@ -324,7 +324,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s LIMIT %d, 1" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db/>
         <search_table/>
@@ -335,7 +335,7 @@
     <dbms value="Microsoft Access">
         <cast query="CVAR(%s)"/>
         <length query="LEN(%s)"/>
-        <isnull query="IIF(LEN(%s)=0, ' ', %s)"/>
+        <isnull query="IIF(LEN(%s)=0,' ',%s)"/>
         <delimiter query=","/>
         <limit query="TOP %d"/>
         <limitregexp query="\s+TOP\s+([\d]+)"/>
@@ -346,13 +346,13 @@
         <count query="COUNT(%s)"/>
         <comment query="%00"/>
         <timedelay/>
-        <substring query="MID((%s), %d, %d)"/>
+        <substring query="MID((%s),%d,%d)"/>
         <case query="IIF(%s,1,0)"/>
         <banner/>
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>
         <current_db/>
-        <inference query="ASC(MID((%s), %d, 1)) > %d"/>
+        <inference query="ASC(MID((%s),%d,1)) > %d"/>
         <is_dba/>
         <dbs/>
         <!--MSysObjects have no read permission by default-->
@@ -386,12 +386,12 @@
         <order query="ORDER BY %s ASC"/>
         <comment query="--"/>
         <count query="COUNT(%s)"/>
-        <timedelay query="SELECT COUNT(*) FROM RDB$DATABASE AS T1, RDB$FIELDS AS T2, RDB$FUNCTIONS AS T3, RDB$TYPES AS T4, RDB$FORMATS AS T5, RDB$COLLATIONS AS T6"/>
+        <timedelay query="SELECT COUNT(*) FROM RDB$DATABASE AS T1,RDB$FIELDS AS T2,RDB$FUNCTIONS AS T3,RDB$TYPES AS T4,RDB$FORMATS AS T5,RDB$COLLATIONS AS T6"/>
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
         <case query="SELECT IIF(%s,1,0)"/>
-        <banner query="SELECT RDB$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
+        <banner query="SELECT RDB$GET_CONTEXT('SYSTEM','ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
-        <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM', 'DB_NAME') FROM RDB$DATABASE"/>
+        <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM','DB_NAME') FROM RDB$DATABASE"/>
         <users>
             <inband query="SELECT DISTINCT RDB$USER FROM RDB$USER_PRIVILEGES"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
@@ -403,14 +403,14 @@
             <blind query="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" count="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
         </tables>
         <privileges>
-            <inband query="SELECT RDB$USER, RDB$PRIVILEGE FROM RDB$USER_PRIVILEGES" condition="RDB$USER"/>
+            <inband query="SELECT RDB$USER,RDB$PRIVILEGE FROM RDB$USER_PRIVILEGES" condition="RDB$USER"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$PRIVILEGE) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'" count="SELECT COUNT(DISTINCT(RDB$PRIVILEGE)) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'"/>
         </privileges>
         <roles/>
         <dbs/>
         <columns>
-            <!--<inband query="SELECT r.RDB$FIELD_NAME, CASE f.RDB$FIELD_TYPE WHEN 261 THEN 'BLOB' WHEN 14 THEN 'CHAR' WHEN 40 THEN 'CSTRING' WHEN 11 THEN 'D_FLOAT' WHEN 27 THEN 'DOUBLE' WHEN 10 THEN 'FLOAT' WHEN 16 THEN 'INT64' WHEN 8 THEN 'INTEGER' WHEN 9 THEN 'QUAD' WHEN 7 THEN 'SMALLINT' WHEN 12 THEN 'DATE' WHEN 13 THEN 'TIME' WHEN 35 THEN 'TIMESTAMP' WHEN 37 THEN 'VARCHAR' ELSE 'UNKNOWN' END AS field_type FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>-->
-            <inband query="SELECT r.RDB$FIELD_NAME, f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>
+            <!--<inband query="SELECT r.RDB$FIELD_NAME,CASE f.RDB$FIELD_TYPE WHEN 261 THEN 'BLOB' WHEN 14 THEN 'CHAR' WHEN 40 THEN 'CSTRING' WHEN 11 THEN 'D_FLOAT' WHEN 27 THEN 'DOUBLE' WHEN 10 THEN 'FLOAT' WHEN 16 THEN 'INT64' WHEN 8 THEN 'INTEGER' WHEN 9 THEN 'QUAD' WHEN 7 THEN 'SMALLINT' WHEN 12 THEN 'DATE' WHEN 13 THEN 'TIME' WHEN 35 THEN 'TIMESTAMP' WHEN 37 THEN 'VARCHAR' ELSE 'UNKNOWN' END AS field_type FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>-->
+            <inband query="SELECT r.RDB$FIELD_NAME,f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>
             <blind query="SELECT r.RDB$FIELD_NAME FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'" query2="SELECT f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s' AND r.RDB$FIELD_NAME='%s'" count="SELECT COUNT(r.RDB$FIELD_NAME) FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>
         </columns>
         <dump_table>
@@ -433,24 +433,24 @@
         <length query="LENGTH(%s)"/>
         <timedelay/>
         <banner query="SELECT ID FROM SYSINFO.VERSION"/>
-        <isnull query="VALUE(%s,' ')" query2="IFNULL(%s, ' ')"/>
+        <isnull query="VALUE(%s,' ')" query2="IFNULL(%s,' ')"/>
         <comment query="--" query2="#"/>
         <count query="COUNT(%s)"/>
         <!-- No real cast on SAP MaxDB -->
-        <cast query="REPLACE(CHR(%s), ' ', '_')"/>
+        <cast query="REPLACE(CHR(%s),' ','_')"/>
         <current_user query="SELECT USER() FROM DUAL"/>
         <current_db query="SELECT DATABASE() FROM DUAL"/>
         <order query="ORDER BY %s ASC"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <inference query="SUBSTR((%s), %d, 1) > '%c'"/>
+        <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <delimiter query=","/>
-        <substring query="SUBSTR((%s), %d, %d)"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
         <users>
             <inband query="SELECT username FROM domain.users"/>
             <blind query="SELECT MIN(username) FROM domain.users WHERE username > '%s'" count="SELECT CHR(COUNT(*)) FROM domain.users"/>
         </users>
         <columns>
-            <inband query="SELECT columnname, datatype, len FROM domain.columns WHERE tablename='%s' AND schemaname=%s"/>
+            <inband query="SELECT columnname,datatype,len FROM domain.columns WHERE tablename='%s' AND schemaname=%s"/>
             <blind/>
         </columns>
         <tables>
@@ -462,7 +462,7 @@
             <blind/>
         </dbs>
         <roles>
-            <inband query="SELECT owner, role FROM domain.roles" condition="owner"/>
+            <inband query="SELECT owner,role FROM domain.roles" condition="owner"/>
             <blind/>
         </roles>
         <dump_table>
@@ -475,7 +475,7 @@
     <dbms value="Sybase">
         <cast query="CONVERT(NVARCHAR(4000),%s)"/>
         <length query="LTRIM(STR(LEN(%s)))"/>
-        <isnull query="ISNULL(%s, ' ')"/>
+        <isnull query="ISNULL(%s,' ')"/>
         <delimiter query="+"/>
         <limit query="SELECT TOP %d "/>
         <limitregexp query="TOP\s+([\d]+)\s+.+?\s+FROM\s+.+?\s+WHERE\s+.+?\s+NOT\s+IN\s+\(SELECT\s+TOP\s+([\d]+)\s+"/>
@@ -486,24 +486,24 @@
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
-        <substring query="SUBSTRING((%s), %d, %d)"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <inference query="ASCII(SUBSTRING((%s), %d, 1)) > %d"/>
+        <inference query="ASCII(SUBSTRING((%s),%d,1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>
         <current_db query="SELECT DB_NAME()"/>
-        <is_dba query="PATINDEX('%sa_role%', SHOW_ROLE())>0" query2="EXISTS(SELECT * FROM master..syslogins, master..sysloginroles WHERE srid=0 and name='%s')"/>
+        <is_dba query="PATINDEX('%sa_role%',SHOW_ROLE())>0" query2="EXISTS(SELECT * FROM master..syslogins,master..sysloginroles WHERE srid=0 and name='%s')"/>
         <users>
             <inband query="SELECT name FROM master..syslogins"/>
             <blind/>
         </users>
         <passwords>
-            <inband query="SELECT name, password FROM master..syslogins" condition="name"/>
+            <inband query="SELECT name,password FROM master..syslogins" condition="name"/>
             <blind/>
         </passwords>
         <privileges/>
         <roles>
-            <inband query="SELECT name, srid FROM master..syslogins, master..sysloginroles" condition="name"/>
+            <inband query="SELECT name,srid FROM master..syslogins,master..sysloginroles" condition="name"/>
             <blind/>
         </roles>
         <dbs>
@@ -515,7 +515,7 @@
             <blind/>
         </tables>
         <columns>
-            <inband query="SELECT %s..syscolumns.name,%s..syscolumns.usertype FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
+            <inband query="SELECT %s..syscolumns.name,%s..syscolumns.usertype FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
             <blind/>
         </columns>
         <dump_table>
@@ -531,7 +531,7 @@
             <blind/>
         </search_table>
         <search_column>
-            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns, %s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
             <blind/>
         </search_column>
     </dbms>
