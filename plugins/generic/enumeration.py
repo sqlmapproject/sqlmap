@@ -38,6 +38,9 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.dicts import firebirdTypes
+from lib.core.dicts import mysqlPrivs
+from lib.core.dicts import pgsqlPrivs
+from lib.core.dicts import firebirdPrivs
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
@@ -412,50 +415,6 @@ class Enumeration:
 
         # Set containing the list of DBMS administrators
         areAdmins = set()
-
-        mysqlPrivs = (
-                        ( 1, "select_priv" ),
-                        ( 2, "insert_priv" ),
-                        ( 3, "update_priv" ),
-                        ( 4, "delete_priv" ),
-                        ( 5, "create_priv" ),
-                        ( 6, "drop_priv" ),
-                        ( 7, "reload_priv" ),
-                        ( 8, "shutdown_priv" ),
-                        ( 9, "process_priv" ),
-                        ( 10, "file_priv" ),
-                        ( 11, "grant_priv" ),
-                        ( 12, "references_priv" ),
-                        ( 13, "index_priv" ),
-                        ( 14, "alter_priv" ),
-                        ( 15, "show_db_priv" ),
-                        ( 16, "super_priv" ),
-                        ( 17, "create_tmp_table_priv" ),
-                        ( 18, "lock_tables_priv" ),
-                        ( 19, "execute_priv" ),
-                        ( 20, "repl_slave_priv" ),
-                        ( 21, "repl_client_priv" ),
-                        ( 22, "create_view_priv" ),
-                        ( 23, "show_view_priv" ),
-                        ( 24, "create_routine_priv" ),
-                        ( 25, "alter_routine_priv" ),
-                        ( 26, "create_user_priv" ),
-                     )
-
-        pgsqlPrivs = (
-                        ( 1, "createdb" ),
-                        ( 2, "super" ),
-                        ( 3, "catupd" ),
-                     )
-
-        firebirdPrivs = {
-                         "S": "SELECT",
-                         "I": "INSERT",
-                         "U": "UPDATE",
-                         "D": "DELETE",
-                         "R": "REFERENCES",
-                         "E": "EXECUTE"
-                     }
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
