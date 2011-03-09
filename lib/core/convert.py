@@ -80,7 +80,7 @@ def urldecode(value, encoding=None):
 
     return result
 
-def urlencode(value, safe=":/?%&=|()", convall=False):
+def urlencode(value, safe="%&=|()", convall=False):
     if conf.direct or "POSTxml" in conf.paramDict:
         return value
 
