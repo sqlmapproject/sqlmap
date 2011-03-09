@@ -463,9 +463,8 @@ class Enumeration:
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
                             if Backend.getIdentifiedDbms() == DBMS.PGSQL and getUnicode(privilege).isdigit():
-                                for position, pgsqlPriv in pgsqlPrivs:
-                                    if count == position and int(privilege) == 1:
-                                        privileges.add(pgsqlPriv)
+                                if int(privilege) == 1:
+                                    privileges.add(pgsqlPrivs[count])
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
@@ -475,9 +474,9 @@ class Enumeration:
                             # In MySQL < 5.0 we get Y if the privilege is 
                             # True, N otherwise
                             elif Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-                                for position, mysqlPriv in mysqlPrivs:
-                                    if count == position and privilege.upper() == "Y":
-                                        privileges.add(mysqlPriv)
+                                if privilege.upper() == "Y":
+                                    privileges.add(mysqlPrivs[count])
+                                        
 
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
