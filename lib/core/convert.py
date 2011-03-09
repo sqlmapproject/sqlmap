@@ -19,7 +19,10 @@ import struct
 import urllib
 
 from lib.core.data import conf
+from lib.core.data import logger
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import URLENCODE_CHAR_LIMIT
+from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 
 def base64decode(value):
     return value.decode("base64")
@@ -80,7 +83,7 @@ def urldecode(value, encoding=None):
 
     return result
 
-def urlencode(value, safe="%&=|()", convall=False):
+def urlencode(value, safe="%&=", convall=False, limit=False):
     if conf.direct or "POSTxml" in conf.paramDict:
         return value
 
@@ -92,7 +95,23 @@ def urlencode(value, safe="%&=|()", convall=False):
     if convall:
         result = urllib.quote(utf8encode(value)) # Reference: http://old.nabble.com/Re:-Problem:-neither-urllib2.quote-nor-urllib.quote-encode-the--unicode-strings-arguments-p19823144.html
     else:
-        result = urllib.quote(utf8encode(value), safe)
+        count = 0
+        while True:
+            result = urllib.quote(utf8encode(value), safe)
+
+            if limit and len(result) > URLENCODE_CHAR_LIMIT:
+                if count >= len(URLENCODE_FAILSAFE_CHARS):
+                    dbgMsg  = "failed to fully shorten urlencoding value"
+                    logger.debug(dbgMsg)
+                    break
+
+                while count < len(URLENCODE_FAILSAFE_CHARS):
+                    safe += URLENCODE_FAILSAFE_CHARS[count]
+                    count += 1
+                    if safe[-1] in value:
+                        break
+            else:
+                break
 
     return result
 

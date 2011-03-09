@@ -271,3 +271,9 @@ REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
 
 # Regular expression used for marking non-alphanum characters
 REFLECTED_NON_ALPHA_NUM_REGEX = r'[^<>\\r\\n]+?'
+
+# chars which can be used as a failsafe values in case of too long URL encoding value
+URLENCODE_FAILSAFE_CHARS = '()|,'
+
+# maximum length of urlencoded value after which failsafe procedure takes away
+URLENCODE_CHAR_LIMIT = 4000

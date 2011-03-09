@@ -421,7 +421,7 @@ class Connect:
             checkPayload(value)
 
         if PLACE.GET in conf.parameters:
-            get = urlencode(conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value)
+            get = urlencode(conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value, limit=True)
 
         if PLACE.POST in conf.parameters:
             post = urlencode(conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value)
