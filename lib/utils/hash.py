@@ -28,6 +28,7 @@ from lib.core.common import paths
 from lib.core.common import readInput
 from lib.core.convert import hexdecode
 from lib.core.convert import hexencode
+from lib.core.convert import utf8encode
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
@@ -99,7 +100,7 @@ def mssql_passwd(password, salt, uppercase=False):
     """
 
     binsalt = hexdecode(salt)
-    unistr = "".join("%s\0" % c for c in password)
+    unistr = "".join(map(lambda c: ("%s\0" if ord(c) < 256 else "%s") % utf8encode(c), password))
 
     retVal = "0100%s%s" % (salt, sha1(unistr + binsalt).hexdigest())
 
@@ -117,7 +118,7 @@ def mssql_old_passwd(password, salt, uppercase=True): # prior to version '2005'
     """
 
     binsalt = hexdecode(salt)
-    unistr = "".join("%s\0" % c for c in password)
+    unistr = "".join(map(lambda c: ("%s\0" if ord(c) < 256 else "%s") % utf8encode(c), password))
 
     retVal = "0100%s%s%s" % (salt, sha1(unistr + binsalt).hexdigest(), sha1(unistr.upper() + binsalt).hexdigest())
 
@@ -136,7 +137,7 @@ def oracle_passwd(password, salt, uppercase=True):
 
     binsalt = hexdecode(salt)
 
-    retVal="s:%s%s" % (sha1(password + binsalt).hexdigest(), salt)
+    retVal="s:%s%s" % (sha1(utf8encode(password) + binsalt).hexdigest(), salt)
 
     return retVal.upper() if uppercase else retVal.lower()
 
