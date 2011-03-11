@@ -328,7 +328,7 @@ class Agent:
         if not Backend.getDbms():
             return fields
 
-        if fields.startswith("(CASE") or fields.startswith("SUBSTR"):
+        if (fields.startswith("(CASE") and "WHEN use" in fields) or fields.startswith("SUBSTR"):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ",")
@@ -555,7 +555,7 @@ class Agent:
                 inbandQuery += ", "
 
             if element == position:
-                if " FROM " in query and "(CASE " not in query and "EXISTS(" not in query and not query.startswith("SELECT "):
+                if " FROM " in query and ("(CASE " not in query or ("(CASE " in query and "WHEN use" in query)) and "EXISTS(" not in query and not query.startswith("SELECT "):
                     conditionIndex = query.index(" FROM ")
                     inbandQuery += query[:conditionIndex]
                 else:
@@ -563,7 +563,7 @@ class Agent:
             else:
                 inbandQuery += char
 
-        if " FROM " in query and "(CASE" not in query and "EXISTS(" not in query and not query.startswith("SELECT "):
+        if " FROM " in query and ("(CASE " not in query or ("(CASE " in query and "WHEN use" in query)) and "EXISTS(" not in query and not query.startswith("SELECT "):
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
