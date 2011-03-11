@@ -42,6 +42,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.datatype import advancedDict
 from lib.core.datatype import injectionDict
+from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
@@ -763,15 +764,15 @@ def checkNullConnection():
     try:
         page, headers = Request.getPage(method=HTTPMETHOD.HEAD)
 
-        if not page and 'Content-Length' in headers:
+        if not page and HTTPHEADER.CONTENT_LENGTH in headers:
             kb.nullConnection = NULLCONNECTION.HEAD
 
             infoMsg = "NULL connection is supported with HEAD header"
             logger.info(infoMsg)
         else:
-            page, headers = Request.getPage(auxHeaders={"Range": "bytes=-1"})
+            page, headers = Request.getPage(auxHeaders={HTTPHEADER.RANGE: "bytes=-1"})
 
-            if page and len(page) == 1 and 'Content-Range' in headers:
+            if page and len(page) == 1 and HTTPHEADER.CONTENT_RANGE in headers:
                 kb.nullConnection = NULLCONNECTION.RANGE
 
                 infoMsg = "NULL connection is supported with GET header "

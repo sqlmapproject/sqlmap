@@ -36,6 +36,7 @@ from lib.core.common import urlEncodeCookieValues
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PLACE
@@ -472,14 +473,14 @@ class Connect:
                 if not auxHeaders:
                     auxHeaders = {}
 
-                auxHeaders["Range"] = "bytes=-1"
+                auxHeaders[HTTPHEADER.RANGE] = "bytes=-1"
 
             _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
-            if kb.nullConnection == NULLCONNECTION.HEAD and 'Content-Length' in headers:
-                pageLength = int(headers['Content-Length'])
-            elif kb.nullConnection == NULLCONNECTION.RANGE and 'Content-Range' in headers:
-                pageLength = int(headers['Content-Range'][headers['Content-Range'].find('/') + 1:])
+            if kb.nullConnection == NULLCONNECTION.HEAD and HTTPHEADER.CONTENT_LENGTH in headers:
+                pageLength = int(headers[HTTPHEADER.CONTENT_LENGTH])
+            elif kb.nullConnection == NULLCONNECTION.RANGE and HTTPHEADER.CONTENT_RANGE in headers:
+                pageLength = int(headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
 
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
