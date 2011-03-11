@@ -1321,7 +1321,7 @@ def __setVerbosity():
     conf.verbose = int(conf.verbose)
 
     if conf.verbose == 0:
-        logger.setLevel(logging.CRITICAL)
+        logger.setLevel(logging.ERROR)
     elif conf.verbose == 1:
         logger.setLevel(logging.INFO)
     elif conf.verbose > 2 and conf.eta:
