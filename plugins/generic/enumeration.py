@@ -587,7 +587,7 @@ class Enumeration:
 
                         for priv in privs:
                             if priv.isdigit() and int(priv) == 1:
-                                for position, pgsqlPriv in pgsqlPrivs:
+                                for position, pgsqlPriv in pgsqlPrivs.items():
                                     if position == i:
                                         privileges.add(pgsqlPriv)
 
@@ -607,7 +607,7 @@ class Enumeration:
 
                         for priv in privs:
                             if priv.upper() == "Y":
-                                for position, mysqlPriv in mysqlPrivs:
+                                for position, mysqlPriv in mysqlPrivs.items():
                                     if position == i:
                                         privileges.add(mysqlPriv)
 

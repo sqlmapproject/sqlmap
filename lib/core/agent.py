@@ -389,7 +389,7 @@ class Agent:
             fieldsToCastStr = fieldsNoSelect
 
         # Function
-        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or fieldsSelectCase or fieldsSubstr:
+        if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
             fieldsToCastList = [fieldsToCastStr]
         else:
             fieldsToCastList = fieldsToCastStr.replace(", ", ",")
