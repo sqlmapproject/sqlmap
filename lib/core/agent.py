@@ -690,7 +690,6 @@ class Agent:
                     limitedQuery += "NOT IN (%s" % (limitStr % num)
                     limitedQuery += "%s %s)" % (field, fromFrom)
 
-
         if orderBy:
             limitedQuery += orderBy
 
