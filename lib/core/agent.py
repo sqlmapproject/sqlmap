@@ -328,7 +328,7 @@ class Agent:
         if not Backend.getDbms():
             return fields
 
-        if (fields.startswith("(CASE") and "WHEN use" in fields) or fields.startswith("SUBSTR"):
+        if fields.startswith("(CASE") or fields.startswith("SUBSTR"):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ",")
