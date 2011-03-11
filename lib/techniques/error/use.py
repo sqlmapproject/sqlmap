@@ -227,8 +227,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     stopLimit = conf.limitStop
 
             # Count the number of SQL query entries output
-            countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
-            countedExpression = expression.replace(expressionFields, countFirstField, 1)
+            countedExpression = expression.replace(expressionFields, "COUNT(*)", 1)
 
             if re.search(" ORDER BY ", expression, re.I):
                 untilOrderChar = countedExpression.index(" ORDER BY ")
