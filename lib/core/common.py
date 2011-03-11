@@ -598,7 +598,7 @@ def filePathToString(filePath):
 
 def dataToStdout(data, forceOutput=False):
     if not ('threadException' in kb and kb.threadException):
-        if forceOutput or (conf.verbose > 0) and not getCurrentThreadData().disableStdOut:
+        if forceOutput or not getCurrentThreadData().disableStdOut:
             try:
                 sys.stdout.write(data.encode(sys.stdout.encoding))
             except:
