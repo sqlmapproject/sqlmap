@@ -417,6 +417,8 @@ class Connect:
 
         elif place:
             if place in (PLACE.GET, PLACE.POST):
+                # payloads in GET and/or POST need to be urlencoded 
+                # throughly without safe chars (especially &, = and %)
                 payload = urlencode(payload, None, True, True)
                 value = agent.replacePayload(value, payload)
 
