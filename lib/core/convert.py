@@ -87,31 +87,31 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
     if conf.direct or "POSTxml" in conf.paramDict:
         return value
 
+    count = 0
     result = None
 
     if value is None:
         return result
 
-    if convall:
-        result = urllib.quote(utf8encode(value)) # Reference: http://old.nabble.com/Re:-Problem:-neither-urllib2.quote-nor-urllib.quote-encode-the--unicode-strings-arguments-p19823144.html
-    else:
-        count = 0
-        while True:
-            result = urllib.quote(utf8encode(value), safe)
+    if convall or safe is None:
+        safe = ""
 
-            if limit and len(result) > URLENCODE_CHAR_LIMIT:
-                if count >= len(URLENCODE_FAILSAFE_CHARS):
-                    dbgMsg  = "failed to fully shorten urlencoding value"
-                    logger.debug(dbgMsg)
-                    break
+    while True:
+        result = urllib.quote(utf8encode(value), safe)
 
-                while count < len(URLENCODE_FAILSAFE_CHARS):
-                    safe += URLENCODE_FAILSAFE_CHARS[count]
-                    count += 1
-                    if safe[-1] in value:
-                        break
-            else:
+        if limit and len(result) > URLENCODE_CHAR_LIMIT:
+            if count >= len(URLENCODE_FAILSAFE_CHARS):
+                dbgMsg  = "failed to fully shorten urlencoding value"
+                logger.debug(dbgMsg)
                 break
+
+            while count < len(URLENCODE_FAILSAFE_CHARS):
+                safe += URLENCODE_FAILSAFE_CHARS[count]
+                count += 1
+                if safe[-1] in value:
+                    break
+        else:
+            break
 
     return result
 

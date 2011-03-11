@@ -414,7 +414,12 @@ class Connect:
         if place == PLACE.COOKIE and conf.cookieUrlencode:
             value = agent.removePayloadDelimiters(value)
             value = urlEncodeCookieValues(value)
+
         elif place:
+            if place in (PLACE.GET, PLACE.POST):
+                payload = urlencode(payload, None, True, True)
+                value = agent.replacePayload(value, payload)
+
             value = agent.removePayloadDelimiters(value)
 
         if conf.checkPayload:
