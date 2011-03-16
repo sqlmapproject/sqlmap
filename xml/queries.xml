@@ -31,7 +31,7 @@
         <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0,1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0,1)='%s'"/>
         <users>
-            <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES ORDER BY 1" query2="SELECT user FROM mysql.user ORDER BY 1"/>
+            <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES" query2="SELECT user FROM mysql.user"/>
             <blind query="SELECT DISTINCT(grantee) FROM information_schema.USER_PRIVILEGES LIMIT %d,1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d,1" count="SELECT COUNT(DISTINCT(grantee)) FROM information_schema.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
         </users>
         <passwords>
@@ -44,7 +44,7 @@
         </privileges>
         <roles/>
         <dbs>
-            <inband query="SELECT schema_name FROM information_schema.SCHEMATA ORDER BY 1" query2="SELECT db FROM mysql.db ORDER BY 1"/>
+            <inband query="SELECT schema_name FROM information_schema.SCHEMATA" query2="SELECT db FROM mysql.db"/>
             <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
         </dbs>
         <tables>
@@ -103,7 +103,7 @@
         <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <check_udf query="(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)"/>
         <users>
-            <inband query="SELECT usename FROM pg_user ORDER BY 1"/>
+            <inband query="SELECT usename FROM pg_user"/>
             <blind query="SELECT DISTINCT(usename) FROM pg_user OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
         </users>
         <passwords>
@@ -116,7 +116,7 @@
         </privileges>
         <roles/>
         <dbs>
-            <inband query="SELECT datname FROM pg_database ORDER BY 1"/>
+            <inband query="SELECT datname FROM pg_database"/>
             <blind query="SELECT DISTINCT(datname) FROM pg_database OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database"/>
         </dbs>
         <tables>
@@ -168,7 +168,7 @@
         <current_db query="SELECT DB_NAME()"/>
         <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1" query2="IS_SRVROLEMEMBER('sysadmin','%s')=1"/>
         <users>
-            <inband query="SELECT name FROM master..syslogins ORDER BY 1" query2="SELECT name FROM sys.sql_logins ORDER BY 1"/>
+            <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
             <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
         </users>
         <passwords>
@@ -179,11 +179,11 @@
         <privileges/>
         <roles/>
         <dbs>
-            <inband query="SELECT name FROM master..sysdatabases ORDER BY 1"/>
+            <inband query="SELECT name FROM master..sysdatabases"/>
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v') ORDER BY 1"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
             <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u','v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u','v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
         </tables>
         <columns>
@@ -236,7 +236,7 @@
         -->
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
-            <inband query="SELECT USERNAME FROM SYS.ALL_USERS ORDER BY 1"/>
+            <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
             <blind query="SELECT DISTINCT(USERNAME) FROM (SELECT DISTINCT(USERNAME),ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(USERNAME)) FROM SYS.ALL_USERS"/>
         </users>
         <passwords>
@@ -315,7 +315,7 @@
         <roles/>
         <dbs/>
         <tables>
-            <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table' ORDER BY 1"/>
+            <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table'"/>
             <blind query="SELECT tbl_name FROM sqlite_master WHERE type='table' LIMIT %d,1" count="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'"/>
         </tables>
         <columns>
