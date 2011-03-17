@@ -21,6 +21,7 @@ class ThreadData():
         self.disableStdOut      = False
         self.lastErrorPage      = None
         self.lastHTTPError      = None
+        self.lastRedirectMsg    = None
         self.lastQueryDuration  = 0
         self.lastRequestUID     = 0
         self.seqMatcher         = difflib.SequenceMatcher(None)

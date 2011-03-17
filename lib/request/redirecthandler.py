@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import urllib2
 
 from lib.core.exception import sqlmapConnectionException
+from lib.core.threads import getCurrentThreadData
 
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     # maximum number of redirections to any single URL
@@ -20,7 +21,10 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     # assuming we're in a loop
     max_redirections = 10
 
-    def common_http_redirect(self, result, headers, code):
+    def common_http_redirect(self, result, headers, code, msg):
+        threadData = getCurrentThreadData()
+        threadData.lastRedirectMsg = (threadData.lastRequestUID, msg)
+
         if "location" in headers:
             result.redurl = headers.getheaders("location")[0].split("?")[0]
         elif "uri" in headers:
@@ -36,12 +40,12 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     def http_error_301(self, req, fp, code, msg, headers):
         self.infinite_loop_check(req)
         result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
-        return self.common_http_redirect(result, headers, code)
+        return self.common_http_redirect(result, headers, code, msg)
 
     def http_error_302(self, req, fp, code, msg, headers):
         self.infinite_loop_check(req)
         result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
-        return self.common_http_redirect(result, headers, code)
+        return self.common_http_redirect(result, headers, code, msg)
 
     def infinite_loop_check(self, req):
         if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= self.max_repeats or len(req.redirect_dict) >= self.max_redirections):
