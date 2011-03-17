@@ -13,6 +13,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
@@ -37,6 +38,8 @@ reqCount = 0
 def __oneShotUnionUse(expression, unpack=True):
     global reqCount
 
+    check = "(?P<result>%s.*%s)" % (kb.misc.start, kb.misc.stop)
+
     # Prepare expression with delimiters
     expression = agent.concatQuery(expression, unpack)
     expression = unescaper.unescape(expression)
@@ -53,23 +56,16 @@ def __oneShotUnionUse(expression, unpack=True):
 
     # Perform the request
     page, headers = Request.queryPage(payload, content=True, raise404=False)
-    content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
-
-    # Remove possible reflective values from content (especially headers part)
-    content = removeReflectiveValues(content, payload)
 
     reqCount += 1
 
-    if kb.misc.start not in content or kb.misc.stop not in content:
-        return None
-
-    # Parse the returned page to get the exact inband
+    # Parse the returned page to get the exact union-based
     # sql injection output
-    startPosition = content.index(kb.misc.start)
-    endPosition = content.rindex(kb.misc.stop) + len(kb.misc.stop)
-    value = getUnicode(content[startPosition:endPosition])
+    output = extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
+            or extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
+            if headers else None), payload), re.DOTALL | re.IGNORECASE)
 
-    return value
+    return output
 
 def configUnion(char=None, columns=None):
     def __configUnionChar(char):
