@@ -31,6 +31,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
+from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -39,6 +40,8 @@ reqCount = 0
 
 def __oneShotErrorUse(expression, field):
     global reqCount
+
+    threadData = getCurrentThreadData()
 
     retVal = None
     offset = 1
@@ -61,13 +64,17 @@ def __oneShotErrorUse(expression, field):
 
         # Perform the request
         page, headers = Request.queryPage(payload, content=True)
+
         reqCount += 1
 
         # Parse the returned page to get the exact error-based
         # sql injection output
         output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
                 or extractRegexResult(check, listToStrValue(headers.headers \
-                if headers else None), re.DOTALL | re.IGNORECASE)
+                if headers else None), re.DOTALL | re.IGNORECASE) \
+                or extractRegexResult(check, threadData.lastRedirectMsg[1] \
+                if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             if offset == 1:
