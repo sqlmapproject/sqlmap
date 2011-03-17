@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import urllib2
 
+from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.threads import getCurrentThreadData
 
@@ -21,9 +22,9 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     # assuming we're in a loop
     max_redirections = 10
 
-    def common_http_redirect(self, result, headers, code, msg):
+    def common_http_redirect(self, result, headers, code, content):
         threadData = getCurrentThreadData()
-        threadData.lastRedirectMsg = (threadData.lastRequestUID, msg)
+        threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
 
         if "location" in headers:
             result.redurl = headers.getheaders("location")[0].split("?")[0]
@@ -39,13 +40,31 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
     def http_error_301(self, req, fp, code, msg, headers):
         self.infinite_loop_check(req)
+
+        content = None
+        try:
+            content = fp.read()
+        except Exception, msg:
+            dbgMsg  = "there was a problem while retrieving "
+            dbgMsg += "redirect response content (%s)" % msg
+            logger.debug(dbgMsg)
+
         result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
-        return self.common_http_redirect(result, headers, code, msg)
+        return self.common_http_redirect(result, headers, code, content)
 
     def http_error_302(self, req, fp, code, msg, headers):
         self.infinite_loop_check(req)
+
+        content = None
+        try:
+            content = fp.read()
+        except Exception, msg:
+            dbgMsg  = "there was a problem while retrieving "
+            dbgMsg += "redirect response content (%s)" % msg
+            logger.debug(dbgMsg)
+
         result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
-        return self.common_http_redirect(result, headers, code, msg)
+        return self.common_http_redirect(result, headers, code, content)
 
     def infinite_loop_check(self, req):
         if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= self.max_repeats or len(req.redirect_dict) >= self.max_redirections):
