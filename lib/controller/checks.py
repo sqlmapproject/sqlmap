@@ -67,6 +67,9 @@ def checkSqlInjection(place, parameter, value):
     # successfully inject
     injection = injectionDict()
 
+    # Localized thread data needed for some methods
+    threadData = getCurrentThreadData()
+
     # Set the flag for sql injection test mode
     kb.testMode = True
 
@@ -334,8 +337,11 @@ def checkSqlInjection(place, parameter, value):
                             # body for the test's <grep> regular expression
                             page, headers = Request.queryPage(reqPayload, place, content=True, raise404=False)
                             output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
-                                     or extractRegexResult(check, listToStrValue(headers.headers \
-                                     if headers else None), re.DOTALL | re.IGNORECASE)
+                                    or extractRegexResult(check, listToStrValue(headers.headers \
+                                    if headers else None), re.DOTALL | re.IGNORECASE) \
+                                    or extractRegexResult(check, threadData.lastRedirectMsg[1] \
+                                    if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                                    threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
                             if output:
                                 result = output.replace(kb.misc.space, " ") == "1"
