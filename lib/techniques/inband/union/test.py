@@ -57,6 +57,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         upperCount = lowerCount + MIN_UNION_RESPONSES
 
     min_, max_ = MAX_RATIO, MIN_RATIO
+
     for count in range(lowerCount, upperCount+1):
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, conf.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
@@ -75,8 +76,8 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         return None
 
     lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
-
     minItem, maxItem = None, None
+
     for item in items:
         if item[1] == min_:
             minItem = item
@@ -163,7 +164,7 @@ def __unionConfirm(comment, place, parameter, value, prefix, suffix, count):
     # Assure that the above function found the exploitable full inband
     # SQL injection position
     if not validPayload:
-        validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=2)
+        validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=PAYLOAD.WHERE.NEGATIVE)
 
     return validPayload, vector
 
