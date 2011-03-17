@@ -824,7 +824,8 @@ Options:
     --keep-alive        Use persistent HTTP(s) connections
     --null-connection   Retrieve page length without actual HTTP response body
     --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
-    --group-concat      Use GROUP_CONCAT MySQL technique in dumping phase
+    --group-concat      Use GROUP_CONCAT (MySQL/error) in dumping phase
+                        (experimental)
 
   Injection:
     These options can be used to specify which parameters to test for,
@@ -845,15 +846,15 @@ Options:
     --risk=RISK         Risk of tests to perform (0-3, default 1)
     --string=STRING     String to match in page when the query is valid
     --regexp=REGEXP     Regexp to match in page when the query is valid
-    --text-only         Compare pages based only on their textual content
+    --text-only         Compare pages based only on the textual content
 
   Techniques:
-    These options can be used to tweak how specific SQL injection
-    techniques are tested.
+    These options can be usedto tweak testing of specific SQL injection
+    techniques.
 
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
     --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
-    --union-char=UCHAR  Character to use to bruteforce number of columns
+    --union-char=UCHAR  Character to use for bruteforcing number of columns
 
   Fingerprint:
     -f, --fingerprint   Perform an extensive DBMS version fingerprint
@@ -937,9 +938,8 @@ Options:
   General:
     These options can be used to set some general working parameters.
 
-    -x XMLFILE          Dump the data into an XML file
-    -s SESSIONFILE      Save and resume all data retrieved on a session file
     -t TRAFFICFILE      Log all HTTP traffic into a textual file
+    -s SESSIONFILE      Save and resume all data retrieved on a session file
     --flush-session     Flush session file for current target
     --eta               Display for each output the estimated time of arrival
     --update            Update sqlmap
@@ -948,7 +948,7 @@ Options:
 
   Miscellaneous:
     --beep              Alert when sql injection found
-    --check-payload     IDS detection testing of injection payload
+    --check-payload     IDS detection testing of injection payloads
     --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
     --forms             Parse and test forms on target url
     --gpage=GOOGLEPAGE  Use google dork results from specified page number
