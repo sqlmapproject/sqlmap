@@ -53,6 +53,7 @@ from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.datatype import injectionDict
 from lib.core.enums import DBMS
+from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
@@ -1003,7 +1004,7 @@ def __setHTTPUserAgent():
             warnMsg += "file '%s'" % paths.USER_AGENTS
             logger.warn(warnMsg)
 
-            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
+            conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __defaultHTTPUserAgent()))
 
             return
 
@@ -1015,7 +1016,7 @@ def __setHTTPUserAgent():
         __userAgent = kb.userAgents[randomRange(stop=__count-1)]
 
     __userAgent = sanitizeStr(__userAgent)
-    conf.httpHeaders.append(("User-Agent", __userAgent))
+    conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __userAgent))
 
     logMsg  = "fetched random HTTP User-Agent header from "
     logMsg += "file '%s': %s" % (paths.USER_AGENTS, __userAgent)
@@ -1030,13 +1031,13 @@ def __setHTTPReferer():
         debugMsg = "setting the HTTP Referer header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append(("Referer", conf.referer))
+        conf.httpHeaders.append((HTTPHEADER.REFERER, conf.referer))
 
     elif conf.level >= 3:
         debugMsg = "setting the default HTTP Referer header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append(("Referer", conf.url))
+        conf.httpHeaders.append((HTTPHEADER.REFERER, conf.url))
 
 def __setHTTPCookies():
     """
@@ -1047,8 +1048,8 @@ def __setHTTPCookies():
         debugMsg = "setting the HTTP Cookie header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append(("Connection", "Keep-Alive"))
-        conf.httpHeaders.append(("Cookie", conf.cookie))
+        conf.httpHeaders.append((HTTPHEADER.CONNECTION, "Keep-Alive"))
+        conf.httpHeaders.append((HTTPHEADER.COOKIE, conf.cookie))
 
 def __setHTTPTimeout():
     """

@@ -75,6 +75,7 @@ class HTTPHEADER:
     CONNECTION          = "Connection"
     ACCEPT_ENCODING     = "Accept-Encoding"
     REFERER             = "Referer"
+    USER_AGENT          = "User-Agent"
 
 class EXPECTED:
     BOOL         = "bool"
