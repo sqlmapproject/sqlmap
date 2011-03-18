@@ -25,6 +25,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import sqlmapFilePathException
+from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import pollProcess
 from lib.request.connect import Connect as Request
@@ -82,6 +83,12 @@ def update():
         if svnStderr:
             errMsg = getUnicode(svnStderr, system=True).strip()
             logger.error(errMsg)
+
+            if IS_WIN:
+                infoMsg = "for Windows platform it's recommended "
+                infoMsg += "to use a TortoiseSVN GUI client for updating "
+                infoMsg += "purposes (http://tortoisesvn.net/)"
+                logger.info(infoMsg)
 
         elif svnStdout:
             revision = re.search("revision\s+([\d]+)", svnStdout, re.I)
