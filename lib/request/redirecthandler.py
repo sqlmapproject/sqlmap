@@ -12,8 +12,10 @@ import urllib2
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.common import getUnicode
+from lib.core.enums import HTTPHEADER
 from lib.core.exception import sqlmapConnectionException
 from lib.core.threads import getCurrentThreadData
+from lib.request.basic import decodePage
 
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     # maximum number of redirections to any single URL
@@ -25,6 +27,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     max_redirections = 10
 
     def common_http_redirect(self, result, headers, code, content, msg):
+        content = decodePage(content, headers.get(HTTPHEADER.CONTENT_ENCODING), headers.get(HTTPHEADER.CONTENT_TYPE))
+
         threadData = getCurrentThreadData()
         threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
 

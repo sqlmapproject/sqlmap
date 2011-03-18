@@ -127,7 +127,7 @@ class Connect:
                 page = conn.read()
                 responseHeaders = conn.info()
                 responseHeaders[URI_HTTP_HEADER] = conn.geturl()
-                page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+                page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
 
                 return page
 
@@ -149,13 +149,13 @@ class Connect:
             headers = forgeHeaders(cookie, ua, referer)
 
             if conf.realTest:
-                headers["Referer"] = "%s://%s" % (conf.scheme, conf.hostname)
+                headers[HTTPHEADER.REFERER] = "%s://%s" % (conf.scheme, conf.hostname)
 
             if kb.authHeader:
-                headers["Authorization"] = kb.authHeader
+                headers[HTTPHEADER.AUTHORIZATION] = kb.authHeader
 
             if kb.proxyAuthHeader:
-                headers["Proxy-authorization"] = kb.proxyAuthHeader
+                headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
@@ -183,16 +183,16 @@ class Connect:
 
                     cookieStr += "%s; " % cookie[8:index]
 
-            if not req.has_header("Accept-Encoding"):
-                requestHeaders += "Accept-Encoding: identity\n"
+            if not req.has_header(HTTPHEADER.ACCEPT_ENCODING):
+                requestHeaders += "%s: identity\n" % HTTPHEADER.ACCEPT_ENCODING
 
             requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
 
-            if not req.has_header("Cookie") and cookieStr:
+            if not req.has_header(HTTPHEADER.COOKIE) and cookieStr:
                 requestHeaders += "\n%s" % cookieStr[:-2]
 
-            if not req.has_header("Connection"):
-                requestHeaders += "\nConnection: close"
+            if not req.has_header(HTTPHEADER.CONNECTION):
+                requestHeaders += "\n%s: close" % HTTPHEADER.CONNECTION
 
             requestMsg += "\n%s" % requestHeaders
 
@@ -205,11 +205,11 @@ class Connect:
 
             conn = urllib2.urlopen(req)
 
-            if not kb.authHeader and req.has_header("Authorization"):
-                kb.authHeader = req.get_header("Authorization")
+            if not kb.authHeader and req.has_header(HTTPHEADER.AUTHORIZATION):
+                kb.authHeader = req.get_header(HTTPHEADER.AUTHORIZATION)
 
-            if not kb.proxyAuthHeader and req.has_header("Proxy-authorization"):
-                kb.proxyAuthHeader = req.get_header("Proxy-authorization")
+            if not kb.proxyAuthHeader and req.has_header(HTTPHEADER.PROXY_AUTHORIZATION):
+                kb.proxyAuthHeader = req.get_header(HTTPHEADER.PROXY_AUTHORIZATION)
 
             if hasattr(conn, "setcookie"):
                 kb.redirectSetCookie = conn.setcookie
@@ -250,7 +250,7 @@ class Connect:
             code = conn.code
             responseHeaders = conn.info()
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
-            page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+            page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
             status = getUnicode(conn.msg)
 
             # Explicit closing of connection object
@@ -270,7 +270,7 @@ class Connect:
                 page = e.read()
                 responseHeaders = e.info()
                 responseHeaders[URI_HTTP_HEADER] = e.geturl()
-                page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+                page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
             except socket.timeout:
                 warnMsg  = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % e.code

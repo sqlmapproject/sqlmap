@@ -64,9 +64,17 @@ class HASH:
     SHA1_GENERIC = r'(?i)\A[0-9a-f]{40}\Z'
 
 class HTTPHEADER:
-    RANGE           = "Range"
-    CONTENT_LENGTH  = "Content-Length"
-    CONTENT_RANGE   = "Content-Range"
+    RANGE               = "Range"
+    CONTENT_LENGTH      = "Content-Length"
+    CONTENT_RANGE       = "Content-Range"
+    CONTENT_ENCODING    = "Content-Encoding"
+    CONTENT_TYPE        = "Content-Type"
+    AUTHORIZATION       = "Authorization"
+    PROXY_AUTHORIZATION = "Proxy-authorization"
+    COOKIE              = "Cookie"
+    CONNECTION          = "Connection"
+    ACCEPT_ENCODING     = "Accept-Encoding"
+    REFERER             = "Referer"
 
 class EXPECTED:
     BOOL         = "bool"
