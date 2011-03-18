@@ -64,16 +64,16 @@ class HASH:
     SHA1_GENERIC = r'(?i)\A[0-9a-f]{40}\Z'
 
 class HTTPHEADER:
-    RANGE               = "Range"
+    ACCEPT_ENCODING     = "Accept-Encoding"
+    AUTHORIZATION       = "Authorization"
+    CONNECTION          = "Connection"
+    CONTENT_ENCODING    = "Content-Encoding"
     CONTENT_LENGTH      = "Content-Length"
     CONTENT_RANGE       = "Content-Range"
-    CONTENT_ENCODING    = "Content-Encoding"
     CONTENT_TYPE        = "Content-Type"
-    AUTHORIZATION       = "Authorization"
-    PROXY_AUTHORIZATION = "Proxy-authorization"
     COOKIE              = "Cookie"
-    CONNECTION          = "Connection"
-    ACCEPT_ENCODING     = "Accept-Encoding"
+    PROXY_AUTHORIZATION = "Proxy-authorization"
+    RANGE               = "Range"
     REFERER             = "Referer"
     USER_AGENT          = "User-Agent"
 
