@@ -118,10 +118,10 @@ class PAYLOAD:
              }
 
     class METHOD:
-        COMPARISON = "comparison"
-        GREP = "grep"
-        TIME = "time"
-        UNION = "union"
+        COMPARISON  = "comparison"
+        GREP        = "grep"
+        TIME        = "time"
+        UNION       = "union"
 
     class TECHNIQUE:
         HEURISTIC = 0
