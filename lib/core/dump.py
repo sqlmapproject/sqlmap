@@ -80,7 +80,7 @@ class Dump:
             try:
                 elements = set(elements)
                 elements = list(elements)
-                elements.sort(key=lambda x: x.lower())
+                elements.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
             except:
                 pass
 
@@ -125,7 +125,7 @@ class Dump:
             userSettings = userSettings[0]
 
         users = userSettings.keys()
-        users.sort(key=lambda x: x.lower())
+        users.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
 
         for user in users:
             settings = userSettings[user]
@@ -198,7 +198,7 @@ class Dump:
                 colType = None
 
                 colList = columns.keys()
-                colList.sort(key=lambda x: x.lower())
+                colList.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
 
                 for column in colList:
                     colType = columns[column]
@@ -282,7 +282,7 @@ class Dump:
         fields      = len(tableValues) - 1
 
         columns = tableValues.keys()
-        columns.sort(key=lambda x: x.lower())
+        columns.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
 
         for column in columns:
             if column != "__infos__":
