@@ -1032,6 +1032,12 @@ def __setHTTPReferer():
 
         conf.httpHeaders.append(("Referer", conf.referer))
 
+    elif conf.level >= 3:
+        debugMsg = "setting the default HTTP Referer header"
+        logger.debug(debugMsg)
+
+        conf.httpHeaders.append(("Referer", conf.url))
+
 def __setHTTPCookies():
     """
     Set the HTTP Cookie header
