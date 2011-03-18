@@ -536,10 +536,7 @@ def cmdLineParser():
         args = []
 
         for arg in sys.argv:
-            try:
-                args.append(getUnicode(arg, sys.getfilesystemencoding() or sys.stdin.encoding))
-            except:
-                args.append(getUnicode(arg, UNICODE_ENCODING))
+            args.append(getUnicode(arg, system=True))
 
         (args, _) = parser.parse_args(args)
 

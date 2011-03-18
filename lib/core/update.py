@@ -68,6 +68,7 @@ def update():
         client = pysvn.Client()
         client.callback_notify = notify
         client.update(rootDir)
+
     except ImportError, _:
         debugMsg = "sqlmap will try to update itself using 'svn' command"
         logger.debug(debugMsg)
@@ -79,8 +80,9 @@ def update():
         svnStdout, svnStderr = process.communicate()
 
         if svnStderr:
-            errMsg = svnStderr.strip()
+            errMsg = getUnicode(svnStderr, system=True).strip()
             logger.error(errMsg)
+
         elif svnStdout:
             revision = re.search("revision\s+([\d]+)", svnStdout, re.I)
 

@@ -1694,7 +1694,7 @@ def getPartRun():
     # Return the INI tag to consider for common outputs (e.g. 'Databases')
     return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal
 
-def getUnicode(value, encoding=None):
+def getUnicode(value, encoding=None, system=False):
     """
     Return the unicode representation of the supplied value:
 
@@ -1706,12 +1706,18 @@ def getUnicode(value, encoding=None):
     u'1'
     """
 
-    if isinstance(value, unicode):
-        return value
-    elif isinstance(value, basestring):
-        return unicode(value, encoding or UNICODE_ENCODING, errors="replace")
+    if not system:
+        if isinstance(value, unicode):
+            return value
+        elif isinstance(value, basestring):
+            return unicode(value, encoding or UNICODE_ENCODING, errors="replace")
+        else:
+            return unicode(value) # encoding ignored for non-basestring instances
     else:
-        return unicode(value) # encoding ignored for non-basestring instances
+        try:
+            return getUnicode(value, sys.getfilesystemencoding() or sys.stdin.encoding)
+        except:
+            return getUnicode(value, UNICODE_ENCODING)
 
 # http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 def longestCommonPrefix(*sequences):

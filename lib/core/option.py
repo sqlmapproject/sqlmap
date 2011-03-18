@@ -30,7 +30,6 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
-from lib.core.common import getUnicode
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import openFile
