@@ -1088,6 +1088,7 @@ def __cleanupOptions():
         conf.progressWidth = width-46
 
     if conf.testParameter:
+        conf.testParameter = urldecode(conf.testParameter)
         conf.testParameter = conf.testParameter.replace(" ", "")
         conf.testParameter = conf.testParameter.split(",")
     else:
@@ -1134,6 +1135,9 @@ def __cleanupOptions():
 
     if conf.tor:
         conf.proxy = DEFAULT_TOR_PROXY
+
+    if conf.data:
+        conf.data = urldecode(conf.data)
 
 def __setConfAttributes():
     """
@@ -1429,9 +1433,9 @@ def init(inputOptions=advancedDict()):
     __mergeOptions(inputOptions)
     __setVerbosity()
     __saveCmdline()
+    __setRequestFromFile()
     __cleanupOptions()
     __basicOptionValidation()
-    __setRequestFromFile()
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()

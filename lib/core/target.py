@@ -68,7 +68,7 @@ def __setRequestParams():
 
     if conf.data:
         conf.data = conf.data.replace("\n", " ")
-        conf.parameters[PLACE.POST] = urldecode(conf.data)
+        conf.parameters[PLACE.POST] = conf.data
 
         # Check if POST data is in xml syntax
         if re.match("[\n]*<(\?xml |soap\:|ns).*>", conf.data):
