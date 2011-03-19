@@ -215,9 +215,11 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
             for line in lines:
                 if len(line) == 0 or line == "\n":
-                    continue
+                    if method == HTTPMETHOD.POST:
+                        data = ""
+                        params = True
 
-                if line.startswith("GET ") or line.startswith("POST "):
+                elif (line.startswith("GET ") or line.startswith("POST ")) and " HTTP/" in line:
                     if line.startswith("GET "):
                         index = 4
                     else:
