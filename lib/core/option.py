@@ -279,7 +279,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     port   = None
 
                 if not kb.targetUrls or url not in addedTargetUrls:
-                    kb.targetUrls.add((url, method, data, cookie))
+                    kb.targetUrls.add((url, method, urldecode(data), cookie))
                     addedTargetUrls.add(url)
 
     fp = openFile(reqFile, "rb")
