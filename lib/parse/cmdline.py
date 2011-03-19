@@ -495,6 +495,10 @@ def cmdLineParser():
                                   action="store_true", default=False,
                                   help="Replicate dumped data into a sqlite3 database")
 
+        miscellaneous.add_option("--tor", dest="tor", 
+                                  action="store_true", default=False,
+                                  help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
+
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
                           default=False, help=SUPPRESS_HELP)
@@ -513,9 +517,6 @@ def cmdLineParser():
 
         parser.add_option("--technique", dest="technique", type="int",
                           default=0, help=SUPPRESS_HELP)
-
-        parser.add_option("--tor", dest="tor", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)
