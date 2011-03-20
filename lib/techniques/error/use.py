@@ -78,7 +78,7 @@ def __oneShotErrorUse(expression, field):
                 threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
         if isinstance(output, basestring):
-            output = htmlunescape(output).replace("<br>", "\n").strip()
+            output = htmlunescape(output).replace("<br>", "\n")
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             if offset == 1:
