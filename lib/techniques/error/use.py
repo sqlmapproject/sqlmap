@@ -22,6 +22,7 @@ from lib.core.common import listToStrValue
 from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
+from lib.core.convert import htmlunescape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -75,6 +76,9 @@ def __oneShotErrorUse(expression, field):
                 or extractRegexResult(check, threadData.lastRedirectMsg[1] \
                 if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
                 threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+
+        if isinstance(output, basestring):
+            output = htmlunescape(output).replace("<br>", "\n").strip()
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             if offset == 1:
