@@ -205,9 +205,9 @@ def cmdLineParser():
                              help="Compare pages based only on the textual content")
 
         # Techniques options
-        techniques = OptionGroup(parser, "Techniques", "These options can be used"
-                                 "to tweak testing of specific SQL injection "
-                                 "techniques.")
+        techniques = OptionGroup(parser, "Techniques", "These options can be "
+                                 "used to tweak testing of specific SQL "
+                                 "injection techniques.")
 
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int", default=TIME_DEFAULT_DELAY,
