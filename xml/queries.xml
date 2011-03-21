@@ -265,9 +265,8 @@
             <blind query="SELECT OWNER FROM (SELECT OWNER,ROWNUM AS LIMIT FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(OWNER)) FROM SYS.ALL_TABLES"/>
         </dbs>
         <tables>
-            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS,SYSDBA,USERS. It is NOT the database name -->
-            <inband query="SELECT TABLESPACE_NAME,TABLE_NAME FROM SYS.ALL_TABLES" condition="TABLESPACE_NAME"/>
-            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME,ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'"/>
+            <inband query="SELECT OWNER,TABLE_NAME FROM SYS.ALL_TABLES" condition="OWNER"/>
+            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME,ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE OWNER='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE OWNER='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT COLUMN_NAME,DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
@@ -279,9 +278,8 @@
         </dump_table>
         <search_db/>
         <search_table>
-            <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS,SYSDBA,USERS. It is NOT the database name -->
-            <inband query="SELECT TABLESPACE_NAME,TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
-            <blind query="SELECT DISTINCT(TABLESPACE_NAME) FROM SYS.ALL_TABLES WHERE " query2="SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" count="SELECT COUNT(DISTINCT(TABLESPACE_NAME)) FROM SYS.ALL_TABLES WHERE " count2="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE TABLESPACE_NAME='%s'" condition="TABLE_NAME" condition2="TABLESPACE_NAME"/>
+            <inband query="SELECT OWNER,TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="OWNER"/>
+            <blind query="SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES WHERE " query2="SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE OWNER='%s'" count="SELECT COUNT(DISTINCT(OWNER)) FROM SYS.ALL_TABLES WHERE " count2="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE OWNER='%s'" condition="TABLE_NAME" condition2="OWNER"/>
         </search_table>
         <search_column>
             <inband query="SELECT TABLE_NAME FROM SYS.ALL_TAB_COLUMNS WHERE " condition="COLUMN_NAME"/>
