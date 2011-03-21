@@ -344,7 +344,7 @@ def checkSqlInjection(place, parameter, value):
                                     threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
                             if output:
-                                result = output.replace(kb.misc.space, " ") == "1"
+                                result = output == "1"
 
                                 if result:
                                     infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)

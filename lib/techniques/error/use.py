@@ -94,6 +94,8 @@ def __oneShotErrorUse(expression, field):
             retVal = output
             break
 
+    retVal = __errorReplaceChars(retVal)
+
     dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(retVal)))
 
     return retVal
@@ -134,12 +136,21 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
         if isinstance(num, int):
             expression = origExpr
 
-        if output:
-            output = output.replace(kb.misc.space, " ")
-
         outputs.append(output)
 
     return outputs
+
+def __errorReplaceChars(value):
+    """
+    Restores safely replaced characters
+    """
+
+    retVal = value
+
+    if value:
+        retVal = retVal.replace(kb.misc.space, " ").replace(kb.misc.dollar, "$")
+
+    return retVal
 
 def errorUse(expression, expected=None, resumeValue=True, dump=False):
     """
