@@ -656,7 +656,16 @@ class Enumeration:
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
-        infoMsg = "fetching database names"
+        if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            warnMsg  = "schema names are going to be used on Oracle "
+            warnMsg += "for enumeration as the counterpart to database "
+            warnMsg += "names on other DBMSes"
+            logger.warn(warnMsg)
+
+            infoMsg = "fetching database (schema) names"
+        else:
+            infoMsg = "fetching database names"
+
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].dbs
@@ -685,7 +694,11 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of databases"
                 raise sqlmapNoneDataException, errMsg
 
-            indexRange = getRange(count)
+            if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                plusOne = True
+            else:
+                plusOne = False
+            indexRange = getRange(count, plusOne=plusOne)
 
             for index in indexRange:
                 if Backend.getIdentifiedDbms() == DBMS.SYBASE:

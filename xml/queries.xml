@@ -259,8 +259,11 @@
             <inband query="SELECT GRANTEE,GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME,GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
             <blind query="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE),ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT DISTINCT(GRANTED_ROLE) FROM (SELECT DISTINCT(GRANTED_ROLE),ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(DISTINCT(GRANTED_ROLE)) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
         </roles>
-        <!-- NOTE: in Oracle there is no query to enumerate DBMS databases. It is possible only through a STATUS request to the Oracle TNS Listener negotiating its protocol -->
-        <dbs/>
+        <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
+        <dbs>
+            <inband query="SELECT OWNER FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)"/>
+            <blind query="SELECT OWNER FROM (SELECT OWNER,ROWNUM AS LIMIT FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(OWNER)) FROM SYS.ALL_TABLES"/>
+        </dbs>
         <tables>
             <!-- NOTE: in Oracle the TABLESPACE_NAME is the spacename corresponding to SYS,SYSDBA,USERS. It is NOT the database name -->
             <inband query="SELECT TABLESPACE_NAME,TABLE_NAME FROM SYS.ALL_TABLES" condition="TABLESPACE_NAME"/>
