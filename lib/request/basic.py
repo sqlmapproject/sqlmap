@@ -103,6 +103,8 @@ def checkCharEncoding(encoding):
     # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
         encoding = translate[encoding]
+    elif encoding.startswith('iso-8858'): #very popular typo
+        encoding = encoding.replace('8858', '8859')
     elif encoding.startswith('cp-'):
         encoding = 'cp%s' % encoding[3:]
     elif encoding.startswith('windows') and not encoding.startswith('windows-'):
@@ -110,6 +112,7 @@ def checkCharEncoding(encoding):
     elif encoding == 'null':
         return None
 
+    # http://www.iana.org/assignments/character-sets
     try:
         codecs.lookup(encoding)
     except LookupError:
