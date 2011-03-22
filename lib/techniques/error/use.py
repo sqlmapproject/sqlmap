@@ -16,6 +16,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
+from lib.core.common import getUnicode
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
@@ -76,6 +77,8 @@ def __oneShotErrorUse(expression, field):
                 or extractRegexResult(check, threadData.lastRedirectMsg[1] \
                 if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
                 threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+
+        output = getUnicode(output, kb.pageEncoding)
 
         if isinstance(output, basestring):
             output = htmlunescape(output).replace("<br>", "\n")
