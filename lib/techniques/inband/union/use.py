@@ -65,7 +65,8 @@ def __oneShotUnionUse(expression, unpack=True):
             or extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
             if headers else None), payload), re.DOTALL | re.IGNORECASE)
 
-    output = getUnicode(output, kb.pageEncoding)
+    if output:
+        output = getUnicode(output, kb.pageEncoding)
 
     return output
 

@@ -78,7 +78,8 @@ def __oneShotErrorUse(expression, field):
                 if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
                 threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
-        output = getUnicode(output, kb.pageEncoding)
+        if output:
+            output = getUnicode(output, kb.pageEncoding)
 
         if isinstance(output, basestring):
             output = htmlunescape(output).replace("<br>", "\n")
