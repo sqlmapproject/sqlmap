@@ -637,7 +637,8 @@ class Agent:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
             if query.startswith("SELECT "):
-                limitedQuery = "%s FROM (%s, %s" % (untilFrom, untilFrom, limitStr)
+                delimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
+                limitedQuery = "%s FROM (%s, %s" % (untilFrom, untilFrom.replace(delimiter, ','), limitStr)
             else:
                 limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, ", ".join(f for f in field), limitStr)
             limitedQuery = limitedQuery % fromFrom
