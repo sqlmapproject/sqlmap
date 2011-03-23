@@ -898,7 +898,7 @@ class Enumeration:
         if "." in conf.tbl:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
-        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
             conf.tbl = "dbo.%s" % conf.tbl
 
         self.forceDbmsEnum()
@@ -1125,6 +1125,7 @@ class Enumeration:
             logger.info(infoMsg)
 
             query = dumpNode.count2 % (column, table)
+
             if blind:
                 value = inject.getValue(query, inband=False, error=False)
             else:
@@ -1178,6 +1179,9 @@ class Enumeration:
                 if blind:
                     value = inject.getValue(query, inband=False, error=False)
                 else:
+                    print 1111
+                    import pdb
+                    pdb.set_trace()
                     value = inject.getValue(query, blind=False)
 
                 if column == colList[0]:
@@ -1209,7 +1213,7 @@ class Enumeration:
         if "." in conf.tbl:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
-        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
             conf.tbl = "dbo.%s" % conf.tbl
 
         self.forceDbmsEnum()

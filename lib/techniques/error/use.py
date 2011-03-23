@@ -194,8 +194,8 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
        expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) \
        or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
        expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
-       and "EXISTS(" not in expression.upper() and "COUNT(*)" not in expression.upper() \
-       and ("(CASE" not in expression.upper() or ("(CASE" in expression.upper() and "WHEN use" in expression))):
+       and ("(CASE" not in expression.upper() or ("(CASE" in expression.upper() and "WHEN use" in expression))) \
+       and not any(map(lambda x: x in expression.upper(), ["COUNT(*)", "EXISTS(", "MAX(", "MIN("])):
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
