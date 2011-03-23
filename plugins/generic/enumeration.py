@@ -898,7 +898,7 @@ class Enumeration:
         if "." in conf.tbl:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
-        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             conf.tbl = "dbo.%s" % conf.tbl
 
         self.forceDbmsEnum()
@@ -1209,7 +1209,7 @@ class Enumeration:
         if "." in conf.tbl:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
-        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             conf.tbl = "dbo.%s" % conf.tbl
 
         self.forceDbmsEnum()
@@ -1288,7 +1288,7 @@ class Enumeration:
             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                 query = rootQuery.inband.query % (colString, conf.tbl)
             elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                table = "%s..%s" % (conf.db, conf.tbl)
+                table = "%s.%s" % (conf.db, conf.tbl)
                 entries, _ = self.__pivotDumpTable(table, colList, blind=False)
                 entries = zip(*[entries[colName] for colName in colList])
             else:
