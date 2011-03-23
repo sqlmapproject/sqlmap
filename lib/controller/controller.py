@@ -201,7 +201,7 @@ def start():
                 if conf.forms:
                     message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
                 else:
-                    message = "url %d:\n%s %s%s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl,  " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork else "")
+                    message = "url %d:\n%s %s%s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl,  " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork and conf.pageRank else "")
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie

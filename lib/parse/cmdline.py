@@ -482,7 +482,11 @@ def cmdLineParser():
                                   help="Parse and test forms on target url")
 
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
-                                  help="Use google dork results from specified page number")
+                                  help="Use Google dork results from specified page number")
+
+        miscellaneous.add_option("--page-rank", dest="pageRank",
+                                  action="store_true", default=False,
+                                  help="Display page rank (PR) for Google dork results")
 
         miscellaneous.add_option("--parse-errors", dest="parseErrors",
                                   action="store_true", default=False,
