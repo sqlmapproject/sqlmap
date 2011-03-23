@@ -896,7 +896,10 @@ class Enumeration:
             raise sqlmapMissingMandatoryOptionException, errMsg
 
         if "." in conf.tbl:
-            conf.db, conf.tbl = conf.tbl.split(".")
+            if not conf.db:
+                conf.db, conf.tbl = conf.tbl.split(".")
+        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            conf.tbl = "dbo.%s" % conf.tbl
 
         self.forceDbmsEnum()
 
@@ -977,7 +980,7 @@ class Enumeration:
                 query = rootQuery.inband.query % (conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.db,
-                                                        conf.db, conf.tbl)
+                                                        conf.db, conf.tbl if '.' not in conf.tbl else conf.tbl.split('.')[1])
                 query += condQuery.replace("[DB]", conf.db)
             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                 query = rootQuery.inband.query % conf.tbl
@@ -1016,7 +1019,8 @@ class Enumeration:
                 query += condQuery
 
             elif Backend.getIdentifiedDbms() in DBMS.MSSQL:
-                query = rootQuery.blind.count % (conf.db, conf.db, conf.tbl)
+                query = rootQuery.blind.count % (conf.db, conf.db, \
+                    conf.tbl if '.' not in conf.tbl else conf.tbl.split('.')[1])
                 query += condQuery.replace("[DB]", conf.db)
 
             elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
@@ -1055,7 +1059,7 @@ class Enumeration:
                     query = rootQuery.blind.query % (conf.db, conf.db,
                                                            conf.db, conf.db,
                                                            conf.db, conf.db,
-                                                           conf.tbl)
+                                                           conf.tbl if '.' not in conf.tbl else conf.tbl.split('.')[1])
                     query += condQuery.replace("[DB]", conf.db)
                     field = condition.replace("[DB]", conf.db)
                 elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
@@ -1203,7 +1207,10 @@ class Enumeration:
             return
 
         if "." in conf.tbl:
-            conf.db, conf.tbl = conf.tbl.split(".")
+            if not conf.db:
+                conf.db, conf.tbl = conf.tbl.split(".")
+        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            conf.tbl = "dbo.%s" % conf.tbl
 
         self.forceDbmsEnum()
 

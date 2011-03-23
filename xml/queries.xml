@@ -183,17 +183,17 @@
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
-            <blind query="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype IN ('u','v') AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype IN ('u','v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
+            <inband query="SELECT sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v')"/>
+            <blind query="SELECT TOP 1 sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') AND sysusers.name+'.'+sysobjects.name NOT IN (SELECT TOP %d sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
             <blind query="SELECT %s..syscolumns.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
         </columns>
         <dump_table>
-            <inband query="SELECT %s FROM %s..%s"/>
+            <inband query="SELECT %s FROM %s.%s"/>
             <!--<blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s)" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>-->
-            <blind query="SELECT TOP 1 %s FROM (SELECT TOP 1 * FROM ( SELECT TOP %d * FROM %s..%s ORDER BY %s ASC ) AS t1 ORDER BY %s DESC) AS t2 ORDER BY %s ASC" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>
+            <blind query="SELECT TOP 1 %s FROM (SELECT TOP 1 * FROM ( SELECT TOP %d * FROM %s.%s ORDER BY %s ASC ) AS t1 ORDER BY %s DESC) AS t2 ORDER BY %s ASC" count="SELECT LTRIM(STR(COUNT(*))) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
