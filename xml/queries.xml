@@ -169,22 +169,23 @@
         <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1" query2="IS_SRVROLEMEMBER('sysadmin','%s')=1"/>
         <users>
             <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
-            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins)" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
+            <!-- NOTE: in NOT IN kind of queries ORDER BY is a must -->
+            <blind query="SELECT TOP 1 name FROM master..syslogins WHERE name NOT IN (SELECT TOP %d name FROM master..syslogins ORDER BY name) ORDER BY name" query2="SELECT TOP 1 name FROM sys.sql_logins WHERE name NOT IN (SELECT TOP %d name FROM sys.sql_logins ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..syslogins" count2="SELECT LTRIM(STR(COUNT(name))) FROM sys.sql_logins"/>
         </users>
         <passwords>
             <inband query="SELECT name,master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins" query2="SELECT name,master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins" condition="name"/>
-            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM master..sysxlogins WHERE name='%s')" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND password_hash NOT IN (SELECT TOP %d password_hash FROM sys.sql_logins WHERE name='%s')" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
+            <blind query="SELECT TOP 1 master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins WHERE name='%s' AND password NOT IN (SELECT TOP %d password FROM master..sysxlogins WHERE name='%s' ORDER BY password) ORDER BY password" query2="SELECT TOP 1 master.dbo.fn_varbintohexstr(password_hash) FROM sys.sql_logins WHERE name='%s' AND password_hash NOT IN (SELECT TOP %d password_hash FROM sys.sql_logins WHERE name='%s' ORDER BY password_hash) ORDER BY password_hash" count="SELECT LTRIM(STR(COUNT(password))) FROM master..sysxlogins WHERE name='%s'" count2="SELECT LTRIM(STR(COUNT(password_hash))) FROM sys.sql_logins WHERE name='%s'"/>
         </passwords>
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
         <privileges/>
         <roles/>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases"/>
-            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases)" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
+            <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
             <inband query="SELECT sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v')"/>
-            <blind query="SELECT TOP 1 sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') AND sysusers.name+'.'+sysobjects.name NOT IN (SELECT TOP %d sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v'))" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
+            <blind query="SELECT TOP 1 sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') AND sysusers.name+'.'+sysobjects.name NOT IN (SELECT TOP %d sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') ORDER BY 1) ORDER BY 1" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
