@@ -444,6 +444,10 @@ def cmdLineParser():
                             action="store_true", default=False,
                             help="Flush session file for current target")
 
+        general.add_option("--fresh-queries", dest="freshQueries",
+                            action="store_true", default=False,
+                            help="Ignores query results stored in session file")
+
         general.add_option("--eta", dest="eta",
                             action="store_true", default=False,
                             help="Display for each output the "

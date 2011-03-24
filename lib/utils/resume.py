@@ -97,7 +97,7 @@ def resume(expression, payload):
     """
 
     try:
-        if "sqlmapfile" in expression or "sqlmapoutput" in expression:
+        if "sqlmapfile" in expression or "sqlmapoutput" in expression or conf.freshQueries:
             return None
 
         condition = (

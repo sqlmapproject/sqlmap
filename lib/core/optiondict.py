@@ -149,6 +149,7 @@ optDict = {
                                "trafficFile":       "string",
                                "sessionFile":       "string",
                                "flushSession":      "boolean",
+                               "freshQueries":      "boolean",
                                "forms":             "boolean",
                                "eta":               "boolean",
                                "updateAll":         "boolean",
