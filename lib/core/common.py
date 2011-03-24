@@ -80,6 +80,7 @@ from lib.core.settings import DUMP_DEL_MARKER
 from lib.core.settings import DUMP_TAB_MARKER
 from lib.core.settings import DUMP_START_MARKER
 from lib.core.settings import DUMP_STOP_MARKER
+from lib.core.settings import LIST_EMAIL
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REFLECTED_NON_ALPHA_NUM_REGEX
@@ -2329,7 +2330,7 @@ def unhandledExceptionMessage():
     errMsg  = "unhandled exception in %s, retry your " % VERSION_STRING
     errMsg += "run with the latest development version from the Subversion "
     errMsg += "repository. If the exception persists, please send by e-mail "
-    errMsg += "to sqlmap-users@lists.sourceforge.net the following text "
+    errMsg += "to %s the following text " % LIST_EMAIL
     errMsg += "and any information required to reproduce the bug. The "
     errMsg += "developers will try to reproduce the bug, fix it accordingly "
     errMsg += "and get back to you.\n"

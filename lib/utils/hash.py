@@ -36,6 +36,7 @@ from lib.core.enums import HASH
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import DUMMY_USER_PREFIX
+from lib.core.settings import LIST_EMAIL
 from lib.core.settings import UNICODE_ENCODING
 
 def mysql_passwd(password, uppercase=True):
@@ -400,7 +401,7 @@ def dictionaryAttack(attack_dict):
 
                     except:
                         warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                        warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+                        warnMsg += "Please report by e-mail to %s." % LIST_EMAIL
                         logger.critical(warnMsg)
 
             clearConsoleLine()
@@ -449,14 +450,14 @@ def dictionaryAttack(attack_dict):
 
                         except:
                             warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                            warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+                            warnMsg += "Please report by e-mail to %s." % LIST_EMAIL
                             logger.critical(warnMsg)
 
                 clearConsoleLine()
 
     if len(hash_regexes) == 0:
         warnMsg  = "unknown hash Format. "
-        warnMsg += "Please report by e-mail to sqlmap-users@lists.sourceforge.net."
+        warnMsg += "Please report by e-mail to %s." % LIST_EMAIL
         logger.warn(warnMsg)
 
     if len(results) == 0:
