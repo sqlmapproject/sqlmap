@@ -101,11 +101,15 @@ def checkCharEncoding(encoding):
         if delimiter in encoding:
             encoding = encoding[:encoding.find(delimiter)]
 
+    # popular typos/errors
+    if '8858' in encoding:
+        encoding = encoding.replace('8858', '8859')
+    if encoding.startswith('8859'):
+        encoding = 'iso-%s' % encoding
+
     # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
         encoding = translate[encoding]
-    elif encoding.startswith('iso-8858'): #very popular typo
-        encoding = encoding.replace('8858', '8859')
     elif encoding.startswith('cp-'):
         encoding = 'cp%s' % encoding[3:]
     elif encoding.startswith('windows') and not encoding.startswith('windows-'):
