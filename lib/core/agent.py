@@ -674,15 +674,15 @@ class Agent:
             if forgeNotIn:
                 limitedQuery = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
 
-                if uniqueField and " ORDER BY " not in fromFrom:
+                if " ORDER BY " not in fromFrom:
                     # Reference: http://vorg.ca/626-the-MS-SQL-equivalent-to-MySQLs-limit-command
                     if " WHERE " in limitedQuery:
-                        limitedQuery = "%s AND %s " % (limitedQuery, uniqueField)
+                        limitedQuery = "%s AND %s " % (limitedQuery, uniqueField or field)
                     else:
-                        limitedQuery = "%s WHERE ISNULL(%s,' ') " % (limitedQuery, uniqueField)
+                        limitedQuery = "%s WHERE ISNULL(%s,' ') " % (limitedQuery, uniqueField or field)
 
                     limitedQuery += "NOT IN (%s" % (limitStr % num)
-                    limitedQuery += "ISNULL(%s,' ') %s ORDER BY %s) ORDER BY %s" % (uniqueField, fromFrom, uniqueField, uniqueField)
+                    limitedQuery += "ISNULL(%s,' ') %s ORDER BY %s) ORDER BY %s" % (uniqueField or field, fromFrom, uniqueField or field, uniqueField or field)
                 else:
                     if " WHERE " in limitedQuery:
                         limitedQuery = "%s AND %s " % (limitedQuery, field)

@@ -1078,7 +1078,7 @@ class Enumeration:
                     elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
                         query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db,
                                                                 conf.db, column, conf.db,
-                                                                conf.db, conf.db, conf.tbl)
+                                                                conf.db, conf.db, conf.tbl if '.' not in conf.tbl else conf.tbl.split('.')[1])
                     elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
                         query = rootQuery.blind.query2 % (conf.tbl, column)
 
