@@ -520,6 +520,9 @@ def cmdLineParser():
         parser.add_option("--real-test", dest="realTest", action="store_true",
                           default=False, help=SUPPRESS_HELP)
 
+        parser.add_option("--run-case", dest="runCase", type="int",
+                          default=None, help=SUPPRESS_HELP)
+
         parser.add_option("--technique", dest="technique", type="int",
                           default=0, help=SUPPRESS_HELP)
 

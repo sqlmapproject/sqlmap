@@ -119,6 +119,11 @@ def liveTest():
                     vars_[child.tagName] = child.getAttribute("value")
 
     for case in livetests.getElementsByTagName("case"):
+        count += 1
+
+        if conf.runCase and conf.runCase != count:
+            continue
+
         name = None
         log = []
         session = []
@@ -143,7 +148,6 @@ def liveTest():
                 if item.hasAttribute("value"):
                     session.append(replaceVars(item.getAttribute("value"), vars_))
 
-        count += 1
         msg = "running live test case '%s' (%d/%d)" % (name, count, length)
         logger.info(msg)
         result = runCase(switches, log, session)
@@ -214,6 +218,8 @@ def runCase(switches=None, log=None, session=None):
         for item in log:
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], content, re.DOTALL):
+                    import pdb
+                    pdb.set_trace()
                     retVal = False
                     break
             elif content.find(item) < 0:
