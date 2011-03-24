@@ -184,7 +184,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
             if result:
-                return chr(charTbl[0]) if charTbl[0] < 128 else decodeIntToUnicode(charTbl[0])
+                return decodeIntToUnicode(charTbl[0])
             else:
                 return None
 
@@ -200,7 +200,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 # e.g.: ... > '%c' -> ... > ORD(..)
                 markingValue = "'%s'" % CHAR_INFERENCE_MARK
-                unescapedCharValue = unescaper.unescape(markingValue % chr(posValue) if posValue < 128 else decodeIntToUnicode(posValue))
+                unescapedCharValue = unescaper.unescape(markingValue % decodeIntToUnicode(posValue))
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
             queriesCount[0] += 1
@@ -255,7 +255,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                                 return getChar(idx, originalTbl, continuousOrder, expand)
                             else:
-                                return chr(retVal) if retVal < 128 else decodeIntToUnicode(retVal)
+                                return decodeIntToUnicode(retVal)
                         else:
                             return None
                 else:
@@ -271,7 +271,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
                         if result:
-                            return chr(retVal) if retVal < 128 else decodeIntToUnicode(retVal)
+                            return decodeIntToUnicode(retVal)
 
                     return None
 
