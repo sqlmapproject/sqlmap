@@ -215,7 +215,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
             for line in lines:
                 if len(line) == 0 or line == "\n":
-                    if method == HTTPMETHOD.POST:
+                    if method == HTTPMETHOD.POST and data is None:
                         data = ""
                         params = True
 
