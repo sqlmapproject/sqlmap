@@ -132,4 +132,46 @@
             <item value="r'5 tables.+BONUS.+DEPT.+EMP.+SALGRADE.+USERS'"/>
         </log>
     </case>
+    <case name="MSSQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+        <switches>
+            <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
+            <isDba value="True"/>
+            <technique value="2"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <db value="testdb"/>
+        </switches>
+        <log>
+            <item value="current user is DBA:    'True'"/>
+            <item value="r'Microsoft SQL Server 2005.+Oct 14 2005 00:33:37'"/>
+            <item value="current user:    'sa'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="r'available databases.+5.+master.+model.+msdb.+tempdb.+testdb'"/>
+            <item value="r'dbo\.sysdiagrams.+dbo\.users'"/>
+        </log>
+    </case>
+    <case name="MSSQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+        <switches>
+            <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
+            <isDba value="True"/>
+            <technique value="3"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <db value="testdb"/>
+        </switches>
+        <log>
+            <item value="current user is DBA:    'True'"/>
+            <item value="r'Microsoft SQL Server 2005.+Oct 14 2005 00:33:37'"/>
+            <item value="current user:    'sa'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="r'available databases.+5.+master.+model.+msdb.+tempdb.+testdb'"/>
+            <item value="r'dbo\.sysdiagrams.+dbo\.users'"/>
+        </log>
+    </case>
 </root>
