@@ -185,7 +185,7 @@
         </dbs>
         <tables>
             <inband query="SELECT sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v')"/>
-            <blind query="SELECT TOP 1 sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') AND sysusers.name+'.'+sysobjects.name NOT IN (SELECT TOP %d sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') ORDER BY 1) ORDER BY 1" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
+            <blind query="SELECT TOP 1 sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') AND sysusers.name+'.'+sysobjects.name NOT IN (SELECT TOP %d sysusers.name+'.'+sysobjects.name FROM %s..sysobjects INNER JOIN sysusers ON sysobjects.uid = sysusers.uid WHERE xtype IN ('u', 'v') ORDER BY sysusers.name+'.'+sysobjects.name) ORDER BY sysusers.name+'.'+sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
