@@ -15,6 +15,7 @@ from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
+from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
@@ -159,7 +160,7 @@ class Dump:
                     if isinstance(table, (list, tuple, set)):
                         table = table[0]
 
-                    maxlength = max(maxlength, len(getUnicode(table)))
+                    maxlength = max(maxlength, len(normalizeUnicode(table)))
 
             lines = "-" * (int(maxlength) + 2)
 
@@ -179,7 +180,7 @@ class Dump:
                     if isinstance(table, (list, tuple, set)):
                         table = table[0]
 
-                    blank = " " * (maxlength - len(getUnicode(table)))
+                    blank = " " * (maxlength - len(normalizeUnicode(table)))
                     self.__write("| %s%s |" % (table, blank))
 
                 self.__write("+%s+\n" % lines)

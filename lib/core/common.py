@@ -22,6 +22,7 @@ import ntpath
 import posixpath
 import httplib
 import struct
+import unicodedata
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
@@ -2430,4 +2431,14 @@ def removeReflectiveValues(content, payload):
             debugMsg = "reflective value found and filtered out"
             logger.debug(debugMsg)
 
+    return retVal
+
+def normalizeUnicode(value):
+    """
+    Does an ASCII normalization of unicode strings
+    Reference: http://www.peterbe.com/plog/unicode-to-ascii
+    """
+    retVal = value
+    if isinstance(value, unicode):
+        retVal = unicodedata.normalize('NFKD', value).encode('ascii','ignore')
     return retVal
