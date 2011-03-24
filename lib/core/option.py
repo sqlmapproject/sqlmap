@@ -1349,7 +1349,7 @@ def __setVerbosity():
     elif conf.verbose >= 5:
         logger.setLevel(7)
 
-def __mergeOptions(inputOptions):
+def __mergeOptions(inputOptions, overrideOptions):
     """
     Merge command line options with configuration file options.
 
@@ -1367,7 +1367,7 @@ def __mergeOptions(inputOptions):
 
     for key, value in inputOptionsItems:
         if key not in conf or (conf[key] is False and value is True) or \
-           value not in (None, False):
+           value not in (None, False) or overrideOptions:
             conf[key] = value
 
 def __setTrafficOutputFP():
@@ -1425,7 +1425,7 @@ def __basicOptionValidation():
         errMsg = "value for --time-sec option must be an integer greater than 0"
         raise sqlmapSyntaxException, errMsg
 
-def init(inputOptions=advancedDict()):
+def init(inputOptions=advancedDict(), overrideOptions=False):
     """
     Set attributes into both configuration and knowledge base singletons
     based upon command line and configuration file options.
@@ -1433,7 +1433,7 @@ def init(inputOptions=advancedDict()):
 
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
-    __mergeOptions(inputOptions)
+    __mergeOptions(inputOptions, overrideOptions)
     __setVerbosity()
     __saveCmdline()
     __setRequestFromFile()

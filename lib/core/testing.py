@@ -17,6 +17,7 @@ import tempfile
 import time
 
 from lib.controller.controller import start
+from lib.core.common import beep
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
@@ -74,6 +75,10 @@ def smokeTest():
     return retVal
 
 def adjustValueType(tagName, value):
+    # as it's not part of optDict
+    if tagName == "technique":
+        value = int(value)
+
     for family in optDict.keys():
         for name, type_ in optDict[family].items():
             if type(type_) == tuple:
@@ -146,6 +151,7 @@ def liveTest():
             logger.info("test passed")
         else:
             logger.error("test failed")
+            beep()
         retVal &= result
 
     dataToStdout("\n")
@@ -169,7 +175,7 @@ def initCase(switches=None):
                 cmdLineOptions.__dict__[key] = value
 
     conf.sessionFile = None
-    init(cmdLineOptions)
+    init(cmdLineOptions, True)
     __setVerbosity()
 
 def cleanCase():
@@ -194,7 +200,7 @@ def runCase(switches=None, log=None, session=None):
         ifile.close()
         for item in session:
             if item.startswith("r'") and item.endswith("'"):
-                if not re.search(item[2:-1], content):
+                if not re.search(item[2:-1], content, re.DOTALL):
                     retVal = False
                     break
             elif content.find(item) < 0:
@@ -207,7 +213,7 @@ def runCase(switches=None, log=None, session=None):
         ifile.close()
         for item in log:
             if item.startswith("r'") and item.endswith("'"):
-                if not re.search(item[2:-1], content):
+                if not re.search(item[2:-1], content, re.DOTALL):
                     retVal = False
                     break
             elif content.find(item) < 0:
