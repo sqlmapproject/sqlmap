@@ -692,29 +692,36 @@ class Enumeration:
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of databases"
-                raise sqlmapNoneDataException, errMsg
-
-            if Backend.getIdentifiedDbms() == DBMS.ORACLE:
-                plusOne = True
+                logger.error(errMsg)
             else:
-                plusOne = False
-            indexRange = getRange(count, plusOne=plusOne)
-
-            for index in indexRange:
-                if Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                    query = rootQuery.blind.query % (kb.data.cachedDbs[-1] if kb.data.cachedDbs else " ")
-                elif Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-                    query = rootQuery.blind.query2 % index
+                if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                    plusOne = True
                 else:
-                    query = rootQuery.blind.query % index
-                db = inject.getValue(query, inband=False, error=False)
+                    plusOne = False
+                indexRange = getRange(count, plusOne=plusOne)
 
-                if db:
-                    kb.data.cachedDbs.append(db)
+                for index in indexRange:
+                    if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                        query = rootQuery.blind.query % (kb.data.cachedDbs[-1] if kb.data.cachedDbs else " ")
+                    elif Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                        query = rootQuery.blind.query2 % index
+                    else:
+                        query = rootQuery.blind.query % index
+                    db = inject.getValue(query, inband=False, error=False)
+
+                    if db:
+                        kb.data.cachedDbs.append(db)
 
         if not kb.data.cachedDbs:
-            errMsg = "unable to retrieve the database names"
-            raise sqlmapNoneDataException, errMsg
+            infoMsg = "falling back to current database"
+            logger.info(infoMsg)
+            self.getCurrentDb()
+
+            if kb.data.currentDb:
+                kb.data.cachedDbs = [kb.data.currentDb]
+            else:
+                errMsg = "unable to retrieve the database names"
+                raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedDbs
 
