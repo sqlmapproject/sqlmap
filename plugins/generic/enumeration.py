@@ -1218,7 +1218,7 @@ class Enumeration:
         Returns an safe representation of identificator name for MySQL
         """
         retVal = value
-        if isinstance(value, basestring) and not re.match(r"\A[A-Za-z0-9]+\Z", value):
+        if isinstance(value, basestring) and not re.match(r"\A[A-Za-z0-9_]+\Z", value):
             retVal = "`%s`" % value
         return retVal
 
