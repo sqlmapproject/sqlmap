@@ -112,7 +112,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
     for position in positions:
         # Prepare expression with delimiters
         randQuery = randomStr()
-        phrase = "%s%s%s" % (kb.misc.start, randQuery, kb.misc.stop)
+        phrase = "%s%s%s".lower() % (kb.misc.start, randQuery, kb.misc.stop)
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
@@ -122,7 +122,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
 
         # Perform the request
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-        content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
+        content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
         # Remove possible reflective values from content (especially headers part)
         content = removeReflectiveValues(content, payload)
@@ -134,7 +134,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
                 randQuery2 = randomStr()
-                phrase2 = "%s%s%s" % (kb.misc.start, randQuery2, kb.misc.stop)
+                phrase2 = "%s%s%s".lower() % (kb.misc.start, randQuery2, kb.misc.stop)
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 
@@ -144,7 +144,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
 
                 # Perform the request
                 page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-                content = "%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")
+                content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
                 if content and ((phrase in content and phrase2 not in content) or (phrase not in content and phrase2 in content)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, PAYLOAD.WHERE.NEGATIVE)
