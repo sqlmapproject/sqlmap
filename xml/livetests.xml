@@ -6,7 +6,7 @@
         <batch value="True"/>
         <verbose value="0"/>
     </global>
-    <case name="MySQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb --threads=4)">
+    <case name="MySQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://debianenv/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -17,6 +17,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
             <threads value="4"/>
         </switches>
         <log>
@@ -26,9 +29,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MySQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+    <case name="MySQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debianenv/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -39,6 +44,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -47,9 +55,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MySQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+    <case name="MySQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debianenv/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -60,6 +70,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -68,9 +81,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="Postgres (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb --threads=4)">
+    <case name="Postgres (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -81,6 +96,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
             <threads value="4"/>
         </switches>
         <log>
@@ -90,9 +108,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'postgres.+template0.+template1.+testdb'"/>
             <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+username.+bpchar'"/>
+            <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Postgres (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+    <case name="Postgres (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -103,6 +123,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -111,9 +134,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'postgres.+template0.+template1.+testdb'"/>
             <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+username.+bpchar'"/>
+            <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Postgres (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+    <case name="Postgres (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -124,6 +149,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -132,9 +160,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'postgres.+template0.+template1.+testdb'"/>
             <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+username.+bpchar'"/>
+            <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Oracle (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT --threads=4)">
+    <case name="Oracle (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://debianenv/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -145,6 +175,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="SCOTT"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
             <threads value="4"/>
         </switches>
         <log>
@@ -154,9 +187,11 @@
             <item value="'TESTDB.REGRESS.RDBMS.DEV.US.ORACLE.COM'"/>
             <item value="r'available databases.+15.+CTXSYS.+DBSNMP.+SCOTT.+SYS.+SYSMAN'"/>
             <item value="r'5 tables.+BONUS.+DEPT.+EMP.+SALGRADE.+USERS'"/>
+            <item value="r'3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Oracle (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT)">
+    <case name="Oracle (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
             <url value="http://debianenv/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -167,6 +202,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="SCOTT"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -175,9 +213,11 @@
             <item value="'TESTDB.REGRESS.RDBMS.DEV.US.ORACLE.COM'"/>
             <item value="r'available databases.+15.+CTXSYS.+DBSNMP.+SCOTT.+SYS.+SYSMAN'"/>
             <item value="r'5 tables.+BONUS.+DEPT.+EMP.+SALGRADE.+USERS'"/>
+            <item value="r'3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Oracle (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT)">
+    <case name="Oracle (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
             <url value="http://debianenv/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -188,6 +228,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="SCOTT"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -196,9 +239,11 @@
             <item value="'TESTDB.REGRESS.RDBMS.DEV.US.ORACLE.COM'"/>
             <item value="r'available databases.+15.+CTXSYS.+DBSNMP.+SCOTT.+SYS.+SYSMAN'"/>
             <item value="r'5 tables.+BONUS.+DEPT.+EMP.+SALGRADE.+USERS'"/>
+            <item value="r'3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="MSSQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb --threads=4)">
+    <case name="MSSQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
@@ -209,6 +254,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
             <threads value="4"/>
         </switches>
         <log>
@@ -218,9 +266,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'available databases.+5.+master.+model.+msdb.+tempdb.+testdb'"/>
             <item value="r'dbo\.sysdiagrams.+dbo\.users'"/>
+            <item value="r'3 columns.+surname.+varchar'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MSSQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+    <case name="MSSQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
@@ -231,6 +281,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -239,9 +292,11 @@
             <item value="current database:    'testdb'"/>
             <item value="r'available databases.+5.+master.+model.+msdb.+tempdb.+testdb'"/>
             <item value="r'dbo\.sysdiagrams.+dbo\.users'"/>
+            <item value="r'3 columns.+surname.+varchar'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MSSQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb)">
+    <case name="MSSQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
@@ -252,6 +307,9 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -260,6 +318,8 @@
             <item value="current database:    'testdb'"/>
             <item value="r'available databases.+5.+master.+model.+msdb.+tempdb.+testdb'"/>
             <item value="r'dbo\.sysdiagrams.+dbo\.users'"/>
+            <item value="r'3 columns.+surname.+varchar'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
 </root>
