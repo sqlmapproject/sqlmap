@@ -6,7 +6,7 @@
         <batch value="True"/>
         <verbose value="0"/>
     </global>
-    <case name="MySQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -o)">
+    <case name="MySQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb --threads=4)">
         <switches>
             <url value="http://debianenv/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -17,7 +17,7 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
-            <optimize value="True"/>
+            <threads value="4"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -70,7 +70,7 @@
             <item value="r'1 table.+users'"/>
         </log>
     </case>
-    <case name="Postgres (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -o)">
+    <case name="Postgres (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb --threads=4)">
         <switches>
             <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -81,7 +81,7 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
-            <optimize value="True"/>
+            <threads value="4"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -134,7 +134,7 @@
             <item value="r'1 table.+users'"/>
         </log>
     </case>
-    <case name="Oracle (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -o)">
+    <case name="Oracle (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT --threads=4)">
         <switches>
             <url value="http://debianenv/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -145,7 +145,7 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="SCOTT"/>
-            <optimize value="True"/>
+            <threads value="4"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>
@@ -198,7 +198,7 @@
             <item value="r'5 tables.+BONUS.+DEPT.+EMP.+SALGRADE.+USERS'"/>
         </log>
     </case>
-    <case name="MSSQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -o)">
+    <case name="MSSQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb --threads=4)">
         <switches>
             <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
@@ -209,7 +209,7 @@
             <getDbs value="True"/>
             <getTables value="True"/>
             <db value="testdb"/>
-            <optimize value="True"/>
+            <threads value="4"/>
         </switches>
         <log>
             <item value="current user is DBA:    'True'"/>

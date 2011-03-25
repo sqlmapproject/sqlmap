@@ -218,8 +218,6 @@ def runCase(switches=None, log=None, session=None):
         for item in log:
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], content, re.DOTALL):
-                    import pdb
-                    pdb.set_trace()
                     retVal = False
                     break
             elif content.find(item) < 0:
