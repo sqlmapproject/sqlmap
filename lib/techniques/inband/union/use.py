@@ -13,8 +13,6 @@ import time
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
 from lib.core.common import getUnicode
@@ -251,15 +249,6 @@ def unionUse(expression, unpack=True, dump=False):
                     if output:
                         value += output
                         parseUnionPage(output, limitedExpr)
-
-                    if conf.verbose == 1:
-                        length = stopLimit - startLimit
-                        count = num - startLimit + 1
-                        status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
-                        dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
-
-                if conf.verbose == 1:
-                    clearConsoleLine(True)
 
             except KeyboardInterrupt:
                 print
