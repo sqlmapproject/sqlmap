@@ -85,6 +85,32 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
+    <case name="MySQL partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+        <switches>
+            <url value="http://debianenv/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <isDba value="True"/>
+            <technique value="3"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
+        </switches>
+        <log>
+            <item value="current user is DBA:    'True'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="current user:    'root@localhost'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="r'information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
+        </log>
+    </case>
     <case name="Postgres (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
@@ -141,6 +167,32 @@
     <case name="Postgres (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
+            <isDba value="True"/>
+            <technique value="3"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
+        </switches>
+        <log>
+            <item value="current user is DBA:    'True'"/>
+            <item value="PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="current user:    'testuser'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="r'postgres.+template0.+template1.+testdb'"/>
+            <item value="r'1 table.+users'"/>
+            <item value="r'3 columns.+username.+bpchar'"/>
+            <item value="r'4 entries.+nameisnull'"/>
+        </log>
+    </case>
+    <case name="Postgres partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+        <switches>
+            <url value="http://debianenv/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
@@ -243,6 +295,32 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
+    <case name="Oracle partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
+        <switches>
+            <url value="http://debianenv/sqlmap/oracle/get_int_partialunion.php?id=1"/>
+            <isDba value="True"/>
+            <technique value="3"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <db value="SCOTT"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
+        </switches>
+        <log>
+            <item value="current user is DBA:    'True'"/>
+            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="current user:    'SYS'"/>
+            <item value="'TESTDB.REGRESS.RDBMS.DEV.US.ORACLE.COM'"/>
+            <item value="r'available databases.+15.+CTXSYS.+DBSNMP.+SCOTT.+SYS.+SYSMAN'"/>
+            <item value="r'5 tables.+BONUS.+DEPT.+EMP.+SALGRADE.+USERS'"/>
+            <item value="r'3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'4 entries.+nameisnull'"/>
+        </log>
+    </case>
     <case name="MSSQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
@@ -299,6 +377,32 @@
     <case name="MSSQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
+            <isDba value="True"/>
+            <technique value="3"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <getColumns value="True"/>
+            <dumpTable value="True"/>
+        </switches>
+        <log>
+            <item value="current user is DBA:    'True'"/>
+            <item value="r'Microsoft SQL Server 2005.+Oct 14 2005 00:33:37'"/>
+            <item value="current user:    'sa'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="r'available databases.+5.+master.+model.+msdb.+tempdb.+testdb'"/>
+            <item value="r'dbo\.sysdiagrams.+dbo\.users'"/>
+            <item value="r'3 columns.+surname.+varchar'"/>
+            <item value="r'4 entries.+nameisnull.+'"/>
+        </log>
+    </case>
+    <case name="MSSQL partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+        <switches>
+            <url value="http://windowsenv/sqlmap/mssql/iis/get_int_partialunion.asp?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
