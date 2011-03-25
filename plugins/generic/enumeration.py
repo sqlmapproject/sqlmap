@@ -1214,9 +1214,9 @@ class Enumeration:
         retVal = value
         if isinstance(value, basestring) and not re.match(r"\A[A-Za-z0-9_]+\Z", value):
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
-                retVal = "`%s`" % value
+                retVal = "`%s`" % value.strip("`")
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
-                retVal = "\"%s\"" % value
+                retVal = "\"%s\"" % value.strip("\"")
         return retVal
 
     def dumpTable(self):
