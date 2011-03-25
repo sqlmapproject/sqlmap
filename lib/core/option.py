@@ -1252,7 +1252,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadData      = {}
 
     kb.misc            = advancedDict()
-    kb.misc.delimiter  = randomStr(length=6)
+    kb.misc.delimiter  = randomStr(length=6, lowercase=True)
     kb.misc.start      = ":%s:" % randomStr(length=3, lowercase=True)
     kb.misc.stop       = ":%s:" % randomStr(length=3, lowercase=True)
     kb.misc.space      = ":%s:" % randomStr(length=1, lowercase=True)

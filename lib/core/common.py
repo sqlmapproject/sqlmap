@@ -1078,8 +1078,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
         elif outCond2:
             regExpr = '%s(.*?)%s' % (DUMP_START_MARKER, DUMP_STOP_MARKER)
 
-        output = re.findall(regExpr, output, re.S)
-
+        output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
         if condition is None:
             condition = (
                           kb.resumedQueries and conf.url in kb.resumedQueries.keys()
@@ -1091,7 +1090,10 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
             dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, logOutput))
 
         if sort:
-            output = set(output)
+            dict_ = {}
+            for entry in output:
+                dict_[entry.lower()] = entry
+            output = dict_.values()
 
         for entry in output:
             info = []
