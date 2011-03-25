@@ -930,6 +930,10 @@ class Enumeration:
             logger.error(errMsg)
             bruteForce = True
 
+        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+            conf.tbl = self.__safeMySQLIdentificatorNaming(conf.tbl)
+            conf.db = self.__safeMySQLIdentificatorNaming(conf.db)
+
         if bruteForce:
             resumeAvailable = False
 
@@ -1002,7 +1006,8 @@ class Enumeration:
 
                 for columnData in value:
                     name = columnData[0]
-
+                    if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+                        name = self.__safeMySQLIdentificatorNaming(name)
                     if len(columnData) == 1:
                         columns[name] = ""
                     else:
@@ -1076,6 +1081,9 @@ class Enumeration:
 
                 query = agent.limitQuery(index, query, field)
                 column = inject.getValue(query, inband=False, error=False)
+
+                if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+                    column = self.__safeMySQLIdentificatorNaming(column)
 
                 if not onlyColNames:
                     if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
@@ -1200,6 +1208,15 @@ class Enumeration:
 
         return entries, lengths
 
+    def __safeMySQLIdentificatorNaming(self, value):
+        """
+        Returns an safe representation of identificator name for MySQL
+        """
+        retVal = value
+        if isinstance(value, basestring) and any(filter(lambda x: x in value, ['-', ' '])) and '`' not in value:
+            retVal = "`%s`" % value
+        return retVal
+
     def dumpTable(self):
         if not conf.tbl and not conf.col:
             errMsg = "missing table parameter"
@@ -1233,10 +1250,8 @@ class Enumeration:
         rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-            if '-' in conf.tbl:
-                conf.tbl = "`%s`" % conf.tbl
-            if '-' in conf.db:
-                conf.db = "`%s`" % conf.db
+            conf.tbl = self.__safeMySQLIdentificatorNaming(conf.tbl)
+            conf.db = self.__safeMySQLIdentificatorNaming(conf.db)
 
         if conf.col:
             colList = conf.col.split(",")
