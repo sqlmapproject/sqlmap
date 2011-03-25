@@ -749,6 +749,9 @@ class Enumeration:
                 else:
                     return tables
 
+        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+            conf.db = self.__safeMySQLIdentificatorNaming(conf.db)
+
         if bruteForce:
             resumeAvailable = False
 
@@ -1006,8 +1009,10 @@ class Enumeration:
 
                 for columnData in value:
                     name = columnData[0]
+
                     if Backend.getIdentifiedDbms() == DBMS.MYSQL:
                         name = self.__safeMySQLIdentificatorNaming(name)
+
                     if len(columnData) == 1:
                         columns[name] = ""
                     else:
@@ -1213,7 +1218,7 @@ class Enumeration:
         Returns an safe representation of identificator name for MySQL
         """
         retVal = value
-        if isinstance(value, basestring) and any(filter(lambda x: x in value, ['-', ' '])) and '`' not in value:
+        if isinstance(value, basestring) and not re.match(r"\A[A-Za-z0-9]+\Z", value):
             retVal = "`%s`" % value
         return retVal
 
