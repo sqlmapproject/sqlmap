@@ -538,6 +538,12 @@ class Agent:
         inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if query.startswith("TOP"):
+            # TOP enumeration on DBMS.MSSQL is too specific and it has to go into it's own brackets
+            # because those NULLs cause problems with ORDER BY clause
+            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+                inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, range(0, count)))
+                inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
+                return inbandQuery
             topNum = re.search("\ATOP\s+([\d]+)\s+", query, re.I).group(1)
             query = query[len("TOP %s " % topNum):]
             inbandQuery += "TOP %s " % topNum
