@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 $Id$
@@ -6,6 +7,11 @@ $Id$
 Copyright (c) 2006-2010 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
+
+try:
+    import crypt
+except ImportError, _:
+    pass
 
 import re
 import time
@@ -347,7 +353,6 @@ def dictionaryAttack(attack_dict):
                             warnMsg = "attack on '%s' is not available for Windows platform" % __functions__[hash_regex].func_name
                             logger.warning(warnMsg)
                         else:
-                            import crypt
                             attack_info.append([(user, hash_), {'salt': hash_[0:2]}])
 
         if not attack_info:
@@ -384,7 +389,7 @@ def dictionaryAttack(attack_dict):
 
         length = len(kb.wordlist) * len(suffix_list)
 
-        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.CRYPT_GENERIC):
+        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
 
             for suffix in suffix_list:
