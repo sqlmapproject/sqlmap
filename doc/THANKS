@@ -75,10 +75,9 @@ Stefano Di Paola <stefano.dipaola@wisec.it>
 Mosk Dmitri <ya@darkbyte.ru>
     for reporting a minor bug
 
-Dan Guido <dguido@gmail.com>
-    for promoting sqlmap in the context of the Penetration Testing and
-    Vulnerability Analysis class at the Polytechnic University of New York,
-    http://isisblogs.poly.edu/courses/pentest/
+Carey Evans <careye@spamcop.net>
+    for his fcrypt module that allows crypt(3) support
+    on Windows platforms
 
 Adam Faheem <faheem.adam@is.co.za>
     for reporting a few bugs
@@ -133,6 +132,11 @@ Oliver Gruskovnjak <oliver.gruskovnjak@gmail.com>
 
 Davide Guerri <d.guerri@caspur.it>
     for suggesting an enhancement
+
+Dan Guido <dguido@gmail.com>
+    for promoting sqlmap in the context of the Penetration Testing and
+    Vulnerability Analysis class at the Polytechnic University of New York,
+    http://isisblogs.poly.edu/courses/pentest/
 
 David Guimaraes <skysbsb@gmail.com>
     for reporting several bugs
