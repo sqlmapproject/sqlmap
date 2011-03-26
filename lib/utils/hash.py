@@ -9,9 +9,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 try:
-    import crypt
+    from crypt import crypt
 except ImportError, _:
-    pass
+    from extra.fcrypt.fcrypt import crypt
 
 import re
 import time
@@ -205,7 +205,7 @@ def crypt_generic_passwd(password, salt, uppercase=False):
     'rl.3StKT.4T8M'
     """
 
-    retVal = crypt.crypt(password, salt)
+    retVal = crypt(password, salt)
 
     return retVal.upper() if uppercase else retVal.lower()
 
@@ -349,11 +349,7 @@ def dictionaryAttack(attack_dict):
                         attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
 
                     elif hash_regex in (HASH.CRYPT_GENERIC):
-                        if IS_WIN:
-                            warnMsg = "attack on '%s' is not available for Windows platform" % __functions__[hash_regex].func_name
-                            logger.warning(warnMsg)
-                        else:
-                            attack_info.append([(user, hash_), {'salt': hash_[0:2]}])
+                        attack_info.append([(user, hash_), {'salt': hash_[0:2]}])
 
         if not attack_info:
             continue
@@ -426,7 +422,7 @@ def dictionaryAttack(attack_dict):
 
                                 attack_info.remove(item)
 
-                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
+                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                                 status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
@@ -474,7 +470,9 @@ def dictionaryAttack(attack_dict):
 
                                 found = True
                                 break
-
+                            elif hash_regex == HASH.CRYPT_GENERIC and (IS_WIN or count % 1117 == 0):
+                                status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                                dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
                             elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
                                 status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
