@@ -1212,11 +1212,15 @@ class Enumeration:
         Returns an safe representation of SQL identificator name
         """
         retVal = value
-        if isinstance(value, basestring) and not re.match(r"\A[A-Za-z0-9_]+\Z", value):
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
-                retVal = "`%s`" % value.strip("`")
-            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
-                retVal = "\"%s\"" % value.strip("\"")
+        if isinstance(value, basestring):
+            parts = value.split('.')
+            for i in range(len(parts)):
+                if not re.match(r"\A[A-Za-z0-9_]+\Z", parts[i]):
+                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
+                        parts[i] = "`%s`" % parts[i].strip("`")
+                    elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
+                        parts[i] = "\"%s\"" % parts[i].strip("\"")
+            retVal = ".".join(parts)
         return retVal
 
     def dumpTable(self):
