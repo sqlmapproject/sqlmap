@@ -470,11 +470,10 @@ def dictionaryAttack(attack_dict):
 
                                 found = True
                                 break
-                            elif hash_regex == HASH.CRYPT_GENERIC and (IS_WIN or count % 1117 == 0):
+                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                                 status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
-                                dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
-                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD):
-                                status = '%d/%d words (%d%s) (user: %s)' % (count, length, round(100.0*count/length), '%', user)
+                                if not user.startswith(DUMMY_USER_PREFIX):
+                                    status += ' (user: %s)' % user
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
                         except KeyboardInterrupt:
