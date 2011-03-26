@@ -36,6 +36,7 @@ from lib.core.enums import HASH
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import DUMMY_USER_PREFIX
+from lib.core.settings import IS_WIN
 from lib.core.settings import LIST_EMAIL
 from lib.core.settings import UNICODE_ENCODING
 
@@ -186,6 +187,22 @@ def sha1_generic_passwd(password, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
+def crypt_generic_passwd(password, salt, uppercase=False):
+    """
+    Reference(s):
+        http://docs.python.org/library/crypt.html
+        http://helpful.knobs-dials.com/index.php/Hashing_notes
+        http://php.net/manual/en/function.crypt.php
+        http://carey.geek.nz/code/python-fcrypt/
+
+    >>> crypt_generic_passwd(password='rasmuslerdorf', salt='rl', uppercase=False)
+    'rl.3StKT.4T8M'
+    """
+
+    retVal = crypt.crypt(password, salt)
+
+    return retVal.upper() if uppercase else retVal.lower()
+
 __functions__ = {
                     HASH.MYSQL: mysql_passwd, 
                     HASH.MYSQL_OLD: mysql_old_passwd,
@@ -195,7 +212,8 @@ __functions__ = {
                     HASH.ORACLE: oracle_passwd,
                     HASH.ORACLE_OLD: oracle_old_passwd, 
                     HASH.MD5_GENERIC: md5_generic_passwd, 
-                    HASH.SHA1_GENERIC: sha1_generic_passwd
+                    HASH.SHA1_GENERIC: sha1_generic_passwd,
+                    HASH.CRYPT_GENERIC: crypt_generic_passwd
                 }
 
 def attackCachedUsersPasswords():
@@ -324,6 +342,17 @@ def dictionaryAttack(attack_dict):
                     elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD):
                         attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
 
+                    elif hash_regex in (HASH.CRYPT_GENERIC):
+                        if IS_WIN:
+                            warnMsg = "attack on '%s' is not available for Windows platform" % __functions__[hash_regex].func_name
+                            logger.warning(warnMsg)
+                        else:
+                            import crypt
+                            attack_info.append([(user, hash_), {'salt': hash_[0:2]}])
+
+        if not attack_info:
+            continue
+
         if not kb.wordlist:
             if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
                 message = "what's the dictionary's location? [%s]" % paths.ORACLE_DEFAULT_PASSWD
@@ -355,7 +384,7 @@ def dictionaryAttack(attack_dict):
 
         length = len(kb.wordlist) * len(suffix_list)
 
-        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
+        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.CRYPT_GENERIC):
             count = 0
 
             for suffix in suffix_list:
