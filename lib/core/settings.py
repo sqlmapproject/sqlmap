@@ -278,3 +278,5 @@ URLENCODE_FAILSAFE_CHARS = '()|,'
 
 # maximum length of urlencoded value after which failsafe procedure takes away
 URLENCODE_CHAR_LIMIT = 4000
+
+DEFAULT_MSSQL_SCHEMA = 'dbo'

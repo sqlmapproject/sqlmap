@@ -52,6 +52,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
 from lib.core.settings import CONCAT_ROW_DELIMITER
 from lib.core.settings import CONCAT_VALUE_DELIMITER
+from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
@@ -908,7 +909,7 @@ class Enumeration:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
         elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
-            conf.tbl = "dbo.%s" % conf.tbl
+            conf.tbl = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, conf.tbl)
 
         self.forceDbmsEnum()
 
@@ -1209,7 +1210,7 @@ class Enumeration:
 
     def __safeSQLIdentificatorNaming(self, value):
         """
-        Returns an safe representation of SQL identificator name
+        Returns a safe representation of SQL identificator name
         """
         retVal = value
         if isinstance(value, basestring):
@@ -1221,6 +1222,20 @@ class Enumeration:
                     elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
                         parts[i] = "\"%s\"" % parts[i].strip("\"")
             retVal = ".".join(parts)
+        return retVal
+
+    def __unsafeSQLIdentificatorNaming(self, value):
+        """
+        Extracts identificator's name from it's safe SQL representation
+        """
+        retVal = value
+        if isinstance(value, basestring):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
+                retVal = value.replace("`", "")
+            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
+                retVal = value.replace("\"", "")
+            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+                retVal = retVal.lstrip("%s." % DEFAULT_MSSQL_SCHEMA)
         return retVal
 
     def dumpTable(self):
@@ -1241,7 +1256,7 @@ class Enumeration:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
         elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
-            conf.tbl = "dbo.%s" % conf.tbl
+            conf.tbl = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, conf.tbl)
 
         self.forceDbmsEnum()
 

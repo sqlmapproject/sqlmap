@@ -1096,15 +1096,6 @@ def __cleanupOptions():
     else:
         conf.testParameter = []
 
-    if conf.db:
-        conf.db = conf.db.replace(" ", "")
-
-    if conf.tbl:
-        conf.tbl = conf.tbl.replace(" ", "")
-
-    if conf.col:
-        conf.col = conf.col.replace(" ", "")
-
     if conf.user:
         conf.user = conf.user.replace(" ", "")
 
