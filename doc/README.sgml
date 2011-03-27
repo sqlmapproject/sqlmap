@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
-<date>version 0.9, March 10, 2011
+<date>version 0.9, April XX, 2011
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 </abstract>
@@ -824,8 +824,6 @@ Options:
     --keep-alive        Use persistent HTTP(s) connections
     --null-connection   Retrieve page length without actual HTTP response body
     --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
-    --group-concat      Use GROUP_CONCAT (MySQL/error) in dumping phase
-                        (experimental)
 
   Injection:
     These options can be used to specify which parameters to test for,
@@ -849,7 +847,7 @@ Options:
     --text-only         Compare pages based only on the textual content
 
   Techniques:
-    These options can be usedto tweak testing of specific SQL injection
+    These options can be used to tweak testing of specific SQL injection
     techniques.
 
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
@@ -941,6 +939,7 @@ Options:
     -t TRAFFICFILE      Log all HTTP traffic into a textual file
     -s SESSIONFILE      Save and resume all data retrieved on a session file
     --flush-session     Flush session file for current target
+    --fresh-queries     Ignores query results stored in session file
     --eta               Display for each output the estimated time of arrival
     --update            Update sqlmap
     --save              Save options on a configuration INI file
@@ -951,9 +950,11 @@ Options:
     --check-payload     IDS detection testing of injection payloads
     --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
     --forms             Parse and test forms on target url
-    --gpage=GOOGLEPAGE  Use google dork results from specified page number
+    --gpage=GOOGLEPAGE  Use Google dork results from specified page number
+    --page-rank         Display page rank (PR) for Google dork results
     --parse-errors      Parse DBMS error messages from response pages
     --replicate         Replicate dumped data into a sqlite3 database
+    --tor               Use default Tor (Vidalia/Privoxy/Polipo) proxy address
 </verb></tscreen>
 
 
