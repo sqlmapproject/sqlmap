@@ -439,6 +439,13 @@ def __findPageForms():
     logger.info(infoMsg)
 
     response, _ = Request.queryPage(response=True)
+
+    if response is None or isinstance(response, basestring):
+        errMsg  = "can't do form parsing as no valid response "
+        errMsg += "object found. please check previous log messages "
+        errMsg += "for connection issues"
+        raise sqlmapGenericException, errMsg
+
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
@@ -455,7 +462,7 @@ def __findPageForms():
             kb.targetUrls.add(target)
             kb.formNames.append(target)
     else:
-        errMsg  = "there were no forms found at a given target url"
+        errMsg  = "there were no forms found at the given target url"
         raise sqlmapGenericException, errMsg
 
 def __setMetasploit():
