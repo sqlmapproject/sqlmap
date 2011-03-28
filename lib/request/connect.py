@@ -342,7 +342,7 @@ class Connect:
             if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
                 return None, None
-            elif silent or (ignoreTimeout and "timed out" in tbMsg):
+            elif silent or (ignoreTimeout and any(map(lambda x: x in tbMsg, ["timed out", "IncompleteRead"]))):
                 return None, None
             elif kb.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
                 kb.retriesCount += 1
