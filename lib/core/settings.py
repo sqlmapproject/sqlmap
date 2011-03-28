@@ -219,6 +219,8 @@ ERROR_PARSING_REGEXES = (
 
 META_CHARSET_REGEX  = r'<meta http-equiv="?content-type"?[^>]+charset=(?P<result>[^">]+)'
 
+EMPTY_FORM_FIELDS_REGEX = r'(?P<result>[^=]+=(&|\Z))'
+
 # Reference: http://www.cs.ru.nl/bachelorscripties/2010/Martin_Devillers___0437999___Analyzing_password_strength.pdf
 COMMON_PASSWORD_SUFFIXES = ["1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18"]
 
