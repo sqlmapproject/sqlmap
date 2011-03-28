@@ -181,20 +181,22 @@ class Enumeration(GenericEnumeration):
         colConsider, colCondParam = self.likeOrExact("column")
 
         for column in colList:
-            column = column.upper()
+            column = self.__safeSQLIdentificatorNaming(column)
 
             infoMsg = "searching column"
             if colConsider == "1":
                 infoMsg += "s like"
-            infoMsg += " '%s'" % column
+            infoMsg += " '%s'" % self.__unsafeSQLIdentificatorNaming(column)
             logger.info(infoMsg)
 
             foundCols[column] = {}
 
             colQuery = "%s%s" % (colCond, colCondParam)
-            colQuery = colQuery % column
+            colQuery = colQuery % self.__unsafeSQLIdentificatorNaming(column)
 
             for db in dbs.keys():
+                db = self.__safeSQLIdentificatorNaming(db)
+
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                     query = rootQuery.inband.query
                     query += colQuery
@@ -205,6 +207,8 @@ class Enumeration(GenericEnumeration):
                             values = [ values ]
 
                         for foundTbl in values:
+                            foundTbl = self.__safeSQLIdentificatorNaming(foundTbl, True)
+
                             if foundTbl is None:
                                 continue
 
@@ -258,6 +262,8 @@ class Enumeration(GenericEnumeration):
                         query = agent.limitQuery(index, query)
                         tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
+
+                        tbl = self.__safeSQLIdentificatorNaming(tbl, True)
 
                         if tbl not in dbs[db]:
                             dbs[db][tbl] = {}

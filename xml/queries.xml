@@ -205,8 +205,8 @@
             <blind query="" query2="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v') " count="" count2="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')" condition="name" condition2="name"/>
         </search_table>
         <search_column>
-            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
-            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name"/>
+            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
         </search_column>
     </dbms>
 

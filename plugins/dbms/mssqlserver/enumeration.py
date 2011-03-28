@@ -78,6 +78,8 @@ class Enumeration(GenericEnumeration):
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             for db in dbs:
+                db = self.__safeSQLIdentificatorNaming(db)
+
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     logger.info(infoMsg)
@@ -92,6 +94,8 @@ class Enumeration(GenericEnumeration):
 
         if not kb.data.cachedTables and not conf.direct:
             for db in dbs:
+                db = self.__safeSQLIdentificatorNaming(db)
+
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     logger.info(infoMsg)
@@ -150,19 +154,24 @@ class Enumeration(GenericEnumeration):
             if isinstance(db, list):
                 db = db[0]
 
+            db = self.__safeSQLIdentificatorNaming(db)
             foundTbls[db] = []
 
         for tbl in tblList:
+            tbl = self.__safeSQLIdentificatorNaming(tbl, True)
+
             infoMsg = "searching table"
             if tblConsider == "1":
                 infoMsg += "s like"
-            infoMsg += " '%s'" % tbl
+            infoMsg += " '%s'" % self.__unsafeSQLIdentificatorNaming(tbl)
             logger.info(infoMsg)
 
             tblQuery = "%s%s" % (tblCond, tblCondParam)
-            tblQuery = tblQuery % tbl
+            tblQuery = tblQuery % self.__unsafeSQLIdentificatorNaming(tbl)
 
             for db in foundTbls.keys():
+                db = self.__safeSQLIdentificatorNaming(db)
+
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     logger.info(infoMsg)
@@ -187,7 +196,7 @@ class Enumeration(GenericEnumeration):
                     infoMsg = "fetching number of table"
                     if tblConsider == "1":
                         infoMsg += "s like"
-                    infoMsg += " '%s' in database '%s'" % (tbl, db)
+                    infoMsg += " '%s' in database '%s'" % (self.__unsafeSQLIdentificatorNaming(tbl), self.__unsafeSQLIdentificatorNaming(db))
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
@@ -199,8 +208,8 @@ class Enumeration(GenericEnumeration):
                         warnMsg = "no table"
                         if tblConsider == "1":
                             warnMsg += "s like"
-                        warnMsg += " '%s' " % tbl
-                        warnMsg += "in database '%s'" % db
+                        warnMsg += " '%s' " % self.__unsafeSQLIdentificatorNaming(tbl)
+                        warnMsg += "in database '%s'" % self.__unsafeSQLIdentificatorNaming(db)
                         logger.warn(warnMsg)
 
                         continue
@@ -236,21 +245,26 @@ class Enumeration(GenericEnumeration):
             enumDbs = kb.data.cachedDbs
 
         for db in enumDbs:
+            db = self.__safeSQLIdentificatorNaming(db)
             dbs[db] = {}
 
         for column in colList:
+            column = self.__safeSQLIdentificatorNaming(column)
+
             infoMsg = "searching column"
             if colConsider == "1":
                 infoMsg += "s like"
-            infoMsg += " '%s'" % column
+            infoMsg += " '%s'" % self.__unsafeSQLIdentificatorNaming(column)
             logger.info(infoMsg)
 
             foundCols[column] = {}
 
             colQuery = "%s%s" % (colCond, colCondParam)
-            colQuery = colQuery % column
+            colQuery = colQuery % self.__unsafeSQLIdentificatorNaming(column)
 
             for db in dbs.keys():
+                db = self.__safeSQLIdentificatorNaming(db)
+
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     logger.info(infoMsg)
@@ -258,7 +272,7 @@ class Enumeration(GenericEnumeration):
                     continue
 
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
-                    query = rootQuery.inband.query % (db, db, db, db, db)
+                    query = rootQuery.inband.query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     values = inject.getValue(query, blind=False)
 
@@ -267,6 +281,8 @@ class Enumeration(GenericEnumeration):
                             values = [ values ]
 
                         for foundTbl in values:
+                            foundTbl = self.__safeSQLIdentificatorNaming(foundTbl, True)
+
                             if foundTbl is None:
                                 continue
 
@@ -279,8 +295,8 @@ class Enumeration(GenericEnumeration):
                                 conf.col = column
 
                                 self.getColumns(onlyColNames=True)
-
-                                dbs[db][foundTbl].update(kb.data.cachedColumns[db][foundTbl])
+                                if kb.data.cachedColumns[db][foundTbl] != {None: None}:
+                                    dbs[db][foundTbl].update(kb.data.cachedColumns[db][foundTbl])
                                 kb.data.cachedColumns = {}
                             else:
                                 dbs[db][foundTbl][column] = None
@@ -299,7 +315,7 @@ class Enumeration(GenericEnumeration):
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
-                    query = query % (db, db, db, db, db)
+                    query = query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
@@ -317,11 +333,13 @@ class Enumeration(GenericEnumeration):
 
                     for index in indexRange:
                         query = rootQuery.blind.query2
-                        query = query % (db, db, db, db, db)
+                        query = query % (db, db, db, db, db, db)
                         query += " AND %s" % colQuery.replace("[DB]", db)
                         query = agent.limitQuery(index, query, colCond.replace("[DB]", db))
                         tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
+
+                        tbl = self.__safeSQLIdentificatorNaming(tbl, True)
 
                         if tbl not in dbs[db]:
                             dbs[db][tbl] = {}
