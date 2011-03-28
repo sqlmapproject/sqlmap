@@ -16,6 +16,7 @@ from optparse import SUPPRESS_HELP
 
 from lib.core.common import getUnicode
 from lib.core.data import logger
+from lib.core.settings import IS_WIN
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import UNICODE_ENCODING
@@ -25,7 +26,7 @@ def cmdLineParser():
     This function parses the command line parameters and arguments
     """
 
-    usage = "%s [options]" % sys.argv[0]
+    usage = "python %s [options]" % sys.argv[0]
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
@@ -560,8 +561,15 @@ def cmdLineParser():
             parser.error(errMsg)
 
         return args
+
     except (OptionError, TypeError), e:
         parser.error(e)
+
+    except SystemExit, _:
+        if IS_WIN:
+            print "\nPress any key to continue...",
+            raw_input()
+        raise
 
     debugMsg = "parsing command line"
     logger.debug(debugMsg)
