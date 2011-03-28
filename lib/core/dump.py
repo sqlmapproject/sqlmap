@@ -109,6 +109,12 @@ class Dump:
         else:
             self.string("current database", data)
 
+        if Backend.getIdentifiedDbms() in (DBMS.ORACLE):
+            warnMsg  = "on %s you have to use switch '--current-user' to " % Backend.getIdentifiedDbms()
+            warnMsg += "retrieve schema name which can be used "
+            warnMsg += "as an equivalent to database name (-D) in further runs"
+            logger.warning(warnMsg)
+
     def dba(self,data):
         self.string("current user is DBA", data)
 
