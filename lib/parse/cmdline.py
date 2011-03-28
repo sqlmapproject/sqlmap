@@ -566,6 +566,7 @@ def cmdLineParser():
         parser.error(e)
 
     except SystemExit, _:
+        # Protection against Windows dummy double clicking
         if IS_WIN:
             print "\nPress any key to continue...",
             raw_input()
