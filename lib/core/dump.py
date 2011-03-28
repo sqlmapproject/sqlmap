@@ -111,7 +111,7 @@ class Dump:
 
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE):
             warnMsg  = "on %s you have to use switch '--current-user' to " % Backend.getIdentifiedDbms()
-            warnMsg += "retrieve schema name which can be used "
+            warnMsg += "retrieve current schema name which can be used "
             warnMsg += "as an equivalent to database name (-D) in further runs"
             logger.warning(warnMsg)
 
