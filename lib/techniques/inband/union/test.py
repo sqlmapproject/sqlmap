@@ -86,8 +86,10 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
     if min_ < lower:
         retVal = minItem[0]
-    elif max_ > upper:
-        retVal = maxItem[0]
+
+    if max_ > upper:
+        if retVal is None or abs(max_ - upper) > abs(min_ - lower):
+            retVal = maxItem[0]
 
     kb.errorIsNone = popValue()
 
