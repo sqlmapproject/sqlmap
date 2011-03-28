@@ -1239,7 +1239,7 @@ class Enumeration:
                 retVal = value.replace("`", "")
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
                 retVal = value.replace("\"", "")
-            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                 retVal = retVal.lstrip("%s." % DEFAULT_MSSQL_SCHEMA)
         return retVal
 
