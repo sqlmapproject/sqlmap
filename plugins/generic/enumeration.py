@@ -1215,7 +1215,7 @@ class Enumeration:
         """
         retVal = value
         if isinstance(value, basestring):
-            if isTable and Backend.getIdentifiedDbms() == DBMS.MSSQL and '.' not in value:
+            if isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and '.' not in value:
                 value = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, value)
 
             parts = value.split('.')
