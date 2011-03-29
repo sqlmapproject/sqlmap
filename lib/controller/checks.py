@@ -30,7 +30,6 @@ from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.common import removeDynamicContent
 from lib.core.common import showStaticWords
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError

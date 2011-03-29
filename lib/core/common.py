@@ -677,7 +677,7 @@ def readInput(message, default=None):
     elif message[-1] == ']':
         message += " "
 
-    if conf.batch and default:
+    if conf.batch and default is not None:
         if isinstance(default, (list, tuple, set)):
             options = ",".join([getUnicode(opt, UNICODE_ENCODING) for opt in default])
         else:

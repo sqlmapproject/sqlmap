@@ -232,7 +232,7 @@ class Connect:
                 msg += "also on the redirection got from the application\n"
 
                 while True:
-                    choice = readInput(msg, default=None)
+                    choice = readInput(msg, default="")
 
                     if not choice:
                         pass
