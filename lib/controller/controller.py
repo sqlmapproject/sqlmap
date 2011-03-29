@@ -326,18 +326,19 @@ def start():
                 for place in parameters:
                     # Test User-Agent and Referer headers only if
                     # --level >= 3
-                    condition = (place == PLACE.UA and conf.level < 3)
-                    condition |= (place == PLACE.REFERER and conf.level < 3)
+                    skip = (place == PLACE.UA and conf.level < 3)
+                    skip |= (place == PLACE.REFERER and conf.level < 3)
+
                     # Test Cookie header only if --level >= 2
-                    condition |= (place == PLACE.COOKIE and conf.level < 2)
+                    skip |= (place == PLACE.COOKIE and conf.level < 2)
 
                     # Test GET parameter in case --data only if --level >= 3
-                    condition |= (place == PLACE.GET and conf.data and conf.level < 3)
+                    skip |= (place == PLACE.GET and conf.data is not None and conf.level < 3)
 
-                    condition &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter))
-                    condition &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter))
+                    skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter))
+                    skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter))
 
-                    if condition:
+                    if skip:
                         continue
 
                     if not conf.paramDict.has_key(place):
