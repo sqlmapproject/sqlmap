@@ -332,9 +332,6 @@ def start():
                     # Test Cookie header only if --level >= 2
                     skip |= (place == PLACE.COOKIE and conf.level < 2)
 
-                    # Test GET parameter in case --data only if --level >= 3
-                    skip |= (place == PLACE.GET and conf.data is not None and conf.level < 3)
-
                     skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter))
 
