@@ -1265,6 +1265,62 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.userAgents      = None
         kb.wordlist        = None
 
+def __useWizardInterface():
+    """
+    Presents simple wizard interface for beginner users
+    """
+
+    if not conf.wizard:
+        return
+
+    logger.info("starting wizard interface")
+
+    while not conf.url:
+        message = "[1] Please enter full target URL ('-u'): "
+        conf.url = readInput(message, default=None)
+
+    message = "[2] POST data ('--data') [Enter for None]: "
+    conf.data = readInput(message, default=None)
+
+    message = "[3] Injection difficulty ('--level'/'--risk') [Please choose: 1-Normal(default), 2-Medium, 3-Hard]: "
+    choice = readInput(message, default=1)
+    if choice == '2':
+        conf.risk = conf.level = 3
+    elif choice == '3':
+        conf.risk = conf.level = 5
+    else:
+        conf.risk = conf.level = 1
+
+    message = "[4] Enumeration ('--banner'/'--current-user'/...) [Please choose: 1-Basic(default), 2-Smart, 3-All]: "
+    choice = readInput(message, default=1)
+    if choice == '2':
+        conf.getBanner = True
+        conf.getCurrentUser = True
+        conf.getCurrentDb = True
+        conf.isDba = True
+        conf.getUsers = True
+        conf.getDbs = True
+        conf.getTables = True
+        conf.excludeSysDbs = True
+    elif choice == '3':
+        conf.getBanner = True
+        conf.getCurrentUser = True
+        conf.getCurrentDb = True
+        conf.isDba = True
+        conf.getUsers = True
+        conf.getPasswordHashes = True
+        conf.getPrivileges = True
+        conf.getRoles = True
+        conf.dumpAll = True
+    else:
+        conf.getBanner = True
+        conf.getCurrentUser = True
+        conf.getCurrentDb = True
+        conf.isDba = True
+
+    conf.batch = True
+    print
+
 def __saveCmdline():
     """
     Saves the command line options on a sqlmap configuration INI file
@@ -1433,6 +1489,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     __setKnowledgeBaseAttributes()
     __mergeOptions(inputOptions, overrideOptions)
     __setVerbosity()
+    __useWizardInterface()
     __saveCmdline()
     __setRequestFromFile()
     __cleanupOptions()

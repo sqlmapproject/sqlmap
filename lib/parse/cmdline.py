@@ -505,6 +505,10 @@ def cmdLineParser():
                                   action="store_true", default=False,
                                   help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
 
+        miscellaneous.add_option("--wizard", dest="wizard",
+                                  action="store_true", default=False,
+                                  help="Simple wizard interface for beginner users")
+
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
                           default=False, help=SUPPRESS_HELP)
@@ -553,10 +557,9 @@ def cmdLineParser():
 
         (args, _) = parser.parse_args(args)
 
-        if not args.direct and not args.url and not args.list and not args.googleDork and not args.configFile \
-            and not args.requestFile and not args.updateAll and not args.smokeTest and not args.liveTest \
-            and not args.realTest:
-            errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c' or '--update'), "
+        if not any([args.direct, args.url, args.list, args.googleDork, args.configFile, \
+            args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard]):
+            errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c', '--wizard' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)
 

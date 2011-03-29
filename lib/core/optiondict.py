@@ -165,6 +165,7 @@ optDict = {
                                "parseErrors":       "boolean",
                                "replicate":         "boolean",
                                "tor":               "boolean",
+                               "wizard":            "boolean",
                                "verbose":           "integer"
                              },
           }
