@@ -1139,6 +1139,9 @@ def __cleanupOptions():
     if conf.data:
         conf.data = urldecode(conf.data)
 
+    if conf.template:
+        map(lambda x: conf.__setitem__(x, True), ['tor', 'flushSession', 'batch', 'getBanner', 'getCurrentUser', 'getCurrentDb', 'getDbs', 'randomAgent'])
+
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration
@@ -1297,29 +1300,11 @@ def __useWizardInterface():
     message = "[4] Enumeration ('--banner'/'--current-user'/...) [Please choose: 1-Basic(default), 2-Smart, 3-All]: "
     choice = readInput(message, default='1')
     if choice == '2':
-        conf.getBanner = True
-        conf.getCurrentUser = True
-        conf.getCurrentDb = True
-        conf.isDba = True
-        conf.getUsers = True
-        conf.getDbs = True
-        conf.getTables = True
-        conf.excludeSysDbs = True
+        map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getDbs', 'getTables', 'excludeSysDbs'])
     elif choice == '3':
-        conf.getBanner = True
-        conf.getCurrentUser = True
-        conf.getCurrentDb = True
-        conf.isDba = True
-        conf.getUsers = True
-        conf.getPasswordHashes = True
-        conf.getPrivileges = True
-        conf.getRoles = True
-        conf.dumpAll = True
+        map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getPasswordHashes', 'getPrivileges', 'getRoles', 'dumpAll'])
     else:
-        conf.getBanner = True
-        conf.getCurrentUser = True
-        conf.getCurrentDb = True
-        conf.isDba = True
+        map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba'])
 
     conf.batch = True
     print
