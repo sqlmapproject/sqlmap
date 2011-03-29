@@ -20,6 +20,7 @@ from lib.core.common import getPageTextWordsSet
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
+from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.data import conf
 from lib.core.data import kb
@@ -94,6 +95,12 @@ def tableExists(tableFile, regex=None):
         infoMsg = "starting %d threads" % conf.threads
         logger.info(infoMsg)
     else:
+        message = "please enter number of threads? [Enter for default (%d)] " % conf.threads
+        choice = readInput(message, default=str(conf.threads))
+        if choice and choice.isdigit():
+            conf.threads = int(choice)
+        
+    if conf.threads == 1:
         warnMsg = "running in a single-thread mode. this could take a while."
         logger.warn(warnMsg)
 

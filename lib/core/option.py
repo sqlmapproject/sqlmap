@@ -1283,7 +1283,7 @@ def __useWizardInterface():
     conf.data = readInput(message, default=None)
 
     message = "[3] Injection difficulty ('--level'/'--risk') [Please choose: 1-Normal(default), 2-Medium, 3-Hard]: "
-    choice = readInput(message, default=1)
+    choice = readInput(message, default='1')
     if choice == '2':
         conf.risk = 2
         conf.level = 3
@@ -1295,7 +1295,7 @@ def __useWizardInterface():
         conf.level = 1
 
     message = "[4] Enumeration ('--banner'/'--current-user'/...) [Please choose: 1-Basic(default), 2-Smart, 3-All]: "
-    choice = readInput(message, default=1)
+    choice = readInput(message, default='1')
     if choice == '2':
         conf.getBanner = True
         conf.getCurrentUser = True
