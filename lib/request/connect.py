@@ -21,6 +21,7 @@ from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
+from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
 from lib.core.common import unicodeToSafeHTMLValue
@@ -43,6 +44,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_SILENT_TIMEOUT
+from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
@@ -96,6 +98,7 @@ class Connect:
         auxHeaders      = kwargs.get('auxHeaders',    None)
         response        = kwargs.get('response',      False)
         ignoreTimeout   = kwargs.get('ignoreTimeout', False)
+        refreshing      = kwargs.get('refreshing',    False)
 
         page            = ""
         cookieStr       = ""
@@ -130,6 +133,13 @@ class Connect:
                 page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
 
                 return page
+
+            elif refreshing:
+                # Reference(s): 
+                # http://vancouver-webpages.com/META/metatags.detail.html
+                # http://webdesign.about.com/od/metataglibraries/a/aa080300a.htm
+                get = None
+                post = None
 
             else:
                 if conf.parameters.has_key(PLACE.GET) and not get:
@@ -252,6 +262,24 @@ class Connect:
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
             page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
             status = getUnicode(conn.msg)
+
+            if extractRegexResult(META_REFRESH_REGEX, page, re.DOTALL | re.IGNORECASE) and not refreshing:
+                url = extractRegexResult(META_REFRESH_REGEX, page, re.DOTALL | re.IGNORECASE)
+
+                if url.lower().startswith('http://'):
+                    kwargs['url'] = url
+                else:
+                    kwargs['url'] = conf.url[:conf.url.rfind('/')+1] + url
+
+                kwargs['refreshing'] = True
+
+                debugMsg = "got HTML meta refresh header"
+                logger.debug(debugMsg)
+
+                try:
+                    return Connect.__getPageProxy(**kwargs)
+                except sqlmapSyntaxException:
+                    pass
 
             # Explicit closing of connection object
             if not conf.keepAlive:
