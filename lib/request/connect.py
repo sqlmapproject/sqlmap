@@ -232,9 +232,9 @@ class Connect:
                 msg += "also on the redirection got from the application\n"
 
                 while True:
-                    choice = readInput(msg, default="1")
+                    choice = readInput(msg, default=None)
 
-                    if not choice or choice == "1":
+                    if not choice:
                         pass
                     else:
                         conf.url = choice
