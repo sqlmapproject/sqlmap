@@ -307,6 +307,7 @@ def hashRecognition(value):
     return retVal
 
 def dictionaryAttack(attack_dict):
+    suffix_list = [""]
     hash_regexes = []
     results = []
 
@@ -369,12 +370,11 @@ def dictionaryAttack(attack_dict):
             logger.info(infoMsg)
             kb.wordlist = getFileItems(dictpath, None, False)
 
-        message = "do you want to use common password suffixes? (slow!) [y/N] "
-        test = readInput(message, default="N")
+            message = "do you want to use common password suffixes? (slow!) [y/N] "
+            test = readInput(message, default="N")
 
-        suffix_list = [""]
-        if test[0] in ("y", "Y"):
-            suffix_list += COMMON_PASSWORD_SUFFIXES
+            if test[0] in ("y", "Y"):
+                suffix_list += COMMON_PASSWORD_SUFFIXES
 
         infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
@@ -427,7 +427,9 @@ def dictionaryAttack(attack_dict):
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
                     except KeyboardInterrupt:
-                        raise
+                        warnMsg = "Ctrl+C detected in dictionary attack phase"
+                        logger.warn(warnMsg)
+                        return results
 
                     except:
                         warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
@@ -477,7 +479,9 @@ def dictionaryAttack(attack_dict):
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
                         except KeyboardInterrupt:
-                            raise
+                            warnMsg = "Ctrl+C detected in dictionary attack phase"
+                            logger.warn(warnMsg)
+                            return results
 
                         except:
                             warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
