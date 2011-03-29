@@ -1500,7 +1500,7 @@ Formats:
     <test>
         <title>MySQL &gt; 5.0.11 stacked queries</title>
         <stype>4</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
@@ -1521,7 +1521,7 @@ Formats:
     <test>
         <title>MySQL &lt; 5.0.12 stacked queries (heavy query)</title>
         <stype>4</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
