@@ -2411,7 +2411,7 @@ def cpuThrottle(value):
     delay = 0.00001 * (value ** 2)
     time.sleep(delay)
 
-def removeReflectiveValues(content, payload):
+def removeReflectiveValues(content, payload, suppressWarning=False):
     """
     Neutralizes (static/marked) reflective values in a given content based on a payload
     (e.g. ?search=sql injection ---> ...value="sql%20injection")
@@ -2429,7 +2429,7 @@ def removeReflectiveValues(content, payload):
 
         retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
 
-        if retVal != content:
+        if retVal != content and not suppressWarning:
             debugMsg = "reflective value found and filtered out"
             logger.debug(debugMsg)
 

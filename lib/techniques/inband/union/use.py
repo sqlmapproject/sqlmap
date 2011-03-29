@@ -65,7 +65,7 @@ def __oneShotUnionUse(expression, unpack=True):
     # sql injection output
     output = extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
             or extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
-            if headers else None), payload), re.DOTALL | re.IGNORECASE)
+            if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
 
     if output:
         output = getUnicode(output, kb.pageEncoding)
