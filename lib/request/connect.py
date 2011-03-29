@@ -271,6 +271,7 @@ class Connect:
                 else:
                     kwargs['url'] = conf.url[:conf.url.rfind('/')+1] + url
 
+                threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
                 kwargs['refreshing'] = True
 
                 debugMsg = "got HTML meta refresh header"
