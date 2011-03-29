@@ -1285,11 +1285,14 @@ def __useWizardInterface():
     message = "[3] Injection difficulty ('--level'/'--risk') [Please choose: 1-Normal(default), 2-Medium, 3-Hard]: "
     choice = readInput(message, default=1)
     if choice == '2':
-        conf.risk = conf.level = 3
+        conf.risk = 2
+        conf.level = 3
     elif choice == '3':
-        conf.risk = conf.level = 5
+        conf.risk = 3
+        conf.level = 5
     else:
-        conf.risk = conf.level = 1
+        conf.risk = 1
+        conf.level = 1
 
     message = "[4] Enumeration ('--banner'/'--current-user'/...) [Please choose: 1-Basic(default), 2-Smart, 3-All]: "
     choice = readInput(message, default=1)
