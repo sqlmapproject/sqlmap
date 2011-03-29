@@ -1802,9 +1802,7 @@ dealers
 diary
 download
 Dragon_users
-e107.e107_user
 e107_user
-forum.ibf_members
 fusion_user_groups
 fusion_users
 ibf_admin_sessions
@@ -1815,7 +1813,6 @@ ibf_sessions
 icq
 index
 info
-ipb.ibf_members
 ipb_sessions
 joomla_users
 jos_blastchatc_users
@@ -1851,7 +1848,6 @@ mitglieder
 movie
 mybb_users
 mysql
-mysql.user
 name
 names
 news_lostpass
@@ -1873,9 +1869,7 @@ phorum_user
 phorum_users
 phpads_clients
 phpads_config
-phpBB2.forum_users
-phpBB2.phpbb_users
-phpmyadmin.pma_table_info
+forum_users
 poll_user
 punbb_users
 pwd
@@ -1885,8 +1879,7 @@ reg_users
 registered
 reguser
 regusers
-shop.cards
-shop.orders
+cards
 site_login
 site_logins
 sitelogin
@@ -2258,7 +2251,6 @@ pwd1
 jhu
 webapps
 ASP
-ASP.NET
 Microsoft
 sing
 singup
@@ -3177,7 +3169,7 @@ cdb_banned
 cdb_crons
 cdb_access
 cdb_invites
-dbo.sysmergeschemaarticles
+sysmergeschemaarticles
 CodeRuleType
 cdb_membermagics
 cdb_imagetypes
@@ -3189,7 +3181,7 @@ cdb_adminsessions
 pw_adminset
 seen
 t_snap
-dbo.MSmerge_altsyncpartners
+MSmerge_altsyncpartners
 zl_deeds
 pw_styles
 pw_announce
@@ -3222,7 +3214,7 @@ cdb_pluginhooks
 mymps_member_docutype
 wp1_categories
 cdb_magicmarket
-dbo.MSmerge_errorlineage
+MSmerge_errorlineage
 cdb_activities
 zl_baoming
 cdb_orders
@@ -3257,7 +3249,7 @@ Market
 mymps_config
 mymps_mail_template
 mymps_advertisement
-dbo.MSrepl_identity_range
+MSrepl_identity_range
 pw_favors
 mymps_crons
 pw_config

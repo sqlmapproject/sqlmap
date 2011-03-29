@@ -22,6 +22,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
+from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -60,7 +61,7 @@ def tableExists(tableFile, regex=None):
     def tableExistsThread():
         while count[0] < length and kb.threadContinue:
             tbllock.acquire()
-            table = tables[count[0]]
+            table = safeSQLIdentificatorNaming(tables[count[0]])
             count[0] += 1
             tbllock.release()
 
@@ -165,6 +166,7 @@ def columnExists(columnFile, regex=None):
         table = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', conf.tbl)
     else:
         table = conf.tbl
+    table = safeSQLIdentificatorNaming(table)
 
     retVal = []
     infoMsg = "checking column existence using items from '%s'" % columnFile
@@ -180,7 +182,7 @@ def columnExists(columnFile, regex=None):
     def columnExistsThread():
         while count[0] < length and kb.threadContinue:
             collock.acquire()
-            column = columns[count[0]]
+            column = safeSQLIdentificatorNaming(columns[count[0]])
             count[0] += 1
             collock.release()
 

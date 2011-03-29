@@ -2444,3 +2444,37 @@ def normalizeUnicode(value):
     if isinstance(value, unicode):
         retVal = unicodedata.normalize('NFKD', value).encode('ascii','ignore')
     return retVal
+
+def safeSQLIdentificatorNaming(name, isTable=False):
+    """
+    Returns a safe representation of SQL identificator name
+    """
+    retVal = name
+    if isinstance(name, basestring):
+        if isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and '.' not in name:
+            name = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, name)
+
+        parts = name.split('.')
+        for i in range(len(parts)):
+            if not re.match(r"\A[A-Za-z0-9_]+\Z", parts[i]):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
+                    parts[i] = "`%s`" % parts[i].strip("`")
+                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
+                    parts[i] = "\"%s\"" % parts[i].strip("\"")
+        retVal = ".".join(parts)
+
+    return retVal
+
+def unsafeSQLIdentificatorNaming(name):
+    """
+    Extracts identificator's name from it's safe SQL representation
+    """
+    retVal = name
+    if isinstance(name, basestring):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
+            retVal = name.replace("`", "")
+        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
+            retVal = name.replace("\"", "")
+        if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+            retVal = retVal.lstrip("%s." % DEFAULT_MSSQL_SCHEMA)
+    return retVal

@@ -12,6 +12,8 @@ from lib.core.common import Backend
 from lib.core.common import getRange
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
+from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -181,21 +183,21 @@ class Enumeration(GenericEnumeration):
         colConsider, colCondParam = self.likeOrExact("column")
 
         for column in colList:
-            column = self.__safeSQLIdentificatorNaming(column)
+            column = safeSQLIdentificatorNaming(column)
 
             infoMsg = "searching column"
             if colConsider == "1":
                 infoMsg += "s like"
-            infoMsg += " '%s'" % self.__unsafeSQLIdentificatorNaming(column)
+            infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
             logger.info(infoMsg)
 
             foundCols[column] = {}
 
             colQuery = "%s%s" % (colCond, colCondParam)
-            colQuery = colQuery % self.__unsafeSQLIdentificatorNaming(column)
+            colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
             for db in dbs.keys():
-                db = self.__safeSQLIdentificatorNaming(db)
+                db = safeSQLIdentificatorNaming(db)
 
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                     query = rootQuery.inband.query
@@ -207,7 +209,7 @@ class Enumeration(GenericEnumeration):
                             values = [ values ]
 
                         for foundTbl in values:
-                            foundTbl = self.__safeSQLIdentificatorNaming(foundTbl, True)
+                            foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
 
                             if foundTbl is None:
                                 continue
@@ -263,7 +265,7 @@ class Enumeration(GenericEnumeration):
                         tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
 
-                        tbl = self.__safeSQLIdentificatorNaming(tbl, True)
+                        tbl = safeSQLIdentificatorNaming(tbl, True)
 
                         if tbl not in dbs[db]:
                             dbs[db][tbl] = {}

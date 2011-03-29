@@ -13,6 +13,8 @@ from lib.core.common import Backend
 from lib.core.common import getRange
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
+from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -78,7 +80,7 @@ class Enumeration(GenericEnumeration):
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             for db in dbs:
-                db = self.__safeSQLIdentificatorNaming(db)
+                db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -94,7 +96,7 @@ class Enumeration(GenericEnumeration):
 
         if not kb.data.cachedTables and not conf.direct:
             for db in dbs:
-                db = self.__safeSQLIdentificatorNaming(db)
+                db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -154,23 +156,23 @@ class Enumeration(GenericEnumeration):
             if isinstance(db, list):
                 db = db[0]
 
-            db = self.__safeSQLIdentificatorNaming(db)
+            db = safeSQLIdentificatorNaming(db)
             foundTbls[db] = []
 
         for tbl in tblList:
-            tbl = self.__safeSQLIdentificatorNaming(tbl, True)
+            tbl = safeSQLIdentificatorNaming(tbl, True)
 
             infoMsg = "searching table"
             if tblConsider == "1":
                 infoMsg += "s like"
-            infoMsg += " '%s'" % self.__unsafeSQLIdentificatorNaming(tbl)
+            infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
             logger.info(infoMsg)
 
             tblQuery = "%s%s" % (tblCond, tblCondParam)
-            tblQuery = tblQuery % self.__unsafeSQLIdentificatorNaming(tbl)
+            tblQuery = tblQuery % unsafeSQLIdentificatorNaming(tbl)
 
             for db in foundTbls.keys():
-                db = self.__safeSQLIdentificatorNaming(db)
+                db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -196,7 +198,7 @@ class Enumeration(GenericEnumeration):
                     infoMsg = "fetching number of table"
                     if tblConsider == "1":
                         infoMsg += "s like"
-                    infoMsg += " '%s' in database '%s'" % (self.__unsafeSQLIdentificatorNaming(tbl), self.__unsafeSQLIdentificatorNaming(db))
+                    infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
@@ -208,8 +210,8 @@ class Enumeration(GenericEnumeration):
                         warnMsg = "no table"
                         if tblConsider == "1":
                             warnMsg += "s like"
-                        warnMsg += " '%s' " % self.__unsafeSQLIdentificatorNaming(tbl)
-                        warnMsg += "in database '%s'" % self.__unsafeSQLIdentificatorNaming(db)
+                        warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                        warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
                         logger.warn(warnMsg)
 
                         continue
@@ -245,25 +247,25 @@ class Enumeration(GenericEnumeration):
             enumDbs = kb.data.cachedDbs
 
         for db in enumDbs:
-            db = self.__safeSQLIdentificatorNaming(db)
+            db = safeSQLIdentificatorNaming(db)
             dbs[db] = {}
 
         for column in colList:
-            column = self.__safeSQLIdentificatorNaming(column)
+            column = safeSQLIdentificatorNaming(column)
 
             infoMsg = "searching column"
             if colConsider == "1":
                 infoMsg += "s like"
-            infoMsg += " '%s'" % self.__unsafeSQLIdentificatorNaming(column)
+            infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
             logger.info(infoMsg)
 
             foundCols[column] = {}
 
             colQuery = "%s%s" % (colCond, colCondParam)
-            colQuery = colQuery % self.__unsafeSQLIdentificatorNaming(column)
+            colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
             for db in dbs.keys():
-                db = self.__safeSQLIdentificatorNaming(db)
+                db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -281,7 +283,7 @@ class Enumeration(GenericEnumeration):
                             values = [ values ]
 
                         for foundTbl in values:
-                            foundTbl = self.__safeSQLIdentificatorNaming(foundTbl, True)
+                            foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
 
                             if foundTbl is None:
                                 continue
@@ -339,7 +341,7 @@ class Enumeration(GenericEnumeration):
                         tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
 
-                        tbl = self.__safeSQLIdentificatorNaming(tbl, True)
+                        tbl = safeSQLIdentificatorNaming(tbl, True)
 
                         if tbl not in dbs[db]:
                             dbs[db][tbl] = {}

@@ -1307,6 +1307,7 @@ def __useWizardInterface():
         map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba'])
 
     conf.batch = True
+    conf.threads = 4
     print
 
 def __saveCmdline():
