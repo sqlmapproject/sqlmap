@@ -42,6 +42,7 @@ from lib.core.enums import HASH
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import DUMMY_USER_PREFIX
+from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import IS_WIN
 from lib.core.settings import LIST_EMAIL
 from lib.core.settings import UNICODE_ENCODING
@@ -422,11 +423,12 @@ def dictionaryAttack(attack_dict):
 
                                 attack_info.remove(item)
 
-                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                                 status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
                     except KeyboardInterrupt:
+                        print
                         warnMsg = "Ctrl+C detected in dictionary attack phase"
                         logger.warn(warnMsg)
                         return results
@@ -472,13 +474,14 @@ def dictionaryAttack(attack_dict):
 
                                 found = True
                                 break
-                            elif count % 1117 == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                                 status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
                                 if not user.startswith(DUMMY_USER_PREFIX):
                                     status += ' (user: %s)' % user
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
                         except KeyboardInterrupt:
+                            print
                             warnMsg = "Ctrl+C detected in dictionary attack phase"
                             logger.warn(warnMsg)
                             return results

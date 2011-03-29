@@ -211,14 +211,17 @@ SQL_STATEMENTS      = {
                              "rollback ",      ),
                      }
 
+# Regular expressions used for parsing error messages (--parse-errors)
 ERROR_PARSING_REGEXES = (   
                           r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>", 
                           r"<li>Error Type:<br>(?P<result>.+?)</li>", 
                           r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)"
                         )
 
+# Regular expression used for parsing charset info from meta html headers
 META_CHARSET_REGEX  = r'<meta http-equiv="?content-type"?[^>]+charset=(?P<result>[^">]+)'
 
+# Regular expression used for parsing empty fields in tested form data
 EMPTY_FORM_FIELDS_REGEX = r'(?P<result>[^=]+=(&|\Z))'
 
 # Reference: http://www.cs.ru.nl/bachelorscripties/2010/Martin_Devillers___0437999___Analyzing_password_strength.pdf
@@ -281,4 +284,8 @@ URLENCODE_FAILSAFE_CHARS = '()|,'
 # maximum length of urlencoded value after which failsafe procedure takes away
 URLENCODE_CHAR_LIMIT = 4000
 
+# default schema for Microsoft SQL Server DBMS
 DEFAULT_MSSQL_SCHEMA = 'dbo'
+
+# display hash attack info every mod number of items
+HASH_MOD_ITEM_DISPLAY = 1117
