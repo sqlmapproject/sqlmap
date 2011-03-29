@@ -166,7 +166,7 @@ class Dump:
                     if isinstance(table, (list, tuple, set)):
                         table = table[0]
 
-                    maxlength = max(maxlength, len(normalizeUnicode(table)))
+                    maxlength = max(maxlength, len(normalizeUnicode(table) or str(table)))
 
             lines = "-" * (int(maxlength) + 2)
 
@@ -186,7 +186,7 @@ class Dump:
                     if isinstance(table, (list, tuple, set)):
                         table = table[0]
 
-                    blank = " " * (maxlength - len(normalizeUnicode(table)))
+                    blank = " " * (maxlength - len(normalizeUnicode(table) or str(table)))
                     self.__write("| %s%s |" % (table, blank))
 
                 self.__write("+%s+\n" % lines)

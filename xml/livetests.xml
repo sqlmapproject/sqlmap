@@ -8,7 +8,7 @@
     </global>
     <case name="MySQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
-            <url value="http://debianenv/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="1"/>
             <getBanner value="True"/>
@@ -35,7 +35,7 @@
     </case>
     <case name="MySQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="2"/>
             <getBanner value="True"/>
@@ -61,7 +61,7 @@
     </case>
     <case name="MySQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
@@ -87,7 +87,7 @@
     </case>
     <case name="MySQL partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
@@ -113,7 +113,7 @@
     </case>
     <case name="Postgres (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
-            <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="1"/>
             <getBanner value="True"/>
@@ -140,7 +140,7 @@
     </case>
     <case name="Postgres (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="2"/>
             <getBanner value="True"/>
@@ -166,7 +166,7 @@
     </case>
     <case name="Postgres (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
@@ -192,7 +192,7 @@
     </case>
     <case name="Postgres partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
@@ -218,7 +218,7 @@
     </case>
     <case name="Oracle (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump --threads=4)">
         <switches>
-            <url value="http://debianenv/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="1"/>
             <getBanner value="True"/>
@@ -245,7 +245,7 @@
     </case>
     <case name="Oracle (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="2"/>
             <getBanner value="True"/>
@@ -271,7 +271,7 @@
     </case>
     <case name="Oracle (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
@@ -297,7 +297,7 @@
     </case>
     <case name="Oracle partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
-            <url value="http://debianenv/sqlmap/oracle/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>

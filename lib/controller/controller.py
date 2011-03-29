@@ -314,10 +314,7 @@ def start():
                 parameters = conf.parameters.keys()
 
                 # Order of testing list (last to first)
-                if conf.forms or conf.data:
-                    orderList = (PLACE.URI, PLACE.GET, PLACE.POST)
-                else:
-                    orderList = (PLACE.URI, PLACE.POST, PLACE.GET)
+                orderList = (PLACE.URI, PLACE.GET, PLACE.POST)
 
                 for place in orderList:
                     if place in parameters:
@@ -334,8 +331,8 @@ def start():
                     # Test Cookie header only if --level >= 2
                     condition |= (place == PLACE.COOKIE and conf.level < 2)
 
-                    # Test GET parameter in case --data and/or --forms used only if --level >= 3
-                    condition |= (place == PLACE.GET and (conf.data or conf.forms) and conf.level < 3)
+                    # Test GET parameter in case --data only if --level >= 3
+                    condition |= (place == PLACE.GET and conf.data and conf.level < 3)
 
                     condition &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter))
                     condition &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter))
