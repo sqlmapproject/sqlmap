@@ -29,7 +29,7 @@ from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
 from lib.core.common import Backend
 from lib.core.common import getPublicTypeMembers
-from lib.core.common import getUnicode
+from lib.core.common import normalizeUnicode
 from lib.core.common import paths
 from lib.core.common import readInput
 from lib.core.convert import hexdecode
@@ -381,7 +381,7 @@ def dictionaryAttack(attack_dict):
 
         for item in attack_info:
             ((user, _), _) = item
-            kb.wordlist.append(getUnicode(user))
+            kb.wordlist.append(normalizeUnicode(user))
 
         length = len(kb.wordlist) * len(suffix_list)
 
