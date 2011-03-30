@@ -334,22 +334,29 @@ def checkSqlInjection(place, parameter, value):
                         elif method == PAYLOAD.METHOD.GREP:
                             # Perform the test's request and grep the response
                             # body for the test's <grep> regular expression
-                            page, headers = Request.queryPage(reqPayload, place, content=True, raise404=False)
-                            output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
-                                    or extractRegexResult(check, listToStrValue(headers.headers \
-                                    if headers else None), re.DOTALL | re.IGNORECASE) \
-                                    or extractRegexResult(check, threadData.lastRedirectMsg[1] \
-                                    if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                                    threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+                            try:
+                                page, headers = Request.queryPage(reqPayload, place, content=True, raise404=False)
+                                output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
+                                        or extractRegexResult(check, listToStrValue(headers.headers \
+                                        if headers else None), re.DOTALL | re.IGNORECASE) \
+                                        or extractRegexResult(check, threadData.lastRedirectMsg[1] \
+                                        if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
-                            if output:
-                                result = output == "1"
+                                if output:
+                                    result = output == "1"
 
-                                if result:
-                                    infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
-                                    logger.info(infoMsg)
+                                    if result:
+                                        infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                        logger.info(infoMsg)
 
-                                    injectable = True
+                                        injectable = True
+
+                            except sqlmapConnectionException, msg:
+                                debugMsg  = "problem occured most likely because the "
+                                debugMsg += "server hasn't recovered as expected from the "
+                                debugMsg += "error-based payload used ('%s')" % msg
+                                logger.debug(debugMsg)
 
                         # In case of time-based blind or stacked queries
                         # SQL injections

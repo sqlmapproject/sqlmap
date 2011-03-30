@@ -208,6 +208,12 @@ def columnExists(columnFile, regex=None):
         infoMsg = "starting %d threads" % conf.threads
         logger.info(infoMsg)
     else:
+        message = "please enter number of threads? [Enter for default (%d)] " % conf.threads
+        choice = readInput(message, default=str(conf.threads))
+        if choice and choice.isdigit():
+            conf.threads = int(choice)
+        
+    if conf.threads == 1:
         warnMsg = "running in a single-thread mode. this could take a while."
         logger.warn(warnMsg)
 
