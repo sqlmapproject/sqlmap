@@ -42,6 +42,7 @@ from lib.core.enums import HASH
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import DUMMY_USER_PREFIX
+from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import IS_WIN
 from lib.core.settings import LIST_EMAIL
@@ -300,6 +301,8 @@ def hashRecognition(value):
             if Backend.getIdentifiedDbms() == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
                 continue
             elif Backend.getIdentifiedDbms() == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
+                continue
+            elif regex == HASH.CRYPT_GENERIC and getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(value):
                 continue
             elif getCompiledRegex(regex).match(value):
                 retVal = regex
