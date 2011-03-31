@@ -486,7 +486,7 @@ name="MS10-015">).
 
 <p>
 <itemize>
-<item><bf>March 10</bf>, <htmlurl name="Bernardo and Miroslav"
+<item><bf>April XX</bf>, <htmlurl name="Bernardo and Miroslav"
 url="http://sqlmap.sourceforge.net/#developers"> release sqlmap
 <bf>0.9</bf> featuring a totally rewritten and powerful SQL injection
 detection engine, the possibility to connect directly to a database
