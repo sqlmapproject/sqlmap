@@ -75,6 +75,7 @@ from lib.core.settings import NON_CONTROL_CHAR_REGEX
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
+from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
 from lib.core.settings import DUMP_DEL_MARKER
