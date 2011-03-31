@@ -129,7 +129,7 @@ def tableExists(tableFile, regex=None):
         print
         logger.debug("waiting for threads to finish")
 
-        warnMsg = "Ctrl+C detected during common table existance check. "
+        warnMsg = "Ctrl+C detected during common table existence check. "
         warnMsg += "sqlmap will display some tables only"
         logger.warn(warnMsg)
 
@@ -245,7 +245,7 @@ def columnExists(columnFile, regex=None):
         print
         logger.debug("waiting for threads to finish")
 
-        warnMsg = "Ctrl+C detected during common column existance check. "
+        warnMsg = "Ctrl+C detected during common column existence check. "
         warnMsg += "sqlmap will display some columns only"
         logger.warn(warnMsg)
 
