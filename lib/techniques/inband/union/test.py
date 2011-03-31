@@ -32,6 +32,7 @@ from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_TABLE
+from lib.core.settings import UNION_MIN_RESPONSE_CHARS
 from lib.core.settings import UNION_STDEV_COEFF
 from lib.core.settings import MIN_RATIO
 from lib.core.settings import MAX_RATIO
@@ -113,7 +114,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
     # affected by an exploitable inband SQL injection vulnerability
     for position in positions:
         # Prepare expression with delimiters
-        randQuery = randomStr()
+        randQuery = randomStr(UNION_MIN_RESPONSE_CHARS)
         phrase = "%s%s%s".lower() % (kb.misc.start, randQuery, kb.misc.stop)
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
@@ -134,7 +135,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
 
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
-                randQuery2 = randomStr()
+                randQuery2 = randomStr(UNION_MIN_RESPONSE_CHARS)
                 phrase2 = "%s%s%s".lower() % (kb.misc.start, randQuery2, kb.misc.stop)
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)

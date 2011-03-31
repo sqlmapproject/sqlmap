@@ -66,6 +66,9 @@ CONCAT_VALUE_DELIMITER   = '|'
 # coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF = 10
 
+# minimum length of usable union injected response (quick defense against substr fields)
+UNION_MIN_RESPONSE_CHARS = 10
+
 # coefficient used for a union-based number of columns checking (must be >= 7)
 UNION_STDEV_COEFF = 7
 
