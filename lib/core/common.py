@@ -1956,7 +1956,7 @@ def extractRegexResult(regex, content, flags=0):
     retVal = None
 
     if regex and content and '?P<result>' in regex:
-        match = re.search(regex, content, flags)
+        match = getCompiledRegex(regex, flags).search(content)
 
         if match:
             retVal = match.group("result")
