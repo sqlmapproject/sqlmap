@@ -363,13 +363,13 @@ class Agent:
         """
 
         prefixRegex = "(?:\s+(?:FIRST|SKIP)\s+\d+)*"
-        fieldsSelectTop = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
-        fieldsSelectDistinct = re.search("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
-        fieldsSelectCase = re.search("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
-        fieldsSelectFrom = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
-        fieldsExists = re.search("EXISTS(.*)", query, re.I)
-        fieldsSelect = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
-        fieldsSubstr = re.search("\ASUBSTR", query, re.I)
+        fieldsSelectTop = getCompiledRegex("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", re.I).search(query)
+        fieldsSelectDistinct = getCompiledRegex("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, re.I).search(query)
+        fieldsSelectCase = getCompiledRegex("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, re.I).search(query)
+        fieldsSelectFrom = getCompiledRegex("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, re.I).search(query)
+        fieldsExists = getCompiledRegex("EXISTS(.*)", re.I).search(query)
+        fieldsSelect = getCompiledRegex("\ASELECT%s\s+(.*)" % prefixRegex, re.I).search(query)
+        fieldsSubstr = getCompiledRegex("\ASUBSTR", re.I).search(query)
         fieldsNoSelect = query
 
         if fieldsSubstr:

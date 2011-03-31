@@ -28,6 +28,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
 from lib.core.common import Backend
+from lib.core.common import getCompiledRegex
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import normalizeUnicode
 from lib.core.common import paths
@@ -338,7 +339,7 @@ def dictionaryAttack(attack_dict):
 
                 hash_ = hash_.split()[0]
 
-                if re.match(hash_regex, hash_):
+                if getCompiledRegex(hash_regex).match(hash_):
                     hash_ = hash_.lower()
 
                     if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
