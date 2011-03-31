@@ -102,7 +102,7 @@ def tableExists(tableFile, regex=None):
             conf.threads = int(choice)
         
     if conf.threads == 1:
-        warnMsg = "running in a single-thread mode. this could take a while."
+        warnMsg = "running in a single-thread mode. This could take a while."
         logger.warn(warnMsg)
 
     # Start the threads
@@ -214,7 +214,7 @@ def columnExists(columnFile, regex=None):
             conf.threads = int(choice)
         
     if conf.threads == 1:
-        warnMsg = "running in a single-thread mode. this could take a while."
+        warnMsg = "running in a single-thread mode. This could take a while."
         logger.warn(warnMsg)
 
     # Start the threads

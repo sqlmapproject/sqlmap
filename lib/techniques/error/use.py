@@ -295,7 +295,8 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
             except KeyboardInterrupt:
                 print
-                warnMsg = "Ctrl+C detected in dumping phase"
+                warnMsg = "Ctrl+C detected during enumeration. sqlmap "
+                warnMsg += "will display partial output"
                 logger.warn(warnMsg)
 
     if not outputs:
