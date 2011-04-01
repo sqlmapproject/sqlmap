@@ -457,6 +457,9 @@ def __findPageForms():
 
     if forms:
         for form in forms:
+            for control in form.controls:
+                if hasattr(control, 'items'):
+                    control.items[0].selected = True
             request = form.click()
             url = urldecode(request.get_full_url(), kb.pageEncoding)
             method = request.get_method()

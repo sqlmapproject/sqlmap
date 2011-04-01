@@ -2754,7 +2754,7 @@ class HTMLForm:
 # Initialisation.  Use ParseResponse / ParseFile instead.
 
     def __init__(self, action, method="GET",
-                 enctype="application/x-www-form-urlencoded",
+                 enctype=None,
                  name=None, attrs=None,
                  request_class=urllib2.Request,
                  forms=None, labels=None, id_to_labels=None,
@@ -2772,7 +2772,7 @@ class HTMLForm:
         """
         self.action = action
         self.method = method
-        self.enctype = enctype
+        self.enctype = enctype or "application/x-www-form-urlencoded"
         self.name = name
         if attrs is not None:
             self.attrs = attrs.copy()
