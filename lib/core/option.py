@@ -27,6 +27,7 @@ from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
+from lib.core.common import filterStringValue
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
@@ -249,11 +250,13 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     if key.lower() == "cookie":
                         cookie = value
                     elif key.lower() == "host":
+                        if '://' in value:
+                            scheme, value = value.split('://')[:2]
                         splitValue = value.split(":")
                         host = splitValue[0]
 
                         if len(splitValue) > 1:
-                            port = splitValue[1]
+                            port = filterStringValue(splitValue[1], '[0-9]')
 
                             if not scheme and port == "443":
                                 scheme = "https"
@@ -262,7 +265,6 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     # conf.httpHeaders and consider the following lines as
                     # POSTed data
                     if key == "Content-Length":
-                        data = ""
                         params = True
 
                     # Avoid proxy and connection type related headers
