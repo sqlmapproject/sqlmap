@@ -104,7 +104,7 @@ optDict = {
                                "firstChar":         "integer",
                                "lastChar":          "integer",
                                "query":             "string",
-                               "sqlShell":          "boolean",
+                               "sqlShell":          "boolean"
                              },
 
             "Brute":         {

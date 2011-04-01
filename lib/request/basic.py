@@ -24,7 +24,7 @@ from lib.core.common import sanitizeAsciiString
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.settings import LIST_EMAIL
+from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import UNICODE_ENCODING
@@ -122,7 +122,7 @@ def checkCharEncoding(encoding):
         codecs.lookup(encoding)
     except LookupError:
         warnMsg  = "unknown charset '%s'. " % encoding
-        warnMsg += "Please report by e-mail to %s." % LIST_EMAIL
+        warnMsg += "Please report by e-mail to %s." % ML
         logger.warn(warnMsg)
         encoding = UNICODE_ENCODING
 

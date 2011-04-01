@@ -46,7 +46,7 @@ from lib.core.settings import DUMMY_USER_PREFIX
 from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import IS_WIN
-from lib.core.settings import LIST_EMAIL
+from lib.core.settings import ML
 from lib.core.settings import UNICODE_ENCODING
 
 def mysql_passwd(password, uppercase=True):
@@ -439,7 +439,7 @@ def dictionaryAttack(attack_dict):
 
                     except:
                         warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                        warnMsg += "Please report by e-mail to %s." % LIST_EMAIL
+                        warnMsg += "Please report by e-mail to %s." % ML
                         logger.critical(warnMsg)
 
             clearConsoleLine()
@@ -492,14 +492,14 @@ def dictionaryAttack(attack_dict):
 
                         except:
                             warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                            warnMsg += "Please report by e-mail to %s." % LIST_EMAIL
+                            warnMsg += "Please report by e-mail to %s." % ML
                             logger.critical(warnMsg)
 
                 clearConsoleLine()
 
     if len(hash_regexes) == 0:
         warnMsg  = "unknown hash Format. "
-        warnMsg += "Please report by e-mail to %s." % LIST_EMAIL
+        warnMsg += "Please report by e-mail to %s." % ML
         logger.warn(warnMsg)
 
     if len(results) == 0:

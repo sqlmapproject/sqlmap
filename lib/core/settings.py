@@ -22,7 +22,7 @@ REVISION           = getRevisionNumber()
 VERSION_STRING     = "sqlmap/%s" % VERSION
 DESCRIPTION        = "automatic SQL injection and database takeover tool"
 SITE               = "http://sqlmap.sourceforge.net"
-LIST_EMAIL         = "sqlmap-users@lists.sourceforge.net"
+ML                 = "sqlmap-users@lists.sourceforge.net"
 
 # minimum distance of ratio from kb.matchRatio to result in True
 DIFF_TOLERANCE     = 0.05
