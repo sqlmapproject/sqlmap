@@ -142,7 +142,7 @@ class Enumeration:
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             self.getCurrentUser()
-            query = queries[Backend.getIdentifiedDbms()].is_dba.query % kb.data.currentUser.split("@")[0]
+            query = queries[Backend.getIdentifiedDbms()].is_dba.query % (kb.data.currentUser.split("@")[0] if kb.data.currentUser else None)
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and user is not None:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query2 % user
         else:

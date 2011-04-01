@@ -323,7 +323,7 @@
     </case>
     <case name="MSSQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
-            <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
+            <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
             <technique value="1"/>
             <getBanner value="True"/>
@@ -350,7 +350,7 @@
     </case>
     <case name="MSSQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
+            <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
             <technique value="2"/>
             <getBanner value="True"/>
@@ -376,7 +376,7 @@
     </case>
     <case name="MSSQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://windowsenv/sqlmap/mssql/iis/get_int.asp?id=1"/>
+            <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
@@ -402,7 +402,7 @@
     </case>
     <case name="MSSQL partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
-            <url value="http://windowsenv/sqlmap/mssql/iis/get_int_partialunion.asp?id=1"/>
+            <url value="http://windowsdev/sqlmap/mssql/iis/get_int_partialunion.asp?id=1"/>
             <isDba value="True"/>
             <technique value="3"/>
             <getBanner value="True"/>
