@@ -221,7 +221,7 @@ def start():
 
                     if not test or test[0] in ("y", "Y"):
                         if conf.method == HTTPMETHOD.POST:
-                            message = "Edit POST data [default: %s]%s: " % (urlencode(conf.data) if conf.data else "", " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
+                            message = "Edit POST data [default: %s]%s: " % (urlencode(conf.data) if conf.data else "None", " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
                             if extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data):
                                 message = "do you want to fill blank fields with random values? [Y/n] "
