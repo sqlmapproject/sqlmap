@@ -360,6 +360,9 @@ Marek Sarvas <marek.sarvas@gmail.com>
 Philippe A. R. Schaeffer <schaeff@compuphil.de>
     for reporting a minor bug
 
+Jorge Santos <jorge_a_santos@hotmail.com>
+    for reporting a minor bug
+
 Sven Schluter <sschlueter@netzwerk.cc>
     for providing with a patch for waiting a number of seconds between
     each HTTP request

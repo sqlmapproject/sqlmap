@@ -104,16 +104,12 @@ class Dump:
         self.string("current user", data)
 
     def currentDb(self,data):
-        if Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ORACLE):
+        if Backend.getIdentifiedDbms() == DBMS.MAXDB:
             self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data)
+        elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data)
         else:
             self.string("current database", data)
-
-        if Backend.getIdentifiedDbms() in (DBMS.ORACLE):
-            warnMsg  = "on %s you have to use switch '--current-user' to " % Backend.getIdentifiedDbms()
-            warnMsg += "retrieve current schema name which can be used "
-            warnMsg += "as an equivalent to database name (-D) in further runs"
-            logger.warning(warnMsg)
 
     def dba(self,data):
         self.string("current user is DBA", data)
