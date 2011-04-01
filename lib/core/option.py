@@ -26,6 +26,7 @@ from extra.keepalive import keepalive
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
+from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
 from lib.core.common import getConsoleWidth
@@ -1281,36 +1282,50 @@ def __useWizardInterface():
     logger.info("starting wizard interface")
 
     while not conf.url:
-        message = "[1] Please enter full target URL ('-u'): "
+        message = "Please enter full target URL (-u): "
         conf.url = readInput(message, default=None)
 
-    message = "[2] POST data ('--data') [Enter for None]: "
+    message = "POST data (--data) [Enter for None]: "
     conf.data = readInput(message, default=None)
 
-    message = "[3] Injection difficulty ('--level'/'--risk') [Please choose: 1-Normal(default), 2-Medium, 3-Hard]: "
-    choice = readInput(message, default='1')
-    if choice == '2':
-        conf.risk = 2
-        conf.level = 3
-    elif choice == '3':
-        conf.risk = 3
-        conf.level = 5
-    else:
-        conf.risk = 1
-        conf.level = 1
+    choice = None
 
-    message = "[4] Enumeration ('--banner'/'--current-user'/...) [Please choose: 1-Basic(default), 2-Smart, 3-All]: "
-    choice = readInput(message, default='1')
-    if choice == '2':
-        map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getDbs', 'getTables', 'excludeSysDbs'])
-    elif choice == '3':
-        map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getPasswordHashes', 'getPrivileges', 'getRoles', 'dumpAll'])
-    else:
-        map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba'])
+    while choice is None or choice not in ("", "1", "2", "3"):
+        message = "Injection difficulty (--level/--risk). Please choose:\n"
+        message += "[1] Normal (default)\n[2] Medium\n[3] Hard"
+        choice = readInput(message, default='1')
+
+        if choice == '2':
+            conf.risk = 2
+            conf.level = 3
+        elif choice == '3':
+            conf.risk = 3
+            conf.level = 5
+        else:
+            conf.risk = 1
+            conf.level = 1
+
+    choice = None
+
+    while choice is None or choice not in ("", "1", "2", "3"):
+        message = "Enumeration (--banner/--current-user/etc). Please choose:\n"
+        message += "[1] Basic (default)\n[2] Smart\n[3] All"
+        choice = readInput(message, default='1')
+
+        if choice == '2':
+            map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getDbs', 'getTables', 'excludeSysDbs'])
+        elif choice == '3':
+            map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getPasswordHashes', 'getPrivileges', 'getRoles', 'dumpAll'])
+        else:
+            map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba'])
 
     conf.batch = True
     conf.threads = 4
-    print
+
+    logger.debug("muting sqlmap.. it will do the magic for you")
+    conf.verbose = 0
+
+    dataToStdout("\nsqlmap is running, please wait..\n\n")
 
 def __saveCmdline():
     """
@@ -1479,8 +1494,8 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
     __mergeOptions(inputOptions, overrideOptions)
-    __setVerbosity()
     __useWizardInterface()
+    __setVerbosity()
     __saveCmdline()
     __setRequestFromFile()
     __cleanupOptions()
