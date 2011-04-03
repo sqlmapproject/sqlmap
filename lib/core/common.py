@@ -1724,6 +1724,22 @@ def getUnicode(value, encoding=None, system=False):
         except:
             return getUnicode(value, UNICODE_ENCODING)
 
+def encodeUnicode(value, encoding=None):
+    """
+    Return 8-bit string representation of the supplied unicode value:
+
+    >>> encodeUnicode(u'test')
+    'test'
+    """
+
+    retVal = value
+    if isinstance(value, unicode):
+        try:
+            retVal = value.encode(encoding or UNICODE_ENCODING)
+        except UnicodeEncodeError:
+            retVal = value.encode(UNICODE_ENCODING, errors="replace")
+    return retVal
+
 # http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 def longestCommonPrefix(*sequences):
     if len(sequences) == 1:
@@ -2261,21 +2277,6 @@ def filterListValue(value, regex):
         return retVal
     else:
         return value
-
-def unicodeToSafeHTMLValue(value):
-    """
-    Returns HTML representation of unicode string value safe for sending
-    over HTTP(s)
-    """
-
-    retVal = value
-
-    if value:
-        for char in value:
-            if ord(char) > 127:
-                retVal = retVal.replace(char, "&#%d;" % ord(char))
-
-    return retVal
 
 def showHttpErrorCodes():
     """

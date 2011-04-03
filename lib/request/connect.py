@@ -21,10 +21,10 @@ from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
+from lib.core.common import encodeUnicode
 from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
-from lib.core.common import unicodeToSafeHTMLValue
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import parseTargetUrl
@@ -173,9 +173,9 @@ class Connect:
 
             for key, item in headers.items():
                 del headers[key]
-                headers[unicodeToSafeHTMLValue(key)] = unicodeToSafeHTMLValue(item)
+                headers[encodeUnicode(key, kb.pageEncoding)] = encodeUnicode(item, kb.pageEncoding)
 
-            post = unicodeToSafeHTMLValue(post)
+            post = encodeUnicode(post, kb.pageEncoding)
 
             if method:
                 req = MethodRequest(url, post, headers)

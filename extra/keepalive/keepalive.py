@@ -71,7 +71,8 @@ EXTRA ATTRIBUTES AND METHODS
 """
 from httplib import _CS_REQ_STARTED, _CS_REQ_SENT, _CS_IDLE, CannotSendHeader
 
-from lib.core.common import unicodeToSafeHTMLValue
+from lib.core.common import encodeUnicode
+from lib.core.data import kb
 
 import threading
 import urllib2
@@ -192,8 +193,6 @@ class HTTPHandler(urllib2.HTTPHandler):
         r._handler = self
         r._host = host
         r._url = req.get_full_url()
-
-
 
         #if r.status == 200 or not HANDLE_ERRORS:
             #return r
@@ -316,7 +315,6 @@ class HTTPConnection(httplib.HTTPConnection):
 
         self._headers[header] = value
 
-
     def endheaders(self):
         """Indicate that the last header line has been sent to the server."""
 
@@ -324,10 +322,6 @@ class HTTPConnection(httplib.HTTPConnection):
             self.__state = _CS_REQ_SENT
         else:
             raise CannotSendHeader()
-
-        for key, item in self._headers.items():
-            del self._headers[key]
-            self._headers[unicodeToSafeHTMLValue(key)] = unicodeToSafeHTMLValue(item)
 
         for header in ['Host', 'Accept-Encoding']:
             if header in self._headers:
@@ -340,6 +334,9 @@ class HTTPConnection(httplib.HTTPConnection):
             self._output(str)
 
         self._send_output()
+
+    def send(self, str):
+        httplib.HTTPConnection.send(self, encodeUnicode(str, kb.pageEncoding))
 
 #########################################################################
 #####   TEST FUNCTIONS
