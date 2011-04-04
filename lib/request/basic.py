@@ -106,16 +106,18 @@ def checkCharEncoding(encoding):
         encoding = encoding.replace('8858', '8859') # iso-8858 -> iso-8859
     elif '2313' in encoding:
         encoding = encoding.replace('2313', '2312') # gb2313 -> gb2312
+
+    # name adjustment for compatibility
     if encoding.startswith('8859'):
         encoding = 'iso-%s' % encoding
-
-    # http://philip.html5.org/data/charsets-2.html
-    if encoding in translate:
-        encoding = translate[encoding]
     elif encoding.startswith('cp-'):
         encoding = 'cp%s' % encoding[3:]
     elif encoding.startswith('windows') and not encoding.startswith('windows-'):
         encoding = 'windows-%s' % encoding[7:]
+
+    # http://philip.html5.org/data/charsets-2.html
+    if encoding in translate:
+        encoding = translate[encoding]
     elif encoding == 'null':
         return None
 
