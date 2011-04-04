@@ -1484,6 +1484,10 @@ def __basicOptionValidation():
         errMsg = "switch --forms requires usage of -u (--url) switch"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.proxy and conf.ignoreProxy:
+        errMsg = "switch --proxy is incompatible with switch --ignore-proxy"
+        raise sqlmapSyntaxException, errMsg
+
     if conf.forms and (conf.list or conf.direct or conf.requestFile or conf.googleDork):
         errMsg = "switch --forms is compatible only with -u (--url) target switch"
         raise sqlmapSyntaxException, errMsg
