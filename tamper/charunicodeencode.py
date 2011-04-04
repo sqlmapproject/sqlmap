@@ -16,8 +16,8 @@ __priority__ = PRIORITY.LOWEST
 
 def tamper(value):
     """
-    Replaces value with unicode-urlencode of non-encoded chars in value
-    Example: 'SELECT%20FIELD%20FROM%20TABLE' becomes '%u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
+    Replaces value with unicode-urlencode of non-encoded chars in value (not processing already encoded)
+    Example: 'SELECT FIELD%20FROM TABLE' becomes '%u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
     """
 
     retVal = value
