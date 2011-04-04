@@ -30,7 +30,8 @@ on the operating system via out-of-band connections.
 sqlmap is developed in <htmlurl url="http://www.python.org" name="Python">,
 a dynamic object-oriented interpreted programming language.
 This makes the tool independent from the operating system. It only
-requires the Python interpreter version equal or higher than <bf>2.6</bf>.
+requires the Python interpreter version <bf>2</bf> equal or higher than
+<bf>2.6</bf>.
 The interpreter is freely downloadable from its
 <htmlurl url="http://python.org/download/" name="official site">.
 To make it even easier, many GNU/Linux distributions come out of the box
@@ -48,9 +49,9 @@ For the ICMP tunneling out-of-band takeover technique, sqlmap requires
 <htmlurl url="http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket"
 name="Impacket"> library too.
 
-If you are willing to connect directly to a database server (<tt>-d</tt> switch), without passing
-via a web application, you need to install Python bindings for the database
-management system that you are going to attack:
+If you are willing to connect directly to a database server (<tt>-d</tt> switch),
+without passing via a web application, you need to install Python bindings
+for the database management system that you are going to attack:
 
 <itemize>
 <item>Firebird: <htmlurl name="python-kinterbasdb" url="http://kinterbasdb.sourceforge.net/">.
@@ -774,7 +775,7 @@ $ python sqlmap.py -h
     sqlmap/0.9 - automatic SQL injection and database takeover tool
     http://sqlmap.sourceforge.net
 
-Usage: sqlmap.py [options]
+Usage: python sqlmap.py [options]
 
 Options:
   --version             show program's version number and exit
@@ -955,6 +956,7 @@ Options:
     --parse-errors      Parse DBMS error messages from response pages
     --replicate         Replicate dumped data into a sqlite3 database
     --tor               Use default Tor (Vidalia/Privoxy/Polipo) proxy address
+    --wizard            Simple wizard interface for beginner users
 </verb></tscreen>
 
 
