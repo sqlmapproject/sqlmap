@@ -11,39 +11,39 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGHEST
 
-def tamper(value):
+def tamper(payload):
     """
     Replaces 'IFNULL(A, B)' with 'IF(ISNULL(A), B, A)'
     Example: 'IFNULL(1, 2)' becomes 'IF(ISNULL(1), 2, 1)'
     """
 
-    if value and value.find("IFNULL") > -1:
+    if payload and payload.find("IFNULL") > -1:
 
-        while value.find("IFNULL(") > -1:
-            index = value.find("IFNULL(")
+        while payload.find("IFNULL(") > -1:
+            index = payload.find("IFNULL(")
             deepness = 1
             comma, end = None, None
 
-            for i in xrange(index + len("IFNULL("), len(value)):
-                if deepness == 1 and value[i] == ',':
+            for i in xrange(index + len("IFNULL("), len(payload)):
+                if deepness == 1 and payload[i] == ',':
                     comma = i
 
-                elif deepness == 1 and value[i] == ')':
+                elif deepness == 1 and payload[i] == ')':
                     end = i
                     break
 
-                elif value[i] == '(':
+                elif payload[i] == '(':
                     deepness += 1
 
-                elif value[i] == ')':
+                elif payload[i] == ')':
                     deepness -= 1
 
             if comma and end:
-                A = value[index + len("IFNULL("):comma]
-                B = value[comma + 1:end]
+                A = payload[index + len("IFNULL("):comma]
+                B = payload[comma + 1:end]
                 newVal = "IF(ISNULL(%s),%s,%s)" % (A, B, A)
-                value = value[:index] + newVal + value[end+1:]
+                payload = payload[:index] + newVal + payload[end+1:]
             else:
                 break
 
-    return value
+    return payload

@@ -14,24 +14,24 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 
 __priority__ = PRIORITY.LOWEST
 
-def tamper(value):
+def tamper(payload):
     """
-    Replaces value with unicode-urlencode of non-encoded chars in value (not processing already encoded)
+    Replaces payload with unicode-urlencode of non-encoded chars in payload (not processing already encoded)
     Example: 'SELECT FIELD%20FROM TABLE' becomes '%u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
     """
 
-    retVal = value
+    retVal = payload
 
-    if value:
+    if payload:
         retVal = ""
         i = 0
 
-        while i < len(value):
-            if value[i] == '%' and (i < len(value) - 2) and value[i+1] in string.hexdigits and value[i+2] in string.hexdigits:
-                retVal += "%%u00%s" % value[i+1:i+3]
+        while i < len(payload):
+            if payload[i] == '%' and (i < len(payload) - 2) and payload[i+1] in string.hexdigits and payload[i+2] in string.hexdigits:
+                retVal += "%%u00%s" % payload[i+1:i+3]
                 i += 3
             else:
-                retVal += '%%u00%X' % ord(value[i])
+                retVal += '%%u00%X' % ord(payload[i])
                 i += 1
 
     return retVal

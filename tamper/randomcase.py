@@ -15,15 +15,15 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
-def tamper(value):
+def tamper(payload):
     """
     Replaces each character with random case value
     Example: 'INSERT' might become 'InsERt'
     """
 
-    retVal = value
+    retVal = payload
 
-    if value:
+    if payload:
         for match in re.finditer(r"[A-Za-z_]+", retVal):
             word = match.group()
 

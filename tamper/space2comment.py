@@ -11,36 +11,36 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
-def tamper(value):
+def tamper(payload):
     """
     Replaces ' ' with '/**/'
     Example: 'SELECT id FROM users' becomes 'SELECT/**/id/**/FROM/**/users'
     """
 
-    retVal = value
+    retVal = payload
 
-    if value:
+    if payload:
         retVal = ""
         quote, doublequote, firstspace = False, False, False
 
-        for i in xrange(len(value)):
+        for i in xrange(len(payload)):
             if not firstspace:
-                if value[i].isspace():
+                if payload[i].isspace():
                     firstspace = True
                     retVal += "/**/"
                     continue
 
-            elif value[i] == '\'':
+            elif payload[i] == '\'':
                 quote = not quote
 
-            elif value[i] == '"':
+            elif payload[i] == '"':
                 doublequote = not doublequote
 
-            elif value[i]==" " and not doublequote and not quote:
+            elif payload[i]==" " and not doublequote and not quote:
                 retVal += "/**/"
                 continue
 
-            retVal += value[i]
+            retVal += payload[i]
 
     return retVal
 

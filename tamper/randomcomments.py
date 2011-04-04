@@ -15,16 +15,16 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
-def tamper(value):
+def tamper(payload):
     """
-    Add random comments to SQL keywords in value
+    Add random comments to SQL keywords
     Example: 'INSERT' becomes 'IN/**/S/**/ERT'
     """
 
-    retVal = value
+    retVal = payload
 
-    if value:
-        for match in re.finditer(r"[A-Za-z_]+", retVal):
+    if payload:
+        for match in re.finditer(r"[A-Za-z_]+", payload):
             word = match.group()
 
             if len(word) < 2:
