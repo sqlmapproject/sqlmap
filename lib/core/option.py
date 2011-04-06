@@ -1497,7 +1497,7 @@ def __basicOptionValidation():
         raise sqlmapSyntaxException, errMsg
 
     if isinstance(conf.uCols, basestring) and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
-        errMsg = "--union-cols must be a range with hyphon (e.g. 1-10)"
+        errMsg = "value for --union-cols must be a range with hyphon (e.g. 1-10)"
         raise sqlmapSyntaxException, errMsg
 
 def init(inputOptions=advancedDict(), overrideOptions=False):
