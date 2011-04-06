@@ -9,7 +9,7 @@
 
 <H2>by 
 <A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A>, 
-<A HREF="mailto:miroslav.stampar@gmail.com">Miroslav Stampar</A></H2>version 0.9, March 10, 2011
+<A HREF="mailto:miroslav.stampar@gmail.com">Miroslav Stampar</A></H2>version 0.9, April XX, 2011
 <HR>
 <EM>This document is the user's manual to use 
 <A HREF="http://sqlmap.sourceforge.net">sqlmap</A>.</EM>
@@ -95,7 +95,8 @@ on the operating system via out-of-band connections.</P>
 <A HREF="http://www.python.org">Python</A>,
 a dynamic object-oriented interpreted programming language.
 This makes the tool independent from the operating system. It only
-requires the Python interpreter version equal or higher than <B>2.6</B>.
+requires the Python interpreter version <B>2</B> equal or higher than
+<B>2.6</B>.
 The interpreter is freely downloadable from its
 <A HREF="http://python.org/download/">official site</A>.
 To make it even easier, many GNU/Linux distributions come out of the box
@@ -110,9 +111,9 @@ features. You need to grab a copy of it from the
 page - the required version is <B>3.5</B> or higher.
 For the ICMP tunneling out-of-band takeover technique, sqlmap requires
 <A HREF="http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket">Impacket</A> library too.</P>
-<P>If you are willing to connect directly to a database server (<CODE>-d</CODE> switch), without passing
-via a web application, you need to install Python bindings for the database
-management system that you are going to attack:</P>
+<P>If you are willing to connect directly to a database server (<CODE>-d</CODE> switch),
+without passing via a web application, you need to install Python bindings
+for the database management system that you are going to attack:</P>
 <P>
 <UL>
 <LI>Firebird: 
@@ -560,7 +561,7 @@ the
 
 <P>
 <UL>
-<LI><B>March 10</B>, 
+<LI><B>April XX</B>, 
 <A HREF="http://sqlmap.sourceforge.net/#developers">Bernardo and Miroslav</A> release sqlmap
 <B>0.9</B> featuring a totally rewritten and powerful SQL injection
 detection engine, the possibility to connect directly to a database
@@ -860,7 +861,7 @@ $ python sqlmap.py -h
     sqlmap/0.9 - automatic SQL injection and database takeover tool
     http://sqlmap.sourceforge.net
 
-Usage: sqlmap.py [options]
+Usage: python sqlmap.py [options]
 
 Options:
   --version             show program's version number and exit
@@ -910,7 +911,6 @@ Options:
     --keep-alive        Use persistent HTTP(s) connections
     --null-connection   Retrieve page length without actual HTTP response body
     --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
-    --group-concat      Use GROUP_CONCAT MySQL technique in dumping phase
 
   Injection:
     These options can be used to specify which parameters to test for,
@@ -931,15 +931,15 @@ Options:
     --risk=RISK         Risk of tests to perform (0-3, default 1)
     --string=STRING     String to match in page when the query is valid
     --regexp=REGEXP     Regexp to match in page when the query is valid
-    --text-only         Compare pages based only on their textual content
+    --text-only         Compare pages based only on the textual content
 
   Techniques:
-    These options can be used to tweak how specific SQL injection
-    techniques are tested.
+    These options can be used to tweak testing of specific SQL injection
+    techniques.
 
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
     --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
-    --union-char=UCHAR  Character to use to bruteforce number of columns
+    --union-char=UCHAR  Character to use for bruteforcing number of columns
 
   Fingerprint:
     -f, --fingerprint   Perform an extensive DBMS version fingerprint
@@ -1023,10 +1023,10 @@ Options:
   General:
     These options can be used to set some general working parameters.
 
-    -x XMLFILE          Dump the data into an XML file
-    -s SESSIONFILE      Save and resume all data retrieved on a session file
     -t TRAFFICFILE      Log all HTTP traffic into a textual file
+    -s SESSIONFILE      Save and resume all data retrieved on a session file
     --flush-session     Flush session file for current target
+    --fresh-queries     Ignores query results stored in session file
     --eta               Display for each output the estimated time of arrival
     --update            Update sqlmap
     --save              Save options on a configuration INI file
@@ -1034,12 +1034,15 @@ Options:
 
   Miscellaneous:
     --beep              Alert when sql injection found
-    --check-payload     IDS detection testing of injection payload
+    --check-payload     IDS detection testing of injection payloads
     --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
     --forms             Parse and test forms on target url
-    --gpage=GOOGLEPAGE  Use google dork results from specified page number
+    --gpage=GOOGLEPAGE  Use Google dork results from specified page number
+    --page-rank         Display page rank (PR) for Google dork results
     --parse-errors      Parse DBMS error messages from response pages
     --replicate         Replicate dumped data into a sqlite3 database
+    --tor               Use default Tor (Vidalia/Privoxy/Polipo) proxy address
+    --wizard            Simple wizard interface for beginner users
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -1318,7 +1321,8 @@ chain file.</P>
 
 <H3>HTTP(S) proxy</H3>
 
-<P>Switches: <CODE>-</CODE><CODE>-proxy</CODE>, <CODE>-</CODE><CODE>-proxy-cred</CODE> and <CODE>-</CODE><CODE>-ignore-proxy</CODE></P>
+<P>Switches: <CODE>-</CODE><CODE>-proxy</CODE>, <CODE>-</CODE><CODE>-proxy-cred</CODE>,
+<CODE>-</CODE><CODE>-ignore-proxy</CODE> and <CODE>-</CODE><CODE>-tor</CODE></P>
 
 <P>It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S)
 requests to the target URL. The syntax of HTTP(S) proxy value is
@@ -1334,7 +1338,8 @@ single predefined HTTP(S) proxy server, you can configure a
 <A HREF="http://www.privoxy.org">Privoxy</A> (or similar) on
 your machine as explained on the Tor client guide and use the Privoxy
 daemon, by default listening on <CODE>127.0.0.1:8118</CODE>, as the sqlmap
-proxy.</P>
+proxy by simply providing the tool with the <CODE>-</CODE><CODE>-tor</CODE>
+switch instead of <CODE>-</CODE><CODE>-proxy</CODE>.</P>
 
 <P>The switch <CODE>-</CODE><CODE>-ignore-proxy</CODE> should be used when you want
 to run sqlmap against a target part of a local area network by ignoring
@@ -1427,8 +1432,7 @@ it.</P>
 <UL>
 <LI><CODE>-</CODE><CODE>-keep-alive</CODE></LI>
 <LI><CODE>-</CODE><CODE>-null-connection</CODE></LI>
-<LI><CODE>-</CODE><CODE>-threads 4</CODE></LI>
-<LI><CODE>-</CODE><CODE>-group-concat</CODE></LI>
+<LI><CODE>-</CODE><CODE>-threads 3</CODE> if not set to a higher value.</LI>
 </UL>
 </P>
 
@@ -1446,14 +1450,17 @@ it.</P>
 
 <P>Switch: <CODE>-</CODE><CODE>-keep-alive</CODE></P>
 
-<P>TODO</P>
+<P>This switch instructs sqlmap to use persistent HTTP(s) connections.
+Note that this switch is incompatible with <CODE>-</CODE><CODE>-proxy</CODE> switch.</P>
 
 
 <H3>HTTP NULL connection</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-null-connection</CODE></P>
 
-<P>TODO</P>
+<P>TODO
+Note that this switch is incompatible with <CODE>-</CODE><CODE>-text-only</CODE>
+switch.</P>
 
 
 <H3>Concurrent HTTP(S) requests</H3>
@@ -1478,19 +1485,11 @@ injection technique. The maximum number of concurrent requests is set to
 <B>10</B> for performance and site reliability reasons.</P>
 
 
-<H3>MySQL GROUP_CONCAT() speed up</H3>
-
-<P>Switch: <CODE>-</CODE><CODE>-group-concat</CODE></P>
-
-<P>TODO</P>
-
-
 <H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Injection</A>
 </H2>
 
 <P>These options can be used to specify which parameters to test for, provide
 custom injection payloads and optional tampering scripts.</P>
-
 
 <H3>Testable parameter(s)</H3>
 
@@ -1627,85 +1626,175 @@ within nested <CODE>JOIN</CODE> queries for instance.</P>
 
 <P>Switch: <CODE>-</CODE><CODE>-tamper</CODE></P>
 
-<P>TODO</P>
+<P>sqlmap itself does no obfuscation of the payload sent, except for strings
+between single quotes replaced by their <CODE>CHAR()</CODE>-alike
+representation.</P>
+
+<P>This switch can be very useful and powerful in situations where there is
+a weak input validation mechanism between you and the back-end database
+management system. This mechanism usually is a self-developed input
+validation routine called by the application source code, an expensive
+enterprise-grade IPS appliance or a web application firewall (WAF). All
+buzzwords to define the same concept, implemented in a different way and
+costing lots of money, usually.</P>
+
+<P>To take advantage of this switch, provide sqlmap with a comma-separated
+list of tamper scripts and this will process the payload and return it
+transformed. You can define your own tamper scripts, use sqlmap ones from
+the <CODE>tamper/</CODE> folder or edit them as long as you concatenate them
+comma-separated as the argument of <CODE>-</CODE><CODE>-tamper</CODE> switch.</P>
+
+<P>The format of a valid tamper script is as follows:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# Needed imports
+from lib.core.enums import PRIORITY
+
+# Define which is the order of application of tamper scripts against the payload
+__priority__ = PRIORITY.HIGHEST
+
+def tamper(payload):
+    '''
+    Description of your tamper script
+    '''
+
+    retVal = payload
+
+    # your code to tamper the original payload (retVal)
+
+    return retVal
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>You can check valid and usable tamper scripts in the <CODE>tamper/</CODE>
+directory.</P>
+
+<P>Example against a MySQL target assuming <CODE>&gt;</CODE> character, spaces and
+<CODE>SELECT</CODE> string are banned:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://debiandev/sqlmap/mysql/get_int.php?id=1" --tamper \
+tamper/between.py,tamper/randomcase.py,tamper/space2comment.py -v 3
+
+[hh:mm:03] [DEBUG] cleaning up configuration parameters
+[hh:mm:03] [INFO] loading tamper script 'between'
+[hh:mm:03] [INFO] loading tamper script 'randomcase'
+[hh:mm:03] [INFO] loading tamper script 'space2comment'
+[...]
+[hh:mm:04] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[hh:mm:04] [PAYLOAD] 1)/**/And/**/1369=7706/**/And/**/(4092=4092
+[hh:mm:04] [PAYLOAD] 1)/**/AND/**/9267=9267/**/AND/**/(4057=4057
+[hh:mm:04] [PAYLOAD] 1/**/AnD/**/950=7041
+[...]
+[hh:mm:04] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
+[hh:mm:04] [PAYLOAD] 1/**/anD/**/(SELeCt/**/9921/**/fROm(SELeCt/**/counT(*),CONCAT(cHar(
+58,117,113,107,58),(SELeCt/**/(case/**/whEN/**/(9921=9921)/**/THeN/**/1/**/elsE/**/0/**/
+ENd)),cHar(58,106,104,104,58),FLOOR(RanD(0)*2))x/**/fROm/**/information_schema.tables/**/
+group/**/bY/**/x)a)
+[hh:mm:04] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING 
+clause' injectable 
+[...]
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 
 
 <H2><A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Detection</A>
 </H2>
 
-<P>These options can be used to specify how to parse and compare page content
-from HTTP responses when using blind SQL injection technique.</P>
-
+<P>These options can be used to specify how to parse and compare page
+content from HTTP responses when using blind SQL injection technique.</P>
 
 <H3>Level</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-level</CODE></P>
 
-<P>TODO</P>
+<P>This switch requires an argument which specifies the level of tests to
+perform. There are <B>five</B> levels. The default value is <B>1</B>
+where limited number of tests (requests) are performed. Vice versa, level
+<B>5</B> will test verbosely for a much larger number of payloads and
+boundaries (as in pair of SQL payload prefix and suffix).
+The payloads used by sqlmap are specified in the textual file
+<CODE>xml/payloads.xml</CODE>. Following the instructions on top of the file,
+if sqlmap misses an injection, you should be able to add your own
+payload(s) to test for too!</P>
+
+<P>Not only this switch affects which payload sqlmap tries, but also which
+injection points are taken in exam: GET and POST parameters are
+<B>always</B> tested, HTTP Cookie header values are tested from level
+<B>2</B> and HTTP User-Agent/Referer headers' value is tested from level
+<B>3</B>.</P>
+
+<P>All in all, the harder it is to detect a SQL injection, the higher the
+<CODE>-</CODE><CODE>-level</CODE> must be set.</P>
+
+<P>It is strongly recommended to higher this value before reporting to the
+mailing list that sqlmap is not able to detect a certain injection point.</P>
 
 
 <H3>Risk</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-risk</CODE></P>
 
-<P>TODO</P>
+<P>This switch requires an argument which specifies the risk of tests to
+perform. There are <B>four</B> risk values. The default value is
+<B>1</B> which is innocuous for the majority of SQL injection points.
+Risk value 2 adds to the default level the tests for heavy query
+time-based SQL injections and value 3 adds also <CODE>OR</CODE>-based SQL
+injection tests.</P>
+
+<P>In some instances, like a SQL injection in an <CODE>UPDATE</CODE> statement,
+injecting an <CODE>OR</CODE>-based payload can lead to an update of all the
+entries of the table, which is certainly not what the attacker wants. For
+this reason and others this switch has been introduced: the user has
+control over which payloads get tested, the user can arbitrarily choose
+to use also potentially dangerous ones.
+As per the previous switch, the payloads used by sqlmap are specified in
+the textual file <CODE>xml/payloads.xml</CODE> and you are free to edit and
+add your owns.</P>
 
 
-<H3>TODO: Page comparison</H3>
+<H3>Page comparison</H3>
 
-<P>Switches: <CODE>-</CODE><CODE>-string</CODE> and <CODE>-</CODE><CODE>-regexp</CODE></P>
+<P>Switches: <CODE>-</CODE><CODE>-string</CODE>, <CODE>-</CODE><CODE>-regexp</CODE> and
+<CODE>-</CODE><CODE>-text-only</CODE></P>
 
-<P>By default the distinction of a True query by a False one (basic concept
-for Inferential blind SQL injection attacks) is done comparing injected
-requests page content MD5 hash with the original not injected page content
-MD5 hash.
+<P>By default the distinction of a <CODE>True</CODE> query by a <CODE>False</CODE>
+one (rough concept behind boolean-based blind SQL injection vulnerabilities)
+is done by comparing the injected requests page content with the original
+not injected page content.
 Not always this concept works because sometimes the page content changes at
 each refresh even not injecting anything, for instance when the page has a
-counter, a dynamic advertisment banner or any other part of the HTML which
-is render dynamically and might change in time not only consequently to
+counter, a dynamic advertisement banner or any other part of the HTML which
+is rendered dynamically and might change in time not only consequently to
 user's input.
-To bypass this limit, sqlmap makes it possible to manually provide a
-string which is <B>always</B> present on the not injected page
-<B>and</B> on all True injected query pages, but that it is <B>not</B>
-on the False ones. This can also be achieved by providing a regular
-expression.
-Such information is easy for an user to retrieve, simply try to inject on
-the affected URL parameter an invalid value and compare original (not
-injected) page content with the injected wrong page content to identify
-which string or regular expression match is on not injected and True page
-only.
+To bypass this limit, sqlmap tries hard to identify these snippets of the
+response bodies and deal accordingly. Sometimes it may fail, that is why
+the user can provide a string (<CODE>-</CODE><CODE>-string</CODE> switch) which is
+<B>always</B> present on the not injected page <B>and</B> on all True
+injected query pages, but that it is <B>not</B> on the False ones. As
+an alternative to a static string, the user can provide a regular
+expression (<CODE>-</CODE><CODE>-regexp</CODE> switch).</P>
+
+<P>Such data is easy for an user to retrieve, simply try to inject on the
+affected parameter an invalid value and compare manually the original (not
+injected) page content with the injected wrong page content.
 This way the distinction will be based upon string presence or regular
-expression match and not page MD5 hash comparison.</P>
+expression match.</P>
 
-<P>As you can see, the string after <CODE>Dynamic content</CODE> changes its
-value every second. In the example it is just a call to PHP
-<CODE>time()</CODE> function, but on the real world it is usually much more
-than that.</P>
-
-<P>Looking at the HTTP responses page content you can see that the first five
-lines of code do not change at all.
-So choosing for instance the word <CODE>luther</CODE> as an output that is
-on the not injected page content and it is not on the False page content
-(because the query condition returns no output so <CODE>luther</CODE> is not
-displayed on the page content) and passing it to sqlmap, you are able to
-inject anyway.</P>
-
-<P>You can also specify a regular expression to match rather than a string if
-you prefer.</P>
-
-<P>As you can see, when one of these options is specified, sqlmap skips the
-URL stability test.</P>
-
-<P><B>Consider one of these options a MUST when dealing with a page
-with content that changes itself at each refresh without modifying the
-user's input</B>.</P>
+<P>TODO: --text-only</P>
 
 
 <H2><A NAME="ss5.7">5.7</A> <A HREF="#toc5.7">Techniques</A>
 </H2>
 
-<P>These options can be used to tweak how specific SQL injection techniques
-are tested.</P>
+<P>These options can be used to tweak testing of specific SQL injection
+techniques.</P>
+
 
 <H3>Seconds to delay the DBMS response for time-based blind SQL injection</H3>
 
@@ -1716,13 +1805,15 @@ time-based blind SQL injection, by providing the
 <CODE>-</CODE><CODE>-time-sec</CODE> option followed by an integer.
 By default delay is set to <B>5 seconds</B>.</P>
 
-<H3>TODO</H3>
+
+<H3>Number of columns in UNION query SQL injection</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-union-cols</CODE></P>
 
 <P>TODO</P>
 
-<H3>TODO</H3>
+
+<H3>Character to use to test for UNION query SQL injection</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-union-char</CODE></P>
 
@@ -1732,43 +1823,27 @@ By default delay is set to <B>5 seconds</B>.</P>
 <H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">Fingerprint</A>
 </H2>
 
-<H3>TODO: Extensive database management system fingerprint</H3>
+<H3>Extensive database management system fingerprint</H3>
 
 <P>Switches: <CODE>-f</CODE> or <CODE>-</CODE><CODE>-fingerprint</CODE></P>
 
 <P>By default the web application's back-end database management system
-fingerprint is performed requesting a database specific function which
-returns a known static value. By comparing these value with the returned
-value it is possible to identify if the back-end database is effectively
-the one that sqlmap expected. Depending on the DBMS being tested, a
-SQL dialect syntax which is syntatically correct depending upon the
-back-end DBMS is also tested.</P>
-<P>After identifying an injectable vector, sqlmap fingerprints the back-end
-database management system and go ahead with the injection with its
-specific syntax within the limits of the database architecture.</P>
+fingerprint is handled automatically by sqlmap.
+Just after the detection phase finishes and the user is eventually
+prompted with a choice of which vulnerable parameter to use further on,
+sqlmap fingerprints the back-end database management system and carries
+on the injection by knowing which SQL syntax, dialect and queries to use
+to proceed with the attack within the limits of the database architecture.</P>
 
-<P>As you can see, sqlmap automatically fingerprints the web server operating
-system and the web application technology by parsing some HTTP response headers.</P>
+<P>If for any instance you want to perform an extensive database management
+system fingerprint based on various techniques like specific SQL dialects
+and inband error messages, you can provide the
+<CODE>-</CODE><CODE>-fingerprint</CODE> switch. sqlmap will perform a lot more
+requests and fingerprint the exact DBMS version and, where possible,
+operating system, architecture and patch level.</P>
 
-<P>If you want to perform an extensive database management system fingerprint
-based on various techniques like specific SQL dialects and inband error
-messages, you can  provide the <CODE>-</CODE><CODE>-fingerprint</CODE> option.</P>
-
-<P>As you can see from the last example, sqlmap first tested for MySQL,
-then for Oracle, then for PostgreSQL since the user did not forced the
-back-end database management system name with option <CODE>-</CODE><CODE>-dbms</CODE>.</P>
-
-<P>If you want an even more accurate result, based also on banner parsing,
-you can also provide the <CODE>-b</CODE> or <CODE>-</CODE><CODE>-banner</CODE> option.</P>
-
-<P>As you can see, sqlmap was also able to fingerprint the back-end DBMS
-operating system by parsing the DBMS banner value.</P>
-
-<P>As you can see, from the Microsoft SQL Server banner, sqlmap was able to
-correctly identify the database management system patch level.
-The Microsoft SQL Server XML versions file is the result of a sqlmap
-parsing library that fetches data from Chip Andrews'
-<A HREF="http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/tabid/63/Default.aspx">SQLSecurity.com site</A> and outputs it to the XML versions file.</P>
+<P>If you want the fingerprint to be even more accurate result, you can also
+provide the <CODE>-b</CODE> or <CODE>-</CODE><CODE>-banner</CODE> switch.</P>
 
 
 <H2><A NAME="ss5.9">5.9</A> <A HREF="#toc5.9">Enumeration</A>
@@ -2071,7 +2146,26 @@ as a users' database.</P>
 
 <P>Switches: <CODE>-</CODE><CODE>-search</CODE>, <CODE>-C</CODE>, <CODE>-T</CODE>, <CODE>-D</CODE></P>
 
-<P>TODO</P>
+<P>This switch allows you to <B>search for specific database names, specific
+tables across all databases or specific columns across all databases'
+tables</B>.</P>
+
+<P>This is useful, for instance, to identify tables containing custom
+application credentials where relevant columns' names contain string like
+<EM>name</EM> and <EM>pass</EM>.</P>
+
+<P>The switch <CODE>-</CODE><CODE>-search</CODE> needs to be used in conjunction with
+one of the following support switches:</P>
+<P>
+<UL>
+<LI><CODE>-C</CODE> following a list of comma-separated column names to look
+for across the whole database management system.</LI>
+<LI><CODE>-T</CODE> following a list of comma-separated table names to look
+for across the whole database management system.</LI>
+<LI><CODE>-D</CODE> following a list of comma-separated database names to
+look for across the database management system.</LI>
+</UL>
+</P>
 
 
 <H3>Run custom SQL statement</H3>
@@ -2506,11 +2600,15 @@ $ python sqlmap.py -u http://192.168.136.129/sqlmap/pgsql/get_int.aspx?id=1 --re
 <H2><A NAME="ss5.15">5.15</A> <A HREF="#toc5.15">General</A>
 </H2>
 
-<H3>TODO</H3>
+<H3>Log HTTP(s) traffic to a textual file</H3>
 
 <P>Switch: <CODE>-t</CODE></P>
 
-<P>TODO</P>
+<P>This switch requires an argument that specified the textual file to write
+all HTTP(s) traffic generated by sqlmap - HTTP(s) requests and HTTP(s)
+responses.</P>
+
+<P>This is useful primarily for debug purposes.</P>
 
 
 <H3>Session file: save and resume data retrieved</H3>
@@ -2552,6 +2650,17 @@ description above, it is good to know that you can flush the content of
 that file using option <CODE>-</CODE><CODE>-flush-session</CODE>.
 This way you can avoid the caching mechanisms implemented by default in
 sqlmap. Other possible way is to manually remove the session file(s).</P>
+
+
+<H3>Ignores query results stored in session file</H3>
+
+<P>Switch: <CODE>-</CODE><CODE>-fresh-queries</CODE></P>
+
+<P>As you are already familiar with the concept of a session file from the
+description above, it is good to know that you can ignore the content of
+that file using option <CODE>-</CODE><CODE>-fresh-queries</CODE>.
+This way you can keep the session file untouched and for a selected run,
+avoid the resuming/restoring of queries output.</P>
 
 
 <H3>Estimated time of arrival</H3>
@@ -2640,18 +2749,23 @@ default behaviour whenever user's input would be required.</P>
 <H2><A NAME="ss5.16">5.16</A> <A HREF="#toc5.16">Miscellaneous</A>
 </H2>
 
-<H3>TODO</H3>
+<H3>Alert when a SQL injection is detected</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-beep</CODE></P>
 
-<P>TODO</P>
+<P>When this switch is provided, sqlmap will beep at every new SQL injection
+that it finds. It can be useful when you are processing in batch mode a
+Google dork output or a proxy log file so that you do not need to monitor
+the terminal constantly.</P>
 
 
-<H3>TODO</H3>
+<H3>IDS detection testing of injection payloads</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-check-payload</CODE></P>
 
-<P>TODO</P>
+<P>Curious to see if a 
+<A HREF="http://www.phpids.org">decent intrusion detection system</A> (IDS) picks up sqlmap payloads?
+Use this switch!</P>
 
 
 <H3>Cleanup the DBMS from sqlmap specific UDF(s) and table(s)</H3>
@@ -2665,11 +2779,25 @@ Switch <CODE>-</CODE><CODE>-cleanup</CODE> will attempt to clean up the DBMS and
 the file system wherever possible.</P>
 
 
-<H3>TODO</H3>
+<H3>Parse and test forms' input fields</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-forms</CODE></P>
 
-<P>TODO</P>
+<P>Say that you want to test against SQL injections a huge <EM>search form</EM>
+or you want to test a login bypass (typically only two input fields named
+like <EM>username</EM> and <EM>password</EM>), you can either pass to sqlmap
+the request in a request file (<CODE>-r</CODE>), set the POSTed data
+accordingly (<CODE>-</CODE><CODE>-data</CODE>) or let sqlmap do it for you!</P>
+
+<P>Both of the above mentioned instances, and many others, appear as
+<CODE>&lt;form&gt;</CODE> and <CODE>&lt;input&gt;</CODE> tags in HTML response
+bodies and this is where this switch comes into play.</P>
+
+<P>Provide sqlmap with <CODE>-</CODE><CODE>-forms</CODE> as well as the page where
+the form can be found as the target url (<CODE>-u</CODE>) and sqlmap will
+request the target url for you, parse the forms it has and guide you
+through to test for SQL injection on those form input fields (parameters)
+rather than the target url provided.</P>
 
 
 <H3>Use Google dork results from specified page number</H3>
@@ -2683,18 +2811,49 @@ this switch, <CODE>-</CODE><CODE>-gpage</CODE>, some page other than the first o
 to retrieve target URLs from.</P>
 
 
-<H3>TODO</H3>
+<H3>Display page rank (PR) for Google dork results</H3>
+
+<P>Switch: <CODE>-</CODE><CODE>-page-rank</CODE></P>
+
+<P>Performs further requests to Google when <CODE>-g</CODE> is provided and
+display page rank (PR) for Google dork results.</P>
+
+
+<H3>Parse DBMS error messages from response pages</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-parse-errors</CODE></P>
 
-<P>TODO</P>
+<P>If the web application is configured in debug mode so that it displays
+in the HTTP responses the back-end database management system error
+messages, sqlmap can parse and display them for you.</P>
+<P>This is useful for debugging purposes like understanding why a certain
+enumeration or takeover switch does not work - it might be a matter of
+session user's privileges and in this case you would see a DBMS error
+message along the lines of <CODE>Access denied for user &lt;SESSION
+USER&gt;</CODE>.</P>
 
 
-<H3>TODO</H3>
+<H3>Replicate dumped data into a sqlite3 database</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-replicate</CODE></P>
 
-<P>TODO</P>
+<P>If you want to store in a local SQLite 3 database file each dumped table
+(<CODE>-</CODE><CODE>-dump</CODE> or <CODE>-</CODE><CODE>-dump-all</CODE>), you can
+provide sqlmap with the <CODE>-</CODE><CODE>-replicate</CODE> switch at dump
+phase. This will create a <CODE>&lt;TABLE_NAME&gt;.sqlite3</CODE> rather than
+a <CODE>&lt;DB_NAME&gt;/&lt;TABLE_NAME&gt;.csv</CODE> file into
+<CODE>output/TARGET_URL/dump/</CODE> directory.</P>
+
+<P>You can then use sqlmap itself to read and query the locally created
+SQLite 3 file. For instance, <CODE>python sqlmap.py -d
+sqlite:///tmp/sqlmap/output/debiandev/dump/testdb.sqlite3 --table</CODE>.</P>
+
+
+<H3>Simple wizard interface for beginner users</H3>
+
+<P>Switch: <CODE>-</CODE><CODE>-wizard</CODE></P>
+
+<P>Do you really want to know?</P>
 
 
 <H2><A NAME="s6">6.</A> <A HREF="#toc6">License and copyright</A></H2>
