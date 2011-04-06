@@ -296,16 +296,16 @@ def attackDumpedTable():
 def hashRecognition(value):
     retVal = None
 
-    if value:
+    if isinstance(value, basestring):
         for name, regex in getPublicTypeMembers(HASH):
             # Hashes for Oracle and old MySQL look the same hence these checks
             if Backend.getIdentifiedDbms() == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
                 continue
             elif Backend.getIdentifiedDbms() == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
                 continue
-            elif regex == HASH.CRYPT_GENERIC and getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(str(value)):
+            elif regex == HASH.CRYPT_GENERIC and getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(value):
                 continue
-            elif getCompiledRegex(regex).match(str(value)):
+            elif getCompiledRegex(regex).match(value):
                 retVal = regex
                 break
 
