@@ -1141,7 +1141,7 @@ def __cleanupOptions():
         #conf.predictOutput = True
         conf.keepAlive = True
         conf.nullConnection = not conf.textOnly
-        conf.threads = 4 if conf.threads < 4 else conf.threads
+        conf.threads = 3 if conf.threads < 3 else conf.threads
 
     if conf.tor:
         conf.proxy = DEFAULT_TOR_PROXY
