@@ -80,9 +80,6 @@ def configUnion(char=None, columns=None):
             conf.uChar = "'%s'" % char
 
     def __configUnionCols(columns):
-        if "-" not in columns or len(columns.split("-")) != 2:
-            raise sqlmapSyntaxException, "--union-cols must be a range with hyphon (e.g. 1-10)"
-
         columns = columns.replace(" ", "")
         colsStart, colsStop = columns.split("-")
 

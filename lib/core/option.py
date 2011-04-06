@@ -1496,6 +1496,10 @@ def __basicOptionValidation():
         errMsg = "value for --time-sec option must be an integer greater than 0"
         raise sqlmapSyntaxException, errMsg
 
+    if isinstance(conf.uCols, basestring) and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
+        errMsg = "--union-cols must be a range with hyphon (e.g. 1-10)"
+        raise sqlmapSyntaxException, errMsg
+
 def init(inputOptions=advancedDict(), overrideOptions=False):
     """
     Set attributes into both configuration and knowledge base singletons
