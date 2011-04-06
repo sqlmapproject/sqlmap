@@ -605,10 +605,22 @@ def __setOS():
         raise sqlmapUnsupportedDBMSException, errMsg
 
 def __setTechnique():
-    if not conf.technique or not isinstance(conf.technique, int):
-        conf.technique = []
+    if not conf.tech or not isinstance(conf.tech, int):
+        conf.tech = []
     else:
-        conf.technique = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.technique)])
+        conf.tech = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.tech)])
+
+    if len(conf.tech) > 0:
+        # TODO: consider MySQL/PHP/ASP/web backdoor case where stacked
+        # queries is technically not necessary
+        if any(map(lambda x: conf.__getitem__(x), ['rFile', 'wFile', \
+           'osCmd', 'osShell', 'osPwn', 'osSmb', 'osBof', 'regRead', \
+           'regAdd', 'regDel'])) and PAYLOAD.TECHNIQUE.STACKED not in conf.tech:
+            errMsg = "value for --technique must include stacked queries "
+            errMsg += "technique (4) when you want to access the file "
+            errMsg += "system, takeover the operating system or access "
+            errMsg += "Windows registry hives"
+            raise sqlmapSyntaxException, errMsg
 
 def __setDBMS():
     """

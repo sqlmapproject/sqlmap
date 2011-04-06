@@ -164,9 +164,9 @@ def resumeConfKb(expression, url, value):
         if injection.place in conf.paramDict and \
            injection.parameter in conf.paramDict[injection.place]:
 
-            if not conf.technique or intersect(conf.technique, injection.data.keys()):
-                if intersect(conf.technique, injection.data.keys()):
-                    injection.data = dict(filter(lambda (key, item): key in conf.technique, injection.data.items()))
+            if not conf.tech or intersect(conf.tech, injection.data.keys()):
+                if intersect(conf.tech, injection.data.keys()):
+                    injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
 
                 if injection not in kb.injections:
                     kb.injections.append(injection)

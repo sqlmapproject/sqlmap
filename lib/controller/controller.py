@@ -406,14 +406,19 @@ def start():
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if not conf.realTest:
-                    errMsg = "all parameters are not injectable, try "
-                    errMsg += "a higher --level/--risk to use more tests"
+                    errMsg = "all parameters are not injectable, try to "
+                    errMsg += "increase --level/--risk values to perform "
+                    errMsg += "more tests."
+
+                    if isinstance(conf.tech, list) and len(conf.tech) > 0:
+                        errMsg += " Rerun without providing the --technique switch."
 
                     if not conf.textOnly and kb.originalPage:
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))
-                        errMsg += " and/or --text-only switch if the target page "
-                        errMsg += "has a low percentage of textual content "
-                        errMsg += "(approximately %.2f%% of page content is text)" % percent
+                        errMsg += " Give it a go with the --text-only switch "
+                        errMsg += "if the target page has a low percentage of "
+                        errMsg += "textual content (~%.2f%% of " % percent
+                        errMsg += "page content is text)"
 
                     raise sqlmapNotVulnerableException, errMsg
                 else:

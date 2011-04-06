@@ -96,10 +96,10 @@ def checkSqlInjection(place, parameter, value):
 
             # Skip test if the user's wants to test only for a specific
             # technique
-            if conf.technique and isinstance(conf.technique, list) and stype not in conf.technique:
+            if conf.tech and isinstance(conf.tech, list) and stype not in conf.tech:
                 debugMsg = "skipping test '%s' because the user " % title
                 debugMsg += "specified to test only for "
-                debugMsg += "%s" % ",".join(map(lambda x: PAYLOAD.SQLINJECTION[x], conf.technique))
+                debugMsg += "%s" % ",".join(map(lambda x: PAYLOAD.SQLINJECTION[x], conf.tech))
                 logger.debug(debugMsg)
                 continue
 

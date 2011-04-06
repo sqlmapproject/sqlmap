@@ -207,6 +207,10 @@ def cmdLineParser():
                                  "used to tweak testing of specific SQL "
                                  "injection techniques.")
 
+        techniques.add_option("--technique", dest="tech", type="int",
+                          default=0, help="SQL injection techniques to "
+                                          "test for (default all)")
+
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int", default=TIME_DEFAULT_DELAY,
                               help="Seconds to delay the DBMS response "
@@ -527,9 +531,6 @@ def cmdLineParser():
 
         parser.add_option("--run-case", dest="runCase", type="int",
                           default=None, help=SUPPRESS_HELP)
-
-        parser.add_option("--technique", dest="technique", type="int",
-                          default=0, help=SUPPRESS_HELP)
 
         parser.add_option("--group-concat", dest="groupConcat", action="store_true",
                            default=False, help=SUPPRESS_HELP)
