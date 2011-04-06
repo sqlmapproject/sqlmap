@@ -851,6 +851,7 @@ Options:
     These options can be used to tweak testing of specific SQL injection
     techniques.
 
+    --technique=TECH    SQL injection techniques to test for (default all)
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
     --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
     --union-char=UCHAR  Character to use for bruteforcing number of columns
@@ -1782,6 +1783,15 @@ TODO: --text-only
 <p>
 These options can be used to tweak testing of specific SQL injection
 techniques.
+
+
+<sect2>SQL injection techniques to test for
+
+<p>
+Switch: <tt>-</tt><tt>-technique</tt>
+
+<p>
+TODO
 
 
 <sect2>Seconds to delay the DBMS response for time-based blind SQL injection
