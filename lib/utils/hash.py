@@ -303,9 +303,9 @@ def hashRecognition(value):
                 continue
             elif Backend.getIdentifiedDbms() == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
                 continue
-            elif regex == HASH.CRYPT_GENERIC and getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(value):
+            elif regex == HASH.CRYPT_GENERIC and getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(str(value)):
                 continue
-            elif getCompiledRegex(regex).match(value):
+            elif getCompiledRegex(regex).match(str(value)):
                 retVal = regex
                 break
 
