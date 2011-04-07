@@ -6,7 +6,7 @@
         <batch value="True"/>
         <verbose value="0"/>
     </global>
-    <case name="MySQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
+    <case name="MySQL (--technique=B --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -33,7 +33,7 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MySQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="MySQL (--technique=E --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -59,7 +59,7 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MySQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="MySQL (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -85,7 +85,7 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MySQL partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="MySQL partial union (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
@@ -111,7 +111,7 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="Postgres (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
+    <case name="Postgres (--technique=B --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -138,7 +138,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Postgres (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="Postgres (--technique=E --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -164,7 +164,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Postgres (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="Postgres (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -190,7 +190,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Postgres partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="Postgres partial union (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
@@ -216,7 +216,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Oracle (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump --threads=4)">
+    <case name="Oracle (--technique=B --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -243,7 +243,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Oracle (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
+    <case name="Oracle (--technique=E --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -269,7 +269,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Oracle (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
+    <case name="Oracle (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
@@ -295,7 +295,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="Oracle partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
+    <case name="Oracle partial union (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D SCOTT -T users --columns --dump)">
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
@@ -321,7 +321,7 @@
             <item value="r'4 entries.+nameisnull'"/>
         </log>
     </case>
-    <case name="MSSQL (--technique=1 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
+    <case name="MSSQL (--technique=B --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump --threads=4)">
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
@@ -348,7 +348,7 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MSSQL (--technique=2 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="MSSQL (--technique=E --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
@@ -374,7 +374,7 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MSSQL (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="MSSQL (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
@@ -400,7 +400,7 @@
             <item value="r'4 entries.+nameisnull.+'"/>
         </log>
     </case>
-    <case name="MSSQL partial union (--technique=3 --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
+    <case name="MSSQL partial union (--technique=U --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int_partialunion.asp?id=1"/>
             <isDba value="True"/>
