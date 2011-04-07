@@ -74,7 +74,7 @@ def __oneShotUnionUse(expression, unpack=True):
 
 def configUnion(char=None, columns=None):
     def __configUnionChar(char):
-        if char.isdigit() or char == "NULL":
+        if char.isdigit() or char == "NULL" or char.startswith("[RANDNUM"):
             conf.uChar = char
         elif not char.startswith("'") or not char.endswith("'"):
             conf.uChar = "'%s'" % char

@@ -94,6 +94,9 @@ def checkSqlInjection(place, parameter, value):
                 if "[CHAR]" in title:
                     title = title.replace("[CHAR]", conf.uChar)
 
+                if "[RANDNUM]" in title:
+                    title = title.replace("[RANDNUM]", "random number")
+
             # Skip test if the user's wants to test only for a specific
             # technique
             if conf.tech and isinstance(conf.tech, list) and stype not in conf.tech:
