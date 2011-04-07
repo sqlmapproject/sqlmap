@@ -759,6 +759,22 @@ def __setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
         conf.threads = 1
 
+def __setDNSCache():
+    """
+    Makes a cached version of socket._getaddrinfo to avoid subsequent DNS requests.
+    """
+
+    def _getaddrinfo(*args, **kwargs):
+        if args in kb.cache:
+            return kb.cache[args]
+        else:
+            kb.cache[args] = socket._getaddrinfo(*args, **kwargs)
+            return kb.cache[args]
+
+    if socket.getaddrinfo != _getaddrinfo:
+        socket._getaddrinfo = socket.getaddrinfo
+        socket.getaddrinfo = _getaddrinfo
+
 def __setHTTPProxy():
     """
     Check and set the HTTP proxy to pass by all HTTP requests.
@@ -1553,6 +1569,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
         __setHTTPMethod()
         __setHTTPAuthentication()
         __setHTTPProxy()
+        __setDNSCache()
         __setSafeUrl()
         __setGoogleDorking()
         __urllib2Opener()

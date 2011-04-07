@@ -334,6 +334,7 @@ Andres Riancho <andres.riancho@gmail.com>
     for reporting a bug and suggesting some features
     for including sqlmap in his great web application audit and attack
     framework, w3af, http://w3af.sourceforge.net
+    for suggesting a way for handling DNS caching
 
 Antonio Riva <antonio.riva@gmail.com>
     for reporting a bug when running with python 2.5
@@ -366,6 +367,9 @@ Jorge Santos <jorge_a_santos@hotmail.com>
 Sven Schluter <sschlueter@netzwerk.cc>
     for providing with a patch for waiting a number of seconds between
     each HTTP request
+
+Ryan Sears <rdsears@mtu.edu>
+    for suggesting an enhancement
 
 Uemit Seren <uemit.seren@gmail.com>
     for reporting a minor adjustment when running with python 2.6
