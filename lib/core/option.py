@@ -615,7 +615,7 @@ def __setTechnique():
         for letter in conf.tech.upper():
             if letter not in validLetters:
                 errMsg = "value for --technique must be a string composed "
-                errMsg += "by the letters %s. Refer to the " % ",".join(validLetters)
+                errMsg += "by the letters %s. Refer to the " % ", ".join(validLetters)
                 errMsg += "user's manual for details"
                 raise sqlmapSyntaxException, errMsg
 
