@@ -614,15 +614,15 @@ def __setTechnique():
 
         # e.g.: BEUST
         if not conf.tech.isdigit():
-            for letter in conf.tech:
-                if letter.upper() not in validLetters:
+            for letter in conf.tech.upper():
+                if letter not in validLetters:
                     errMsg = "value for --technique must be a string composed "
                     errMsg += "by the letters %s. Refer to the " % ",".join(validLetters)
                     errMsg += "user's manual for details"
                     raise sqlmapSyntaxException, errMsg
 
                 for validTech, validInt in validTechniques:
-                    if letter.upper() == validTech[0]:
+                    if letter == validTech[0]:
                         selTechniques.append(validInt)
                         break
 
