@@ -1054,18 +1054,18 @@ def __setHTTPUserAgent():
 
             return
 
-    __count = len(kb.userAgents)
+    count = len(kb.userAgents)
 
-    if __count == 1:
-        __userAgent = kb.userAgents[0]
+    if count == 1:
+        userAgent = kb.userAgents[0]
     else:
-        __userAgent = kb.userAgents[randomRange(stop=__count-1)]
+        userAgent = kb.userAgents[randomRange(stop=count-1)]
 
-    __userAgent = sanitizeStr(__userAgent)
-    conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __userAgent))
+    userAgent = sanitizeStr(userAgent)
+    conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
 
     logMsg  = "fetched random HTTP User-Agent header from "
-    logMsg += "file '%s': %s" % (paths.USER_AGENTS, __userAgent)
+    logMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
     logger.info(logMsg)
 
 def __setHTTPReferer():
