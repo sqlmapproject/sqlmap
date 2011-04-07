@@ -207,9 +207,9 @@ def cmdLineParser():
                                  "used to tweak testing of specific SQL "
                                  "injection techniques.")
 
-        techniques.add_option("--technique", dest="tech", type="int",
-                          default=0, help="SQL injection techniques to "
-                                          "test for (default all)")
+        techniques.add_option("--technique", dest="tech", default="BEUST",
+                              help="SQL injection techniques to test for "
+                                   "(default BEUST)")
 
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int", default=TIME_DEFAULT_DELAY,

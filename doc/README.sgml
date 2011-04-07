@@ -1791,7 +1791,36 @@ techniques.
 Switch: <tt>-</tt><tt>-technique</tt>
 
 <p>
-TODO
+This switch can be used to specify which SQL injection type to test for.
+By default sqlmap tests for <bf>all</bf> types/techniques it supports.
+
+<p>
+In certain situations you may want to test only for one or few specific
+types of SQL injection thought and this is where this switch comes into
+play.
+
+<p>
+This switch requires an argument. Such argument is a string composed by
+any combination of <tt>B</tt>, <tt>E</tt>, <tt>U</tt>, <tt>S</tt> and
+<tt>T</tt> characters where each letter stands for a different technique:
+
+<itemize>
+<item><tt>B</tt>: Boolean-based blind SQL injection
+<item><tt>E</tt>: Error-based SQL injection
+<item><tt>U</tt>: UNION query SQL injection
+<item><tt>S</tt>: Stacked queries SQL injection
+<item><tt>T</tt>: Time-based blind SQL injection
+</itemize>
+
+<p>
+For instance, you can provide <tt>ES</tt> if you want to test for and
+exploit error-based and stacked queries SQL injection types only.
+The default value is <tt>BEUST</tt>.
+
+<p>
+Note that the string must include stacked queries technique letter,
+<tt>S</tt>, when you want to access the file system, takeover the
+operating system or access Windows registry hives.
 
 
 <sect2>Seconds to delay the DBMS response for time-based blind SQL injection

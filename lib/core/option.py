@@ -27,6 +27,7 @@ from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
+from lib.core.common import getPublicTypeMembers
 from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
 from lib.core.common import getConsoleWidth
@@ -605,8 +606,22 @@ def __setOS():
         raise sqlmapUnsupportedDBMSException, errMsg
 
 def __setTechnique():
-    if not conf.tech or not isinstance(conf.tech, int):
-        conf.tech = []
+    validTechniques = getPublicTypeMembers(PAYLOAD.TECHNIQUE)
+    selTechniques = []
+
+    if conf.tech and isinstance(conf.tech, basestring):
+        for t in conf.tech:
+            if t.upper() not in ("B", "E", "U", "S", "T"):
+                errMsg = "value for --technique must be a string composed "
+                errMsg += "by the letters B, E, U, S and T. Refer to the "
+                errMsg += "user's manual for details"
+                raise sqlmapSyntaxException, errMsg
+
+            for validTech, validInt in validTechniques:
+                if t.upper() == validTech[0]:
+                    selTechniques.append(validInt)
+                    break
+        conf.tech = selTechniques
     else:
         conf.tech = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.tech)])
 
@@ -617,7 +632,7 @@ def __setTechnique():
            'osCmd', 'osShell', 'osPwn', 'osSmb', 'osBof', 'regRead', \
            'regAdd', 'regDel'])) and PAYLOAD.TECHNIQUE.STACKED not in conf.tech:
             errMsg = "value for --technique must include stacked queries "
-            errMsg += "technique (4) when you want to access the file "
+            errMsg += "technique (S) when you want to access the file "
             errMsg += "system, takeover the operating system or access "
             errMsg += "Windows registry hives"
             raise sqlmapSyntaxException, errMsg

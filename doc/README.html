@@ -937,6 +937,7 @@ Options:
     These options can be used to tweak testing of specific SQL injection
     techniques.
 
+    --technique=TECH    SQL injection techniques to test for (default all)
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
     --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
     --union-char=UCHAR  Character to use for bruteforcing number of columns
@@ -1794,6 +1795,39 @@ expression match.</P>
 
 <P>These options can be used to tweak testing of specific SQL injection
 techniques.</P>
+
+
+<H3>SQL injection techniques to test for</H3>
+
+<P>Switch: <CODE>-</CODE><CODE>-technique</CODE></P>
+
+<P>This switch can be used to specify which SQL injection type to test for.
+By default sqlmap tests for <B>all</B> types/techniques it supports.</P>
+
+<P>In certain situations you may want to test only for one or few specific
+types of SQL injection thought and this is where this switch comes into
+play.</P>
+
+<P>This switch requires an argument. Such argument is a string composed by
+any combination of <CODE>B</CODE>, <CODE>E</CODE>, <CODE>U</CODE>, <CODE>S</CODE> and
+<CODE>T</CODE> characters where each letter stands for a different technique:</P>
+<P>
+<UL>
+<LI><CODE>B</CODE>: Boolean-based blind SQL injection</LI>
+<LI><CODE>E</CODE>: Error-based SQL injection</LI>
+<LI><CODE>U</CODE>: UNION query SQL injection</LI>
+<LI><CODE>S</CODE>: Stacked queries SQL injection</LI>
+<LI><CODE>T</CODE>: Time-based blind SQL injection</LI>
+</UL>
+</P>
+
+<P>For instance, you can provide <CODE>ES</CODE> if you want to test for and
+exploit error-based and stacked queries SQL injection types only.
+The default value is <CODE>BEUST</CODE>.</P>
+
+<P>Note that the string must include stacked queries technique letter,
+<CODE>S</CODE>, when you want to access the file system, takeover the
+operating system or access Windows registry hives.</P>
 
 
 <H3>Seconds to delay the DBMS response for time-based blind SQL injection</H3>
