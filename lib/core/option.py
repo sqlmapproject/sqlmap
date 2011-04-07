@@ -607,9 +607,10 @@ def __setOS():
 
 def __setTechnique():
     validTechniques = getPublicTypeMembers(PAYLOAD.TECHNIQUE)
-    selTechniques = []
 
     if conf.tech and isinstance(conf.tech, basestring):
+        selTechniques = []
+
         for t in conf.tech:
             if t.upper() not in ("B", "E", "U", "S", "T"):
                 errMsg = "value for --technique must be a string composed "
@@ -621,6 +622,7 @@ def __setTechnique():
                 if t.upper() == validTech[0]:
                     selTechniques.append(validInt)
                     break
+
         conf.tech = selTechniques
     else:
         conf.tech = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.tech)])

@@ -851,7 +851,7 @@ Options:
     These options can be used to tweak testing of specific SQL injection
     techniques.
 
-    --technique=TECH    SQL injection techniques to test for (default all)
+    --technique=TECH    SQL injection techniques to test for (default BEUST)
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
     --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
     --union-char=UCHAR  Character to use for bruteforcing number of columns
