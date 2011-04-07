@@ -688,7 +688,7 @@ class Agent:
                         limitedQuery = "%s WHERE ISNULL(%s,' ') " % (limitedQuery, uniqueField or field)
 
                     limitedQuery += "NOT IN (%s" % (limitStr % num)
-                    limitedQuery += "ISNULL(%s,' ') %s ORDER BY 1) ORDER BY 1" % (uniqueField or field, fromFrom)
+                    limitedQuery += "ISNULL(%s,' ') %s ORDER BY %s) ORDER BY %s" % (uniqueField or field, fromFrom, uniqueField or '1', uniqueField or '1')
                 else:
                     if " WHERE " in limitedQuery:
                         limitedQuery = "%s AND %s " % (limitedQuery, field)
