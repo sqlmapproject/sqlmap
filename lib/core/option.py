@@ -612,23 +612,17 @@ def __setTechnique():
     if conf.tech and isinstance(conf.tech, basestring):
         selTechniques = []
 
-        # e.g.: BEUST
-        if not conf.tech.isdigit():
-            for letter in conf.tech.upper():
-                if letter not in validLetters:
-                    errMsg = "value for --technique must be a string composed "
-                    errMsg += "by the letters %s. Refer to the " % ",".join(validLetters)
-                    errMsg += "user's manual for details"
-                    raise sqlmapSyntaxException, errMsg
+        for letter in conf.tech.upper():
+            if letter not in validLetters:
+                errMsg = "value for --technique must be a string composed "
+                errMsg += "by the letters %s. Refer to the " % ",".join(validLetters)
+                errMsg += "user's manual for details"
+                raise sqlmapSyntaxException, errMsg
 
-                for validTech, validInt in validTechniques:
-                    if letter == validTech[0]:
-                        selTechniques.append(validInt)
-                        break
-
-        # e.g.: 12345
-        else:
-            selTechniques = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.tech)])
+            for validTech, validInt in validTechniques:
+                if letter == validTech[0]:
+                    selTechniques.append(validInt)
+                    break
 
         conf.tech = selTechniques
 
