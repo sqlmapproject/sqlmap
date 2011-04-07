@@ -1466,7 +1466,16 @@ class Enumeration:
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-        conf.db              = None
+        if conf.db is None:
+            infoMsg = "sqlmap will dump entries of all databases' tables now"
+            logger.info(infoMsg)
+        else:
+            infoMsg = "you provided database '%s'. sqlmap will " % conf.db
+            infoMsg += "dump all entries of this database's tables only. "
+            infoMsg += "If you wish to dump entries of all databases' "
+            infoMsg += "tables, run without the -D switch"
+            logger.info(infoMsg)
+
         conf.tbl             = None
         conf.col             = None
         kb.data.cachedDbs    = []
