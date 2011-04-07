@@ -50,6 +50,7 @@ from lib.core.convert import htmlunescape
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
+from lib.core.enums import HTTPHEADER
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import SORTORDER
@@ -1011,6 +1012,12 @@ def parseTargetUrl():
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
+
+    if not conf.referer and conf.level >= 3:
+        debugMsg = "setting the HTTP Referer header to the target url"
+        logger.debug(debugMsg)
+        conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.REFERER, conf.httpHeaders)
+        conf.httpHeaders.append((HTTPHEADER.REFERER, conf.url))
 
 def expandAsteriskForColumns(expression):
     # If the user provided an asterisk rather than the column(s)
