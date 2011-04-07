@@ -125,7 +125,6 @@ class PAYLOAD:
         UNION       = "union"
 
     class TECHNIQUE:
-        HEURISTIC = 0
         BOOLEAN = 1
         ERROR = 2
         UNION = 3

@@ -606,26 +606,31 @@ def __setOS():
         raise sqlmapUnsupportedDBMSException, errMsg
 
 def __setTechnique():
-    validTechniques = getPublicTypeMembers(PAYLOAD.TECHNIQUE)
+    validTechniques = sorted(getPublicTypeMembers(PAYLOAD.TECHNIQUE), key=lambda x: x[1])
+    validLetters = map(lambda x: x[0][0].upper(), validTechniques)
 
     if conf.tech and isinstance(conf.tech, basestring):
         selTechniques = []
 
-        for t in conf.tech:
-            if t.upper() not in ("B", "E", "U", "S", "T"):
-                errMsg = "value for --technique must be a string composed "
-                errMsg += "by the letters B, E, U, S and T. Refer to the "
-                errMsg += "user's manual for details"
-                raise sqlmapSyntaxException, errMsg
+        # e.g.: BEUST
+        if not conf.tech.isdigit():
+            for letter in conf.tech:
+                if letter.upper() not in validLetters:
+                    errMsg = "value for --technique must be a string composed "
+                    errMsg += "by the letters %s. Refer to the " % ",".join(validLetters)
+                    errMsg += "user's manual for details"
+                    raise sqlmapSyntaxException, errMsg
 
-            for validTech, validInt in validTechniques:
-                if t.upper() == validTech[0]:
-                    selTechniques.append(validInt)
-                    break
+                for validTech, validInt in validTechniques:
+                    if letter.upper() == validTech[0]:
+                        selTechniques.append(validInt)
+                        break
+
+        # e.g.: 12345
+        else:
+            selTechniques = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.tech)])
 
         conf.tech = selTechniques
-    else:
-        conf.tech = filter(lambda x: x in PAYLOAD.SQLINJECTION, [int(c) for c in str(conf.tech)])
 
     if len(conf.tech) > 0:
         # TODO: consider MySQL/PHP/ASP/web backdoor case where stacked
