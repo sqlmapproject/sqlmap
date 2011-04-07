@@ -1212,6 +1212,9 @@ class Enumeration:
         return entries, lengths
 
     def dumpTable(self):
+        if conf.db and not conf.tbl:
+            return self.dumpAll()
+
         if not conf.tbl and not conf.col:
             errMsg = "missing table parameter"
             raise sqlmapMissingMandatoryOptionException, errMsg
@@ -1472,8 +1475,6 @@ class Enumeration:
         else:
             infoMsg = "you provided database '%s'. sqlmap will " % conf.db
             infoMsg += "dump all entries of this database's tables only. "
-            infoMsg += "If you wish to dump entries of all databases' "
-            infoMsg += "tables, run without the -D switch"
             logger.info(infoMsg)
 
         conf.tbl             = None
