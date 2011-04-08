@@ -505,11 +505,18 @@ def __setMetasploit():
             raise sqlmapMissingPrivileges, errMsg
 
     if conf.msfPath:
-        condition  = os.path.exists(normalizePath(conf.msfPath))
-        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfcli")))
-        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfconsole")))
-        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfencode")))
-        condition &= os.path.exists(normalizePath(os.path.join(conf.msfPath, "msfpayload")))
+        condition = False
+
+        for path in [conf.msfPath, os.path.join(conf.msfPath, 'bin')]:
+            condition  = os.path.exists(normalizePath(path))
+            condition &= os.path.exists(normalizePath(os.path.join(path, "msfcli")))
+            condition &= os.path.exists(normalizePath(os.path.join(path, "msfconsole")))
+            condition &= os.path.exists(normalizePath(os.path.join(path, "msfencode")))
+            condition &= os.path.exists(normalizePath(os.path.join(path, "msfpayload")))
+
+            if condition:
+                conf.msfPath = path
+                break
 
         if condition:
             debugMsg  = "provided Metasploit Framework 3 path "
