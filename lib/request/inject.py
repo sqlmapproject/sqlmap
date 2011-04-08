@@ -63,8 +63,9 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)
 
-    debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
-    logger.debug(debugMsg)
+    if not kb.bruteMode:
+        debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
+        logger.debug(debugMsg)
 
     return value
 

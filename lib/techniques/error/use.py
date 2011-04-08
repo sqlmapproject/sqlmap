@@ -307,7 +307,8 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
     duration = calculateDeltaSeconds(start)
 
-    debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
-    logger.debug(debugMsg)
+    if not kb.bruteMode:
+        debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
+        logger.debug(debugMsg)
 
     return outputs

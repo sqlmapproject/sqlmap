@@ -57,6 +57,7 @@ def tableExists(tableFile, regex=None):
     tbllock = threading.Lock()
     iolock = threading.Lock()
     kb.threadContinue = True
+    kb.bruteMode = True
 
     def tableExistsThread():
         while count[0] < length and kb.threadContinue:
@@ -140,6 +141,7 @@ def tableExists(tableFile, regex=None):
         except KeyboardInterrupt:
             raise sqlmapThreadException, "user aborted"
     finally:
+        kb.bruteMode = False
         kb.threadContinue = True
         kb.threadException = False
 
@@ -182,6 +184,7 @@ def columnExists(columnFile, regex=None):
     collock = threading.Lock()
     iolock = threading.Lock()
     kb.threadContinue = True
+    kb.bruteMode = True
 
     def columnExistsThread():
         while count[0] < length and kb.threadContinue:
@@ -256,6 +259,7 @@ def columnExists(columnFile, regex=None):
         except KeyboardInterrupt:
             raise sqlmapThreadException, "user aborted"
     finally:
+        kb.bruteMode = False
         kb.threadContinue = True
         kb.threadException = False
 
