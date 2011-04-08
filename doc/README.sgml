@@ -2374,7 +2374,7 @@ of the following categories:
 <item>The database management system is MySQL <bf>&lt; 5.0</bf> where
 <tt>information_schema</tt> is not available.
 <item>The database management system is Microsoft Access and system table
-<tt>MSysObjects</tt> is not readable - vanilla setting.
+<tt>MSysObjects</tt> is not readable - default setting.
 <item>The session user does not have read privileges against the system
 table storing the scheme of the databases.
 </itemize>
