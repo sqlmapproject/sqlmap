@@ -306,7 +306,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                 except KeyboardInterrupt:
                     print
-                    warnMsg = "Ctrl+C detected in dumping phase"
+                    warnMsg = "user aborted during dumping phase"
                     logger.warn(warnMsg)
 
                 return outputs

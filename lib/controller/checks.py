@@ -468,7 +468,7 @@ def checkSqlInjection(place, parameter, value):
             Backend.flushForcedDbms()
 
         except KeyboardInterrupt:
-            warnMsg = "Ctrl+C detected in detection phase"
+            warnMsg = "user aborted during detection phase"
             logger.warn(warnMsg)
 
             message = "How do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"

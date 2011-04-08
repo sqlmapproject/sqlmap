@@ -448,7 +448,7 @@ def start():
 
         except KeyboardInterrupt:
             if conf.multipleTargets:
-                warnMsg = "Ctrl+C detected in multiple target mode"
+                warnMsg = "user aborted in multiple target mode"
                 logger.warn(warnMsg)
 
                 message = "do you want to skip to the next target in list? [Y/n/q]"

@@ -433,7 +433,7 @@ def dictionaryAttack(attack_dict):
 
                     except KeyboardInterrupt:
                         print
-                        warnMsg = "Ctrl+C detected in dictionary attack phase"
+                        warnMsg = "user aborted during dictionary attack phase"
                         logger.warn(warnMsg)
                         return results
 
@@ -486,7 +486,7 @@ def dictionaryAttack(attack_dict):
 
                         except KeyboardInterrupt:
                             print
-                            warnMsg = "Ctrl+C detected in dictionary attack phase"
+                            warnMsg = "user aborted during dictionary attack phase"
                             logger.warn(warnMsg)
                             return results
 
