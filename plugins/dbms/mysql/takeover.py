@@ -14,6 +14,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -80,11 +81,29 @@ class Takeover(GenericTakeover):
         self.udfLocalFile     = paths.SQLMAP_UDF_PATH
         self.udfSharedLibName = "libs%s" % randomStr(lowercase=True)
 
+        msg = "what is the back-end database management system architecture?"
+        msg += "\n[1] 32-bit (default)"
+        msg += "\n[2] 64-bit"
+
+        while True:
+            arch = readInput(msg, default='1')
+
+            if isinstance(arch, basestring) and arch.isdigit() and int(arch) in ( 1, 2 ):
+                if int(arch) == 1:
+                    arch = 32
+                else:
+                    arch = 64
+
+                break
+            else:
+                warnMsg = "invalid value, valid values are 1 and 2"
+                logger.warn(warnMsg)
+
         if kb.os == "Windows":
-            self.udfLocalFile   += "/mysql/windows/32/lib_mysqludf_sys.dll"
+            self.udfLocalFile   += "/mysql/windows/%d/lib_mysqludf_sys.dll" % arch
             self.udfSharedLibExt = "dll"
         else:
-            self.udfLocalFile   += "/mysql/linux/32/lib_mysqludf_sys.so"
+            self.udfLocalFile   += "/mysql/linux/%d/lib_mysqludf_sys.so" % arch
             self.udfSharedLibExt = "so"
 
     def udfCreateFromSharedLib(self, udf, inpRet):

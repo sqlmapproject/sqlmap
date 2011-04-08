@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -54,11 +55,29 @@ class Takeover(GenericTakeover):
             errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
             raise sqlmapUnsupportedFeatureException, errMsg
 
+        msg = "what is the back-end database management system architecture?"
+        msg += "\n[1] 32-bit (default)"
+        msg += "\n[2] 64-bit"
+
+        while True:
+            arch = readInput(msg, default='1')
+
+            if isinstance(arch, basestring) and arch.isdigit() and int(arch) in ( 1, 2 ):
+                if int(arch) == 1:
+                    arch = 32
+                else:
+                    arch = 64
+
+                break
+            else:
+                warnMsg = "invalid value, valid values are 1 and 2"
+                logger.warn(warnMsg)
+
         if kb.os == "Windows":
-            self.udfLocalFile += "/postgresql/windows/32/%s/lib_postgresqludf_sys.dll" % majorVer
+            self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (arch, majorVer)
             self.udfSharedLibExt = "dll"
         else:
-            self.udfLocalFile += "/postgresql/linux/32/%s/lib_postgresqludf_sys.so" % majorVer
+            self.udfLocalFile += "/postgresql/linux/%d/%s/lib_postgresqludf_sys.so" % (arch, majorVer)
             self.udfSharedLibExt = "so"
 
     def udfCreateFromSharedLib(self, udf, inpRet):
