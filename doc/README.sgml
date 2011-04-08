@@ -1775,7 +1775,10 @@ This way the distinction will be based upon string presence or regular
 expression match.
 
 <p>
-TODO: --text-only
+In cases with lot of active (e.g. scripts, embeds,...) content inside
+you can filter pages (<tt>-</tt><tt>-text-only</tt> switch) just for
+their textual content. This way, in major number of cases, you can
+automatically tune detection engine.
 
 
 <sect1>Techniques
@@ -2369,7 +2372,8 @@ of the following categories:
 <itemize>
 <item>The database management system is MySQL <bf>&lt; 5.0</bf> where
 <tt>information_schema</tt> is not available.
-<item>The database management system is Microsoft Access where there TODO.
+<item>The database management system is Microsoft Access and system table
+<tt>MSysObjects</tt> is not readable.
 <item>The session user does not have read privileges against the system
 table storing the scheme of the databases.
 </itemize>
@@ -2402,7 +2406,8 @@ cases usually fit into one of the following categories:
 <itemize>
 <item>The database management system is MySQL <bf>&lt; 5.0</bf> where
 <tt>information_schema</tt> is not available.
-<item>The database management system is Microsoft Access where there TODO.
+<item>The database management system is Microsoft Access where this
+kind of information is not available inside system tables.
 <item>The session user does not have read privileges against the system
 table storing the scheme of the databases.
 </itemize>
