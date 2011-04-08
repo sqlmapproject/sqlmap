@@ -1841,7 +1841,17 @@ By default delay is set to <bf>5 seconds</bf>.
 Switch: <tt>-</tt><tt>-union-cols</tt>
 
 <p>
-TODO
+By default sqlmap tests for UNION query SQL injection technique using 1 to
+10 columns. However, this range can be increased up to 50 columns by
+providing an higher <tt>-</tt>-<tt>level</tt> value. See the relevant
+paragraph for details.
+
+<p>
+You can manually tell sqlmap to test for this type of SQL injection with a
+specific range of columns by providing the tool with the
+<tt>-</tt><tt>-union-cols</tt> switch followed by a range of integers. For
+instance, <tt>12-16</tt> means tests for UNION query SQL injection by
+using 12 up to 16 columns.
 
 
 <sect2>Character to use to test for UNION query SQL injection
@@ -1850,7 +1860,16 @@ TODO
 Switch: <tt>-</tt><tt>-union-char</tt>
 
 <p>
-TODO
+By default sqlmap tests for UNION query SQL injection technique using
+<tt>NULL</tt> character. However, by providing an higher
+<tt>-</tt>-<tt>level</tt> value sqlmap will performs tests also with a
+random number because there are some corner cases where UNION query tests
+with <tt>NULL</tt> fail whereas with a random integer they succeed.
+
+<p>
+You can manually tell sqlmap to test for this type of SQL injection with a
+specific character by providing the tool with the
+<tt>-</tt><tt>-union-char</tt> switch followed by a string.
 
 
 <sect1>Fingerprint
@@ -2331,7 +2350,31 @@ These options can be used to run brute force checks.
 Switches: <tt>-</tt><tt>-common-tables</tt>
 
 <p>
-TODO
+There are cases where <tt>-</tt>-<tt>tables</tt> switch can not be used to
+retrieve the databases' table names. These cases usually fit into one
+of the following categories:
+
+<itemize>
+<item>The database management system is MySQL <bf>&lt; 5.0</bf> where
+<tt>information_schema</tt> is not available.
+<item>The database management system is Microsoft Access where there TODO.
+<item>The session user does not have read privileges against the system
+table storing the scheme of the databases.
+</itemize>
+
+<p>
+If any of the first two cases apply and you provided the
+<tt>-</tt>-<tt>tables</tt> switch, sqlmap will prompt you with a question
+to fall back to this technique.
+Either of these cases apply to your situation, sqlmap can possibly still
+identify some existing tables if you provide it with the
+<tt>-</tt><tt>-common-tables</tt> switch. sqlmap will perform a
+brute-force attack in order to detect the existence of common tables
+across the DBMS.
+
+<p>
+The list of common table names is <tt>txt/common-tables.txt</tt> and you
+can edit it as you wish.
 
 
 <sect2>Brute force columns names
@@ -2340,7 +2383,31 @@ TODO
 Switches: <tt>-</tt><tt>-common-columns</tt>
 
 <p>
-TODO
+As per tables, there are cases where <tt>-</tt>-<tt>columns</tt> switch
+can not be used to retrieve the databases' tables' column names. These
+cases usually fit into one of the following categories:
+
+<itemize>
+<item>The database management system is MySQL <bf>&lt; 5.0</bf> where
+<tt>information_schema</tt> is not available.
+<item>The database management system is Microsoft Access where there TODO.
+<item>The session user does not have read privileges against the system
+table storing the scheme of the databases.
+</itemize>
+
+<p>
+If any of the first two cases apply and you provided the
+<tt>-</tt>-<tt>columns</tt> switch, sqlmap will prompt you with a question
+to fall back to this technique.
+Either of these cases apply to your situation, sqlmap can possibly still
+identify some existing tables if you provide it with the
+<tt>-</tt><tt>-common-columns</tt> switch. sqlmap will perform a
+brute-force attack in order to detect the existence of common columns
+across the DBMS.
+
+<p>
+The list of common table names is <tt>txt/common-columns.txt</tt> and you
+can edit it as you wish.
 
 
 <sect1>User-defined function injection

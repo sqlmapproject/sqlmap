@@ -937,7 +937,7 @@ Options:
     These options can be used to tweak testing of specific SQL injection
     techniques.
 
-    --technique=TECH    SQL injection techniques to test for (default all)
+    --technique=TECH    SQL injection techniques to test for (default BEUST)
     --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
     --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
     --union-char=UCHAR  Character to use for bruteforcing number of columns
@@ -1844,14 +1844,31 @@ By default delay is set to <B>5 seconds</B>.</P>
 
 <P>Switch: <CODE>-</CODE><CODE>-union-cols</CODE></P>
 
-<P>TODO</P>
+<P>By default sqlmap tests for UNION query SQL injection technique using 1 to
+10 columns. However, this range can be increased up to 50 columns by
+providing an higher <CODE>-</CODE>-<CODE>level</CODE> value. See the relevant
+paragraph for details.</P>
+
+<P>You can manually tell sqlmap to test for this type of SQL injection with a
+specific range of columns by providing the tool with the
+<CODE>-</CODE><CODE>-union-cols</CODE> switch followed by a range of integers. For
+instance, <CODE>12-16</CODE> means tests for UNION query SQL injection by
+using 12 up to 16 columns.</P>
 
 
 <H3>Character to use to test for UNION query SQL injection</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-union-char</CODE></P>
 
-<P>TODO</P>
+<P>By default sqlmap tests for UNION query SQL injection technique using
+<CODE>NULL</CODE> character. However, by providing an higher
+<CODE>-</CODE>-<CODE>level</CODE> value sqlmap will performs tests also with a
+random number because there are some corner cases where UNION query tests
+with <CODE>NULL</CODE> fail whereas with a random integer they succeed.</P>
+
+<P>You can manually tell sqlmap to test for this type of SQL injection with a
+specific character by providing the tool with the
+<CODE>-</CODE><CODE>-union-char</CODE> switch followed by a string.</P>
 
 
 <H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">Fingerprint</A>
@@ -2279,14 +2296,60 @@ This feature provides TAB completion and history support too.</P>
 
 <P>Switches: <CODE>-</CODE><CODE>-common-tables</CODE></P>
 
-<P>TODO</P>
+<P>There are cases where <CODE>-</CODE>-<CODE>tables</CODE> switch can not be used to
+retrieve the databases' table names. These cases usually fit into one
+of the following categories:</P>
+<P>
+<UL>
+<LI>The database management system is MySQL <B>&lt; 5.0</B> where
+<CODE>information_schema</CODE> is not available.</LI>
+<LI>The database management system is Microsoft Access where there TODO.</LI>
+<LI>The session user does not have read privileges against the system
+table storing the scheme of the databases.</LI>
+</UL>
+</P>
+
+<P>If any of the first two cases apply and you provided the
+<CODE>-</CODE>-<CODE>tables</CODE> switch, sqlmap will prompt you with a question
+to fall back to this technique.
+Either of these cases apply to your situation, sqlmap can possibly still
+identify some existing tables if you provide it with the
+<CODE>-</CODE><CODE>-common-tables</CODE> switch. sqlmap will perform a
+brute-force attack in order to detect the existence of common tables
+across the DBMS.</P>
+
+<P>The list of common table names is <CODE>txt/common-tables.txt</CODE> and you
+can edit it as you wish.</P>
 
 
 <H3>Brute force columns names</H3>
 
 <P>Switches: <CODE>-</CODE><CODE>-common-columns</CODE></P>
 
-<P>TODO</P>
+<P>As per tables, there are cases where <CODE>-</CODE>-<CODE>columns</CODE> switch
+can not be used to retrieve the databases' tables' column names. These
+cases usually fit into one of the following categories:</P>
+<P>
+<UL>
+<LI>The database management system is MySQL <B>&lt; 5.0</B> where
+<CODE>information_schema</CODE> is not available.</LI>
+<LI>The database management system is Microsoft Access where there TODO.</LI>
+<LI>The session user does not have read privileges against the system
+table storing the scheme of the databases.</LI>
+</UL>
+</P>
+
+<P>If any of the first two cases apply and you provided the
+<CODE>-</CODE>-<CODE>columns</CODE> switch, sqlmap will prompt you with a question
+to fall back to this technique.
+Either of these cases apply to your situation, sqlmap can possibly still
+identify some existing tables if you provide it with the
+<CODE>-</CODE><CODE>-common-columns</CODE> switch. sqlmap will perform a
+brute-force attack in order to detect the existence of common columns
+across the DBMS.</P>
+
+<P>The list of common table names is <CODE>txt/common-columns.txt</CODE> and you
+can edit it as you wish.</P>
 
 
 <H2><A NAME="ss5.11">5.11</A> <A HREF="#toc5.11">User-defined function injection</A>
