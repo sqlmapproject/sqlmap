@@ -16,7 +16,6 @@ from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.data import logger
 
-
 rules = None
 
 def __adjustGrammar(string):
@@ -36,6 +35,7 @@ def checkPayload(payload):
 
     global rules
 
+    detected = False
     payload = urldecode(payload)
 
     if not rules:
@@ -50,5 +50,10 @@ def checkPayload(payload):
     if payload:
         for rule, desc in rules:
             regObj = getCompiledRegex(rule)
+
             if regObj.search(payload):
+                detected = True
                 logger.warn("highly probable IDS/IPS detection: '%s: %s'" % (desc, payload))
+
+    if not detected:
+        logger.warn("payload '%s' possibly gone undetected" % payload)
