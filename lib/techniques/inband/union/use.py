@@ -137,7 +137,7 @@ def unionUse(expression, unpack=True, dump=False):
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
        not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE \
        and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
-       and not any(map(lambda x: x in expression.upper(), ["(CASE", "COUNT(*)", "EXISTS(", "MAX(", "MIN("])):
+       and not any(map(lambda x: x in expression.upper(), ["(CASE", "COUNT(*)", "EXISTS(", "MAX(", "MIN(", "COUNT(DISTINCT"])):
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)

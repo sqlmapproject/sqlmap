@@ -193,8 +193,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <!--<blind query="SELECT TOP 1 %s FROM %s..%s WHERE %s NOT IN (SELECT TOP %d %s FROM %s..%s)" count="SELECT LTRIM(STR(COUNT(*))) FROM %s..%s"/>-->
-            <blind query="SELECT TOP 1 %s FROM (SELECT TOP 1 * FROM ( SELECT TOP %d * FROM %s.%s ORDER BY %s ASC ) AS t1 ORDER BY %s DESC) AS t2 ORDER BY %s ASC" count="SELECT LTRIM(STR(COUNT(*))) FROM %s.%s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>

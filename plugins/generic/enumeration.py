@@ -1304,10 +1304,14 @@ class Enumeration:
                 query = rootQuery.inband.query % (colString, conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                 query = rootQuery.inband.query % (colString, conf.tbl)
-            elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                table = "%s..%s" % (conf.db, conf.tbl)
-                entries, _ = self.__pivotDumpTable(table, colList, blind=False)
-                entries = zip(*[entries[colName] for colName in colList])
+            elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
+                # Partial inband and error
+                if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
+                    table = "%s.%s" % (conf.db, conf.tbl)
+                    entries, _ = self.__pivotDumpTable(table, colList, blind=False)
+                    entries = zip(*[entries[colName] for colName in colList])
+                else:
+                    query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
 
@@ -1358,8 +1362,8 @@ class Enumeration:
                 query = rootQuery.blind.count % (conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                 query = rootQuery.blind.count % conf.tbl
-            elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                query = rootQuery.blind.count % ("%s..%s" % (conf.db, conf.tbl))
+            elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
+                query = rootQuery.blind.count % ("%s.%s" % (conf.db, conf.tbl))
             elif Backend.getIdentifiedDbms() == DBMS.MAXDB:
                 query = rootQuery.blind.count % ("%s" % conf.tbl)
             else:
@@ -1381,17 +1385,17 @@ class Enumeration:
             entries = {}
 
             try:
-                if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB):
+                if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL):
                     if Backend.getIdentifiedDbms() == DBMS.ACCESS:
                         table = conf.tbl
-                    elif Backend.getIdentifiedDbms() == DBMS.SYBASE:
-                        table = "%s..%s" % (conf.db, conf.tbl)
+                    elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
+                        table = "%s.%s" % (conf.db, conf.tbl)
                     elif Backend.getIdentifiedDbms() == DBMS.MAXDB:
                         table = "%s.%s" % (conf.db, conf.tbl)
                     entries, lengths = self.__pivotDumpTable(table, colList, count, blind=True)
 
                 else:
-                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MSSQL, DBMS.SYBASE):
+                    if Backend.getIdentifiedDbms() == DBMS.ORACLE:
                         plusOne = True
                     else:
                         plusOne = False
@@ -1412,11 +1416,6 @@ class Enumeration:
                                 query = rootQuery.blind.query % (column, column,
                                                                        conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())),
                                                                        index)
-                            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                                query = rootQuery.blind.query % (column, index, conf.db,
-                                                                       conf.tbl, colList[0],
-                                                                       colList[0], colList[0])
-
                             elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
                                 query = rootQuery.blind.query % (column, conf.tbl, index)
 
