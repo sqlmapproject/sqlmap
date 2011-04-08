@@ -1412,7 +1412,8 @@ Switch: <tt>-</tt><tt>-keep-alive</tt>
 
 <p>
 This switch instructs sqlmap to use persistent HTTP(s) connections.
-Note that this switch is incompatible with <tt>-</tt><tt>-proxy</tt> switch.
+Note that this switch is incompatible with <tt>-</tt><tt>-proxy</tt>
+switch.
 
 
 <sect2>HTTP NULL connection
@@ -1775,10 +1776,10 @@ This way the distinction will be based upon string presence or regular
 expression match.
 
 <p>
-In cases with lot of active (e.g. scripts, embeds,...) content inside
-you can filter pages (<tt>-</tt><tt>-text-only</tt> switch) just for
-their textual content. This way, in major number of cases, you can
-automatically tune detection engine.
+In cases with lot of active (e.g. scripts, embeds, etc.) content in the
+HTTP responses' body, you can filter pages (<tt>-</tt><tt>-text-only</tt>
+switch) just for their textual content. This way, in a good number of
+cases, you can automatically tune the detection engine.
 
 
 <sect1>Techniques
@@ -2373,7 +2374,7 @@ of the following categories:
 <item>The database management system is MySQL <bf>&lt; 5.0</bf> where
 <tt>information_schema</tt> is not available.
 <item>The database management system is Microsoft Access and system table
-<tt>MSysObjects</tt> is not readable.
+<tt>MSysObjects</tt> is not readable - vanilla setting.
 <item>The session user does not have read privileges against the system
 table storing the scheme of the databases.
 </itemize>
