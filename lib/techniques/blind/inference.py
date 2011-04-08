@@ -455,9 +455,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 val = None
                 commonValue, commonPattern, commonCharset, otherCharset = goGoodSamaritan(finalValue, asciiTbl)
 
-                # Debug print
-                #print "\ncommonValue, commonPattern, commonCharset:", commonValue, commonPattern, commonCharset
-
                 # If there is one single output in common-outputs, check
                 # it via equal against the query output
                 if commonValue is not None:
