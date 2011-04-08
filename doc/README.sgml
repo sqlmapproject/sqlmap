@@ -2043,6 +2043,11 @@ want to enumerate the privileges.
 If you provide <tt>CU</tt> as username it will consider it as an alias for
 current user and will enumerate the privileges for this user.
 
+<p>
+On Microsoft SQL Server, this feature will display you whether or not each
+user is a database administrator rather than the list of privileges for
+all users.
+
 
 <sect2>List database management system users roles
 
@@ -2076,15 +2081,12 @@ When the session user has read access to the system table containing
 information about available databases, it is possible to enumerate the
 list of databases.
 
-<p>
-Note that this feature is not available if the database management system
-is Oracle.
-
 
 <sect2>Enumerate database's tables
 
 <p>
-Switches: <tt>-</tt><tt>-tables</tt> and <tt>-D</tt>
+Switches: <tt>-</tt><tt>-tables</tt>, <tt>-D</tt> and
+<tt>-</tt><tt>-exclude-sysdbs</tt>
 
 <p>
 When the session user has read access to the system table containing
@@ -2094,6 +2096,10 @@ the list of tables for a specific database management system's databases.
 <p>
 If you do not provide a specific database with switch <tt>-D</tt>, sqlmap
 will enumerate the tables for all DBMS databases.
+
+<p>
+You can also provide the <tt>-</tt><tt>-exclude-sysdbs</tt> switch to
+exclude all system databases.
 
 <p>
 Note that on Oracle you have to provide the <tt>TABLESPACE_NAME</tt>
@@ -2122,8 +2128,8 @@ name like the one you provided to be enumerated.
 Example against a SQLite target:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://192.168.136.131/sqlmap/sqlite/get_int.php?id=1" --columns -D testdb \
-  -T users -C name
+$ python sqlmap.py -u "http://192.168.136.131/sqlmap/sqlite/get_int.php?id=1" --columns \
+  -D testdb -T users -C name
 [...]
 Database: SQLite_masterdb
 Table: users
@@ -2182,6 +2188,12 @@ Table: USERS
 </verb></tscreen>
 
 <p>
+This switch can also be used to dump all tables' entries of a provided
+database. You simply have to provide sqlmap with the <tt>-</tt><tt>-dump</tt>
+switch along with only the <tt>-D</tt> switch, no <tt>-T</tt> and no
+<tt>-C</tt>.
+
+<p>
 You can also provide a comma-separated list of the specific columns to
 dump with the <tt>-C</tt> switch.
 
@@ -2212,8 +2224,8 @@ is exactly the same, regardless of the length of the column's entry output
 to dump.
 
 <p>
-As you know by down, sqlmap is <bf>flexible</bf>. You can leave it to
-automatically enumerate the whole database table or you can be very
+As you may have noticed by now, sqlmap is <bf>flexible</bf>: you can leave
+it to automatically dump the whole database table or you can be very
 precise in which characters to dump, from which columns and which range of
 entries.
 
