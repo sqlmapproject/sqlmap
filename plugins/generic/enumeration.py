@@ -252,7 +252,7 @@ class Enumeration:
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=False)
                 if retVal:
                     for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
-                        password = "0x%s" % strToHex(password)
+                        #password = "0x%s" % strToHex(password)
                         if not kb.data.cachedUsersPasswords.has_key(user):
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:

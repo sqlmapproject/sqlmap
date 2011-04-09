@@ -2524,4 +2524,7 @@ def getSafeHexEncodedBinaryData(value):
     retVal = value
     if isinstance(value, basestring):
         retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\%x' % ord(y)), value, unicode())
+    elif isinstance(value, list):
+        for i in xrange(len(value)):
+            retVal[i] = getSafeHexEncodedBinaryData(value[i])
     return retVal
