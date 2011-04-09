@@ -1402,6 +1402,7 @@ def posixToNtSlashes(filepath):
     """
     Replaces all occurances of Posix slashes (/) in provided
     filepath with NT ones (/)
+
     >>> posixToNtSlashes('C:/Windows')
     'C:\\\\Windows'
     """
@@ -1412,6 +1413,7 @@ def ntToPosixSlashes(filepath):
     """
     Replaces all occurances of NT slashes (\) in provided
     filepath with Posix ones (/)
+
     >>> ntToPosixSlashes('C:\\Windows')
     'C:/Windows'
     """
@@ -1421,6 +1423,7 @@ def ntToPosixSlashes(filepath):
 def isBase64EncodedString(subject):
     """
     Checks if the provided string is Base64 encoded
+
     >>> isBase64EncodedString('dGVzdA==')
     True
     >>> isBase64EncodedString('123456')
@@ -1432,6 +1435,7 @@ def isBase64EncodedString(subject):
 def isHexEncodedString(subject):
     """
     Checks if the provided string is hex encoded
+
     >>> isHexEncodedString('DEADBEEF')
     True
     >>> isHexEncodedString('test')
@@ -1667,6 +1671,7 @@ def getCompiledRegex(regex, flags=0):
     """
     Returns compiled regular expression and stores it in cache for further
     usage
+
     >>> getCompiledRegex('test') # doctest: +ELLIPSIS
     <_sre.SRE_Pattern object at...
     """
@@ -2374,6 +2379,7 @@ def maskSensitiveData(msg):
 def listToStrValue(value):
     """
     Flattens list to a string value
+
     >>> listToStrValue([1,2,3])
     '1, 2, 3'
     """
@@ -2408,6 +2414,7 @@ def intersect(valueA, valueB):
     """
     Returns intersection of the array-ized values
     """
+
     retVal = None
 
     if valueA and valueB:
@@ -2419,6 +2426,7 @@ def cpuThrottle(value):
     """
     Does a CPU throttling for a lesser CPU consumption
     """
+
     delay = 0.00001 * (value ** 2)
     time.sleep(delay)
 
@@ -2451,6 +2459,7 @@ def normalizeUnicode(value):
     Does an ASCII normalization of unicode strings
     Reference: http://www.peterbe.com/plog/unicode-to-ascii
     """
+
     retVal = value
     if isinstance(value, unicode):
         retVal = unicodedata.normalize('NFKD', value).encode('ascii','ignore')
@@ -2460,6 +2469,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
     """
     Returns a safe representation of SQL identificator name
     """
+
     retVal = name
     if isinstance(name, basestring):
         if isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and '.' not in name:
@@ -2480,6 +2490,7 @@ def unsafeSQLIdentificatorNaming(name):
     """
     Extracts identificator's name from it's safe SQL representation
     """
+
     retVal = name
     if isinstance(name, basestring):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
@@ -2488,4 +2499,29 @@ def unsafeSQLIdentificatorNaming(name):
             retVal = name.replace("\"", "")
         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             retVal = retVal.lstrip("%s." % DEFAULT_MSSQL_SCHEMA)
+    return retVal
+
+def isBinaryData(value):
+    """
+    Tests given value for binary content
+    """
+
+    retVal = False
+    if isinstance(value, basestring):
+       retVal = reduce(lambda x, y: x or not (y in string.printable or ord(y) > 255), value, False)
+    return retVal
+
+def getSafeHexEncodedBinaryData(value):
+    """
+    Returns safe representation of given basestring value
+
+    >>> getSafeEncodedBinaryData(u'test123')
+    u'test123'
+    >>> getSafeEncodedBinaryData(u'test\01\02\03')
+    u'test\\1\\2\\3'
+    """
+
+    retVal = value
+    if isinstance(value, basestring):
+        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\%x' % ord(y)), value, unicode())
     return retVal
