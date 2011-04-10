@@ -14,6 +14,7 @@ except:
     import sha
 
 import pickle
+import re
 import sys
 import string
 import struct
@@ -96,6 +97,11 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
 
     if convall or safe is None:
         safe = ""
+
+    # corner case when character % really needs to be
+    # encoded (when not representing url encoded char)
+    if all(map(lambda x: '%' in x, [safe, value])):
+        value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value, re.DOTALL | re.IGNORECASE)
 
     while True:
         result = urllib.quote(utf8encode(value), safe)
