@@ -40,10 +40,10 @@ it packaged in their formats and ready to be installed.
 Windows users can download and install the Python setup-ready installer
 for x86, AMD64 and Itanium too.
 
-sqlmap relies on the <htmlurl url="http://metasploit.com/framework/"
+sqlmap relies on the <htmlurl url="http://metasploit.com"
 name="Metasploit Framework"> for some of its post-exploitation takeover
 features. You need to grab a copy of it from the
-<htmlurl url="http://metasploit.com/framework/download/" name="download">
+<htmlurl url="http://metasploit.com/download/" name="download">
 page - the required version is <bf>3.5</bf> or higher.
 For the ICMP tunneling out-of-band takeover technique, sqlmap requires
 <htmlurl url="http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket"
@@ -346,7 +346,7 @@ subversion repository.
 message to the user.
 
 <item>Integration with other IT security open source projects,
-<htmlurl url="http://metasploit.com/framework/" name="Metasploit"> and <htmlurl
+<htmlurl url="http://metasploit.com" name="Metasploit"> and <htmlurl
 url="http://w3af.sourceforge.net/" name="w3af">.
 </itemize>
 
@@ -650,7 +650,7 @@ release only.
 
 <item><bf>October 20</bf>, sqlmap first point release, <bf>0.6.1</bf>, goes
 public. This includes minor bug fixes and the first contact between the
-tool and <htmlurl url="http://metasploit.com/framework" name="Metasploit">:
+tool and <htmlurl url="http://metasploit.com" name="Metasploit">:
 an auxiliary module to launch sqlmap from within Metasploit Framework.
 The <htmlurl url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/"
 name="subversion development repository"> goes public again.
@@ -1403,16 +1403,16 @@ Switch: <tt>-</tt><tt>-predict-output</tt>
 
 <p>
 This switch is used in inference algorithm for sequential statistical
-prediction of characters of value being retrieved. Based on items given in
-<tt>txt/common-outputs.txt</tt> together with the knowledge of current
-enumeration used statistical table with the most promising values is being
-built. In case that the value can be found among the common output values,
-as the process progresses, subsequent character tables are being narrowed
-more and more. If used in combination with retrieval of common DBMS
-entities, as with system table names and privileges, speed up is
-significant. Of course, you can edit the common outputs file according to
-your needs if, for instance, you notice common patterns in database table
-names or similar.
+prediction of characters of value being retrieved. Statistical table with
+the most promising character values is being built based on items given in
+<tt>txt/common-outputs.txt</tt> combined with the knowledge of current
+enumeration used. In case that the value can be found among the common
+output values, as the process progresses, subsequent character tables are
+being narrowed more and more. If used in combination with retrieval of
+common DBMS entities, as with system table names and privileges, speed up
+is significant. Of course, you can edit the common outputs file according
+to your needs if, for instance, you notice common patterns in database
+table names or similar.
 
 <p>
 Note that this switch is not compatible with <tt>-</tt><tt>-threads</tt>
@@ -1666,7 +1666,7 @@ The format of a valid tamper script is as follows:
 from lib.core.enums import PRIORITY
 
 # Define which is the order of application of tamper scripts against the payload
-__priority__ = PRIORITY.HIGHEST
+__priority__ = PRIORITY.NORMAL
 
 def tamper(payload):
     '''
@@ -1675,8 +1675,9 @@ def tamper(payload):
 
     retVal = payload
 
-    # your code to tamper the original payload (retVal)
+    # your code to tamper the original payload
 
+    # return the tampered payload
     return retVal
 </verb></tscreen>
 
@@ -1685,11 +1686,11 @@ You can check valid and usable tamper scripts in the <tt>tamper/</tt>
 directory.
 
 <p>
-Example against a MySQL target assuming <tt>&gt;</tt> character, spaces and
-<tt>SELECT</tt> string are banned:
+Example against a MySQL target assuming that <tt>&gt;</tt> character,
+spaces and capital <tt>SELECT</tt> string are banned:
 
 <tscreen><verb>
-$ python sqlmap.py -u "http://debiandev/sqlmap/mysql/get_int.php?id=1" --tamper \
+$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" --tamper \
 tamper/between.py,tamper/randomcase.py,tamper/space2comment.py -v 3
 
 [hh:mm:03] [DEBUG] cleaning up configuration parameters
@@ -1809,7 +1810,7 @@ This way the distinction will be based upon string presence or regular
 expression match.
 
 <p>
-In cases with lot of active (e.g. scripts, embeds, etc.) content in the
+In cases with lot of active content (e.g. scripts, embeds, etc.) in the
 HTTP responses' body, you can filter pages (<tt>-</tt><tt>-text-only</tt>
 switch) just for their textual content. This way, in a good number of
 cases, you can automatically tune the detection engine.
@@ -3116,7 +3117,7 @@ a <tt>&lt;DB_NAME&gt;/&lt;TABLE_NAME&gt;.csv</tt> file into
 <p>
 You can then use sqlmap itself to read and query the locally created
 SQLite 3 file. For instance, <tt>python sqlmap.py -d
-sqlite:///tmp/sqlmap/output/debiandev/dump/testdb.sqlite3 --table</tt>.
+sqlite:///tmp/sqlmap/output/192.168.136.131/dump/testdb.sqlite3 --table</tt>.
 
 
 <sect2>Simple wizard interface for beginner users

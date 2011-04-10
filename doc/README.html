@@ -105,9 +105,9 @@ it packaged in their formats and ready to be installed.
 Windows users can download and install the Python setup-ready installer
 for x86, AMD64 and Itanium too.</P>
 <P>sqlmap relies on the 
-<A HREF="http://metasploit.com/framework/">Metasploit Framework</A> for some of its post-exploitation takeover
+<A HREF="http://metasploit.com">Metasploit Framework</A> for some of its post-exploitation takeover
 features. You need to grab a copy of it from the
-<A HREF="http://metasploit.com/framework/download/">download</A>
+<A HREF="http://metasploit.com/download/">download</A>
 page - the required version is <B>3.5</B> or higher.
 For the ICMP tunneling out-of-band takeover technique, sqlmap requires
 <A HREF="http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket">Impacket</A> library too.</P>
@@ -418,7 +418,7 @@ subversion repository.
 message to the user.
 </LI>
 <LI>Integration with other IT security open source projects,
-<A HREF="http://metasploit.com/framework/">Metasploit</A> and 
+<A HREF="http://metasploit.com">Metasploit</A> and 
 <A HREF="http://w3af.sourceforge.net/">w3af</A>.</LI>
 </UL>
 </P>
@@ -727,7 +727,7 @@ release only.
 <LI><B>October 20</B>, sqlmap first point release, <B>0.6.1</B>, goes
 public. This includes minor bug fixes and the first contact between the
 tool and 
-<A HREF="http://metasploit.com/framework">Metasploit</A>:
+<A HREF="http://metasploit.com">Metasploit</A>:
 an auxiliary module to launch sqlmap from within Metasploit Framework.
 The 
 <A HREF="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/">subversion development repository</A> goes public again.
@@ -1445,16 +1445,16 @@ it.</P>
 <P>Switch: <CODE>-</CODE><CODE>-predict-output</CODE></P>
 
 <P>This switch is used in inference algorithm for sequential statistical
-prediction of characters of value being retrieved. Based on items given in
-<CODE>txt/common-outputs.txt</CODE> together with the knowledge of current
-enumeration used statistical table with the most promising values is being
-built. In case that the value can be found among the common output values,
-as the process progresses, subsequent character tables are being narrowed
-more and more. If used in combination with retrieval of common DBMS
-entities, as with system table names and privileges, speed up is
-significant. Of course, you can edit the common outputs file according to
-your needs if, for instance, you notice common patterns in database table
-names or similar.</P>
+prediction of characters of value being retrieved. Statistical table with
+the most promising character values is being built based on items given in
+<CODE>txt/common-outputs.txt</CODE> combined with the knowledge of current
+enumeration used. In case that the value can be found among the common
+output values, as the process progresses, subsequent character tables are
+being narrowed more and more. If used in combination with retrieval of
+common DBMS entities, as with system table names and privileges, speed up
+is significant. Of course, you can edit the common outputs file according
+to your needs if, for instance, you notice common patterns in database
+table names or similar.</P>
 
 <P>Note that this switch is not compatible with <CODE>-</CODE><CODE>-threads</CODE>
 switch.</P>
@@ -1507,9 +1507,8 @@ assigned to retrieve one character of the query output. The thread ends
 when that character is retrieved - it takes up to 7 HTTP(S) requests with
 the bisection algorithm implemented in sqlmap.</P>
 
-<P>Note that the multi-threading switch does not affect any other SQL
-injection technique. The maximum number of concurrent requests is set to
-<B>10</B> for performance and site reliability reasons.</P>
+<P>The maximum number of concurrent requests is set to <B>10</B> for
+performance and site reliability reasons.</P>
 
 <P>Note that this switch is not compatible with
 <CODE>-</CODE><CODE>-predict-output</CODE> switch.</P>
@@ -1682,7 +1681,7 @@ comma-separated as the argument of <CODE>-</CODE><CODE>-tamper</CODE> switch.</P
 from lib.core.enums import PRIORITY
 
 # Define which is the order of application of tamper scripts against the payload
-__priority__ = PRIORITY.HIGHEST
+__priority__ = PRIORITY.NORMAL
 
 def tamper(payload):
     '''
@@ -1691,8 +1690,9 @@ def tamper(payload):
 
     retVal = payload
 
-    # your code to tamper the original payload (retVal)
+    # your code to tamper the original payload
 
+    # return the tampered payload
     return retVal
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -1701,12 +1701,12 @@ def tamper(payload):
 <P>You can check valid and usable tamper scripts in the <CODE>tamper/</CODE>
 directory.</P>
 
-<P>Example against a MySQL target assuming <CODE>&gt;</CODE> character, spaces and
-<CODE>SELECT</CODE> string are banned:</P>
+<P>Example against a MySQL target assuming that <CODE>&gt;</CODE> character,
+spaces and capital <CODE>SELECT</CODE> string are banned:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u "http://debiandev/sqlmap/mysql/get_int.php?id=1" --tamper \
+$ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" --tamper \
 tamper/between.py,tamper/randomcase.py,tamper/space2comment.py -v 3
 
 [hh:mm:03] [DEBUG] cleaning up configuration parameters
@@ -1816,7 +1816,7 @@ injected) page content with the injected wrong page content.
 This way the distinction will be based upon string presence or regular
 expression match.</P>
 
-<P>In cases with lot of active (e.g. scripts, embeds, etc.) content in the
+<P>In cases with lot of active content (e.g. scripts, embeds, etc.) in the
 HTTP responses' body, you can filter pages (<CODE>-</CODE><CODE>-text-only</CODE>
 switch) just for their textual content. This way, in a good number of
 cases, you can automatically tune the detection engine.</P>
@@ -2987,7 +2987,7 @@ a <CODE>&lt;DB_NAME&gt;/&lt;TABLE_NAME&gt;.csv</CODE> file into
 
 <P>You can then use sqlmap itself to read and query the locally created
 SQLite 3 file. For instance, <CODE>python sqlmap.py -d
-sqlite:///tmp/sqlmap/output/debiandev/dump/testdb.sqlite3 --table</CODE>.</P>
+sqlite:///tmp/sqlmap/output/192.168.136.131/dump/testdb.sqlite3 --table</CODE>.</P>
 
 
 <H3>Simple wizard interface for beginner users</H3>
