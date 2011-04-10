@@ -116,6 +116,7 @@ class Miscellaneous:
 
         logger.debug("removing support tables")
         inject.goStacked("DROP TABLE %s" % self.fileTblName, silent=True)
+        inject.goStacked("DROP TABLE %shex" % self.fileTblName, silent=True)
 
         if not onlyFileTbl:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
