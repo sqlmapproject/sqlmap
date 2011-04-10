@@ -329,7 +329,7 @@ class Agent:
         if not Backend.getDbms():
             return fields
 
-        if fields.startswith("(CASE") or fields.startswith("SUBSTR"):
+        if fields.startswith("(CASE") or fields.startswith("SUBSTR") or fields.startswith("MID("):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ",")
@@ -369,7 +369,7 @@ class Agent:
         fieldsSelectFrom = getCompiledRegex("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, re.I).search(query)
         fieldsExists = getCompiledRegex("EXISTS(.*)", re.I).search(query)
         fieldsSelect = getCompiledRegex("\ASELECT%s\s+(.*)" % prefixRegex, re.I).search(query)
-        fieldsSubstr = getCompiledRegex("\ASUBSTR", re.I).search(query)
+        fieldsSubstr = getCompiledRegex("\A(SUBSTR|MID\()", re.I).search(query)
         fieldsNoSelect = query
 
         if fieldsSubstr:
