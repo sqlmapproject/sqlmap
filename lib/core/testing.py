@@ -75,10 +75,6 @@ def smokeTest():
     return retVal
 
 def adjustValueType(tagName, value):
-    # as it's not part of optDict
-    if tagName == "technique":
-        value = int(value)
-
     for family in optDict.keys():
         for name, type_ in optDict[family].items():
             if type(type_) == tuple:

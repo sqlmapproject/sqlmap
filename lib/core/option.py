@@ -778,7 +778,7 @@ def __setDNSCache():
             kb.cache[args] = socket._getaddrinfo(*args, **kwargs)
             return kb.cache[args]
 
-    if socket.getaddrinfo != _getaddrinfo:
+    if not hasattr(socket, '_getaddrinfo'):
         socket._getaddrinfo = socket.getaddrinfo
         socket.getaddrinfo = _getaddrinfo
 
