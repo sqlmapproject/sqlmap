@@ -14,7 +14,7 @@
         <limitstring query=" LIMIT "/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
-        <comment query="#" query2="/*"/>
+        <comment query="--" query2="/*"/>
         <!--
              NOTE: MySQL 5.0.12 introduced SLEEP() function
                    References:
