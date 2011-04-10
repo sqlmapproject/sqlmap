@@ -58,8 +58,6 @@ class Takeover(GenericTakeover):
             self.__basedir = ntToPosixSlashes(normalizePath(self.__basedir))
             self.udfRemoteFile = "%s/%s.%s" % (self.__basedir, self.udfSharedLibName, self.udfSharedLibExt)
 
-            logger.warn("this will only work if the database administrator created manually the '%s' subfolder" % self.__basedir)
-
         # On MySQL 4.1 < 4.1.25 and on MySQL 4.1 >= 4.1.25 with NO plugin_dir set in my.ini configuration file
         # On MySQL 5.0 < 5.0.67 and on MySQL 5.0 >= 5.0.67 with NO plugin_dir set in my.ini configuration file
         else:
