@@ -289,7 +289,10 @@ class Filesystem:
 
             for chunk in fileContent:
                 if isinstance(chunk, (list, tuple, set)):
-                    chunk = chunk[0]
+                    if len(chunk) > 0:
+                        chunk = chunk[0]
+                    else:
+                        chunk = ""
 
                 newFileContent += chunk
 
