@@ -152,7 +152,12 @@ def tableExists(tableFile, regex=None):
         warnMsg = "no table found"
         logger.warn(warnMsg)
     else:
+        items = set()
         for item in retVal:
+            if item.lower() in items:
+                continue
+            else:
+                items.add(item.lower())
             if not kb.data.cachedTables.has_key(conf.db):
                 kb.data.cachedTables[conf.db] = [item]
             else:
