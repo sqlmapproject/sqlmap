@@ -9,7 +9,7 @@
 
 <H2>by 
 <A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A>, 
-<A HREF="mailto:miroslav.stampar@gmail.com">Miroslav Stampar</A></H2>version 0.9, April XX, 2011
+<A HREF="mailto:miroslav.stampar@gmail.com">Miroslav Stampar</A></H2>version 0.9, April 10, 2011
 <HR>
 <EM>This document is the user's manual to use 
 <A HREF="http://sqlmap.sourceforge.net">sqlmap</A>.</EM>
@@ -561,7 +561,7 @@ the
 
 <P>
 <UL>
-<LI><B>April XX</B>, 
+<LI><B>April 10</B>, 
 <A HREF="http://sqlmap.sourceforge.net/#developers">Bernardo and Miroslav</A> release sqlmap
 <B>0.9</B> featuring a totally rewritten and powerful SQL injection
 detection engine, the possibility to connect directly to a database
@@ -1444,23 +1444,49 @@ it.</P>
 
 <P>Switch: <CODE>-</CODE><CODE>-predict-output</CODE></P>
 
-<P>TODO</P>
+<P>This switch is used in inference algorithm for sequential statistical
+prediction of characters of value being retrieved. Based on items given in
+<CODE>txt/common-outputs.txt</CODE> together with the knowledge of current
+enumeration used statistical table with the most promising values is being
+built. In case that the value can be found among the common output values,
+as the process progresses, subsequent character tables are being narrowed
+more and more. If used in combination with retrieval of common DBMS
+entities, as with system table names and privileges, speed up is
+significant. Of course, you can edit the common outputs file according to
+your needs if, for instance, you notice common patterns in database table
+names or similar.</P>
+
+<P>Note that this switch is not compatible with <CODE>-</CODE><CODE>-threads</CODE>
+switch.</P>
 
 
 <H3>HTTP Keep-Alive</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-keep-alive</CODE></P>
 
-<P>This switch instructs sqlmap to use persistent HTTP(s) connections.
-Note that this switch is incompatible with <CODE>-</CODE><CODE>-proxy</CODE> switch.</P>
+<P>This switch instructs sqlmap to use persistent HTTP(s) connections.</P>
+
+<P>Note that this switch is incompatible with <CODE>-</CODE><CODE>-proxy</CODE>
+switch.</P>
 
 
 <H3>HTTP NULL connection</H3>
 
 <P>Switch: <CODE>-</CODE><CODE>-null-connection</CODE></P>
 
-<P>TODO
-Note that this switch is incompatible with <CODE>-</CODE><CODE>-text-only</CODE>
+<P>There are special HTTP request types which can be used to retrieve
+HTTP response's size without getting the HTTP body. This knowledge can be
+used in blind injection technique to distinguish <CODE>True</CODE> from
+<CODE>False</CODE> responses. When this switch is provided, sqlmap will try to
+test and exploit two different <EM>NULL connection</EM> techniques:
+<CODE>Range</CODE> and <CODE>HEAD</CODE>.
+If any of these is supported by the target web server, speed up will come
+from the obvious saving of used bandwidth.</P>
+
+<P>These techniques are detailed in the white paper
+<A HREF="http://www.wisec.it/sectou.php?id=472f952d79293">Bursting Performances in Blind SQL Injection - Take 2 (Bandwidth)</A>.</P>
+
+<P>Note that this switch is incompatible with <CODE>-</CODE><CODE>-text-only</CODE>
 switch.</P>
 
 
@@ -1484,6 +1510,9 @@ the bisection algorithm implemented in sqlmap.</P>
 <P>Note that the multi-threading switch does not affect any other SQL
 injection technique. The maximum number of concurrent requests is set to
 <B>10</B> for performance and site reliability reasons.</P>
+
+<P>Note that this switch is not compatible with
+<CODE>-</CODE><CODE>-predict-output</CODE> switch.</P>
 
 
 <H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Injection</A>
@@ -1787,7 +1816,10 @@ injected) page content with the injected wrong page content.
 This way the distinction will be based upon string presence or regular
 expression match.</P>
 
-<P>TODO: --text-only</P>
+<P>In cases with lot of active (e.g. scripts, embeds, etc.) content in the
+HTTP responses' body, you can filter pages (<CODE>-</CODE><CODE>-text-only</CODE>
+switch) just for their textual content. This way, in a good number of
+cases, you can automatically tune the detection engine.</P>
 
 
 <H2><A NAME="ss5.7">5.7</A> <A HREF="#toc5.7">Techniques</A>
@@ -2313,7 +2345,8 @@ of the following categories:</P>
 <UL>
 <LI>The database management system is MySQL <B>&lt; 5.0</B> where
 <CODE>information_schema</CODE> is not available.</LI>
-<LI>The database management system is Microsoft Access where there TODO.</LI>
+<LI>The database management system is Microsoft Access and system table
+<CODE>MSysObjects</CODE> is not readable - default setting.</LI>
 <LI>The session user does not have read privileges against the system
 table storing the scheme of the databases.</LI>
 </UL>
@@ -2343,7 +2376,8 @@ cases usually fit into one of the following categories:</P>
 <UL>
 <LI>The database management system is MySQL <B>&lt; 5.0</B> where
 <CODE>information_schema</CODE> is not available.</LI>
-<LI>The database management system is Microsoft Access where there TODO.</LI>
+<LI>The database management system is Microsoft Access where this
+kind of information is not available inside system tables.</LI>
 <LI>The session user does not have read privileges against the system
 table storing the scheme of the databases.</LI>
 </UL>
@@ -2800,7 +2834,7 @@ $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int_bool.php?id=
 <BLOCKQUOTE><CODE>
 <PRE>
 100% [===================================================] 64/64               
-[10:28:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod
+[hh:mm:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod
 
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: Oracle

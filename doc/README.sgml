@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
-<date>version 0.9, April XX, 2011
+<date>version 0.9, April 10, 2011
 <abstract>
 This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
 </abstract>
@@ -487,7 +487,7 @@ name="MS10-015">).
 
 <p>
 <itemize>
-<item><bf>April XX</bf>, <htmlurl name="Bernardo and Miroslav"
+<item><bf>April 10</bf>, <htmlurl name="Bernardo and Miroslav"
 url="http://sqlmap.sourceforge.net/#developers"> release sqlmap
 <bf>0.9</bf> featuring a totally rewritten and powerful SQL injection
 detection engine, the possibility to connect directly to a database
@@ -1402,7 +1402,21 @@ Read below for details about each switch.
 Switch: <tt>-</tt><tt>-predict-output</tt>
 
 <p>
-TODO
+This switch is used in inference algorithm for sequential statistical
+prediction of characters of value being retrieved. Based on items given in
+<tt>txt/common-outputs.txt</tt> together with the knowledge of current
+enumeration used statistical table with the most promising values is being
+built. In case that the value can be found among the common output values,
+as the process progresses, subsequent character tables are being narrowed
+more and more. If used in combination with retrieval of common DBMS
+entities, as with system table names and privileges, speed up is
+significant. Of course, you can edit the common outputs file according to
+your needs if, for instance, you notice common patterns in database table
+names or similar.
+
+<p>
+Note that this switch is not compatible with <tt>-</tt><tt>-threads</tt>
+switch.
 
 
 <sect2>HTTP Keep-Alive
@@ -1412,6 +1426,8 @@ Switch: <tt>-</tt><tt>-keep-alive</tt>
 
 <p>
 This switch instructs sqlmap to use persistent HTTP(s) connections.
+
+<p>
 Note that this switch is incompatible with <tt>-</tt><tt>-proxy</tt>
 switch.
 
@@ -1422,7 +1438,21 @@ switch.
 Switch: <tt>-</tt><tt>-null-connection</tt>
 
 <p>
-TODO
+There are special HTTP request types which can be used to retrieve
+HTTP response's size without getting the HTTP body. This knowledge can be
+used in blind injection technique to distinguish <tt>True</tt> from
+<tt>False</tt> responses. When this switch is provided, sqlmap will try to
+test and exploit two different <em>NULL connection</em> techniques:
+<tt>Range</tt> and <tt>HEAD</tt>.
+If any of these is supported by the target web server, speed up will come
+from the obvious saving of used bandwidth.
+
+<p>
+These techniques are detailed in the white paper
+<htmlurl url="http://www.wisec.it/sectou.php?id=472f952d79293"
+name="Bursting Performances in Blind SQL Injection - Take 2 (Bandwidth)">.
+
+<p>
 Note that this switch is incompatible with <tt>-</tt><tt>-text-only</tt>
 switch.
 
@@ -1448,9 +1478,12 @@ when that character is retrieved - it takes up to 7 HTTP(S) requests with
 the bisection algorithm implemented in sqlmap.
 
 <p>
-Note that the multi-threading switch does not affect any other SQL
-injection technique. The maximum number of concurrent requests is set to
-<bf>10</bf> for performance and site reliability reasons.
+The maximum number of concurrent requests is set to <bf>10</bf> for
+performance and site reliability reasons.
+
+<p>
+Note that this switch is not compatible with
+<tt>-</tt><tt>-predict-output</tt> switch.
 
 
 <sect1>Injection
@@ -2904,7 +2937,7 @@ Then:
 
 <tscreen><verb>
 100% [===================================================] 64/64               
-[10:28:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod
+[hh:mm:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod
 
 web application technology: PHP 5.2.6, Apache 2.2.9
 back-end DBMS: Oracle
