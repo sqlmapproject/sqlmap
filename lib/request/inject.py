@@ -17,7 +17,6 @@ from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import getPublicTypeMembers
-from lib.core.common import getSafeHexEncodedBinaryData
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -28,6 +27,7 @@ from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
+from lib.core.convert import safehexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -495,7 +495,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             value = None
 
     if safeHexEncode:
-        value = getSafeHexEncodedBinaryData(value)
+        value = safehexencode(value)
 
     return value
 

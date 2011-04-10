@@ -15,6 +15,7 @@ except:
 
 import pickle
 import sys
+import string
 import struct
 import urllib
 
@@ -126,3 +127,21 @@ def htmlescape(value):
 
 def htmlunescape(value):
     return value.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'").replace('&nbsp;', ' ')
+
+def safehexencode(value):
+    """
+    Returns safe hex representation of a given basestring value
+
+    >>> safehexencode(u'test123')
+    u'test123'
+    >>> safehexencode(u'test\x01\x02\xff')
+    u'test\\01\\02\\03\\ff'
+    """
+
+    retVal = value
+    if isinstance(value, basestring):
+        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\%02x' % ord(y)), value, unicode())
+    elif isinstance(value, list):
+        for i in xrange(len(value)):
+            retVal[i] = safehexencode(value[i])
+    return retVal
