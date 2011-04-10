@@ -54,6 +54,7 @@ def tableExists(tableFile, regex=None):
     count = [0]
     length = len(tables)
     threads = []
+    items = set()
     tbllock = threading.Lock()
     iolock = threading.Lock()
     kb.threadContinue = True
@@ -75,8 +76,10 @@ def tableExists(tableFile, regex=None):
 
             iolock.acquire()
 
-            if result:
+            if result and table.lower() not in items:
                 retVal.append(table)
+
+                items.add(table.lower())
 
                 dataToSessionFile("[%s][%s][%s][TABLE_EXISTS][%s]\n" % (conf.url,\
                   kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]),\
@@ -152,12 +155,7 @@ def tableExists(tableFile, regex=None):
         warnMsg = "no table found"
         logger.warn(warnMsg)
     else:
-        items = set()
         for item in retVal:
-            if item.lower() in items:
-                continue
-            else:
-                items.add(item.lower())
             if not kb.data.cachedTables.has_key(conf.db):
                 kb.data.cachedTables[conf.db] = [item]
             else:
