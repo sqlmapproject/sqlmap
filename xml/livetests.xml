@@ -10,7 +10,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="B"/>
+            <tech value="B"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -37,7 +37,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="E"/>
+            <tech value="E"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -63,7 +63,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -89,7 +89,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -115,7 +115,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="B"/>
+            <tech value="B"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -142,7 +142,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="E"/>
+            <tech value="E"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -168,7 +168,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -194,7 +194,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -220,7 +220,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="B"/>
+            <tech value="B"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -247,7 +247,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="E"/>
+            <tech value="E"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -273,7 +273,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -299,7 +299,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int_partialunion.php?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -325,7 +325,7 @@
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
-            <technique value="B"/>
+            <tech value="B"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -352,7 +352,7 @@
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
-            <technique value="E"/>
+            <tech value="E"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -378,7 +378,7 @@
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int.asp?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
@@ -404,7 +404,7 @@
         <switches>
             <url value="http://windowsdev/sqlmap/mssql/iis/get_int_partialunion.asp?id=1"/>
             <isDba value="True"/>
-            <technique value="U"/>
+            <tech value="U"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
             <getCurrentDb value="True"/>
