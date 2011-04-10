@@ -1194,9 +1194,6 @@ def __cleanupOptions():
     if conf.data:
         conf.data = urldecode(conf.data)
 
-    if conf.template:
-        map(lambda x: conf.__setitem__(x, True), ['tor', 'flushSession', 'batch', 'getBanner', 'getCurrentUser', 'getCurrentDb', 'getDbs', 'randomAgent'])
-
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration
