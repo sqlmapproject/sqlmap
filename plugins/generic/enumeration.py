@@ -1011,12 +1011,13 @@ class Enumeration:
                 columns = {}
 
                 for columnData in value:
-                    name = safeSQLIdentificatorNaming(columnData[0])
+                    if columnData[0] is not None:
+                        name = safeSQLIdentificatorNaming(columnData[0])
 
-                    if len(columnData) == 1:
-                        columns[name] = ""
-                    else:
-                        columns[name] = columnData[1]
+                        if len(columnData) == 1:
+                            columns[name] = ""
+                        else:
+                            columns[name] = columnData[1]
 
                 table[conf.tbl] = columns
                 kb.data.cachedColumns[conf.db] = table
