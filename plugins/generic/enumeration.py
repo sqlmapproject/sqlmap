@@ -55,6 +55,7 @@ from lib.core.session import setOs
 from lib.core.settings import CONCAT_ROW_DELIMITER
 from lib.core.settings import CONCAT_VALUE_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
+from lib.core.settings import MAX_INT
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.unescaper import unescaper
@@ -1137,7 +1138,7 @@ class Enumeration:
             else:
                 count = inject.getValue(query, blind=False)
 
-        colList = sorted(colList, key=lambda x: len(x))
+        colList = sorted(colList, key=lambda x: len(x) if x else MAX_INT)
 
         for column in colList:
             infoMsg = "fetching number of distinct "

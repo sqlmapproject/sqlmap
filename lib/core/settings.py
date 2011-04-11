@@ -298,3 +298,6 @@ DEFAULT_MSSQL_SCHEMA = 'dbo'
 
 # display hash attack info every mod number of items
 HASH_MOD_ITEM_DISPLAY = 1117
+
+# maximum integer value
+MAX_INT = sys.maxint
