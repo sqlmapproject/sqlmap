@@ -1137,6 +1137,8 @@ class Enumeration:
             else:
                 count = inject.getValue(query, blind=False)
 
+        colList = sorted(colList, key=lambda x: len(x))
+
         for column in colList:
             infoMsg = "fetching number of distinct "
             infoMsg += "values for column '%s'" % column
