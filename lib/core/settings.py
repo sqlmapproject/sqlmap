@@ -17,7 +17,7 @@ from lib.core.enums import PLACE
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
-VERSION            = "0.9"
+VERSION            = "1.0-dev"
 REVISION           = getRevisionNumber()
 VERSION_STRING     = "sqlmap/%s" % VERSION
 DESCRIPTION        = "automatic SQL injection and database takeover tool"
