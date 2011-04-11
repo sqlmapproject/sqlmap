@@ -130,6 +130,22 @@ def __showInjections():
 
     conf.dumper.technic(header, data)
 
+def __randomFillBlankFields(value):
+    retVal = value
+
+    if extractRegexResult(EMPTY_FORM_FIELDS_REGEX, value):
+        message = "do you want to fill blank fields with random values? [Y/n] "
+        test = readInput(message, default="Y")
+        if not test or test[0] in ("y", "Y"):
+            while extractRegexResult(EMPTY_FORM_FIELDS_REGEX, retVal):
+                item = extractRegexResult(EMPTY_FORM_FIELDS_REGEX, retVal)
+                if item[-1] == '&':
+                    retVal = retVal.replace(item, "%s%s&" % (item[:-1], randomStr()))
+                else:
+                    retVal = retVal.replace(item, "%s%s" % (item, randomStr()))
+
+    return retVal
+
 def __saveToSessionFile():
     for inj in kb.injections:
         if inj.place is None or inj.parameter is None:
@@ -182,8 +198,8 @@ def start():
 
             testSqlInj = False
             if PLACE.GET in conf.parameters:
-                for parameter in re.findall(r"([^=]+)=[^&]+&?", conf.parameters[PLACE.GET]):
-                    paramKey = (conf.hostname, conf.path, PLACE.GET, parameter)
+                for parameter in re.findall(r"([^=]+)=([^&]+&?|\Z)", conf.parameters[PLACE.GET]):
+                    paramKey = (conf.hostname, conf.path, PLACE.GET, parameter[0])
                     if paramKey not in kb.testedParams:
                         testSqlInj = True
                         break
@@ -223,25 +239,22 @@ def start():
                         if conf.method == HTTPMETHOD.POST:
                             message = "Edit POST data [default: %s]%s: " % (urlencode(conf.data) if conf.data else "None", " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
-                            if extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data):
-                                message = "do you want to fill blank fields with random values? [Y/n] "
-                                test = readInput(message, default="Y")
-                                if not test or test[0] in ("y", "Y"):
-                                    while extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data):
-                                        item = extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data)
-                                        if item[-1] == '&':
-                                            conf.data = conf.data.replace(item, "%s%s&" % (item[:-1], randomStr()))
-                                        else:
-                                            conf.data = conf.data.replace(item, "%s%s" % (item, randomStr()))
+                            conf.data = __randomFillBlankFields(conf.data)
                             conf.data = urldecode(conf.data)
 
                         elif conf.method == HTTPMETHOD.GET:
-                            if conf.url.find("?") > -1:
-                                firstPart = conf.url[:conf.url.find("?")]
-                                secondPart = conf.url[conf.url.find("?")+1:]
+                            if targetUrl.find("?") > -1:
+                                firstPart = targetUrl[:targetUrl.find("?")]
+                                secondPart = targetUrl[targetUrl.find("?")+1:]
                                 message = "Edit GET data [default: %s]: " % secondPart
                                 test = readInput(message, default=secondPart)
+                                test = __randomFillBlankFields(test)
                                 conf.url = "%s?%s" % (firstPart, test)
+
+                        # we need to reinitialize environment as
+                        # we are expecting changes in testing data
+                        initTargetEnv()
+                        parseTargetUrl()
 
                     elif test[0] in ("n", "N"):
                         continue
