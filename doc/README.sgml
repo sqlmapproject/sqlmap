@@ -2449,7 +2449,6 @@ banner:    '4.1.21-community-nt'
 [hh:mm:40] [INFO] adding words used on web page to the check list
 please enter number of threads? [Enter for 1 (current)] 8
 [hh:mm:43] [INFO] retrieved: users
-[hh:mm:56] [INFO] retrieved: Users
 
 Database: testdb
 [1 table]
