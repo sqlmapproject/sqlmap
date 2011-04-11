@@ -33,6 +33,9 @@ def checkPayload(payload):
     PHPIDS filter rules
     """
 
+    if not payload:
+        return
+
     global rules
 
     detected = False
