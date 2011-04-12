@@ -55,7 +55,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         if "set-cookie" in headers:
             result.setcookie = headers["set-cookie"].split("; path")[0]
 
-        result.redcode = code
+        if result:
+            result.redcode = code
 
         return result
 
