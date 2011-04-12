@@ -108,7 +108,7 @@ class Fingerprint(GenericFingerprint):
             logger.info(infoMsg)
 
             if inject.checkBooleanExpression("LENGTH(TO_CHAR(1, 'EEEE'))>0"):
-                Backend.setVersion(">= 9.0.3")
+                Backend.setVersion(">= 9.0.0")
             elif inject.checkBooleanExpression("2=(SELECT DIV(6, 3))"):
                 Backend.setVersion(">= 8.4.0")
             elif inject.checkBooleanExpression("EXTRACT(ISODOW FROM CURRENT_TIMESTAMP)<8"):
