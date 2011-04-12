@@ -23,3 +23,10 @@ Variable name			Variable value
 PLATFORM_SDK_DIR		C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
 MYSQL_SERVER_DIR		C:\Program Files\MySQL\MySQL Server 5.1
 POSTGRESQL_SERVER_DIR	C:\Program Files\PostgreSQL\8.4
+
+
+Notes:
+
+To get as small shared libraries as possible compile as follows:
+* MySQL Windows 32-bit DLL: use Visual C++ 2005 and strip the library with UPX
+* TODO
