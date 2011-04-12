@@ -107,7 +107,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            if inject.checkBooleanExpression("LENGTH(to_char(1, 'EEEE'))>0"):
+            if inject.checkBooleanExpression("LENGTH(TO_CHAR(1, 'EEEE'))>0"):
                 Backend.setVersion(">= 9.0.3")
             elif inject.checkBooleanExpression("2=(SELECT DIV(6, 3))"):
                 Backend.setVersion(">= 8.4.0")
