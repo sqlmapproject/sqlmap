@@ -74,24 +74,19 @@ def update():
         debugMsg = "sqlmap will try to update itself using 'svn' command"
         logger.debug(debugMsg)
 
-        process = execute("svn update %s" % rootDir, shell=True, stdout=PIPE, stderr=PIPE)
-
         dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
+        process = execute("svn update %s" % rootDir, shell=True, stdout=PIPE)
         pollProcess(process)
-        svnStdout, svnStderr = process.communicate()
+        svnStdout, _ = process.communicate()
 
-        if svnStderr:
-            errMsg = getUnicode(svnStderr, system=True).strip()
-            logger.error(errMsg)
-
-            if IS_WIN:
-                infoMsg = "for Windows platform it's recommended "
-                infoMsg += "to use a TortoiseSVN GUI client for updating "
-                infoMsg += "purposes (http://tortoisesvn.net/)"
-                logger.info(infoMsg)
-
-        elif svnStdout:
+        if svnStdout:
             revision = re.search("revision\s+([\d]+)", svnStdout, re.I)
 
             if revision:
                 logger.info('updated to the latest revision %s' % revision.group(1))
+
+        if IS_WIN:
+            infoMsg = "for Windows platform it's recommended "
+            infoMsg += "to use a TortoiseSVN GUI client for updating "
+            infoMsg += "purposes (http://tortoisesvn.net/)"
+            logger.info(infoMsg)
