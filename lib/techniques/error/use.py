@@ -24,6 +24,7 @@ from lib.core.common import randomInt
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import htmlunescape
+from lib.core.convert import safehexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -135,7 +136,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
             output = __oneShotErrorUse(expressionReplaced, field)
 
             if output is not None:
-                dataToStdout("[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), replaceNewlineTabs(output, stdout=True)))
+                dataToStdout("[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), safehexencode(replaceNewlineTabs(output, stdout=True))))
 
         if isinstance(num, int):
             expression = origExpr
