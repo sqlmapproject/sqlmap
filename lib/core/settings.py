@@ -287,17 +287,20 @@ REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
 # Regular expression used for marking non-alphanum characters
 REFLECTED_NON_ALPHA_NUM_REGEX = r'[^<>\\r\\n]+?'
 
-# chars which can be used as a failsafe values in case of too long URL encoding value
+# Chars which can be used as a failsafe values in case of too long URL encoding value
 URLENCODE_FAILSAFE_CHARS = '()|,'
 
-# maximum length of urlencoded value after which failsafe procedure takes away
+# Maximum length of urlencoded value after which failsafe procedure takes away
 URLENCODE_CHAR_LIMIT = 2000
 
-# default schema for Microsoft SQL Server DBMS
+# Default schema for Microsoft SQL Server DBMS
 DEFAULT_MSSQL_SCHEMA = 'dbo'
 
-# display hash attack info every mod number of items
+# Display hash attack info every mod number of items
 HASH_MOD_ITEM_DISPLAY = 1117
 
-# maximum integer value
+# Maximum integer value
 MAX_INT = sys.maxint
+
+# Length of entry info for partial inband technique
+PARTIAL_INBAND_STATUS_LENGTH = 10

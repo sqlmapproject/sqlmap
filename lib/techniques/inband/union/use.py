@@ -31,6 +31,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
+from lib.core.settings import PARTIAL_INBAND_STATUS_LENGTH
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -252,7 +253,8 @@ def unionUse(expression, unpack=True, dump=False):
                     if conf.verbose == 1:
                         length = stopLimit - startLimit
                         count = num - startLimit + 1
-                        status = '%d/%d entries (%d%s)' % (count, length, round(100.0*count/length), '%')
+                        items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
+                        status = '%d/%d entries (%d%s) [%s...]' % (count, length, round(100.0*count/length), '%', ",".join(items)[:PARTIAL_INBAND_STATUS_LENGTH].ljust(PARTIAL_INBAND_STATUS_LENGTH, '.'))
                         dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
 
                 if conf.verbose == 1:
