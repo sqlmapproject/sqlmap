@@ -1874,6 +1874,9 @@ def beep():
     Reference: http://de3.aminet.net/dev/src/clr.py.txt
     """
 
+    def _failsafe():
+        dataToStdout('\a', True)
+
     if sys.platform == 'linux2':
         for dev in ('/dev/audio', '/dev/oss', '/dev/dsp', '/dev/sound'):
             if os.path.exists(dev):
@@ -1897,10 +1900,17 @@ def beep():
             curses.endwin()
             return
         except:
-            dataToStdout('\a', True)
+            _failsafe()
+
+    elif sys.platform == 'darwin':
+        try:
+            import Carbon.Snd
+            Carbon.Snd.SysBeep(1)
+        except:
+            _failsafe()
 
     else:
-        dataToStdout('\a', True)
+        _failsafe()
 
 def runningAsAdmin():
     isAdmin = False
