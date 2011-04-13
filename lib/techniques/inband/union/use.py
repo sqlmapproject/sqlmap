@@ -17,6 +17,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
+from lib.core.common import getConsoleWidth
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
@@ -31,7 +32,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
-from lib.core.settings import PARTIAL_INBAND_STATUS_LENGTH
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -124,6 +124,7 @@ def unionUse(expression, unpack=True, dump=False):
     test = True
     value = ""
     reqCount = 0
+    width = getConsoleWidth()
     start = time.time()
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
@@ -250,12 +251,12 @@ def unionUse(expression, unpack=True, dump=False):
                     if output:
                         value += output
 
-                    if conf.verbose == 1:
-                        length = stopLimit - startLimit
-                        count = num - startLimit + 1
-                        items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
-                        status = '%d/%d entries (%d%s) [%s...]' % (count, length, round(100.0*count/length), '%', ",".join(items)[:PARTIAL_INBAND_STATUS_LENGTH].ljust(PARTIAL_INBAND_STATUS_LENGTH, '.'))
-                        dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), status), True)
+                        if conf.verbose == 1:
+                            items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
+                            status = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), ",".join(map(lambda x: "\"%s\"" % x, items)))
+                            if len(status) > width:
+                                status = "%s..." % status[:width - 3]
+                            dataToStdout(status, True)
 
                 if conf.verbose == 1:
                     clearConsoleLine(True)

@@ -301,6 +301,3 @@ HASH_MOD_ITEM_DISPLAY = 1117
 
 # Maximum integer value
 MAX_INT = sys.maxint
-
-# Length of entry info for partial inband technique
-PARTIAL_INBAND_STATUS_LENGTH = 10

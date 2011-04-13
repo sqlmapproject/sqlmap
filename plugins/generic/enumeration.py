@@ -16,7 +16,6 @@ from lib.core.common import Backend
 from lib.core.common import dataToStdout
 from lib.core.common import getRange
 from lib.core.common import getCompiledRegex
-from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import Backend
 from lib.core.common import getUnicode
