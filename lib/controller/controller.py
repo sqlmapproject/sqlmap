@@ -44,6 +44,7 @@ from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
+from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv
@@ -367,6 +368,12 @@ def start():
                             testSqlInj = False
 
                             infoMsg = "skipping previously processed %s parameter '%s'" % (place, parameter)
+                            logger.info(infoMsg)
+
+                        elif parameter.upper() in IGNORE_PARAMETERS:
+                            testSqlInj = False
+
+                            infoMsg = "ignoring %s parameter '%s'" % (place, parameter)
                             logger.info(infoMsg)
 
                         # Avoid dinamicity test if the user provided the
