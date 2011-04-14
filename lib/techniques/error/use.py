@@ -136,7 +136,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
             output = __oneShotErrorUse(expressionReplaced, field)
 
             if output is not None:
-                dataToStdout("[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(replaceNewlineTabs(output, stdout=True))))
+                dataToStdout("[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(output)))
 
         if isinstance(num, int):
             expression = origExpr

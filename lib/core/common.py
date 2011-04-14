@@ -72,7 +72,7 @@ from lib.core.settings import REVISION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import SITE
 from lib.core.settings import ERROR_PARSING_REGEXES
-from lib.core.settings import NON_PRINTABLE_CHAR_REGEX
+from lib.core.settings import PRINTABLE_CHAR_REGEX
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
@@ -2131,7 +2131,7 @@ def filterControlChars(value):
     Returns string value with control chars being supstituted with ' '
     """
 
-    return filterStringValue(value, NON_PRINTABLE_CHAR_REGEX, ' ')
+    return filterStringValue(value, PRINTABLE_CHAR_REGEX, ' ')
 
 def isDBMSVersionAtLeast(version):
     """

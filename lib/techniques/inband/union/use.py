@@ -24,6 +24,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
+from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -253,7 +254,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                         if conf.verbose == 1:
                             items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
-                            status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), ",".join(map(lambda x: "\"%s\"" % x, items)))
+                            status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
                             if len(status) > width:
                                 status = "%s..." % status[:width - 3]
                             dataToStdout(status, True)
