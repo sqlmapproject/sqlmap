@@ -1493,14 +1493,19 @@ class Enumeration:
                 conf.db = db
 
                 for table in tables:
-                    conf.tbl = table
-                    kb.data.cachedColumns = {}
-                    kb.data.dumpedTable = {}
+                    try:
+                        conf.tbl = table
+                        kb.data.cachedColumns = {}
+                        kb.data.dumpedTable = {}
 
-                    data = self.dumpTable()
+                        data = self.dumpTable()
 
-                    if data:
-                        conf.dumper.dbTableValues(data)
+                        if data:
+                            conf.dumper.dbTableValues(data)
+                    except sqlmapNoneDataException:
+                        infoMsg = "skipping table '%s'" % table
+                        logger.info(infoMsg)
+
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
         if not dbs:
