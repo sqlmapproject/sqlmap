@@ -278,6 +278,8 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
             if getPostReq and (params or cookie):
                 if not url.startswith("http"):
+                    if not port and scheme == "https":
+                        port = "443"
                     url    = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
                     scheme = None
                     port   = None
