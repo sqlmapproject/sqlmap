@@ -87,7 +87,7 @@ def tableExists(tableFile, regex=None):
 
                 if conf.verbose in (1, 2):
                     clearConsoleLine(True)
-                    infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), table)
+                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), table)
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
@@ -205,7 +205,7 @@ def columnExists(columnFile, regex=None):
 
                 if conf.verbose in (1, 2):
                     clearConsoleLine(True)
-                    infoMsg = "\r[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), column)
+                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), column)
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):

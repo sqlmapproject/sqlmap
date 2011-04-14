@@ -27,7 +27,7 @@ from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
-from lib.core.convert import safehexencode
+from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -388,7 +388,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
 
     return data
 
-def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeHexEncode=True):
+def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -494,8 +494,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         elif value == [None]:
             value = None
 
-    if safeHexEncode:
-        value = safehexencode(value)
+    if safeCharEncode:
+        value = safecharencode(value)
 
     return value
 

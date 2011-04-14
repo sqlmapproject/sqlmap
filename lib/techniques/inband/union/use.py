@@ -253,7 +253,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                         if conf.verbose == 1:
                             items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
-                            status = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), ",".join(map(lambda x: "\"%s\"" % x, items)))
+                            status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), ",".join(map(lambda x: "\"%s\"" % x, items)))
                             if len(status) > width:
                                 status = "%s..." % status[:width - 3]
                             dataToStdout(status, True)
