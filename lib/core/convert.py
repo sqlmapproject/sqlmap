@@ -13,6 +13,7 @@ except:
     import md5
     import sha
 
+import binascii
 import pickle
 import re
 import sys
@@ -23,6 +24,7 @@ import urllib
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.settings import HEX_ENCODED_CHAR_REGEX
+from lib.core.settings import SAFE_ENCODE_SLASH_REPLACEMENTS
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
@@ -148,9 +150,10 @@ def safecharencode(value):
     retVal = value
 
     if isinstance(value, basestring):
-        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\%02x' % ord(y)), value, unicode())
-        for char in "\t\n\r\x0b\x0c":
+        for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
             retVal = retVal.replace(char, repr(char).strip('\''))
+
+        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\%02x' % ord(y)), retVal, unicode())
 
     elif isinstance(value, list):
         for i in xrange(len(value)):
@@ -165,17 +168,17 @@ def safechardecode(value):
 
     retVal = value
     if isinstance(value, basestring):
-        for char in "\t\n\r\x0b\x0c":
-            retVal = retVal.replace(repr(char).strip('\''), char)
-
         regex = re.compile(HEX_ENCODED_CHAR_REGEX)
 
         while True:
             match = regex.search(retVal)
             if match:
-                retVal = retVal.replace(match.group("result"), unhexlify(value.lstrip('\\')))
+                retVal = retVal.replace(match.group("result"), binascii.unhexlify(match.group("result").lstrip('\\')))
             else:
                 break
+
+        for char in SAFE_ENCODE_SLASH_REPLACEMENTS[::-1]:
+            retVal = retVal.replace(repr(char).strip('\''), char)
 
     elif isinstance(value, (list, tuple)):
         for i in xrange(len(value)):
