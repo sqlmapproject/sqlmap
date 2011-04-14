@@ -32,6 +32,7 @@ from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import strToHex
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
+from lib.core.convert import safechardecode
 from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -1207,7 +1208,7 @@ class Enumeration:
                         breakRetrieval = True
                         break
                     else:
-                        pivotValue = value
+                        pivotValue = safechardecode(value)
 
                 lengths[column] = max(lengths[column], len(value) if value else 0)
                 entries[column].append(value)
