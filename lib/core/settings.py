@@ -302,5 +302,5 @@ HASH_MOD_ITEM_DISPLAY = 1117
 # Maximum integer value
 MAX_INT = sys.maxint
 
-# Parameters to be ignored in detection phase
-IGNORE_PARAMETERS = ("__VIEWSTATE", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SessionId", "JSESSIONID", "cfid", "cftoken")
+# Parameters to be ignored in detection phase (upper case)
+IGNORE_PARAMETERS = ("__VIEWSTATE", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
