@@ -135,7 +135,9 @@ def htmlescape(value):
     return value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;').replace(' ', '&nbsp;')
 
 def htmlunescape(value):
-    return value.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'").replace('&nbsp;', ' ')
+    retVal = value.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'").replace('&nbsp;', ' ')
+    retVal = re.sub('&#(\d+);', lambda x: unichr(int(x.group(1))), retVal)
+    return retVal
 
 def safecharencode(value):
     """
