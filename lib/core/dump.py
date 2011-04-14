@@ -358,6 +358,9 @@ class Dump:
         if not conf.multipleTargets and not conf.replicate:
             dataToDumpFile(dumpFP, "\n")
 
+        if conf.replicate:
+            rtable.beginTransaction()
+
         for i in range(count):
             field = 1
             values = []
@@ -398,11 +401,12 @@ class Dump:
         self.__write("%s\n" % separator)
 
         if conf.replicate:
+            rtable.endTransaction()
             logger.info("Table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
+
         elif not conf.multipleTargets:
             dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
-
             logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
 
     def dbColumns(self, dbColumns, colConsider, dbs):

@@ -177,7 +177,7 @@ def safechardecode(value):
             else:
                 break
 
-    elif isinstance(value, list):
+    elif isinstance(value, (list, tuple)):
         for i in xrange(len(value)):
             retVal[i] = safechardecode(value[i])
 

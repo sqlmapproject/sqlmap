@@ -71,6 +71,16 @@ class Replication:
                 errMsg = "wrong number of columns used in replicating insert"
                 raise sqlmapValueException, errMsg
 
+        def beginTransaction(self):
+            """
+            Great speed improvement can be gained by using explicit transactions around multiple inserts.
+            Reference: http://stackoverflow.com/questions/4719836/python-and-sqlite3-adding-thousands-of-rows
+            """
+            self.parent.cursor.execute('BEGIN TRANSACTION')
+
+        def endTransaction(self):
+            self.parent.cursor.execute('END TRANSACTION')
+
         def select(self, condition=None):
             """
             This function is used for selecting row(s) from current table.
