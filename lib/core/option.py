@@ -260,9 +260,6 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                         if len(splitValue) > 1:
                             port = filterStringValue(splitValue[1], '[0-9]')
 
-                            if not scheme and port == "443":
-                                scheme = "https"
-
                     # Avoid to add a static content length header to
                     # conf.httpHeaders and consider the following lines as
                     # POSTed data
@@ -277,8 +274,10 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 getPostReq &= re.search(conf.scope, host) is not None
 
             if getPostReq and (params or cookie):
-                if not port and scheme == "https":
+                if not port and isinstance(scheme, basestring) and scheme.lower() == "https":
                     port = "443"
+                elif not scheme and port == "443":
+                    scheme = "https"
 
                 if not url.startswith("http"):
                     url    = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
