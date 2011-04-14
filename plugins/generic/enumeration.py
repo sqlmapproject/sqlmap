@@ -250,6 +250,7 @@ class Enumeration:
             if Backend.getIdentifiedDbms() == DBMS.SYBASE:
                 randStr = randomStr()
                 getCurrentThreadData().disableStdOut = True
+
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=False)
                 if retVal:
                     for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
@@ -258,6 +259,7 @@ class Enumeration:
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
                             kb.data.cachedUsersPasswords[user].append(password)
+
                 getCurrentThreadData().disableStdOut = False
             else:
                 value = inject.getValue(query, blind=False)
@@ -293,7 +295,6 @@ class Enumeration:
                 query = rootQuery.inband.query
 
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=True)
-
                 if retVal:
                     for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
                         password = "0x%s" % strToHex(password)
@@ -1139,6 +1140,11 @@ class Enumeration:
             else:
                 count = inject.getValue(query, blind=False)
 
+        if not count or count == "0":
+            infoMsg = "table '%s' is empty" % table
+            logger.info(infoMsg)
+            return entries
+
         colList = sorted(colList, key=lambda x: len(x) if x else MAX_INT)
 
         for column in colList:
@@ -1289,6 +1295,7 @@ class Enumeration:
 
         if any([isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION), isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR), conf.direct]):
             entries = []
+            query = None
 
             if all([Backend.getIdentifiedDbms() == DBMS.MYSQL, isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR), conf.groupConcat]):
                 randStr, randStr2 = randomStr(), randomStr()
@@ -1312,14 +1319,17 @@ class Enumeration:
                 # Partial inband and error
                 if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                     table = "%s.%s" % (conf.db, conf.tbl)
-                    entries, _ = self.__pivotDumpTable(table, colList, blind=False)
-                    entries = zip(*[entries[colName] for colName in colList])
+
+                    retVal = self.__pivotDumpTable(table, colList, blind=False)
+                    if retVal:
+                        entries, _ = retVal
+                        entries = zip(*[entries[colName] for colName in colList])
                 else:
                     query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
             else:
                 query = rootQuery.inband.query % (colString, conf.db, conf.tbl)
 
-            if not entries:
+            if not entries and query:
                 entries = inject.getValue(query, blind=False, dump=True)
 
             if entries:
@@ -1396,7 +1406,10 @@ class Enumeration:
                         table = "%s.%s" % (conf.db, conf.tbl)
                     elif Backend.getIdentifiedDbms() == DBMS.MAXDB:
                         table = "%s.%s" % (conf.db, conf.tbl)
-                    entries, lengths = self.__pivotDumpTable(table, colList, count, blind=True)
+
+                    retVal = self.__pivotDumpTable(table, colList, count, blind=True)
+                    if retVal:
+                        entries, lengths = retVal
 
                 else:
                     if Backend.getIdentifiedDbms() == DBMS.ORACLE:
