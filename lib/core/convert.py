@@ -153,7 +153,7 @@ def safecharencode(value):
         for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
             retVal = retVal.replace(char, repr(char).strip('\''))
 
-        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\%02x' % ord(y)), retVal, unicode())
+        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\\x%02x' % ord(y)), retVal, unicode())
 
     elif isinstance(value, list):
         for i in xrange(len(value)):
@@ -173,7 +173,7 @@ def safechardecode(value):
         while True:
             match = regex.search(retVal)
             if match:
-                retVal = retVal.replace(match.group("result"), binascii.unhexlify(match.group("result").lstrip('\\')))
+                retVal = retVal.replace(match.group("result"), binascii.unhexlify(match.group("result").lstrip('\\x')))
             else:
                 break
 
