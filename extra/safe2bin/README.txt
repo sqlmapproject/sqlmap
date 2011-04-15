@@ -7,7 +7,7 @@ $ python ./safe2bin.py -i output.txt -o output.txt.bin
 
 This will create an binary decoded file output.txt.bin. For example, 
 if the content of output.txt is: "\ttest\t\x32\x33\x34\nnewline" it will 
-be decoded to: "    test   234
+be decoded to: "	test	234
 newline"
 
 If you skip the output file name, general rule is that the binary

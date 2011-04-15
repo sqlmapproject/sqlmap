@@ -21,10 +21,10 @@ import string
 import struct
 import urllib
 
+from extra.safe2bin.safe2bin import safecharencode
+from extra.safe2bin.safe2bin import safechardecode
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.settings import HEX_ENCODED_CHAR_REGEX
-from lib.core.settings import SAFE_ENCODE_SLASH_REPLACEMENTS
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
@@ -135,53 +135,4 @@ def htmlescape(value):
 def htmlunescape(value):
     retVal = value.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'").replace('&nbsp;', ' ')
     retVal = re.sub('&#(\d+);', lambda x: unichr(int(x.group(1))), retVal)
-    return retVal
-
-def safecharencode(value):
-    """
-    Returns safe representation of a given basestring value
-
-    >>> safecharencode(u'test123')
-    u'test123'
-    >>> safecharencode(u'test\x01\x02\xff')
-    u'test\\01\\02\\03\\ff'
-    """
-
-    retVal = value
-
-    if isinstance(value, basestring):
-        for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
-            retVal = retVal.replace(char, repr(char).strip('\''))
-
-        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\\x%02x' % ord(y)), retVal, unicode())
-
-    elif isinstance(value, list):
-        for i in xrange(len(value)):
-            retVal[i] = safecharencode(value[i])
-
-    return retVal
-
-def safechardecode(value):
-    """
-    Reverse function to safecharencode
-    """
-
-    retVal = value
-    if isinstance(value, basestring):
-        regex = re.compile(HEX_ENCODED_CHAR_REGEX)
-
-        while True:
-            match = regex.search(retVal)
-            if match:
-                retVal = retVal.replace(match.group("result"), binascii.unhexlify(match.group("result").lstrip('\\x')))
-            else:
-                break
-
-        for char in SAFE_ENCODE_SLASH_REPLACEMENTS[::-1]:
-            retVal = retVal.replace(repr(char).strip('\''), char)
-
-    elif isinstance(value, (list, tuple)):
-        for i in xrange(len(value)):
-            retVal[i] = safechardecode(value[i])
-
     return retVal

@@ -11,6 +11,7 @@ See the file 'doc/COPYING' for copying permission
 
 import binascii
 import re
+import string
 import os
 import sys
 
@@ -23,9 +24,33 @@ HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
 # Raw chars that will be safe encoded to their slash (\) representations (e.g. newline to \n)
 SAFE_ENCODE_SLASH_REPLACEMENTS = "\\\t\n\r\x0b\x0c"
 
+def safecharencode(value):
+    """
+    Returns safe representation of a given basestring value
+
+    >>> safecharencode(u'test123')
+    u'test123'
+    >>> safecharencode(u'test\x01\x02\xff')
+    u'test\\01\\02\\03\\ff'
+    """
+
+    retVal = value
+
+    if isinstance(value, basestring):
+        for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
+            retVal = retVal.replace(char, repr(char).strip('\''))
+
+        retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\\x%02x' % ord(y)), retVal, unicode())
+
+    elif isinstance(value, list):
+        for i in xrange(len(value)):
+            retVal[i] = safecharencode(value[i])
+
+    return retVal
+
 def safechardecode(value):
     """
-    Decode safe(hex) encoded values
+    Reverse function to safecharencode
     """
 
     retVal = value

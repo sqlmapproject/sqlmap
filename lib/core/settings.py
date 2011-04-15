@@ -304,9 +304,3 @@ MAX_INT = sys.maxint
 
 # Parameters to be ignored in detection phase (upper case)
 IGNORE_PARAMETERS = ("__VIEWSTATE", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
-
-# Regex used for recognition of hex encoded characters
-HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
-
-# Raw chars that will be safe encoded to their slash (\) representations (e.g. newline to \n)
-SAFE_ENCODE_SLASH_REPLACEMENTS = "\\\t\n\r\x0b\x0c"
