@@ -1184,40 +1184,52 @@ class Enumeration:
         pivotValue = " "
         breakRetrieval = False
 
-        for i in xrange(int(count)):
-            if breakRetrieval:
-                break
+        try:
+            for i in xrange(int(count)):
+                if breakRetrieval:
+                    break
 
-            for column in colList:
-                if column not in lengths:
-                    lengths[column] = 0
+                for column in colList:
+                    if column not in lengths:
+                        lengths[column] = 0
 
-                if column not in entries:
-                    entries[column] = []
+                    if column not in entries:
+                        entries[column] = []
 
-                if column == colList[0]:
-                    # Correction for pivotValues with unrecognized chars
-                    if pivotValue and '?' in pivotValue and pivotValue[0] != '?':
-                        pivotValue = pivotValue.split('?')[0]
-                        pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
-                    query = dumpNode.query % (column, table, column, pivotValue)
-                else:
-                    query = dumpNode.query2 % (column, table, colList[0], pivotValue)
-
-                if blind:
-                    value = inject.getValue(query, inband=False, error=False)
-                else:
-                    value = inject.getValue(query, blind=False)
-
-                if column == colList[0]:
-                    if not value:
-                        breakRetrieval = True
-                        break
+                    if column == colList[0]:
+                        # Correction for pivotValues with unrecognized chars
+                        if pivotValue and '?' in pivotValue and pivotValue[0] != '?':
+                            pivotValue = pivotValue.split('?')[0]
+                            pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
+                        query = dumpNode.query % (column, table, column, pivotValue)
                     else:
-                        pivotValue = safechardecode(value)
+                        query = dumpNode.query2 % (column, table, colList[0], pivotValue)
 
-                lengths[column] = max(lengths[column], len(value) if value else 0)
-                entries[column].append(value)
+                    if blind:
+                        value = inject.getValue(query, inband=False, error=False)
+                    else:
+                        value = inject.getValue(query, blind=False)
+
+                    if column == colList[0]:
+                        if not value:
+                            breakRetrieval = True
+                            break
+                        else:
+                            pivotValue = safechardecode(value)
+
+                    lengths[column] = max(lengths[column], len(value) if value else 0)
+                    entries[column].append(value)
+
+        except KeyboardInterrupt:
+            warnMsg = "user aborted during enumeration. sqlmap "
+            warnMsg += "will display partial output"
+            logger.warn(warnMsg)
+
+        except sqlmapConnectionException, e:
+            errMsg = "connection exception detected. sqlmap "
+            errMsg += "will display partial output"
+            errMsg += "'%s'" % e
+            logger.critical(errMsg)
 
         return entries, lengths
 
