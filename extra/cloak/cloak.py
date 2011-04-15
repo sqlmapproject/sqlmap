@@ -35,8 +35,13 @@ def cloak(inputFile):
 
 def decloak(inputFile):
     f = open(inputFile, 'rb')
-    data = bz2.decompress(hideAscii(f.read()))
-    f.close()
+    try:
+        data = bz2.decompress(hideAscii(f.read()))
+    except:
+        print 'ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile
+        sys.exit(1)
+    finally:
+        f.close()
 
     return data
 
@@ -58,7 +63,7 @@ def main():
         parser.error(e)
 
     if not os.path.isfile(args.inputFile):
-        print 'ERROR: the provided input file \'%s\' is not a regular file' % args.inputFile
+        print 'ERROR: the provided input file \'%s\' is non existent' % args.inputFile
         sys.exit(1)
 
     if not args.decrypt:
@@ -72,10 +77,9 @@ def main():
         else:
             args.outputFile = args.inputFile[:-1]
 
-    fpOut      = open(args.outputFile, 'wb')
-    sys.stdout = fpOut
-    sys.stdout.write(data)
-    sys.stdout.close()
+    f = open(args.outputFile, 'wb')
+    f.write(data)
+    f.close()
 
 if __name__ == '__main__':
     main()
