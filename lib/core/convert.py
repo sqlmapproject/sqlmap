@@ -111,8 +111,6 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
 
         if limit and len(result) > URLENCODE_CHAR_LIMIT:
             if count >= len(URLENCODE_FAILSAFE_CHARS):
-                dbgMsg  = "failed to fully shorten urlencoding value"
-                logger.debug(dbgMsg)
                 break
 
             while count < len(URLENCODE_FAILSAFE_CHARS):
