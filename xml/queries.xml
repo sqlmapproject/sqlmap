@@ -205,7 +205,7 @@
         </search_table>
         <search_column>
             <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name"/>
-            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id" condition="[DB]..syscolumns.name"/>
+            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name"/>
         </search_column>
     </dbms>
 
