@@ -31,6 +31,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
+from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
 from lib.core.unescaper import unescaper
@@ -263,10 +264,15 @@ def unionUse(expression, unpack=True, dump=False):
                     clearConsoleLine(True)
 
             except KeyboardInterrupt:
-                print
                 warnMsg = "user aborted during enumeration. sqlmap "
                 warnMsg += "will display partial output"
                 logger.warn(warnMsg)
+
+            except sqlmapConnectionException, e:
+                errMsg = "connection exception detected. sqlmap "
+                errMsg += "will display partial output"
+                errMsg += "'%s'" % e
+                logger.critical(errMsg)
 
     if not value:
         value = __oneShotUnionUse(expression, unpack)

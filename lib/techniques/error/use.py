@@ -32,6 +32,7 @@ from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
+from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.threads import getCurrentThreadData
@@ -295,10 +296,15 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     outputs.append(output)
 
             except KeyboardInterrupt:
-                print
                 warnMsg = "user aborted during enumeration. sqlmap "
                 warnMsg += "will display partial output"
                 logger.warn(warnMsg)
+
+            except sqlmapConnectionException, e:
+                errMsg = "connection exception detected. sqlmap "
+                errMsg += "will display partial output"
+                errMsg += "'%s'" % e
+                logger.critical(errMsg)
 
     if not outputs:
         outputs = __errorFields(expression, expressionFields, expressionFieldsList)
