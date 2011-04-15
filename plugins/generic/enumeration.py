@@ -481,7 +481,6 @@ class Enumeration:
                             elif Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
                                 if privilege.upper() == "Y":
                                     privileges.add(mysqlPrivs[count])
-                                        
 
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)

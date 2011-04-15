@@ -104,7 +104,7 @@ def tableExists(tableFile, regex=None):
         choice = readInput(message, default=str(conf.threads))
         if choice and choice.isdigit():
             conf.threads = int(choice)
-        
+
     if conf.threads == 1:
         warnMsg = "running in a single-thread mode. This could take a while."
         logger.warn(warnMsg)
@@ -222,7 +222,7 @@ def columnExists(columnFile, regex=None):
         choice = readInput(message, default=str(conf.threads))
         if choice and choice.isdigit():
             conf.threads = int(choice)
-        
+
     if conf.threads == 1:
         warnMsg = "running in a single-thread mode. This could take a while."
         logger.warn(warnMsg)
