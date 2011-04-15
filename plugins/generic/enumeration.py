@@ -98,7 +98,7 @@ class Enumeration:
             logger.info(infoMsg)
 
             query = queries[Backend.getIdentifiedDbms()].banner.query
-            kb.data.banner = unArrayizeValue(inject.getValue(query))
+            kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
             bannerParser(kb.data.banner)
 
             if conf.os and conf.os == "windows":
@@ -133,7 +133,7 @@ class Enumeration:
         query = queries[Backend.getIdentifiedDbms()].current_db.query
 
         if not kb.data.currentDb:
-            kb.data.currentDb = unArrayizeValue(inject.getValue(query))
+            kb.data.currentDb = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
 
         return kb.data.currentDb
 
