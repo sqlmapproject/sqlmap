@@ -1826,7 +1826,7 @@ def wasLastRequestDelayed():
         lowerStdLimit = average(kb.responseTimes) + TIME_STDEV_COEFF * deviation
         retVal = (threadData.lastQueryDuration >= lowerStdLimit)
 
-        if not kb.testMode and retVal and conf.timeSec == TIME_DEFAULT_DELAY:
+        if not kb.testMode and retVal and kb.adjustTimeDelay:
             adjustTimeDelay(threadData.lastQueryDuration, lowerStdLimit)
 
         return retVal

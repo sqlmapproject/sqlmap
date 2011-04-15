@@ -89,6 +89,7 @@ from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import MAX_NUMBER_OF_THREADS
+from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_DELAY_CANDIDATES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
@@ -1196,6 +1197,8 @@ def __cleanupOptions():
     if conf.data:
         conf.data = urldecode(conf.data)
 
+    kb.adjustTimeDelay = (conf.timeSec == TIME_DEFAULT_DELAY)
+
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration
@@ -1237,6 +1240,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     logger.debug(debugMsg)
 
     kb.absFilePaths    = set()
+    kb.adjustTimeDelay = False
     kb.authHeader      = None
     kb.bannerFp        = advancedDict()
 
