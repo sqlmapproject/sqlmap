@@ -104,6 +104,8 @@ def checkCharEncoding(encoding):
     # popular typos/errors
     if '8858' in encoding:
         encoding = encoding.replace('8858', '8859') # iso-8858 -> iso-8859
+    elif '5889' in encoding:
+        encoding = encoding.replace('5889', '8859') # iso-5889 -> iso-8859
     elif '2313' in encoding:
         encoding = encoding.replace('2313', '2312') # gb2313 -> gb2312
 
@@ -125,7 +127,7 @@ def checkCharEncoding(encoding):
     try:
         codecs.lookup(encoding)
     except LookupError:
-        warnMsg  = "unknown charset '%s'. " % encoding
+        warnMsg  = "unknown web page charset '%s'. " % encoding
         warnMsg += "Please report by e-mail to %s." % ML
         logger.warn(warnMsg)
         encoding = UNICODE_ENCODING
