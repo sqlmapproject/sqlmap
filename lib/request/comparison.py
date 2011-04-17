@@ -19,7 +19,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import MIN_RATIO
 from lib.core.settings import MAX_RATIO
@@ -78,13 +77,9 @@ def comparison(page, getRatioValue=False, pageLength=None):
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
     if kb.matchRatio is None:
-        if kb.pageStable and ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
+        if ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
             kb.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
-
-        elif not kb.pageStable:
-            kb.matchRatio = CONSTANT_RATIO
-            logger.debug("setting match ratio for current parameter to default value 0.900")
 
     # If it has been requested to return the ratio and not a comparison
     # response
@@ -98,7 +93,4 @@ def comparison(page, getRatioValue=False, pageLength=None):
         return None
 
     else:
-        if kb.matchRatio == CONSTANT_RATIO:
-            return ratio > kb.matchRatio
-        else:
-            return (ratio - kb.matchRatio) > DIFF_TOLERANCE
+        return (ratio - kb.matchRatio) > DIFF_TOLERANCE
