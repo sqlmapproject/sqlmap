@@ -1014,9 +1014,15 @@ def __setHTTPExtraHeaders():
 
             if header and value:
                 conf.httpHeaders.append((header, value))
+
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
         conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
         conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
+
+        # Invalidating any proxy mechanism
+        # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+        conf.httpHeaders.append(("Cache-Control", "no-cache,no-store"))
+        conf.httpHeaders.append(("Pragma", "no-cache"))
 
 def __defaultHTTPUserAgent():
     """
