@@ -68,17 +68,18 @@ def __setRequestParams():
 
     if conf.data:
         conf.data = conf.data.replace("\n", " ")
-        conf.parameters[PLACE.POST] = conf.data
 
         # Check if POST data is in xml syntax
         if re.match("[\n]*<(\?xml |soap\:|ns).*>", conf.data):
-            conf.paramDict["POSTxml"] = True
-            __paramDict = paramToDict("POSTxml", conf.data)
+            place = PLACE.SOAP
         else:
-            __paramDict = paramToDict(PLACE.POST, conf.data)
+            place = PLACE.POST
+
+        conf.parameters[place] = conf.data
+        __paramDict = paramToDict(place, conf.data)
 
         if __paramDict:
-            conf.paramDict[PLACE.POST] = __paramDict
+            conf.paramDict[place] = __paramDict
             __testableParameters = True
 
         conf.method = HTTPMETHOD.POST

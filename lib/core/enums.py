@@ -38,6 +38,7 @@ class DBMS:
 class PLACE:
     GET     = "GET"
     POST    = "POST"
+    SOAP    = "SOAP"
     URI     = "URI"
     COOKIE  = "Cookie"
     UA      = "User-Agent"

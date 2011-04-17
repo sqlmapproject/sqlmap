@@ -149,9 +149,11 @@ class Connect:
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
 
-                if conf.method == HTTPMETHOD.POST:
-                    if conf.parameters.has_key(PLACE.POST) and not post:
-                        post = conf.parameters[PLACE.POST]
+                if conf.method == HTTPMETHOD.POST and not post:
+                    for place in (PLACE.POST, PLACE.SOAP):
+                        if conf.parameters.has_key(place):
+                            post = conf.parameters[place]
+                            break
 
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
@@ -465,6 +467,9 @@ class Connect:
 
         if PLACE.POST in conf.parameters:
             post = urlencode(conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value)
+
+        if PLACE.SOAP in conf.parameters:
+            post = conf.parameters[PLACE.SOAP] if place != PLACE.SOAP or not value else value
 
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value

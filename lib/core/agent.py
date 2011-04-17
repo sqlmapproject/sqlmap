@@ -98,7 +98,7 @@ class Agent:
 
         newValue = self.cleanupPayload(newValue, origValue)
 
-        if "POSTxml" in conf.paramDict and place == PLACE.POST:
+        if place == PLACE.SOAP:
             root = ET.XML(paramString)
             iterator = root.getiterator(parameter)
 

@@ -25,6 +25,7 @@ from extra.safe2bin.safe2bin import safecharencode
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.enums import PLACE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
@@ -89,7 +90,7 @@ def urldecode(value, encoding=None):
     return result
 
 def urlencode(value, safe="%&=", convall=False, limit=False):
-    if conf.direct or "POSTxml" in conf.paramDict:
+    if conf.direct or PLACE.SOAP in conf.paramDict:
         return value
 
     count = 0

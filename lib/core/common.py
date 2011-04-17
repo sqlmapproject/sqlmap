@@ -441,7 +441,7 @@ def paramToDict(place, parameters=None):
     if conf.parameters.has_key(place) and not parameters:
         parameters = conf.parameters[place]
 
-    if place != "POSTxml":
+    if place != PLACE.SOAP:
         parameters = parameters.replace(", ", ",")
 
         if place == PLACE.COOKIE:
