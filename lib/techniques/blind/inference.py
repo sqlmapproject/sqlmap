@@ -250,9 +250,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 logger.error(errMsg)
 
                                 conf.timeSec += 1
-                                warnMsg = "adjusting time delay to %d seconds" % conf.timeSec
+                                warnMsg  = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                warnMsg += "(due to invalid char)"
                                 logger.warn(warnMsg)
 
+                                if kb.adjustTimeDelay:
+                                    dbgMsg = "turning off auto-adjustment mechanism"
+                                    logger.debug(dbgMsg)
+                                    kb.adjustTimeDelay = False
                                 return getChar(idx, originalTbl, continuousOrder, expand)
                             else:
                                 return decodeIntToUnicode(retVal)
