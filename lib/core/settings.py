@@ -233,6 +233,9 @@ EMPTY_FORM_FIELDS_REGEX = r'(?P<result>[^=]+=(&|\Z))'
 # Regular expression for general IP address matching
 GENERAL_IP_ADDRESS_REGEX = r'\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z'
 
+# Regular expression for soap message recognition
+SOAP_REGEX = r"\A(<\?xml[^>]+>)?\s*<soap.+</soap"
+
 # Reference: http://www.cs.ru.nl/bachelorscripties/2010/Martin_Devillers___0437999___Analyzing_password_strength.pdf
 COMMON_PASSWORD_SUFFIXES = ["1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18"]
 

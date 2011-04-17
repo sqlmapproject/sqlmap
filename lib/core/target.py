@@ -33,6 +33,7 @@ from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
 from lib.core.settings import REFERER_ALIASES
+from lib.core.settings import SOAP_REGEX
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import URI_INJECTION_MARK_CHAR
@@ -70,7 +71,7 @@ def __setRequestParams():
         conf.data = conf.data.replace("\n", " ")
 
         # Check if POST data is in xml syntax
-        if re.match(r"\A\s*<(\?xml|soap)[^>]*>", conf.data, re.I | re.M):
+        if re.match(SOAP_REGEX, conf.data, re.I | re.M):
             place = PLACE.SOAP
         else:
             place = PLACE.POST
