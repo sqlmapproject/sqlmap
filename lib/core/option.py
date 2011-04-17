@@ -167,7 +167,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
             getPostReq = True
 
             if not method or not url:
-                logger.debug("Invalid log data")
+                logger.debug("not a valid WebScarab log data")
                 continue
 
             if method.upper() == "POST":
