@@ -70,7 +70,7 @@ def __setRequestParams():
         conf.data = conf.data.replace("\n", " ")
 
         # Check if POST data is in xml syntax
-        if re.match("[\n]*<(\?xml |soap\:|ns).*>", conf.data):
+        if re.match(r"\A\s*<(\?xml|soap)[^>]*>", conf.data, re.I | re.M):
             place = PLACE.SOAP
         else:
             place = PLACE.POST
