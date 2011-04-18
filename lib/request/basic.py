@@ -123,7 +123,6 @@ def checkCharEncoding(encoding):
     elif encoding == 'null':
         return None
 
-    encoding = "bla"
     # http://www.iana.org/assignments/character-sets
     try:
         codecs.lookup(encoding)
