@@ -320,6 +320,9 @@ Chris Patten <cpatten@sunera.com>
 Zack Payton <zack.payton@executiveinstruments.com>
     for reporting a minor bug
 
+Mark Pilgrim <mark@diveintomark.org>
+    for porting chardet package (Universal Encoding Detector) to Python
+
 Steve Pinkham <steve.pinkham@gmail.com>
     for suggesting a feature
     for providing a new sql injection vector (MSSQL time based)
