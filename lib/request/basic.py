@@ -14,6 +14,7 @@ import re
 import StringIO
 import zlib
 
+from extra.chardet import detect
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getCompiledRegex
@@ -26,7 +27,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
-from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import UNICODE_ENCODING
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
@@ -123,16 +123,33 @@ def checkCharEncoding(encoding):
     elif encoding == 'null':
         return None
 
+    encoding = "bla"
     # http://www.iana.org/assignments/character-sets
     try:
         codecs.lookup(encoding)
     except LookupError:
-        warnMsg  = "unknown web page charset '%s'. " % encoding
-        warnMsg += "Please report by e-mail to %s." % ML
-        logger.warn(warnMsg)
-        encoding = UNICODE_ENCODING
+        if encoding not in kb.warningFlags:
+            kb.warningFlags.add(encoding)
+            warnMsg  = "unknown web page charset '%s'. " % encoding
+            warnMsg += "Please report by e-mail to %s." % ML
+            logger.warn(warnMsg)
+        encoding = None
 
     return encoding
+
+def getHeuristicCharEncoding(page):
+    """
+    Returns page encoding charset detected by usage of heuristics
+    Reference: http://chardet.feedparser.org/docs/
+    """
+    retVal = detect(page)['encoding']
+
+    if retVal not in kb.warningFlags:
+        kb.warningFlags.add(retVal)
+        warnMsg  = "heuristics detected web page charset '%s'." % retVal
+        logger.warn(warnMsg)
+
+    return retVal
 
 def decodePage(page, contentEncoding, contentType):
     """
@@ -159,8 +176,7 @@ def decodePage(page, contentEncoding, contentType):
     elif extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE):
         charset = extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE)
 
-    charset = checkCharEncoding(charset)
-    kb.pageEncoding = charset or DEFAULT_PAGE_ENCODING
+    kb.pageEncoding = checkCharEncoding(charset) or getHeuristicCharEncoding(page)
 
     if contentType and any(map(lambda x: x in contentType.lower(), ('text/txt', 'text/raw', 'text/html', 'text/xml'))):
         # can't do for all responses because we need to support binary files too
