@@ -75,8 +75,8 @@ UNION_STDEV_COEFF = 7
 # length of queue for candidates for time delay adjustment
 TIME_DELAY_CANDIDATES = 3
 
-# default time delay in seconds (decimal places added to distinguish explicit usage of --time-sec)
-TIME_DEFAULT_DELAY = 5.0001
+# default time delay in seconds
+TIME_DEFAULT_DELAY = 5
 
 # HTTP timeout in silent mode
 HTTP_SILENT_TIMEOUT = 3

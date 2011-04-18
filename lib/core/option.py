@@ -1203,8 +1203,9 @@ def __cleanupOptions():
     if conf.data:
         conf.data = urldecode(conf.data)
 
-    if conf.timeSec == TIME_DEFAULT_DELAY:
-        conf.timeSec = int(conf.timeSec)
+    # to distinguish explicit usafe of --time-sec
+    if conf.timeSec is None:
+        conf.timeSec = TIME_DEFAULT_DELAY
         kb.adjustTimeDelay = True
     else:
         kb.adjustTimeDelay = False
