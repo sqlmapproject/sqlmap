@@ -387,7 +387,9 @@ def dictionaryAttack(attack_dict):
 
         for item in attack_info:
             ((user, _), _) = item
-            kb.wordlist.append(normalizeUnicode(user))
+
+            if user:
+                kb.wordlist.append(normalizeUnicode(user))
 
         length = len(kb.wordlist) * len(suffix_list)
 
@@ -403,6 +405,9 @@ def dictionaryAttack(attack_dict):
                         break
 
                     count += 1
+
+                    if not isinstance(word, basestring):
+                        continue
 
                     if suffix:
                         word = word + suffix
@@ -457,6 +462,9 @@ def dictionaryAttack(attack_dict):
                     for word in kb.wordlist:
                         current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
                         count += 1
+
+                        if not isinstance(word, basestring):
+                            continue
 
                         if suffix:
                             word = word + suffix
