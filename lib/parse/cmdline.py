@@ -214,7 +214,7 @@ def cmdLineParser():
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int", default=TIME_DEFAULT_DELAY,
                               help="Seconds to delay the DBMS response "
-                                   "(default 5)")
+                                   "(default %s)" % int(TIME_DEFAULT_DELAY))
 
         techniques.add_option("--union-cols", dest="uCols",
                               help="Range of columns to test for UNION query SQL injection")

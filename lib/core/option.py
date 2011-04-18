@@ -1203,7 +1203,11 @@ def __cleanupOptions():
     if conf.data:
         conf.data = urldecode(conf.data)
 
-    kb.adjustTimeDelay = (conf.timeSec == TIME_DEFAULT_DELAY)
+    if conf.timeSec == TIME_DEFAULT_DELAY:
+        conf.timeSec = int(conf.timeSec)
+        kb.adjustTimeDelay = True
+    else:
+        kb.adjustTimeDelay = False
 
 def __setConfAttributes():
     """
