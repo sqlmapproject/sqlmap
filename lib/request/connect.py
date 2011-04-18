@@ -456,6 +456,11 @@ class Connect:
                 # functions therefore we need to use % as a safe char
                 payload = urlencode(payload, "%", False, True)
                 value = agent.replacePayload(value, payload)
+            elif place == PLACE.SOAP:
+                # payloads in SOAP should have chars > and < replaced
+                # with their HTML encoded counterparts
+                payload = payload.replace('>', '&gt;').replace('<', '&lt;')
+                value = agent.replacePayload(value, payload)
 
             value = agent.removePayloadDelimiters(value)
 
