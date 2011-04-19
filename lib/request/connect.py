@@ -46,6 +46,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import WARN_TIME_STDEV
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
@@ -500,6 +501,12 @@ class Connect:
 
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                     Connect.queryPage(content=True)
+
+                if stdev(kb.responseTimes) > WARN_TIME_STDEV:
+                    warnMsg  = "there are considerable lags in connection "
+                    warnMsg += "response(s). please use as high value for "
+                    warnMsg += "--time-sec option as possible (e.g. 10)"
+                    logger.critical(warnMsg)
 
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
