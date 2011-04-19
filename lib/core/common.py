@@ -604,7 +604,22 @@ def dataToStdout(data, forceOutput=False):
     if not ('threadException' in kb and kb.threadException):
         if forceOutput or not getCurrentThreadData().disableStdOut:
             try:
-                sys.stdout.write(data.encode(sys.stdout.encoding))
+                if IS_WIN:
+                    output = data.encode('ascii', errors="replace")
+                    if output != data and 'dataToStdout' not in kb.warningFlags:
+                        kb.warningFlags.add('dataToStdout')
+                        warnMsg  = "cannot properly display Unicode characters "
+                        warnMsg += "inside Windows OS command prompt "
+                        warnMsg += "(http://bugs.python.org/issue1602). all "
+                        warnMsg += "similar occurances will result in "
+                        warnMsg += "replacement with '?' character. please, find "
+                        warnMsg += "proper character representations inside "
+                        warnMsg += "coresponding output files. "
+                        warnMsg += "p.s. FORMAT C: /U is highly recommended"
+                        logger.critical(warnMsg)
+                    sys.stdout.write(output)
+                else:
+                    sys.stdout.write(data.encode(sys.stdout.encoding))
             except:
                 sys.stdout.write(data.encode(UNICODE_ENCODING))
             finally:
