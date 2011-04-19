@@ -46,9 +46,8 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
-from lib.core.settings import TIME_DEFAULT_DELAY
-from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
+from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
@@ -504,20 +503,12 @@ class Connect:
                     Connect.queryPage(content=True)
 
                 if stdev(kb.responseTimes) > WARN_TIME_STDEV:
-                    warnMsg  = "there is considerable lagging in connection "
-                    warnMsg += "response(s). "
                     kb.adjustTimeDelay = False
 
-                    if conf.timeSec != TIME_DEFAULT_DELAY:
-                        warnMsg += "please use as high value for --time-sec "
-                        warnMsg += "option as possible (e.g. 10)"
-                        logger.critical(warnMsg)
-                    else:
-                        conf.timeSec = 2 * TIME_DEFAULT_DELAY
-
-                        warnMsg += "increasing default value for "
-                        warnMsg += "--time-sec to %d" % conf.timeSec
-                        logger.warn(warnMsg)
+                    warnMsg  = "there is considerable lagging in connection "
+                    warnMsg += "response(s). please use as high value for "
+                    warnMsg += "--time-sec option as possible (e.g. 10)"
+                    logger.critical(warnMsg)
 
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
