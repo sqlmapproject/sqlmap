@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import codecs
 import ctypes
 import inspect
+import logging
 import os
 import random
 import re
@@ -600,23 +601,27 @@ def filePathToString(filePath):
 
     return strRepl
 
+def singleTimeLogMessage(message, level, flag):
+    if flag not in kb.singleLogFlags:
+        kb.singleLogFlags.add(flag)
+        logger.log(level, message)
+
 def dataToStdout(data, forceOutput=False):
     if not ('threadException' in kb and kb.threadException):
         if forceOutput or not getCurrentThreadData().disableStdOut:
             try:
                 if IS_WIN:
                     output = data.encode('ascii', errors="replace")
-                    if output != data and 'dataToStdout' not in kb.warningFlags:
-                        kb.warningFlags.add('dataToStdout')
+                    if output != data:
                         warnMsg  = "cannot properly display Unicode characters "
                         warnMsg += "inside Windows OS command prompt "
                         warnMsg += "(http://bugs.python.org/issue1602). all "
                         warnMsg += "similar occurances will result in "
                         warnMsg += "replacement with '?' character. please, find "
-                        warnMsg += "proper character representations inside "
+                        warnMsg += "proper character representation inside "
                         warnMsg += "coresponding output files. "
                         warnMsg += "p.s. FORMAT C: /U is highly recommended"
-                        logger.critical(warnMsg)
+                        singleTimeLogMessage(warnMsg, logging.WARN, 'dataToStdout')
                     sys.stdout.write(output)
                 else:
                     sys.stdout.write(data.encode(sys.stdout.encoding))

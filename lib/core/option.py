@@ -1320,6 +1320,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.responseTimes   = []
     kb.resumedQueries  = {}
     kb.retriesCount    = 0
+    kb.singleLogFlags  = set()
     kb.skipOthersDbms  = None
     kb.suppressSession = False
     kb.technique       = None
@@ -1328,7 +1329,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadContinue  = True
     kb.threadException = False
     kb.threadData      = {}
-    kb.warningFlags    = set()
 
     kb.misc            = advancedDict()
     kb.misc.delimiter  = randomStr(length=6, lowercase=True)

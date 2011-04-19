@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import codecs
 import gzip
+import logging
 import os
 import re
 import StringIO
@@ -22,6 +23,7 @@ from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
 from lib.core.common import sanitizeAsciiString
+from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -127,11 +129,9 @@ def checkCharEncoding(encoding):
     try:
         codecs.lookup(encoding)
     except LookupError:
-        if encoding not in kb.warningFlags:
-            kb.warningFlags.add(encoding)
-            warnMsg  = "unknown web page charset '%s'. " % encoding
-            warnMsg += "Please report by e-mail to %s." % ML
-            logger.warn(warnMsg)
+        warnMsg  = "unknown web page charset '%s'. " % encoding
+        warnMsg += "Please report by e-mail to %s." % ML
+        singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
 
     return encoding
@@ -143,10 +143,8 @@ def getHeuristicCharEncoding(page):
     """
     retVal = detect(page)['encoding']
 
-    if retVal not in kb.warningFlags:
-        kb.warningFlags.add(retVal)
-        warnMsg  = "heuristics detected web page charset '%s'." % retVal
-        logger.warn(warnMsg)
+    warnMsg  = "heuristics detected web page charset '%s'." % retVal
+    singleTimeLogMessage(warnMsg, logging.WARN, retVal)
 
     return retVal
 
