@@ -804,6 +804,10 @@ def banner():
     %s\n
 """ % (VERSION_STRING, DESCRIPTION, SITE)
 
+    # Reference: http://www.frexx.de/xterm-256-notes/
+    #if not any([IS_WIN, os.getenv('ANSI_COLORS_DISABLED')]):
+    #    ban = "\033[1;34m%s\033[0m" % ban
+
     dataToStdout(ban, forceOutput=True)
 
 def parsePasswordHash(password):
