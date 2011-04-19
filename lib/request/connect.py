@@ -503,8 +503,7 @@ class Connect:
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                     Connect.queryPage(content=True)
 
-                #if stdev(kb.responseTimes) > WARN_TIME_STDEV:
-                if True:
+                if stdev(kb.responseTimes) > WARN_TIME_STDEV:
                     warnMsg  = "there is considerable lagging in connection "
                     warnMsg += "response(s). "
                     kb.adjustTimeDelay = False
