@@ -1203,10 +1203,19 @@ def __cleanupOptions():
     if conf.data:
         conf.data = urldecode(conf.data)
 
-    # to distinguish explicit usafe of --time-sec
+    # to distinguish explicit usage of --time-sec
     if conf.timeSec is None:
-        conf.timeSec = TIME_DEFAULT_DELAY
-        kb.adjustTimeDelay = True
+        if conf.tor or conf.proxy:
+            conf.timeSec = 2 * TIME_DEFAULT_DELAY
+            kb.adjustTimeDelay = False
+
+            warnMsg  = "increasing default value for "
+            warnMsg += " --time-sec to %d because " % conf.timeSec
+            warnMsg += "%s switch used" % ("--tor" if conf.tor else "--proxy")
+            logger.warn(warnMsg)
+        else:
+            conf.timeSec = TIME_DEFAULT_DELAY
+            kb.adjustTimeDelay = True
     else:
         kb.adjustTimeDelay = False
 
@@ -1541,6 +1550,10 @@ def __basicOptionValidation():
 
     if conf.forms and not conf.url:
         errMsg = "switch --forms requires usage of -u (--url) switch"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.tor and conf.ignoreProxy:
+        errMsg = "switch --tor is incompatible with switch --ignore-proxy"
         raise sqlmapSyntaxException, errMsg
 
     if conf.proxy and conf.ignoreProxy:
