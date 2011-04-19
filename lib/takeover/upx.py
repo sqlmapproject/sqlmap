@@ -33,22 +33,23 @@ class UPX:
 
     def __initialize(self, srcFile, dstFile=None):
         if PLATFORM == "mac":
-            self.__upxPath = "%s/upx/macosx/upx" % paths.SQLMAP_CONTRIB_PATH
+            self.__upxTemp = decloakToMkstemp("%s/upx/macosx/upx_" % paths.SQLMAP_CONTRIB_PATH)
 
         elif PLATFORM in ( "ce", "nt" ):
-            self.__upxTempExe = decloakToMkstemp("%s\upx\windows\upx.exe_" % paths.SQLMAP_CONTRIB_PATH, suffix=".exe")
-            self.__upxPath = self.__upxTempExe.name
-            self.__upxTempExe.close() #needed for execution rights
+            self.__upxTemp = decloakToMkstemp("%s\upx\windows\upx.exe_" % paths.SQLMAP_CONTRIB_PATH, suffix=".exe")
 
         elif PLATFORM == "posix":
-            self.__upxPath = "%s/upx/linux/upx" % paths.SQLMAP_CONTRIB_PATH
+            self.__upxTemp = decloakToMkstemp("%s/upx/linux/upx_" % paths.SQLMAP_CONTRIB_PATH)
 
         else:
             warnMsg  = "unsupported platform for the compression tool "
             warnMsg += "(upx), sqlmap will continue anyway"
             logger.warn(warnMsg)
 
-            self.__upxPath = "%s/upx/linux/upx" % paths.SQLMAP_CONTRIB_PATH
+            self.__upxTemp = decloakToMkstemp("%s/upx/linux/upx_" % paths.SQLMAP_CONTRIB_PATH)
+
+        self.__upxPath = self.__upxTemp.name
+        self.__upxTemp.close() #needed for execution rights
 
         self.__upxCmd = "%s -9 -qq %s" % (self.__upxPath, srcFile)
 
@@ -65,8 +66,8 @@ class UPX:
         pollProcess(process)
         upxStdout, upxStderr = process.communicate()
 
-        if hasattr(self, '__upxTempExe'):
-            os.remove(self.__upxTempExe.name)
+        if hasattr(self, '__upxTemp'):
+            os.remove(self.__upxTemp.name)
 
         msg = "failed to compress the file"
 
