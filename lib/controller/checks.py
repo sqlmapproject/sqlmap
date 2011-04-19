@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import logging
 import re
 import socket
 import time
@@ -31,6 +32,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import showStaticWords
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
@@ -201,9 +203,6 @@ def checkSqlInjection(place, parameter, value):
 
             infoMsg = "testing '%s'" % title
             logger.info(infoMsg)
-
-            # Flag used for signaling warning messages regarding unescaping
-            genericWarningFlag = False
 
             # Force back-end DBMS according to the current
             # test value for proper payload unescaping
@@ -387,14 +386,11 @@ def checkSqlInjection(place, parameter, value):
 
                             configUnion(test.request.char, test.request.columns)
 
-                            if not Backend.getIdentifiedDbms() and not genericWarningFlag:
+                            if not Backend.getIdentifiedDbms():
                                 warnMsg = "using unescaped version of the test "
                                 warnMsg += "because of zero knowledge of the "
                                 warnMsg += "back-end DBMS"
-                                logger.warn(warnMsg)
-
-                                # Set the flag preventing bulking of the message for the same test
-                                genericWarningFlag = True
+                                singleTimeLogMessage(warnMsg, logging.WARN, title)
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
