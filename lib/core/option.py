@@ -1205,13 +1205,13 @@ def __cleanupOptions():
 
     # to distinguish explicit usage of --time-sec
     if conf.timeSec is None:
-        if conf.tor or conf.proxy:
+        if conf.tor:
             conf.timeSec = 2 * TIME_DEFAULT_DELAY
             kb.adjustTimeDelay = False
 
             warnMsg  = "increasing default value for "
             warnMsg += " --time-sec to %d because " % conf.timeSec
-            warnMsg += "%s switch used" % ("--tor" if conf.tor else "--proxy")
+            warnMsg += "--tor switch used"
             logger.warn(warnMsg)
         else:
             conf.timeSec = TIME_DEFAULT_DELAY
