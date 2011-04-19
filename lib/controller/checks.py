@@ -812,7 +812,7 @@ def checkConnection(suppressOutput=False):
         logger.info(infoMsg)
 
     try:
-        page, _ = Request.queryPage(content=True)
+        page, _ = Request.queryPage(content=True, noteResponseTime=False)
         kb.originalPage = kb.pageTemplate = page
 
         kb.errorIsNone = False
