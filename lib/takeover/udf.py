@@ -92,7 +92,7 @@ class UDF:
         cmd = unescaper.unescape(cmd)
 
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
-        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last)
+        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False)
         inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
         if output and isinstance(output, (list, tuple)):
