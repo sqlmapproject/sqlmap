@@ -173,7 +173,7 @@ def decodePage(page, contentEncoding, contentType):
 
     metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE))
 
-    if (httpCharset or metaCharset and not all([httpCharset, metaCharset]))\
+    if ((httpCharset or metaCharset) and not all([httpCharset, metaCharset]))\
         or (httpCharset == metaCharset and all([httpCharset, metaCharset])):
         kb.pageEncoding = httpCharset or metaCharset
     else:
