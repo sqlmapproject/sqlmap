@@ -44,6 +44,7 @@ def __oneShotUnionUse(expression, unpack=True):
     global reqCount
 
     check = "(?P<result>%s.*%s)" % (kb.misc.start, kb.misc.stop)
+    trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
 
     # Prepare expression with delimiters
     expression = agent.concatQuery(expression, unpack)
@@ -72,6 +73,15 @@ def __oneShotUnionUse(expression, unpack=True):
 
     if output:
         output = getUnicode(output, kb.pageEncoding)
+    else:
+        trimmed = extractRegexResult(trimcheck, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
+                or extractRegexResult(trimcheck, removeReflectiveValues(listToStrValue(headers.headers \
+                if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
+
+        if trimmed:
+            warnMsg  = "trimmed output output detected: "
+            warnMsg += trimmed
+            logger.warn(warnMsg)
 
     return output
 

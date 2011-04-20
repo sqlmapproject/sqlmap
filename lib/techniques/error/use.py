@@ -52,6 +52,8 @@ def __oneShotErrorUse(expression, field):
 
     while True:
         check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
+        trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
+
         nulledCastedField = agent.nullAndCastField(field)
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
@@ -82,6 +84,18 @@ def __oneShotErrorUse(expression, field):
 
         if output:
             output = getUnicode(output, kb.pageEncoding)
+        else:
+            trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
+                or extractRegexResult(trimcheck, listToStrValue(headers.headers \
+                if headers else None), re.DOTALL | re.IGNORECASE) \
+                or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
+                if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+
+            if trimmed:
+                warnMsg  = "trimmed output output detected: "
+                warnMsg += trimmed
+                logger.warn(warnMsg)
 
         if isinstance(output, basestring):
             output = htmlunescape(output).replace("<br>", "\n")
