@@ -73,7 +73,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             web = True
         else:
             errMsg  = "unable to prompt for an interactive operating "
-            errMsg += "system shell via the back-end DBMS"
+            errMsg += "system shell via the back-end DBMS because "
+            errMsg += "stacked queries SQL injection is not supported"
             raise sqlmapNotVulnerableException(errMsg)
 
         self.initEnv(web=web)
