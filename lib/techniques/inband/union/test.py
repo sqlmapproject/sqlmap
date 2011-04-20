@@ -25,6 +25,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import removeReflectiveValues
 from lib.core.common import stdev
+from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -74,6 +75,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     deviation = stdev(ratios)
 
     if abs(max_ - min_) < MIN_STATISTICAL_RANGE:
+        kb.errorIsNone = popValue()
         return None
 
     lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
@@ -129,6 +131,12 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
             removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
             payload, True) or "")
 
+        unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
+        if unionErrorCase:
+            warnMsg  = "combined UNION/ERROR sql injection case found on column %d. " % (position + 1)
+            warnMsg += "will try to find another column with better characteristics."
+            logger.warn(warnMsg)
+
         if content and phrase in content:
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, conf.uChar, where)
@@ -151,7 +159,8 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 if content and ((phrase in content and phrase2 not in content) or (phrase not in content and phrase2 in content)):
                     vector = (position, count, comment, prefix, suffix, conf.uChar, PAYLOAD.WHERE.NEGATIVE)
 
-            break
+            if not unionErrorCase:
+                break
 
     return validPayload, vector
 
