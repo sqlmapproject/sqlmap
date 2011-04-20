@@ -54,7 +54,7 @@ class Syntax(GenericSyntax):
                 break
 
             firstIndex = index
-            index = expression[firstIndex:].find("))")
+            index = expression[firstIndex:].find(")")
 
             if index == -1:
                 raise sqlmapSyntaxException("Unenclosed ) in '%s'" % expression)
@@ -63,9 +63,9 @@ class Syntax(GenericSyntax):
             old = expression[firstIndex:lastIndex]
             oldUpper = old.upper()
             oldUpper = oldUpper.replace("CHAR(", "").replace(")", "")
-            oldUpper = oldUpper.split("+")
 
-            escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
+            escaped = "'%s'" % chr(int(oldUpper))
             expression = expression.replace(old, escaped)
 
+        expression = expression.replace("'+'", "")
         return expression
