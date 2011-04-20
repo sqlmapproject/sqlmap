@@ -93,7 +93,7 @@ def __oneShotErrorUse(expression, field):
                 threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
             if trimmed:
-                warnMsg  = "trimmed output detected: "
+                warnMsg  = "possible server trimmed output detected (due to it's length): "
                 warnMsg += trimmed
                 logger.warn(warnMsg)
 

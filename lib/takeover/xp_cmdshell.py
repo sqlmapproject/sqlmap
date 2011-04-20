@@ -181,4 +181,6 @@ class xp_cmdshell:
         debugMsg += "output to"
         logger.debug(debugMsg)
 
-        self.createSupportTbl(self.cmdTblName, self.tblField, "TEXT")
+        # TEXT can't be used here because in error technique you get:
+        # "The text, ntext, and image data types cannot be compared or sorted"
+        self.createSupportTbl(self.cmdTblName, self.tblField, "NVARCHAR(4000)")
