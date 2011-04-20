@@ -165,18 +165,23 @@ def decodePage(page, contentEncoding, contentType):
 
         page = data.read()
 
-    charset = None
+    httpCharset, metaCharset = None, None
 
     # http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
     if contentType and (contentType.find('charset=') != -1):
-        charset = contentType.split('charset=')[-1]
-    elif extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE):
-        charset = extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE)
+        httpCharset = checkCharEncoding(contentType.split('charset=')[-1])
 
-    kb.pageEncoding = checkCharEncoding(charset) or getHeuristicCharEncoding(page)
+    metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE))
+
+    if (httpCharset or metaCharset and not all([httpCharset, metaCharset]))\
+        or (httpCharset == metaCharset and all([httpCharset, metaCharset])):
+        kb.pageEncoding = httpCharset or metaCharset
+    else:
+        kb.pageEncoding = None
 
     if contentType and any(map(lambda x: x in contentType.lower(), ('text/txt', 'text/raw', 'text/html', 'text/xml'))):
         # can't do for all responses because we need to support binary files too
+        kb.pageEncoding = kb.pageEncoding or getHeuristicCharEncoding(page)
         page = getUnicode(page, kb.pageEncoding)
 
     return page
