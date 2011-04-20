@@ -120,7 +120,7 @@ class xp_cmdshell:
 
         self.delRemoteFile(tmpFile)
 
-        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, sort=False, firstChar=first, lastChar=last)
+        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, sort=False, firstChar=first, lastChar=last, safeCharEncode=False)
         inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
         if output and isinstance(output, (list, tuple)):
