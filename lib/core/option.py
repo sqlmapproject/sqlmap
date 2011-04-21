@@ -1329,6 +1329,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadContinue  = True
     kb.threadException = False
     kb.threadData      = {}
+    kb.xpCmdshellAvailable = False
 
     kb.misc            = advancedDict()
     kb.misc.delimiter  = randomStr(length=6, lowercase=True)

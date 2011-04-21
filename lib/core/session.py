@@ -154,6 +154,15 @@ def setRemoteTempPath():
     if condition:
         dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(conf.tmpPath)))
 
+def setXpCmdshellAvailability(available):
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("xp_cmdshell availability") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][xp_cmdshell availability][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), str(available).lower()))
+
 def resumeConfKb(expression, url, value):
     if expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
@@ -270,3 +279,8 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
         kb.brute.columns.append((db, table, colName, colType))
+
+    elif expression == "xp_cmdshell availability" and url == conf.url:
+        kb.xpCmdshellAvailable = True if unSafeFormatString(value[:-1]).lower() == "true" else False
+        logMsg = "resuming xp_cmdshell availability"
+        logger.info(logMsg)

@@ -15,6 +15,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.session import setXpCmdshellAvailability
 from lib.core.unescaper import unescaper
 from lib.request import inject
 
@@ -132,52 +133,53 @@ class xp_cmdshell:
         return output
 
     def xpCmdshellInit(self):
-        self.__xpCmdshellAvailable = False
+        if kb.xpCmdshellAvailable is False:
+            infoMsg  = "checking if xp_cmdshell extended procedure is "
+            infoMsg += "available, please wait.."
+            logger.info(infoMsg)
 
-        infoMsg  = "checking if xp_cmdshell extended procedure is "
-        infoMsg += "available, please wait.."
-        logger.info(infoMsg)
+            result = self.__xpCmdshellCheck()
 
-        result = self.__xpCmdshellCheck()
+            if result:
+                logger.info("xp_cmdshell extended procedure is available")
+                kb.xpCmdshellAvailable = True
 
-        if result:
-            logger.info("xp_cmdshell extended procedure is available")
-            self.__xpCmdshellAvailable = True
+            else:
+                message  = "xp_cmdshell extended procedure does not seem to "
+                message += "be available. Do you want sqlmap to try to "
+                message += "re-enable it? [Y/n] "
+                choice   = readInput(message, default="Y")
 
-        else:
-            message  = "xp_cmdshell extended procedure does not seem to "
-            message += "be available. Do you want sqlmap to try to "
-            message += "re-enable it? [Y/n] "
-            choice   = readInput(message, default="Y")
-
-            if not choice or choice in ("y", "Y"):
-                self.__xpCmdshellConfigure(1)
-
-                if self.__xpCmdshellCheck():
-                    logger.info("xp_cmdshell re-enabled successfully")
-                    self.__xpCmdshellAvailable = True
-
-                else:
-                    logger.warn("xp_cmdshell re-enabling failed")
-
-                    logger.info("creating xp_cmdshell with sp_OACreate")
-                    self.__xpCmdshellConfigure(0)
-                    self.__xpCmdshellCreate()
+                if not choice or choice in ("y", "Y"):
+                    self.__xpCmdshellConfigure(1)
 
                     if self.__xpCmdshellCheck():
-                        logger.info("xp_cmdshell created successfully")
-                        self.__xpCmdshellAvailable = True
+                        logger.info("xp_cmdshell re-enabled successfully")
+                        kb.xpCmdshellAvailable = True
 
                     else:
-                        warnMsg  = "xp_cmdshell creation failed, probably "
-                        warnMsg += "because sp_OACreate is disabled"
-                        logger.warn(warnMsg)
+                        logger.warn("xp_cmdshell re-enabling failed")
 
-        if not self.__xpCmdshellAvailable:
-            errMsg = "unable to proceed without xp_cmdshell"
-            raise sqlmapUnsupportedFeatureException, errMsg
+                        logger.info("creating xp_cmdshell with sp_OACreate")
+                        self.__xpCmdshellConfigure(0)
+                        self.__xpCmdshellCreate()
 
-        debugMsg  = "creating a support table to write commands standard "
+                        if self.__xpCmdshellCheck():
+                            logger.info("xp_cmdshell created successfully")
+                            kb.xpCmdshellAvailable = True
+
+                        else:
+                            warnMsg  = "xp_cmdshell creation failed, probably "
+                            warnMsg += "because sp_OACreate is disabled"
+                            logger.warn(warnMsg)
+
+            setXpCmdshellAvailability(kb.xpCmdshellAvailable)
+
+            if not kb.xpCmdshellAvailable:
+                errMsg = "unable to proceed without xp_cmdshell"
+                raise sqlmapUnsupportedFeatureException, errMsg
+
+        debugMsg = "creating a support table to write commands standard "
         debugMsg += "output to"
         logger.debug(debugMsg)
 
