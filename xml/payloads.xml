@@ -568,7 +568,7 @@ Formats:
             <comment>#</comment>
         </request>
         <response>
-            <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
+            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
