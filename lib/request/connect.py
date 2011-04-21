@@ -506,8 +506,8 @@ class Connect:
                     kb.adjustTimeDelay = False
 
                     warnMsg  = "there is considerable lagging in connection "
-                    warnMsg += "response(s). please use as high value for "
-                    warnMsg += "--time-sec option as possible (e.g. 10)"
+                    warnMsg += "response(s). Please use as high value for "
+                    warnMsg += "--time-sec option as possible (e.g. 10 or more)"
                     logger.critical(warnMsg)
 
         if conf.safUrl and conf.saFreq > 0:

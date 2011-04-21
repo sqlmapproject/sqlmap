@@ -1211,7 +1211,7 @@ def __cleanupOptions():
 
             warnMsg  = "increasing default value for "
             warnMsg += "--time-sec to %d because " % conf.timeSec
-            warnMsg += "--tor switch used"
+            warnMsg += "--tor switch was provided"
             logger.warn(warnMsg)
         else:
             conf.timeSec = TIME_DEFAULT_DELAY
