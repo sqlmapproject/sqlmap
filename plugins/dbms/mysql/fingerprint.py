@@ -281,9 +281,9 @@ class Fingerprint(GenericFingerprint):
         result = inject.checkBooleanExpression("'W'=UPPER(MID(@@version_compile_os,1,1))")
 
         if result:
-            kb.os = "Linux"
-        elif not result:
             kb.os = "Windows"
+        elif not result:
+            kb.os = "Linux"
 
         if kb.os:
             infoMsg = "the back-end DBMS operating system is %s" % kb.os
