@@ -198,9 +198,11 @@ def start():
             parseTargetUrl()
 
             testSqlInj = False
+
             if PLACE.GET in conf.parameters:
                 for parameter in re.findall(r"([^=]+)=([^&]+&?|\Z)", conf.parameters[PLACE.GET]):
                     paramKey = (conf.hostname, conf.path, PLACE.GET, parameter[0])
+
                     if paramKey not in kb.testedParams:
                         testSqlInj = True
                         break
@@ -218,6 +220,7 @@ def start():
 
             if conf.multipleTargets:
                 hostCount += 1
+
                 if conf.forms:
                     message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
                 else:
@@ -254,7 +257,7 @@ def start():
 
                         # we need to reinitialize environment as
                         # we are expecting changes in testing data
-                        initTargetEnv()
+                        #initTargetEnv()
                         parseTargetUrl()
 
                     elif test[0] in ("n", "N"):

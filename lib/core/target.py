@@ -92,13 +92,18 @@ def __setRequestParams():
         conf.parameters[PLACE.URI] = conf.url
         conf.paramDict[PLACE.URI] = {}
         parts = conf.url.split(URI_INJECTION_MARK_CHAR)
+
         for i in range(len(parts)-1):
             result = str()
+
             for j in range(len(parts)):
                 result += parts[j]
+
                 if i == j:
                     result += URI_INJECTION_MARK_CHAR
+
             conf.paramDict[PLACE.URI]["#%d%s" % (i+1, URI_INJECTION_MARK_CHAR)] = result
+
         conf.url = conf.url.replace(URI_INJECTION_MARK_CHAR, str())
         __testableParameters = True
 
