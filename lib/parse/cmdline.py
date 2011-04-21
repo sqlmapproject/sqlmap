@@ -26,8 +26,8 @@ def cmdLineParser():
     This function parses the command line parameters and arguments
     """
 
-    usage = "%s%s [options]" % ("python " if not IS_WIN else "",\
-        "\"%s\"" % sys.argv[0] if " " in sys.argv[0] else sys.argv[0])
+    usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
+            "\"%s\"" % sys.argv[0] if " " in sys.argv[0] else sys.argv[0])
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:

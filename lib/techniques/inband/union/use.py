@@ -79,7 +79,7 @@ def __oneShotUnionUse(expression, unpack=True):
                 if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
 
         if trimmed:
-            warnMsg  = "possible server trimmed output detected (due to it's length): "
+            warnMsg = "possible server trimmed output detected (due to its length): "
             warnMsg += trimmed
             logger.warn(warnMsg)
 
