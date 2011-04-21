@@ -432,11 +432,13 @@ def start():
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if not conf.realTest:
-                    errMsg = "all parameters are not injectable, try to "
-                    errMsg += "increase --level/--risk values to perform "
-                    errMsg += "more tests."
+                    errMsg = "all parameters are not injectable."
 
-                    if isinstance(conf.tech, list) and len(conf.tech) > 0:
+                    if conf.level < 5 or conf.risk < 3:
+                        errMsg += " Try to increase --level/--risk values "
+                        errMsg += "to perform more tests."
+
+                    if isinstance(conf.tech, list) and len(conf.tech) < 5:
                         errMsg += " Rerun without providing the --technique switch."
 
                     if not conf.textOnly and kb.originalPage:
