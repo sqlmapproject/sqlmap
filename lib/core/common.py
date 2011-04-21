@@ -610,6 +610,7 @@ def dataToStdout(data, forceOutput=False):
     if not ('threadException' in kb and kb.threadException):
         if forceOutput or not getCurrentThreadData().disableStdOut:
             try:
+                # Reference: http://bugs.python.org/issue1602
                 if IS_WIN:
                     output = data.encode('ascii', errors="replace")
                     if output != data:
