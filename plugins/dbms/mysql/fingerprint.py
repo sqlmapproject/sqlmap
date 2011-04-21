@@ -278,7 +278,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "fingerprinting the back-end DBMS operating system"
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("'/'=(SELECT MID(@@datadir, 1, 1))")
+        result = inject.checkBooleanExpression("'W'=UPPER(MID(@@version_compile_os,1,1))")
 
         if result:
             kb.os = "Linux"
