@@ -482,7 +482,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         if isinstance(value, basestring):
             value = value.strip().lower()
             if value in ("true", "false"):
-                value = bool(value)
+                value = value == "true"
             elif value in ("1", "-1"):
                 value = True
             elif value == "0":
