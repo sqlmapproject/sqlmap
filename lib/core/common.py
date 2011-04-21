@@ -622,7 +622,6 @@ def dataToStdout(data, forceOutput=False):
                         warnMsg += "replacement with '?' character. Please, find "
                         warnMsg += "proper character representation inside "
                         warnMsg += "coresponding output files. "
-                        warnMsg += "PS: FORMAT C: /U is highly recommended"
                         singleTimeLogMessage(warnMsg, logging.WARN, 'dataToStdout')
 
                     sys.stdout.write(output)
