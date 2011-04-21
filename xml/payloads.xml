@@ -503,7 +503,7 @@ Formats:
         </response>
     </test>
 
-   <test>
+    <test>
         <title>OR boolean-based blind - WHERE or HAVING clause</title>
         <stype>1</stype>
         <level>2</level>
