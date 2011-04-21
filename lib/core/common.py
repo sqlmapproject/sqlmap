@@ -613,16 +613,18 @@ def dataToStdout(data, forceOutput=False):
                 # Reference: http://bugs.python.org/issue1602
                 if IS_WIN:
                     output = data.encode('ascii', errors="replace")
+
                     if output != data:
                         warnMsg  = "cannot properly display Unicode characters "
                         warnMsg += "inside Windows OS command prompt "
-                        warnMsg += "(http://bugs.python.org/issue1602). all "
+                        warnMsg += "(http://bugs.python.org/issue1602). All "
                         warnMsg += "similar occurances will result in "
-                        warnMsg += "replacement with '?' character. please, find "
+                        warnMsg += "replacement with '?' character. Please, find "
                         warnMsg += "proper character representation inside "
                         warnMsg += "coresponding output files. "
-                        warnMsg += "p.s. FORMAT C: /U is highly recommended"
+                        warnMsg += "PS: FORMAT C: /U is highly recommended"
                         singleTimeLogMessage(warnMsg, logging.WARN, 'dataToStdout')
+
                     sys.stdout.write(output)
                 else:
                     sys.stdout.write(data.encode(sys.stdout.encoding))
