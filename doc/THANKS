@@ -30,6 +30,9 @@ Daniele Bellucci <daniele.bellucci@gmail.com>
     for starting sqlmap project and developing it between July and August
     2006
 
+Anthony Boynes <aboynes@gmail.com>
+    for reporting a bug
+
 Velky Brat <velkybrat@gmail.com>
     for suggesting a minor enhancement to the bisection algorithm
 

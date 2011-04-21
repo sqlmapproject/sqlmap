@@ -322,6 +322,7 @@ def start():
 
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
                 and (kb.injection.place is None or kb.injection.parameter is None):
+
                 if not conf.string and not conf.regexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
@@ -359,6 +360,7 @@ def start():
                         continue
 
                     paramDict = conf.paramDict[place]
+
                     for parameter, value in paramDict.items():
                         if not proceed:
                             break
@@ -396,8 +398,9 @@ def start():
 
                         if testSqlInj:
                             check = heuristicCheckSqlInjection(place, parameter)
-                            if not check and conf.realTest and\
-                              not simpletonCheckSqlInjection(place, parameter, value):
+
+                            if not check and conf.realTest and \
+                               not simpletonCheckSqlInjection(place, parameter, value):
                                 continue
 
                             logMsg = "testing sql injection on %s " % place
