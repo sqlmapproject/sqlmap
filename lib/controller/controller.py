@@ -441,7 +441,20 @@ def start():
                         errMsg += " Give it a go with the --text-only switch "
                         errMsg += "if the target page has a low percentage of "
                         errMsg += "textual content (~%.2f%% of " % percent
-                        errMsg += "page content is text)"
+                        errMsg += "page content is text)."
+
+                    if not conf.string and not conf.regexp:
+                        errMsg += " Rerun by providing either a valid --string "
+                        errMsg += "or a valid --regexp, refer to the user's "
+                        errMsg += "manual for details"
+                    elif conf.string:
+                        errMsg += " Rerun by providing a valid --string, perhaps "
+                        errMsg += "the string that you have choosen does not match "
+                        errMsg += "only on True responses"
+                    elif conf.regexp:
+                        errMsg += " Rerun by providing a valid --regexp, perhaps "
+                        errMsg += "the regular expression that you have choosen "
+                        errMsg += "does not match only on True responses"
 
                     raise sqlmapNotVulnerableException, errMsg
                 else:
