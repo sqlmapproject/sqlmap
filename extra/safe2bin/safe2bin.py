@@ -60,7 +60,7 @@ def safechardecode(value):
         while True:
             match = regex.search(retVal)
             if match:
-                retVal = retVal.replace(match.group("result"), binascii.unhexlify(match.group("result").lstrip('\\x')))
+                retVal = retVal.replace(match.group("result"), unichr(ord(binascii.unhexlify(match.group("result").lstrip('\\x')))))
             else:
                 break
 
