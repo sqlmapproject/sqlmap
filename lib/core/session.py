@@ -233,7 +233,7 @@ def resumeConfKb(expression, url, value):
             else:
                 conf.os = os
 
-    elif expression == "Remote temp path" and url == conf.url:
+    elif expression == "Remote temp path" and url == conf.url and conf.tmpPath is None:
         conf.tmpPath = unSafeFormatString(value[:-1])
 
         logMsg = "resuming remote absolute path of temporary "
