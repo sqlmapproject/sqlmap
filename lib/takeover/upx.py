@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 
 import os
+import stat
 import time
 
 from subprocess import PIPE
@@ -19,6 +20,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import decloakToMkstemp
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.subprocessng import pollProcess
 
@@ -50,6 +52,9 @@ class UPX:
 
         self.__upxPath = self.__upxTemp.name
         self.__upxTemp.close() #needed for execution rights
+
+        if not IS_WIN:
+            os.chmod(self.__upxPath, stat.S_IXUSR)
 
         self.__upxCmd = "%s -9 -qq %s" % (self.__upxPath, srcFile)
 

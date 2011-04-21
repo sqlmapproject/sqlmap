@@ -1410,7 +1410,11 @@ def decloakToNamedTemporaryFile(filepath, name=None):
     return retVal
 
 def decloakToMkstemp(filepath, **kwargs):
-    name = mkstemp(**kwargs)[1]
+    handle, name = mkstemp(**kwargs)
+
+    fptr = os.fdopen(handle)
+    fptr.close() # close low level handle (causing problems latter)
+
     retVal = open(name, 'w+b')
 
     retVal.write(decloak(filepath))
