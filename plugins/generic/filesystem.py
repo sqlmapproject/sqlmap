@@ -294,7 +294,8 @@ class Filesystem:
                     else:
                         chunk = ""
 
-                newFileContent += chunk
+                if chunk:
+                    newFileContent += chunk
 
             fileContent = newFileContent
 
