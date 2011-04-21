@@ -143,7 +143,7 @@ def getHeuristicCharEncoding(page):
     """
     retVal = detect(page)['encoding']
 
-    infoMsg  = "heuristics detected web page charset '%s'." % retVal
+    infoMsg  = "heuristics detected web page charset '%s'" % retVal
     singleTimeLogMessage(infoMsg, logging.INFO, retVal)
 
     return retVal
