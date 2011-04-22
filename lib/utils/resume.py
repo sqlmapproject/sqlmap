@@ -102,8 +102,8 @@ def resume(expression, payload):
             return None
 
         condition = (
-                      kb.resumedQueries and conf.url in kb.resumedQueries.keys()
-                      and expression in kb.resumedQueries[conf.url].keys()
+                      kb.resumedQueries and conf.url in kb.resumedQueries
+                      and expression in kb.resumedQueries[conf.url]
                     )
 
         if not condition:
