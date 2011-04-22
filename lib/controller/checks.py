@@ -59,6 +59,7 @@ from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
+from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
 from lib.techniques.inband.union.test import unionTest
 from lib.techniques.inband.union.use import configUnion
@@ -485,9 +486,49 @@ def checkSqlInjection(place, parameter, value):
 
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:
+        injection = checkFalsePositives(injection)
         return injection
     else:
         return None
+
+def checkFalsePositives(injection):
+    """
+    Checks for false positives
+    """
+
+    retVal = injection
+
+    if len(injection.data) == 1 and any(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED])):
+        pushValue(kb.injection)
+
+        infoMsg = "testing if an injection point on %s parameter " % injection.place
+        infoMsg += "'%s' is a false positive" % injection.parameter
+        logger.info(infoMsg)
+
+        kb.injection = injection
+        randInt1, randInt2 = int(randomInt(2)) + 1, int(randomInt(2)) + 1
+
+        # just in case (also, they have to be different than 0 because of the last test)
+        while randInt1 == randInt2:
+            randInt2 = int(randomInt(2)) + 1
+
+        # simple arithmetic operations like in Turing tests
+        if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
+            retVal = None
+        elif checkBooleanExpression("%d=%d" % (randInt1, randInt2)):
+            retVal = None
+        elif not checkBooleanExpression("%d=(%d-%d)" % (abs(randInt1 - randInt2), max(randInt1, randInt2), min(randInt1, randInt2))):
+            retVal = None
+        elif checkBooleanExpression("(%d+%d)=(%d-%d)" % (randInt1, randInt2, randInt1, randInt2)):
+            retVal = None
+
+        if retVal is None:
+            warnMsg = "false positive injection point detected"
+            logger.warn(warnMsg)
+
+        kb.injection = popValue()
+
+    return retVal
 
 def heuristicCheckSqlInjection(place, parameter):
     if kb.nullConnection:
