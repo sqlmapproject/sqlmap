@@ -255,9 +255,6 @@ def start():
                                 test = __randomFillBlankFields(test)
                                 conf.url = "%s?%s" % (firstPart, test)
 
-                        # we need to reinitialize environment as
-                        # we are expecting changes in testing data
-                        #initTargetEnv()
                         parseTargetUrl()
 
                     elif test[0] in ("n", "N"):
