@@ -14,6 +14,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
+from lib.core.common import getCompiledRegex
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
 from lib.core.common import replaceNewlineTabs
@@ -119,7 +120,7 @@ def resume(expression, payload):
             resumedValue = resumedValue[:-1]
 
             infoMsg  = "read from file '%s': " % conf.sessionFile
-            logValue = re.findall("%s(.*?)%s" % (DUMP_START_MARKER, DUMP_STOP_MARKER), resumedValue, re.S)
+            logValue = getCompiledRegex("%s(.*?)%s" % (DUMP_START_MARKER, DUMP_STOP_MARKER), re.S).findall(resumedValue)
 
             if logValue:
                 if kb.technique == PAYLOAD.TECHNIQUE.UNION:
@@ -150,7 +151,7 @@ def resume(expression, payload):
             return None
 
         substringQuery = queries[Backend.getIdentifiedDbms()].substring.query
-        select = re.search("\ASELECT ", expression, re.I)
+        select = getCompiledRegex("\ASELECT ", re.I).search(expression)
 
         _, length, regExpr = queryOutputLength(expression, payload)
 
