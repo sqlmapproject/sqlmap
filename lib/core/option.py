@@ -1259,76 +1259,77 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     debugMsg = "initializing the knowledge base"
     logger.debug(debugMsg)
 
-    kb.absFilePaths    = set()
-    kb.adjustTimeDelay = False
-    kb.authHeader      = None
-    kb.bannerFp        = advancedDict()
+    kb.absFilePaths        = set()
+    kb.adjustTimeDelay     = False
+    kb.authHeader          = None
+    kb.bannerFp            = advancedDict()
 
-    kb.brute           = advancedDict({'tables':[], 'columns':[]})
-    kb.bruteMode       = False
+    kb.brute               = advancedDict({'tables':[], 'columns':[]})
+    kb.bruteMode           = False
 
-    kb.cache           = advancedDict()
-    kb.cache.content   = {}
-    kb.cache.regex     = {}
-    kb.cache.stdev     = {}
+    kb.cache               = advancedDict()
+    kb.cache.content       = {}
+    kb.cache.regex         = {}
+    kb.cache.stdev         = {}
 
-    kb.commonOutputs   = None
+    kb.commonOutputs       = None
 
-    kb.data            = advancedDict()
+    kb.data                = advancedDict()
 
     # Active back-end DBMS fingerprint
-    kb.dbms            = None
-    kb.dbmsVersion     = [ UNKNOWN_DBMS_VERSION ]
+    kb.dbms                = None
+    kb.dbmsVersion         = [ UNKNOWN_DBMS_VERSION ]
 
-    kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]
-    kb.dep             = None
-    kb.docRoot         = None
-    kb.dynamicMarkings = []
-    kb.endDetection    = False
-    kb.httpErrorCodes  = {}
-    kb.errorIsNone     = True
-    kb.formNames       = []
-    kb.headersCount    = 0
-    kb.headersFp       = {}
-    kb.hintValue       = None
-    kb.htmlFp          = []
-    kb.injection       = injectionDict()
-    kb.injections      = []
+    kb.delayCandidates     = TIME_DELAY_CANDIDATES * [0]
+    kb.dep                 = None
+    kb.docRoot             = None
+    kb.dynamicMarkings     = []
+    kb.endDetection        = False
+    kb.httpErrorCodes      = {}
+    kb.errorIsNone         = True
+    kb.formNames           = []
+    kb.headersCount        = 0
+    kb.headersFp           = {}
+    kb.hintValue           = None
+    kb.htmlFp              = []
+    kb.injection           = injectionDict()
+    kb.injections          = []
 
-    kb.locks           = advancedDict()
-    kb.locks.cacheLock = threading.Lock()
-    kb.locks.logLock   = threading.Lock()
+    kb.locks               = advancedDict()
+    kb.locks.cacheLock     = threading.Lock()
+    kb.locks.logLock       = threading.Lock()
 
-    kb.matchRatio      = None
-    kb.nullConnection  = None
-    kb.pageTemplate    = None
-    kb.pageTemplates   = dict()
-    kb.originalPage    = None
+    kb.matchRatio          = None
+    kb.nullConnection      = None
+    kb.pageTemplate        = None
+    kb.pageTemplates       = dict()
+    kb.originalPage        = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing
-    kb.os              = None
-    kb.osVersion       = None
-    kb.osSP            = None
+    kb.os                  = None
+    kb.osVersion           = None
+    kb.osSP                = None
 
-    kb.pageEncoding    = DEFAULT_PAGE_ENCODING
-    kb.pageStable      = None
-    kb.partRun         = None
-    kb.proxyAuthHeader = None
-    kb.queryCounter    = 0
-    kb.redirectSetCookie = None
-    kb.responseTimes   = []
-    kb.resumedQueries  = {}
-    kb.retriesCount    = 0
-    kb.singleLogFlags  = set()
-    kb.skipOthersDbms  = None
-    kb.suppressSession = False
-    kb.technique       = None
-    kb.testMode        = False
-    kb.testQueryCount  = 0
-    kb.threadContinue  = True
-    kb.threadException = False
-    kb.threadData      = {}
+    kb.pageEncoding        = DEFAULT_PAGE_ENCODING
+    kb.pageStable          = None
+    kb.partRun             = None
+    kb.proxyAuthHeader     = None
+    kb.queryCounter        = 0
+    kb.redirectSetCookie   = None
+    kb.responseTimes       = []
+    kb.resumedQueries      = {}
+    kb.retriesCount        = 0
+    kb.singleLogFlags      = set()
+    kb.skipOthersDbms      = None
+    kb.suppressSession     = False
+    kb.suppressResumeInfo  = False
+    kb.technique           = None
+    kb.testMode            = False
+    kb.testQueryCount      = 0
+    kb.threadContinue      = True
+    kb.threadException     = False
+    kb.threadData          = {}
     kb.xpCmdshellAvailable = False
 
     kb.misc            = advancedDict()

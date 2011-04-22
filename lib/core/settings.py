@@ -310,3 +310,6 @@ MAX_INT = sys.maxint
 
 # Parameters to be ignored in detection phase (upper case)
 IGNORE_PARAMETERS = ("__VIEWSTATE", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
+
+# Turn off resume console info to avoid potential slowdowns
+TURN_OFF_RESUME_INFO_LIMIT = 20

@@ -135,7 +135,8 @@ def resume(expression, payload):
             else:
                 infoMsg += logValue
 
-            dataToStdout("[%s] [INFO] %s\n" % (time.strftime("%X"), infoMsg))
+            if not kb.suppressResumeInfo:
+                dataToStdout("[%s] [INFO] %s\n" % (time.strftime("%X"), infoMsg))
 
             return resumedValue
 

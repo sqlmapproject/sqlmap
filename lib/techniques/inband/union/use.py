@@ -34,6 +34,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
+from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -246,6 +247,12 @@ def unionUse(expression, unpack=True, dump=False):
                     logger.info(infoMsg)
 
             try:
+                if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
+                    kb.suppressResumeInfo = True
+                    infoMsg  = "suppressing resume console info because of "
+                    infoMsg += "large number of rows (possible slowdown)"
+                    logger.info(infoMsg)
+
                 for num in xrange(startLimit, stopLimit):
                     if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                         field = expressionFieldsList[0]
@@ -283,6 +290,9 @@ def unionUse(expression, unpack=True, dump=False):
                 errMsg += "will display partial output"
                 errMsg += "'%s'" % e
                 logger.critical(errMsg)
+
+            finally:
+                kb.suppressResumeInfo = False
 
     if not value:
         value = __oneShotUnionUse(expression, unpack)
