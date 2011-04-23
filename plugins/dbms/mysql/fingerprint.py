@@ -18,6 +18,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import PLACE
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
@@ -272,7 +273,7 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def checkDbmsOs(self, detailed=False):
-        if kb.os:
+        if Backend.getOs():
             return
 
         infoMsg = "fingerprinting the back-end DBMS operating system"
@@ -281,12 +282,12 @@ class Fingerprint(GenericFingerprint):
         result = inject.checkBooleanExpression("'W'=UPPER(MID(@@version_compile_os,1,1))")
 
         if result:
-            kb.os = "Windows"
+            Backend.setOs(OS.WINDOWS)
         elif not result:
-            kb.os = "Linux"
+            Backend.setOs(OS.LINUX)
 
-        if kb.os:
-            infoMsg = "the back-end DBMS operating system is %s" % kb.os
+        if Backend.getOs():
+            infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
             logger.info(infoMsg)
         else:
             self.userChooseDbmsOs()

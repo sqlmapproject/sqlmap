@@ -21,6 +21,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -37,13 +38,13 @@ class Miscellaneous:
 
     def getRemoteTempPath(self):
         if not conf.tmpPath:
-            if kb.os == "Windows":
+            if Backend.isOs(OS.WINDOWS):
                 conf.tmpPath = "C:/WINDOWS/Temp"
             else:
                 conf.tmpPath = "/tmp"
 
         if getCompiledRegex("(?i)\A[\w]:[\/\\\\]+").search(conf.tmpPath):
-            kb.os = "Windows"
+            Backend.setOs(OS.WINDOWS)
 
         conf.tmpPath = normalizePath(conf.tmpPath)
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
@@ -80,7 +81,7 @@ class Miscellaneous:
     def delRemoteFile(self, tempFile):
         self.checkDbmsOs()
 
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             tempFile = posixToNtSlashes(tempFile)
             cmd = "del /F /Q %s" % tempFile
         else:
@@ -100,10 +101,10 @@ class Miscellaneous:
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             return
 
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             libtype = "dynamic-link library"
 
-        elif kb.os == "Linux":
+        elif Backend.isOs(OS.LINUX):
             libtype = "shared object"
 
         else:

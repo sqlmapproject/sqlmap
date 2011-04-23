@@ -35,6 +35,10 @@ class DBMS:
     SQLITE   = "SQLite"
     SYBASE   = "Sybase"
 
+class OS:
+    LINUX   = "Linux"
+    WINDOWS = "Windows"
+
 class PLACE:
     GET     = "GET"
     POST    = "POST"

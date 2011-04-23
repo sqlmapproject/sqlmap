@@ -11,6 +11,7 @@ from lib.core.common import Backend
 from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import OS
 from lib.core.exception import sqlmapUndefinedMethod
 
 class Fingerprint:
@@ -50,10 +51,10 @@ class Fingerprint:
             os = readInput(msg, default="W")
 
             if os[0].lower() == "w":
-                kb.os = "Windows"
+                Backend.setOs(OS.WINDOWS)
                 break
             elif os[0].lower() == "l":
-                kb.os = "Linux"
+                Backend.setOs(OS.LINUX)
                 break
             else:
                 warnMsg = "invalid value"

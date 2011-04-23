@@ -18,6 +18,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PGSQL_SYSTEM_DBS
@@ -148,7 +149,7 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def checkDbmsOs(self, detailed=False):
-        if kb.os:
+        if Backend.getOs():
             return
 
         infoMsg = "fingerprinting the back-end DBMS operating system"
@@ -166,14 +167,14 @@ class Fingerprint(GenericFingerprint):
             query += "LIKE '%" + osPattern + "%')>0"
 
             if inject.checkBooleanExpression(query):
-                kb.os = "Windows"
+                Backend.setOs(OS.WINDOWS)
 
                 break
 
-        if kb.os is None:
-            kb.os = "Linux"
+        if Backend.getOs() is None:
+            Backend.setOs(OS.LINUX)
 
-        infoMsg = "the back-end DBMS operating system is %s" % kb.os
+        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
         logger.info(infoMsg)
 
         self.cleanup(onlyFileTbl=True)

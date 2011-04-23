@@ -42,7 +42,6 @@ from extra.cloak.cloak import decloak
 from extra.magic import magic
 from extra.odict.odict import OrderedDict
 from lib.core.data import conf
-from lib.core.data import dbmsDict
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -52,6 +51,7 @@ from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
+from lib.core.enums import OS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import SORTORDER
@@ -64,6 +64,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import DBMS_DICT
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -93,6 +94,7 @@ from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import SENSITIVE_DATA_REGEX
+from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import URI_QUESTION_MARKER
@@ -305,7 +307,7 @@ class Backend:
             return None
 
         # Little precaution, in theory this condition should always be false
-        elif kb.os is not None and kb.os != os:
+        elif kb.os is not None and isinstance(os, basestring) and kb.os.lower() != os.lower():
             msg = "sqlmap previously fingerprinted back-end DBMS "
             msg += "operating system %s. However now it has " % kb.os
             msg += "been fingerprinted to be %s. " % os
@@ -318,14 +320,14 @@ class Backend:
                 if inp == kb.os:
                     break
                 elif inp == os:
-                    kb.os = inp
+                    kb.os = inp.capitalize()
                     break
                 else:
                     warnMsg = "invalid value"
                     logger.warn(warnMsg)
 
-        elif kb.os is None:
-            kb.os = os
+        elif kb.os is None and isinstance(os, basestring):
+            kb.os = os.capitalize()
 
         return kb.os
 
@@ -419,7 +421,7 @@ class Backend:
 
     @staticmethod
     def isOs(os):
-        return Backend.getOs() is not None and Backend.getOs().lower() == kb.os.lower()
+        return Backend.getOs() is not None and Backend.getOs().lower() == os.lower()
 
 def paramToDict(place, parameters=None):
     """
@@ -506,7 +508,7 @@ def getDocRoot():
     docRoot = None
     pagePath = directoryPath(conf.path)
 
-    if kb.os == "Windows":
+    if Backend.isOs(OS.WINDOWS):
         defaultDocRoot = ["C:/xampp/htdocs/", "C:/Inetpub/wwwroot/"]
     else:
         defaultDocRoot = ["/var/www/"]
@@ -954,7 +956,7 @@ def parseTargetDirect():
         errMsg += "or 'access://DATABASE_FILEPATH'"
         raise sqlmapSyntaxException, errMsg
 
-    for dbmsName, data in dbmsDict.items():
+    for dbmsName, data in DBMS_DICT.items():
         if conf.dbms in data[0]:
             try:
                 if dbmsName in (DBMS.ACCESS, DBMS.SQLITE, DBMS.FIREBIRD):
@@ -2064,7 +2066,7 @@ def aliasToDbmsEnum(dbms):
     if dbms is None:
         return None
 
-    for key, item in dbmsDict.items():
+    for key, item in DBMS_DICT.items():
         if dbms.lower() in item[0]:
             retVal = key
             break

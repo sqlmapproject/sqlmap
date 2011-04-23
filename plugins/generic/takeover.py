@@ -17,6 +17,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapMissingMandatoryOptionException
@@ -108,7 +109,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 warnMsg = "invalid value, valid values are 1 and 2"
                 logger.warn(warnMsg)
 
-        if tunnel == 2 and kb.os != "Windows":
+        if tunnel == 2 and Backend.isOs(OS.WINDOWS):
                 errMsg = "icmpsh slave is only supported on Windows at "
                 errMsg += "the moment. The back-end database server is "
                 errMsg += "not. sqlmap will fallback to TCP (Metasploit)"
@@ -189,13 +190,13 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     self.createMsfPayloadStager()
                     self.uploadMsfPayloadStager()
 
-                if kb.os == "Windows" and conf.privEsc:
+                if Backend.isOs(OS.WINDOWS) and conf.privEsc:
                     if Backend.getIdentifiedDbms() == DBMS.MYSQL:
                         debugMsg  = "by default MySQL on Windows runs as SYSTEM "
                         debugMsg += "user, no need to privilege escalate"
                         logger.debug(debugMsg)
 
-                elif kb.os != "Windows" and conf.privEsc:
+                elif not Backend.isOs(OS.WINDOWS) and conf.privEsc:
                     # Unset --priv-esc if the back-end DBMS underlying operating
                     # system is not Windows
                     conf.privEsc = False
@@ -217,7 +218,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.initEnv(web=web)
 
             if self.webBackdoorUrl:
-                if kb.os != "Windows" and conf.privEsc:
+                if not Backend.isOs(OS.WINDOWS) and conf.privEsc:
                     # Unset --priv-esc if the back-end DBMS underlying operating
                     # system is not Windows
                     conf.privEsc = False
@@ -250,7 +251,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
     def osSmb(self):
         self.checkDbmsOs()
 
-        if kb.os != "Windows":
+        if not Backend.isOs(OS.WINDOWS):
             errMsg  = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows: it is not possible to perform the SMB "
             errMsg += "relay attack"
@@ -329,7 +330,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         self.checkDbmsOs()
 
-        if kb.os != "Windows":
+        if not Backend.isOs(OS.WINDOWS):
             errMsg  = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows"
             raise sqlmapUnsupportedDBMSException(errMsg)

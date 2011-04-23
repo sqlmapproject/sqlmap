@@ -22,6 +22,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import injectionDict
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.settings import METADB_SUFFIX
@@ -123,8 +124,8 @@ def setOs():
         return
 
     if "type" in kb.bannerFp:
-        kb.os = Format.humanize(kb.bannerFp["type"])
-        infoMsg = "the back-end DBMS operating system is %s" % kb.os
+        Backend.setOs(Format.humanize(kb.bannerFp["type"]))
+        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
 
     if "distrib" in kb.bannerFp:
         kb.osVersion = Format.humanize(kb.bannerFp["distrib"])
@@ -133,17 +134,17 @@ def setOs():
     if "sp" in kb.bannerFp:
         kb.osSP = int(Format.humanize(kb.bannerFp["sp"]).replace("Service Pack ", ""))
 
-    elif "sp" not in kb.bannerFp and kb.os == "Windows":
+    elif "sp" not in kb.bannerFp and Backend.isOs(OS.WINDOWS):
         kb.osSP = 0
 
-    if kb.os and kb.osVersion and kb.osSP:
+    if Backend.getOs() and kb.osVersion and kb.osSP:
         infoMsg += " Service Pack %d" % kb.osSP
 
     if infoMsg:
         logger.info(infoMsg)
 
     if condition:
-        dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(kb.os)))
+        dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), Backend.getOs()))
 
 def setRemoteTempPath():
     condition = (
@@ -241,6 +242,8 @@ def resumeConfKb(expression, url, value):
                     conf.os = os
             else:
                 conf.os = os
+
+            Backend.setOs(conf.os)
 
     elif expression == "Remote temp path" and url == conf.url and conf.tmpPath is None:
         conf.tmpPath = unSafeFormatString(value[:-1])

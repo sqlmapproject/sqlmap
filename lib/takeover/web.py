@@ -14,6 +14,7 @@ import re
 
 from extra.cloak.cloak import decloak
 from lib.core.agent import agent
+from lib.core.common import Backend
 from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
@@ -31,6 +32,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.shell import autoCompletion
@@ -103,7 +105,7 @@ class Web:
 
     def __webFileInject(self, fileContent, fileName, directory):
         outFile = posixpath.normpath("%s/%s" % (directory, fileName))
-        uplQuery = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if kb.os == "Windows" else directory)
+        uplQuery = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
         query = ""
 
         if isTechniqueAvailable(kb.technique):
@@ -144,12 +146,12 @@ class Web:
                 break
 
         if not default:
-            if kb.os == "Windows":
+            if Backend.isOs(OS.WINDOWS):
                 default = "asp"
             else:
                 default = "php"
 
-        message  = "which web application language does the web server "
+        message = "which web application language does the web server "
         message += "support?\n"
 
         for count in xrange(len(choices)):
@@ -284,7 +286,7 @@ class Web:
                         continue
 
                 else:
-                    if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(localPath) if kb.os == "Windows" else localPath):
+                    if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(localPath) if Backend.isOs(OS.WINDOWS) else localPath):
                         warnMsg  = "backdoor has not been successfully uploaded "
                         warnMsg += "with file stager probably because of "
                         warnMsg += "lack of write permission."

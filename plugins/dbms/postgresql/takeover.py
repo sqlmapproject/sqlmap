@@ -7,11 +7,13 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import Backend
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import OS
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.request import inject
 
@@ -23,7 +25,7 @@ class Takeover(GenericTakeover):
 
     def udfSetRemotePath(self):
         # On Windows
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             # The DLL can be in any folder where postgres user has
             # read/write/execute access is valid
             # NOTE: by not specifing any path, it will save into the
@@ -75,7 +77,7 @@ class Takeover(GenericTakeover):
                 warnMsg = "invalid value, valid values are 1 and 2"
                 logger.warn(warnMsg)
 
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (arch, majorVer)
             self.udfSharedLibExt = "dll"
         else:

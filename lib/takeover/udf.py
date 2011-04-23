@@ -19,6 +19,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
@@ -191,12 +192,12 @@ class UDF:
             errMsg = "shared library file must end with '.dll' or '.so'"
             raise sqlmapMissingMandatoryOptionException(errMsg)
 
-        elif self.udfLocalFile.endswith(".so") and kb.os == "Windows":
+        elif self.udfLocalFile.endswith(".so") and Backend.isOs(OS.WINDOWS):
             errMsg  = "you provided a shared object as shared library, but "
             errMsg += "the database underlying operating system is Windows"
             raise sqlmapMissingMandatoryOptionException(errMsg)
 
-        elif self.udfLocalFile.endswith(".dll") and kb.os == "Linux":
+        elif self.udfLocalFile.endswith(".dll") and Backend.isOs(OS.LINUX):
             errMsg  = "you provided a dynamic-link library as shared library, "
             errMsg += "but the database underlying operating system is Linux"
             raise sqlmapMissingMandatoryOptionException(errMsg)

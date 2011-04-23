@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
+from lib.core.common import Backend
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -18,6 +19,7 @@ from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.request import inject
 from lib.request.connect import Connect as Request
@@ -45,12 +47,12 @@ class Takeover(GenericTakeover):
                 self.__basedir = inject.getValue("SELECT @@basedir")
 
                 if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
-                    kb.os = "Windows"
+                    Backend.setOs(OS.WINDOWS)
                 else:
-                    kb.os = "Linux"
+                    Backend.setOs(OS.LINUX)
 
             # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
-            if kb.os == "Windows":
+            if Backend.isOs(OS.WINDOWS):
                 self.__basedir += "/lib/plugin"
             else:
                 self.__basedir += "/lib/mysql/plugin"
@@ -97,7 +99,7 @@ class Takeover(GenericTakeover):
                 warnMsg = "invalid value, valid values are 1 and 2"
                 logger.warn(warnMsg)
 
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             self.udfLocalFile   += "/mysql/windows/%d/lib_mysqludf_sys.dll" % arch
             self.udfSharedLibExt = "dll"
         else:

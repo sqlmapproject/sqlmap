@@ -15,6 +15,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
@@ -108,7 +109,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 errMsg = "feature not yet implemented for the back-end DBMS"
                 raise sqlmapUnsupportedFeatureException, errMsg
 
-            infoMsg  = "calling %s OS shell. To quit type " % (kb.os or "Windows")
+            infoMsg  = "calling %s OS shell. To quit type " % (Backend.getOs() or "Windows")
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)
 

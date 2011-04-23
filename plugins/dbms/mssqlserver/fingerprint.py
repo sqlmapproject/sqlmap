@@ -16,6 +16,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
@@ -78,7 +79,7 @@ class Fingerprint(GenericFingerprint):
 
             self.getBanner()
 
-            kb.os = "Windows"
+            Backend.setOs(OS.WINDOWS)
 
             return True
 
@@ -112,7 +113,7 @@ class Fingerprint(GenericFingerprint):
 
             self.getBanner()
 
-            kb.os = "Windows"
+            Backend.setOs(OS.WINDOWS)
 
             return True
         else:
@@ -122,11 +123,11 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def checkDbmsOs(self, detailed=False):
-        if kb.os and kb.osVersion and kb.osSP:
+        if Backend.getOs() and kb.osVersion and kb.osSP:
             return
 
-        if not kb.os:
-            kb.os = "Windows"
+        if not Backend.getOs():
+            Backend.setOs(OS.WINDOWS)
 
         if not detailed:
             return
@@ -135,7 +136,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg += "version and service pack"
         logger.info(infoMsg)
 
-        infoMsg = "the back-end DBMS operating system is %s" % kb.os
+        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
 
         self.createSupportTbl(self.fileTblName, self.tblField, "varchar(1000)")
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "@@VERSION"))

@@ -75,6 +75,7 @@ from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
 from lib.core.settings import DEFAULT_TOR_PROXY
+from lib.core.settings import DBMS_DICT
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING
@@ -601,19 +602,20 @@ def __setOS():
     if not conf.os:
         return
 
-    debugMsg = "forcing back-end DBMS operating system to user defined value"
-    logger.debug(debugMsg)
-
-    conf.os = conf.os.lower()
-
-    if conf.os not in SUPPORTED_OS:
-        errMsg  = "you provided an unsupported back-end DBMS operating "
+    if conf.os.lower() not in SUPPORTED_OS:
+        errMsg = "you provided an unsupported back-end DBMS operating "
         errMsg += "system. The supported DBMS operating systems for OS "
-        errMsg += "and file system access are Linux and Windows. "
+        errMsg += "and file system access are %s. " % ', '.join([o.capitalize() for o in SUPPORTED_OS])
         errMsg += "If you do not know the back-end DBMS underlying OS, "
         errMsg += "do not provide it and sqlmap will fingerprint it for "
         errMsg += "you."
         raise sqlmapUnsupportedDBMSException, errMsg
+
+    debugMsg = "forcing back-end DBMS operating system to user defined "
+    debugMsg += "value '%s'" % conf.os
+    logger.debug(debugMsg)
+
+    Backend.setOs(conf.os)
 
 def __setTechnique():
     validTechniques = sorted(getPublicTypeMembers(PAYLOAD.TECHNIQUE), key=lambda x: x[1])
@@ -667,11 +669,10 @@ def __setDBMS():
         Backend.setVersion(str(dbmsRegExp.group(2)))
 
     if conf.dbms not in SUPPORTED_DBMS:
-        errMsg  = "you provided an unsupported back-end database management "
-        errMsg += "system. The supported DBMS are MySQL, PostgreSQL, "
-        errMsg += "Microsoft SQL Server and Oracle. If you do not know "
-        errMsg += "the back-end DBMS, do not provide it and sqlmap will "
-        errMsg += "fingerprint it for you."
+        errMsg = "you provided an unsupported back-end database management "
+        errMsg += "system. The supported DBMS are %s. " % ', '.join([d for d in DBMS_DICT])
+        errMsg += "If you do not know the back-end DBMS, do not provide "
+        errMsg += "it and sqlmap will fingerprint it for you."
         raise sqlmapUnsupportedDBMSException, errMsg
 
     for aliases in (MSSQL_ALIASES, MYSQL_ALIASES, PGSQL_ALIASES, \
@@ -1202,6 +1203,12 @@ def __cleanupOptions():
 
     if conf.data:
         conf.data = urldecode(conf.data)
+
+    if conf.os:
+        conf.os = conf.os.capitalize()
+
+    if conf.dbms:
+        conf.dbms = conf.dbms.capitalize()
 
     # to distinguish explicit usage of --time-sec
     if conf.timeSec is None:

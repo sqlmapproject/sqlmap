@@ -17,6 +17,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.enums import OS
 
 def saveHistory():
     historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
@@ -68,7 +69,7 @@ def autoCompletion(sqlShell=False, osShell=False):
     if sqlShell:
         completer = CompleterNG(queriesForAutoCompletion())
     elif osShell:
-        if kb.os == "Windows":
+        if Backend.isOs(OS.WINDOWS):
             # Reference: http://en.wikipedia.org/wiki/List_of_DOS_commands
             completer = CompleterNG({
                                       "copy": None, "del": None, "dir": None,
