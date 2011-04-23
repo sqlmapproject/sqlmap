@@ -93,18 +93,26 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         msg  = "how do you want to establish the tunnel?"
         msg += "\n[1] TCP: Metasploit Framework (default)"
-        msg += "\n[2] ICMP: icmpsh - ICMP tunneling"
+
+        if Backend.isOs(OS.WINDOWS):
+            msg += "\n[2] ICMP: icmpsh - ICMP tunneling"
+            valids = ( 1, 2 )
+        else:
+            valids = ( 1, )
 
         while True:
             tunnel = readInput(msg, default=1)
 
-            if isinstance(tunnel, basestring) and tunnel.isdigit() and int(tunnel) in ( 1, 2 ):
+            if isinstance(tunnel, basestring) and tunnel.isdigit() and int(tunnel) in valids:
                 tunnel = int(tunnel)
                 break
 
-            elif isinstance(tunnel, int) and tunnel in ( 1, 2 ):
+            elif isinstance(tunnel, int) and tunnel in valids:
                 break
 
+            elif len(valids) == 1:
+                warnMsg = "invalid value, valid value is 1"
+                logger.warn(warnMsg)
             else:
                 warnMsg = "invalid value, valid values are 1 and 2"
                 logger.warn(warnMsg)
