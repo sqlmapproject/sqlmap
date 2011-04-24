@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import randomStr
-from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -40,7 +39,7 @@ class Takeover(GenericTakeover):
             self.udfRemoteFile = "/tmp/%s.%s" % (self.udfSharedLibName, self.udfSharedLibExt)
 
     def udfSetLocalPaths(self):
-        self.udfLocalFile     = paths.SQLMAP_UDF_PATH
+        self.udfLocalFile = paths.SQLMAP_UDF_PATH
         self.udfSharedLibName = "libs%s" % randomStr(lowercase=True)
 
         self.getVersionFromBanner()
@@ -59,29 +58,11 @@ class Takeover(GenericTakeover):
             errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-        msg = "what is the back-end database management system architecture?"
-        msg += "\n[1] 32-bit (default)"
-        msg += "\n[2] 64-bit"
-
-        while True:
-            arch = readInput(msg, default='1')
-
-            if isinstance(arch, basestring) and arch.isdigit() and int(arch) in ( 1, 2 ):
-                if int(arch) == 1:
-                    arch = 32
-                else:
-                    arch = 64
-
-                break
-            else:
-                warnMsg = "invalid value, valid values are 1 and 2"
-                logger.warn(warnMsg)
-
         if Backend.isOs(OS.WINDOWS):
-            self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (arch, majorVer)
+            self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (Backend.getArch(), majorVer)
             self.udfSharedLibExt = "dll"
         else:
-            self.udfLocalFile += "/postgresql/linux/%d/%s/lib_postgresqludf_sys.so" % (arch, majorVer)
+            self.udfLocalFile += "/postgresql/linux/%d/%s/lib_postgresqludf_sys.so" % (Backend.getArch(), majorVer)
             self.udfSharedLibExt = "so"
 
     def udfCreateFromSharedLib(self, udf, inpRet):

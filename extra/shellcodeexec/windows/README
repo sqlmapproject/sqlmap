@@ -1,0 +1,25 @@
+Before compiling, an enviroment variable has to be set.
+
+--------------------------------------------------------------------------
+Variable name			Variable description
+--------------------------------------------------------------------------
+PLATFORM_SDK_DIR		Directory where the Platform SDK is installed
+
+
+Procedure for setting environment variables on Windows:
+My Computer -> Properties -> Advanced -> Environment Variables
+User variables -> New
+
+
+Sample value:
+--------------------------------------------------------------------------
+Variable name			Variable value
+--------------------------------------------------------------------------
+PLATFORM_SDK_DIR		C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
+
+
+Notes:
+
+To get as small portable executable as possible compile as follows:
+* Use Visual C++ 2005
+* Strip the executable with UPX

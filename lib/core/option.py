@@ -1268,6 +1268,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.absFilePaths        = set()
     kb.adjustTimeDelay     = False
+    kb.arch                = None
     kb.authHeader          = None
     kb.bannerFp            = advancedDict()
 
