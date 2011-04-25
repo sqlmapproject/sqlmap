@@ -539,7 +539,7 @@ class Metasploit:
         self.shellcodeexecLocal = paths.SQLMAP_SEXEC_PATH
 
         if Backend.isOs(OS.WINDOWS):
-            self.shellcodeexecLocal += "/windows/shellcodeexec/shellcodeexec.x%s.exe" % Backend.getArch()
+            self.shellcodeexecLocal += "/windows/shellcodeexec.x%s.exe" % Backend.getArch()
         else:
             self.shellcodeexecLocal += "/linux/shellcodeexec.x%s" % Backend.getArch()
 
