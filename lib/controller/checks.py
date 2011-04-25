@@ -501,8 +501,8 @@ def checkFalsePositives(injection):
     if len(injection.data) == 1 and any(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED])):
         pushValue(kb.injection)
 
-        infoMsg = "testing if an injection point on %s parameter " % injection.place
-        infoMsg += "'%s' is a false positive" % injection.parameter
+        infoMsg = "checking if the injection point on %s " % injection.place
+        infoMsg += "parameter '%s' is a false positive" % injection.parameter
         logger.info(infoMsg)
 
         kb.injection = injection
