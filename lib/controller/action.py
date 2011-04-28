@@ -90,14 +90,11 @@ def action():
     if conf.getTables:
         conf.dumper.dbTables(conf.dbmsHandler.getTables())
 
-    if conf.commonTables:
-        conf.dumper.dbTables(tableExists(paths.COMMON_TABLES))
-
     if conf.getColumns:
         conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns())
 
-    if conf.commonColumns:
-        conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS))
+    if conf.getSchema:
+        conf.dumper.dbTableColumns(conf.dbmsHandler.getSchema())
 
     if conf.dumpTable:
         conf.dumper.dbTableValues(conf.dbmsHandler.dumpTable())
@@ -113,6 +110,13 @@ def action():
 
     if conf.sqlShell:
         conf.dbmsHandler.sqlShell()
+
+    # Brute force options
+    if conf.commonTables:
+        conf.dumper.dbTables(tableExists(paths.COMMON_TABLES))
+
+    if conf.commonColumns:
+        conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS))
 
     # User-defined function options
     if conf.udfInject:

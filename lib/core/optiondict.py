@@ -92,6 +92,7 @@ optDict = {
                                "getDbs":            ("boolean", "Databases"),
                                "getTables":         ("boolean", "Tables"),
                                "getColumns":        ("boolean", "Columns"),
+                               "getSchema":         "boolean",
                                "dumpTable":         "boolean",
                                "dumpAll":           "boolean",
                                "search":            "boolean",

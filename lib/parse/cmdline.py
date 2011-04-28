@@ -276,6 +276,9 @@ def cmdLineParser():
         enumeration.add_option("--columns", dest="getColumns", action="store_true",
                                default=False, help="Enumerate DBMS database table columns")
 
+        enumeration.add_option("--schema", dest="getSchema", action="store_true",
+                               default=False, help="Enumerate DBMS schema")
+
         enumeration.add_option("--dump", dest="dumpTable", action="store_true",
                                default=False, help="Dump DBMS database table entries")
 

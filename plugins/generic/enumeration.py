@@ -822,7 +822,6 @@ class Enumeration:
             if Backend.getIdentifiedDbms() == DBMS.MSSQL:
                 query = safeStringFormat(query, conf.db)
             value = inject.getValue(query, blind=False)
-
             value = filter(lambda x: x, value)
 
             if value:
@@ -904,12 +903,43 @@ class Enumeration:
 
         return kb.data.cachedTables
 
+    def getSchema(self):
+        pushValue(conf.db)
+        pushValue(conf.tbl)
+
+        conf.db = None
+        conf.tbl = None
+
+        self.getTables()
+
+        infoMsg = "fetched tables: "
+        infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (db, ".." if \
+                   Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) \
+                   else ".", t) for t in tbl) for db, tbl in \
+                   kb.data.cachedTables.items()])
+        logger.info(infoMsg)
+
+        for db, tables in kb.data.cachedTables.items():
+            for tbl in tables:
+                conf.db = db
+                conf.tbl = tbl
+
+                self.getColumns()
+
+        conf.tbl = popValue()
+        conf.db = popValue()
+
+        return kb.data.cachedColumns
+
     def getColumns(self, onlyColNames=False):
         bruteForce = False
 
         if not conf.tbl:
-            errMsg = "missing table parameter"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            warnMsg = "missing table parameter, sqlmap will enumerate "
+            warnMsg += "the whole database management system schema"
+            logger.warn(warnMsg)
+
+            return self.getSchema()
 
         if "." in conf.tbl:
             if not conf.db:
@@ -954,7 +984,10 @@ class Enumeration:
                     if db == conf.db and table == conf.tbl:
                         columns[colName] = colType
 
-                kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
+                if conf.db in kb.data.cachedColumns:
+                    kb.data.cachedColumns[conf.db][conf.tbl] = columns
+                else:
+                    kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
 
                 return kb.data.cachedColumns
 
@@ -1019,8 +1052,11 @@ class Enumeration:
                         else:
                             columns[name] = columnData[1]
 
-                table[conf.tbl] = columns
-                kb.data.cachedColumns[conf.db] = table
+                if conf.db in kb.data.cachedColumns:
+                    kb.data.cachedColumns[conf.db][conf.tbl] = columns
+                else:
+                    table[conf.tbl] = columns
+                    kb.data.cachedColumns[conf.db] = table
 
         if not kb.data.cachedColumns and not conf.direct:
             infoMsg  = "fetching number of columns "
@@ -1112,8 +1148,11 @@ class Enumeration:
                     columns[column] = None
 
             if columns:
-                table[conf.tbl] = columns
-                kb.data.cachedColumns[conf.db] = table
+                if conf.db in kb.data.cachedColumns:
+                    kb.data.cachedColumns[conf.db][conf.tbl] = columns
+                else:
+                    table[conf.tbl] = columns
+                    kb.data.cachedColumns[conf.db] = table
 
         if not kb.data.cachedColumns:
             errMsg  = "unable to retrieve the columns "
