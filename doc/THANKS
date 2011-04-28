@@ -564,15 +564,16 @@ AthCon Conference team <cfp@athcon.org>
     access? Own the network!' at AthCon Conference 2010 on June 3, 2010 in
     Athens (GR). I unveiled and demonstrated some of the sqlmap 0.8
     version features during my presentation
-    Homepage: 
+    Homepage: http://goo.gl/Fs71I
     Slides: http://goo.gl/QMfjO
 
 Metasploit Framework development team <msfdev@metasploit.com>
     for their powerful tool Metasploit Framework 3, used by sqlmap, among
     others things, to create the shellcode and establish an out-of-band
-    connection between sqlmap and the database server,
-    http://www.metasploit.com/framework
+    connection between sqlmap and the database server
+    Homepage: http://www.metasploit.com
 
-OWASP Board <http://www.owasp.org>
+OWASP Board <info@owasp.org>
     for sponsoring part of the sqlmap development in the context of OWASP
     Spring of Code 2007
+    Homepage: http://www.owasp.org
