@@ -179,9 +179,6 @@ Will Holcomb <wholcomb@gmail.com>
 Daniel Huckmann <sanitybit@gmail.com>
     for reporting a couple of bugs
 
-Mounir Idrassi <mounir.idrassi@idrix.net>
-    for his compiled version of UPX for Mac OS X
-
 Daliev Ilya <daliser@yandex.ru>
     for reporting a bug
 
@@ -294,14 +291,6 @@ Yonny Mutai <yonnym@googlemail.com>
 
 Roberto Nemirovsky <roberto.paes@gmail.com>
     for pointing me out some enhancements
-
-Markus Oberhumer <markus.oberhumer@jk.uni-linz.ac.at>
-Laszlo Molnar <ml1050@cdata.tvnet.hu>
-John F. Reiser <sales@bitwagon.com>
-    for their great tool UPX (Ultimate Packer for eXecutables) included
-    in sqlmap tree as a contrib library and used mainly to pack the
-    Metasploit Framework 3 payload stager portable executable,
-    http://upx.sourceforge.net
 
 Simone Onofri <simone.onofri@gmail.com>
     for patching the PHP web backdoor to make it work properly also on
