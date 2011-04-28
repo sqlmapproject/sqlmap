@@ -318,6 +318,7 @@ Mark Pilgrim <mark@diveintomark.org>
 Steve Pinkham <steve.pinkham@gmail.com>
     for suggesting a feature
     for providing a new sql injection vector (MSSQL time based)
+    for donating to sqlmap development
 
 Adam Pridgen <adam.pridgen@gmail.com>
     for suggesting some features
@@ -372,6 +373,7 @@ Sven Schluter <sschlueter@netzwerk.cc>
 
 Ryan Sears <rdsears@mtu.edu>
     for suggesting a couple of enhancements
+    for donating to sqlmap development
 
 Uemit Seren <uemit.seren@gmail.com>
     for reporting a minor adjustment when running with python 2.6
@@ -539,13 +541,33 @@ x <deep_freeze@mail.ru>
 == Organizations ==
 
 Black Hat team <info@blackhat.com>
-    for the opportunity to present my research on 'Advanced SQL injection
-    to operating system full control' at Black Hat Europe 2009 Briefings on
-    April 16, 2009 in Amsterdam (NL). I unveiled and demonstrated some of
-    the sqlmap 0.7 release candidate version new features during my
+    for the opportunity to present my research titled 'Advanced SQL injection
+    to operating system full control' at Black Hat Europe 2009 Briefings
+    on April 16, 2009 in Amsterdam (NL). I unveiled and demonstrated some
+    of the sqlmap 0.7 release candidate version new features during my
     presentation
+    Homepage: http://goo.gl/BKfs7
+    Slides: http://goo.gl/Dh65t
+    White paper: http://goo.gl/spX3N
 
-Metasploit LLC <msfdev@metasploit.com>
+SOURCE Conference team <press@sourceconference.com>
+    for the opportunity to present my research titled 'Expanding the control
+    over the operating system from the database' at SOURCE Conference 2009
+    on September 21, 2009 in Barcelona (ES). I unveiled and demonstrated
+    some of the sqlmap 0.8 release candidate version new features during
+    my presentation
+    Homepage: http://goo.gl/IeXV4
+    Slides: http://goo.gl/OKnfj
+
+AthCon Conference team <cfp@athcon.org>
+    for the opportunity to present my research titled 'Got database
+    access? Own the network!' at AthCon Conference 2010 on June 3, 2010 in
+    Athens (GR). I unveiled and demonstrated some of the sqlmap 0.8
+    version features during my presentation
+    Homepage: 
+    Slides: http://goo.gl/QMfjO
+
+Metasploit Framework development team <msfdev@metasploit.com>
     for their powerful tool Metasploit Framework 3, used by sqlmap, among
     others things, to create the shellcode and establish an out-of-band
     connection between sqlmap and the database server,
