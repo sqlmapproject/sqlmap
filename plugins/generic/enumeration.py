@@ -816,7 +816,7 @@ class Enumeration:
                 elif conf.excludeSysDbs:
                     query += " WHERE "
                     query += " AND ".join("%s != '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                    infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                    infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
                     logger.info(infoMsg)
 
             if Backend.getIdentifiedDbms() == DBMS.MSSQL:
@@ -1675,7 +1675,7 @@ class Enumeration:
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
@@ -1788,7 +1788,7 @@ class Enumeration:
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
@@ -1951,7 +1951,7 @@ class Enumeration:
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases '%s'" % ", ".join(db for db in self.excludeDbsList)
+                infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
