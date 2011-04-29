@@ -1799,22 +1799,6 @@ def getUnicode(value, encoding=None, system=False):
         except:
             return getUnicode(value, UNICODE_ENCODING)
 
-def encodeUnicode(value, encoding=None):
-    """
-    Return 8-bit string representation of the supplied unicode value:
-
-    >>> encodeUnicode(u'test')
-    'test'
-    """
-
-    retVal = value
-    if isinstance(value, unicode):
-        try:
-            retVal = value.encode(encoding or UNICODE_ENCODING)
-        except UnicodeEncodeError:
-            retVal = value.encode(UNICODE_ENCODING, errors="replace")
-    return retVal
-
 # http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 def longestCommonPrefix(*sequences):
     if len(sequences) == 1:

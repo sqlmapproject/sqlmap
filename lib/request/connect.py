@@ -21,7 +21,6 @@ from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
-from lib.core.common import encodeUnicode
 from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
@@ -31,9 +30,10 @@ from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
 from lib.core.common import stdev
-from lib.core.common import wasLastRequestDelayed
-from lib.core.convert import urlencode
 from lib.core.common import urlEncodeCookieValues
+from lib.core.common import wasLastRequestDelayed
+from lib.core.convert import unicodeencode
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -176,9 +176,9 @@ class Connect:
 
             for key, item in headers.items():
                 del headers[key]
-                headers[encodeUnicode(key, kb.pageEncoding)] = encodeUnicode(item, kb.pageEncoding)
+                headers[unicodeencode(key, kb.pageEncoding)] = unicodeencode(item, kb.pageEncoding)
 
-            post = encodeUnicode(post, kb.pageEncoding)
+            post = unicodeencode(post, kb.pageEncoding)
 
             if method:
                 req = MethodRequest(url, post, headers)

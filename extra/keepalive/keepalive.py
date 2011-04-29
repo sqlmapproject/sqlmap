@@ -71,7 +71,7 @@ EXTRA ATTRIBUTES AND METHODS
 """
 from httplib import _CS_REQ_STARTED, _CS_REQ_SENT, _CS_IDLE, CannotSendHeader
 
-from lib.core.common import encodeUnicode
+from lib.core.convert import unicodeencode
 from lib.core.data import kb
 
 import threading
@@ -336,7 +336,7 @@ class HTTPConnection(httplib.HTTPConnection):
         self._send_output()
 
     def send(self, str):
-        httplib.HTTPConnection.send(self, encodeUnicode(str, kb.pageEncoding))
+        httplib.HTTPConnection.send(self, unicodeencode(str, kb.pageEncoding))
 
 #########################################################################
 #####   TEST FUNCTIONS

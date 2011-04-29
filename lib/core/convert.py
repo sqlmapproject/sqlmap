@@ -124,8 +124,24 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
 
     return result
 
+def unicodeencode(value, encoding=None):
+    """
+    Return 8-bit string representation of the supplied unicode value:
+
+    >>> unicodeencode(u'test')
+    'test'
+    """
+
+    retVal = value
+    if isinstance(value, unicode):
+        try:
+            retVal = value.encode(encoding or UNICODE_ENCODING)
+        except UnicodeEncodeError:
+            retVal = value.encode(UNICODE_ENCODING, errors="replace")
+    return retVal
+
 def utf8encode(value):
-    return value.encode("utf-8")
+    return unicodeencode(value, "utf-8")
 
 def utf8decode(value):
     return value.decode("utf-8")
