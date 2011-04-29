@@ -1053,14 +1053,16 @@ def __setHTTPUserAgent():
     """
 
     if conf.mobile:
-        message  = "which smartphone do you want sqlmap to imitate through HTTP User-Agent header?\n"
+        message = "which smartphone do you want sqlmap to imitate "
+        message += "through HTTP User-Agent header?\n"
         items = sorted(getPublicTypeMembers(MOBILES, True))
 
         for count in xrange(len(items)):
             item = items[count]
-            message += "[%d] %s%s\n" % (count + 1, item[:item.find(';')], " (default)" if item==MOBILES.IPHONE else "")
+            message += "[%d] %s%s\n" % (count + 1, item[:item.find(';')], " (default)" if item == MOBILES.IPHONE else "")
 
         test = readInput(message.rstrip('\n'), default=items.index(MOBILES.IPHONE) + 1)
+
         try:
             item = items[int(test) - 1]
         except:
@@ -1087,7 +1089,7 @@ def __setHTTPUserAgent():
         if addDefaultUserAgent:
             conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
 
-    elif not kb.userAgents:
+    else:
         debugMsg  = "loading random HTTP User-Agent header(s) from "
         debugMsg += "file '%s'" % paths.USER_AGENTS
         logger.debug(debugMsg)
@@ -1101,7 +1103,6 @@ def __setHTTPUserAgent():
 
             conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __defaultHTTPUserAgent()))
 
-    else:
         count = len(kb.userAgents)
 
         if count == 1:
