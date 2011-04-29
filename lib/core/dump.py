@@ -305,7 +305,7 @@ class Dump:
 
                     for value in tableValues[column]['values']:
                         try:
-                            if re.search("^[\ *]*$", value): #NULL
+                            if not value or re.search("^[\ *]*$", value): #NULL
                                 continue
 
                             _ = int(value)
@@ -318,7 +318,7 @@ class Dump:
 
                         for value in tableValues[column]['values']:
                             try:
-                                if re.search("^[\ *]*$", value): #NULL
+                                if not value or re.search("^[\ *]*$", value): #NULL
                                     continue
 
                                 _ = float(value)
