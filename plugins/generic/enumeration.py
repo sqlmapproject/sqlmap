@@ -903,37 +903,6 @@ class Enumeration:
 
         return kb.data.cachedTables
 
-    def getSchema(self):
-        infoMsg = "enumerating database management system schema"
-        logger.info(infoMsg)
-
-        pushValue(conf.db)
-        pushValue(conf.tbl)
-
-        conf.db = None
-        conf.tbl = None
-
-        self.getTables()
-
-        infoMsg = "fetched tables: "
-        infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (db, ".." if \
-                   Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) \
-                   else ".", t) for t in tbl) for db, tbl in \
-                   kb.data.cachedTables.items()])
-        logger.info(infoMsg)
-
-        for db, tables in kb.data.cachedTables.items():
-            for tbl in tables:
-                conf.db = db
-                conf.tbl = tbl
-
-                self.getColumns()
-
-        conf.tbl = popValue()
-        conf.db = popValue()
-
-        return kb.data.cachedColumns
-
     def getColumns(self, onlyColNames=False):
         bruteForce = False
 
@@ -1171,6 +1140,37 @@ class Enumeration:
             errMsg += "for table '%s' " % conf.tbl
             errMsg += "on database '%s'" % conf.db
             raise sqlmapNoneDataException, errMsg
+
+        return kb.data.cachedColumns
+
+    def getSchema(self):
+        infoMsg = "enumerating database management system schema"
+        logger.info(infoMsg)
+
+        pushValue(conf.db)
+        pushValue(conf.tbl)
+
+        conf.db = None
+        conf.tbl = None
+
+        self.getTables()
+
+        infoMsg = "fetched tables: "
+        infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (db, ".." if \
+                   Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) \
+                   else ".", t) for t in tbl) for db, tbl in \
+                   kb.data.cachedTables.items()])
+        logger.info(infoMsg)
+
+        for db, tables in kb.data.cachedTables.items():
+            for tbl in tables:
+                conf.db = db
+                conf.tbl = tbl
+
+                self.getColumns()
+
+        conf.tbl = popValue()
+        conf.db = popValue()
 
         return kb.data.cachedColumns
 
