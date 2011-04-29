@@ -904,6 +904,9 @@ class Enumeration:
         return kb.data.cachedTables
 
     def getSchema(self):
+        infoMsg = "enumerating database management system schema"
+        logger.info(infoMsg)
+
         pushValue(conf.db)
         pushValue(conf.tbl)
 
@@ -934,26 +937,35 @@ class Enumeration:
     def getColumns(self, onlyColNames=False):
         bruteForce = False
 
-        if not conf.tbl:
-            warnMsg = "missing table parameter, sqlmap will enumerate "
-            warnMsg += "the whole database management system schema"
-            logger.warn(warnMsg)
-
-            return self.getSchema()
-
-        if "." in conf.tbl:
+        if conf.tbl is not None and "." in conf.tbl:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
 
-        self.forceDbmsEnum()
-
-        if not conf.db:
-            warnMsg  = "missing database parameter, sqlmap is going to "
+        if conf.tbl is not None and conf.db is None:
+            warnMsg = "missing database parameter, sqlmap is going to "
             warnMsg += "use the current database to enumerate table "
             warnMsg += "'%s' columns" % conf.tbl
             logger.warn(warnMsg)
 
             conf.db = self.getCurrentDb()
+
+        self.forceDbmsEnum()
+
+        if kb.data.cachedColumns and conf.db in kb.data.cachedColumns \
+           and conf.tbl in kb.data.cachedColumns[conf.db]:
+            infoMsg = "fetching columns "
+            infoMsg += "for table '%s' " % conf.tbl
+            infoMsg += "on database '%s'" % conf.db
+            logger.info(infoMsg)
+
+            return { conf.db: kb.data.cachedColumns[conf.db]}
+
+        if not conf.tbl:
+            warnMsg = "missing table parameter, sqlmap will enumerate "
+            warnMsg += "the full database management system schema"
+            logger.warn(warnMsg)
+
+            return self.getSchema()
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
             errMsg  = "information_schema not available, "
@@ -1155,7 +1167,7 @@ class Enumeration:
                     kb.data.cachedColumns[conf.db] = table
 
         if not kb.data.cachedColumns:
-            errMsg  = "unable to retrieve the columns "
+            errMsg = "unable to retrieve the columns "
             errMsg += "for table '%s' " % conf.tbl
             errMsg += "on database '%s'" % conf.db
             raise sqlmapNoneDataException, errMsg
