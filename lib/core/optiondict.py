@@ -163,6 +163,7 @@ optDict = {
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
                                "googlePage":        "integer",
+                               "mobile":            "boolean",
                                "pageRank":          "boolean",
                                "parseErrors":       "boolean",
                                "replicate":         "boolean",

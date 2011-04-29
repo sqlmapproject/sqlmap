@@ -69,6 +69,15 @@ class HASH:
     SHA1_GENERIC  = r'(?i)\A[0-9a-f]{40}\Z'
     CRYPT_GENERIC = r'(?i)\A[./0-9A-Za-z]{13}\Z'
 
+class MOBILES:
+    IPHONE        = "Apple iPhone 4;Apple-iPhone3C1/801.306"
+    BLACKBERRY    = "Blackberry 9800;Mozilla/5.0 (BlackBerry; U; BlackBerry 9800; en-US) AppleWebKit/534.1+ (KHTML, like Gecko) Version/6.0.0.246 Mobile Safari/534.1+"
+    NEXUS         = "Google Nexus One;Mozilla/5.0 (Linux; U; Android 2.2; en-US; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+    KINDLE        = "Amazon Kindle 3;Mozilla/5.0 (Linux; U; en-US) AppleWebKit/528.5+ (KHTML, like Gecko, Safari/528.5+) Version/4.0 Kindle/3.0 (screen 600X800; rotate)"
+    GALAXY        = "Samsung Galaxy S;Mozilla/5.0 (Linux; U; Android 2.2; en-US; SGH-T959D Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+    NOKIA         = "Nokia N97;Mozilla/5.0 (SymbianOS/9.3; U; Series60/3.2 NokiaN79-1/32.001; Profile/MIDP-2.1 Configuration/CLDC-1.1) AppleWebKit/413 (KHTML, like Gecko) Safari/413"
+    HP            = "HP iPAQ 6365;Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; PPC; 240x320; HP iPAQ h6300)"
+
 class HTTPHEADER:
     ACCEPT_ENCODING     = "Accept-Encoding"
     AUTHORIZATION       = "Authorization"

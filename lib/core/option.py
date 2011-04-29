@@ -57,6 +57,7 @@ from lib.core.datatype import injectionDict
 from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import MOBILES
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
 from lib.core.exception import sqlmapFilePathException
@@ -1051,14 +1052,31 @@ def __setHTTPUserAgent():
           file choosed as user option
     """
 
-    if conf.agent:
+    if conf.mobile:
+        message  = "which smartphone do you want sqlmap to imitate through HTTP User-Agent header?\n"
+        items = sorted(getPublicTypeMembers(MOBILES, True))
+
+        for count in xrange(len(items)):
+            item = items[count]
+            message += "[%d] %s%s\n" % (count + 1, item[:item.find(';')], " (default)" if item==MOBILES.IPHONE else "")
+
+        test = readInput(message.rstrip('\n'), default=items.index(MOBILES.IPHONE) + 1)
+        try:
+            item = items[int(test) - 1]
+        except:
+            item = MOBILES.IPHONE
+
+        item = item[item.find(';') + 1:]
+
+        conf.httpHeaders.append(("User-Agent", item))
+
+    elif conf.agent:
         debugMsg = "setting the HTTP User-Agent header"
         logger.debug(debugMsg)
 
         conf.httpHeaders.append(("User-Agent", conf.agent))
-        return
 
-    if not conf.randomAgent:
+    elif not conf.randomAgent:
         addDefaultUserAgent = True
 
         for header, _ in conf.httpHeaders:
@@ -1069,9 +1087,7 @@ def __setHTTPUserAgent():
         if addDefaultUserAgent:
             conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
 
-        return
-
-    if not kb.userAgents:
+    elif not kb.userAgents:
         debugMsg  = "loading random HTTP User-Agent header(s) from "
         debugMsg += "file '%s'" % paths.USER_AGENTS
         logger.debug(debugMsg)
@@ -1085,21 +1101,20 @@ def __setHTTPUserAgent():
 
             conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __defaultHTTPUserAgent()))
 
-            return
-
-    count = len(kb.userAgents)
-
-    if count == 1:
-        userAgent = kb.userAgents[0]
     else:
-        userAgent = kb.userAgents[randomRange(stop=count-1)]
+        count = len(kb.userAgents)
 
-    userAgent = sanitizeStr(userAgent)
-    conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
+        if count == 1:
+            userAgent = kb.userAgents[0]
+        else:
+            userAgent = kb.userAgents[randomRange(stop=count-1)]
 
-    logMsg  = "fetched random HTTP User-Agent header from "
-    logMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
-    logger.info(logMsg)
+        userAgent = sanitizeStr(userAgent)
+        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
+
+        logMsg  = "fetched random HTTP User-Agent header from "
+        logMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
+        logger.info(logMsg)
 
 def __setHTTPReferer():
     """
@@ -1564,6 +1579,10 @@ def __basicOptionValidation():
 
     if conf.tor and conf.ignoreProxy:
         errMsg = "switch --tor is incompatible with switch --ignore-proxy"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.mobile and conf.agent:
+        errMsg = "switch --mobile is incompatible with switch --user-agent"
         raise sqlmapSyntaxException, errMsg
 
     if conf.proxy and conf.ignoreProxy:
