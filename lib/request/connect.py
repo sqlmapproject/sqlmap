@@ -127,7 +127,7 @@ class Connect:
                 from lib.core.option import proxyHandler
 
                 multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
-                conn = multipartOpener.open(url, multipart)
+                conn = multipartOpener.open(unicodeencode(url), multipart)
                 page = conn.read()
                 responseHeaders = conn.info()
                 responseHeaders[URI_HTTP_HEADER] = conn.geturl()
