@@ -48,8 +48,11 @@ class Enumeration(GenericEnumeration):
 
     def getColumns(self, onlyColNames=False):
         if not conf.tbl:
-            errMsg = "missing table parameter"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            warnMsg = "missing table parameter, sqlmap will enumerate "
+            warnMsg += "the whole database management system schema"
+            logger.warn(warnMsg)
+
+            return self.getSchema()
 
         if "." in conf.tbl:
             conf.db, conf.tbl = conf.tbl.split(".")
