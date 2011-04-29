@@ -1183,6 +1183,10 @@ class Enumeration:
             logger.info(infoMsg)
             return entries
 
+        for column in colList:
+            lengths[column] = 0
+            entries[column] = []
+
         colList = sorted(colList, key=lambda x: len(x) if x else MAX_INT)
 
         for column in colList:
@@ -1199,6 +1203,7 @@ class Enumeration:
 
             if isNumPosStrValue(value):
                 validColumnList = True
+
                 if value == count:
                     infoMsg = "using column '%s' as a pivot " % column
                     infoMsg += "for retrieving row data"
@@ -1228,12 +1233,6 @@ class Enumeration:
                     break
 
                 for column in colList:
-                    if column not in lengths:
-                        lengths[column] = 0
-
-                    if column not in entries:
-                        entries[column] = []
-
                     if column == colList[0]:
                         # Correction for pivotValues with unrecognized chars
                         if pivotValue and '?' in pivotValue and pivotValue[0] != '?':
