@@ -870,7 +870,7 @@ class Enumeration:
 
                 tables = []
 
-                if Backend.getIdentifiedDbms() in ( DBMS.MSSQL, DBMS.ORACLE ):
+                if Backend.isDbms(DBMS.ORACLE):
                     plusOne = True
                 else:
                     plusOne = False
@@ -905,37 +905,61 @@ class Enumeration:
         return kb.data.cachedTables
 
     def getColumns(self, onlyColNames=False):
-        bruteForce = False
+        self.forceDbmsEnum()
 
-        if conf.tbl is not None and "." in conf.tbl:
-            if not conf.db:
-                conf.db, conf.tbl = conf.tbl.split(".")
-
-        if conf.tbl is not None and conf.db is None:
-            warnMsg = "missing database parameter, sqlmap is going to "
-            warnMsg += "use the current database to enumerate table "
-            warnMsg += "'%s' columns" % conf.tbl
-            logger.warn(warnMsg)
+        if conf.db is None or conf.db == "CD":
+            if conf.db is None:
+                warnMsg = "missing database parameter, sqlmap is going "
+                warnMsg += "to use the current database to enumerate "
+                warnMsg += "table(s) columns"
+                logger.warn(warnMsg)
 
             conf.db = self.getCurrentDb()
 
-        self.forceDbmsEnum()
+        elif conf.db is not None:
+            if Backend.isDbms(DBMS.ORACLE):
+                conf.db = conf.db.upper()
 
-        if kb.data.cachedColumns and conf.db in kb.data.cachedColumns \
-           and conf.tbl in kb.data.cachedColumns[conf.db]:
-            infoMsg = "fetching columns "
-            infoMsg += "for table '%s' " % conf.tbl
-            infoMsg += "on database '%s'" % conf.db
-            logger.info(infoMsg)
+            if  ',' in conf.db:
+                errMsg = "only one database name is allowed when enumerating "
+                errMsg += "the tables' columns"
+                raise sqlmapMissingMandatoryOptionException, errMsg
 
-            return { conf.db: kb.data.cachedColumns[conf.db]}
+        conf.db = safeSQLIdentificatorNaming(conf.db)
 
-        if not conf.tbl:
-            warnMsg = "missing table parameter, sqlmap will enumerate "
-            warnMsg += "the full database management system schema"
-            logger.warn(warnMsg)
+        if conf.col:
+            if Backend.isDbms(DBMS.ORACLE):
+                conf.col = conf.col.upper()
 
-            return self.getSchema()
+            colList = conf.col.split(",")
+        else:
+            colList = []
+
+        for col in colList:
+            colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
+
+        if conf.tbl:
+            if Backend.isDbms(DBMS.ORACLE):
+                conf.tbl = conf.tbl.upper()
+
+            tblList = conf.tbl.split(",")
+        else:
+            self.getTables()
+
+            if len(kb.data.cachedTables) > 0:
+                tblList = kb.data.cachedTables.values()
+
+                if isinstance(tblList[0], (set, tuple, list)):
+                    tblList = tblList[0]
+            else:
+                errMsg = "unable to retrieve the tables"
+                errMsg += "on database '%s'" % conf.db
+                raise sqlmapNoneDataException, errMsg
+
+        for tbl in tblList:
+            tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl)
+
+        bruteForce = False
 
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
@@ -949,27 +973,27 @@ class Enumeration:
             logger.error(errMsg)
             bruteForce = True
 
-        conf.tbl = safeSQLIdentificatorNaming(conf.tbl, True)
-        conf.db = safeSQLIdentificatorNaming(conf.db)
-
         if bruteForce:
             resumeAvailable = False
 
-            for db, table, colName, colType in kb.brute.columns:
-                if db == conf.db and table == conf.tbl:
-                    resumeAvailable = True
-                    break
+            for tbl in tblList:
+                for db, table, colName, colType in kb.brute.columns:
+                    if db == conf.db and table == tbl:
+                        resumeAvailable = True
+                        break
 
             if resumeAvailable:
                 columns = {}
-                for db, table, colName, colType in kb.brute.columns:
-                    if db == conf.db and table == conf.tbl:
-                        columns[colName] = colType
 
-                if conf.db in kb.data.cachedColumns:
-                    kb.data.cachedColumns[conf.db][conf.tbl] = columns
-                else:
-                    kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
+                for tbl in tblList:
+                    for db, table, colName, colType in kb.brute.columns:
+                        if db == conf.db and table == tbl:
+                            columns[colName] = colType
+
+                    if conf.db in kb.data.cachedColumns:
+                        kb.data.cachedColumns[conf.db][tbl] = columns
+                    else:
+                        kb.data.cachedColumns[conf.db] = {tbl: columns}
 
                 return kb.data.cachedColumns
 
@@ -986,160 +1010,190 @@ class Enumeration:
         rootQuery = queries[Backend.getIdentifiedDbms()].columns
         condition = rootQuery.blind.condition if 'condition' in rootQuery.blind else None
 
-        infoMsg = "fetching columns "
-
-        if conf.col:
-            if Backend.isDbms(DBMS.ORACLE):
-                conf.col = conf.col.upper()
-            colList = conf.col.split(",")
-            condQuery = " AND (" + " OR ".join("%s LIKE '%s'" % (condition, "%" + unsafeSQLIdentificatorNaming(col) + "%") for col in colList) + ")"
-            infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
-        else:
-            condQuery = ""
-
-        infoMsg += "for table '%s' " % conf.tbl
-        infoMsg += "on database '%s'" % conf.db
-        logger.info(infoMsg)
-
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
-            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(conf.tbl), unsafeSQLIdentificatorNaming(conf.db))
-                query += condQuery
-            elif Backend.isDbms(DBMS.ORACLE):
-                query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(conf.tbl.upper())
-                query += condQuery
-            elif Backend.isDbms(DBMS.MSSQL):
-                query = rootQuery.inband.query % (conf.db, conf.db,
-                                                        conf.db, conf.db,
-                                                        conf.db, conf.db,
-                                                        conf.db, unsafeSQLIdentificatorNaming(conf.tbl))
-                query += condQuery.replace("[DB]", conf.db)
-            elif Backend.isDbms(DBMS.SQLITE):
-                query = rootQuery.inband.query % conf.tbl
+            for tbl in tblList:
+                if conf.db is not None and len(kb.data.cachedColumns) > 0 \
+                   and conf.db in kb.data.cachedColumns and tbl in \
+                   kb.data.cachedColumns[conf.db]:
+                    infoMsg = "fetched tables' columns on "
+                    infoMsg += "database '%s'" % conf.db
+                    logger.info(infoMsg)
 
-            value = inject.getValue(query, blind=False)
+                    return { conf.db: kb.data.cachedColumns[conf.db]}
 
-            if Backend.isDbms(DBMS.SQLITE):
-                parseSqliteTableSchema(value)
-            elif value:
+                infoMsg = "fetching columns "
+
+                if len(colList) > 0:
+                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
+                    infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                else:
+                    condQuery = ""
+
+                infoMsg += "for table '%s' " % tbl
+                infoMsg += "on database '%s'" % conf.db
+                logger.info(infoMsg)
+
+                if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                    query += condQuery
+                elif Backend.isDbms(DBMS.ORACLE):
+                    query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl.upper())
+                    query += condQuery
+                elif Backend.isDbms(DBMS.MSSQL):
+                    query = rootQuery.inband.query % (conf.db, conf.db,
+                                                      conf.db, conf.db,
+                                                      conf.db, conf.db,
+                                                      conf.db, unsafeSQLIdentificatorNaming(tbl))
+                    query += condQuery.replace("[DB]", conf.db)
+                elif Backend.isDbms(DBMS.SQLITE):
+                    query = rootQuery.inband.query % tbl
+
+                value = inject.getValue(query, blind=False)
+
+                if Backend.isDbms(DBMS.SQLITE):
+                    parseSqliteTableSchema(value)
+                elif value:
+                    table = {}
+                    columns = {}
+
+                    for columnData in value:
+                        if columnData[0] is not None:
+                            name = safeSQLIdentificatorNaming(columnData[0])
+
+                            if len(columnData) == 1:
+                                columns[name] = ""
+                            else:
+                                columns[name] = columnData[1]
+
+                    if conf.db in kb.data.cachedColumns:
+                        kb.data.cachedColumns[conf.db][tbl] = columns
+                    else:
+                        table[tbl] = columns
+                        kb.data.cachedColumns[conf.db] = table
+
+        if not kb.data.cachedColumns and not conf.direct:
+            for tbl in tblList:
+                if conf.db is not None and len(kb.data.cachedColumns) > 0 \
+                   and conf.db in kb.data.cachedColumns and tbl in \
+                   kb.data.cachedColumns[conf.db]:
+                    infoMsg = "fetched tables' columns on "
+                    infoMsg += "database '%s'" % conf.db
+                    logger.info(infoMsg)
+
+                    return { conf.db: kb.data.cachedColumns[conf.db]}
+
+                infoMsg = "fetching columns "
+
+                if len(colList) > 0:
+                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
+                    likeMsg = "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                    infoMsg += likeMsg
+                else:
+                    condQuery = ""
+                    likeMsg = ""
+
+                infoMsg += "for table '%s' " % tbl
+                infoMsg += "on database '%s'" % conf.db
+                logger.info(infoMsg)
+
+                countMsg = "fetching number of columns %s" % likeMsg
+                countMsg += "for table '%s'" % tbl
+                countMsg += " on database '%s'" % conf.db
+                logger.info(countMsg)
+
+                if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                    query += condQuery
+
+                elif Backend.isDbms(DBMS.ORACLE):
+                    query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(tbl.upper())
+                    query += condQuery
+
+                elif Backend.getIdentifiedDbms() in DBMS.MSSQL:
+                    query = rootQuery.blind.count % (conf.db, conf.db, \
+                        unsafeSQLIdentificatorNaming(tbl))
+                    query += condQuery.replace("[DB]", conf.db)
+
+                elif Backend.isDbms(DBMS.FIREBIRD):
+                    query = rootQuery.blind.count % (tbl)
+                    query += condQuery
+
+                elif Backend.isDbms(DBMS.SQLITE):
+                    query = rootQuery.blind.query % tbl
+                    value = inject.getValue(query, inband=False, error=False)
+                    parseSqliteTableSchema(value)
+                    return kb.data.cachedColumns
+
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+
+                if not isNumPosStrValue(count):
+                    errMsg = "unable to retrieve the number of columns "
+                    errMsg += "for table '%s' " % tbl
+                    errMsg += "on database '%s'" % conf.db
+                    raise sqlmapNoneDataException, errMsg
+
                 table = {}
                 columns = {}
 
-                for columnData in value:
-                    if columnData[0] is not None:
-                        name = safeSQLIdentificatorNaming(columnData[0])
+                indexRange = getRange(count)
 
-                        if len(columnData) == 1:
-                            columns[name] = ""
-                        else:
-                            columns[name] = columnData[1]
-
-                if conf.db in kb.data.cachedColumns:
-                    kb.data.cachedColumns[conf.db][conf.tbl] = columns
-                else:
-                    table[conf.tbl] = columns
-                    kb.data.cachedColumns[conf.db] = table
-
-        if not kb.data.cachedColumns and not conf.direct:
-            infoMsg = "fetching number of columns "
-            infoMsg += "for table '%s'" % conf.tbl
-            infoMsg += " on database '%s'" % conf.db
-            logger.info(infoMsg)
-
-            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(conf.tbl), unsafeSQLIdentificatorNaming(conf.db))
-                query += condQuery
-
-            elif Backend.isDbms(DBMS.ORACLE):
-                query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(conf.tbl.upper())
-                query += condQuery
-
-            elif Backend.getIdentifiedDbms() in DBMS.MSSQL:
-                query = rootQuery.blind.count % (conf.db, conf.db, \
-                    unsafeSQLIdentificatorNaming(conf.tbl))
-                query += condQuery.replace("[DB]", conf.db)
-
-            elif Backend.isDbms(DBMS.FIREBIRD):
-                query = rootQuery.blind.count % (conf.tbl)
-                query += condQuery
-
-            elif Backend.isDbms(DBMS.SQLITE):
-                query = rootQuery.blind.query % conf.tbl
-                value = inject.getValue(query, inband=False, error=False)
-                parseSqliteTableSchema(value)
-                return kb.data.cachedColumns
-
-            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
-
-            if not isNumPosStrValue(count):
-                errMsg = "unable to retrieve the number of columns "
-                errMsg += "for table '%s' " % conf.tbl
-                errMsg += "on database '%s'" % conf.db
-                raise sqlmapNoneDataException, errMsg
-
-            table = {}
-            columns = {}
-
-            indexRange = getRange(count)
-
-            for index in indexRange:
-                if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                    query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(conf.tbl), unsafeSQLIdentificatorNaming(conf.db))
-                    query += condQuery
-                    field = None
-                elif Backend.isDbms(DBMS.ORACLE):
-                    query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(conf.tbl.upper())
-                    query += condQuery
-                    field = None
-                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                    query = rootQuery.blind.query % (conf.db, conf.db,
-                                                           conf.db, conf.db,
-                                                           conf.db, conf.db,
-                                                           unsafeSQLIdentificatorNaming(conf.tbl))
-                    query += condQuery.replace("[DB]", conf.db)
-                    field = condition.replace("[DB]", conf.db)
-                elif Backend.isDbms(DBMS.FIREBIRD):
-                    query = rootQuery.blind.query % (conf.tbl)
-                    query += condQuery
-                    field = None
-
-                query = agent.limitQuery(index, query, field)
-                column = inject.getValue(query, inband=False, error=False)
-
-                if not onlyColNames:
+                for index in indexRange:
                     if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                        query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(conf.tbl), column, unsafeSQLIdentificatorNaming(conf.db))
+                        query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                        query += condQuery
+                        field = None
                     elif Backend.isDbms(DBMS.ORACLE):
-                        query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(conf.tbl.upper()), column)
-                    elif Backend.isDbms(DBMS.MSSQL):
-                        query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db,
-                                                                conf.db, column, conf.db,
-                                                                conf.db, conf.db, unsafeSQLIdentificatorNaming(conf.tbl))
+                        query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl.upper())
+                        query += condQuery
+                        field = None
+                    elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                        query = rootQuery.blind.query % (conf.db, conf.db,
+                                                               conf.db, conf.db,
+                                                               conf.db, conf.db,
+                                                               unsafeSQLIdentificatorNaming(tbl))
+                        query += condQuery.replace("[DB]", conf.db)
+                        field = condition.replace("[DB]", conf.db)
                     elif Backend.isDbms(DBMS.FIREBIRD):
-                        query = rootQuery.blind.query2 % (conf.tbl, column)
+                        query = rootQuery.blind.query % (tbl)
+                        query += condQuery
+                        field = None
 
-                    colType = inject.getValue(query, inband=False, error=False)
+                    query = agent.limitQuery(index, query, field)
+                    column = inject.getValue(query, inband=False, error=False)
 
-                    if Backend.isDbms(DBMS.FIREBIRD):
-                        colType = firebirdTypes[colType] if colType in firebirdTypes else colType
+                    if not onlyColNames:
+                        if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                            query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
+                        elif Backend.isDbms(DBMS.ORACLE):
+                            query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
+                        elif Backend.isDbms(DBMS.MSSQL):
+                            query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db,
+                                                                    conf.db, column, conf.db,
+                                                                    conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                        elif Backend.isDbms(DBMS.FIREBIRD):
+                            query = rootQuery.blind.query2 % (tbl, column)
 
-                    column = safeSQLIdentificatorNaming(column)
-                    columns[column] = colType
-                else:
-                    column = safeSQLIdentificatorNaming(column)
-                    columns[column] = None
+                        colType = inject.getValue(query, inband=False, error=False)
 
-            if columns:
-                if conf.db in kb.data.cachedColumns:
-                    kb.data.cachedColumns[conf.db][conf.tbl] = columns
-                else:
-                    table[conf.tbl] = columns
-                    kb.data.cachedColumns[conf.db] = table
+                        if Backend.isDbms(DBMS.FIREBIRD):
+                            colType = firebirdTypes[colType] if colType in firebirdTypes else colType
+
+                        column = safeSQLIdentificatorNaming(column)
+                        columns[column] = colType
+                    else:
+                        column = safeSQLIdentificatorNaming(column)
+                        columns[column] = None
+
+                if columns:
+                    if conf.db in kb.data.cachedColumns:
+                        kb.data.cachedColumns[conf.db][tbl] = columns
+                    else:
+                        table[tbl] = columns
+                        kb.data.cachedColumns[conf.db] = table
 
         if not kb.data.cachedColumns:
-            errMsg = "unable to retrieve the columns "
-            errMsg += "for table '%s' " % conf.tbl
-            errMsg += "on database '%s'" % conf.db
+            errMsg = "unable to retrieve the columns for any "
+            errMsg += "table on database '%s'" % conf.db
             raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedColumns
@@ -1150,9 +1204,13 @@ class Enumeration:
 
         pushValue(conf.db)
         pushValue(conf.tbl)
+        pushValue(conf.col)
 
         conf.db = None
         conf.tbl = None
+        conf.col = None
+        kb.data.cachedTables = {}
+        kb.data.cachedColumns = {}
 
         self.getTables()
 
@@ -1170,6 +1228,7 @@ class Enumeration:
 
                 self.getColumns()
 
+        conf.col = popValue()
         conf.tbl = popValue()
         conf.db = popValue()
 
