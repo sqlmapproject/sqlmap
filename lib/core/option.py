@@ -1090,18 +1090,20 @@ def __setHTTPUserAgent():
             conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
 
     else:
-        debugMsg  = "loading random HTTP User-Agent header(s) from "
-        debugMsg += "file '%s'" % paths.USER_AGENTS
-        logger.debug(debugMsg)
+        if not kb.userAgents:
+            debugMsg  = "loading random HTTP User-Agent header(s) from "
+            debugMsg += "file '%s'" % paths.USER_AGENTS
+            logger.debug(debugMsg)
 
-        try:
-            kb.userAgents = getFileItems(paths.USER_AGENTS)
-        except IOError:
-            warnMsg  = "unable to read HTTP User-Agent header "
-            warnMsg += "file '%s'" % paths.USER_AGENTS
-            logger.warn(warnMsg)
+            try:
+                kb.userAgents = getFileItems(paths.USER_AGENTS)
+            except IOError:
+                warnMsg  = "unable to read HTTP User-Agent header "
+                warnMsg += "file '%s'" % paths.USER_AGENTS
+                logger.warn(warnMsg)
 
-            conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __defaultHTTPUserAgent()))
+                conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __defaultHTTPUserAgent()))
+                return
 
         count = len(kb.userAgents)
 
