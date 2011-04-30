@@ -299,9 +299,9 @@ def hashRecognition(value):
     if isinstance(value, basestring):
         for name, regex in getPublicTypeMembers(HASH):
             # Hashes for Oracle and old MySQL look the same hence these checks
-            if Backend.getIdentifiedDbms() == DBMS.ORACLE and regex == HASH.MYSQL_OLD:
+            if Backend.isDbms(DBMS.ORACLE) and regex == HASH.MYSQL_OLD:
                 continue
-            elif Backend.getIdentifiedDbms() == DBMS.MYSQL and regex == HASH.ORACLE_OLD:
+            elif Backend.isDbms(DBMS.MYSQL) and regex == HASH.ORACLE_OLD:
                 continue
             elif regex == HASH.CRYPT_GENERIC:
                 if any([getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(value), value.lower() == value, value.upper() == value, value.isdigit()]):

@@ -282,14 +282,14 @@ class Agent:
 
         # SQLite version 2 does not support neither CAST() nor IFNULL(),
         # introduced only in SQLite version 3
-        if Backend.getIdentifiedDbms() == DBMS.SQLITE:
+        if Backend.isDbms(DBMS.SQLITE):
             return field
 
         if field.startswith("(CASE"):
             nulledCastedField = field
         else:
             nulledCastedField = queries[Backend.getIdentifiedDbms()].cast.query % field
-            if Backend.getIdentifiedDbms() == DBMS.ACCESS:
+            if Backend.isDbms(DBMS.ACCESS):
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].isnull.query % (nulledCastedField, nulledCastedField)
             else:
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].isnull.query % nulledCastedField
@@ -401,7 +401,7 @@ class Agent:
     def simpleConcatQuery(self, query1, query2):
         concatenatedQuery = ""
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
         elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
@@ -447,7 +447,7 @@ class Agent:
         else:
             return query
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.misc.start, 1)
                 concatenatedQuery += ",'%s')" % kb.misc.stop
@@ -540,7 +540,7 @@ class Agent:
         if query.startswith("TOP"):
             # TOP enumeration on DBMS.MSSQL is too specific and it has to go into it's own brackets
             # because those NULLs cause problems with ORDER BY clause
-            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            if Backend.isDbms(DBMS.MSSQL):
                 inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, range(0, count)))
                 inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
                 return inbandQuery
@@ -633,11 +633,11 @@ class Agent:
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
-        elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+        elif Backend.isDbms(DBMS.FIREBIRD):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
-        elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+        elif Backend.isDbms(DBMS.ORACLE):
             if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
@@ -650,7 +650,7 @@ class Agent:
             limitedQuery = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
-        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.isDbms(DBMS.MSSQL):
             forgeNotIn = True
 
             if " ORDER BY " in limitedQuery:

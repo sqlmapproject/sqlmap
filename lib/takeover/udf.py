@@ -144,9 +144,9 @@ class UDF:
             if udf in self.udfToCreate and udf not in self.createdUdf:
                 self.udfCreateFromSharedLib(udf, inpRet)
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             supportTblType = "longtext"
-        elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
+        elif Backend.isDbms(DBMS.PGSQL):
             supportTblType = "text"
 
         self.udfCreateSupportTbl(supportTblType)
@@ -237,9 +237,9 @@ class UDF:
                 else:
                     logger.warn("you need to specify the name of the UDF")
 
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+            if Backend.isDbms(DBMS.MYSQL):
                 defaultType = "string"
-            elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
+            elif Backend.isDbms(DBMS.PGSQL):
                 defaultType = "text"
 
             self.udfs[udfName]["input"] = []

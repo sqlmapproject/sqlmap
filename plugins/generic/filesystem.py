@@ -93,13 +93,13 @@ class Filesystem:
         return fileLines
 
     def __checkWrittenFile(self, wFile, dFile, fileType):
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % dFile
 
-        elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
+        elif Backend.isDbms(DBMS.PGSQL):
             lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
 
-        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.isDbms(DBMS.MSSQL):
             self.createSupportTbl(self.fileTblName, self.tblField, "text")
 
             # Reference: http://msdn.microsoft.com/en-us/library/ms188365.aspx

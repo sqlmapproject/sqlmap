@@ -142,7 +142,7 @@ class Enumeration:
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             self.getCurrentUser()
             query = queries[Backend.getIdentifiedDbms()].is_dba.query % (kb.data.currentUser.split("@")[0] if kb.data.currentUser else None)
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and user is not None:
@@ -164,8 +164,8 @@ class Enumeration:
 
         rootQuery = queries[Backend.getIdentifiedDbms()].users
 
-        condition = ( Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")) )
-        condition |= ( Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema )
+        condition = ( Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")) )
+        condition |= ( Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema )
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if condition:
@@ -191,7 +191,7 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of database users"
                 raise sqlmapNoneDataException, errMsg
 
-            if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            if Backend.isDbms(DBMS.ORACLE):
                 plusOne = True
             else:
                 plusOne = False
@@ -242,7 +242,7 @@ class Enumeration:
             users = []
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
-            if Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
+            if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
@@ -253,7 +253,7 @@ class Enumeration:
                 query += " WHERE "
                 query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
-            if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+            if Backend.isDbms(DBMS.SYBASE):
                 randStr = randomStr()
                 getCurrentThreadData().disableStdOut = True
 
@@ -294,7 +294,7 @@ class Enumeration:
                         if parsedUser:
                             users[users.index(user)] = parsedUser.groups()[0]
 
-            if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+            if Backend.isDbms(DBMS.SYBASE):
                 getCurrentThreadData().disableStdOut = True
 
                 randStr = randomStr()
@@ -323,7 +323,7 @@ class Enumeration:
                     infoMsg += "for user '%s'" % user
                     logger.info(infoMsg)
 
-                    if Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
+                    if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                         query = rootQuery.blind.count2 % user
                     else:
                         query = rootQuery.blind.count % user
@@ -340,14 +340,14 @@ class Enumeration:
 
                     passwords = []
 
-                    if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                    if Backend.isDbms(DBMS.ORACLE):
                         plusOne = True
                     else:
                         plusOne = False
                     indexRange = getRange(count, plusOne=plusOne)
 
                     for index in indexRange:
-                        if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+                        if Backend.isDbms(DBMS.MSSQL):
                             if Backend.isVersionWithin(("2005", "2008")):
                                 query = rootQuery.blind.query2 % (user, index, user)
                             else:
@@ -387,24 +387,24 @@ class Enumeration:
     def __isAdminFromPrivileges(self, privileges):
         # In PostgreSQL the usesuper privilege means that the
         # user is DBA
-        dbaCondition = ( Backend.getIdentifiedDbms() == DBMS.PGSQL and "super" in privileges )
+        dbaCondition = ( Backend.isDbms(DBMS.PGSQL) and "super" in privileges )
 
         # In Oracle the DBA privilege means that the
         # user is DBA
-        dbaCondition |= ( Backend.getIdentifiedDbms() == DBMS.ORACLE and "DBA" in privileges )
+        dbaCondition |= ( Backend.isDbms(DBMS.ORACLE) and "DBA" in privileges )
 
         # In MySQL >= 5.0 the SUPER privilege means
         # that the user is DBA
-        dbaCondition |= ( Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema and "SUPER" in privileges )
+        dbaCondition |= ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema and "SUPER" in privileges )
 
         # In MySQL < 5.0 the super_priv privilege means
         # that the user is DBA
-        dbaCondition |= ( Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema and "super_priv" in privileges )
+        dbaCondition |= ( Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema and "super_priv" in privileges )
 
         # In Firebird there is no specific privilege that means
         # that the user is DBA
         # TODO: confirm
-        dbaCondition |= ( Backend.getIdentifiedDbms() == DBMS.FIREBIRD and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges )
+        dbaCondition |= ( Backend.isDbms(DBMS.FIREBIRD) and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges )
 
         return dbaCondition
 
@@ -438,10 +438,10 @@ class Enumeration:
         areAdmins = set()
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+            if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
-            elif Backend.getIdentifiedDbms() == DBMS.ORACLE and query2:
+            elif Backend.isDbms(DBMS.ORACLE) and query2:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
             else:
@@ -451,14 +451,14 @@ class Enumeration:
             if conf.user:
                 query += " WHERE "
 
-                if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
+                if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
                     query += " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in users)
                 else:
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
             values = inject.getValue(query, blind=False)
 
-            if not values and Backend.getIdentifiedDbms() == DBMS.ORACLE and not query2:
+            if not values and Backend.isDbms(DBMS.ORACLE) and not query2:
                 infoMsg = "trying with table USER_SYS_PRIVS"
                 logger.info(infoMsg)
 
@@ -480,18 +480,18 @@ class Enumeration:
 
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
-                            if Backend.getIdentifiedDbms() == DBMS.PGSQL and getUnicode(privilege).isdigit():
+                            if Backend.isDbms(DBMS.PGSQL) and getUnicode(privilege).isdigit():
                                 if int(privilege) == 1:
                                     privileges.add(pgsqlPrivs[count])
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
-                            elif Backend.getIdentifiedDbms() == DBMS.ORACLE or ( Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema ):
+                            elif Backend.isDbms(DBMS.ORACLE) or ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema ):
                                 privileges.add(privilege)
 
                             # In MySQL < 5.0 we get Y if the privilege is 
                             # True, N otherwise
-                            elif Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                            elif Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                                 if privilege.upper() == "Y":
                                     privileges.add(mysqlPrivs[count])
 
@@ -504,7 +504,7 @@ class Enumeration:
                         kb.data.cachedUsersPrivileges[user] = list(privileges)
 
         if not kb.data.cachedUsersPrivileges and not conf.direct:
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
+            if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
                 conditionChar = " LIKE "
             else:
                 conditionChar = "="
@@ -525,25 +525,25 @@ class Enumeration:
                 if user in retrievedUsers:
                     continue
 
-                if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
+                if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
                     user = "%%%s%%" % user
 
                 infoMsg = "fetching number of privileges "
                 infoMsg += "for user '%s'" % user
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                     query = rootQuery.blind.count2 % user
-                elif Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
+                elif Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
                     query = rootQuery.blind.count % (conditionChar, user)
-                elif Backend.getIdentifiedDbms() == DBMS.ORACLE and query2:
+                elif Backend.isDbms(DBMS.ORACLE) and query2:
                     query = rootQuery.blind.count2 % user
                 else:
                     query = rootQuery.blind.count % user
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
-                    if not (isinstance(count, basestring) and count.isdigit()) and Backend.getIdentifiedDbms() == DBMS.ORACLE and not query2:
+                    if not (isinstance(count, basestring) and count.isdigit()) and Backend.isDbms(DBMS.ORACLE) and not query2:
                         infoMsg = "trying with table USER_SYS_PRIVS"
                         logger.info(infoMsg)
 
@@ -559,20 +559,20 @@ class Enumeration:
 
                 privileges = set()
 
-                if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                if Backend.isDbms(DBMS.ORACLE):
                     plusOne = True
                 else:
                     plusOne = False
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                    if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                         query = rootQuery.blind.query2 % (user, index)
-                    elif Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
+                    elif Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
                         query = rootQuery.blind.query % (conditionChar, user, index)
-                    elif Backend.getIdentifiedDbms() == DBMS.ORACLE and query2:
+                    elif Backend.isDbms(DBMS.ORACLE) and query2:
                         query = rootQuery.blind.query2 % (user, index)
-                    elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+                    elif Backend.isDbms(DBMS.FIREBIRD):
                         query = rootQuery.blind.query % (index, user)
                     else:
                         query = rootQuery.blind.query % (user, index)
@@ -580,7 +580,7 @@ class Enumeration:
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise
-                    if Backend.getIdentifiedDbms() == DBMS.PGSQL and ", " in privilege:
+                    if Backend.isDbms(DBMS.PGSQL) and ", " in privilege:
                         privilege = privilege.replace(", ", ",")
                         privs = privilege.split(",")
                         i = 1
@@ -595,12 +595,12 @@ class Enumeration:
 
                     # In MySQL >= 5.0 and Oracle we get the list
                     # of privileges as string
-                    elif Backend.getIdentifiedDbms() == DBMS.ORACLE or ( Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema ):
+                    elif Backend.isDbms(DBMS.ORACLE) or ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema ):
                         privileges.add(privilege)
 
                     # In MySQL < 5.0 we get Y if the privilege is 
                     # True, N otherwise
-                    elif Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                    elif Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                         privilege = privilege.replace(", ", ",")
                         privs = privilege.split(",")
                         i = 1
@@ -614,7 +614,7 @@ class Enumeration:
                             i += 1
 
                     # In Firebird we get one letter for each privilege
-                    elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+                    elif Backend.isDbms(DBMS.FIREBIRD):
                         privileges.add(firebirdPrivs[privilege.strip()])
 
                     if self.__isAdminFromPrivileges(privileges):
@@ -623,7 +623,7 @@ class Enumeration:
                     # In MySQL < 5.0 we break the cycle after the first
                     # time we get the user's privileges otherwise we
                     # duplicate the same query
-                    if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                    if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                         break
 
                 if privileges:
@@ -650,13 +650,13 @@ class Enumeration:
         return self.getPrivileges(query2)
 
     def getDbs(self):
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+        if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             warnMsg = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
-        if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+        if Backend.isDbms(DBMS.ORACLE):
             warnMsg = "schema names are going to be used on Oracle "
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
@@ -671,7 +671,7 @@ class Enumeration:
         rootQuery = queries[Backend.getIdentifiedDbms()].dbs
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+            if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
@@ -684,7 +684,7 @@ class Enumeration:
             infoMsg = "fetching number of databases"
             logger.info(infoMsg)
 
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+            if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
@@ -694,16 +694,16 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of databases"
                 logger.error(errMsg)
             else:
-                if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                if Backend.isDbms(DBMS.ORACLE):
                     plusOne = True
                 else:
                     plusOne = False
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                    if Backend.isDbms(DBMS.SYBASE):
                         query = rootQuery.blind.query % (kb.data.cachedDbs[-1] if kb.data.cachedDbs else " ")
-                    elif Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                    elif Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                         query = rootQuery.blind.query2 % index
                     else:
                         query = rootQuery.blind.query % index
@@ -729,13 +729,13 @@ class Enumeration:
         self.forceDbmsEnum()
 
         if bruteForce is None:
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+            if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 errMsg = "information_schema not available, "
                 errMsg += "back-end DBMS is MySQL < 5.0"
                 logger.error(errMsg)
                 bruteForce = True
 
-            elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
+            elif Backend.isDbms(DBMS.ACCESS):
                 try:
                     tables = self.getTables(False)
                 except sqlmapNoneDataException:
@@ -815,13 +815,13 @@ class Enumeration:
                     infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
                     logger.info(infoMsg)
 
-            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            if Backend.isDbms(DBMS.MSSQL):
                 query = safeStringFormat(query, conf.db)
             value = inject.getValue(query, blind=False)
             value = filter(lambda x: x, value)
 
             if value:
-                if Backend.getIdentifiedDbms() == DBMS.SQLITE:
+                if Backend.isDbms(DBMS.SQLITE):
                     if isinstance(value, basestring):
                         value = [[ DBMS.SQLITE, value ]]
                     elif isinstance(value, (list, tuple, set)):
@@ -874,7 +874,7 @@ class Enumeration:
                 indexRange = getRange(count, plusOne=plusOne)
 
                 for index in indexRange:
-                    if Backend.getIdentifiedDbms() == DBMS.SYBASE:
+                    if Backend.isDbms(DBMS.SYBASE):
                         query = rootQuery.blind.query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
                     elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS):
                         query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
@@ -934,13 +934,13 @@ class Enumeration:
 
             return self.getSchema()
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+        if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             logger.error(errMsg)
             bruteForce = True
 
-        elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
+        elif Backend.isDbms(DBMS.ACCESS):
             errMsg = "cannot retrieve column names, "
             errMsg += "back-end DBMS is Access"
             logger.error(errMsg)
@@ -986,7 +986,7 @@ class Enumeration:
         infoMsg = "fetching columns "
 
         if conf.col:
-            if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            if Backend.isDbms(DBMS.ORACLE):
                 conf.col = conf.col.upper()
             colList = conf.col.split(",")
             condQuery = " AND (" + " OR ".join("%s LIKE '%s'" % (condition, "%" + unsafeSQLIdentificatorNaming(col) + "%") for col in colList) + ")"
@@ -1002,21 +1002,21 @@ class Enumeration:
             if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                 query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(conf.tbl), unsafeSQLIdentificatorNaming(conf.db))
                 query += condQuery
-            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            elif Backend.isDbms(DBMS.ORACLE):
                 query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(conf.tbl.upper())
                 query += condQuery
-            elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            elif Backend.isDbms(DBMS.MSSQL):
                 query = rootQuery.inband.query % (conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, conf.db,
                                                         conf.db, unsafeSQLIdentificatorNaming(conf.tbl))
                 query += condQuery.replace("[DB]", conf.db)
-            elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
+            elif Backend.isDbms(DBMS.SQLITE):
                 query = rootQuery.inband.query % conf.tbl
 
             value = inject.getValue(query, blind=False)
 
-            if Backend.getIdentifiedDbms() == DBMS.SQLITE:
+            if Backend.isDbms(DBMS.SQLITE):
                 parseSqliteTableSchema(value)
             elif value:
                 table = {}
@@ -1047,7 +1047,7 @@ class Enumeration:
                 query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(conf.tbl), unsafeSQLIdentificatorNaming(conf.db))
                 query += condQuery
 
-            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            elif Backend.isDbms(DBMS.ORACLE):
                 query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(conf.tbl.upper())
                 query += condQuery
 
@@ -1056,11 +1056,11 @@ class Enumeration:
                     unsafeSQLIdentificatorNaming(conf.tbl))
                 query += condQuery.replace("[DB]", conf.db)
 
-            elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+            elif Backend.isDbms(DBMS.FIREBIRD):
                 query = rootQuery.blind.count % (conf.tbl)
                 query += condQuery
 
-            elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
+            elif Backend.isDbms(DBMS.SQLITE):
                 query = rootQuery.blind.query % conf.tbl
                 value = inject.getValue(query, inband=False, error=False)
                 parseSqliteTableSchema(value)
@@ -1084,7 +1084,7 @@ class Enumeration:
                     query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(conf.tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
                     field = None
-                elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                elif Backend.isDbms(DBMS.ORACLE):
                     query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(conf.tbl.upper())
                     query += condQuery
                     field = None
@@ -1095,7 +1095,7 @@ class Enumeration:
                                                            unsafeSQLIdentificatorNaming(conf.tbl))
                     query += condQuery.replace("[DB]", conf.db)
                     field = condition.replace("[DB]", conf.db)
-                elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+                elif Backend.isDbms(DBMS.FIREBIRD):
                     query = rootQuery.blind.query % (conf.tbl)
                     query += condQuery
                     field = None
@@ -1106,18 +1106,18 @@ class Enumeration:
                 if not onlyColNames:
                     if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                         query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(conf.tbl), column, unsafeSQLIdentificatorNaming(conf.db))
-                    elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                    elif Backend.isDbms(DBMS.ORACLE):
                         query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(conf.tbl.upper()), column)
-                    elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+                    elif Backend.isDbms(DBMS.MSSQL):
                         query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db,
                                                                 conf.db, column, conf.db,
                                                                 conf.db, conf.db, unsafeSQLIdentificatorNaming(conf.tbl))
-                    elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+                    elif Backend.isDbms(DBMS.FIREBIRD):
                         query = rootQuery.blind.query2 % (conf.tbl, column)
 
                     colType = inject.getValue(query, inband=False, error=False)
 
-                    if Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+                    if Backend.isDbms(DBMS.FIREBIRD):
                         colType = firebirdTypes[colType] if colType in firebirdTypes else colType
 
                     column = safeSQLIdentificatorNaming(column)
@@ -1402,7 +1402,7 @@ class Enumeration:
             entries = []
             query = None
 
-            if all([Backend.getIdentifiedDbms() == DBMS.MYSQL, isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR), conf.groupConcat]):
+            if all([Backend.isDbms(DBMS.MYSQL), isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR), conf.groupConcat]):
                 randStr, randStr2 = randomStr(), randomStr()
                 filterFunction = "REPLACE(REPLACE(IFNULL(%s, ' '),'%s','%s'),'%s','%s')"\
                   % ('%s', CONCAT_VALUE_DELIMITER, randStr, CONCAT_ROW_DELIMITER, randStr2)
@@ -1416,9 +1416,9 @@ class Enumeration:
                         row = map(lambda x: x.replace(randStr, CONCAT_VALUE_DELIMITER).replace(randStr2, CONCAT_ROW_DELIMITER), row)
                         entries.append(row)
 
-            if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            if Backend.isDbms(DBMS.ORACLE):
                 query = rootQuery.inband.query % (colString, conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
-            elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
+            elif Backend.isDbms(DBMS.SQLITE):
                 query = rootQuery.inband.query % (colString, conf.tbl)
             elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                 # Partial inband and error
@@ -1477,13 +1477,13 @@ class Enumeration:
             infoMsg += "on database '%s'" % conf.db
             logger.info(infoMsg)
 
-            if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            if Backend.isDbms(DBMS.ORACLE):
                 query = rootQuery.blind.count % (conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())))
             elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                 query = rootQuery.blind.count % conf.tbl
             elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                 query = rootQuery.blind.count % ("%s.%s" % (conf.db, conf.tbl))
-            elif Backend.getIdentifiedDbms() == DBMS.MAXDB:
+            elif Backend.isDbms(DBMS.MAXDB):
                 query = rootQuery.blind.count % ("%s" % conf.tbl)
             else:
                 query = rootQuery.blind.count % (conf.db, conf.tbl)
@@ -1505,11 +1505,11 @@ class Enumeration:
 
             try:
                 if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL):
-                    if Backend.getIdentifiedDbms() == DBMS.ACCESS:
+                    if Backend.isDbms(DBMS.ACCESS):
                         table = conf.tbl
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         table = "%s.%s" % (conf.db, conf.tbl)
-                    elif Backend.getIdentifiedDbms() == DBMS.MAXDB:
+                    elif Backend.isDbms(DBMS.MAXDB):
                         table = "%s.%s" % (conf.db, conf.tbl)
 
                     retVal = self.__pivotDumpTable(table, colList, count, blind=True)
@@ -1517,7 +1517,7 @@ class Enumeration:
                         entries, lengths = retVal
 
                 else:
-                    if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                    if Backend.isDbms(DBMS.ORACLE):
                         plusOne = True
                     else:
                         plusOne = False
@@ -1534,14 +1534,14 @@ class Enumeration:
                             if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                                 query = rootQuery.blind.query % (column, conf.db,
                                                                        conf.tbl, index)
-                            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                            elif Backend.isDbms(DBMS.ORACLE):
                                 query = rootQuery.blind.query % (column, column,
                                                                        conf.tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), conf.tbl.upper())),
                                                                        index)
-                            elif Backend.getIdentifiedDbms() == DBMS.SQLITE:
+                            elif Backend.isDbms(DBMS.SQLITE):
                                 query = rootQuery.blind.query % (column, conf.tbl, index)
 
-                            elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+                            elif Backend.isDbms(DBMS.FIREBIRD):
                                 query = rootQuery.blind.query % (index, column, conf.tbl)
 
                             value = inject.getValue(query, inband=False, error=False, dump=True)
@@ -1585,7 +1585,7 @@ class Enumeration:
         return kb.data.dumpedTable
 
     def dumpAll(self):
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+        if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
@@ -1700,7 +1700,7 @@ class Enumeration:
         rootQuery = queries[Backend.getIdentifiedDbms()].search_db
         dbList = conf.db.split(",")
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+        if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             dbCond = rootQuery.inband.condition2
         else:
             dbCond = rootQuery.inband.condition
@@ -1727,7 +1727,7 @@ class Enumeration:
             dbQuery = dbQuery % unsafeSQLIdentificatorNaming(db)
 
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
-                if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                     query = rootQuery.inband.query2
                 else:
                     query = rootQuery.inband.query
@@ -1749,7 +1749,7 @@ class Enumeration:
                 infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(db)
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                     query = rootQuery.blind.count2
                 else:
                     query = rootQuery.blind.count
@@ -1769,7 +1769,7 @@ class Enumeration:
                 indexRange = getRange(count)
 
                 for index in indexRange:
-                    if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+                    if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                         query = rootQuery.blind.query2
                     else:
                         query = rootQuery.blind.query
@@ -1786,12 +1786,12 @@ class Enumeration:
     def searchTable(self):
         bruteForce = False
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+        if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             bruteForce = True
 
-        elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
+        elif Backend.isDbms(DBMS.ACCESS):
             errMsg = "cannot retrieve table names, "
             errMsg += "back-end DBMS is Access"
             logger.error(errMsg)
@@ -1820,7 +1820,7 @@ class Enumeration:
         for tbl in tblList:
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            if Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            if Backend.isDbms(DBMS.ORACLE):
                 tbl = tbl.upper()
 
             infoMsg = "searching table"
@@ -1941,12 +1941,12 @@ class Enumeration:
     def searchColumn(self):
         bruteForce = False
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
+        if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             bruteForce = True
 
-        elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
+        elif Backend.isDbms(DBMS.ACCESS):
             errMsg = "cannot retrieve column names, "
             errMsg += "back-end DBMS is Access"
             logger.error(errMsg)

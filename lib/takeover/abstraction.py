@@ -45,7 +45,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
         elif Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
             self.udfExecCmd(cmd, silent=silent)
 
-        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.isDbms(DBMS.MSSQL):
             self.xpCmdshellExecCmd(cmd, silent=silent)
 
         else:
@@ -59,7 +59,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
         elif Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
             return self.udfEvalCmd(cmd, first, last)
 
-        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.isDbms(DBMS.MSSQL):
             return self.xpCmdshellEvalCmd(cmd, first, last)
 
         else:
@@ -100,7 +100,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 infoMsg += "command execution"
                 logger.info(infoMsg)
 
-            elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            elif Backend.isDbms(DBMS.MSSQL):
                 infoMsg = "going to use xp_cmdshell extended procedure for "
                 infoMsg += "operating system command execution"
                 logger.info(infoMsg)
@@ -154,7 +154,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
 
             if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                 self.udfInjectSys()
-            elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            elif Backend.isDbms(DBMS.MSSQL):
                 if mandatory:
                     self.xpCmdshellInit()
             else:

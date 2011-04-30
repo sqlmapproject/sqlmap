@@ -97,13 +97,13 @@ def bannerParser(banner):
 
     xmlfile = None
 
-    if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+    if Backend.isDbms(DBMS.MSSQL):
         xmlfile = paths.MSSQL_XML
-    elif Backend.getIdentifiedDbms() == DBMS.MYSQL:
+    elif Backend.isDbms(DBMS.MYSQL):
         xmlfile = paths.MYSQL_XML
-    elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+    elif Backend.isDbms(DBMS.ORACLE):
         xmlfile = paths.ORACLE_XML
-    elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
+    elif Backend.isDbms(DBMS.PGSQL):
         xmlfile = paths.PGSQL_XML
 
     if not xmlfile:
@@ -111,7 +111,7 @@ def bannerParser(banner):
 
     checkFile(xmlfile)
 
-    if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+    if Backend.isDbms(DBMS.MSSQL):
         handler = MSSQLBannerHandler(banner, kb.bannerFp)
         parseXmlFile(xmlfile, handler)
 

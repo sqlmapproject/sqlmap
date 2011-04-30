@@ -184,7 +184,7 @@ def unionUse(expression, unpack=True, dump=False):
                     stopLimit = int(topLimit.group(1))
                     limitCond = int(stopLimit) > 1
 
-            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            elif Backend.isDbms(DBMS.ORACLE):
                 limitCond = False
         else:
             limitCond = True
@@ -256,7 +256,7 @@ def unionUse(expression, unpack=True, dump=False):
                 for num in xrange(startLimit, stopLimit):
                     if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                         field = expressionFieldsList[0]
-                    elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+                    elif Backend.isDbms(DBMS.ORACLE):
                         field = expressionFieldsList
                     else:
                         field = None

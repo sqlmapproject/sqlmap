@@ -189,13 +189,13 @@ class Metasploit:
         if __payloadStr == "windows/vncinject":
             choose = False
 
-            if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+            if Backend.isDbms(DBMS.MYSQL):
                 debugMsg = "by default MySQL on Windows runs as SYSTEM "
                 debugMsg += "user, it is likely that the the VNC "
                 debugMsg += "injection will be successful"
                 logger.debug(debugMsg)
 
-            elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
+            elif Backend.isDbms(DBMS.PGSQL):
                 choose = True
 
                 warnMsg = "by default PostgreSQL on Windows runs as "
@@ -203,7 +203,7 @@ class Metasploit:
                 warnMsg += "injection will be successful"
                 logger.warn(warnMsg)
 
-            elif Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
+            elif Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                 choose = True
 
                 warnMsg = "it is unlikely that the VNC injection will be "
@@ -232,12 +232,12 @@ class Metasploit:
                         break
 
                     elif choice == "1":
-                        if Backend.getIdentifiedDbms() == DBMS.PGSQL:
+                        if Backend.isDbms(DBMS.PGSQL):
                             logger.warn("beware that the VNC injection might not work")
 
                             break
 
-                        elif Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
+                        elif Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                             break
 
                     elif not choice.isdigit():

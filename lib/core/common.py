@@ -869,7 +869,7 @@ def parsePasswordHash(password):
     if not password or password == " ":
         password = "NULL"
 
-    if Backend.getIdentifiedDbms() == DBMS.MSSQL and password != "NULL" and isHexEncodedString(password):
+    if Backend.isDbms(DBMS.MSSQL) and password != "NULL" and isHexEncodedString(password):
         hexPassword = password
         password = "%s\n" % hexPassword
         password += "%sheader: %s\n" % (blank, hexPassword[:6])
@@ -1194,11 +1194,11 @@ def getDelayQuery(andCond=False):
 
         banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
 
-        if banVer is None or (Backend.getIdentifiedDbms() == DBMS.MYSQL and banVer >= "5.0.12") or (Backend.getIdentifiedDbms() == DBMS.PGSQL and banVer >= "8.2"):
+        if banVer is None or (Backend.isDbms(DBMS.MYSQL) and banVer >= "5.0.12") or (Backend.isDbms(DBMS.PGSQL) and banVer >= "8.2"):
             query = queries[Backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
         else:
             query = queries[Backend.getIdentifiedDbms()].timedelay.query2 % conf.timeSec
-    elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+    elif Backend.isDbms(DBMS.FIREBIRD):
         query = queries[Backend.getIdentifiedDbms()].timedelay.query
     else:
         query = queries[Backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
@@ -1206,7 +1206,7 @@ def getDelayQuery(andCond=False):
     if andCond:
         if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.SQLITE ):
             query = query.replace("SELECT ", "")
-        elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+        elif Backend.isDbms(DBMS.FIREBIRD):
             query = "(%s)>0" % query
 
     return query

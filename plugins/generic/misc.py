@@ -58,13 +58,13 @@ class Miscellaneous:
         infoMsg = "detecting back-end DBMS version from its banner"
         logger.info(infoMsg)
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             first, last = 1, 6
 
-        elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
+        elif Backend.isDbms(DBMS.PGSQL):
             first, last = 12, 6
 
-        elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
+        elif Backend.isDbms(DBMS.MSSQL):
             first, last = 29, 9
 
         else:
@@ -122,7 +122,7 @@ class Miscellaneous:
         if not onlyFileTbl:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
 
-            if Backend.getIdentifiedDbms() == DBMS.MSSQL:
+            if Backend.isDbms(DBMS.MSSQL):
                 return
 
             if udfDict is None:
@@ -135,7 +135,7 @@ class Miscellaneous:
                 if not output or output in ("y", "Y"):
                     dropStr = "DROP FUNCTION %s" % udf
 
-                    if Backend.getIdentifiedDbms() == DBMS.PGSQL:
+                    if Backend.isDbms(DBMS.PGSQL):
                         inp = ", ".join(i for i in inpRet["input"])
                         dropStr += "(%s)" % inp
 

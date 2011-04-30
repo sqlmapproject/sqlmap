@@ -27,7 +27,7 @@ def direct(query, content=True):
     select = True
     query = agent.payloadDirect(query)
 
-    if Backend.getIdentifiedDbms() == DBMS.ORACLE and query.startswith("SELECT ") and " FROM " not in query:
+    if Backend.isDbms(DBMS.ORACLE) and query.startswith("SELECT ") and " FROM " not in query:
         query = "%s FROM DUAL" % query
 
     for sqlTitle, sqlStatements in SQL_STATEMENTS.items():

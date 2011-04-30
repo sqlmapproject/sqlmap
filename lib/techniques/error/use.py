@@ -57,7 +57,7 @@ def __oneShotErrorUse(expression, field):
 
         nulledCastedField = agent.nullAndCastField(field)
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, MYSQL_ERROR_CHUNK_LENGTH)
 
         # Forge the error-based SQL injection request
@@ -101,7 +101,7 @@ def __oneShotErrorUse(expression, field):
         if isinstance(output, basestring):
             output = htmlunescape(output).replace("<br>", "\n")
 
-        if Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        if Backend.isDbms(DBMS.MYSQL):
             if offset == 1:
                 retVal = output
             else:
@@ -243,7 +243,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     stopLimit = int(topLimit.group(1))
                     limitCond = int(stopLimit) > 1
 
-            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            elif Backend.isDbms(DBMS.ORACLE):
                 limitCond = False
         else:
             limitCond = True

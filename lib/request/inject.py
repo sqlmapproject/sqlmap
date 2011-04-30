@@ -141,7 +141,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
     rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
-    if rdbRegExp and Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
+    if rdbRegExp and Backend.isDbms(DBMS.FIREBIRD):
         expressionFieldsList = [expressionFields]
 
     if len(expressionFieldsList) > 1:
@@ -189,7 +189,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                     stopLimit = int(topLimit.group(1))
                     limitCond = int(stopLimit) > 1
 
-            elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+            elif Backend.isDbms(DBMS.ORACLE):
                 limitCond = False
         else:
             limitCond = True

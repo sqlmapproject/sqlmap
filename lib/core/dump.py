@@ -104,9 +104,9 @@ class Dump:
         self.string("current user", data)
 
     def currentDb(self,data):
-        if Backend.getIdentifiedDbms() == DBMS.MAXDB:
+        if Backend.isDbms(DBMS.MAXDB):
             self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data)
-        elif Backend.getIdentifiedDbms() == DBMS.ORACLE:
+        elif Backend.isDbms(DBMS.ORACLE):
             self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data)
         else:
             self.string("current database", data)
