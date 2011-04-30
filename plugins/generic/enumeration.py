@@ -1130,7 +1130,9 @@ class Enumeration:
                     errMsg = "unable to retrieve the number of columns "
                     errMsg += "for table '%s' " % tbl
                     errMsg += "on database '%s'" % conf.db
-                    raise sqlmapNoneDataException, errMsg
+                    logger.error(errMsg)
+
+                    continue
 
                 table = {}
                 columns = {}
@@ -1194,7 +1196,7 @@ class Enumeration:
         if not kb.data.cachedColumns:
             errMsg = "unable to retrieve the columns for any "
             errMsg += "table on database '%s'" % conf.db
-            raise sqlmapNoneDataException, errMsg
+            logger.error(errMsg)
 
         return kb.data.cachedColumns
 
