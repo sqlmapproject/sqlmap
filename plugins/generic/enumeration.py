@@ -226,6 +226,21 @@ class Enumeration:
 
         logger.info(infoMsg)
 
+        if conf.user and Backend.isDbms(DBMS.ORACLE):
+            conf.user = conf.user.upper()
+
+        if conf.user:
+            users = conf.user.split(",")
+
+            if Backend.isDbms(DBMS.MYSQL):
+                for user in users:
+                    parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+
+                    if parsedUser:
+                        users[users.index(user)] = parsedUser.groups()[0]
+        else:
+            users = []
+
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
                 query = rootQuery.inband.query2
@@ -235,27 +250,18 @@ class Enumeration:
             condition = rootQuery.inband.condition
 
             if conf.user:
-                if "," in conf.user:
-                    users = conf.user.split(",")
-                    query += " WHERE "
-                    query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
-                else:
-                    if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", conf.user)
-
-                        if parsedUser:
-                            conf.user = parsedUser.groups()[0]
-
-                    query += " WHERE %s = '%s'" % (condition, conf.user)
+                query += " WHERE "
+                query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
             if Backend.getIdentifiedDbms() == DBMS.SYBASE:
                 randStr = randomStr()
                 getCurrentThreadData().disableStdOut = True
 
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=False)
+
                 if retVal:
                     for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
-                        #password = "0x%s" % strToHex(password)
+                        # password = "0x%s" % strToHex(password)
                         if not kb.data.cachedUsersPasswords.has_key(user):
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
@@ -278,16 +284,15 @@ class Enumeration:
                             kb.data.cachedUsersPasswords[user].append(password)
 
         if not kb.data.cachedUsersPasswords and not conf.direct:
-            if conf.user:
-                if "," in conf.user:
-                    users = conf.user.split(",")
-                else:
-                    users = [conf.user]
-            else:
-                if not len(kb.data.cachedUsers):
-                    users = self.getUsers()
-                else:
-                    users = kb.data.cachedUsers
+            if not len(users):
+                users = self.getUsers()
+
+                if Backend.isDbms(DBMS.MYSQL):
+                    for user in users:
+                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+
+                        if parsedUser:
+                            users[users.index(user)] = parsedUser.groups()[0]
 
             if Backend.getIdentifiedDbms() == DBMS.SYBASE:
                 getCurrentThreadData().disableStdOut = True
@@ -296,27 +301,22 @@ class Enumeration:
                 query = rootQuery.inband.query
 
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=True)
+
                 if retVal:
                     for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
                         password = "0x%s" % strToHex(password)
+
                         if not kb.data.cachedUsersPasswords.has_key(user):
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
                             kb.data.cachedUsersPasswords[user].append(password)
 
                 getCurrentThreadData().disableStdOut = False
-
             else:
                 retrievedUsers = set()
 
                 for user in users:
-                    if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
-
-                        if parsedUser:
-                            user = parsedUser.groups()[0]
-
-                    if not user or user in retrievedUsers:
+                    if user in retrievedUsers:
                         continue
 
                     infoMsg = "fetching number of password hashes "
@@ -419,6 +419,21 @@ class Enumeration:
 
         logger.info(infoMsg)
 
+        if conf.user and Backend.isDbms(DBMS.ORACLE):
+            conf.user = conf.user.upper()
+
+        if conf.user:
+            users = conf.user.split(",")
+
+            if Backend.isDbms(DBMS.MYSQL):
+                for user in users:
+                    parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+
+                    if parsedUser:
+                        users[users.index(user)] = parsedUser.groups()[0]
+        else:
+            users = []
+
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
@@ -434,13 +449,10 @@ class Enumeration:
                 condition = rootQuery.inband.condition
 
             if conf.user:
-                users = conf.user.split(",")
                 query += " WHERE "
-                # NOTE: I assume that the user provided is not in
-                # MySQL >= 5.0 syntax 'user'@'host'
+
                 if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
-                    queryUser = "%" + conf.user + "%"
-                    query += " OR ".join("%s LIKE '%s'" % (condition, "%" + user + "%") for user in users)
+                    query += " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in users)
                 else:
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
 
@@ -492,59 +504,42 @@ class Enumeration:
                         kb.data.cachedUsersPrivileges[user] = list(privileges)
 
         if not kb.data.cachedUsersPrivileges and not conf.direct:
-            conditionChar = "="
+            if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
+                conditionChar = " LIKE "
+            else:
+                conditionChar = "="
 
-            if conf.user:
-                if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
-                    conditionChar = " LIKE "
+            if not len(users):
+                users = self.getUsers()
 
-                    if "," in conf.user:
-                        users = set()
-                        for user in conf.user.split(","):
-                            users.add("%" + user + "%")
-                    else:
-                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", conf.user)
+                if Backend.isDbms(DBMS.MYSQL):
+                    for user in users:
+                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
 
                         if parsedUser:
-                            conf.user = parsedUser.groups()[0]
-
-                        users = [ "%" + conf.user + "%" ]
-                else:
-                    users = conf.user.split(",")
-            else:
-                if not len(kb.data.cachedUsers):
-                    users = self.getUsers()
-                else:
-                    users = kb.data.cachedUsers
+                            users[users.index(user)] = parsedUser.groups()[0]
 
             retrievedUsers = set()
 
             for user in users:
-                unescapedUser = None
+                if user in retrievedUsers:
+                    continue
 
                 if Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
-                    unescapedUser = unescaper.unescape(user, quote=False)
-
-                if not user or user in retrievedUsers:
-                    continue
+                    user = "%%%s%%" % user
 
                 infoMsg = "fetching number of privileges "
                 infoMsg += "for user '%s'" % user
                 logger.info(infoMsg)
 
-                if unescapedUser:
-                    queryUser = unescapedUser
-                else:
-                    queryUser = user
-
                 if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-                    query = rootQuery.blind.count2 % queryUser
+                    query = rootQuery.blind.count2 % user
                 elif Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
-                    query = rootQuery.blind.count % (conditionChar, queryUser)
+                    query = rootQuery.blind.count % (conditionChar, user)
                 elif Backend.getIdentifiedDbms() == DBMS.ORACLE and query2:
-                    query = rootQuery.blind.count2 % queryUser
+                    query = rootQuery.blind.count2 % user
                 else:
-                    query = rootQuery.blind.count % queryUser
+                    query = rootQuery.blind.count % user
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
@@ -572,15 +567,15 @@ class Enumeration:
 
                 for index in indexRange:
                     if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-                        query = rootQuery.blind.query2 % (queryUser, index)
+                        query = rootQuery.blind.query2 % (user, index)
                     elif Backend.getIdentifiedDbms() == DBMS.MYSQL and kb.data.has_information_schema:
-                        query = rootQuery.blind.query % (conditionChar, queryUser, index)
+                        query = rootQuery.blind.query % (conditionChar, user, index)
                     elif Backend.getIdentifiedDbms() == DBMS.ORACLE and query2:
-                        query = rootQuery.blind.query2 % (queryUser, index)
+                        query = rootQuery.blind.query2 % (user, index)
                     elif Backend.getIdentifiedDbms() == DBMS.FIREBIRD:
-                        query = rootQuery.blind.query % (index, queryUser)
+                        query = rootQuery.blind.query % (index, user)
                     else:
-                        query = rootQuery.blind.query % (queryUser, index)
+                        query = rootQuery.blind.query % (user, index)
                     privilege = inject.getValue(query, inband=False, error=False)
 
                     # In PostgreSQL we get 1 if the privilege is True,
