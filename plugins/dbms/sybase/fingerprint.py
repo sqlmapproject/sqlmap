@@ -83,8 +83,8 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("tempdb_id()=tempdb_id()")
 
         if result:
-            logMsg = "confirming %s" % DBMS.SYBASE
-            logger.info(logMsg)
+            infoMsg = "confirming %s" % DBMS.SYBASE
+            logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("suser_id()=suser_id()")
 

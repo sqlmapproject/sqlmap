@@ -123,15 +123,15 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        logMsg = "testing %s" % DBMS.FIREBIRD
-        logger.info(logMsg)
+        infoMsg = "testing %s" % DBMS.FIREBIRD
+        logger.info(infoMsg)
 
         randInt = randomInt()
         result = inject.checkBooleanExpression("EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
 
         if result:
-            logMsg = "confirming %s" % DBMS.FIREBIRD
-            logger.info(logMsg)
+            infoMsg = "confirming %s" % DBMS.FIREBIRD
+            logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
 

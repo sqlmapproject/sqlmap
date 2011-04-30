@@ -160,14 +160,14 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        logMsg = "testing %s" % DBMS.ACCESS
-        logger.info(logMsg)
+        infoMsg = "testing %s" % DBMS.ACCESS
+        logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("VAL(CVAR(1))=1")
 
         if result:
-            logMsg = "confirming %s" % DBMS.ACCESS
-            logger.info(logMsg)
+            infoMsg = "confirming %s" % DBMS.ACCESS
+            logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
 

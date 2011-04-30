@@ -393,8 +393,8 @@ def __setGoogleDorking():
     debugMsg = "initializing Google dorking requests"
     logger.debug(debugMsg)
 
-    logMsg = "first request to Google to get the session cookie"
-    logger.info(logMsg)
+    infoMsg = "first request to Google to get the session cookie"
+    logger.info(infoMsg)
 
     handlers = [ proxyHandler ]
 
@@ -421,16 +421,16 @@ def __setGoogleDorking():
     googleObj.getTargetUrls()
 
     if kb.targetUrls:
-        logMsg = "sqlmap got %d results for your " % len(matches)
-        logMsg += "Google dork expression, "
+        infoMsg = "sqlmap got %d results for your " % len(matches)
+        infoMsg += "Google dork expression, "
 
         if len(matches) == len(kb.targetUrls):
-            logMsg += "all "
+            infoMsg += "all "
         else:
-            logMsg += "%d " % len(kb.targetUrls)
+            infoMsg += "%d " % len(kb.targetUrls)
 
-        logMsg += "of them are testable targets"
-        logger.info(logMsg)
+        infoMsg += "of them are testable targets"
+        logger.info(infoMsg)
     else:
         errMsg = "sqlmap got %d results " % len(matches)
         errMsg += "for your Google dork expression, but none of them "
@@ -1115,9 +1115,9 @@ def __setHTTPUserAgent():
         userAgent = sanitizeStr(userAgent)
         conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
 
-        logMsg = "fetched random HTTP User-Agent header from "
-        logMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
-        logger.info(logMsg)
+        infoMsg = "fetched random HTTP User-Agent header from "
+        infoMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
+        logger.info(infoMsg)
 
 def __setHTTPReferer():
     """

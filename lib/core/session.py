@@ -168,8 +168,8 @@ def resumeConfKb(expression, url, value):
     if expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
 
-        logMsg = "resuming injection data from session file"
-        logger.info(logMsg)
+        infoMsg = "resuming injection data from session file"
+        logger.info(infoMsg)
 
         if injection.place in conf.paramDict and \
            injection.parameter in conf.paramDict[injection.place]:
@@ -187,17 +187,17 @@ def resumeConfKb(expression, url, value):
 
     elif expression == "Dynamic markings" and url == conf.url:
         kb.dynamicMarkings = base64unpickle(value[:-1])
-        logMsg = "resuming dynamic markings from session file"
-        logger.info(logMsg)
+        infoMsg = "resuming dynamic markings from session file"
+        logger.info(infoMsg)
 
     elif expression == "DBMS" and url == conf.url:
         dbms = unSafeFormatString(value[:-1])
         dbms = dbms.lower()
         dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
-        logMsg = "resuming back-end DBMS '%s' " % dbms
-        logMsg += "from session file"
-        logger.info(logMsg)
+        infoMsg = "resuming back-end DBMS '%s' " % dbms
+        infoMsg += "from session file"
+        logger.info(infoMsg)
 
         firstRegExp = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
         dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, dbms)
@@ -225,9 +225,9 @@ def resumeConfKb(expression, url, value):
         os = unSafeFormatString(value[:-1])
 
         if os and os != 'None':
-            logMsg = "resuming back-end DBMS operating system '%s' " % os
-            logMsg += "from session file"
-            logger.info(logMsg)
+            infoMsg = "resuming back-end DBMS operating system '%s' " % os
+            infoMsg += "from session file"
+            logger.info(infoMsg)
 
             if conf.os and conf.os.lower() != os.lower():
                 message = "you provided '%s' as back-end DBMS operating " % conf.os
@@ -248,9 +248,9 @@ def resumeConfKb(expression, url, value):
     elif expression == "Remote temp path" and url == conf.url and conf.tmpPath is None:
         conf.tmpPath = unSafeFormatString(value[:-1])
 
-        logMsg = "resuming remote absolute path of temporary "
-        logMsg += "files directory '%s' from session file" % conf.tmpPath
-        logger.info(logMsg)
+        infoMsg = "resuming remote absolute path of temporary "
+        infoMsg += "files directory '%s' from session file" % conf.tmpPath
+        logger.info(infoMsg)
 
     elif expression == "TABLE_EXISTS" and url == conf.url:
         table = unSafeFormatString(value[:-1])
@@ -261,9 +261,9 @@ def resumeConfKb(expression, url, value):
         else:
             db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
 
-        logMsg = "resuming brute forced table name "
-        logMsg += "'%s' from session file" % table
-        logger.info(logMsg)
+        infoMsg = "resuming brute forced table name "
+        infoMsg += "'%s' from session file" % table
+        logger.info(infoMsg)
 
         kb.brute.tables.append((db, table))
 
@@ -277,13 +277,13 @@ def resumeConfKb(expression, url, value):
         else:
             db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
 
-        logMsg = "resuming brute forced column name "
-        logMsg += "'%s' for table '%s' from session file" % (colName, table)
-        logger.info(logMsg)
+        infoMsg = "resuming brute forced column name "
+        infoMsg += "'%s' for table '%s' from session file" % (colName, table)
+        logger.info(infoMsg)
 
         kb.brute.columns.append((db, table, colName, colType))
 
     elif expression == "xp_cmdshell availability" and url == conf.url:
         kb.xpCmdshellAvailable = True if unSafeFormatString(value[:-1]).lower() == "true" else False
-        logMsg = "resuming xp_cmdshell availability"
-        logger.info(logMsg)
+        infoMsg = "resuming xp_cmdshell availability"
+        logger.info(infoMsg)

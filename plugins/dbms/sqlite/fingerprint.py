@@ -76,14 +76,14 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        logMsg = "testing %s" % DBMS.SQLITE
-        logger.info(logMsg)
+        infoMsg = "testing %s" % DBMS.SQLITE
+        logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
 
         if result:
-            logMsg = "confirming %s" % DBMS.SQLITE
-            logger.info(logMsg)
+            infoMsg = "confirming %s" % DBMS.SQLITE
+            logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("SQLITE_VERSION()=SQLITE_VERSION()")
 

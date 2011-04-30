@@ -275,8 +275,8 @@ def start():
                     elif test[0] in ("q", "Q"):
                         break
 
-                    logMsg = "testing url %s" % targetUrl
-                    logger.info(logMsg)
+                    infoMsg = "testing url %s" % targetUrl
+                    logger.info(infoMsg)
 
             setupTargetEnv()
 
@@ -388,8 +388,8 @@ def start():
                             logger.warn(warnMsg)
 
                         else:
-                            logMsg = "%s parameter '%s' is dynamic" % (place, parameter)
-                            logger.info(logMsg)
+                            infoMsg = "%s parameter '%s' is dynamic" % (place, parameter)
+                            logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)
 
@@ -400,9 +400,9 @@ def start():
                                not simpletonCheckSqlInjection(place, parameter, value):
                                 continue
 
-                            logMsg = "testing sql injection on %s " % place
-                            logMsg += "parameter '%s'" % parameter
-                            logger.info(logMsg)
+                            infoMsg = "testing sql injection on %s " % place
+                            infoMsg += "parameter '%s'" % parameter
+                            logger.info(infoMsg)
 
                             injection = checkSqlInjection(place, parameter, value)
                             proceed = not kb.endDetection

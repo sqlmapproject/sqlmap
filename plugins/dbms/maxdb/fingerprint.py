@@ -106,14 +106,14 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        logMsg = "testing %s" % DBMS.MAXDB
-        logger.info(logMsg)
+        infoMsg = "testing %s" % DBMS.MAXDB
+        logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("ALPHA(NULL) IS NULL")
 
         if result:
-            logMsg = "confirming %s" % DBMS.MAXDB
-            logger.info(logMsg)
+            infoMsg = "confirming %s" % DBMS.MAXDB
+            logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
 

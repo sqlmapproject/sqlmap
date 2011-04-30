@@ -699,8 +699,8 @@ def checkStability():
 
     if kb.pageStable:
         if firstPage:
-            logMsg = "url is stable"
-            logger.info(logMsg)
+            infoMsg = "url is stable"
+            logger.info(infoMsg)
         else:
             errMsg = "there was an error checking the stability of page "
             errMsg += "because of lack of content. please check the "

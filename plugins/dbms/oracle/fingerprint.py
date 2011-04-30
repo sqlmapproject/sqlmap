@@ -70,8 +70,8 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        logMsg = "testing %s" % DBMS.ORACLE
-        logger.info(logMsg)
+        infoMsg = "testing %s" % DBMS.ORACLE
+        logger.info(infoMsg)
 
         # NOTE: SELECT ROWNUM=ROWNUM FROM DUAL does not work connecting
         # directly to the Oracle database
@@ -81,8 +81,8 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("ROWNUM=ROWNUM")
 
         if result:
-            logMsg = "confirming %s" % DBMS.ORACLE
-            logger.info(logMsg)
+            infoMsg = "confirming %s" % DBMS.ORACLE
+            logger.info(infoMsg)
 
             # NOTE: SELECT LENGTH(SYSDATE)=LENGTH(SYSDATE) FROM DUAL does
             # not work connecting directly to the Oracle database
