@@ -60,28 +60,30 @@ class Enumeration(GenericEnumeration):
         return ( kb.data.cachedUsersPrivileges, areAdmins )
 
     def getTables(self):
-        infoMsg = "fetching tables"
+        if len(kb.data.cachedTables) > 0:
+            return kb.data.cachedTables
+
+        self.forceDbmsEnum()
+
+        if conf.db == "CD":
+            conf.db = self.getCurrentDb()
+
         if conf.db:
-            infoMsg += " for database '%s'" % conf.db
+            dbs = conf.db.split(",")
+        else:
+            dbs = self.getDbs()
+
+        for db in dbs:
+            dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
+
+        infoMsg = "fetching tables for database"
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in dbs))
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
-        if not conf.db:
-            if not len(kb.data.cachedDbs):
-                dbs = self.getDbs()
-            else:
-                dbs = kb.data.cachedDbs
-        else:
-            if "," in conf.db:
-                dbs = conf.db.split(",")
-            else:
-                dbs = [conf.db]
-
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             for db in dbs:
-                db = safeSQLIdentificatorNaming(db)
-
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     logger.info(infoMsg)
@@ -96,8 +98,6 @@ class Enumeration(GenericEnumeration):
 
         if not kb.data.cachedTables and not conf.direct:
             for db in dbs:
-                db = safeSQLIdentificatorNaming(db)
-
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     logger.info(infoMsg)
@@ -122,8 +122,9 @@ class Enumeration(GenericEnumeration):
                 for index in range(int(count)):
                     query = rootQuery.blind.query % (db, index, db)
                     table = inject.getValue(query, inband=False, error=False)
-                    tables.append(table)
                     kb.hintValue = table
+                    table = safeSQLIdentificatorNaming(table, True)
+                    tables.append(table)
 
                 if tables:
                     kb.data.cachedTables[db] = tables
