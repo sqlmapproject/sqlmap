@@ -1211,12 +1211,8 @@ class Enumeration:
 
         self.forceDbmsEnum()
 
-        if conf.db:
-            conf.db = safeSQLIdentificatorNaming(conf.db)
-
         if conf.tbl:
             for table in conf.tbl.split(","):
-                table = safeSQLIdentificatorNaming(table, True)
                 self.__tableGetCount(conf.db, table)
         else:
             self.getTables()
