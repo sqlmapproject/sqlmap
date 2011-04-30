@@ -650,6 +650,9 @@ class Enumeration:
         return self.getPrivileges(query2)
 
     def getDbs(self):
+        if len(kb.data.cachedDbs) > 0:
+            return kb.data.cachedDbs
+
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             warnMsg = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
@@ -710,7 +713,7 @@ class Enumeration:
                     db = inject.getValue(query, inband=False, error=False)
 
                     if db:
-                        kb.data.cachedDbs.append(db)
+                        kb.data.cachedDbs.append(safeSQLIdentificatorNaming(db))
 
         if not kb.data.cachedDbs:
             infoMsg = "falling back to current database"
@@ -726,6 +729,9 @@ class Enumeration:
         return kb.data.cachedDbs
 
     def getTables(self, bruteForce=None):
+        if len(kb.data.cachedTables) > 0:
+            return kb.data.cachedTables
+
         self.forceDbmsEnum()
 
         if bruteForce is None:
@@ -749,7 +755,19 @@ class Enumeration:
                 else:
                     return tables
 
-        conf.db = safeSQLIdentificatorNaming(conf.db)
+        if conf.db == "CD":
+            conf.db = self.getCurrentDb()
+
+        if conf.db and Backend.isDbms(DBMS.ORACLE):
+            conf.db = conf.db.upper()
+
+        if conf.db:
+            dbs = conf.db.split(",")
+        else:
+            dbs = self.getDbs()
+
+        for db in dbs:
+            dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
 
         if bruteForce:
             resumeAvailable = False
@@ -779,44 +797,29 @@ class Enumeration:
             else:
                 return tableExists(paths.COMMON_TABLES)
 
-        infoMsg = "fetching tables"
-        if conf.db:
-            infoMsg += " for database '%s'" % conf.db
+        infoMsg = "fetching tables for database"
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in dbs))
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
-
-        if conf.db:
-            if "," in conf.db:
-                dbs = conf.db.split(",")
-            else:
-                dbs = [conf.db]
-        else:
-            if not len(kb.data.cachedDbs):
-                dbs = self.getDbs()
-            else:
-                dbs = kb.data.cachedDbs
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             query = rootQuery.inband.query
             condition = rootQuery.inband.condition if 'condition' in rootQuery.inband else None
 
             if condition:
-                if conf.db and Backend.getIdentifiedDbms() != DBMS.SQLITE:
-                    if "," in conf.db:
-                        dbs = conf.db.split(",")
-                        query += " WHERE "
-                        query += " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in dbs)
-                    else:
-                        query += " WHERE %s='%s'" % (condition, unsafeSQLIdentificatorNaming(conf.db))
-                elif conf.excludeSysDbs:
+                if conf.excludeSysDbs:
                     query += " WHERE "
                     query += " AND ".join("%s != '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                    infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
+                    infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                     logger.info(infoMsg)
+                elif not Backend.isDbms(DBMS.SQLITE):
+                    query += " WHERE "
+                    query += " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in dbs)
 
             if Backend.isDbms(DBMS.MSSQL):
                 query = safeStringFormat(query, conf.db)
+
             value = inject.getValue(query, blind=False)
             value = filter(lambda x: x, value)
 
@@ -1601,7 +1604,7 @@ class Enumeration:
         conf.tbl = None
         conf.col = None
         kb.data.cachedDbs = []
-        kb.data.cachedTables = self.getTables()
+        self.getTables()
 
         if kb.data.cachedTables:
             if isinstance(kb.data.cachedTables, list):
@@ -1718,7 +1721,7 @@ class Enumeration:
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
+                infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
@@ -1831,7 +1834,7 @@ class Enumeration:
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
+                infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
@@ -1994,7 +1997,7 @@ class Enumeration:
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system databases: %s" % ", ".join(db for db in self.excludeDbsList)
+                infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
