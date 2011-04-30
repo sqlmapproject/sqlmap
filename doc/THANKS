@@ -306,7 +306,7 @@ Antonio Parata <s4tan@ictsc.it>
 Adrian Pastor <ap@gnucitizen.org>
     for donating to sqlmap development
 
-Chris Patten <cpatten@sunera.com>
+Christopher Patten <cpatten@sunera.com>
     for reporting a bug in the blind SQL injection bisection algorithm
 
 Zack Payton <zack.payton@executiveinstruments.com>
