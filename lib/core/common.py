@@ -1357,6 +1357,7 @@ def safeStringFormat(formatStr, params):
                     retVal = retVal[:index] + getUnicode(params[count]) + retVal[index+2:]
                 else:
                     raise sqlmapNoneDataException, "wrong number of parameters during string formatting"
+
                 count += 1
 
     return retVal
@@ -1364,10 +1365,12 @@ def safeStringFormat(formatStr, params):
 def sanitizeAsciiString(subject):
     if subject:
         index = None
+
         for i in xrange(len(subject)):
             if ord(subject[i]) >= 128:
                 index = i
                 break
+
         if index is None:
             return subject
         else:
@@ -1380,6 +1383,7 @@ def getFilteredPageContent(page, onlyText=True):
 
     if isinstance(page, basestring):
         retVal = re.sub(r"(?s)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page)
+
         while retVal.find("  ") != -1:
             retVal = retVal.replace("  ", " ")
 
