@@ -49,9 +49,9 @@ def setHandler():
     management system.
     """
 
-    count     = 0
+    count = 0
     dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird", "SAP MaxDB", "Sybase" )
-    dbmsObj   = [
+    dbmsObj = [
                   ( MYSQL_ALIASES, MySQLMap, MySQLConn ),
                   ( ORACLE_ALIASES, OracleMap, OracleConn ),
                   ( PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn ),
@@ -77,7 +77,7 @@ def setHandler():
 
     for dbmsAliases, dbmsMap, dbmsConn in dbmsObj:
         if conf.dbms and conf.dbms not in dbmsAliases:
-            debugMsg  = "skipping test for %s" % dbmsNames[count]
+            debugMsg = "skipping test for %s" % dbmsNames[count]
             logger.debug(debugMsg)
 
             count += 1

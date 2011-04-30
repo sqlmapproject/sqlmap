@@ -18,14 +18,14 @@ class ThreadData():
     """
 
     def __init__(self):
-        self.disableStdOut      = False
-        self.lastErrorPage      = None
-        self.lastHTTPError      = None
-        self.lastRedirectMsg    = None
-        self.lastQueryDuration  = 0
-        self.lastRequestUID     = 0
-        self.seqMatcher         = difflib.SequenceMatcher(None)
-        self.valueStack         = []
+        self.disableStdOut = False
+        self.lastErrorPage = None
+        self.lastHTTPError = None
+        self.lastRedirectMsg = None
+        self.lastQueryDuration = 0
+        self.lastRequestUID = 0
+        self.seqMatcher = difflib.SequenceMatcher(None)
+        self.valueStack = []
 
 def getCurrentThreadUID():
     return hash(threading.currentThread())

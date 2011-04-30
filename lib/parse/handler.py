@@ -20,12 +20,12 @@ class FingerprintHandler(ContentHandler):
     def __init__(self, banner, info):
         ContentHandler.__init__(self)
 
-        self.__banner      = sanitizeStr(banner)
-        self.__regexp      = None
-        self.__match       = None
+        self.__banner = sanitizeStr(banner)
+        self.__regexp = None
+        self.__match = None
         self.__dbmsVersion = None
         self.__techVersion = None
-        self.__info        = info
+        self.__info = info
 
     def __feedInfo(self, key, value):
         value = sanitizeStr(value)
@@ -45,7 +45,7 @@ class FingerprintHandler(ContentHandler):
     def startElement(self, name, attrs):
         if name == "regexp":
             self.__regexp = sanitizeStr(attrs.get("value"))
-            self.__match  = re.search(self.__regexp, self.__banner, re.I | re.M)
+            self.__match = re.search(self.__regexp, self.__banner, re.I | re.M)
 
         if name == "info" and self.__match:
             self.__feedInfo("type", attrs.get("type"))
@@ -55,7 +55,7 @@ class FingerprintHandler(ContentHandler):
 
             self.__dbmsVersion = sanitizeStr(attrs.get("dbms_version"))
             self.__techVersion = sanitizeStr(attrs.get("tech_version"))
-            self.__sp          = sanitizeStr(attrs.get("sp"))
+            self.__sp = sanitizeStr(attrs.get("sp"))
 
             if self.__dbmsVersion.isdigit():
                 self.__feedInfo("dbmsVersion", self.__match.group(int(self.__dbmsVersion)))
@@ -68,7 +68,7 @@ class FingerprintHandler(ContentHandler):
             if self.__sp.isdigit():
                 self.__feedInfo("sp", "Service Pack %s" % self.__match.group(int(self.__sp)))
 
-            self.__regexp      = None
-            self.__match       = None
+            self.__regexp = None
+            self.__match = None
             self.__dbmsVersion = None
             self.__techVersion = None

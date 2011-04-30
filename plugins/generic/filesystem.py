@@ -32,7 +32,7 @@ class Filesystem:
 
     def __init__(self):
         self.fileTblName = "sqlmapfile"
-        self.tblField    = "data"
+        self.tblField = "data"
 
     def __unbase64String(self, base64Str):
         unbase64Str = "%s\n" % base64Str.decode("base64")
@@ -41,7 +41,7 @@ class Filesystem:
 
     def __unhexString(self, hexStr):
         if len(hexStr) % 2 != 0:
-            errMsg  = "for some reason(s) sqlmap retrieved an odd-length "
+            errMsg = "for some reason(s) sqlmap retrieved an odd-length "
             errMsg += "hexadecimal string which it is not able to convert "
             errMsg += "to raw string"
             logger.error(errMsg)
@@ -63,9 +63,9 @@ class Filesystem:
         """
 
         fileLines = []
-        fileSize  = len(binaryData)
-        lineAddr  = 0x100
-        lineLen   = 20
+        fileSize = len(binaryData)
+        lineAddr = 0x100
+        lineLen = 20
 
         fileLines.append("n %s" % chunkName)
         fileLines.append("rcx")
@@ -79,7 +79,7 @@ class Filesystem:
                 strLineChar = binascii.hexlify(lineChar)
 
                 if not scrString:
-                    scrString  = "e %x %s" % (lineAddr, strLineChar)
+                    scrString = "e %x %s" % (lineAddr, strLineChar)
                 else:
                     scrString += " %s" % strLineChar
 
@@ -113,7 +113,7 @@ class Filesystem:
         dFileSize = inject.getValue(lengthQuery, resumeValue=False, charsetType=2)
 
         if dFileSize and dFileSize.isdigit():
-            infoMsg  = "the file has been successfully written and "
+            infoMsg = "the file has been successfully written and "
             infoMsg += "its size is %s bytes" % dFileSize
 
             dFileSize = long(dFileSize)
@@ -126,7 +126,7 @@ class Filesystem:
 
             logger.info(infoMsg)
         else:
-            warnMsg  = "it looks like the file has not been written, this "
+            warnMsg = "it looks like the file has not been written, this "
             warnMsg += "can occur if the DBMS process' user has no write "
             warnMsg += "privileges in the destination path"
             logger.warn(warnMsg)
@@ -137,7 +137,7 @@ class Filesystem:
         back-end DBMS underlying file system
         """
 
-        counter    = 0
+        counter = 0
         sqlQueries = []
 
         for fcEncodedLine in fcEncodedList:
@@ -194,23 +194,23 @@ class Filesystem:
         back-end DBMS underlying file system
         """
 
-        randScr        = "tmpf%s.scr" % randomStr(lowercase=True)
-        chunkName      = randomStr(lowercase=True)
-        fileScrLines   = self.__binDataToScr(binaryData, chunkName)
+        randScr = "tmpf%s.scr" % randomStr(lowercase=True)
+        chunkName = randomStr(lowercase=True)
+        fileScrLines = self.__binDataToScr(binaryData, chunkName)
         forgedScrLines = []
-        cmd            = ""
-        charCounter    = 0
-        maxLen         = 512
+        cmd = ""
+        charCounter = 0
+        maxLen = 512
 
         logger.debug("generating binary file %s\%s, please wait.." % (tmpPath, chunkName))
 
         for scrLine in fileScrLines:
-            forgedScrLine  = "echo %s " % scrLine
+            forgedScrLine = "echo %s " % scrLine
             forgedScrLine += ">> \"%s\%s\"" % (tmpPath, randScr)
             forgedScrLines.append(forgedScrLine)
 
         for forgedScrLine in forgedScrLines:
-            cmd         += "%s & " % forgedScrLine
+            cmd += "%s & " % forgedScrLine
             charCounter += len(forgedScrLine)
 
             if charCounter >= maxLen:
@@ -230,31 +230,31 @@ class Filesystem:
         return chunkName
 
     def askCheckWrittenFile(self, wFile, dFile, fileType):
-        message  = "do you want confirmation that the file '%s' " % dFile
+        message = "do you want confirmation that the file '%s' " % dFile
         message += "has been successfully written on the back-end DBMS "
         message += "file system? [Y/n] "
-        output   = readInput(message, default="Y")
+        output = readInput(message, default="Y")
 
         if not output or output in ("y", "Y"):
             self.__checkWrittenFile(wFile, dFile, fileType)
 
     def unionReadFile(self, rFile):
-        errMsg  = "'unionReadFile' method must be defined "
+        errMsg = "'unionReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def stackedReadFile(self, rFile):
-        errMsg  = "'stackedReadFile' method must be defined "
+        errMsg = "'stackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
-        errMsg  = "'unionWriteFile' method must be defined "
+        errMsg = "'unionWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
-        errMsg  = "'stackedWriteFile' method must be defined "
+        errMsg = "'stackedWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
@@ -265,7 +265,7 @@ class Filesystem:
 
         if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-                debugMsg  = "going to read the file with stacked query SQL "
+                debugMsg = "going to read the file with stacked query SQL "
                 debugMsg += "injection technique"
                 logger.debug(debugMsg)
 
@@ -312,7 +312,7 @@ class Filesystem:
 
         if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-                debugMsg  = "going to upload the %s file with " % fileType
+                debugMsg = "going to upload the %s file with " % fileType
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)
 

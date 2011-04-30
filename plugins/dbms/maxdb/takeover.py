@@ -24,11 +24,11 @@ class Takeover(GenericTakeover):
         raise sqlmapUnsupportedFeatureException, errMsg
 
     def osPwn(self):
-        errMsg  = "on SAP MaxDB it is not possible to establish an "
+        errMsg = "on SAP MaxDB it is not possible to establish an "
         errMsg += "out-of-band connection"
         raise sqlmapUnsupportedFeatureException, errMsg
 
     def osSmb(self):
-        errMsg  = "on SAP MaxDB it is not possible to establish an "
+        errMsg = "on SAP MaxDB it is not possible to establish an "
         errMsg += "out-of-band connection"
         raise sqlmapUnsupportedFeatureException, errMsg

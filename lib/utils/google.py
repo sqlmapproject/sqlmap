@@ -94,7 +94,7 @@ class Google:
         if not googleDork:
             return None
 
-        url  = "http://www.google.com/search?"
+        url = "http://www.google.com/search?"
         url += "q=%s&" % urlencode(googleDork, convall=True)
         url += "num=100&hl=en&safe=off&filter=0&btnG=Search"
         url += "&start=%d" % ((gpage-1) * 100)
@@ -124,7 +124,7 @@ class Google:
             try:
                 page = e.read()
             except socket.timeout:
-                warnMsg  = "connection timed out while trying "
+                warnMsg = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % e.code
                 logger.critical(warnMsg)
                 return None
@@ -135,8 +135,8 @@ class Google:
         self.__matches = self.__parsePage(page)
 
         if not self.__matches and "detected unusual traffic" in page:
-            warnMsg  = "Google has detected 'unusual' traffic from "
-            warnMsg  += "this computer disabling further searches"
+            warnMsg = "Google has detected 'unusual' traffic from "
+            warnMsg += "this computer disabling further searches"
             raise sqlmapGenericException, warnMsg
 
         return self.__matches

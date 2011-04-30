@@ -34,7 +34,7 @@ class Dump:
 
     def __init__(self):
         self.__outputFile = None
-        self.__outputFP   = None
+        self.__outputFP = None
 
     def __write(self, data, n=True):
         text = "%s%s" % (data, "\n" if n else " ")
@@ -300,7 +300,7 @@ class Dump:
 
     def dbTableValues(self, tableValues):
         replication = None
-        rtable      = None
+        rtable = None
 
         if tableValues is None:
             return
@@ -321,18 +321,18 @@ class Dump:
             dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, table)
             dumpFP = openFile(dumpFileName, "wb")
 
-        count       = int(tableValues["__infos__"]["count"])
-        separator   = str()
-        field       = 1
-        fields      = len(tableValues) - 1
+        count = int(tableValues["__infos__"]["count"])
+        separator = str()
+        field = 1
+        fields = len(tableValues) - 1
 
         columns = tableValues.keys()
         columns.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
 
         for column in columns:
             if column != "__infos__":
-                info       = tableValues[column]
-                lines      = "-" * (int(info["length"]) + 2)
+                info = tableValues[column]
+                lines = "-" * (int(info["length"]) + 2)
                 separator += "+%s" % lines
 
         separator += "+"
@@ -381,9 +381,9 @@ class Dump:
 
         for column in columns:
             if column != "__infos__":
-                info      = tableValues[column]
+                info = tableValues[column]
                 maxlength = int(info["length"])
-                blank     = " " * (maxlength - len(column))
+                blank = " " * (maxlength - len(column))
 
                 self.__write("| %s%s" % (column, blank), n=False)
 
@@ -458,7 +458,7 @@ class Dump:
             else:
                 colConsiderStr = " '%s' was" % column
 
-            msg  = "Column%s found in the " % colConsiderStr
+            msg = "Column%s found in the " % colConsiderStr
             msg += "following databases:"
             self.__write(msg)
 

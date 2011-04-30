@@ -34,10 +34,10 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "executing %s SYSINFO version check" % DBMS.MAXDB
         logger.info(infoMsg)
 
-        query   = agent.prefixQuery("/* NoValue */")
-        query   = agent.suffixQuery(query)
+        query = agent.prefixQuery("/* NoValue */")
+        query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
-        result  = Request.queryPage(payload)
+        result = Request.queryPage(payload)
 
         if not result:
             warnMsg = "unable to perform %s version check" % DBMS.MAXDB
@@ -65,7 +65,7 @@ class Fingerprint(GenericFingerprint):
             return None
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
@@ -77,15 +77,15 @@ class Fingerprint(GenericFingerprint):
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        blank   = " " * 15
-        value  += "back-end DBMS: "
+        blank = " " * 15
+        value += "back-end DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.MAXDB
             return value
 
         actVer = Format.getDbms() + " (%s)" % self.__versionCheck()
-        blank  = " " * 15
+        blank = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:

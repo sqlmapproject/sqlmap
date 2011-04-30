@@ -38,16 +38,16 @@ def updateMSSQLXML():
         mssqlVersionsHtmlString = f.read()
         f.close()
     except urllib2.URLError:
-        __mssqlPath     = urlparse.urlsplit(MSSQL_VERSIONS_URL)
+        __mssqlPath = urlparse.urlsplit(MSSQL_VERSIONS_URL)
         __mssqlHostname = __mssqlPath[1]
 
-        warnMsg  = "[WARNING] sqlmap was unable to connect to %s," % __mssqlHostname
+        warnMsg = "[WARNING] sqlmap was unable to connect to %s," % __mssqlHostname
         warnMsg += " check your Internet connection and retry"
         print warnMsg
 
         return
 
-    releases      = re.findall("class=\"BCC_DV_01DarkBlueTitle\">SQL Server ([\d\.]+) Builds", mssqlVersionsHtmlString, re.I | re.M)
+    releases = re.findall("class=\"BCC_DV_01DarkBlueTitle\">SQL Server ([\d\.]+) Builds", mssqlVersionsHtmlString, re.I | re.M)
     releasesCount = len(releases)
 
     # Create the minidom document
@@ -73,9 +73,9 @@ def updateMSSQLXML():
         startIdx = mssqlVersionsHtmlString.index("SQL Server %s Builds" % releases[index])
 
         if index == releasesCount - 1:
-            stopIdx  = len(mssqlVersionsHtmlString)
+            stopIdx = len(mssqlVersionsHtmlString)
         else:
-            stopIdx  = mssqlVersionsHtmlString.index("SQL Server %s Builds" % releases[index + 1])
+            stopIdx = mssqlVersionsHtmlString.index("SQL Server %s Builds" % releases[index + 1])
 
         mssqlVersionsReleaseString = mssqlVersionsHtmlString[startIdx:stopIdx]
         servicepackVersion = re.findall("</td><td>[7\.0|2000|2005|2008]*(.*?)</td><td.*?([\d\.]+)</td>[\r]*\n", mssqlVersionsReleaseString, re.I | re.M)
@@ -133,7 +133,7 @@ def updateMSSQLXML():
     doc.writexml(writer=mssqlXml, addindent="    ", newl="\n")
     mssqlXml.close()
 
-    infoMsg  = "[INFO] done. retrieved data parsed and saved into '%s'" % MSSQL_XML
+    infoMsg = "[INFO] done. retrieved data parsed and saved into '%s'" % MSSQL_XML
     print infoMsg
 
 if __name__ == "__main__":

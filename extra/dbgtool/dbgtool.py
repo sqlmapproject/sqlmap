@@ -24,13 +24,13 @@ def convert(inputFile):
         print "ERROR: the provided input file '%s' is too big for debug.exe" % inputFile
         sys.exit(1)
 
-    script     = "n %s\nr cx\n" % os.path.basename(inputFile.replace(".", "_"))
-    script    += "%x\nf 0100 ffff 00\n" % fileSize
-    scrString  = ""
-    counter    = 256
-    counter2   = 0
+    script = "n %s\nr cx\n" % os.path.basename(inputFile.replace(".", "_"))
+    script += "%x\nf 0100 ffff 00\n" % fileSize
+    scrString = ""
+    counter = 256
+    counter2 = 0
 
-    fp          = open(inputFile, "rb")
+    fp = open(inputFile, "rb")
     fileContent = fp.read()
 
     for fileChar in fileContent:
@@ -40,20 +40,20 @@ def convert(inputFile):
             counter2 += 1
 
             if not scrString:
-                scrString  = "e %0x %02x" % (counter, unsignedFileChar)
+                scrString = "e %0x %02x" % (counter, unsignedFileChar)
             else:
                 scrString += " %02x" % unsignedFileChar
         elif scrString:
-            script   += "%s\n" % scrString
+            script += "%s\n" % scrString
             scrString = ""
-            counter2  = 0
+            counter2 = 0
 
         counter += 1
 
         if counter2 == 20:
-            script    += "%s\n" % scrString
-            scrString  = ""
-            counter2   = 0
+            script += "%s\n" % scrString
+            scrString = ""
+            counter2 = 0
 
     script += "w\nq\n"
 
@@ -67,7 +67,7 @@ def main(inputFile, outputFile):
     script = convert(inputFile)
 
     if outputFile:
-        fpOut      = open(outputFile, "w")
+        fpOut = open(outputFile, "w")
         sys.stdout = fpOut
         sys.stdout.write(script)
         sys.stdout.close()
@@ -76,7 +76,7 @@ def main(inputFile, outputFile):
 
 if __name__ == "__main__":
     usage = "%s -i <input file> [-o <output file>]" % sys.argv[0]
-    parser  = OptionParser(usage=usage, version="0.1")
+    parser = OptionParser(usage=usage, version="0.1")
 
     try:
         parser.add_option("-i", dest="inputFile", help="Input binary file")
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     except (OptionError, TypeError), e:
         parser.error(e)
 
-    inputFile  = args.inputFile
+    inputFile = args.inputFile
     outputFile = args.outputFile
 
     main(inputFile, outputFile)

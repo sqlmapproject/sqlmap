@@ -164,8 +164,8 @@ def liveTest():
 
 def initCase(switches=None):
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp()
-    paths.SQLMAP_DUMP_PATH   = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
-    paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
+    paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
+    paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     cmdLineOptions = cmdLineParser()
     cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
 
@@ -181,8 +181,8 @@ def initCase(switches=None):
 def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
     paths.SQLMAP_OUTPUT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
-    paths.SQLMAP_DUMP_PATH   = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
-    paths.SQLMAP_FILES_PATH  = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
+    paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
+    paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     conf.verbose = 1
     __setVerbosity()
 

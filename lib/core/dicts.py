@@ -24,7 +24,7 @@ firebirdTypes = {
                     "37":"VARCHAR"
                 }
 
-sybaseTypes   = {
+sybaseTypes = {
                     "14":"floatn",
                     "8":"float",
                     "15":"datetimn",
@@ -55,7 +55,7 @@ sybaseTypes   = {
                     "20":"image",
                 }
 
-mysqlPrivs    = {
+mysqlPrivs = {
                     1:"select_priv",
                     2:"insert_priv",
                     3:"update_priv",
@@ -84,7 +84,7 @@ mysqlPrivs    = {
                     26:"create_user_priv",
                 }
 
-pgsqlPrivs    = {
+pgsqlPrivs = {
                     1:"createdb",
                     2:"super",
                     3:"catupd",

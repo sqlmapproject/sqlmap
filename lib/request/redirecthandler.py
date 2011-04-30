@@ -67,7 +67,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         try:
             content = fp.read()
         except Exception, msg:
-            dbgMsg  = "there was a problem while retrieving "
+            dbgMsg = "there was a problem while retrieving "
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
 
@@ -81,7 +81,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         try:
             content = fp.read()
         except Exception, msg:
-            dbgMsg  = "there was a problem while retrieving "
+            dbgMsg = "there was a problem while retrieving "
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
 
@@ -90,6 +90,6 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
     def infinite_loop_check(self, req):
         if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= self.max_repeats or len(req.redirect_dict) >= self.max_redirections):
-            errMsg  = "infinite redirect loop detected (%s). " % ", ".join(item for item in req.redirect_dict.keys())
+            errMsg = "infinite redirect loop detected (%s). " % ", ".join(item for item in req.redirect_dict.keys())
             errMsg += "please check all provided parameters and/or provide missing ones."
             raise sqlmapConnectionException, errMsg

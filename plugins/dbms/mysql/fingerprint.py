@@ -97,7 +97,7 @@ class Fingerprint(GenericFingerprint):
         return None
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
@@ -117,7 +117,7 @@ class Fingerprint(GenericFingerprint):
             return value
 
         comVer = self.__commentCheck()
-        blank  = " " * 15
+        blank = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if comVer:

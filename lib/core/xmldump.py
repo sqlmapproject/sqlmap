@@ -73,7 +73,7 @@ XMLNS_ATTR = "xmlns:xsi"
 SCHEME_NAME = "sqlmap.xsd"
 SCHEME_NAME_ATTR = "xsi:noNamespaceSchemaLocation"
 CHARACTERS_TO_ENCODE = range(32) + range(127, 256)
-ENTITIES  = {'"':'&quot;',"'":"&apos;"}
+ENTITIES = {'"':'&quot;',"'":"&apos;"}
 
 class XMLDump:
     '''
@@ -83,7 +83,7 @@ class XMLDump:
 
     def __init__(self):
         self.__outputFile = None
-        self.__outputFP   = None
+        self.__outputFP = None
         self.__root = None
         self.__doc = Document()
 
@@ -384,7 +384,7 @@ class XMLDump:
                 db = "All"
             table = tableValues["__infos__"]["table"]
 
-            count     = int(tableValues["__infos__"]["count"])
+            count = int(tableValues["__infos__"]["count"])
             columns = tableValues.keys()
             columns.sort(key=lambda x: x.lower())
 

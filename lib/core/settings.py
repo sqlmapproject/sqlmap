@@ -17,16 +17,16 @@ from lib.core.enums import PLACE
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
-VERSION            = "1.0-dev"
-REVISION           = getRevisionNumber()
-VERSION_STRING     = "sqlmap/%s (r%s)" % (VERSION, REVISION)
-DESCRIPTION        = "automatic SQL injection and database takeover tool"
-SITE               = "http://sqlmap.sourceforge.net"
-ML                 = "sqlmap-users@lists.sourceforge.net"
+VERSION = "1.0-dev"
+REVISION = getRevisionNumber()
+VERSION_STRING = "sqlmap/%s (r%s)" % (VERSION, REVISION)
+DESCRIPTION = "automatic SQL injection and database takeover tool"
+SITE = "http://sqlmap.sourceforge.net"
+ML = "sqlmap-users@lists.sourceforge.net"
 
 # minimum distance of ratio from kb.matchRatio to result in True
-DIFF_TOLERANCE     = 0.05
-CONSTANT_RATIO     = 0.9
+DIFF_TOLERANCE = 0.05
+CONSTANT_RATIO = 0.9
 
 # lower and upper values for match ratio in case of stable page
 LOWER_RATIO_BOUND = 0.02
@@ -37,9 +37,9 @@ logging.addLevelName(9, "PAYLOAD")
 logging.addLevelName(8, "TRAFFIC OUT")
 logging.addLevelName(7, "TRAFFIC IN")
 
-LOGGER             = logging.getLogger("sqlmapLog")
-LOGGER_HANDLER     = logging.StreamHandler(sys.stdout)
-FORMATTER          = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
+LOGGER = logging.getLogger("sqlmapLog")
+LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
+FORMATTER = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
 
 LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
@@ -47,21 +47,21 @@ LOGGER.setLevel(logging.WARN)
 
 # dump markers
 DUMP_NEWLINE_MARKER = "__NEWLINE__"
-DUMP_CR_MARKER      = "__CARRIAGE_RETURN__"
-DUMP_DEL_MARKER     = "__DEL__"
-DUMP_TAB_MARKER     = "__TAB__"
-DUMP_START_MARKER   = "__START__"
-DUMP_STOP_MARKER    = "__STOP__"
+DUMP_CR_MARKER = "__CARRIAGE_RETURN__"
+DUMP_DEL_MARKER = "__DEL__"
+DUMP_TAB_MARKER = "__TAB__"
+DUMP_START_MARKER = "__START__"
+DUMP_STOP_MARKER = "__STOP__"
 
 URI_QUESTION_MARKER = "__QUESTION_MARK__"
 
-PAYLOAD_DELIMITER   = "\x00"
+PAYLOAD_DELIMITER = "\x00"
 CHAR_INFERENCE_MARK = "%c"
 PRINTABLE_CHAR_REGEX = r'[^\x00-\x1f\x7e-\xff]'
 
 # dumping characters used in GROUP_CONCAT MySQL technique
-CONCAT_ROW_DELIMITER     = ','
-CONCAT_VALUE_DELIMITER   = '|'
+CONCAT_ROW_DELIMITER = ','
+CONCAT_VALUE_DELIMITER = '|'
 
 # coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF = 10
@@ -124,20 +124,20 @@ DUMMY_USER_PREFIX = "__dummy__"
 DEFAULT_PAGE_ENCODING = "iso-8859-1"
 
 # System variables
-IS_WIN             = subprocess.mswindows
+IS_WIN = subprocess.mswindows
 # The name of the operating system dependent module imported. The following
 # names have currently been registered: 'posix', 'nt', 'mac', 'os2', 'ce',
 # 'java', 'riscos'
-PLATFORM           = os.name
-PYVERSION          = sys.version.split()[0]
+PLATFORM = os.name
+PYVERSION = sys.version.split()[0]
 
 # Database management system specific variables
-MSSQL_SYSTEM_DBS    = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
-MYSQL_SYSTEM_DBS    = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
-PGSQL_SYSTEM_DBS    = ( "information_schema", "pg_catalog", "pg_toast" )
-ORACLE_SYSTEM_DBS   = ( "SYSTEM", "SYSAUX" )                              # These are TABLESPACE_NAME
-SQLITE_SYSTEM_DBS   = ( "sqlite_master", "sqlite_temp_master" )
-ACCESS_SYSTEM_DBS   = ( "MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
+MSSQL_SYSTEM_DBS = ( "Northwind", "model", "msdb", "pubs", "tempdb" )
+MYSQL_SYSTEM_DBS = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
+PGSQL_SYSTEM_DBS = ( "information_schema", "pg_catalog", "pg_toast" )
+ORACLE_SYSTEM_DBS = ( "SYSTEM", "SYSAUX" )                              # These are TABLESPACE_NAME
+SQLITE_SYSTEM_DBS = ( "sqlite_master", "sqlite_temp_master" )
+ACCESS_SYSTEM_DBS = ( "MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
                         "MSysAccessXML", "MSysModules", "MSysModules2" )
 FIREBIRD_SYSTEM_DBS = ( "RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE",\
                         "RDB$DEPENDENCIES", "RDB$EXCEPTIONS", "RDB$FIELDS", "RDB$FIELD_DIMENSIONS", " RDB$FILES", "RDB$FILTERS",\
@@ -145,21 +145,21 @@ FIREBIRD_SYSTEM_DBS = ( "RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_C
                         "RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS",\
                         "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS",\
                         "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS" )
-MAXDB_SYSTEM_DBS    = ( "SYSINFO", "DOMAIN" )
-SYBASE_SYSTEM_DBS   = ( "master", "model", "sybsystemdb", "sybsystemprocs" )
+MAXDB_SYSTEM_DBS = ( "SYSINFO", "DOMAIN" )
+SYBASE_SYSTEM_DBS = ( "master", "model", "sybsystemdb", "sybsystemprocs" )
 
-MSSQL_ALIASES       = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
-MYSQL_ALIASES       = [ "mysql", "my" ]
-PGSQL_ALIASES       = [ "postgresql", "postgres", "pgsql", "psql", "pg" ]
-ORACLE_ALIASES      = [ "oracle", "orcl", "ora", "or" ]
-SQLITE_ALIASES      = [ "sqlite", "sqlite3" ]
-ACCESS_ALIASES      = [ "access", "jet", "microsoft access", "msaccess" ]
-FIREBIRD_ALIASES    = [ "firebird", "mozilla firebird", "interbase", "ibase", "fb" ]
-MAXDB_ALIASES       = [ "maxdb", "sap maxdb", "sap db" ]
-SYBASE_ALIASES      = [ "sybase", "sybase sql server" ]
+MSSQL_ALIASES = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
+MYSQL_ALIASES = [ "mysql", "my" ]
+PGSQL_ALIASES = [ "postgresql", "postgres", "pgsql", "psql", "pg" ]
+ORACLE_ALIASES = [ "oracle", "orcl", "ora", "or" ]
+SQLITE_ALIASES = [ "sqlite", "sqlite3" ]
+ACCESS_ALIASES = [ "access", "jet", "microsoft access", "msaccess" ]
+FIREBIRD_ALIASES = [ "firebird", "mozilla firebird", "interbase", "ibase", "fb" ]
+MAXDB_ALIASES = [ "maxdb", "sap maxdb", "sap db" ]
+SYBASE_ALIASES = [ "sybase", "sybase sql server" ]
 
-SUPPORTED_DBMS      = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES
-SUPPORTED_OS        = ( "linux", "windows" )
+SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES
+SUPPORTED_OS = ( "linux", "windows" )
 
 DBMS_DICT = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
               DBMS.MYSQL: [MYSQL_ALIASES, "python-mysqldb", "http://mysql-python.sourceforge.net/"],
@@ -172,17 +172,17 @@ DBMS_DICT = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sour
               DBMS.SYBASE: [SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"]
             }
 
-REFERER_ALIASES     = ( "ref", "referer", "referrer" )
-USER_AGENT_ALIASES  = ( "ua", "useragent", "user-agent" )
+REFERER_ALIASES = ( "ref", "referer", "referrer" )
+USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
 
-FROM_TABLE          = {
+FROM_TABLE = {
                         DBMS.ORACLE: " FROM DUAL",
                         DBMS.ACCESS: " FROM MSysObjects",
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS"
                       }
 
-SQL_STATEMENTS      = {
+SQL_STATEMENTS = {
                        "SQL SELECT statement":  (
                              "select ",
                              "show ",
@@ -236,10 +236,10 @@ ERROR_PARSING_REGEXES = (
                         )
 
 # Regular expression used for parsing charset info from meta html headers
-META_CHARSET_REGEX  = r'<meta http-equiv="?content-type"?[^>]+charset=(?P<result>[^">]+)'
+META_CHARSET_REGEX = r'<meta http-equiv="?content-type"?[^>]+charset=(?P<result>[^">]+)'
 
 # Regular expression used for parsing refresh info from meta html headers
-META_REFRESH_REGEX  = r'<meta http-equiv="?refresh"?[^>]+content="?[^">]+url=(?P<result>[^">]+)'
+META_REFRESH_REGEX = r'<meta http-equiv="?refresh"?[^>]+content="?[^">]+url=(?P<result>[^">]+)'
 
 # Regular expression used for parsing empty fields in tested form data
 EMPTY_FORM_FIELDS_REGEX = r'(?P<result>[^=]+=(&|\Z))'

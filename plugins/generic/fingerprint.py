@@ -23,17 +23,17 @@ class Fingerprint:
         Backend.forceDbms(dbms)
 
     def getFingerprint(self):
-        errMsg  = "'getFingerprint' method must be defined "
+        errMsg = "'getFingerprint' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def checkDbms(self):
-        errMsg  = "'checkDbms' method must be defined "
+        errMsg = "'checkDbms' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def checkDbmsOs(self, detailed=False):
-        errMsg  = "'checkDbmsOs' method must be defined "
+        errMsg = "'checkDbmsOs' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 

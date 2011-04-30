@@ -32,7 +32,7 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.PGSQL)
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
@@ -50,9 +50,9 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.PGSQL
             return value
 
-        actVer      = Format.getDbms()
-        blank       = " " * 15
-        value      += "active fingerprint: %s" % actVer
+        actVer = Format.getDbms()
+        blank = " " * 15
+        value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
@@ -183,7 +183,7 @@ class Fingerprint(GenericFingerprint):
         if conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
             conf.db = "public"
 
-            warnMsg  = "on %s it is only possible to enumerate " % DBMS.PGSQL
+            warnMsg = "on %s it is only possible to enumerate " % DBMS.PGSQL
             warnMsg += "on the current schema and on system databases, "
             warnMsg += "sqlmap is going to use 'public' schema as "
             warnMsg += "database name"

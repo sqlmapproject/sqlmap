@@ -657,8 +657,8 @@ class XmlTokenizer:
         self.character_data = ''
 
         self.parser = xml.parsers.expat.ParserCreate()
-        self.parser.StartElementHandler  = self.handle_element_start
-        self.parser.EndElementHandler    = self.handle_element_end
+        self.parser.StartElementHandler = self.handle_element_start
+        self.parser.EndElementHandler = self.handle_element_end
         self.parser.CharacterDataHandler = self.handle_character_data
 
     def handle_element_start(self, name, attributes):

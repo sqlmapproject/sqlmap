@@ -34,7 +34,7 @@ def action():
     if not Backend.getDbms() or not conf.dbmsHandler:
         htmlParsed = Format.getErrorParsedDBMSes()
 
-        errMsg  = "sqlmap was not able to fingerprint the "
+        errMsg = "sqlmap was not able to fingerprint the "
         errMsg += "back-end database management system"
 
         if htmlParsed:

@@ -60,7 +60,7 @@ class Enumeration(GenericEnumeration):
         self.forceDbmsEnum()
 
         if not conf.db:
-            warnMsg  = "missing database parameter, sqlmap is going to "
+            warnMsg = "missing database parameter, sqlmap is going to "
             warnMsg += "use the current database to enumerate table "
             warnMsg += "'%s' columns" % conf.tbl
             logger.warn(warnMsg)

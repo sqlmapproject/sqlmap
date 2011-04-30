@@ -33,7 +33,7 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.FIREBIRD)
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
@@ -52,9 +52,9 @@ class Fingerprint(GenericFingerprint):
             value += actVer
             return value
 
-        actVer  = Format.getDbms() + " (%s)" % (self.__dialectCheck())
-        blank       = " " * 15
-        value      += "active fingerprint: %s" % actVer
+        actVer = Format.getDbms() + " (%s)" % (self.__dialectCheck())
+        blank = " " * 15
+        value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"]

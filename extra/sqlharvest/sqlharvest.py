@@ -19,15 +19,15 @@ from operator import itemgetter
 
 def main():
 
-    TIMEOUT         = 10
-    CONFIG_FILE     = 'sqlharvest.cfg'
-    TABLES_FILE     = 'tables.txt'
-    USER_AGENT      = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; AskTB5.3)'
-    SEARCH_URL      = 'http://www.google.com/m?source=mobileproducts&dc=gorganic'
-    MAX_FILE_SIZE   = 2*1024*1024 # if a result (.sql) file for downloading is more than 2MB in size just skip it
-    QUERY           = 'CREATE TABLE ext:sql'
-    REGEX_URLS      = r';u=([^"]+)'
-    REGEX_RESULT    = r'CREATE TABLE\s*(/\*.*\*/)?\s*(IF NOT EXISTS)?\s*(?P<result>[^\(;]+)'
+    TIMEOUT = 10
+    CONFIG_FILE = 'sqlharvest.cfg'
+    TABLES_FILE = 'tables.txt'
+    USER_AGENT = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; AskTB5.3)'
+    SEARCH_URL = 'http://www.google.com/m?source=mobileproducts&dc=gorganic'
+    MAX_FILE_SIZE = 2*1024*1024 # if a result (.sql) file for downloading is more than 2MB in size just skip it
+    QUERY = 'CREATE TABLE ext:sql'
+    REGEX_URLS = r';u=([^"]+)'
+    REGEX_RESULT = r'CREATE TABLE\s*(/\*.*\*/)?\s*(IF NOT EXISTS)?\s*(?P<result>[^\(;]+)'
 
     tables = dict()
     refiles = re.compile(REGEX_URLS)

@@ -40,7 +40,7 @@ def headersParser(headers):
 
     for header in headers:
         if header in topHeaders.keys():
-            value   = headers[header]
+            value = headers[header]
             xmlfile = topHeaders[header]
 
             checkFile(xmlfile)

@@ -51,7 +51,7 @@ def blockingWriteToFD(fd, data):
     while True:
         try:
             data_length = len(data)
-            wrote_data  = os.write(fd, data)
+            wrote_data = os.write(fd, data)
         except (OSError, IOError), io:
             if io.errno in (errno.EAGAIN, errno.EINTR):
                 continue    

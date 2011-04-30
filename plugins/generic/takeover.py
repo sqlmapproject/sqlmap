@@ -52,7 +52,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
             web = True
         else:
-            errMsg  = "unable to execute operating system commands via "
+            errMsg = "unable to execute operating system commands via "
             errMsg += "the back-end DBMS"
             raise sqlmapNotVulnerableException(errMsg)
 
@@ -73,7 +73,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
             web = True
         else:
-            errMsg  = "unable to prompt for an interactive operating "
+            errMsg = "unable to prompt for an interactive operating "
             errMsg += "system shell via the back-end DBMS because "
             errMsg += "stacked queries SQL injection is not supported"
             raise sqlmapNotVulnerableException(errMsg)
@@ -91,7 +91,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         self.checkDbmsOs()
 
-        msg  = "how do you want to establish the tunnel?"
+        msg = "how do you want to establish the tunnel?"
         msg += "\n[1] TCP: Metasploit Framework (default)"
 
         if Backend.isOs(OS.WINDOWS):
@@ -129,7 +129,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             isAdmin = runningAsAdmin()
 
             if isAdmin is not True:
-                errMsg  = "you need to run sqlmap as an administrator "
+                errMsg = "you need to run sqlmap as an administrator "
                 errMsg += "if you want to establish an out-of-band ICMP "
                 errMsg += "tunnel because icmpsh uses raw sockets to "
                 errMsg += "sniff and craft ICMP packets"
@@ -139,7 +139,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 from impacket import ImpactDecoder
                 from impacket import ImpactPacket
             except ImportError, _:
-                errMsg  = "sqlmap requires 'impacket' third-party library "
+                errMsg = "sqlmap requires 'impacket' third-party library "
                 errMsg += "in order to run icmpsh master. Download from "
                 errMsg += "http://oss.coresecurity.com/projects/impacket.html"
                 raise sqlmapMissingDependence, errMsg
@@ -170,7 +170,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
             if tunnel == 1:
                 if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                    msg  = "how do you want to execute the Metasploit shellcode "
+                    msg = "how do you want to execute the Metasploit shellcode "
                     msg += "on the back-end database underlying operating system?"
                     msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
                     msg += "\n[2] Via shellcodeexec (file system way)"
@@ -202,7 +202,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
                 if Backend.isOs(OS.WINDOWS) and conf.privEsc:
                     if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-                        debugMsg  = "by default MySQL on Windows runs as SYSTEM "
+                        debugMsg = "by default MySQL on Windows runs as SYSTEM "
                         debugMsg += "user, no need to privilege escalate"
                         logger.debug(debugMsg)
 
@@ -211,7 +211,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     # system is not Windows
                     conf.privEsc = False
 
-                    warnMsg  = "sqlmap does not implement any operating system "
+                    warnMsg = "sqlmap does not implement any operating system "
                     warnMsg += "user privilege escalation technique when the "
                     warnMsg += "back-end DBMS underlying system is not Windows"
                     logger.warn(warnMsg)
@@ -233,7 +233,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     # system is not Windows
                     conf.privEsc = False
 
-                    warnMsg  = "sqlmap does not implement any operating system "
+                    warnMsg = "sqlmap does not implement any operating system "
                     warnMsg += "user privilege escalation technique when the "
                     warnMsg += "back-end DBMS underlying system is not Windows"
                     logger.warn(warnMsg)
@@ -262,26 +262,26 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self.checkDbmsOs()
 
         if not Backend.isOs(OS.WINDOWS):
-            errMsg  = "the back-end DBMS underlying operating system is "
+            errMsg = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows: it is not possible to perform the SMB "
             errMsg += "relay attack"
             raise sqlmapUnsupportedDBMSException(errMsg)
 
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             if Backend.getIdentifiedDbms() in ( DBMS.PGSQL, DBMS.MSSQL ):
-                errMsg  = "on this back-end DBMS it is only possible to "
+                errMsg = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
                 errMsg += "queries are supported"
                 raise sqlmapUnsupportedDBMSException(errMsg)
 
             elif Backend.getIdentifiedDbms() == DBMS.MYSQL:
-                debugMsg  = "since stacked queries are not supported, "
+                debugMsg = "since stacked queries are not supported, "
                 debugMsg += "sqlmap is going to perform the SMB relay "
                 debugMsg += "attack via inference blind SQL injection"
                 logger.debug(debugMsg)
 
         printWarn = True
-        warnMsg   = "it is unlikely that this attack will be successful "
+        warnMsg = "it is unlikely that this attack will be successful "
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL:
             warnMsg += "because by default MySQL on Windows runs as "
@@ -313,13 +313,13 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             return
 
         if not Backend.getIdentifiedDbms() == DBMS.MSSQL or not Backend.isVersionWithin(("2000", "2005")):
-            errMsg  = "the back-end DBMS must be Microsoft SQL Server "
+            errMsg = "the back-end DBMS must be Microsoft SQL Server "
             errMsg += "2000 or 2005 to be able to exploit the heap-based "
             errMsg += "buffer overflow in the 'sp_replwritetovarbin' "
             errMsg += "stored procedure (MS09-004)"
             raise sqlmapUnsupportedDBMSException(errMsg)
 
-        infoMsg  = "going to exploit the Microsoft SQL Server %s " % Backend.getVersion()
+        infoMsg = "going to exploit the Microsoft SQL Server %s " % Backend.getVersion()
         infoMsg += "'sp_replwritetovarbin' stored procedure heap-based "
         infoMsg += "buffer overflow (MS09-004)"
         logger.info(infoMsg)
@@ -330,7 +330,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self.bof()
 
     def uncPathRequest(self):
-        errMsg  = "'uncPathRequest' method must be defined "
+        errMsg = "'uncPathRequest' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
@@ -341,7 +341,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self.checkDbmsOs()
 
         if not Backend.isOs(OS.WINDOWS):
-            errMsg  = "the back-end DBMS underlying operating system is "
+            errMsg = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows"
             raise sqlmapUnsupportedDBMSException(errMsg)
 
@@ -353,15 +353,15 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         if not conf.regKey:
             default = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
-            msg     = "which registry key do you want to read? [%s] " % default
-            regKey  = readInput(msg, default=default)
+            msg = "which registry key do you want to read? [%s] " % default
+            regKey = readInput(msg, default=default)
         else:
             regKey = conf.regKey
 
         if not conf.regVal:
             default = "ProductName"
-            msg     = "which registry key value do you want to read? [%s] " % default
-            regVal  = readInput(msg, default=default)
+            msg = "which registry key value do you want to read? [%s] " % default
+            regVal = readInput(msg, default=default)
         else:
             regVal = conf.regVal
 
@@ -376,7 +376,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         errMsg = "missing mandatory option"
 
         if not conf.regKey:
-            msg    = "which registry key do you want to write? "
+            msg = "which registry key do you want to write? "
             regKey = readInput(msg)
 
             if not regKey:
@@ -385,7 +385,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regKey = conf.regKey
 
         if not conf.regVal:
-            msg    = "which registry key value do you want to write? "
+            msg = "which registry key value do you want to write? "
             regVal = readInput(msg)
 
             if not regVal:
@@ -394,7 +394,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regVal = conf.regVal
 
         if not conf.regData:
-            msg     = "which registry key value data do you want to write? "
+            msg = "which registry key value data do you want to write? "
             regData = readInput(msg)
 
             if not regData:
@@ -404,13 +404,13 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         if not conf.regType:
             default = "REG_SZ"
-            msg     = "which registry key value data-type is it? "
-            msg    += "[%s] " % default
+            msg = "which registry key value data-type is it? "
+            msg += "[%s] " % default
             regType = readInput(msg, default=default)
         else:
             regType = conf.regType
 
-        infoMsg  = "adding Windows registry path '%s\%s' " % (regKey, regVal)
+        infoMsg = "adding Windows registry path '%s\%s' " % (regKey, regVal)
         infoMsg += "with data '%s'. " % regData
         infoMsg += "This will work only if the user running the database "
         infoMsg += "process has privileges to modify the Windows registry."
@@ -424,7 +424,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         errMsg = "missing mandatory option"
 
         if not conf.regKey:
-            msg    = "which registry key do you want to delete? "
+            msg = "which registry key do you want to delete? "
             regKey = readInput(msg)
 
             if not regKey:
@@ -433,7 +433,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regKey = conf.regKey
 
         if not conf.regVal:
-            msg    = "which registry key value do you want to delete? "
+            msg = "which registry key value do you want to delete? "
             regVal = readInput(msg)
 
             if not regVal:
@@ -441,14 +441,14 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         else:
             regVal = conf.regVal
 
-        message  = "are you sure that you want to delete the Windows "
+        message = "are you sure that you want to delete the Windows "
         message += "registry path '%s\%s? [y/N] " % (regKey, regVal)
-        output   = readInput(message, default="N")
+        output = readInput(message, default="N")
 
         if output and output[0] not in ( "Y", "y" ):
             return
 
-        infoMsg  = "deleting Windows registry path '%s\%s'. " % (regKey, regVal)
+        infoMsg = "deleting Windows registry path '%s\%s'. " % (regKey, regVal)
         infoMsg += "This will work only if the user running the database "
         infoMsg += "process has privileges to modify the Windows registry."
         logger.info(infoMsg)

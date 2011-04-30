@@ -132,7 +132,7 @@ class Fingerprint(GenericFingerprint):
         if not detailed:
             return
 
-        infoMsg  = "fingerprinting the back-end DBMS operating system "
+        infoMsg = "fingerprinting the back-end DBMS operating system "
         infoMsg += "version and service pack"
         logger.info(infoMsg)
 

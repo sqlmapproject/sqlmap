@@ -49,7 +49,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     if os.path.exists(imageOutputFile):
         os.remove(imageOutputFile)
 
-    infoMsg  = "profiling the execution into file %s" % profileOutputFile
+    infoMsg = "profiling the execution into file %s" % profileOutputFile
     logger.info(infoMsg)
 
     # Start sqlmap main function and generate a raw profile file

@@ -40,7 +40,7 @@ class Syntax(GenericSyntax):
 
                 expression = expression.replace(old, "CHAR(%s)" % unescaped)
         else:
-            unescaped  = "CHAR("
+            unescaped = "CHAR("
             unescaped += ",".join("%d" % ord(c) for c in expression)
             unescaped += ")"
 

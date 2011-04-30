@@ -16,21 +16,21 @@ class Takeover(GenericTakeover):
         GenericTakeover.__init__(self)
 
     def osCmd(self):
-        errMsg  = "Operating system command execution functionality not "
+        errMsg = "Operating system command execution functionality not "
         errMsg += "yet implemented for Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
 
     def osShell(self):
-        errMsg  = "Operating system shell functionality not yet "
+        errMsg = "Operating system shell functionality not yet "
         errMsg += "implemented for Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
 
     def osPwn(self):
-        errMsg  = "Operating system out-of-band control functionality "
+        errMsg = "Operating system out-of-band control functionality "
         errMsg += "not yet implemented for Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
 
     def osSmb(self):
-        errMsg  = "One click operating system out-of-band control "
+        errMsg = "One click operating system out-of-band control "
         errMsg += "functionality not yet implemented for Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg

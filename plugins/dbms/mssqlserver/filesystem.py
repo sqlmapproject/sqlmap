@@ -31,7 +31,7 @@ class Filesystem(GenericFilesystem):
         GenericFilesystem.__init__(self)
 
     def unionReadFile(self, rFile):
-        errMsg  = "Microsoft SQL Server does not support file reading "
+        errMsg = "Microsoft SQL Server does not support file reading "
         errMsg += "with UNION query SQL injection technique"
         raise sqlmapUnsupportedFeatureException(errMsg)
 
@@ -98,10 +98,10 @@ class Filesystem(GenericFilesystem):
 
         if not result:
             result = []
-            count  = inject.getValue("SELECT COUNT(%s) FROM %s" % (self.tblField, hexTbl), resumeValue=False, charsetType=2)
+            count = inject.getValue("SELECT COUNT(%s) FROM %s" % (self.tblField, hexTbl), resumeValue=False, charsetType=2)
 
             if not isNumPosStrValue(count):
-                errMsg  = "unable to retrieve the content of the "
+                errMsg = "unable to retrieve the content of the "
                 errMsg += "file '%s'" % rFile
                 raise sqlmapNoneDataException(errMsg)
 
@@ -116,7 +116,7 @@ class Filesystem(GenericFilesystem):
         return result
 
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
-        errMsg  = "Microsoft SQL Server does not support file upload with "
+        errMsg = "Microsoft SQL Server does not support file upload with "
         errMsg += "UNION query SQL injection technique"
         raise sqlmapUnsupportedFeatureException(errMsg)
 
@@ -128,22 +128,22 @@ class Filesystem(GenericFilesystem):
 
         self.getRemoteTempPath()
 
-        debugMsg  = "going to use xp_cmdshell extended procedure to write "
+        debugMsg = "going to use xp_cmdshell extended procedure to write "
         debugMsg += "the %s file content to file '%s'" % (fileType, dFile)
         logger.debug(debugMsg)
 
-        debugSize    = 0xFF00
-        tmpPath      = posixToNtSlashes(conf.tmpPath)
-        dFile        = posixToNtSlashes(dFile)
-        dFileName    = ntpath.basename(dFile)
-        wFileSize    = os.path.getsize(wFile)
+        debugSize = 0xFF00
+        tmpPath = posixToNtSlashes(conf.tmpPath)
+        dFile = posixToNtSlashes(dFile)
+        dFileName = ntpath.basename(dFile)
+        wFileSize = os.path.getsize(wFile)
         wFilePointer = codecs.open(wFile, "rb")
         wFileContent = wFilePointer.read()
         wFilePointer.close()
 
         if wFileSize < debugSize:
             chunkName = self.updateBinChunk(wFileContent, tmpPath)
-            sFile     = "%s\%s" % (tmpPath, dFileName)
+            sFile = "%s\%s" % (tmpPath, dFileName)
 
             logger.debug("moving binary file %s to %s" % (sFile, dFile))
 
@@ -153,7 +153,7 @@ class Filesystem(GenericFilesystem):
             self.execCmd(complComm)
 
         else:
-            infoMsg  = "the %s file is bigger than %d " % (fileType, debugSize)
+            infoMsg = "the %s file is bigger than %d " % (fileType, debugSize)
             infoMsg += "bytes. sqlmap will split it into chunks, upload "
             infoMsg += "them and recreate the original file out of the "
             infoMsg += "binary chunks server-side, please wait.."
@@ -163,7 +163,7 @@ class Filesystem(GenericFilesystem):
 
             for i in range(0, wFileSize, debugSize):
                 wFileChunk = wFileContent[i:i + debugSize]
-                chunkName  = self.updateBinChunk(wFileChunk, tmpPath)
+                chunkName = self.updateBinChunk(wFileChunk, tmpPath)
 
                 if i == 0:
                     infoMsg = "renaming chunk "

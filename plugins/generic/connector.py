@@ -60,21 +60,21 @@ class Connector:
             raise sqlmapFilePathException, errMsg
 
     def connect(self):
-        errMsg  = "'connect' method must be defined "
+        errMsg = "'connect' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def fetchall(self):
-        errMsg  = "'fetchall' method must be defined "
+        errMsg = "'fetchall' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def execute(self, query):
-        errMsg  = "'execute' method must be defined "
+        errMsg = "'execute' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
     def select(self, query):
-        errMsg  = "'select' method must be defined "
+        errMsg = "'select' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg

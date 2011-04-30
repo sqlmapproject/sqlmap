@@ -571,7 +571,7 @@ def cmdLineParser():
 
         if not any([args.direct, args.url, args.list, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard]):
-            errMsg  = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c', '--wizard' or '--update'), "
+            errMsg = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c', '--wizard' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)
 

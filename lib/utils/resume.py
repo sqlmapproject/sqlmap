@@ -36,13 +36,13 @@ def queryOutputLength(expression, payload):
     Returns the query output length.
     """
 
-    lengthQuery         = queries[Backend.getIdentifiedDbms()].length.query
-    select              = re.search("\ASELECT\s+", expression, re.I)
-    selectTopExpr       = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
-    selectDistinctExpr  = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
-    selectFromExpr      = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
-    selectExpr          = re.search("\ASELECT\s+(.+)$", expression, re.I)
-    miscExpr            = re.search("\A(.+)", expression, re.I)
+    lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
+    select = re.search("\ASELECT\s+", expression, re.I)
+    selectTopExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
+    selectDistinctExpr = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
+    selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
+    selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
+    miscExpr = re.search("\A(.+)", expression, re.I)
 
     if selectTopExpr or selectDistinctExpr or selectFromExpr or selectExpr:
         if selectTopExpr:
@@ -119,7 +119,7 @@ def resume(expression, payload):
         if resumedValue[-1] == "]":
             resumedValue = resumedValue[:-1]
 
-            infoMsg  = "read from file '%s': " % conf.sessionFile
+            infoMsg = "read from file '%s': " % conf.sessionFile
             logValue = getCompiledRegex("%s(.*?)%s" % (DUMP_START_MARKER, DUMP_STOP_MARKER), re.S).findall(resumedValue)
 
             if logValue:
@@ -160,7 +160,7 @@ def resume(expression, payload):
             return None
 
         if len(resumedValue) == int(length):
-            infoMsg  = "read from file '%s': " % conf.sessionFile
+            infoMsg = "read from file '%s': " % conf.sessionFile
             infoMsg += "%s" % resumedValue.split("\n")[0]
             logger.info(infoMsg)
 
@@ -168,7 +168,7 @@ def resume(expression, payload):
 
             return resumedValue
         elif len(resumedValue) < int(length):
-            infoMsg  = "resumed from file '%s': " % conf.sessionFile
+            infoMsg = "resumed from file '%s': " % conf.sessionFile
             infoMsg += "%s..." % resumedValue.split("\n")[0]
             logger.info(infoMsg)
 
@@ -181,7 +181,7 @@ def resume(expression, payload):
 
             missingCharsLength = int(length) - len(resumedValue)
 
-            infoMsg  = "retrieving pending %d query " % missingCharsLength
+            infoMsg = "retrieving pending %d query " % missingCharsLength
             infoMsg += "output characters"
             logger.info(infoMsg)
 
@@ -192,7 +192,7 @@ def resume(expression, payload):
             logger.debug(debugMsg)
 
             if len(finalValue) != ( int(length) - len(resumedValue) ):
-                warnMsg  = "the total length of the query is not "
+                warnMsg = "the total length of the query is not "
                 warnMsg += "right, sqlmap is going to retrieve the "
                 warnMsg += "query value from the beginning now"
                 logger.warn(warnMsg)

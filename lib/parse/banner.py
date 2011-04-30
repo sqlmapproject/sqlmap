@@ -30,14 +30,14 @@ class MSSQLBannerHandler(ContentHandler):
     def __init__(self, banner, info):
         ContentHandler.__init__(self)
 
-        self.__banner        = sanitizeStr(banner)
-        self.__inVersion     = False
+        self.__banner = sanitizeStr(banner)
+        self.__inVersion = False
         self.__inServicePack = False
-        self.__release       = None
-        self.__version       = ""
-        self.__versionAlt    = None
-        self.__servicePack   = ""
-        self.__info          = info
+        self.__release = None
+        self.__version = ""
+        self.__versionAlt = None
+        self.__servicePack = ""
+        self.__info = info
 
     def __feedInfo(self, key, value):
         value = sanitizeStr(value)
@@ -73,8 +73,8 @@ class MSSQLBannerHandler(ContentHandler):
                     self.__feedInfo("dbmsServicePack", self.__servicePack)
                     break
 
-            self.__version     = ""
-            self.__versionAlt  = None
+            self.__version = ""
+            self.__versionAlt = None
             self.__servicePack = ""
 
         elif name == "version":

@@ -103,8 +103,8 @@ class Takeover(GenericTakeover):
 
     def uncPathRequest(self):
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-            query   = agent.prefixQuery("AND LOAD_FILE('%s')" % self.uncPath)
-            query   = agent.suffixQuery(query)
+            query = agent.prefixQuery("AND LOAD_FILE('%s')" % self.uncPath)
+            query = agent.suffixQuery(query)
             payload = agent.payload(newValue=query)
 
             Request.queryPage(payload)

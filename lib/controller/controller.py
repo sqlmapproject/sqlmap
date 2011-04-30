@@ -174,7 +174,7 @@ def start():
         kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
     if conf.configFile and not kb.targetUrls:
-        errMsg  = "you did not edit the configuration file properly, set "
+        errMsg = "you did not edit the configuration file properly, set "
         errMsg += "the target url, list of targets or google dork"
         logger.error(errMsg)
         return False
@@ -183,15 +183,15 @@ def start():
         infoMsg = "sqlmap got a total of %d targets" % len(kb.targetUrls)
         logger.info(infoMsg)
 
-    hostCount             = 0
-    cookieStr             = ""
+    hostCount = 0
+    cookieStr = ""
     setCookieAsInjectable = True
 
     for targetUrl, targetMethod, targetData, targetCookie in kb.targetUrls:
         try:
-            conf.url    = targetUrl
+            conf.url = targetUrl
             conf.method = targetMethod
-            conf.data   = targetData
+            conf.data = targetData
             conf.cookie = targetCookie
 
             initTargetEnv()
@@ -289,7 +289,7 @@ def start():
             if not conf.dropSetCookie and conf.cj:
                 for _, cookie in enumerate(conf.cj):
                     cookie = getUnicode(cookie)
-                    index  = cookie.index(" for ")
+                    index = cookie.index(" for ")
 
                     cookieStr += "%s;" % cookie[8:index]
 
@@ -297,7 +297,7 @@ def start():
                     cookieStr = cookieStr[:-1]
 
                     if PLACE.COOKIE in conf.parameters:
-                        message  = "you provided an HTTP Cookie header value. "
+                        message = "you provided an HTTP Cookie header value. "
                         message += "The target url provided its own Cookie within "
                         message += "the HTTP Set-Cookie header. Do you want to "
                         message += "continue using the HTTP Cookie values that "

@@ -114,7 +114,7 @@ class Fingerprint(GenericFingerprint):
         return retVal
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
@@ -126,14 +126,14 @@ class Fingerprint(GenericFingerprint):
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value  += "back-end DBMS: "
+        value += "back-end DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.ACCESS
             return value
 
         actVer = Format.getDbms() + " (%s)" % (self.__sandBoxCheck())
-        blank  = " " * 15
+        blank = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:

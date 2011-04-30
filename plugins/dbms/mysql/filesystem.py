@@ -39,12 +39,12 @@ class Filesystem(GenericFilesystem):
 
         tmpFile = "%s/tmpf%s" % (conf.tmpPath, randomStr(lowercase=True))
 
-        debugMsg  = "saving hexadecimal encoded content of file '%s' " % rFile
+        debugMsg = "saving hexadecimal encoded content of file '%s' " % rFile
         debugMsg += "into temporary file '%s'" % tmpFile
         logger.debug(debugMsg)
         inject.goStacked("SELECT HEX(LOAD_FILE('%s')) INTO DUMPFILE '%s'" % (rFile, tmpFile))
 
-        debugMsg  = "loading the content of hexadecimal encoded file "
+        debugMsg = "loading the content of hexadecimal encoded file "
         debugMsg += "'%s' into support table" % rFile
         logger.debug(debugMsg)
         inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
@@ -52,11 +52,11 @@ class Filesystem(GenericFilesystem):
         length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=2)
 
         if length is None or not length.isdigit() or not len(length) or length in ( "0", "1" ):
-            errMsg  = "unable to retrieve the content of the "
+            errMsg = "unable to retrieve the content of the "
             errMsg += "file '%s'" % rFile
             raise sqlmapNoneDataException, errMsg
 
-        length   = int(length)
+        length = int(length)
         sustrLen = 1024
 
         if length > sustrLen:
@@ -74,12 +74,12 @@ class Filesystem(GenericFilesystem):
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
         logger.debug("encoding file to its hexadecimal string value")
 
-        fcEncodedList   = self.fileEncode(wFile, "hex", True)
-        fcEncodedStr    = fcEncodedList[0]
+        fcEncodedList = self.fileEncode(wFile, "hex", True)
+        fcEncodedStr = fcEncodedList[0]
         fcEncodedStrLen = len(fcEncodedStr)
 
         if kb.injection.place == PLACE.GET and fcEncodedStrLen > 8000:
-            warnMsg  = "the injection is on a GET parameter and the file "
+            warnMsg = "the injection is on a GET parameter and the file "
             warnMsg += "to be written hexadecimal value is %d " % fcEncodedStrLen
             warnMsg += "bytes, this might cause errors in the file "
             warnMsg += "writing process"
@@ -95,7 +95,7 @@ class Filesystem(GenericFilesystem):
             self.askCheckWrittenFile(wFile, dFile, fileType)
 
     def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
-        debugMsg  = "creating a support table to write the hexadecimal "
+        debugMsg = "creating a support table to write the hexadecimal "
         debugMsg += "encoded file to"
         logger.debug(debugMsg)
 
@@ -104,7 +104,7 @@ class Filesystem(GenericFilesystem):
         logger.debug("encoding file to its hexadecimal string value")
         fcEncodedList = self.fileEncode(wFile, "hex", False)
 
-        debugMsg  = "forging SQL statements to write the hexadecimal "
+        debugMsg = "forging SQL statements to write the hexadecimal "
         debugMsg += "encoded file to the support table"
         logger.debug(debugMsg)
 

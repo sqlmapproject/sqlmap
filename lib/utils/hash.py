@@ -507,12 +507,12 @@ def dictionaryAttack(attack_dict):
                 clearConsoleLine()
 
     if len(hash_regexes) == 0:
-        warnMsg  = "unknown hash Format. "
+        warnMsg = "unknown hash Format. "
         warnMsg += "Please report by e-mail to %s." % ML
         logger.warn(warnMsg)
 
     if len(results) == 0:
-        warnMsg  = "no clear password(s) found"
+        warnMsg = "no clear password(s) found"
         logger.warn(warnMsg)
 
     return results

@@ -107,8 +107,8 @@ class Replication:
         self.connection.close()
 
     # sqlite data types
-    NULL    = DataType('NULL')
+    NULL = DataType('NULL')
     INTEGER = DataType('INTEGER')
-    REAL    = DataType('REAL')
-    TEXT    = DataType('TEXT')
-    BLOB    = DataType('BLOB')
+    REAL = DataType('REAL')
+    TEXT = DataType('TEXT')
+    BLOB = DataType('BLOB')

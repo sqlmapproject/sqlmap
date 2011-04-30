@@ -45,10 +45,10 @@ class Enumeration(GenericEnumeration):
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if query2:
-                query     = rootQuery.inband.query2
+                query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
             else:
-                query     = rootQuery.inband.query
+                query = rootQuery.inband.query
                 condition = rootQuery.inband.condition
 
             if conf.user:
@@ -66,7 +66,7 @@ class Enumeration(GenericEnumeration):
 
             if values:
                 for value in values:
-                    user  = None
+                    user = None
                     roles = set()
 
                     for count in xrange(0, len(value)):
@@ -108,7 +108,7 @@ class Enumeration(GenericEnumeration):
                 if user in retrievedUsers:
                     continue
 
-                infoMsg  = "fetching number of roles "
+                infoMsg = "fetching number of roles "
                 infoMsg += "for user '%s'" % user
                 logger.info(infoMsg)
 
@@ -130,7 +130,7 @@ class Enumeration(GenericEnumeration):
 
                         return self.getPrivileges(query2=True)
 
-                    warnMsg  = "unable to retrieve the number of "
+                    warnMsg = "unable to retrieve the number of "
                     warnMsg += "roles for user '%s'" % user
                     logger.warn(warnMsg)
                     continue
@@ -155,14 +155,14 @@ class Enumeration(GenericEnumeration):
                 if roles:
                     kb.data.cachedUsersRoles[user] = list(roles)
                 else:
-                    warnMsg  = "unable to retrieve the roles "
+                    warnMsg = "unable to retrieve the roles "
                     warnMsg += "for user '%s'" % user
                     logger.warn(warnMsg)
 
                 retrievedUsers.add(user)
 
         if not kb.data.cachedUsersRoles:
-            errMsg  = "unable to retrieve the roles "
+            errMsg = "unable to retrieve the roles "
             errMsg += "for the database users"
             raise sqlmapNoneDataException, errMsg
 

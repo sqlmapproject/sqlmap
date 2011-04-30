@@ -42,7 +42,7 @@ def configFileProxy(section, option, boolean=False, integer=False):
         else:
             conf[option] = None
     else:
-        debugMsg  = "missing requested option '%s' (section " % option
+        debugMsg = "missing requested option '%s' (section " % option
         debugMsg += "'%s') into the configuration file, " % section
         debugMsg += "ignoring. Skipping to next."
         logger.debug(debugMsg)
@@ -66,12 +66,12 @@ def configFileParser(configFile):
     if not config.has_section("Target"):
         raise NoSectionError, "Target in the configuration file is mandatory"
 
-    condition  = not config.has_option("Target", "url")
+    condition = not config.has_option("Target", "url")
     condition &= not config.has_option("Target", "list")
     condition &= not config.has_option("Target", "googleDork")
 
     if condition:
-        errMsg  = "missing a mandatory option in the configuration "
+        errMsg = "missing a mandatory option in the configuration "
         errMsg += "file (url, list or googleDork)"
         raise sqlmapMissingMandatoryOptionException, errMsg
 

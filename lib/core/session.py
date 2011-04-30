@@ -113,7 +113,7 @@ def setOs():
     }
     """
 
-    infoMsg   = ""
+    infoMsg = ""
     condition = (
                   not kb.resumedQueries
                   or ( kb.resumedQueries.has_key(conf.url) and
@@ -191,8 +191,8 @@ def resumeConfKb(expression, url, value):
         logger.info(logMsg)
 
     elif expression == "DBMS" and url == conf.url:
-        dbms        = unSafeFormatString(value[:-1])
-        dbms        = dbms.lower()
+        dbms = unSafeFormatString(value[:-1])
+        dbms = dbms.lower()
         dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
         logMsg = "resuming back-end DBMS '%s' " % dbms
@@ -203,11 +203,11 @@ def resumeConfKb(expression, url, value):
         dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, dbms)
 
         if dbmsRegExp:
-            dbms        = dbmsRegExp.group(1)
+            dbms = dbmsRegExp.group(1)
             dbmsVersion = [ dbmsRegExp.group(2) ]
 
         if conf.dbms and conf.dbms.lower() != dbms:
-            message  = "you provided '%s' as back-end DBMS, " % conf.dbms
+            message = "you provided '%s' as back-end DBMS, " % conf.dbms
             message += "but from a past scan information on the target URL "
             message += "sqlmap assumes the back-end DBMS is %s. " % dbms
             message += "Do you really want to force the back-end "
@@ -230,7 +230,7 @@ def resumeConfKb(expression, url, value):
             logger.info(logMsg)
 
             if conf.os and conf.os.lower() != os.lower():
-                message  = "you provided '%s' as back-end DBMS operating " % conf.os
+                message = "you provided '%s' as back-end DBMS operating " % conf.os
                 message += "system, but from a past scan information on the "
                 message += "target URL sqlmap assumes the back-end DBMS "
                 message += "operating system is %s. " % os

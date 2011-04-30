@@ -28,7 +28,7 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.ORACLE)
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:
@@ -46,9 +46,9 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.ORACLE
             return value
 
-        actVer      = Format.getDbms()
-        blank       = " " * 15
-        value      += "active fingerprint: %s" % actVer
+        actVer = Format.getDbms()
+        blank = " " * 15
+        value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None

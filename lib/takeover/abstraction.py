@@ -70,8 +70,8 @@ class Abstraction(Web, UDF, xp_cmdshell):
         getOutput = None
 
         if not self.alwaysRetrieveCmdOutput:
-            message   = "do you want to retrieve the command standard "
-            message  += "output? [Y/n/a] "
+            message = "do you want to retrieve the command standard "
+            message += "output? [Y/n/a] "
             getOutput = readInput(message, default="Y")
 
             if getOutput in ("a", "A"):
@@ -89,19 +89,19 @@ class Abstraction(Web, UDF, xp_cmdshell):
 
     def shell(self):
         if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-            infoMsg  = "calling OS shell. To quit type "
+            infoMsg = "calling OS shell. To quit type "
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)
 
         else:
             if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                infoMsg  = "going to use injected sys_eval and sys_exec "
+                infoMsg = "going to use injected sys_eval and sys_exec "
                 infoMsg += "user-defined functions for operating system "
                 infoMsg += "command execution"
                 logger.info(infoMsg)
 
             elif Backend.getIdentifiedDbms() == DBMS.MSSQL:
-                infoMsg  = "going to use xp_cmdshell extended procedure for "
+                infoMsg = "going to use xp_cmdshell extended procedure for "
                 infoMsg += "operating system command execution"
                 logger.info(infoMsg)
 
@@ -109,7 +109,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 errMsg = "feature not yet implemented for the back-end DBMS"
                 raise sqlmapUnsupportedFeatureException, errMsg
 
-            infoMsg  = "calling %s OS shell. To quit type " % (Backend.getOs() or "Windows")
+            infoMsg = "calling %s OS shell. To quit type " % (Backend.getOs() or "Windows")
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)
 
@@ -148,7 +148,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             self.checkDbmsOs(detailed)
 
             if mandatory and not self.isDba():
-                warnMsg  = "the functionality requested might not work because "
+                warnMsg = "the functionality requested might not work because "
                 warnMsg += "the session user is not a database administrator"
                 logger.warn(warnMsg)
 

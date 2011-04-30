@@ -129,7 +129,7 @@ def checkCharEncoding(encoding):
     try:
         codecs.lookup(encoding)
     except LookupError:
-        warnMsg  = "unknown web page charset '%s'. " % encoding
+        warnMsg = "unknown web page charset '%s'. " % encoding
         warnMsg += "Please report by e-mail to %s." % ML
         singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
@@ -143,7 +143,7 @@ def getHeuristicCharEncoding(page):
     """
     retVal = detect(page)['encoding']
 
-    infoMsg  = "heuristics detected web page charset '%s'" % retVal
+    infoMsg = "heuristics detected web page charset '%s'" % retVal
     singleTimeLogMessage(infoMsg, logging.INFO, retVal)
 
     return retVal

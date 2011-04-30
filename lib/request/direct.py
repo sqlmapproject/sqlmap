@@ -49,7 +49,7 @@ def direct(query, content=True):
         except:
             output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
 
-        infoMsg  = "resumed from file '%s': " % conf.sessionFile
+        infoMsg = "resumed from file '%s': " % conf.sessionFile
         infoMsg += "%s..." % getUnicode(output, UNICODE_ENCODING)[:20]
         logger.info(infoMsg)
     else:

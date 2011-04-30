@@ -140,12 +140,12 @@ def __setRequestParams():
                     __testableParameters = True
 
     if not conf.parameters:
-        errMsg  = "you did not provide any GET, POST and Cookie "
+        errMsg = "you did not provide any GET, POST and Cookie "
         errMsg += "parameter, neither an User-Agent or Referer header"
         raise sqlmapGenericException, errMsg
 
     elif not __testableParameters:
-        errMsg  = "all testable parameters you provided are not present "
+        errMsg = "all testable parameters you provided are not present "
         errMsg += "within the GET, POST and Cookie parameters"
         raise sqlmapGenericException, errMsg
 
@@ -308,9 +308,9 @@ def initTargetEnv():
         if conf.cj:
             conf.cj.clear()
 
-        conf.paramDict     = {}
-        conf.parameters    = {}
-        conf.sessionFile   = None
+        conf.paramDict = {}
+        conf.parameters = {}
+        conf.sessionFile = None
 
         __setKnowledgeBaseAttributes(False)
         __restoreCmdLineOptions()

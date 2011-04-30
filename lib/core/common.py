@@ -646,7 +646,7 @@ def dataToStdout(data, forceOutput=False):
                     output = data.encode('ascii', errors="replace")
 
                     if output != data:
-                        warnMsg  = "cannot properly display Unicode characters "
+                        warnMsg = "cannot properly display Unicode characters "
                         warnMsg += "inside Windows OS command prompt "
                         warnMsg += "(http://bugs.python.org/issue1602). All "
                         warnMsg += "similar occurances will result in "
@@ -1891,7 +1891,7 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
         if all([x == candidate for x in kb.delayCandidates]) and candidate < conf.timeSec:
             print
 
-            warnMsg  = "adjusting time delay to %d second%s " % (candidate, 's' if candidate > 1 else '')
+            warnMsg = "adjusting time delay to %d second%s " % (candidate, 's' if candidate > 1 else '')
             warnMsg += "(due to good response times)"
             logger.warn(warnMsg)
 
@@ -2402,7 +2402,7 @@ def unhandledExceptionMessage():
     Returns detailed message about occured unhandled exception
     """
 
-    errMsg  = "unhandled exception in %s, retry your " % VERSION_STRING
+    errMsg = "unhandled exception in %s, retry your " % VERSION_STRING
     errMsg += "run with the latest development version from the Subversion "
     errMsg += "repository. If the exception persists, please send by e-mail "
     errMsg += "to %s the following text " % ML

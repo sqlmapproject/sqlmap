@@ -19,14 +19,14 @@ class Registry:
     """
 
     def __initVars(self, regKey, regValue, regType=None, regData=None, parse=False):
-        self.__regKey        = regKey
-        self.__regValue      = regValue
-        self.__regType       = regType
-        self.__regData       = regData
+        self.__regKey = regKey
+        self.__regValue = regValue
+        self.__regType = regType
+        self.__regData = regData
 
-        self.__randStr       = randomStr(lowercase=True)
+        self.__randStr = randomStr(lowercase=True)
         self.__batPathRemote = "%s/tmpr%s.bat" % (conf.tmpPath, self.__randStr)
-        self.__batPathLocal  = os.path.join(conf.outputPath, "tmpr%s.bat" % self.__randStr)
+        self.__batPathLocal = os.path.join(conf.outputPath, "tmpr%s.bat" % self.__randStr)
 
         if parse:
             readParse = "FOR /F \"tokens=*\" %%A IN ('REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"
@@ -38,12 +38,12 @@ class Registry:
                            readParse
                          )
 
-        self.__batAdd  = (
+        self.__batAdd = (
                            "@ECHO OFF\r\n",
                            "REG ADD \"%s\" /v \"%s\" /t %s /d %s /f" % (self.__regKey, self.__regValue, self.__regType, self.__regData)
                          )
 
-        self.__batDel  = (
+        self.__batDel = (
                            "@ECHO OFF\r\n",
                            "REG DELETE \"%s\" /v \"%s\" /f" % (self.__regKey, self.__regValue)
                          )
@@ -97,7 +97,7 @@ class Registry:
         self.__initVars(regKey, regValue, regType, regData)
         self.__createRemoteBatchFile()
 
-        debugMsg  = "adding registry key value '%s' " % self.__regValue
+        debugMsg = "adding registry key value '%s' " % self.__regValue
         debugMsg += "to registry key '%s'" % self.__regKey
         logger.debug(debugMsg)
 
@@ -110,7 +110,7 @@ class Registry:
         self.__initVars(regKey, regValue)
         self.__createRemoteBatchFile()
 
-        debugMsg  = "deleting registry key value '%s' " % self.__regValue
+        debugMsg = "deleting registry key value '%s' " % self.__regValue
         debugMsg += "from registry key '%s'" % self.__regKey
         logger.debug(debugMsg)
 

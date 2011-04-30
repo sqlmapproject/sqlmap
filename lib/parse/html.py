@@ -26,12 +26,12 @@ class htmlHandler(ContentHandler):
     def __init__(self, page):
         ContentHandler.__init__(self)
 
-        self.__dbms   = None
-        self.__page   = page
+        self.__dbms = None
+        self.__page = page
         self.__regexp = None
-        self.__match  = None
+        self.__match = None
 
-        self.dbms     = None
+        self.dbms = None
 
     def startElement(self, name, attrs):
         if name == "dbms":

@@ -16,11 +16,11 @@ class Filesystem(GenericFilesystem):
         GenericFilesystem.__init__(self)
 
     def readFile(self, rFile):
-        errMsg  = "File system read access not yet implemented for "
+        errMsg = "File system read access not yet implemented for "
         errMsg += "Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg
 
     def writeFile(self, wFile, dFile, fileType=None, confirm=True):
-        errMsg  = "File system write access not yet implemented for "
+        errMsg = "File system write access not yet implemented for "
         errMsg += "Oracle"
         raise sqlmapUnsupportedFeatureException, errMsg

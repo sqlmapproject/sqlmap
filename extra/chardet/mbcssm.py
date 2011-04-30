@@ -129,7 +129,7 @@ EUCJPSMModel = {'classTable': EUCJP_cls,
 
 # EUC-KR
 
-EUCKR_cls  = ( \
+EUCKR_cls = ( \
     1,1,1,1,1,1,1,1,  # 00 - 07 
     1,1,1,1,1,1,0,0,  # 08 - 0f 
     1,1,1,1,1,1,1,1,  # 10 - 17 
@@ -371,7 +371,7 @@ UCS2BE_cls = ( \
     0,0,0,0,0,0,0,0,  # f0 - f7 
     0,0,0,0,0,0,4,5)  # f8 - ff 
 
-UCS2BE_st  = ( \
+UCS2BE_st = ( \
           5,     7,     7,eError,     4,     3,eError,eError,#00-07 
      eError,eError,eError,eError,eItsMe,eItsMe,eItsMe,eItsMe,#08-0f 
      eItsMe,eItsMe,     6,     6,     6,     6,eError,eError,#10-17 

@@ -35,14 +35,14 @@ class UDF:
     """
 
     def __init__(self):
-        self.createdUdf  = set()
-        self.udfs        = {}
+        self.createdUdf = set()
+        self.udfs = {}
         self.udfToCreate = set()
 
     def __askOverwriteUdf(self, udf):
-        message  = "UDF '%s' already exists, do you " % udf
+        message = "UDF '%s' already exists, do you " % udf
         message += "want to overwrite it? [y/N] "
-        output   = readInput(message, default="N")
+        output = readInput(message, default="N")
 
         if output and output[0] in ("y", "Y"):
             return True
@@ -61,7 +61,7 @@ class UDF:
             return False
 
     def udfCheckAndOverwrite(self, udf):
-        exists    = self.__checkExistUdf(udf)
+        exists = self.__checkExistUdf(udf)
         overwrite = True
 
         if exists:
@@ -78,7 +78,7 @@ class UDF:
 
     def udfExecCmd(self, cmd, silent=False, udfName=None):
         if udfName is None:
-            cmd     = "'%s'" % cmd
+            cmd = "'%s'" % cmd
             udfName = "sys_exec"
 
         cmd = unescaper.unescape(cmd)
@@ -87,7 +87,7 @@ class UDF:
 
     def udfEvalCmd(self, cmd, first=None, last=None, udfName=None):
         if udfName is None:
-            cmd     = "'%s'" % cmd
+            cmd = "'%s'" % cmd
             udfName = "sys_eval"
 
         cmd = unescaper.unescape(cmd)
@@ -167,7 +167,7 @@ class UDF:
         self.checkDbmsOs()
 
         if not self.isDba():
-            warnMsg  = "the functionality requested might not work because "
+            warnMsg = "the functionality requested might not work because "
             warnMsg += "the session user is not a database administrator"
             logger.warn(warnMsg)
 
@@ -193,19 +193,19 @@ class UDF:
             raise sqlmapMissingMandatoryOptionException(errMsg)
 
         elif self.udfLocalFile.endswith(".so") and Backend.isOs(OS.WINDOWS):
-            errMsg  = "you provided a shared object as shared library, but "
+            errMsg = "you provided a shared object as shared library, but "
             errMsg += "the database underlying operating system is Windows"
             raise sqlmapMissingMandatoryOptionException(errMsg)
 
         elif self.udfLocalFile.endswith(".dll") and Backend.isOs(OS.LINUX):
-            errMsg  = "you provided a dynamic-link library as shared library, "
+            errMsg = "you provided a dynamic-link library as shared library, "
             errMsg += "but the database underlying operating system is Linux"
             raise sqlmapMissingMandatoryOptionException(errMsg)
 
         self.udfSharedLibName = os.path.basename(self.udfLocalFile).split(".")[0]
-        self.udfSharedLibExt  = os.path.basename(self.udfLocalFile).split(".")[1]
+        self.udfSharedLibExt = os.path.basename(self.udfLocalFile).split(".")[1]
 
-        msg  = "how many user-defined functions do you want to create "
+        msg = "how many user-defined functions do you want to create "
         msg += "from the shared library? "
 
         while True:
@@ -228,7 +228,7 @@ class UDF:
 
         for x in range(0, udfCount):
             while True:
-                msg     = "what is the name of the UDF number %d? " % (x + 1)
+                msg = "what is the name of the UDF number %d? " % (x + 1)
                 udfName = readInput(msg)
 
                 if udfName:
@@ -245,8 +245,8 @@ class UDF:
             self.udfs[udfName]["input"] = []
 
             default = 1
-            msg     = "how many input parameters takes UDF "
-            msg    += "'%s'? (default: %d) " % (udfName, default)
+            msg = "how many input parameters takes UDF "
+            msg += "'%s'? (default: %d) " % (udfName, default)
 
             while True:
                 parCount = readInput(msg, default=default)
@@ -262,8 +262,8 @@ class UDF:
                     logger.warn("invalid value, only digits >= 0 are allowed")
 
             for y in range(0, parCount):
-                msg     = "what is the data-type of input parameter "
-                msg    += "number %d? (default: %s) " % ((y + 1), defaultType)
+                msg = "what is the data-type of input parameter "
+                msg += "number %d? (default: %s) " % ((y + 1), defaultType)
 
                 while True:
                     parType = readInput(msg, default=defaultType)
@@ -275,7 +275,7 @@ class UDF:
                         self.udfs[udfName]["input"].append(parType)
                         break
 
-            msg  = "what is the data-type of the return "
+            msg = "what is the data-type of the return "
             msg += "value? (default: %s) " % defaultType
 
             while True:
@@ -289,8 +289,8 @@ class UDF:
 
         self.udfInjectCore(self.udfs)
 
-        msg    = "do you want to call your injected user-defined "
-        msg   += "functions now? [Y/n/q] "
+        msg = "do you want to call your injected user-defined "
+        msg += "functions now? [Y/n/q] "
         choice = readInput(msg, default="Y")
 
         if choice[0] in ( "n", "N" ):
@@ -302,7 +302,7 @@ class UDF:
 
         while True:
             udfList = []
-            msg     = "which UDF do you want to call?"
+            msg = "which UDF do you want to call?"
 
             for udf in self.udfs.keys():
                 udfList.append(udf)
@@ -321,16 +321,16 @@ class UDF:
                 elif isinstance(choice, int) and choice > 0 and choice <= len(udfList):
                     break
                 else:
-                    warnMsg  = "invalid value, only digits >= 1 and "
+                    warnMsg = "invalid value, only digits >= 1 and "
                     warnMsg += "<= %d are allowed" % len(udfList)
                     logger.warn(warnMsg)
 
-            cmd       = ""
-            count     = 1
+            cmd = ""
+            count = 1
             udfToCall = udfList[choice - 1]
 
             for inp in self.udfs[udfToCall]["input"]:
-                msg  = "what is the value of the parameter number "
+                msg = "what is the value of the parameter number "
                 msg += "%d (data-type: %s)? " % (count, inp)
 
                 while True:
@@ -348,9 +348,9 @@ class UDF:
 
                 count += 1
 
-            cmd    = cmd[:-1]
-            msg    = "do you want to retrieve the return value of the "
-            msg   += "UDF? [Y/n] "
+            cmd = cmd[:-1]
+            msg = "do you want to retrieve the return value of the "
+            msg += "UDF? [Y/n] "
             choice = readInput(msg, default="Y")
 
             if choice[0] in ("y", "Y"):
@@ -363,7 +363,7 @@ class UDF:
             else:
                 self.udfExecCmd(cmd, udfName=udfToCall, silent=True)
 
-            msg    = "do you want to call this or another injected UDF? [Y/n] "
+            msg = "do you want to call this or another injected UDF? [Y/n] "
             choice = readInput(msg, default="Y")
 
             if choice[0] not in ("y", "Y"):

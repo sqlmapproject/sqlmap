@@ -130,13 +130,13 @@ class Miscellaneous:
 
             for udf, inpRet in udfDict.items():
                 message = "do you want to remove UDF '%s'? [Y/n] " % udf
-                output  = readInput(message, default="Y")
+                output = readInput(message, default="Y")
 
                 if not output or output in ("y", "Y"):
                     dropStr = "DROP FUNCTION %s" % udf
 
                     if Backend.getIdentifiedDbms() == DBMS.PGSQL:
-                        inp      = ", ".join(i for i in inpRet["input"])
+                        inp = ", ".join(i for i in inpRet["input"])
                         dropStr += "(%s)" % inp
 
                     logger.debug("removing UDF '%s'" % udf)

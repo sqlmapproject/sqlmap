@@ -85,10 +85,10 @@ class ProxyHTTPSConnection(ProxyHTTPConnection):
 
         # Make the sock ssl-aware
         if PYVERSION >= "2.6":
-            sslobj    = ssl.wrap_socket(self.sock, self.key_file, self.cert_file)
+            sslobj = ssl.wrap_socket(self.sock, self.key_file, self.cert_file)
             self.sock = sslobj
         else:
-            sslobj    = socket.ssl(self.sock, self.key_file, self.cert_file)
+            sslobj = socket.ssl(self.sock, self.key_file, self.cert_file)
             self.sock = httplib.FakeSocket(self.sock, sslobj)
 
 class ProxyHTTPHandler(urllib2.HTTPHandler):

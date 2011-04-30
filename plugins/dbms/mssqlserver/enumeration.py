@@ -104,7 +104,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                infoMsg  = "fetching number of tables for "
+                infoMsg = "fetching number of tables for "
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
@@ -112,7 +112,7 @@ class Enumeration(GenericEnumeration):
                 count = inject.getValue(query, inband=False, error=False, charsetType=2)
 
                 if not isNumPosStrValue(count):
-                    warnMsg  = "unable to retrieve the number of "
+                    warnMsg = "unable to retrieve the number of "
                     warnMsg += "tables for database '%s'" % db
                     logger.warn(warnMsg)
                     continue
@@ -128,7 +128,7 @@ class Enumeration(GenericEnumeration):
                 if tables:
                     kb.data.cachedTables[db] = tables
                 else:
-                    warnMsg  = "unable to retrieve the tables "
+                    warnMsg = "unable to retrieve the tables "
                     warnMsg += "for database '%s'" % db
                     logger.warn(warnMsg)
 

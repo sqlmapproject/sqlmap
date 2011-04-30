@@ -95,9 +95,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     if lastChar > 0 and length > ( lastChar - firstChar ):
         length = ( lastChar - firstChar )
 
-    showEta    = conf.eta and isinstance(length, int)
+    showEta = conf.eta and isinstance(length, int)
     numThreads = min(conf.threads, length)
-    threads    = []
+    threads = []
 
     if showEta:
         progress = ProgressBar(maxValue=length)
@@ -250,7 +250,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 logger.error(errMsg)
 
                                 conf.timeSec += 1
-                                warnMsg  = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
                                 warnMsg += "(due to invalid char)"
                                 logger.warn(warnMsg)
 
@@ -294,11 +294,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     # Go multi-threading (--threads > 1)
     if conf.threads > 1 and isinstance(length, int) and length > 1:
-        value   = [ None ] * length
-        index   = [ firstChar ]    # As list for python nested function scoping
+        value = [ None ] * length
+        index = [ firstChar ]    # As list for python nested function scoping
         idxlock = threading.Lock()
-        iolock  = threading.Lock()
-        valuelock  = threading.Lock()
+        iolock = threading.Lock()
+        valuelock = threading.Lock()
         kb.threadContinue = True
 
         def downloadThread():

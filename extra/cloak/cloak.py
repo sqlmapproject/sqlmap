@@ -47,7 +47,7 @@ def decloak(inputFile):
 
 def main():
     usage = '%s [-d] -i <input file> [-o <output file>]' % sys.argv[0]
-    parser  = OptionParser(usage=usage, version='0.1')
+    parser = OptionParser(usage=usage, version='0.1')
 
     try:
         parser.add_option('-d', dest='decrypt', action="store_true", help='Decrypt')

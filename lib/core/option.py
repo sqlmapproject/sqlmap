@@ -163,7 +163,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         getPostReq = False
 
         for request in reqResList:
-            url    = extractRegexResult(r"URL: (?P<result>.+?)\n", request, re.I)
+            url = extractRegexResult(r"URL: (?P<result>.+?)\n", request, re.I)
             method = extractRegexResult(r"METHOD: (?P<result>.+?)\n", request, re.I)
             cookie = extractRegexResult(r"COOKIE: (?P<result>.+?)\n", request, re.I)
             getPostReq = True
@@ -191,7 +191,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         """
         Parses burp logs
         """
-        port   = None
+        port = None
         scheme = None
 
         reqResList = content.split(BURP_SPLITTER)
@@ -202,7 +202,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
                 if schemePort:
                     scheme = schemePort.group(1)
-                    port   = schemePort.group(2)
+                    port = schemePort.group(2)
 
             if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I):
                 continue
@@ -211,13 +211,13 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 continue
 
             getPostReq = False
-            url        = None
-            host       = None
-            method     = None
-            data       = None
-            cookie     = None
-            params     = False
-            lines      = request.split("\n")
+            url = None
+            host = None
+            method = None
+            data = None
+            cookie = None
+            params = False
+            lines = request.split("\n")
 
             for line in lines:
                 if len(line) == 0 or line == "\n":
@@ -283,9 +283,9 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     scheme = "https"
 
                 if not url.startswith("http"):
-                    url    = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
+                    url = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
                     scheme = None
-                    port   = None
+                    port = None
 
                 if not kb.targetUrls or url not in addedTargetUrls:
                     kb.targetUrls.add((url, method, urldecode(data), cookie))
@@ -343,14 +343,14 @@ def __setMultipleTargets():
             __feedTargetsDict(os.path.join(conf.list, reqFile), addedTargetUrls)
 
     else:
-        errMsg  = "the specified list of targets is not a file "
+        errMsg = "the specified list of targets is not a file "
         errMsg += "nor a directory"
         raise sqlmapFilePathException, errMsg
 
     updatedTargetsCount = len(kb.targetUrls)
 
     if updatedTargetsCount > initialTargetsCount:
-        infoMsg  = "sqlmap parsed %d " % (updatedTargetsCount - initialTargetsCount)
+        infoMsg = "sqlmap parsed %d " % (updatedTargetsCount - initialTargetsCount)
         infoMsg += "testable requests from the targets list"
         logger.info(infoMsg)
 
@@ -371,7 +371,7 @@ def __setRequestFromFile():
     logger.info(infoMsg)
 
     if not os.path.isfile(conf.requestFile):
-        errMsg  = "the specified HTTP request file "
+        errMsg = "the specified HTTP request file "
         errMsg += "does not exist"
         raise sqlmapFilePathException, errMsg
 
@@ -414,14 +414,14 @@ def __setGoogleDorking():
     matches = googleObj.search(conf.googleDork)
 
     if not matches:
-        errMsg  = "unable to find results for your "
+        errMsg = "unable to find results for your "
         errMsg += "Google dork expression"
         raise sqlmapGenericException, errMsg
 
     googleObj.getTargetUrls()
 
     if kb.targetUrls:
-        logMsg  = "sqlmap got %d results for your " % len(matches)
+        logMsg = "sqlmap got %d results for your " % len(matches)
         logMsg += "Google dork expression, "
 
         if len(matches) == len(kb.targetUrls):
@@ -432,7 +432,7 @@ def __setGoogleDorking():
         logMsg += "of them are testable targets"
         logger.info(logMsg)
     else:
-        errMsg  = "sqlmap got %d results " % len(matches)
+        errMsg = "sqlmap got %d results " % len(matches)
         errMsg += "for your Google dork expression, but none of them "
         errMsg += "have GET parameters to test for SQL injection"
         raise sqlmapGenericException, errMsg
@@ -450,7 +450,7 @@ def __findPageForms():
     response, _ = Request.queryPage(response=True)
 
     if response is None or isinstance(response, basestring):
-        errMsg  = "can't do form parsing as no valid response "
+        errMsg = "can't do form parsing as no valid response "
         errMsg += "object found. please check previous log messages "
         errMsg += "for connection issues"
         raise sqlmapGenericException, errMsg
@@ -458,7 +458,7 @@ def __findPageForms():
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
-        errMsg  = "badly formed HTML at the target url. can't parse forms"
+        errMsg = "badly formed HTML at the target url. can't parse forms"
         raise sqlmapGenericException, errMsg
 
     if forms:
@@ -478,7 +478,7 @@ def __findPageForms():
             kb.targetUrls.add(target)
             kb.formNames.append(target)
     else:
-        errMsg  = "there were no forms found at the given target url"
+        errMsg = "there were no forms found at the given target url"
         raise sqlmapGenericException, errMsg
 
 def __setMetasploit():
@@ -491,7 +491,7 @@ def __setMetasploit():
     msfEnvPathExists = False
 
     if IS_WIN:
-        warnMsg  = "some sqlmap takeover functionalities are not yet "
+        warnMsg = "some sqlmap takeover functionalities are not yet "
         warnMsg += "supported on Windows. Please use Linux in a virtual "
         warnMsg += "machine for out-of-band features."
 
@@ -503,7 +503,7 @@ def __setMetasploit():
         isAdmin = runningAsAdmin()
 
         if isAdmin is not True:
-            errMsg  = "you need to run sqlmap as an administrator "
+            errMsg = "you need to run sqlmap as an administrator "
             errMsg += "if you want to perform a SMB relay attack because "
             errMsg += "it will need to listen on a user-specified SMB "
             errMsg += "TCP port for incoming connection attempts"
@@ -513,7 +513,7 @@ def __setMetasploit():
         condition = False
 
         for path in [conf.msfPath, os.path.join(conf.msfPath, 'bin')]:
-            condition  = os.path.exists(normalizePath(path))
+            condition = os.path.exists(normalizePath(path))
             condition &= os.path.exists(normalizePath(os.path.join(path, "msfcli")))
             condition &= os.path.exists(normalizePath(os.path.join(path, "msfconsole")))
             condition &= os.path.exists(normalizePath(os.path.join(path, "msfencode")))
@@ -524,13 +524,13 @@ def __setMetasploit():
                 break
 
         if condition:
-            debugMsg  = "provided Metasploit Framework 3 path "
+            debugMsg = "provided Metasploit Framework 3 path "
             debugMsg += "'%s' is valid" % conf.msfPath
             logger.debug(debugMsg)
 
             msfEnvPathExists = True
         else:
-            warnMsg  = "the provided Metasploit Framework 3 path "
+            warnMsg = "the provided Metasploit Framework 3 path "
             warnMsg += "'%s' is not valid. The cause could " % conf.msfPath
             warnMsg += "be that the path does not exists or that one "
             warnMsg += "or more of the needed Metasploit executables "
@@ -538,12 +538,12 @@ def __setMetasploit():
             warnMsg += "msfpayload do not exist"
             logger.warn(warnMsg)
     else:
-        warnMsg  = "you did not provide the local path where Metasploit "
+        warnMsg = "you did not provide the local path where Metasploit "
         warnMsg += "Framework 3 is installed"
         logger.warn(warnMsg)
 
     if not msfEnvPathExists:
-        warnMsg  = "sqlmap is going to look for Metasploit Framework 3 "
+        warnMsg = "sqlmap is going to look for Metasploit Framework 3 "
         warnMsg += "installation into the environment paths"
         logger.warn(warnMsg)
 
@@ -555,25 +555,25 @@ def __setMetasploit():
             envPaths = envPaths.split(":")
 
         for envPath in envPaths:
-            envPath    = envPath.replace(";", "")
-            condition  = os.path.exists(normalizePath(envPath))
+            envPath = envPath.replace(";", "")
+            condition = os.path.exists(normalizePath(envPath))
             condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfcli")))
             condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfconsole")))
             condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfencode")))
             condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfpayload")))
 
             if condition:
-                infoMsg  = "Metasploit Framework 3 has been found "
+                infoMsg = "Metasploit Framework 3 has been found "
                 infoMsg += "installed in the '%s' path" % envPath
                 logger.info(infoMsg)
 
                 msfEnvPathExists = True
-                conf.msfPath     = envPath
+                conf.msfPath = envPath
 
                 break
 
     if not msfEnvPathExists:
-        errMsg  = "unable to locate Metasploit Framework 3 installation. "
+        errMsg = "unable to locate Metasploit Framework 3 installation. "
         errMsg += "Get it from http://metasploit.com/framework/download/"
         raise sqlmapFilePathException, errMsg
 
@@ -589,7 +589,7 @@ def __setWriteFile():
         raise sqlmapFilePathException, errMsg
 
     if not conf.dFile:
-        errMsg  = "you did not provide the back-end DBMS absolute path "
+        errMsg = "you did not provide the back-end DBMS absolute path "
         errMsg += "where you want to write the local file '%s'" % conf.wFile
         raise sqlmapMissingMandatoryOptionException, errMsg
 
@@ -714,11 +714,11 @@ def __setTamperingFunctions():
             dirname, filename = os.path.split(tfile)
             dirname = os.path.abspath(dirname)
 
-            infoMsg  = "loading tamper script '%s'" % filename[:-3]
+            infoMsg = "loading tamper script '%s'" % filename[:-3]
             logger.info(infoMsg)
 
             if not os.path.exists(os.path.join(dirname, '__init__.py')):
-                errMsg  = "make sure that there is an empty file '__init__.py' "
+                errMsg = "make sure that there is an empty file '__init__.py' "
                 errMsg += "inside of tamper scripts directory '%s'" % dirname
                 raise sqlmapGenericException, errMsg
 
@@ -738,7 +738,7 @@ def __setTamperingFunctions():
                     kb.tamperFunctions.append(function)
 
                     if check_priority and priority > last_priority:
-                        message  = "it seems that you might have mixed "
+                        message = "it seems that you might have mixed "
                         message += "the order of tamper scripts.\n"
                         message += "Do you want to auto resolve this? [Y/n/q]"
                         test = readInput(message, default="Y")
@@ -803,13 +803,13 @@ def __setHTTPProxy():
     debugMsg = "setting the HTTP proxy to pass by all HTTP requests"
     logger.debug(debugMsg)
 
-    __proxySplit   = urlparse.urlsplit(conf.proxy)
+    __proxySplit = urlparse.urlsplit(conf.proxy)
     __hostnamePort = __proxySplit[1].split(":")
 
-    __scheme       = __proxySplit[0]
-    __hostname     = __hostnamePort[0]
-    __port         = None
-    __proxyString  = ""
+    __scheme = __proxySplit[0]
+    __hostname = __hostnamePort[0]
+    __port = None
+    __proxyString = ""
 
     if len(__hostnamePort) == 2:
         try:
@@ -825,7 +825,7 @@ def __setHTTPProxy():
         pCredRegExp = re.search("^(.*?):(.*?)$", conf.pCred)
 
         if not pCredRegExp:
-            errMsg  = "Proxy authentication credentials "
+            errMsg = "Proxy authentication credentials "
             errMsg += "value must be in format username:password"
             raise sqlmapSyntaxException, errMsg
 
@@ -911,12 +911,12 @@ def __setHTTPAuthentication():
         return
 
     elif conf.aType and not conf.aCred:
-        errMsg  = "you specified the HTTP authentication type, but "
+        errMsg = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
         raise sqlmapSyntaxException, errMsg
 
     elif not conf.aType and conf.aCred:
-        errMsg  = "you specified the HTTP authentication credentials, "
+        errMsg = "you specified the HTTP authentication credentials, "
         errMsg += "but did not provide the type"
         raise sqlmapSyntaxException, errMsg
 
@@ -927,16 +927,16 @@ def __setHTTPAuthentication():
         aTypeLower = conf.aType.lower()
 
         if aTypeLower not in ( "basic", "digest", "ntlm" ):
-            errMsg  = "HTTP authentication type value must be "
+            errMsg = "HTTP authentication type value must be "
             errMsg += "Basic, Digest or NTLM"
             raise sqlmapSyntaxException, errMsg
         elif aTypeLower in ( "basic", "digest" ):
             regExp = "^(.*?):(.*?)$"
-            errMsg  = "HTTP %s authentication credentials " % aTypeLower
+            errMsg = "HTTP %s authentication credentials " % aTypeLower
             errMsg += "value must be in format username:password"
         elif aTypeLower == "ntlm":
             regExp = "^(.*?)\\\(.*?):(.*?)$"
-            errMsg  = "HTTP NTLM authentication credentials value must "
+            errMsg = "HTTP NTLM authentication credentials value must "
             errMsg += "be in format DOMAIN\username:password"
 
         aCredRegExp = re.search(regExp, conf.aCred)
@@ -960,7 +960,7 @@ def __setHTTPAuthentication():
             try:
                 from ntlm import HTTPNtlmAuthHandler
             except ImportError, _:
-                errMsg  = "sqlmap requires Python NTLM third-party library "
+                errMsg = "sqlmap requires Python NTLM third-party library "
                 errMsg += "in order to authenticate via NTLM, "
                 errMsg += "http://code.google.com/p/python-ntlm/"
                 raise sqlmapMissingDependence, errMsg
@@ -973,7 +973,7 @@ def __setHTTPAuthentication():
         aCertRegExp = re.search("^(.+?),\s*(.+?)$", conf.aCert)
 
         if not aCertRegExp:
-            errMsg  = "HTTP authentication certificate option "
+            errMsg = "HTTP authentication certificate option "
             errMsg += "must be in format key_file,cert_file"
             raise sqlmapSyntaxException, errMsg
 
@@ -983,7 +983,7 @@ def __setHTTPAuthentication():
 
         for ifile in (key_file, cert_file):
             if not os.path.exists(ifile):
-                errMsg  = "File '%s' does not exist" % ifile
+                errMsg = "File '%s' does not exist" % ifile
                 raise sqlmapSyntaxException, errMsg
 
         authHandler = HTTPSCertAuthHandler(key_file, cert_file)
@@ -1091,14 +1091,14 @@ def __setHTTPUserAgent():
 
     else:
         if not kb.userAgents:
-            debugMsg  = "loading random HTTP User-Agent header(s) from "
+            debugMsg = "loading random HTTP User-Agent header(s) from "
             debugMsg += "file '%s'" % paths.USER_AGENTS
             logger.debug(debugMsg)
 
             try:
                 kb.userAgents = getFileItems(paths.USER_AGENTS)
             except IOError:
-                warnMsg  = "unable to read HTTP User-Agent header "
+                warnMsg = "unable to read HTTP User-Agent header "
                 warnMsg += "file '%s'" % paths.USER_AGENTS
                 logger.warn(warnMsg)
 
@@ -1115,7 +1115,7 @@ def __setHTTPUserAgent():
         userAgent = sanitizeStr(userAgent)
         conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
 
-        logMsg  = "fetched random HTTP User-Agent header from "
+        logMsg = "fetched random HTTP User-Agent header from "
         logMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
         logger.info(logMsg)
 
@@ -1154,7 +1154,7 @@ def __setHTTPTimeout():
         conf.timeout = float(conf.timeout)
 
         if conf.timeout < 3.0:
-            warnMsg  = "the minimum HTTP timeout is 3 seconds, sqlmap "
+            warnMsg = "the minimum HTTP timeout is 3 seconds, sqlmap "
             warnMsg += "will going to reset it"
             logger.warn(warnMsg)
 
@@ -1234,7 +1234,7 @@ def __cleanupOptions():
             conf.timeSec = 2 * TIME_DEFAULT_DELAY
             kb.adjustTimeDelay = False
 
-            warnMsg  = "increasing default value for "
+            warnMsg = "increasing default value for "
             warnMsg += "--time-sec to %d because " % conf.timeSec
             warnMsg += "--tor switch was provided"
             logger.warn(warnMsg)
@@ -1253,27 +1253,27 @@ def __setConfAttributes():
     debugMsg = "initializing the configuration"
     logger.debug(debugMsg)
 
-    conf.boundaries       = []
-    conf.cj               = None
-    conf.dbmsConnector    = None
-    conf.dbmsHandler      = None
-    conf.dumpPath         = None
-    conf.httpHeaders      = []
-    conf.hostname         = None
-    conf.loggedToOut      = None
-    conf.multipleTargets  = False
-    conf.outputPath       = None
-    conf.paramDict        = {}
-    conf.parameters       = {}
-    conf.path             = None
-    conf.port             = None
-    conf.redirectHandled  = False
-    conf.scheme           = None
-    conf.sessionFP        = None
-    conf.start            = True
-    conf.tests            = []
-    conf.trafficFP        = None
-    conf.wFileType        = None
+    conf.boundaries = []
+    conf.cj = None
+    conf.dbmsConnector = None
+    conf.dbmsHandler = None
+    conf.dumpPath = None
+    conf.httpHeaders = []
+    conf.hostname = None
+    conf.loggedToOut = None
+    conf.multipleTargets = False
+    conf.outputPath = None
+    conf.paramDict = {}
+    conf.parameters = {}
+    conf.path = None
+    conf.port = None
+    conf.redirectHandled = False
+    conf.scheme = None
+    conf.sessionFP = None
+    conf.start = True
+    conf.tests = []
+    conf.trafficFP = None
+    conf.wFileType = None
 
 def __setKnowledgeBaseAttributes(flushAll=True):
     """
@@ -1284,95 +1284,95 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     debugMsg = "initializing the knowledge base"
     logger.debug(debugMsg)
 
-    kb.absFilePaths        = set()
-    kb.adjustTimeDelay     = False
-    kb.arch                = None
-    kb.authHeader          = None
-    kb.bannerFp            = advancedDict()
+    kb.absFilePaths = set()
+    kb.adjustTimeDelay = False
+    kb.arch = None
+    kb.authHeader = None
+    kb.bannerFp = advancedDict()
 
-    kb.brute               = advancedDict({'tables':[], 'columns':[]})
-    kb.bruteMode           = False
+    kb.brute = advancedDict({'tables':[], 'columns':[]})
+    kb.bruteMode = False
 
-    kb.cache               = advancedDict()
-    kb.cache.content       = {}
-    kb.cache.regex         = {}
-    kb.cache.stdev         = {}
+    kb.cache = advancedDict()
+    kb.cache.content = {}
+    kb.cache.regex = {}
+    kb.cache.stdev = {}
 
-    kb.commonOutputs       = None
+    kb.commonOutputs = None
 
-    kb.data                = advancedDict()
+    kb.data = advancedDict()
 
     # Active back-end DBMS fingerprint
-    kb.dbms                = None
-    kb.dbmsVersion         = [ UNKNOWN_DBMS_VERSION ]
+    kb.dbms = None
+    kb.dbmsVersion = [ UNKNOWN_DBMS_VERSION ]
 
-    kb.delayCandidates     = TIME_DELAY_CANDIDATES * [0]
-    kb.dep                 = None
-    kb.docRoot             = None
-    kb.dynamicMarkings     = []
-    kb.endDetection        = False
-    kb.httpErrorCodes      = {}
-    kb.errorIsNone         = True
-    kb.formNames           = []
-    kb.headersCount        = 0
-    kb.headersFp           = {}
-    kb.hintValue           = None
-    kb.htmlFp              = []
-    kb.injection           = injectionDict()
-    kb.injections          = []
+    kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]
+    kb.dep = None
+    kb.docRoot = None
+    kb.dynamicMarkings = []
+    kb.endDetection = False
+    kb.httpErrorCodes = {}
+    kb.errorIsNone = True
+    kb.formNames = []
+    kb.headersCount = 0
+    kb.headersFp = {}
+    kb.hintValue = None
+    kb.htmlFp = []
+    kb.injection = injectionDict()
+    kb.injections = []
 
-    kb.locks               = advancedDict()
-    kb.locks.cacheLock     = threading.Lock()
-    kb.locks.logLock       = threading.Lock()
+    kb.locks = advancedDict()
+    kb.locks.cacheLock = threading.Lock()
+    kb.locks.logLock = threading.Lock()
 
-    kb.matchRatio          = None
-    kb.nullConnection      = None
-    kb.pageTemplate        = None
-    kb.pageTemplates       = dict()
-    kb.originalPage        = None
+    kb.matchRatio = None
+    kb.nullConnection = None
+    kb.pageTemplate = None
+    kb.pageTemplates = dict()
+    kb.originalPage = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing
-    kb.os                  = None
-    kb.osVersion           = None
-    kb.osSP                = None
+    kb.os = None
+    kb.osVersion = None
+    kb.osSP = None
 
-    kb.pageEncoding        = DEFAULT_PAGE_ENCODING
-    kb.pageStable          = None
-    kb.partRun             = None
-    kb.proxyAuthHeader     = None
-    kb.queryCounter        = 0
-    kb.redirectSetCookie   = None
-    kb.responseTimes       = []
-    kb.resumedQueries      = {}
-    kb.retriesCount        = 0
-    kb.singleLogFlags      = set()
-    kb.skipOthersDbms      = None
-    kb.suppressSession     = False
-    kb.suppressResumeInfo  = False
-    kb.technique           = None
-    kb.testMode            = False
-    kb.testQueryCount      = 0
-    kb.threadContinue      = True
-    kb.threadException     = False
-    kb.threadData          = {}
+    kb.pageEncoding = DEFAULT_PAGE_ENCODING
+    kb.pageStable = None
+    kb.partRun = None
+    kb.proxyAuthHeader = None
+    kb.queryCounter = 0
+    kb.redirectSetCookie = None
+    kb.responseTimes = []
+    kb.resumedQueries = {}
+    kb.retriesCount = 0
+    kb.singleLogFlags = set()
+    kb.skipOthersDbms = None
+    kb.suppressSession = False
+    kb.suppressResumeInfo = False
+    kb.technique = None
+    kb.testMode = False
+    kb.testQueryCount = 0
+    kb.threadContinue = True
+    kb.threadException = False
+    kb.threadData = {}
     kb.xpCmdshellAvailable = False
 
-    kb.misc            = advancedDict()
-    kb.misc.delimiter  = randomStr(length=6, lowercase=True)
-    kb.misc.start      = ":%s:" % randomStr(length=3, lowercase=True)
-    kb.misc.stop       = ":%s:" % randomStr(length=3, lowercase=True)
-    kb.misc.space      = ":%s:" % randomStr(length=1, lowercase=True)
-    kb.misc.dollar     = ":%s:" % randomStr(length=1, lowercase=True)
+    kb.misc = advancedDict()
+    kb.misc.delimiter = randomStr(length=6, lowercase=True)
+    kb.misc.start = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.misc.stop = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.misc.space = ":%s:" % randomStr(length=1, lowercase=True)
+    kb.misc.dollar = ":%s:" % randomStr(length=1, lowercase=True)
     kb.misc.forcedDbms = None
 
     if flushAll:
-        kb.keywords        = set(getFileItems(paths.SQL_KEYWORDS))
+        kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
         kb.tamperFunctions = []
-        kb.targetUrls      = set()
-        kb.testedParams    = set()
-        kb.userAgents      = None
-        kb.wordlist        = None
+        kb.targetUrls = set()
+        kb.testedParams = set()
+        kb.userAgents = None
+        kb.wordlist = None
 
 def __useWizardInterface():
     """

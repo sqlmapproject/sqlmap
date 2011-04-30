@@ -356,7 +356,7 @@ def checkSqlInjection(place, parameter, value):
                                         injectable = True
 
                             except sqlmapConnectionException, msg:
-                                debugMsg  = "problem occured most likely because the "
+                                debugMsg = "problem occured most likely because the "
                                 debugMsg += "server hasn't recovered as expected from the "
                                 debugMsg += "error-based payload used ('%s')" % msg
                                 logger.debug(debugMsg)

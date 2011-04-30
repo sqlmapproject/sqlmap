@@ -75,20 +75,20 @@ class Enumeration:
 
     def __init__(self):
         kb.data.has_information_schema = False
-        kb.data.banner                 = None
-        kb.data.currentUser            = ""
-        kb.data.currentDb              = ""
-        kb.data.cachedUsers            = []
-        kb.data.cachedUsersPasswords   = {}
-        kb.data.cachedUsersPrivileges  = {}
-        kb.data.cachedUsersRoles       = {}
-        kb.data.cachedDbs              = []
-        kb.data.cachedTables           = {}
-        kb.data.cachedColumns          = {}
-        kb.data.cachedCounts           = {}
-        kb.data.dumpedTable            = {}
-        kb.data.processChar            = None
-        self.alwaysRetrieveSqlOutput   = False
+        kb.data.banner = None
+        kb.data.currentUser = ""
+        kb.data.currentDb = ""
+        kb.data.cachedUsers = []
+        kb.data.cachedUsersPasswords = {}
+        kb.data.cachedUsersPrivileges = {}
+        kb.data.cachedUsersRoles = {}
+        kb.data.cachedDbs = []
+        kb.data.cachedTables = {}
+        kb.data.cachedColumns = {}
+        kb.data.cachedCounts = {}
+        kb.data.dumpedTable = {}
+        kb.data.processChar = None
+        self.alwaysRetrieveSqlOutput = False
 
     def getBanner(self):
         if not conf.getBanner:
@@ -164,7 +164,7 @@ class Enumeration:
 
         rootQuery = queries[Backend.getIdentifiedDbms()].users
 
-        condition  = ( Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")) )
+        condition = ( Backend.getIdentifiedDbms() == DBMS.MSSQL and Backend.isVersionWithin(("2005", "2008")) )
         condition |= ( Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema )
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
@@ -319,7 +319,7 @@ class Enumeration:
                     if not user or user in retrievedUsers:
                         continue
 
-                    infoMsg  = "fetching number of password hashes "
+                    infoMsg = "fetching number of password hashes "
                     infoMsg += "for user '%s'" % user
                     logger.info(infoMsg)
 
@@ -330,7 +330,7 @@ class Enumeration:
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                     if not isNumPosStrValue(count):
-                        warnMsg  = "unable to retrieve the number of password "
+                        warnMsg = "unable to retrieve the number of password "
                         warnMsg += "hashes for user '%s'" % user
                         logger.warn(warnMsg)
                         continue
@@ -338,7 +338,7 @@ class Enumeration:
                     infoMsg = "fetching password hashes for user '%s'" % user
                     logger.info(infoMsg)
 
-                    passwords  = []
+                    passwords = []
 
                     if Backend.getIdentifiedDbms() == DBMS.ORACLE:
                         plusOne = True
@@ -361,14 +361,14 @@ class Enumeration:
                     if passwords:
                         kb.data.cachedUsersPasswords[user] = passwords
                     else:
-                        warnMsg  = "unable to retrieve the password "
+                        warnMsg = "unable to retrieve the password "
                         warnMsg += "hashes for user '%s'" % user
                         logger.warn(warnMsg)
 
                     retrievedUsers.add(user)
 
         if not kb.data.cachedUsersPasswords:
-            errMsg  = "unable to retrieve the password "
+            errMsg = "unable to retrieve the password "
             errMsg += "hashes for the database users"
             raise sqlmapNoneDataException, errMsg
 
@@ -387,7 +387,7 @@ class Enumeration:
     def __isAdminFromPrivileges(self, privileges):
         # In PostgreSQL the usesuper privilege means that the
         # user is DBA
-        dbaCondition  = ( Backend.getIdentifiedDbms() == DBMS.PGSQL and "super" in privileges )
+        dbaCondition = ( Backend.getIdentifiedDbms() == DBMS.PGSQL and "super" in privileges )
 
         # In Oracle the DBA privilege means that the
         # user is DBA
@@ -424,13 +424,13 @@ class Enumeration:
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-                query     = rootQuery.inband.query2
+                query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
             elif Backend.getIdentifiedDbms() == DBMS.ORACLE and query2:
-                query     = rootQuery.inband.query2
+                query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
             else:
-                query     = rootQuery.inband.query
+                query = rootQuery.inband.query
                 condition = rootQuery.inband.condition
 
             if conf.user:
@@ -454,7 +454,7 @@ class Enumeration:
 
             if values:
                 for value in values:
-                    user       = None
+                    user = None
                     privileges = set()
 
                     for count in xrange(0, len(value)):
@@ -528,7 +528,7 @@ class Enumeration:
                 if not user or user in retrievedUsers:
                     continue
 
-                infoMsg  = "fetching number of privileges "
+                infoMsg = "fetching number of privileges "
                 infoMsg += "for user '%s'" % user
                 logger.info(infoMsg)
 
@@ -554,7 +554,7 @@ class Enumeration:
 
                         return self.getPrivileges(query2=True)
 
-                    warnMsg  = "unable to retrieve the number of "
+                    warnMsg = "unable to retrieve the number of "
                     warnMsg += "privileges for user '%s'" % user
                     logger.warn(warnMsg)
                     continue
@@ -634,21 +634,21 @@ class Enumeration:
                 if privileges:
                     kb.data.cachedUsersPrivileges[user] = list(privileges)
                 else:
-                    warnMsg  = "unable to retrieve the privileges "
+                    warnMsg = "unable to retrieve the privileges "
                     warnMsg += "for user '%s'" % user
                     logger.warn(warnMsg)
 
                 retrievedUsers.add(user)
 
         if not kb.data.cachedUsersPrivileges:
-            errMsg  = "unable to retrieve the privileges "
+            errMsg = "unable to retrieve the privileges "
             errMsg += "for the database users"
             raise sqlmapNoneDataException, errMsg
 
         return ( kb.data.cachedUsersPrivileges, areAdmins )
 
     def getRoles(self, query2=False):
-        warnMsg  = "on %s the concept of roles does not " % Backend.getIdentifiedDbms()
+        warnMsg = "on %s the concept of roles does not " % Backend.getIdentifiedDbms()
         warnMsg += "exist. sqlmap will enumerate privileges instead"
         logger.warn(warnMsg)
 
@@ -656,13 +656,13 @@ class Enumeration:
 
     def getDbs(self):
         if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-            warnMsg  = "information_schema not available, "
+            warnMsg = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
         if Backend.getIdentifiedDbms() == DBMS.ORACLE:
-            warnMsg  = "schema names are going to be used on Oracle "
+            warnMsg = "schema names are going to be used on Oracle "
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             logger.warn(warnMsg)
@@ -735,7 +735,7 @@ class Enumeration:
 
         if bruteForce is None:
             if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-                errMsg  = "information_schema not available, "
+                errMsg = "information_schema not available, "
                 errMsg += "back-end DBMS is MySQL < 5.0"
                 logger.error(errMsg)
                 bruteForce = True
@@ -747,7 +747,7 @@ class Enumeration:
                     tables = None
 
                 if not tables:
-                    errMsg  = "cannot retrieve table names, "
+                    errMsg = "cannot retrieve table names, "
                     errMsg += "back-end DBMS is Access"
                     logger.error(errMsg)
                     bruteForce = True
@@ -854,7 +854,7 @@ class Enumeration:
 
                     continue
 
-                infoMsg  = "fetching number of tables for "
+                infoMsg = "fetching number of tables for "
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
@@ -865,7 +865,7 @@ class Enumeration:
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
-                    warnMsg  = "unable to retrieve the number of "
+                    warnMsg = "unable to retrieve the number of "
                     warnMsg += "tables for database '%s'" % db
                     logger.warn(warnMsg)
                     continue
@@ -896,7 +896,7 @@ class Enumeration:
                 if tables:
                     kb.data.cachedTables[db] = tables
                 else:
-                    warnMsg  = "unable to retrieve the tables "
+                    warnMsg = "unable to retrieve the tables "
                     warnMsg += "for database '%s'" % db
                     logger.warn(warnMsg)
 
@@ -940,13 +940,13 @@ class Enumeration:
             return self.getSchema()
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-            errMsg  = "information_schema not available, "
+            errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             logger.error(errMsg)
             bruteForce = True
 
         elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
-            errMsg  = "cannot retrieve column names, "
+            errMsg = "cannot retrieve column names, "
             errMsg += "back-end DBMS is Access"
             logger.error(errMsg)
             bruteForce = True
@@ -1043,7 +1043,7 @@ class Enumeration:
                     kb.data.cachedColumns[conf.db] = table
 
         if not kb.data.cachedColumns and not conf.direct:
-            infoMsg  = "fetching number of columns "
+            infoMsg = "fetching number of columns "
             infoMsg += "for table '%s'" % conf.tbl
             infoMsg += " on database '%s'" % conf.db
             logger.info(infoMsg)
@@ -1074,12 +1074,12 @@ class Enumeration:
             count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
             if not isNumPosStrValue(count):
-                errMsg  = "unable to retrieve the number of columns "
+                errMsg = "unable to retrieve the number of columns "
                 errMsg += "for table '%s' " % conf.tbl
                 errMsg += "on database '%s'" % conf.db
                 raise sqlmapNoneDataException, errMsg
 
-            table   = {}
+            table = {}
             columns = {}
 
             indexRange = getRange(count)
@@ -1355,7 +1355,7 @@ class Enumeration:
         self.forceDbmsEnum()
 
         if not conf.db:
-            warnMsg  = "missing database parameter, sqlmap is going to "
+            warnMsg = "missing database parameter, sqlmap is going to "
             warnMsg += "use the current database to dump table "
             warnMsg += "'%s' entries" % conf.tbl
             logger.warn(warnMsg)
@@ -1383,7 +1383,7 @@ class Enumeration:
         elif kb.data.cachedColumns and conf.db in kb.data.cachedColumns and conf.tbl in kb.data.cachedColumns[conf.db]:
             colList = kb.data.cachedColumns[conf.db][conf.tbl].keys()
         else:
-            errMsg  = "missing column names, "
+            errMsg = "missing column names, "
             errMsg += "can't dump table"
             raise sqlmapNoneDataException, errMsg
 
@@ -1447,7 +1447,7 @@ class Enumeration:
                     entries = [ entries ]
 
                 entriesCount = len(entries)
-                index        = 0
+                index = 0
 
                 for column in colList:
                     colLen = len(column)
@@ -1591,7 +1591,7 @@ class Enumeration:
 
     def dumpAll(self):
         if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-            errMsg  = "information_schema not available, "
+            errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
 
@@ -1603,9 +1603,9 @@ class Enumeration:
             infoMsg += "dump all entries of this database's tables only. "
             logger.info(infoMsg)
 
-        conf.tbl             = None
-        conf.col             = None
-        kb.data.cachedDbs    = []
+        conf.tbl = None
+        conf.col = None
+        kb.data.cachedDbs = []
         kb.data.cachedTables = self.getTables()
 
         if kb.data.cachedTables:
@@ -1763,7 +1763,7 @@ class Enumeration:
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
-                    warnMsg  = "no database"
+                    warnMsg = "no database"
                     if dbConsider == "1":
                         warnMsg += "s like"
                     warnMsg += " '%s' found" % unsafeSQLIdentificatorNaming(db)
@@ -1792,12 +1792,12 @@ class Enumeration:
         bruteForce = False
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-            errMsg  = "information_schema not available, "
+            errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             bruteForce = True
 
         elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
-            errMsg  = "cannot retrieve table names, "
+            errMsg = "cannot retrieve table names, "
             errMsg += "back-end DBMS is Access"
             logger.error(errMsg)
             bruteForce = True
@@ -1878,7 +1878,7 @@ class Enumeration:
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
-                    warnMsg  = "no databases have table"
+                    warnMsg = "no databases have table"
                     if tblConsider == "1":
                         warnMsg += "s like"
                     warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
@@ -1947,12 +1947,12 @@ class Enumeration:
         bruteForce = False
 
         if Backend.getIdentifiedDbms() == DBMS.MYSQL and not kb.data.has_information_schema:
-            errMsg  = "information_schema not available, "
+            errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
             bruteForce = True
 
         elif Backend.getIdentifiedDbms() == DBMS.ACCESS:
-            errMsg  = "cannot retrieve column names, "
+            errMsg = "cannot retrieve column names, "
             errMsg += "back-end DBMS is Access"
             logger.error(errMsg)
             bruteForce = True
@@ -2059,7 +2059,7 @@ class Enumeration:
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
-                    warnMsg  = "no databases have tables containing column"
+                    warnMsg = "no databases have tables containing column"
                     if colConsider == "1":
                         warnMsg += "s like"
                     warnMsg += " '%s'" % column
@@ -2186,7 +2186,7 @@ class Enumeration:
             return output
         else:
             if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
-                warnMsg  = "execution of custom SQL queries is only "
+                warnMsg = "execution of custom SQL queries is only "
                 warnMsg += "available when stacked queries are supported"
                 logger.warn(warnMsg)
                 return None
@@ -2207,7 +2207,7 @@ class Enumeration:
         return output
 
     def sqlShell(self):
-        infoMsg  = "calling %s shell. To quit type " % Backend.getIdentifiedDbms()
+        infoMsg = "calling %s shell. To quit type " % Backend.getIdentifiedDbms()
         infoMsg += "'x' or 'q' and press ENTER"
         logger.info(infoMsg)
 
