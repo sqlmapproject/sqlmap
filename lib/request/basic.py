@@ -118,6 +118,8 @@ def checkCharEncoding(encoding):
         encoding = 'cp%s' % encoding[3:]
     elif encoding.startswith('windows') and not encoding.startswith('windows-'):
         encoding = 'windows-%s' % encoding[7:]
+    elif encoding.find('iso-88') > 0:
+        encoding = encoding[encoding.find('iso-88'):]
 
     # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
