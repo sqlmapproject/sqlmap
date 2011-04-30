@@ -279,6 +279,9 @@ def cmdLineParser():
         enumeration.add_option("--schema", dest="getSchema", action="store_true",
                                default=False, help="Enumerate DBMS schema")
 
+        enumeration.add_option("--count", dest="getCount", action="store_true",
+                               default=False, help="Retrieve number of entries for table(s)")
+
         enumeration.add_option("--dump", dest="dumpTable", action="store_true",
                                default=False, help="Dump DBMS database table entries")
 

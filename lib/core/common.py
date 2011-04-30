@@ -2527,17 +2527,20 @@ def safeSQLIdentificatorNaming(name, isTable=False):
     """
 
     retVal = name
+
     if isinstance(name, basestring):
         if isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and '.' not in name:
             name = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, name)
 
         parts = name.split('.')
+
         for i in range(len(parts)):
             if not re.match(r"\A[A-Za-z0-9_]+\Z", parts[i]):
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
                     parts[i] = "`%s`" % parts[i].strip("`")
                 elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
                     parts[i] = "\"%s\"" % parts[i].strip("\"")
+
         retVal = ".".join(parts)
 
     return retVal

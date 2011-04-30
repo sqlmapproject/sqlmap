@@ -211,11 +211,11 @@ class Dump:
                         maxlength2 = max(maxlength2, len(colType))
 
                 maxlength1 = max(maxlength1, len("COLUMN"))
-                lines1 = "-" * (int(maxlength1) + 2)
+                lines1 = "-" * (maxlength1 + 2)
 
                 if colType is not None:
                     maxlength2 = max(maxlength2, len("TYPE"))
-                    lines2 = "-" * (int(maxlength2) + 2)
+                    lines2 = "-" * (maxlength2 + 2)
 
                 self.__write("Database: %s\nTable: %s" % (db, table))
 
@@ -255,6 +255,48 @@ class Dump:
                     self.__write("+%s+%s+\n" % (lines1, lines2))
                 else:
                     self.__write("+%s+\n" % lines1)
+
+    def dbTablesCount(self, dbTables):
+        if isinstance(dbTables, dict) and len(dbTables) > 0:
+            maxlength1 = len("Table")
+            maxlength2 = len("Entries")
+
+            for ctables in dbTables.values():
+                for tables in ctables.values():
+                    for table in tables:
+                        maxlength1 = max(maxlength1, len(normalizeUnicode(table) or str(table)))
+
+            for db, counts in dbTables.items():
+                self.__write("Database: %s" % db)
+
+                lines1 = "-" * (maxlength1 + 2)
+                blank1 = " " * (maxlength1 - len("Table"))
+                lines2 = "-" * (maxlength2 + 2)
+                blank2 = " " * (maxlength2 - len("Entries"))
+
+                self.__write("+%s+%s+" % (lines1, lines2))
+                self.__write("| Table%s | Entries%s |" % (blank1, blank2))
+                self.__write("+%s+%s+" % (lines1, lines2))
+
+                sortedCounts = counts.keys()
+                sortedCounts.sort(reverse=True)
+
+                for count in sortedCounts:
+                    tables = counts[count]
+
+                    if count is None:
+                        count = "Unknown"
+
+                    tables.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
+
+                    for table in tables:
+                        blank1 = " " * (maxlength1 - len(normalizeUnicode(table) or str(table)))
+                        blank2 = " " * (maxlength2 - len(str(count)))
+                        self.__write("| %s%s | %d%s |" % (table, blank1, count, blank2))
+
+                self.__write("+%s+%s+\n" % (lines1, lines2))
+        else:
+            logger.error("unable to retrieve the number of entries for any table")
 
     def dbTableValues(self, tableValues):
         replication = None

@@ -85,6 +85,7 @@ class Enumeration:
         kb.data.cachedDbs              = []
         kb.data.cachedTables           = {}
         kb.data.cachedColumns          = {}
+        kb.data.cachedCounts           = {}
         kb.data.dumpedTable            = {}
         kb.data.processChar            = None
         self.alwaysRetrieveSqlOutput   = False
@@ -839,6 +840,7 @@ class Enumeration:
                 for db, table in value:
                     db = safeSQLIdentificatorNaming(db)
                     table = safeSQLIdentificatorNaming(table, True)
+
                     if not kb.data.cachedTables.has_key(db):
                         kb.data.cachedTables[db] = [table]
                     else:
@@ -885,6 +887,7 @@ class Enumeration:
                         query = rootQuery.blind.query % index
                     else:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
+
                     table = inject.getValue(query, inband=False, error=False)
                     kb.hintValue = table
                     table = safeSQLIdentificatorNaming(table, True)
@@ -1173,6 +1176,56 @@ class Enumeration:
         conf.db = popValue()
 
         return kb.data.cachedColumns
+
+    def __tableGetCount(self, db, table):
+        query = "SELECT COUNT(*) FROM %s.%s" % (safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
+        count = inject.getValue(query, expected=EXPECTED.INT, charsetType=2)
+
+        if count is not None and isinstance(count, basestring) and count.isdigit():
+            if unsafeSQLIdentificatorNaming(db) not in kb.data.cachedCounts:
+                kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)] = {}
+
+            if int(count) in kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)]:
+                kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)][int(count)].append(unsafeSQLIdentificatorNaming(table))
+            else:
+                kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)][int(count)] = [unsafeSQLIdentificatorNaming(table)]
+
+    def getCount(self):
+        if not conf.tbl:
+            warnMsg = "missing table parameter, sqlmap will retrieve "
+            warnMsg += "the number of entries for all database "
+            warnMsg += "management system databases' tables"
+            logger.warn(warnMsg)
+
+        elif "." in conf.tbl:
+            if not conf.db:
+                conf.db, conf.tbl = conf.tbl.split(".")
+
+        if conf.tbl is not None and conf.db is None:
+            warnMsg = "missing database parameter, sqlmap is going to "
+            warnMsg += "use the current database to retrieve the "
+            warnMsg += "number of entries for table '%s'" % conf.tbl
+            logger.warn(warnMsg)
+
+            conf.db = self.getCurrentDb()
+
+        self.forceDbmsEnum()
+
+        if conf.db:
+            conf.db = safeSQLIdentificatorNaming(conf.db)
+
+        if conf.tbl:
+            for table in conf.tbl.split(","):
+                table = safeSQLIdentificatorNaming(table, True)
+                self.__tableGetCount(conf.db, table)
+        else:
+            self.getTables()
+
+            for db, tables in kb.data.cachedTables.items():
+                for table in tables:
+                    self.__tableGetCount(db, table)
+
+        return kb.data.cachedCounts
 
     def __pivotDumpTable(self, table, colList, count=None, blind=True):
         lengths = {}
@@ -1579,7 +1632,6 @@ class Enumeration:
                     except sqlmapNoneDataException:
                         infoMsg = "skipping table '%s'" % table
                         logger.info(infoMsg)
-
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
         if not dbs:
