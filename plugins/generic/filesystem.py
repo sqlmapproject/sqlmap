@@ -280,7 +280,7 @@ class Filesystem:
 
             return None
 
-        if fileContent in ( None, "" ) and Backend.getIdentifiedDbms() != DBMS.PGSQL:
+        if fileContent in ( None, "" ) and not Backend.isDbms(DBMS.PGSQL):
             self.cleanup(onlyFileTbl=True)
 
             return
@@ -302,7 +302,7 @@ class Filesystem:
         fileContent = self.__unhexString(fileContent)
         rFilePath = dataToOutFile(fileContent)
 
-        if Backend.getIdentifiedDbms() != DBMS.PGSQL:
+        if not Backend.isDbms(DBMS.PGSQL):
             self.cleanup(onlyFileTbl=True)
 
         return rFilePath

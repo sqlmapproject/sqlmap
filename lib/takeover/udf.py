@@ -105,7 +105,7 @@ class UDF:
         return output
 
     def udfCheckNeeded(self):
-        if ( not conf.rFile or ( conf.rFile and Backend.getIdentifiedDbms() != DBMS.PGSQL ) ) and "sys_fileread" in self.sysUdfs:
+        if ( not conf.rFile or ( conf.rFile and not Backend.isDbms(DBMS.PGSQL) ) ) and "sys_fileread" in self.sysUdfs:
             self.sysUdfs.pop("sys_fileread")
 
         if not conf.osPwn:
