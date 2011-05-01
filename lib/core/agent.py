@@ -499,6 +499,9 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'+%s+'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
+        else:
+            concatenatedQuery = query
+
         return concatenatedQuery
 
     def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, multipleUnions=None):
