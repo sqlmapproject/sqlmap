@@ -370,10 +370,13 @@ class Agent:
         fieldsExists = getCompiledRegex("EXISTS(.*)", re.I).search(query)
         fieldsSelect = getCompiledRegex("\ASELECT%s\s+(.*)" % prefixRegex, re.I).search(query)
         fieldsSubstr = getCompiledRegex("\A(SUBSTR|MID\()", re.I).search(query)
+        fieldsMinMaxstr = getCompiledRegex("(?:MIN|MAX)\(([^\(\)]+)\)", re.I).search(query)
         fieldsNoSelect = query
 
         if fieldsSubstr:
             fieldsToCastStr = query
+        elif fieldsMinMaxstr:
+            fieldsToCastStr = fieldsMinMaxstr.groups()[0]
         elif fieldsExists:
             fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsSelectTop:
