@@ -2230,8 +2230,13 @@ class Enumeration:
 
         if not self.alwaysRetrieveSqlOutput:
             message = "do you want to retrieve the SQL statement output? "
-            message += "[Y/n/a] "
-            getOutput = readInput(message, default="Y")
+
+            if not sqlType or 'SELECT' in sqlType:
+                message += "[Y/n/a] "
+                getOutput = readInput(message, default="Y")
+            else:
+                message += "[y/N/a] "
+                getOutput = readInput(message, default="N")
 
             if getOutput in ("a", "A"):
                 self.alwaysRetrieveSqlOutput = True
