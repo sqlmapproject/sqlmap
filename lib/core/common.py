@@ -421,11 +421,19 @@ class Backend:
     # Comparison methods
     @staticmethod
     def isDbms(dbms):
-        return Backend.getDbms() is not None and Backend.getDbms() == aliasToDbmsEnum(dbms)
+        if Backend.getDbms() is not None:
+            return Backend.getDbms() == aliasToDbmsEnum(dbms)
+        else:
+            return Backend.getIdentifiedDbms() == aliasToDbmsEnum(dbms)
 
     @staticmethod
     def isDbmsWithin(aliases):
-        return Backend.getDbms() is not None and Backend.getDbms().lower() in aliases
+        if Backend.getDbms() is not None:
+            return Backend.getDbms().lower() in aliases
+        elif Backend.getIdentifiedDbms() is not None:
+            return Backend.getIdentifiedDbms().lower() in aliases
+        else:
+            return False
 
     @staticmethod
     def isVersion(version):
