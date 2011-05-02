@@ -266,7 +266,7 @@ class Filesystem:
 
         self.checkDbmsOs()
 
-        if Backend.isOs(OS.WINDOWS) and not re.search(r'\A[A-Z]:\\', rFile, re.I) or\
+        if Backend.isOs(OS.WINDOWS) and not re.search(r'\A[A-Z]:', rFile, re.I) or\
             Backend.isOs(OS.LINUX) and not rFile.startswith('/'):
             errMsg = "invalid file path used for the underlying operating "
             errMsg += "system '%s' of the back-end '%s' server ('%s')" % (Backend.getOs(), Backend.getDbms(), rFile)
