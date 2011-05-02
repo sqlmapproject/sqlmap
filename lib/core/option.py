@@ -465,7 +465,11 @@ def __findPageForms():
         for form in forms:
             for control in form.controls:
                 if hasattr(control, 'items'):
-                    control.items[0].selected = True
+                    # if control has selectable items select first non-disabled
+                    for item in control.items:
+                        if not item.disabled:
+                            item.selected = True
+                            break
             request = form.click()
             url = urldecode(request.get_full_url(), kb.pageEncoding)
             method = request.get_method()
