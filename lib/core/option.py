@@ -1228,6 +1228,12 @@ def __cleanupOptions():
     if conf.dbms:
         conf.dbms = conf.dbms.capitalize()
 
+    if conf.optimize and any([conf.data, conf.textOnly]):
+        conf.nullConnection = False
+
+        debugMsg = "turning off --null-connection switch used indirectly by switch -o"
+        logger.debug(debugMsg)
+
     # to distinguish explicit usage of --time-sec
     if conf.timeSec is None:
         if conf.tor:
@@ -1561,11 +1567,11 @@ def __basicOptionValidation():
         raise sqlmapSyntaxException, errMsg
 
     if conf.textOnly and conf.nullConnection:
-        errMsg = "switch --text-only is incompatible with switch --null-connection%s" % (" used indirectly by switch -o" if conf.optimize else "")
+        errMsg = "switch --text-only is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
     if conf.data and conf.nullConnection:
-        errMsg = "switch --data is incompatible with switch --null-connection%s" % (" used indirectly by switch -o" if conf.optimize else "")
+        errMsg = "switch --data is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
     if conf.predictOutput and conf.threads > 1:
