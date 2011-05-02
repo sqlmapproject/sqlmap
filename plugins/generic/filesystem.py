@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import binascii
 import codecs
 import os
+import re
 
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
@@ -21,7 +22,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
+from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.request import inject
 
@@ -262,6 +265,12 @@ class Filesystem:
         fileContent = None
 
         self.checkDbmsOs()
+
+        if Backend.isOs(OS.WINDOWS) and not re.search(r'\A[A-Z]:\\', rFile, re.I) or\
+            Backend.isOs(OS.LINUX) and not rFile.startswith('/'):
+            errMsg = "invalid file path used for the underlying operating "
+            errMsg += "system '%s' of the back-end '%s' server ('%s')" % (Backend.getOs(), Backend.getDbms(), rFile)
+            raise sqlmapFilePathException, errMsg
 
         if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
