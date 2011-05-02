@@ -120,7 +120,7 @@ def checkCharEncoding(encoding):
         encoding = 'windows-%s' % encoding[7:]
     elif encoding.find('iso-88') > 0:
         encoding = encoding[encoding.find('iso-88'):]
-    elif encoding.startswith('is0-88'):
+    elif encoding.startswith('is0-'):
         encoding = 'iso%s' % encoding[4:]
 
     # http://philip.html5.org/data/charsets-2.html
