@@ -439,6 +439,9 @@ Efrain Torres <et@metasploit.com>
 Sandro Tosi <matrixhasu@gmail.com>
     for helping to create sqlmap Debian package correctly
 
+Jacco van Tuijl <jaccovantuijl@gmail.com>
+    for reporting several bugs
+
 Vitaly Turenko <dsu@dsu.com.ua>
     for reporting a bug
 
