@@ -1561,11 +1561,11 @@ def __basicOptionValidation():
         raise sqlmapSyntaxException, errMsg
 
     if conf.textOnly and conf.nullConnection:
-        errMsg = "switch --text-only is incompatible with switch --null-connection"
+        errMsg = "switch --text-only is incompatible with switch --null-connection%s" % (" used indirectly by switch -o" if conf.optimize else "")
         raise sqlmapSyntaxException, errMsg
 
     if conf.data and conf.nullConnection:
-        errMsg = "switch --data is incompatible with switch --null-connection"
+        errMsg = "switch --data is incompatible with switch --null-connection%s" % (" used indirectly by switch -o" if conf.optimize else "")
         raise sqlmapSyntaxException, errMsg
 
     if conf.predictOutput and conf.threads > 1:
