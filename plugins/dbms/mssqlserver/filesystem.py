@@ -98,7 +98,7 @@ class Filesystem(GenericFilesystem):
 
         if not result:
             result = []
-            count = inject.getValue("SELECT COUNT(%s) FROM %s" % (self.tblField, hexTbl), resumeValue=False, charsetType=2)
+            count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, charsetType=2)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the content of the "
