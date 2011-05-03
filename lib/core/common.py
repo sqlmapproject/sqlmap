@@ -429,12 +429,7 @@ class Backend:
 
     @staticmethod
     def isDbmsWithin(aliases):
-        if Backend.getDbms() is not None:
-            return Backend.getDbms().lower() in aliases
-        elif Backend.getIdentifiedDbms() is not None:
-            return Backend.getIdentifiedDbms().lower() in aliases
-        else:
-            return False
+        return Backend.getDbms() is not None and Backend.getDbms().lower() in aliases
 
     @staticmethod
     def isVersion(version):
