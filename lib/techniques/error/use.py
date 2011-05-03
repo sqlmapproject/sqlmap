@@ -113,10 +113,10 @@ def __oneShotErrorUse(expression, field):
             else:
                 retVal += output if output else ''
 
-            if not (output and len(output) == chunk_length):
-                break
-            else:
+            if output and len(output) >= chunk_length:
                 offset += chunk_length
+            else:
+                break
         else:
             retVal = output
             break
