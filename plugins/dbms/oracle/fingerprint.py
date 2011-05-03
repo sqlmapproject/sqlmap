@@ -63,10 +63,6 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        print "Backend.getDbms():", Backend.getDbms()
-        print "Backend.isDbmsWithin(ORACLE_ALIASES):", Backend.isDbmsWithin(ORACLE_ALIASES)
-        print "conf.dbms:", conf.dbms
-
         if not conf.extensiveFp and (Backend.isDbmsWithin(ORACLE_ALIASES) or conf.dbms in ORACLE_ALIASES):
             setDbms(DBMS.ORACLE)
 
