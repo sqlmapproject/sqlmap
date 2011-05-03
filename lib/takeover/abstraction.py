@@ -11,6 +11,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
+from lib.core.convert import safechardecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -53,18 +54,22 @@ class Abstraction(Web, UDF, xp_cmdshell):
             raise sqlmapUnsupportedFeatureException, errMsg
 
     def evalCmd(self, cmd, first=None, last=None):
+        retVal = None
+
         if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-            return self.webBackdoorRunCmd(cmd)
+            retVal = self.webBackdoorRunCmd(cmd)
 
         elif Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-            return self.udfEvalCmd(cmd, first, last)
+            retVal = self.udfEvalCmd(cmd, first, last)
 
         elif Backend.isDbms(DBMS.MSSQL):
-            return self.xpCmdshellEvalCmd(cmd, first, last)
+            retVal = self.xpCmdshellEvalCmd(cmd, first, last)
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
             raise sqlmapUnsupportedFeatureException, errMsg
+
+        return safechardecode(retVal)
 
     def runCmd(self, cmd):
         getOutput = None
