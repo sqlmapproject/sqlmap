@@ -295,6 +295,9 @@ URI_INJECTION_MARK_CHAR = '*'
 # Maximum length used for retrieving data over MySQL error based payload due to "known" problems with longer result strings
 MYSQL_ERROR_CHUNK_LENGTH = 50
 
+# Maximum length used for retrieving data over MSSQL error based payload due to trimming problems with longer result strings
+MSSQL_ERROR_CHUNK_LENGTH = 100
+
 # Do not unescape the injected statement if it contains any of the following SQL words
 EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", CHAR_INFERENCE_MARK)
 

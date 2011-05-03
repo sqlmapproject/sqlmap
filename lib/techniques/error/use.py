@@ -35,6 +35,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
+from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
@@ -50,6 +51,7 @@ def __oneShotErrorUse(expression, field):
 
     retVal = None
     offset = 1
+    chunk_length = None
 
     while True:
         check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
@@ -58,7 +60,11 @@ def __oneShotErrorUse(expression, field):
         nulledCastedField = agent.nullAndCastField(field)
 
         if Backend.isDbms(DBMS.MYSQL):
-            nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, MYSQL_ERROR_CHUNK_LENGTH)
+            chunk_length = MYSQL_ERROR_CHUNK_LENGTH
+            nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, chunk_length)
+        elif Backend.isDbms(DBMS.MSSQL):
+            chunk_length = MSSQL_ERROR_CHUNK_LENGTH
+            nulledCastedField = queries[DBMS.MSSQL].substring.query % (nulledCastedField, offset, chunk_length)
 
         # Forge the error-based SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
@@ -101,16 +107,16 @@ def __oneShotErrorUse(expression, field):
         if isinstance(output, basestring):
             output = htmlunescape(output).replace("<br>", "\n")
 
-        if Backend.isDbms(DBMS.MYSQL):
+        if any(map(lambda dbms: Backend.isDbms(dbms), [DBMS.MYSQL, DBMS.MSSQL])):
             if offset == 1:
                 retVal = output
             else:
                 retVal += output if output else ''
 
-            if not (output and len(output) == MYSQL_ERROR_CHUNK_LENGTH):
+            if not (output and len(output) == chunk_length):
                 break
             else:
-                offset += MYSQL_ERROR_CHUNK_LENGTH
+                offset += chunk_length
         else:
             retVal = output
             break
