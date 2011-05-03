@@ -104,9 +104,6 @@ def __oneShotErrorUse(expression, field):
                 warnMsg += trimmed
                 logger.warn(warnMsg)
 
-        if isinstance(output, basestring):
-            output = htmlunescape(output).replace("<br>", "\n")
-
         if any(map(lambda dbms: Backend.isDbms(dbms), [DBMS.MYSQL, DBMS.MSSQL])):
             if offset == 1:
                 retVal = output
@@ -120,6 +117,9 @@ def __oneShotErrorUse(expression, field):
         else:
             retVal = output
             break
+
+    if isinstance(retVal, basestring):
+        retVal = htmlunescape(retVal).replace("<br>", "\n")
 
     retVal = __errorReplaceChars(retVal)
 
