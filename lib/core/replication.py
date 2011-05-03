@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.convert import safechardecode
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapValueException
@@ -51,7 +52,7 @@ class Replication:
 
         def __init__(self, parent, name, columns=None, create=True, typeless=False):
             self.parent = parent
-            self.name = name
+            self.name = unsafeSQLIdentificatorNaming(name)
             self.columns = columns
             if create:
                 self.parent.cursor.execute('DROP TABLE IF EXISTS %s' % self.name)
