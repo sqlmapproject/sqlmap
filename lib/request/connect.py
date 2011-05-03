@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import httplib
+import logging
 import re
 import socket
 import time
@@ -29,6 +30,7 @@ from lib.core.common import logHTTPTraffic
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import stdev
 from lib.core.common import urlEncodeCookieValues
 from lib.core.common import wasLastRequestDelayed
@@ -41,6 +43,7 @@ from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PLACE
+from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_SILENT_TIMEOUT
@@ -381,6 +384,11 @@ class Connect:
 
                 warnMsg += ", sqlmap is going to retry the request"
                 logger.critical(warnMsg)
+
+                if kb.originalPage is None:
+                    warnMsg = "if the problem persists please try to rerun "
+                    warnMsg += "with the --random-agent switch turned on"
+                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
 
                 time.sleep(1)
 

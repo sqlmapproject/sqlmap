@@ -93,6 +93,10 @@ class HTTPHEADER:
     REFERER = "Referer"
     USER_AGENT = "User-Agent"
 
+class WARNFLAGS:
+    RANDOM_AGENT = 'randomAgent'
+    DATA_TO_STDOUT = 'dataToStdout'
+
 class EXPECTED:
     BOOL = "bool"
     INT = "int"
