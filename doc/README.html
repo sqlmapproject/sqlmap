@@ -9,7 +9,7 @@
 
 <H2>by 
 <A HREF="mailto:bernardo.damele@gmail.com">Bernardo Damele A. G.</A>, 
-<A HREF="mailto:miroslav.stampar@gmail.com">Miroslav Stampar</A></H2>version 0.9, April 10, 2011
+<A HREF="mailto:miroslav.stampar@gmail.com">Miroslav Stampar</A></H2>version 1.0-dev, XXX XX, 2011
 <HR>
 <EM>This document is the user's manual to use 
 <A HREF="http://sqlmap.sourceforge.net">sqlmap</A>.</EM>
@@ -858,7 +858,7 @@ $ svn update
 <PRE>
 $ python sqlmap.py -h
 
-    sqlmap/0.9 - automatic SQL injection and database takeover tool
+    sqlmap/1.0 - automatic SQL injection and database takeover tool
     http://sqlmap.sourceforge.net
 
 Usage: python sqlmap.py [options]
@@ -961,6 +961,8 @@ Options:
     --dbs               Enumerate DBMS databases
     --tables            Enumerate DBMS database tables
     --columns           Enumerate DBMS database table columns
+    --schema            Enumerate DBMS schema
+    --count             Retrieve number of entries for table(s)
     --dump              Dump DBMS database table entries
     --dump-all          Dump all DBMS databases tables entries
     --search            Search column(s), table(s) and/or database name(s)
@@ -1039,6 +1041,7 @@ Options:
     --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
     --forms             Parse and test forms on target url
     --gpage=GOOGLEPAGE  Use Google dork results from specified page number
+    --mobile            Imitate smartphone through HTTP User-Agent header
     --page-rank         Display page rank (PR) for Google dork results
     --parse-errors      Parse DBMS error messages from response pages
     --replicate         Replicate dumped data into a sqlite3 database
@@ -1535,6 +1538,28 @@ on the value of <CODE>-</CODE><CODE>-level</CODE> too.</P>
 
 <P>For instance, to test for GET parameter <CODE>id</CODE> and for HTTP
 <CODE>User-Agent</CODE> only, provide <CODE>-p id,user-agent</CODE>.</P>
+
+
+<H3>URI injection point</H3>
+
+<P>There are special cases when injection point is within the URI itself.
+sqlmap does not perform any automatic test against URI paths, unless
+manually pointed to.
+You have to specify these injection points in the command line by
+appending an asterisk (<CODE>*</CODE>) after each URI point that you want
+sqlmap to test for and exploit a SQL injection.</P>
+
+<P>This is particularly useful when, for instance, Apache web server's
+<A HREF="http://httpd.apache.org/docs/current/mod/mod_rewrite.html">mod_rewrite</A> module is in use or other similar technologies.</P>
+
+<P>An example of valid command line would be:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ python sqlmap.py -u "http://targeturl/param1/value1*/param2/value2/"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 
 <H3>Force the database management system name</H3>
@@ -2145,6 +2170,20 @@ name of a system database. That's because it is not possible to enumerate
 other databases tables, only the tables under the schema that the web
 application's user is connected to, which is always aliased by
 <CODE>public</CODE>.</P>
+
+
+<H3>Enumerate database management system schema</H3>
+
+<P>Switches: <CODE>-</CODE><CODE>-schema</CODE></P>
+
+<P>TODO</P>
+
+
+<H3>Retrieve number of entries for table(s)</H3>
+
+<P>Switches: <CODE>-</CODE><CODE>-count</CODE></P>
+
+<P>TODO</P>
 
 
 <H3>Dump database table entries</H3>
@@ -3079,6 +3118,13 @@ search and use the first 100 resulting URLs for further SQL injection
 testing. However, in combination with this option you can specify with
 this switch, <CODE>-</CODE><CODE>-gpage</CODE>, some page other than the first one
 to retrieve target URLs from.</P>
+
+
+<H3>Imitate smartphone</H3>
+
+<P>Switch: <CODE>-</CODE><CODE>-mobile</CODE></P>
+
+<P>TODO</P>
 
 
 <H3>Display page rank (PR) for Google dork results</H3>
