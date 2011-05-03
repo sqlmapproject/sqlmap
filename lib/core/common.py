@@ -2571,7 +2571,9 @@ def unsafeSQLIdentificatorNaming(name):
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
             retVal = name.replace("\"", "")
         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-            retVal = retVal.lstrip("%s." % DEFAULT_MSSQL_SCHEMA)
+            prefix = "%s." % DEFAULT_MSSQL_SCHEMA
+            if retVal.startswith(prefix):
+                retVal = retVal[len(prefix):]
 
     return retVal
 
