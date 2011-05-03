@@ -55,11 +55,11 @@ class Replication:
             self.name = unsafeSQLIdentificatorNaming(name)
             self.columns = columns
             if create:
-                self.parent.cursor.execute('DROP TABLE IF EXISTS %s' % self.name)
+                self.parent.cursor.execute('DROP TABLE IF EXISTS "%s"' % self.name)
                 if not typeless:
-                    self.parent.cursor.execute('CREATE TABLE %s (%s)' % (self.name, ','.join('%s %s' % (colname, coltype) for colname, coltype in self.columns)))
+                    self.parent.cursor.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
                 else:
-                    self.parent.cursor.execute('CREATE TABLE %s (%s)' % (self.name, ','.join(colname for colname in self.columns)))
+                    self.parent.cursor.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
 
         def insert(self, values):
             """
@@ -67,7 +67,7 @@ class Replication:
             """
 
             if len(values) == len(self.columns):
-                self.parent.cursor.execute('INSERT INTO %s VALUES (%s)' % (self.name, ','.join(['?']*len(values))), safechardecode(values))
+                self.parent.cursor.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?']*len(values))), safechardecode(values))
             else:
                 errMsg = "wrong number of columns used in replicating insert"
                 raise sqlmapValueException, errMsg
