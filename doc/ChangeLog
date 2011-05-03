@@ -1,3 +1,17 @@
+sqlmap (1.0-1) stable; urgency=low
+
+  * Added --schema switch to enumerate DBMS schema: shows all columns of
+    all databases' tables (Bernardo)
+  * Added --count switch to count the number of entries for a specific
+    table or all database(s) tables (Bernardo)
+  * Major improvements to --tables and --columns switches (Bernardo)
+  * Takeover switch --os-pwn improved: stealthier, faster and AV-proof
+    (Bernardo)
+  * Added --mobile switch to imitate a mobile device through HTTP
+    User-Agent header (Miroslav)
+
+ -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  XXX, XX XXX 2011 10:00:00 +0000
+
 sqlmap (0.9-1) stable; urgency=low
 
   * Rewritten SQL injection detection engine (Bernardo and Miroslav).
