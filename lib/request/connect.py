@@ -387,7 +387,8 @@ class Connect:
 
                 if kb.originalPage is None:
                     warnMsg = "if the problem persists please try to rerun "
-                    warnMsg += "with the --random-agent switch turned on"
+                    warnMsg += "with the --random-agent switch turned on "
+                    warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
                     singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
 
                 time.sleep(1)
