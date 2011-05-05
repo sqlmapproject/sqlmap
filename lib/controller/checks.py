@@ -80,6 +80,7 @@ def checkSqlInjection(place, parameter, value):
             if kb.endDetection:
                 break
 
+            proceed = True
             title = test.title
             stype = test.stype
             clause = test.clause
@@ -200,6 +201,21 @@ def checkSqlInjection(place, parameter, value):
                 debugMsg = "skipping test '%s' because custom " % title
                 debugMsg += "UNION columns range was provided"
                 logger.debug(debugMsg)
+                continue
+
+            if len(kb.injections) > 0:
+                for resumedInj in kb.injections:
+                    if resumedInj.place == place and resumedInj.parameter \
+                       == parameter and stype in resumedInj.data:
+                        debugMsg = "skipping test '%s' because this " % title
+                        debugMsg += "technique has already been detected "
+                        debugMsg += "in a previous run"
+                        logger.debug(debugMsg)
+
+                        proceed = False
+                        break
+
+            if not proceed:
                 continue
 
             infoMsg = "testing '%s'" % title

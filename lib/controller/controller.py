@@ -317,9 +317,18 @@ def start():
                             # TODO: consider the following line in __setRequestParams()
                             # __testableParameters = True
 
-            if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
-                and (kb.injection.place is None or kb.injection.parameter is None):
+            proceed = False
 
+            if len(kb.injections) > 0:
+                for resumedInj in kb.injections:
+                    for tech in conf.tech:
+                        if tech not in resumedInj.data:
+                            proceed = True
+                            break
+            else:
+                proceed = True
+
+            if proceed:
                 if not conf.string and not conf.regexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
