@@ -53,7 +53,7 @@ def setInjection(inj):
                   or ( kb.resumedQueries[conf.url].has_key("Injection data")
                   and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(),\
                     inj.data.keys()) != inj.data.keys()
-                ) ) 
+                ) )
 
     if condition:
         dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
@@ -168,18 +168,32 @@ def resumeConfKb(expression, url, value):
     if expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
 
-        infoMsg = "resuming injection data from session file"
-        logger.info(infoMsg)
-
         if injection.place in conf.paramDict and \
            injection.parameter in conf.paramDict[injection.place]:
 
             if not conf.tech or intersect(conf.tech, injection.data.keys()):
+                # Strip not required techniques (--technique switch)
                 if intersect(conf.tech, injection.data.keys()):
                     injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
 
-                if injection not in kb.injections:
+                infoMsg = "resuming injection data for technique%s " % ("s" if len(injection.data.keys()) > 1 else "")
+                infoMsg += "%s " % " & ".join([PAYLOAD.SQLINJECTION[k] for k in injection.data.keys()])
+                infoMsg += "from session file"
+                logger.info(infoMsg)
+
+                if len(kb.injections) == 0:
                     kb.injections.append(injection)
+                else:
+                    for resumedInj in kb.injections:
+                        for inj, data in injection.data.items():
+                            if inj not in resumedInj.data:
+                                kb.injections[kb.injections.index(resumedInj)].data[inj] = data
+            else:
+                warnMsg = "not resuming injection data for technique%s " % ("s" if len(injection.data.keys()) > 1 else "")
+                warnMsg += "%s " % " & ".join([PAYLOAD.SQLINJECTION[k] for k in injection.data.keys()])
+                warnMsg += "from session file because you provided "
+                warnMsg += "different technique(s) to be tested on this run"
+                logger.warn(warnMsg)
         else:
             warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
             warnMsg += "but you did not provided it this time"
