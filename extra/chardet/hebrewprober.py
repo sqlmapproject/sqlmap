@@ -164,7 +164,7 @@ class HebrewProber(CharSetProber):
         self._mPrev = ' '
         self._mBeforePrev = ' '
         # These probers are owned by the group prober.
-        
+
     def set_model_probers(self, logicalProber, visualProber):
         self._mLogicalProber = logicalProber
         self._mVisualProber = visualProber
@@ -184,7 +184,7 @@ class HebrewProber(CharSetProber):
         # these letters as Non-Final letters outweighs the damage since these words 
         # are quite rare.
         return c in [NORMAL_KAF, NORMAL_MEM, NORMAL_NUN, NORMAL_PE]
-    
+
     def feed(self, aBuf):
         # Final letter analysis for logical-visual decision.
         # Look for evidence that the received buffer is either logical Hebrew or 
@@ -215,7 +215,7 @@ class HebrewProber(CharSetProber):
             return constants.eNotMe
 
         aBuf = self.filter_high_bit_only(aBuf)
-        
+
         for cur in aBuf:
             if cur == ' ':
                 # We stand on a space - a word just ended

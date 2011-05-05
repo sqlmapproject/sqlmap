@@ -122,7 +122,7 @@ class Latin1Prober(CharSetProber):
     def get_confidence(self):
         if self.get_state() == constants.eNotMe:
             return 0.01
-  
+
         total = reduce(operator.add, self._mFreqCounter)
         if total < 0.01:
             confidence = 0.0

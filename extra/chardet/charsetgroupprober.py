@@ -34,7 +34,7 @@ class CharSetGroupProber(CharSetProber):
         self._mActiveNum = 0
         self._mProbers = []
         self._mBestGuessProber = None
-        
+
     def reset(self):
         CharSetProber.reset(self)
         self._mActiveNum = 0

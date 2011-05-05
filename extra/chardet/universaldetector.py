@@ -63,7 +63,7 @@ class UniversalDetector:
 
         aLen = len(aBuf)
         if not aLen: return
-        
+
         if not self._mGotData:
             # If the data starts with BOM, we know it is UTF
             if aBuf[:3] == '\xEF\xBB\xBF':
@@ -125,7 +125,7 @@ class UniversalDetector:
                 sys.stderr.write('no data received!\n')
             return
         self.done = constants.True
-        
+
         if self._mInputState == ePureAscii:
             self.result = {'encoding': 'ascii', 'confidence': 1.0}
             return self.result

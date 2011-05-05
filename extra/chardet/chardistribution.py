@@ -42,7 +42,7 @@ class CharDistributionAnalysis:
         self._mTableSize = None # Size of above table
         self._mTypicalDistributionRatio = None # This is a constant value which varies from language to language, used in calculating confidence.  See http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html for further detail.
         self.reset()
-        
+
     def reset(self):
         """reset analyser, clear any state"""
         self._mDone = constants.False # If this flag is set to constants.True, detection is done and conclusion has been made
@@ -87,7 +87,7 @@ class CharDistributionAnalysis:
         # convert this encoding string to a number, here called order.
         # This allows multiple encodings of a language to share one frequency table.
         return -1
-    
+
 class EUCTWDistributionAnalysis(CharDistributionAnalysis):
     def __init__(self):
         CharDistributionAnalysis.__init__(self)

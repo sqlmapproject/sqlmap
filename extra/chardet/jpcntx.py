@@ -123,7 +123,7 @@ jp2CharContext = ( \
 class JapaneseContextAnalysis:
     def __init__(self):
         self.reset()
-        
+
     def reset(self):
         self._mTotalRel = 0 # total sequence received
         self._mRelSample = [0] * NUM_OF_CATEGORY # category counters, each interger counts sequence in its category
@@ -133,7 +133,7 @@ class JapaneseContextAnalysis:
 
     def feed(self, aBuf, aLen):
         if self._mDone: return
-        
+
         # The buffer we got is byte oriented, and a character may span in more than one
         # buffers. In case the last one or two byte in last buffer is not complete, we 
         # record how many byte needed to complete that character and skip these bytes here.
@@ -158,7 +158,7 @@ class JapaneseContextAnalysis:
 
     def got_enough_data(self):
         return self._mTotalRel > ENOUGH_REL_THRESHOLD
-    
+
     def get_confidence(self):
         # This is just one way to calculate confidence. It works well for me.
         if self._mTotalRel > MINIMUM_DATA_THRESHOLD:
@@ -168,7 +168,7 @@ class JapaneseContextAnalysis:
 
     def get_order(self, aStr):
         return -1, 1
-        
+
 class SJISContextAnalysis(JapaneseContextAnalysis):
     def get_order(self, aStr):
         if not aStr: return -1, 1

@@ -75,5 +75,5 @@ class EscCharSetProber(CharSetProber):
                     self._mState = constants.eFoundIt
                     self._mDetectedCharset = codingSM.get_coding_state_machine()
                     return self.get_state()
-                
+
         return self.get_state()

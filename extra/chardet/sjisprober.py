@@ -44,7 +44,7 @@ class SJISProber(MultiByteCharSetProber):
     def reset(self):
         MultiByteCharSetProber.reset(self)
         self._mContextAnalyzer.reset()
-        
+
     def get_charset_name(self):
         return "SHIFT_JIS"
 
@@ -69,9 +69,9 @@ class SJISProber(MultiByteCharSetProber):
                 else:
                     self._mContextAnalyzer.feed(aBuf[i + 1 - charLen : i + 3 - charLen], charLen)
                     self._mDistributionAnalyzer.feed(aBuf[i - 1 : i + 1], charLen)
-                    
+
         self._mLastChar[0] = aBuf[aLen - 1]
-        
+
         if self.get_state() == constants.eDetecting:
             if self._mContextAnalyzer.got_enough_data() and \
                    (self.get_confidence() > constants.SHORTCUT_THRESHOLD):

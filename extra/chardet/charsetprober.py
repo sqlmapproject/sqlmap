@@ -31,10 +31,10 @@ import constants, re
 class CharSetProber:
     def __init__(self):
         pass
-        
+
     def reset(self):
         self._mState = constants.eDetecting
-    
+
     def get_charset_name(self):
         return None
 
@@ -50,11 +50,11 @@ class CharSetProber:
     def filter_high_bit_only(self, aBuf):
         aBuf = re.sub(r'([\x00-\x7F])+', ' ', aBuf)
         return aBuf
-    
+
     def filter_without_english_letters(self, aBuf):
         aBuf = re.sub(r'([A-Za-z])+', ' ', aBuf)
         return aBuf
-        
+
     def filter_with_english_letters(self, aBuf):
         # TODO
         return aBuf

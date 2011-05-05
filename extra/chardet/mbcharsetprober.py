@@ -68,9 +68,9 @@ class MultiByteCharSetProber(CharSetProber):
                     self._mDistributionAnalyzer.feed(self._mLastChar, charLen)
                 else:
                     self._mDistributionAnalyzer.feed(aBuf[i-1:i+1], charLen)
-                    
+
         self._mLastChar[0] = aBuf[aLen - 1]
-        
+
         if self.get_state() == constants.eDetecting:
             if self._mDistributionAnalyzer.got_enough_data() and \
                (self.get_confidence() > constants.SHORTCUT_THRESHOLD):

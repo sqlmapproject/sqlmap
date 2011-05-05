@@ -37,7 +37,7 @@ SYMBOL_CAT_ORDER = 250
 NUMBER_OF_SEQ_CAT = 4
 POSITIVE_CAT = NUMBER_OF_SEQ_CAT - 1
 #NEGATIVE_CAT = 0
- 
+
 class SingleByteCharSetProber(CharSetProber):
     def __init__(self, model, reversed=constants.False, nameProber=None):
         CharSetProber.__init__(self)
