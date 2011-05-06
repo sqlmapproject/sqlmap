@@ -19,6 +19,7 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
+from lib.core.settings import DB2_ALIASES
 
 # sqlmap paths
 paths = advancedDict()

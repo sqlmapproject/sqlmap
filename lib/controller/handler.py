@@ -23,6 +23,7 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
+from lib.core.settings import DB2_ALIASES
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
 from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn
@@ -42,6 +43,8 @@ from plugins.dbms.maxdb import MaxDBMap
 from plugins.dbms.maxdb.connector import Connector as MaxDBConn
 from plugins.dbms.sybase import SybaseMap
 from plugins.dbms.sybase.connector import Connector as SybaseConn
+from plugins.dbms.db2 import DB2Map
+from plugins.dbms.db2.connector import Connector as DB2Conn
 
 def setHandler():
     """
@@ -50,7 +53,7 @@ def setHandler():
     """
 
     count = 0
-    dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird", "SAP MaxDB", "Sybase" )
+    dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird", "SAP MaxDB", "Sybase", "DB2" )
     dbmsObj = [
                   ( MYSQL_ALIASES, MySQLMap, MySQLConn ),
                   ( ORACLE_ALIASES, OracleMap, OracleConn ),
@@ -61,6 +64,7 @@ def setHandler():
                   ( FIREBIRD_ALIASES, FirebirdMap, FirebirdConn ),
                   ( MAXDB_ALIASES, MaxDBMap, MaxDBConn ),
                   ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
+                  ( DB2_ALIASES, DB2Map, DB2Conn )
                 ]
 
     if Backend.getIdentifiedDbms() is not None:
