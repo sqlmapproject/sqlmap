@@ -101,9 +101,127 @@ some money"> to the developers via PayPal.
 <p>
 <bf>No</bf>.
 
-<sect1>How sqlmap decides this and that?
+<sect1>When sqlmap will switch to the Python 3?
 
 <p>
-TODO
+Currently there is no huge pressure on Python projects to switch to the new
+version of Python interpreter, as the process of switching, especially on
+larger projects can be cumbersome (due to the few backward incompatibilities).
+The switch will take place eventually, but currently it's a very low priority task.
+
+<sect1>What does <tt>"WARNING unknown charset '...'"</tt> mean?
+
+<p>
+sqlmap needs to properly decode page content to be able to properly 
+detect and deal with internationalized characters. In some cases web developers
+are doing mistakes when declaring used web page charset (e.g. <tt>iso_8859</tt> instead 
+of standardized name <tt>iso-8859</tt>), which can cause problems. As a failsafe mechanism
+we've incorporated heuristic detection engine
+<htmlurl url="http://chardet.feedparser.org/" name="chardet">, 
+so in most cases sqlmap will deal with this kind of problems automatically.
+Nevertheless, you are strongly advised to report us back those typographic "mistakes" 
+so we could handle them manually inside the code.
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/737" name="#1">
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1232" name="#2">
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1239" name="#3">
+
+<sect1>How to use sqlmap with <tt>mod_rewrite</tt> enabled?
+
+<p>
+Just put * to the place where sqlmap should check for injections in URI 
+itself. In example: <tt>./sqlmap.py -u "www.site.com/id1/1*/id2/2"</tt> sqlmap 
+will try to inject the payloads just at that place marked with * character.
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/731" name="#1">
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/728" name="#2">
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1258" name="#3">
+
+<sect1>Why is sqlmap not able to get password hashes in some cases?
+
+<p>
+You most probably don't have enough permissions for querying on a system 
+table containing password hashes.
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/714" name="#1">
+
+<sect1>What is <tt>-</tt><tt>-text-only</tt> switch?
+
+<p>
+Switch <tt>-</tt><tt>-text-only</tt> is used for removing non-textual data (tags, 
+javascripts, styles,...) from the retrieved page content to further 
+improve detection capabilities.
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/699" name="#1">
+
+<sect1>sqlmap is retrieving weird characters for even simplest data (e.g. <tt>--banner</tt>)?
+
+<p>
+If everything you retrieve from the target is garbled, then you are 
+most probably dealing with false positive blind injection. Please 
+report the problem to the <htmlurl url="mailto:dev@sqlmap.org" name="developers">.
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/686" name="#1">
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1181" name="#2">
+
+<sect1>I am getting <tt>"CRITICAL connection timed"</tt> while I am able to browse 
+the site normally?
+
+<p>
+There are few IDSes that filter out all sqlmap requests based on default 
+User-Agent HTTP header used (e.g. <tt>"User-agent: sqlmap/1.0-dev"</tt>). To prevent this
+kind of situations you are advised to use switch <tt>-</tt><tt>-random-agent</tt>.
+If you are getting those kind of messages for all targets then you
+most probably need to properly set up your proxy settings (switches <tt>-</tt><tt>-proxy</tt>
+and/or <tt>-</tt><tt>-ignore-proxy</tt>)
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1241" name="#1">
+
+<sect1>Is it possible to use <tt>"INSERT/UPDATE"</tt> SQL commands via <tt>-</tt><tt>-sql-query</tt>
+and/or <tt>-</tt><tt>-sql-shell</tt>?
+
+<p>
+It is possible to use those commands, but only if the stacked injection is supported
+by the vulnerable target.
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1237" name="#1">
+
+<sect1>I am getting <tt>"finally: SyntaxError: invalid syntax"</tt> when trying to run sqlmap?
+
+<p>
+You are most probably using outdated version of Python. sqlmap is generally
+supported by Python versions in range 2.5, 2.6 and 2.7, while you are strongly
+advised to use versions 2.6 and 2.7.
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1231" name="#1">
+
+<sect1>sqlmap is not able to detect/exploit injection while Havij/Pangolin is?
+
+<p>
+Currently there are only two of us working on a pure good will and donating our 
+free time to the community. If you are not willing to help us achive better tool
+you are strongly advised to buy most probably better commercial tool(s) and just 
+forget about the sqlmap. Our promise is that we won't miss you as you are most 
+probably "script kiddie".
+
+<p>
+Question(s):
+<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/970" name="#1">
 
 </article>
