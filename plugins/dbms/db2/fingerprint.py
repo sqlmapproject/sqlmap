@@ -27,12 +27,12 @@ class Fingerprint(GenericFingerprint):
 
     def versionCheck(self):
         minor, major = None, None
-    
+
         for version in reversed(xrange(5, 15)):
             result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM sysibm.sysversions WHERE versionnumber BETWEEN %d000000 AND %d999999)>0" % (version, version))
             if result:
                 major = version
-    
+
                 for version in reversed(xrange(0, 20)):
                     result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM sysibm.sysversions WHERE versionnumber BETWEEN %d%02d0000 AND %d%02d9999)>0" % (major, version, major, version))
                     if result:
@@ -40,7 +40,7 @@ class Fingerprint(GenericFingerprint):
                         version = "%s.%s" % (major, minor)
                         break                    
                 break
-            
+
         if major and minor:
             return "%s.%s" % (major, minor)
         else:
