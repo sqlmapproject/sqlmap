@@ -211,14 +211,13 @@ advised to use versions 2.6 and 2.7.
 Question(s):
 <htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1231" name="#1">
 
-<sect1>sqlmap is not able to detect/exploit injection while Havij/Pangolin is?
+<sect1>sqlmap is not able to detect/exploit injection while other tools are?
 
 <p>
 Currently there are only two of us working on a pure good will and donating our 
 free time to the community. If you are not willing to help us achive better tool
 you are strongly advised to buy most probably better commercial tool(s) and just 
-forget about the sqlmap. Our promise is that we won't miss you as you are most 
-probably "script kiddie".
+forget about the sqlmap.
 
 <p>
 Question(s):
