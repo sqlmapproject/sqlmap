@@ -6,4 +6,5 @@
 # See the file 'doc/COPYING' for copying permission
 
 # Adds SVN property 'Id' to project files
-find ../../. -type f -name "*.py" -exec svn propset svn:keywords "Id" '{}' \;
+find ../../. -type f -iname "*.py" -exec sed -i s/\$Id.*$/\$Id\$/g '{}' \;
+find ../../. -type f -iname "*.py" -exec svn propset svn:keywords "Id" '{}' \;
