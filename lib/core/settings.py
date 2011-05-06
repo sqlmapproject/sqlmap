@@ -147,8 +147,6 @@ FIREBIRD_SYSTEM_DBS = ( "RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_C
                         "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS" )
 MAXDB_SYSTEM_DBS = ( "SYSINFO", "DOMAIN" )
 SYBASE_SYSTEM_DBS = ( "master", "model", "sybsystemdb", "sybsystemprocs" )
-DB2_SYSTEM_DBS = ( "NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS", "SYSPROC", "SYSPUBLIC",\
-                   "SYSSTAT", "SYSTOOLS" )
 
 MSSQL_ALIASES = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
 MYSQL_ALIASES = [ "mysql", "my" ]
@@ -159,9 +157,8 @@ ACCESS_ALIASES = [ "access", "jet", "microsoft access", "msaccess" ]
 FIREBIRD_ALIASES = [ "firebird", "mozilla firebird", "interbase", "ibase", "fb" ]
 MAXDB_ALIASES = [ "maxdb", "sap maxdb", "sap db" ]
 SYBASE_ALIASES = [ "sybase", "sybase sql server" ]
-DB2_ALIASES = [ "ibm db2", "db2" ]
 
-SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES
+SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES
 SUPPORTED_OS = ( "linux", "windows" )
 
 DBMS_DICT = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
@@ -172,8 +169,7 @@ DBMS_DICT = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sour
               DBMS.ACCESS: [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
               DBMS.FIREBIRD: [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"],
               DBMS.MAXDB: [MAXDB_ALIASES, None, None],
-              DBMS.SYBASE: [SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
-              DBMS.DB2: [DB2_ALIASES, None, None]
+              DBMS.SYBASE: [SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"]
             }
 
 REFERER_ALIASES = ( "ref", "referer", "referrer" )

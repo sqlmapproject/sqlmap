@@ -89,7 +89,6 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
-from lib.core.settings import DB2_ALIASES
 from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import TIME_DEFAULT_DELAY
@@ -683,7 +682,7 @@ def __setDBMS():
 
     for aliases in (MSSQL_ALIASES, MYSQL_ALIASES, PGSQL_ALIASES, \
                     ORACLE_ALIASES, SQLITE_ALIASES, ACCESS_ALIASES, \
-                    FIREBIRD_ALIASES, MAXDB_ALIASES, SYBASE_ALIASES, DB2_ALIASES):
+                    FIREBIRD_ALIASES, MAXDB_ALIASES, SYBASE_ALIASES):
         if conf.dbms in aliases:
             conf.dbms = aliases[0]
 

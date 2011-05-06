@@ -2546,7 +2546,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
             if not re.match(r"\A[A-Za-z0-9_]+\Z", parts[i]):
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
                     parts[i] = "`%s`" % parts[i].strip("`")
-                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.DB2):
+                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
                     parts[i] = "\"%s\"" % parts[i].strip("\"")
 
         retVal = ".".join(parts)
@@ -2563,7 +2563,7 @@ def unsafeSQLIdentificatorNaming(name):
     if isinstance(name, basestring):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.DB2):
+        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.PGSQL):
             retVal = name.replace("\"", "")
         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             prefix = "%s." % DEFAULT_MSSQL_SCHEMA

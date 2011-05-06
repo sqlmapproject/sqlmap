@@ -407,7 +407,7 @@ class Agent:
         if Backend.isDbms(DBMS.MYSQL):
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
@@ -466,7 +466,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
@@ -643,7 +643,7 @@ class Agent:
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        elif Backend.isDbms(DBMS.ORACLE):
             if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
