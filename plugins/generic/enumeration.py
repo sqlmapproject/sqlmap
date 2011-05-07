@@ -1391,9 +1391,6 @@ class Enumeration:
         return entries, lengths
 
     def dumpTable(self):
-        if conf.db and not conf.tbl:
-            return self.dumpAll()
-
         if not conf.tbl and not conf.col:
             errMsg = "missing table parameter"
             raise sqlmapMissingMandatoryOptionException, errMsg
