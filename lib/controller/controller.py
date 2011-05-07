@@ -198,6 +198,7 @@ def start():
             initTargetEnv()
             parseTargetUrl()
 
+            proceed = False
             testSqlInj = False
 
             if PLACE.GET in conf.parameters:
@@ -318,10 +319,15 @@ def start():
                             # TODO: consider the following line in __setRequestParams()
                             # __testableParameters = True
 
-            if len(kb.tested) > 0 and kb.tested == conf.tech:
-                testSqlInj = False
+            if len(kb.tested) > 0:
+                for t in conf.tech:
+                    if t not in kb.tested:
+                        proceed = True
+                        break
+            else:
+                proceed = True
 
-            if testSqlInj:
+            if proceed:
                 if not conf.string and not conf.regexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
