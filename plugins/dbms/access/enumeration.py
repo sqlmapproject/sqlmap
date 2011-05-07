@@ -28,6 +28,10 @@ class Enumeration(GenericEnumeration):
         warnMsg = "on Microsoft Access it is not possible to get name of the current database"
         logger.warn(warnMsg)
 
+    def isDba(self):
+        warnMsg = "on Microsoft Access it is not possible to test if current user is DBA"
+        logger.warn(warnMsg)
+
     def getUsers(self):
         warnMsg = "on Microsoft Access it is not possible to enumerate the users"
         logger.warn(warnMsg)
