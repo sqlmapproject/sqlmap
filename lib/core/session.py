@@ -41,6 +41,23 @@ def unSafeFormatString(value):
         retVal = retVal.replace("__LEFT_SQUARE_BRACKET__", "[").replace("__RIGHT_SQUARE_BRACKET__", "]")
     return retVal
 
+def setTestedTechniques():
+    """
+    Save information retrieved about dynamic markings to the
+    session file.
+    """
+
+    condition = (
+                  ( not kb.resumedQueries
+                  or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Tested techniques")) )
+                  or ( kb.resumedQueries[conf.url].has_key("Tested techniques")
+                  and base64unpickle(kb.resumedQueries[conf.url]["Tested techniques"][:-1]) != conf.tech
+                ) )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Tested techniques][%s]\n" % (conf.url, None, None, base64pickle(conf.tech)))
+
 def setInjection(inj):
     """
     Save information retrieved about injection place and parameter in the
@@ -51,7 +68,7 @@ def setInjection(inj):
                   or ( kb.resumedQueries.has_key(conf.url) and
                   not kb.resumedQueries[conf.url].has_key("Injection data"))
                   or ( kb.resumedQueries[conf.url].has_key("Injection data")
-                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(),\
+                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(), \
                     inj.data.keys()) != inj.data.keys()
                 ) )
 
@@ -165,7 +182,12 @@ def setXpCmdshellAvailability(available):
         dataToSessionFile("[%s][%s][%s][xp_cmdshell availability][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), str(available).lower()))
 
 def resumeConfKb(expression, url, value):
-    if expression == "Injection data" and url == conf.url:
+    if expression == "Tested techniques" and url == conf.url:
+        kb.tested.extend(base64unpickle(value[:-1]))
+        kb.tested = list(set(kb.tested))
+        kb.tested.sort()
+
+    elif expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
 
         if injection.place in conf.paramDict and \

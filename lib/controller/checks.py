@@ -203,17 +203,13 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
-            if len(kb.injections) > 0:
-                for resumedInj in kb.injections:
-                    if resumedInj.place == place and resumedInj.parameter \
-                       == parameter and stype in resumedInj.data:
-                        debugMsg = "skipping test '%s' because this " % title
-                        debugMsg += "technique has already been detected "
-                        debugMsg += "in a previous run"
-                        logger.debug(debugMsg)
+            if len(kb.tested) > 0 and stype in kb.tested:
+                debugMsg = "skipping test '%s' because this " % title
+                debugMsg += "technique has already been detected "
+                debugMsg += "in a previous run"
+                logger.debug(debugMsg)
 
-                        proceed = False
-                        break
+                proceed = False
 
             if not proceed:
                 continue

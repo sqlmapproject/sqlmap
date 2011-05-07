@@ -43,6 +43,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
+from lib.core.session import setTestedTechniques
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import REFERER_ALIASES
@@ -317,18 +318,10 @@ def start():
                             # TODO: consider the following line in __setRequestParams()
                             # __testableParameters = True
 
-            proceed = False
+            if len(kb.tested) > 0 and kb.tested == conf.tech:
+                testSqlInj = False
 
-            if len(kb.injections) > 0:
-                for resumedInj in kb.injections:
-                    for tech in conf.tech:
-                        if tech not in resumedInj.data:
-                            proceed = True
-                            break
-            else:
-                proceed = True
-
-            if proceed:
+            if testSqlInj:
                 if not conf.string and not conf.regexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
@@ -435,6 +428,8 @@ def start():
                                 warnMsg = "%s parameter '%s' is not " % (place, parameter)
                                 warnMsg += "injectable"
                                 logger.warn(warnMsg)
+
+            setTestedTechniques()
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if not conf.realTest:
