@@ -29,6 +29,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
@@ -86,7 +87,20 @@ def __setRequestParams():
         conf.method = HTTPMETHOD.POST
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not conf.parameters.has_key(PLACE.GET):
-        conf.url = "%s%s" % (conf.url, URI_INJECTION_MARK_CHAR)
+        warnMsg  = "you've provided target url without "
+        warnMsg += "any GET parameters (e.g. ?id=1)"
+        logger.warn(warnMsg)
+
+        message = "do you want to try URI injections "
+        message += "in the target url itself? [Y/n/q] "
+        test = readInput(message, default="Y")
+
+        if not test or test[0] in ("y", "Y"):
+            conf.url = "%s%s" % (conf.url, URI_INJECTION_MARK_CHAR)
+        elif test[0] in ("n", "N"):
+            pass
+        elif test[0] in ("q", "Q"):
+            raise sqlmapUserQuitException
 
     if URI_INJECTION_MARK_CHAR in conf.url:
         conf.parameters[PLACE.URI] = conf.url
