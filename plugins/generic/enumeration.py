@@ -1635,7 +1635,6 @@ class Enumeration:
                         warnMsg += "columns '%s' " % colString
                     warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-
                     logger.warn(warnMsg)
 
             except KeyboardInterrupt:
