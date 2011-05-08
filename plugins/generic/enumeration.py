@@ -1663,7 +1663,6 @@ class Enumeration:
 
         conf.tbl = None
         conf.col = None
-        kb.data.cachedDbs = []
 
         self.getTables()
 
@@ -1680,10 +1679,7 @@ class Enumeration:
                         kb.data.cachedColumns = {}
                         kb.data.dumpedTable = {}
 
-                        data = self.dumpTable()
-
-                        if data:
-                            conf.dumper.dbTableValues(data)
+                        self.dumpTable()
                     except sqlmapNoneDataException:
                         infoMsg = "skipping table '%s'" % table
                         logger.info(infoMsg)
