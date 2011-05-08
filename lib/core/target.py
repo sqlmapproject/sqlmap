@@ -86,9 +86,11 @@ def __setRequestParams():
 
         conf.method = HTTPMETHOD.POST
 
-    if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not conf.parameters.has_key(PLACE.GET):
-        warnMsg  = "you've provided target url without "
-        warnMsg += "any GET parameters (e.g. ?id=1)"
+    if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(map(lambda place: place in conf.parameters, [PLACE.GET, PLACE.POST])):
+        warnMsg  = "you've provided target url without any GET "
+        warnMsg += "parameters (e.g. www.site.com/article.php?id=1) "
+        warnMsg += "and without providing any POST parameters "
+        warnMsg += "through --data option"
         logger.warn(warnMsg)
 
         message = "do you want to try URI injections "
