@@ -129,6 +129,8 @@ class Enumeration(GenericEnumeration):
         else:
             blinds = [True]
 
+        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+
         for db in dbs:
             for blind in blinds:
                 randStr = randomStr()
