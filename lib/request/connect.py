@@ -87,22 +87,22 @@ class Connect:
 
         # dirty hack because urllib2 just skips the other part of provided url
         # splitted with space char while urlencoding it in the later phase
-        url = kwargs.get('url',           conf.url).replace(" ", "%20")
+        url = kwargs.get('url',                     conf.url).replace(" ", "%20")
 
-        get = kwargs.get('get',           None)
-        post = kwargs.get('post',          None)
-        method = kwargs.get('method',        None)
-        cookie = kwargs.get('cookie',        None)
-        ua = kwargs.get('ua',            None)
-        referer = kwargs.get('referer',       None)
-        direct = kwargs.get('direct',        False)
-        multipart = kwargs.get('multipart',     False)
-        silent = kwargs.get('silent',        False)
-        raise404 = kwargs.get('raise404',      True)
-        auxHeaders = kwargs.get('auxHeaders',    None)
-        response = kwargs.get('response',      False)
+        get = kwargs.get('get',                     None)
+        post = kwargs.get('post',                   None)
+        method = kwargs.get('method',               None)
+        cookie = kwargs.get('cookie',               None)
+        ua = kwargs.get('ua',                       None)
+        referer = kwargs.get('referer',             None)
+        direct = kwargs.get('direct',               False)
+        multipart = kwargs.get('multipart',         False)
+        silent = kwargs.get('silent',               False)
+        raise404 = kwargs.get('raise404',           True)
+        auxHeaders = kwargs.get('auxHeaders',       None)
+        response = kwargs.get('response',           False)
         ignoreTimeout = kwargs.get('ignoreTimeout', False)
-        refreshing = kwargs.get('refreshing',    False)
+        refreshing = kwargs.get('refreshing',       False)
 
         page = ""
         cookieStr = ""
@@ -112,6 +112,10 @@ class Connect:
         requestHeaders = ""
         responseHeaders = None
         logHeaders = ""
+
+        # there are known issues when using url in unicode format
+        # (e.g. UnicodeDecodeError: "url = url + '?' + query" in redirect case)
+        url = unicodeencode(url)
 
         try:
             if silent:
