@@ -43,7 +43,6 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
-from lib.core.session import setTestedTechniques
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import REFERER_ALIASES
@@ -198,7 +197,6 @@ def start():
             initTargetEnv()
             parseTargetUrl()
 
-            proceed = False
             testSqlInj = False
 
             if PLACE.GET in conf.parameters:
@@ -319,15 +317,9 @@ def start():
                             # TODO: consider the following line in __setRequestParams()
                             # __testableParameters = True
 
-            if len(kb.tested) > 0:
-                for t in conf.tech:
-                    if t not in kb.tested:
-                        proceed = True
-                        break
-            else:
-                proceed = True
+            if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
+                and (kb.injection.place is None or kb.injection.parameter is None):
 
-            if proceed:
                 if not conf.string and not conf.regexp:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
@@ -435,8 +427,6 @@ def start():
                                 warnMsg += "injectable"
                                 logger.warn(warnMsg)
 
-            setTestedTechniques()
-
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if not conf.realTest:
                     errMsg = "all parameters are not injectable."
@@ -457,8 +447,8 @@ def start():
 
                     if not conf.string and not conf.regexp:
                         errMsg += " Rerun by providing either a valid --string "
-                        errMsg += "or a valid --regexp (refer to the user's "
-                        errMsg += "manual for details)"
+                        errMsg += "or a valid --regexp, refer to the user's "
+                        errMsg += "manual for details"
                     elif conf.string:
                         errMsg += " Rerun by providing a valid --string, perhaps "
                         errMsg += "the string that you have choosen does not match "

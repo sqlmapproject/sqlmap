@@ -41,23 +41,6 @@ def unSafeFormatString(value):
         retVal = retVal.replace("__LEFT_SQUARE_BRACKET__", "[").replace("__RIGHT_SQUARE_BRACKET__", "]")
     return retVal
 
-def setTestedTechniques():
-    """
-    Save information retrieved about dynamic markings to the
-    session file.
-    """
-
-    condition = (
-                  ( not kb.resumedQueries
-                  or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Tested techniques")) )
-                  or ( kb.resumedQueries[conf.url].has_key("Tested techniques")
-                  and base64unpickle(kb.resumedQueries[conf.url]["Tested techniques"][:-1]) != conf.tech
-                ) )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Tested techniques][%s]\n" % (conf.url, None, None, base64pickle(conf.tech)))
-
 def setInjection(inj):
     """
     Save information retrieved about injection place and parameter in the
@@ -68,9 +51,9 @@ def setInjection(inj):
                   or ( kb.resumedQueries.has_key(conf.url) and
                   not kb.resumedQueries[conf.url].has_key("Injection data"))
                   or ( kb.resumedQueries[conf.url].has_key("Injection data")
-                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(), \
+                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(),\
                     inj.data.keys()) != inj.data.keys()
-                ) )
+                ) ) 
 
     if condition:
         dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
@@ -182,40 +165,21 @@ def setXpCmdshellAvailability(available):
         dataToSessionFile("[%s][%s][%s][xp_cmdshell availability][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), str(available).lower()))
 
 def resumeConfKb(expression, url, value):
-    if expression == "Tested techniques" and url == conf.url:
-        kb.tested.extend(base64unpickle(value[:-1]))
-        kb.tested = list(set(kb.tested))
-        kb.tested.sort()
-
-    elif expression == "Injection data" and url == conf.url:
+    if expression == "Injection data" and url == conf.url:
         injection = base64unpickle(value[:-1])
+
+        infoMsg = "resuming injection data from session file"
+        logger.info(infoMsg)
 
         if injection.place in conf.paramDict and \
            injection.parameter in conf.paramDict[injection.place]:
 
             if not conf.tech or intersect(conf.tech, injection.data.keys()):
-                # Strip not required techniques (--technique switch)
                 if intersect(conf.tech, injection.data.keys()):
                     injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
 
-                infoMsg = "resuming injection data for technique%s " % ("s" if len(injection.data.keys()) > 1 else "")
-                infoMsg += "%s " % " & ".join([PAYLOAD.SQLINJECTION[k] for k in injection.data.keys()])
-                infoMsg += "from session file"
-                logger.info(infoMsg)
-
-                if len(kb.injections) == 0:
+                if injection not in kb.injections:
                     kb.injections.append(injection)
-                else:
-                    for resumedInj in kb.injections:
-                        for inj, data in injection.data.items():
-                            if inj not in resumedInj.data:
-                                kb.injections[kb.injections.index(resumedInj)].data[inj] = data
-            else:
-                warnMsg = "not resuming injection data for technique%s " % ("s" if len(injection.data.keys()) > 1 else "")
-                warnMsg += "%s " % " & ".join([PAYLOAD.SQLINJECTION[k] for k in injection.data.keys()])
-                warnMsg += "from session file because you provided "
-                warnMsg += "different technique(s) to be tested on this run"
-                logger.warn(warnMsg)
         else:
             warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
             warnMsg += "but you did not provided it this time"

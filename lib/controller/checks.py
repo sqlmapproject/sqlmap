@@ -80,7 +80,6 @@ def checkSqlInjection(place, parameter, value):
             if kb.endDetection:
                 break
 
-            proceed = True
             title = test.title
             stype = test.stype
             clause = test.clause
@@ -103,6 +102,7 @@ def checkSqlInjection(place, parameter, value):
                     else:
                         title = title.replace("[COLSTART]", str(conf.uColsStart))
                         title = title.replace("[COLSTOP]", str(conf.uColsStop))
+
                 elif conf.uCols is not None:
                     debugMsg = "skipping test '%s' because the user " % title
                     debugMsg += "provided custom column range %s" % conf.uCols
@@ -209,17 +209,6 @@ def checkSqlInjection(place, parameter, value):
                 debugMsg = "skipping test '%s' because the user " % title
                 debugMsg += "provided a specific character, %s" % conf.uChar
                 logger.debug(debugMsg)
-                continue
-
-            if len(kb.tested) > 0 and stype in kb.tested:
-                debugMsg = "skipping test '%s' because this " % title
-                debugMsg += "technique has already been detected "
-                debugMsg += "in a previous run"
-                logger.debug(debugMsg)
-
-                proceed = False
-
-            if not proceed:
                 continue
 
             infoMsg = "testing '%s'" % title
