@@ -43,7 +43,7 @@ class Dump:
         self.__outputFP.write(text)
         self.__outputFP.flush()
 
-        conf.loggedToOut = True
+        kb.dataOutputFlag = True
 
     def __formatString(self, inpStr):
         return restoreDumpMarkedChars(getUnicode(inpStr))

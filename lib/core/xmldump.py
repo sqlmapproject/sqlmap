@@ -14,6 +14,7 @@ from extra.prettyprint import prettyprint
 from lib.core.common import getUnicode
 from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapFilePathException
 from lib.core.settings import UNICODE_ENCODING
@@ -104,7 +105,7 @@ class XMLDump:
 
         self.__outputFP.flush()
 
-        conf.loggedToOut = True
+        kb.dataOutputFlag = True
 
     def __getRootChild(self,elemName):
         '''

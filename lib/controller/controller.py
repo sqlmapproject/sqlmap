@@ -457,8 +457,8 @@ def start():
 
                     if not conf.string and not conf.regexp:
                         errMsg += " Rerun by providing either a valid --string "
-                        errMsg += "or a valid --regexp, refer to the user's "
-                        errMsg += "manual for details"
+                        errMsg += "or a valid --regexp (refer to the user's "
+                        errMsg += "manual for details)"
                     elif conf.string:
                         errMsg += " Rerun by providing a valid --string, perhaps "
                         errMsg += "the string that you have choosen does not match "
@@ -530,7 +530,7 @@ def start():
         finally:
             showHttpErrorCodes()
 
-    if conf.loggedToOut and not conf.multipleTargets:
+    if kb.dataOutputFlag and not conf.multipleTargets:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
 
     return True

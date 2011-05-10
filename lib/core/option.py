@@ -1270,7 +1270,6 @@ def __setConfAttributes():
     conf.dumpPath = None
     conf.httpHeaders = []
     conf.hostname = None
-    conf.loggedToOut = None
     conf.multipleTargets = False
     conf.outputPath = None
     conf.paramDict = {}
@@ -1309,8 +1308,8 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.stdev = {}
 
     kb.commonOutputs = None
-
     kb.data = advancedDict()
+    kb.dataOutputFlag = False
 
     # Active back-end DBMS fingerprint
     kb.dbms = None
