@@ -390,6 +390,10 @@ class Connect:
                     warnMsg += "with the --random-agent switch turned on "
                     warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
                     singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
+                elif conf.threads > 1:
+                    warnMsg = "if the problem persists please try to lower "
+                    warnMsg += "the number of used threads (--threads)"
+                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.THREADS)
 
                 time.sleep(1)
 

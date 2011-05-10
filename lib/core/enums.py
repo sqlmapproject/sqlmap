@@ -96,6 +96,7 @@ class HTTPHEADER:
 class WARNFLAGS:
     RANDOM_AGENT = 'randomAgent'
     DATA_TO_STDOUT = 'dataToStdout'
+    THREADS = 'threads'
 
 class EXPECTED:
     BOOL = "bool"

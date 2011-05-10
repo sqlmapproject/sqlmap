@@ -29,6 +29,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapThreadException
+from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import METADB_SUFFIX
 from lib.core.session import safeFormatString
 from lib.request import inject
@@ -100,10 +101,16 @@ def tableExists(tableFile, regex=None):
         infoMsg = "starting %d threads" % conf.threads
         logger.info(infoMsg)
     else:
-        message = "please enter number of threads? [Enter for %d (current)] " % conf.threads
-        choice = readInput(message, default=str(conf.threads))
-        if choice and choice.isdigit():
-            conf.threads = int(choice)
+        while True:
+            message = "please enter number of threads? [Enter for %d (current)] " % conf.threads
+            choice = readInput(message, default=str(conf.threads))
+            if choice and choice.isdigit():
+                if int(choice) > MAX_NUMBER_OF_THREADS:
+                    errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
+                    logger.critical(errMsg)
+                else:
+                    conf.threads = int(choice)
+                    break
 
     if conf.threads == 1:
         warnMsg = "running in a single-thread mode. This could take a while."
@@ -218,10 +225,16 @@ def columnExists(columnFile, regex=None):
         infoMsg = "starting %d threads" % conf.threads
         logger.info(infoMsg)
     else:
-        message = "please enter number of threads? [Enter for %d (current)] " % conf.threads
-        choice = readInput(message, default=str(conf.threads))
-        if choice and choice.isdigit():
-            conf.threads = int(choice)
+        while True:
+            message = "please enter number of threads? [Enter for %d (current)] " % conf.threads
+            choice = readInput(message, default=str(conf.threads))
+            if choice and choice.isdigit():
+                if int(choice) > MAX_NUMBER_OF_THREADS:
+                    errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
+                    logger.critical(errMsg)
+                else:
+                    conf.threads = int(choice)
+                    break
 
     if conf.threads == 1:
         warnMsg = "running in a single-thread mode. This could take a while."
