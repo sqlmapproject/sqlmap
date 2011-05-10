@@ -1366,6 +1366,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadContinue = True
     kb.threadException = False
     kb.threadData = {}
+    kb.uChar = "NULL"
     kb.xpCmdshellAvailable = False
 
     kb.misc = advancedDict()

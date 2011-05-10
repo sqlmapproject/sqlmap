@@ -88,13 +88,18 @@ def __oneShotUnionUse(expression, unpack=True):
 
 def configUnion(char=None, columns=None):
     def __configUnionChar(char):
-        if isinstance(char, basestring):
-            if any([char.isdigit(), char == "NULL", char == "[RANDNUM]"]):
-                conf.uChar = char
-            else:
-                conf.uChar = "'%s'" % char.strip("'")
+        if not isinstance(char, basestring):
+            return
+
+        kb.uChar = char
+
+        if conf.uChar is not None:
+            kb.uChar = char.replace("[CHAR]", conf.uChar if conf.uChar.isdigit() else "'%s'" % conf.uChar.strip("'"))
 
     def __configUnionCols(columns):
+        if not isinstance(columns, basestring):
+            return
+
         columns = columns.replace(" ", "")
         colsStart, colsStop = columns.split("-")
 
@@ -109,15 +114,8 @@ def configUnion(char=None, columns=None):
             errMsg += "higher number of columns"
             raise sqlmapSyntaxException, errMsg
 
-    if isinstance(conf.uChar, basestring):
-        __configUnionChar(conf.uChar)
-    elif isinstance(char, basestring):
-        __configUnionChar(char)
-
-    if isinstance(conf.uCols, basestring):
-        __configUnionCols(conf.uCols)
-    elif isinstance(columns, basestring):
-        __configUnionCols(columns)
+    __configUnionChar(char)
+    __configUnionCols(conf.uCols or columns)
 
 def unionUse(expression, unpack=True, dump=False):
     """

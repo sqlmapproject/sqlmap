@@ -61,7 +61,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     min_, max_ = MAX_RATIO, MIN_RATIO
 
     for count in range(lowerCount, upperCount+1):
-        query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, conf.uChar)
+        query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
         ratio = comparison(page, True) or MIN_RATIO
@@ -122,7 +122,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
         # Forge the inband SQL injection request
-        query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, conf.uChar)
+        query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
         # Perform the request
@@ -141,7 +141,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
 
         if content and phrase in content:
             validPayload = payload
-            vector = (position, count, comment, prefix, suffix, conf.uChar, where)
+            vector = (position, count, comment, prefix, suffix, kb.uChar, where)
 
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
@@ -151,7 +151,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 
                 # Confirm that it is a full inband SQL injection
-                query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, conf.uChar, multipleUnions=randQueryUnescaped2)
+                query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, multipleUnions=randQueryUnescaped2)
                 payload = agent.payload(place=place, parameter=parameter, newValue=query, where=PAYLOAD.WHERE.NEGATIVE)
 
                 # Perform the request
@@ -159,7 +159,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
                 if content and ((phrase in content and phrase2 not in content) or (phrase not in content and phrase2 in content)):
-                    vector = (position, count, comment, prefix, suffix, conf.uChar, PAYLOAD.WHERE.NEGATIVE)
+                    vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE)
 
             if not unionErrorCase:
                 break
@@ -190,7 +190,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
     validPayload = None
     vector = None
-    query = agent.prefixQuery("UNION ALL SELECT %s" % conf.uChar)
+    query = agent.prefixQuery("UNION ALL SELECT %s" % kb.uChar)
     total = conf.uColsStop+1 - conf.uColsStart
 
     count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix)
@@ -200,7 +200,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
             query = query[:-len(FROM_TABLE[Backend.getIdentifiedDbms()])]
 
         if count:
-            query += ", %s" % conf.uChar
+            query += ", %s" % kb.uChar
 
         if Backend.getIdentifiedDbms() in FROM_TABLE:
             query += FROM_TABLE[Backend.getIdentifiedDbms()]

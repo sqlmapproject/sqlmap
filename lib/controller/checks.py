@@ -85,8 +85,17 @@ def checkSqlInjection(place, parameter, value):
             stype = test.stype
             clause = test.clause
 
-            if stype == 3:
+            if stype == PAYLOAD.TECHNIQUE.UNION:
                 configUnion(test.request.char)
+
+                if "[CHAR]" in title:
+                    if conf.uChar is None:
+                        continue
+                    else:
+                        title = title.replace("[CHAR]", conf.uChar)
+
+                elif "[RANDNUM]" in title or "(NULL)" in title:
+                    title = title.replace("[RANDNUM]", "random number")
 
                 if test.request.columns == "[COLSTART]-[COLSTOP]":
                     if conf.uCols is None:
@@ -94,12 +103,11 @@ def checkSqlInjection(place, parameter, value):
                     else:
                         title = title.replace("[COLSTART]", str(conf.uColsStart))
                         title = title.replace("[COLSTOP]", str(conf.uColsStop))
-
-                if "[CHAR]" in title:
-                    title = title.replace("[CHAR]", conf.uChar)
-
-                if "[RANDNUM]" in title:
-                    title = title.replace("[RANDNUM]", "random number")
+                elif conf.uCols is not None:
+                    debugMsg = "skipping test '%s' because the user " % title
+                    debugMsg += "provided custom column range %s" % conf.uCols
+                    logger.debug(debugMsg)
+                    continue
 
             # Skip test if the user's wants to test only for a specific
             # technique
@@ -132,8 +140,9 @@ def checkSqlInjection(place, parameter, value):
             # value
             # Parse test's <level>
             if test.level > conf.level:
-                debugMsg = "skipping test '%s' because the level " % title
-                debugMsg += "is higher than the provided"
+                debugMsg = "skipping test '%s' because the level" % title
+                debugMsg += ", %d, is higher than the provided" % test.level
+                debugMsg += ", %d" % conf.level
                 logger.debug(debugMsg)
                 continue
 
@@ -195,11 +204,10 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
-            # Skip test if the user provided custom column
-            # range and this is not a custom UNION test
-            if conf.uCols is not None and hasattr(test.request, "columns") and test.request.columns != "[COLSTART]-[COLSTOP]":
-                debugMsg = "skipping test '%s' because custom " % title
-                debugMsg += "UNION columns range was provided"
+            # Skip test if the user provided custom character
+            if conf.uChar is not None and ("random number" in title or "(NULL)" in title):
+                debugMsg = "skipping test '%s' because the user " % title
+                debugMsg += "provided a specific character, %s" % conf.uChar
                 logger.debug(debugMsg)
                 continue
 
