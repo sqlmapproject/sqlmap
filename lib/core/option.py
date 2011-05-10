@@ -667,11 +667,11 @@ def __setDBMS():
     logger.debug(debugMsg)
 
     conf.dbms = conf.dbms.lower()
-    firstRegExp = "(%s)" % "|".join([alias for alias in SUPPORTED_DBMS])
-    dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, conf.dbms, re.I)
 
-    if dbmsRegExp:
-        Backend.setVersion(str(dbmsRegExp.group(2)))
+    regex = re.search("%s ([\d\.]+)" % ("(%s)" % "|".join([alias for alias in SUPPORTED_DBMS])), conf.dbms, re.I)
+    if regex:
+        conf.dbms = regex.group(1)
+        Backend.setVersion(regex.group(2))
 
     if conf.dbms not in SUPPORTED_DBMS:
         errMsg = "you provided an unsupported back-end database management "
