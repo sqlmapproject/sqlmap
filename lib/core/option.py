@@ -1355,7 +1355,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.redirectSetCookie = None
     kb.responseTimes = []
     kb.resumedQueries = {}
-    kb.retriesCount = 0
     kb.singleLogFlags = set()
     kb.skipOthersDbms = None
     kb.suppressSession = False
