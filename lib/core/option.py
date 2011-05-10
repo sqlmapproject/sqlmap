@@ -319,28 +319,28 @@ def __setMultipleTargets():
     initialTargetsCount = len(kb.targetUrls)
     addedTargetUrls = set()
 
-    if not conf.list:
+    if not conf.logFile:
         return
 
-    debugMsg = "parsing targets list from '%s'" % conf.list
+    debugMsg = "parsing targets list from '%s'" % conf.logFile
     logger.debug(debugMsg)
 
-    if not os.path.exists(conf.list):
+    if not os.path.exists(conf.logFile):
         errMsg = "the specified list of targets does not exist"
         raise sqlmapFilePathException, errMsg
 
-    if os.path.isfile(conf.list):
-        __feedTargetsDict(conf.list, addedTargetUrls)
+    if os.path.isfile(conf.logFile):
+        __feedTargetsDict(conf.logFile, addedTargetUrls)
 
-    elif os.path.isdir(conf.list):
-        files = os.listdir(conf.list)
+    elif os.path.isdir(conf.logFile):
+        files = os.listdir(conf.logFile)
         files.sort()
 
         for reqFile in files:
             if not re.search("([\d]+)\-request", reqFile):
                 continue
 
-            __feedTargetsDict(os.path.join(conf.list, reqFile), addedTargetUrls)
+            __feedTargetsDict(os.path.join(conf.logFile, reqFile), addedTargetUrls)
 
     else:
         errMsg = "the specified list of targets is not a file "
@@ -1211,7 +1211,7 @@ def __cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if conf.googleDork or conf.list or conf.forms:
+    if conf.googleDork or conf.logFile or conf.forms:
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1602,7 +1602,7 @@ def __basicOptionValidation():
         errMsg = "switch --proxy is incompatible with switch --ignore-proxy"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.forms and (conf.list or conf.direct or conf.requestFile or conf.googleDork):
+    if conf.forms and (conf.logFile or conf.direct or conf.requestFile or conf.googleDork):
         errMsg = "switch --forms is compatible only with -u (--url) target switch"
         raise sqlmapSyntaxException, errMsg
 
@@ -1636,7 +1636,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     parseTargetUrl()
     parseTargetDirect()
 
-    if conf.url or conf.list or conf.requestFile or conf.googleDork or conf.liveTest:
+    if conf.url or conf.logFile or conf.requestFile or conf.googleDork or conf.liveTest:
         __setHTTPTimeout()
         __setHTTPExtraHeaders()
         __setHTTPCookies()

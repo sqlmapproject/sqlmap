@@ -44,7 +44,7 @@ def cmdLineParser():
 
         target.add_option("-u", "--url", dest="url", help="Target url")
 
-        target.add_option("-l", dest="list", help="Parse targets from Burp "
+        target.add_option("-l", dest="logFile", help="Parse targets from Burp "
                           "or WebScarab proxy logs")
 
         target.add_option("-r", dest="requestFile",

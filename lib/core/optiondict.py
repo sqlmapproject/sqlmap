@@ -15,7 +15,7 @@ optDict = {
             "Target":        {
                                "direct":            "string",
                                "url":               "string",
-                               "list":              "string",
+                               "logFile":           "string",
                                "requestFile":       "string",
                                "googleDork":        "string",
                                "configFile":        "string"
