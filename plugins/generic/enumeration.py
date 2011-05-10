@@ -1628,6 +1628,7 @@ class Enumeration:
                                                          "table": unsafeSQLIdentificatorNaming(tbl),
                                                          "db":    unsafeSQLIdentificatorNaming(conf.db) }
 
+                    attackDumpedTable()
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
                 else:
                     warnMsg = "unable to retrieve the entries of "
@@ -1645,8 +1646,6 @@ class Enumeration:
                 errMsg = "connection exception detected in dumping phase: "
                 errMsg += "'%s'" % e
                 logger.critical(errMsg)
-
-        attackDumpedTable()
 
     def dumpAll(self):
         if conf.db is not None and conf.tbl is None:
