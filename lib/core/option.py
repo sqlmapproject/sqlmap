@@ -437,6 +437,26 @@ def __setGoogleDorking():
         errMsg += "have GET parameters to test for SQL injection"
         raise sqlmapGenericException, errMsg
 
+def __setBulkMultipleTargets():
+    if not conf.bulkFile:
+        return
+
+    conf.bulkFile = os.path.expanduser(conf.bulkFile)
+
+    infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
+    logger.info(infoMsg)
+
+    if not os.path.isfile(conf.bulkFile):
+        errMsg = "the specified bulk file "
+        errMsg += "does not exist"
+        raise sqlmapFilePathException, errMsg
+
+    f = open(conf.bulkFile, 'r')
+    for line in f.xreadlines():
+        if re.search(r"[^ ]+\?(.+)", line, re.I):
+            kb.targetUrls.add((line, None, None, None))
+    f.close()
+
 def __findPageForms():
     if not conf.forms:
         return
@@ -1211,7 +1231,7 @@ def __cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if conf.googleDork or conf.logFile or conf.forms:
+    if conf.googleDork or conf.logFile or conf.bulkFile or conf.forms:
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1602,7 +1622,7 @@ def __basicOptionValidation():
         errMsg = "switch --proxy is incompatible with switch --ignore-proxy"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.forms and (conf.logFile or conf.direct or conf.requestFile or conf.googleDork):
+    if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
         errMsg = "switch --forms is compatible only with -u (--url) target switch"
         raise sqlmapSyntaxException, errMsg
 
@@ -1636,7 +1656,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     parseTargetUrl()
     parseTargetDirect()
 
-    if conf.url or conf.logFile or conf.requestFile or conf.googleDork or conf.liveTest:
+    if any([conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.liveTest]):
         __setHTTPTimeout()
         __setHTTPExtraHeaders()
         __setHTTPCookies()
@@ -1648,6 +1668,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
         __setDNSCache()
         __setSafeUrl()
         __setGoogleDorking()
+        __setBulkMultipleTargets()
         __urllib2Opener()
         __findPageForms()
         __setDBMS()

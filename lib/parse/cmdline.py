@@ -47,6 +47,9 @@ def cmdLineParser():
         target.add_option("-l", dest="logFile", help="Parse targets from Burp "
                           "or WebScarab proxy logs")
 
+        target.add_option("-m", dest="bulkFile", help="Scan multiple targets enlisted "
+                          "in a given textual file ")
+
         target.add_option("-r", dest="requestFile",
                           help="Load HTTP request from a file")
 
@@ -569,9 +572,9 @@ def cmdLineParser():
 
         (args, _) = parser.parse_args(args)
 
-        if not any([args.direct, args.url, args.logFile, args.googleDork, args.configFile, \
+        if not any([args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard]):
-            errMsg = "missing a mandatory parameter ('-d', '-u', '-l', '-r', '-g', '-c', '--wizard' or '--update'), "
+            errMsg = "missing a mandatory parameter ('-d', '-u', '-l', '-m', '-r', '-g', '-c', '--wizard' or '--update'), "
             errMsg += "-h for help"
             parser.error(errMsg)
 
