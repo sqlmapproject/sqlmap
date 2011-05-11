@@ -23,6 +23,7 @@ import urlparse
 from extra.clientform.clientform import ParseResponse
 from extra.clientform.clientform import ParseError
 from extra.keepalive import keepalive
+from extra.oset.pyoset import oset
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
@@ -1399,7 +1400,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     if flushAll:
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
         kb.tamperFunctions = []
-        kb.targetUrls = set()
+        kb.targetUrls = oset()
         kb.testedParams = set()
         kb.userAgents = None
         kb.wordlist = None
