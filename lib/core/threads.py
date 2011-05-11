@@ -24,6 +24,7 @@ class ThreadData():
         self.lastRedirectMsg = None
         self.lastQueryDuration = 0
         self.lastRequestUID = 0
+        self.retriesCount = 0
         self.seqMatcher = difflib.SequenceMatcher(None)
         self.valueStack = []
 
