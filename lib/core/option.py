@@ -1164,7 +1164,6 @@ def __setHTTPCookies():
         debugMsg = "setting the HTTP Cookie header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append((HTTPHEADER.CONNECTION, "Keep-Alive"))
         conf.httpHeaders.append((HTTPHEADER.COOKIE, conf.cookie))
 
 def __setHTTPTimeout():
