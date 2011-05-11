@@ -76,7 +76,9 @@ class OrderedSet(MutableSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
 
-    def __del__(self):
-        self.clear()                    # remove circular references
+    # causing "Exception TypeError: TypeError('list indices must be integers, not NoneType',)"
+    # in garbage collection phase
+    #def __del__(self):
+        #self.clear()                    # remove circular references
 
 oset = OrderedSet
