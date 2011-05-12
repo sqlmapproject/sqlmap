@@ -414,10 +414,13 @@ class Dump:
                     if len(info["values"]) <= i:
                         continue
 
-                    value = getUnicode(info["values"][i])
+                    if info["values"][i] is None:
+                        value = u''
+                    else:
+                        value = getUnicode(info["values"][i])
 
-                    if re.search("^[\ *]*$", value):
-                        value = "NULL"
+                        if re.search("^[\ *]*$", value):
+                            value = "NULL"
 
                     values.append(value)
                     maxlength = int(info["length"])
