@@ -848,7 +848,7 @@ def checkNullConnection():
 
 def checkConnection(suppressOutput=False):
     try:
-        socket.gethostbyname(conf.hostname)
+        socket.getaddrinfo(conf.hostname, None)
     except socket.gaierror:
         errMsg = "host '%s' does not exist" % conf.hostname
         raise sqlmapConnectionException, errMsg
