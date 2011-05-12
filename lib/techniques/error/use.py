@@ -289,15 +289,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
                 count = __oneShotErrorUse(countedExpression, countedExpressionFields)
 
-            if (not count or (count.isdigit() and int(count) == 0)):
-                warnMsg = "it was not possible to count the number "
-                warnMsg += "of entries for the used SQL query. "
-                warnMsg += "sqlmap will assume that it returns only "
-                warnMsg += "one entry"
-                logger.warn(warnMsg)
-
-                stopLimit = 1
-            elif isNumPosStrValue(count):
+            if isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
                     stopLimit = min(int(count), int(stopLimit))
                 else:
@@ -306,6 +298,15 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     infoMsg = "the SQL query used returns "
                     infoMsg += "%d entries" % stopLimit
                     logger.info(infoMsg)
+
+            else:
+                warnMsg = "it was not possible to count the number "
+                warnMsg += "of entries for the used SQL query. "
+                warnMsg += "sqlmap will assume that it returns only "
+                warnMsg += "one entry"
+                logger.warn(warnMsg)
+
+                stopLimit = 1
 
             try:
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
