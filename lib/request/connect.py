@@ -48,6 +48,7 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import META_REFRESH_REGEX
+from lib.core.settings import IS_WIN
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import WARN_TIME_STDEV
 from lib.core.settings import URI_HTTP_HEADER
@@ -390,10 +391,22 @@ class Connect:
                 logger.critical(warnMsg)
 
                 if kb.originalPage is None:
-                    warnMsg = "if the problem persists please try to rerun "
-                    warnMsg += "with the --random-agent switch turned on "
-                    warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
-                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
+                    if conf.tor:
+                        warnMsg = "please make sure that you have "
+                        warnMsg += "some kind of Vidalia/Privoxy/Polipo "
+                        warnMsg += "Tor proxy bundle installed for "
+                        warnMsg += "you to be able to successfully use "
+                        warnMsg += "--tor switch "
+                        if IS_WIN:
+                            warnMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
+                        else:
+                            warnMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
+                        singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.TOR)
+                    else:
+                        warnMsg = "if the problem persists please try to rerun "
+                        warnMsg += "with the --random-agent switch turned on "
+                        warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
+                        singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
                 elif conf.threads > 1:
                     warnMsg = "if the problem persists please try to lower "
                     warnMsg += "the number of used threads (--threads)"

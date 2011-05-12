@@ -1241,6 +1241,9 @@ def __cleanupOptions():
         conf.threads = 3 if conf.threads < 3 else conf.threads
 
     if conf.tor:
+        infoMsg = "setting Tor proxy settings"
+        logger.info(infoMsg)
+
         conf.proxy = DEFAULT_TOR_PROXY
 
     if conf.data:
