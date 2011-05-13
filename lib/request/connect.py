@@ -95,6 +95,7 @@ class Connect:
         method = kwargs.get('method',               None)
         cookie = kwargs.get('cookie',               None)
         ua = kwargs.get('ua',                       None)
+        host = kwargs.get('host',                   None)
         referer = kwargs.get('referer',             None)
         direct = kwargs.get('direct',               False)
         multipart = kwargs.get('multipart',         False)
@@ -104,10 +105,11 @@ class Connect:
         response = kwargs.get('response',           False)
         ignoreTimeout = kwargs.get('ignoreTimeout', False)
         refreshing = kwargs.get('refreshing',       False)
+        target = kwargs.get('target',               True)
 
         page = ""
         cookieStr = ""
-        requestMsg = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, conf.method)
+        requestMsg = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or conf.method)
         requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
         responseMsg = "HTTP response "
         requestHeaders = ""
@@ -150,7 +152,7 @@ class Connect:
                 get = None
                 post = None
 
-            else:
+            elif target:
                 if conf.parameters.has_key(PLACE.GET) and not get:
                     get = conf.parameters[PLACE.GET]
 
@@ -163,6 +165,10 @@ class Connect:
                         if conf.parameters.has_key(place):
                             post = conf.parameters[place]
                             break
+
+            elif get:
+                url = "%s?%s" % (url, get)
+                requestMsg += "?%s" % get
 
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
@@ -178,7 +184,7 @@ class Connect:
             if kb.proxyAuthHeader:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
-            headers[HTTPHEADER.HOST] = urlparse.urlparse(url).netloc
+            headers[HTTPHEADER.HOST] = host or urlparse.urlparse(url).netloc
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
@@ -237,7 +243,7 @@ class Connect:
             if hasattr(conn, "setcookie"):
                 kb.redirectSetCookie = conn.setcookie
 
-            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and not conf.redirectHandled and not conf.realTest:
+            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and target and not conf.redirectHandled and not conf.realTest:
                 msg = "sqlmap got a %d redirect to " % conn.redcode
                 msg += "%s - What target address do you " % conn.redurl
                 msg += "want to use from now on? %s " % conf.url
