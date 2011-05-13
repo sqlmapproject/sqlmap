@@ -88,6 +88,7 @@ class HTTPHEADER:
     CONTENT_RANGE = "Content-Range"
     CONTENT_TYPE = "Content-Type"
     COOKIE = "Cookie"
+    HOST = "Host"
     PROXY_AUTHORIZATION = "Proxy-authorization"
     RANGE = "Range"
     REFERER = "Referer"

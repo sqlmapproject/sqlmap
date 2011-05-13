@@ -1027,9 +1027,6 @@ def __setHTTPMethod():
     logger.debug(debugMsg)
 
 def __setHTTPExtraHeaders():
-    if conf.hostname:
-        conf.httpHeaders.append(("Host", conf.hostname))
-
     if conf.headers:
         debugMsg = "setting extra HTTP headers"
         logger.debug(debugMsg)
