@@ -137,7 +137,7 @@ def unicodeencode(value, encoding=None):
         try:
             retVal = value.encode(encoding or UNICODE_ENCODING)
         except UnicodeEncodeError:
-            retVal = value.encode(UNICODE_ENCODING, errors="replace")
+            retVal = value.encode(UNICODE_ENCODING, "replace")
     return retVal
 
 def utf8encode(value):

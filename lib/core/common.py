@@ -647,7 +647,7 @@ def dataToStdout(data, forceOutput=False):
             try:
                 # Reference: http://bugs.python.org/issue1602
                 if IS_WIN:
-                    output = data.encode('ascii', errors="replace")
+                    output = data.encode('ascii', "replace")
 
                     if output != data:
                         warnMsg = "cannot properly display Unicode characters "
