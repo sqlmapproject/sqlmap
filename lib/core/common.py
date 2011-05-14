@@ -653,7 +653,7 @@ def dataToStdout(data, forceOutput=False):
                         warnMsg = "cannot properly display Unicode characters "
                         warnMsg += "inside Windows OS command prompt "
                         warnMsg += "(http://bugs.python.org/issue1602). All "
-                        warnMsg += "similar occurances will result in "
+                        warnMsg += "unhandled occurances will result in "
                         warnMsg += "replacement with '?' character. Please, find "
                         warnMsg += "proper character representation inside "
                         warnMsg += "coresponding output files. "
@@ -1798,7 +1798,7 @@ def getUnicode(value, encoding=None, system=False):
         if isinstance(value, unicode):
             return value
         elif isinstance(value, basestring):
-            return unicode(value, encoding or UNICODE_ENCODING, errors="replace")
+            return unicode(value, encoding or UNICODE_ENCODING, errors="xmlcharrefreplace")
         else:
             return unicode(value) # encoding ignored for non-basestring instances
     else:
