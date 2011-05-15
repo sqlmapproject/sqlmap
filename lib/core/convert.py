@@ -85,7 +85,7 @@ def urldecode(value, encoding=None):
             result = urllib.unquote_plus(value)
 
     if isinstance(result, str):
-        result = unicode(result, encoding or UNICODE_ENCODING, errors="xmlcharrefreplace")
+        result = unicode(result, encoding or UNICODE_ENCODING, errors="replace")
 
     return result
 
@@ -137,7 +137,7 @@ def unicodeencode(value, encoding=None):
         try:
             retVal = value.encode(encoding or UNICODE_ENCODING)
         except UnicodeEncodeError:
-            retVal = value.encode(UNICODE_ENCODING, "xmlcharrefreplace")
+            retVal = value.encode(UNICODE_ENCODING, "replace")
     return retVal
 
 def utf8encode(value):

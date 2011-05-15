@@ -1798,7 +1798,7 @@ def getUnicode(value, encoding=None, system=False):
         if isinstance(value, unicode):
             return value
         elif isinstance(value, basestring):
-            return unicode(value, encoding or UNICODE_ENCODING, errors="xmlcharrefreplace")
+            return unicode(value, encoding or UNICODE_ENCODING, errors="replace")
         else:
             return unicode(value) # encoding ignored for non-basestring instances
     else:
