@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
 import re
 
 from lib.controller.action import action
@@ -22,6 +23,7 @@ from lib.controller.checks import simpletonCheckSqlInjection
 from lib.core.agent import agent
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
+from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
 from lib.core.common import intersect
 from lib.core.common import paramToDict
@@ -154,6 +156,34 @@ def __saveToSessionFile():
 
         setInjection(inj)
 
+def __saveToResultsFile():
+    if not conf.resultsFP:
+        return
+
+    techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
+
+    found = False
+
+    results = {}
+    for inj in kb.injections:
+        if inj.place is None or inj.parameter is None:
+            continue
+
+        key = (inj.place, inj.parameter)
+        if key not in results:
+            results[key] = []
+
+        results[key].extend(inj.data.keys())
+
+    for key, value in results.items():
+        place, parameter = key
+        line = "%s,%s,%s,%s%s" % (conf.url, place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), os.linesep)
+        conf.resultsFP.writelines(line)
+
+    if not results:
+        line = "%s,,,%s" % (conf.url, os.linesep)
+        conf.resultsFP.writelines(line)
+    
 def start():
     """
     This function calls a function that performs checks on both URL
@@ -467,6 +497,7 @@ def start():
                 kb.testMode = False
 
                 __saveToSessionFile()
+                __saveToResultsFile()
                 __showInjections()
                 __selectInjection()
 
@@ -522,5 +553,10 @@ def start():
 
     if kb.dataOutputFlag and not conf.multipleTargets:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
+
+    if conf.multipleTargets:
+        infoMsg  = "you can find results of scanning in multiple targets mode "
+        infoMsg += "inside the CSV file '%s'" % conf.resultsFilename
+        logger.info(infoMsg)
 
     return True

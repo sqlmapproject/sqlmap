@@ -1297,6 +1297,8 @@ def __setConfAttributes():
     conf.path = None
     conf.port = None
     conf.redirectHandled = False
+    conf.resultsFilename = None
+    conf.resultsFP = None
     conf.scheme = None
     conf.sessionFP = None
     conf.start = True

@@ -34,6 +34,7 @@ from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
 from lib.core.settings import REFERER_ALIASES
+from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_REGEX
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
@@ -234,6 +235,22 @@ def __setOutputResume():
         errMsg = "unable to write on the session file specified"
         raise sqlmapFilePathException, errMsg
 
+def __setResultsFile():
+    """
+    Create results file for storing results of running in a 
+    multiple target mode.
+    """
+
+    if not conf.multipleTargets:
+        return
+
+    if not conf.resultsFP:
+        conf.resultsFilename = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, time.strftime(RESULTS_FILE_FORMAT).lower())
+        conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING)
+        conf.resultsFP.writelines("Target url,Place,Parameter,Techniques%s" % os.linesep)
+
+        logger.info("using '%s' as results file" % conf.resultsFilename)
+
 def __createFilesDir():
     """
     Create the file directory.
@@ -336,3 +353,4 @@ def setupTargetEnv():
     __createTargetDirs()
     __setRequestParams()
     __setOutputResume()
+    __setResultsFile()
