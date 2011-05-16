@@ -2016,16 +2016,12 @@ def getPublicTypeMembers(type_, onlyValues=False):
     Useful for getting members from types (e.g. in enums)
     """
 
-    retVal = []
-
     for name, value in inspect.getmembers(type_):
         if not name.startswith('__'):
             if not onlyValues:
-                retVal.append((name, value))
+                yield (name, value)
             else:
-                retVal.append(value)
-
-    return retVal
+                yield value
 
 def enumValueToNameLookup(type_, value_):
     """
