@@ -269,7 +269,7 @@ def unionUse(expression, unpack=True, dump=False):
                         value += output
 
                         if conf.verbose == 1:
-                            items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
+                            items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
                             status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
                             if len(status) > width:
                                 status = "%s..." % status[:width - 3]
