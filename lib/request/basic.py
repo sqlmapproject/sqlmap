@@ -97,7 +97,7 @@ def checkCharEncoding(encoding):
         return encoding
 
     # http://www.destructor.de/charsets/index.htm
-    translate = { 'windows-874': 'iso-8859-11', 'en_us': 'utf8', 'macintosh': 'iso-8859-1' }
+    translate = { 'windows-874': 'iso-8859-11', 'en_us': 'utf8', 'macintosh': 'iso-8859-1', 'euc_tw': 'big5_tw' }
 
     for delimiter in (';', ','):
         if delimiter in encoding:
@@ -110,12 +110,16 @@ def checkCharEncoding(encoding):
         encoding = encoding.replace('5889', '8859') # iso-5889 -> iso-8859
     elif '2313' in encoding:
         encoding = encoding.replace('2313', '2312') # gb2313 -> gb2312
+    elif 'x-euc' in encoding:
+        encoding = encoding.replace('x-euc', 'euc') # x-euc-kr -> euc-kr
 
     # name adjustment for compatibility
     if encoding.startswith('8859'):
         encoding = 'iso-%s' % encoding
     elif encoding.startswith('cp-'):
         encoding = 'cp%s' % encoding[3:]
+    elif encoding.startswith('euc-'):
+        encoding = 'euc_%s' % encoding[4:]
     elif encoding.startswith('windows') and not encoding.startswith('windows-'):
         encoding = 'windows-%s' % encoding[7:]
     elif encoding.find('iso-88') > 0:
@@ -185,7 +189,7 @@ def decodePage(page, contentEncoding, contentType):
 
     if contentType and any(map(lambda x: x in contentType.lower(), ('text/txt', 'text/raw', 'text/html', 'text/xml'))):
         # can't do for all responses because we need to support binary files too
-        kb.pageEncoding = kb.pageEncoding or getHeuristicCharEncoding(page)
+        kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
         page = getUnicode(page, kb.pageEncoding)
 
     return page
