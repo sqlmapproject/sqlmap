@@ -2344,17 +2344,12 @@ def filterListValue(value, regex):
     expression
     """
 
-    if regex:
-        retVal = []
-        filt = getCompiledRegex(regex, re.I)
-
-        for word in value:
-            if filt.search(word):
-                retVal.append(word)
-
-        return retVal
+    if isinstance(value, list) and regex:
+        retVal = filter(lambda word: getCompiledRegex(regex, re.I).search(word), value)
     else:
-        return value
+        retVal = value
+
+    return retVal
 
 def showHttpErrorCodes():
     """
