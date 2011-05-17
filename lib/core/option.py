@@ -71,6 +71,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
+from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -1641,7 +1642,7 @@ def __basicOptionValidation():
             codecs.lookup(conf.charset)
         except LookupError:
             errMsg  = "unknown charset '%s'. please visit page " % conf.charset
-            errMsg += "'http://docs.python.org/library/codecs.html#standard-encodings' "
+            errMsg += "'%s' " % CODECS_LIST_PAGE
             errMsg += "to get the full list of supported charsets"
             raise sqlmapSyntaxException, errMsg
 
