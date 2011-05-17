@@ -1636,6 +1636,15 @@ def __basicOptionValidation():
         errMsg = "value for --union-cols must be a range with hyphon (e.g. 1-10)"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.charset:
+        try:
+            codecs.lookup(conf.charset)
+        except LookupError:
+            errMsg  = "unknown charset '%s'. please visit page " % conf.charset
+            errMsg += "'http://docs.python.org/library/codecs.html#standard-encodings' "
+            errMsg += "to get the full list of supported charsets"
+            raise sqlmapSyntaxException, errMsg
+
 def init(inputOptions=advancedDict(), overrideOptions=False):
     """
     Set attributes into both configuration and knowledge base singletons

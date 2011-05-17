@@ -447,13 +447,25 @@ def cmdLineParser():
         #general.add_option("-x", dest="xmlFile",
         #                    help="Dump the data into an XML file")
 
+        general.add_option("-s", dest="sessionFile",
+                            help="Save and resume all data retrieved "
+                            "on a session file")
+
         general.add_option("-t", dest="trafficFile",
                             help="Log all HTTP traffic into a "
                             "textual file")
 
-        general.add_option("-s", dest="sessionFile",
-                            help="Save and resume all data retrieved "
-                            "on a session file")
+        general.add_option("--batch", dest="batch",
+                            action="store_true", default=False,
+                            help="Never ask for user input, use the default behaviour")
+
+        general.add_option("--charset", dest="charset",
+                            help="Force character encoding used for data retrieval")
+
+        general.add_option("--eta", dest="eta",
+                            action="store_true", default=False,
+                            help="Display for each output the "
+                                      "estimated time of arrival")
 
         general.add_option("--flush-session", dest="flushSession",
                             action="store_true", default=False,
@@ -463,22 +475,13 @@ def cmdLineParser():
                             action="store_true", default=False,
                             help="Ignores query results stored in session file")
 
-        general.add_option("--eta", dest="eta",
-                            action="store_true", default=False,
-                            help="Display for each output the "
-                                      "estimated time of arrival")
-
-        general.add_option("--update", dest="updateAll",
-                            action="store_true", default=False,
-                            help="Update sqlmap")
-
         general.add_option("--save", dest="saveCmdline",
                             action="store_true", default=False,
                             help="Save options on a configuration INI file")
 
-        general.add_option("--batch", dest="batch",
+        general.add_option("--update", dest="updateAll",
                             action="store_true", default=False,
-                            help="Never ask for user input, use the default behaviour")
+                            help="Update sqlmap")
 
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")

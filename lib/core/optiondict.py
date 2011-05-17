@@ -150,14 +150,15 @@ optDict = {
 
             "General":       {
                                #"xmlFile":           "string",
-                               "trafficFile":       "string",
                                "sessionFile":       "string",
-                               "flushSession":      "boolean",
-                               "freshQueries":      "boolean",
-                               "forms":             "boolean",
+                               "trafficFile":       "string",
+                               "batch":             "boolean",
+                               "charset":           "string",
                                "eta":               "boolean",
-                               "updateAll":         "boolean",
-                               "batch":             "boolean"
+                               "flushSession":      "boolean",
+                               "forms":             "boolean",
+                               "freshQueries":      "boolean",
+                               "updateAll":         "boolean"
                              },
 
             "Miscellaneous": {

@@ -134,6 +134,7 @@ def checkCharEncoding(encoding):
         return None
 
     # http://www.iana.org/assignments/character-sets
+    # http://docs.python.org/library/codecs.html
     try:
         codecs.lookup(encoding)
     except LookupError:
@@ -173,19 +174,22 @@ def decodePage(page, contentEncoding, contentType):
 
         page = data.read()
 
-    httpCharset, metaCharset = None, None
+    if not conf.charset:
+        httpCharset, metaCharset = None, None
 
-    # http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
-    if contentType and (contentType.find('charset=') != -1):
-        httpCharset = checkCharEncoding(contentType.split('charset=')[-1])
+        # http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
+        if contentType and (contentType.find('charset=') != -1):
+            httpCharset = checkCharEncoding(contentType.split('charset=')[-1])
 
-    metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE))
+        metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE))
 
-    if ((httpCharset or metaCharset) and not all([httpCharset, metaCharset]))\
-        or (httpCharset == metaCharset and all([httpCharset, metaCharset])):
-        kb.pageEncoding = httpCharset or metaCharset
+        if ((httpCharset or metaCharset) and not all([httpCharset, metaCharset]))\
+            or (httpCharset == metaCharset and all([httpCharset, metaCharset])):
+            kb.pageEncoding = httpCharset or metaCharset
+        else:
+            kb.pageEncoding = None
     else:
-        kb.pageEncoding = None
+        kb.pageEncoding = conf.charset
 
     if contentType and any(map(lambda x: x in contentType.lower(), ('text/txt', 'text/raw', 'text/html', 'text/xml'))):
         # can't do for all responses because we need to support binary files too
