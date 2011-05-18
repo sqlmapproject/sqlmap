@@ -721,13 +721,16 @@ def __setTamperingFunctions():
         resolve_priorities = False
         priorities = []
 
-        for tfile in conf.tamper.split(','):
+        for tfile in re.split(r'[,|;]', conf.tamper):
             found = False
 
             tfile = tfile.strip()
 
             if not tfile:
                 continue
+
+            elif os.path.exists(os.path.join(paths.SQLMAP_TAMPER_PATH, tfile if tfile.endswith('.py') else "%s.py" % tfile)):
+                tfile = os.path.join(paths.SQLMAP_TAMPER_PATH, tfile if tfile.endswith('.py') else "%s.py" % tfile)
 
             elif not os.path.exists(tfile):
                 errMsg = "tamper script '%s' does not exist" % tfile
