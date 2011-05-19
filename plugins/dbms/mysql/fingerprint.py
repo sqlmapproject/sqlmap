@@ -188,8 +188,9 @@ class Fingerprint(GenericFingerprint):
                 return False
 
             # Determine if it is MySQL >= 5.0.0
-            #if inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.TABLES LIMIT 0, 1)" % (randInt, randInt)):
-            if inject.checkBooleanExpression("EXISTS(SELECT %s FROM information_schema.TABLES)" % randInt):
+            # reading information_schema on some platforms is causing annoying timeout exits
+            #if inject.checkBooleanExpression("EXISTS(SELECT %s FROM information_schema.TABLES)" % randInt):
+            if inject.checkBooleanExpression("ISNULL(TIMESTAMPADD(MINUTE,%s,%s))" % (randInt, randInt)):
                 kb.data.has_information_schema = True
                 Backend.setVersion(">= 5.0.0")
                 setDbms("%s 5" % DBMS.MYSQL)
