@@ -1026,8 +1026,19 @@ class Enumeration:
                 infoMsg = "fetching columns "
 
                 if len(colList) > 0:
-                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
-                    infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                    message  = "do you want to use LIKE operator to "
+                    message += "retrieve column names similar to the "
+                    message += "ones provided with the -C option? [Y/n]"
+
+                    test = readInput(message, default="Y")
+
+                    if not (isinstance(test, basestring) and test.upper() == "N"):
+                        condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
+                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                    else:
+                        condQuery = " AND (%s)" % " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
+                        infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                    
                 else:
                     condQuery = ""
 
@@ -1446,7 +1457,8 @@ class Enumeration:
             try:
                 if not unsafeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
                    or unsafeSQLIdentificatorNaming(tbl) not in \
-                   kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)]:
+                   kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)] \
+                   or not kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)][unsafeSQLIdentificatorNaming(tbl)]:
                     warnMsg = "unable to enumerate the columns for table "
                     warnMsg += "'%s' on database" % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += " '%s', skipping" % unsafeSQLIdentificatorNaming(conf.db)
@@ -1460,7 +1472,7 @@ class Enumeration:
 
                 infoMsg = "fetching"
                 if conf.col:
-                    infoMsg += " columns '%s'" % colString
+                    infoMsg += " column(s) '%s'" % colString
                 infoMsg += " entries for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += " on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
