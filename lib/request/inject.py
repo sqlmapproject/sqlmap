@@ -40,6 +40,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
+from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
@@ -158,7 +159,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     # can return multiple entries
     if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
       not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
-      expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))):
+      expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
+      and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)

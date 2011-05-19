@@ -36,6 +36,7 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
+from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
@@ -218,7 +219,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
        or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
        expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
        and ("(CASE" not in expression.upper() or ("(CASE" in expression.upper() and "WHEN use" in expression))) \
-       and not any(map(lambda x: x in expression.upper(), ["COUNT(*)", "EXISTS(", "MAX(", "MIN(", "COUNT(DISTINCT"])):
+       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)

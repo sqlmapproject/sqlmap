@@ -333,3 +333,6 @@ RESULTS_FILE_FORMAT = 'results-%I%M%p_%m%d%Y.csv'
 
 # Official web page with the list of Python supported codecs
 CODECS_LIST_PAGE = 'http://docs.python.org/library/codecs.html#standard-encodings'
+
+# Simple regular expression used to distinguish scalar from multiple-row commands (not sole condition)
+SQL_SCALAR_REGEX = r"\A(SELECT(?!\s+DISTINCT\(?))?\s*\w*\("
