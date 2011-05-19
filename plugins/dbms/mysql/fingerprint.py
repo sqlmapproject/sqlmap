@@ -187,9 +187,10 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
-            # Determine if it is MySQL >= 5.0.0
             # reading information_schema on some platforms is causing annoying timeout exits
-            #if inject.checkBooleanExpression("EXISTS(SELECT %s FROM information_schema.TABLES)" % randInt):
+            # Reference: http://bugs.mysql.com/bug.php?id=15855
+
+            # Determine if it is MySQL >= 5.0.0
             if inject.checkBooleanExpression("ISNULL(TIMESTAMPADD(MINUTE,%s,%s))" % (randInt, randInt)):
                 kb.data.has_information_schema = True
                 Backend.setVersion(">= 5.0.0")
