@@ -1999,9 +1999,9 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
 
     kb.locks.logLock.acquire()
 
-    dataToTrafficFile("%s\n" % requestLogMsg)
-    dataToTrafficFile("%s\n" % responseLogMsg)
-    dataToTrafficFile("\n%s\n\n" % (76 * '#'))
+    dataToTrafficFile("%s%s" % (requestLogMsg, os.linesep))
+    dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
+    dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
     kb.locks.logLock.release()
 
