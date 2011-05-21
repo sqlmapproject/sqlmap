@@ -24,6 +24,7 @@ from extra.clientform.clientform import ParseResponse
 from extra.clientform.clientform import ParseError
 from extra.keepalive import keepalive
 from extra.oset.pyoset import oset
+from extra.socks import socks
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
@@ -77,7 +78,6 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
-from lib.core.settings import DEFAULT_TOR_PROXY
 from lib.core.settings import DBMS_DICT
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
@@ -1242,10 +1242,11 @@ def __cleanupOptions():
         conf.threads = 3 if conf.threads < 3 else conf.threads
 
     if conf.tor:
-        infoMsg = "setting Tor proxy settings"
+        infoMsg = "setting Tor socks settings"
         logger.info(infoMsg)
 
-        conf.proxy = DEFAULT_TOR_PROXY
+        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, 'localhost', 9050)
+        socks.wrapmodule(urllib2)
 
     if conf.data:
         conf.data = urldecode(conf.data)
@@ -1618,6 +1619,10 @@ def __basicOptionValidation():
 
     if conf.tor and conf.ignoreProxy:
         errMsg = "switch --tor is incompatible with switch --ignore-proxy"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.tor and conf.proxy:
+        errMsg = "switch --tor is incompatible with switch --proxy"
         raise sqlmapSyntaxException, errMsg
 
     if conf.mobile and conf.agent:

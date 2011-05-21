@@ -401,14 +401,13 @@ class Connect:
                 if kb.originalPage is None:
                     if conf.tor:
                         warnMsg = "please make sure that you have "
-                        warnMsg += "some kind of Vidalia/Privoxy/Polipo "
-                        warnMsg += "Tor proxy bundle installed for "
+                        warnMsg += "Tor installed and running for "
                         warnMsg += "you to be able to successfully use "
                         warnMsg += "--tor switch "
                         if IS_WIN:
-                            warnMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
+                            warnMsg += "(e.g. https://www.torproject.org/download/download.html.en)"
                         else:
-                            warnMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
+                            warnMsg += "(e.g. https://help.ubuntu.com/community/Tor)"
                         singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.TOR)
                     else:
                         warnMsg = "if the problem persists please try to rerun "
