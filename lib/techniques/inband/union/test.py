@@ -206,6 +206,11 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
         validPayload, vector = __unionConfirm(comment, place, parameter, value, prefix, suffix, count)
 
+        if not all([validPayload, vector]) and not conf.uChar:
+            warnMsg = "please consider usage of --union-char option "
+            warnMsg += "(e.g. --union-char=1) to make it work"
+            logger.warn(warnMsg)
+
     return validPayload, vector
 
 def unionTest(comment, place, parameter, value, prefix, suffix):
