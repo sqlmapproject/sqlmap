@@ -131,14 +131,6 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
             removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
             payload, True) or "")
 
-        unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
-
-        if unionErrorCase:
-            warnMsg = "combined UNION/ERROR SQL injection case found on "
-            warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
-            warnMsg += "column with better characteristics"
-            logger.warn(warnMsg)
-
         if content and phrase in content:
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, kb.uChar, where)
@@ -161,7 +153,14 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 if content and ((phrase in content and phrase2 not in content) or (phrase not in content and phrase2 in content)):
                     vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE)
 
-            if not unionErrorCase:
+            unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
+
+            if unionErrorCase:
+                warnMsg = "combined UNION/ERROR SQL injection case found on "
+                warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
+                warnMsg += "column with better characteristics"
+                logger.warn(warnMsg)
+            else:
                 break
 
     return validPayload, vector
