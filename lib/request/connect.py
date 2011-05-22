@@ -100,7 +100,7 @@ class Connect:
         raise404 = kwargs.get('raise404',           True)
         auxHeaders = kwargs.get('auxHeaders',       None)
         response = kwargs.get('response',           False)
-        ignoreTimeout = kwargs.get('ignoreTimeout', False)
+        ignoreTimeout = kwargs.get('ignoreTimeout', kb.ignoreTimeout)
         refreshing = kwargs.get('refreshing',       False)
 
         # flag to know if we are dealing with the same target host

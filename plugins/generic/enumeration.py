@@ -789,7 +789,7 @@ class Enumeration:
 
                 return kb.data.cachedTables
 
-            message = "do you want to use common table existance check? [Y/n/q]"
+            message = "do you want to use common table existence check? [Y/n/q]"
             test = readInput(message, default="Y")
 
             if test[0] in ("n", "N"):
@@ -999,7 +999,7 @@ class Enumeration:
 
                 return kb.data.cachedColumns
 
-            message = "do you want to use common columns existance check? [Y/n/q]"
+            message = "do you want to use common columns existence check? [Y/n/q]"
             test = readInput(message, default="Y")
 
             if test[0] in ("n", "N"):
@@ -1871,7 +1871,7 @@ class Enumeration:
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common table existance check? [Y/n/q]"
+            message = "do you want to use common table existence check? [Y/n/q]"
             test = readInput(message, default="Y")
 
             if test[0] in ("n", "N"):
@@ -2026,7 +2026,7 @@ class Enumeration:
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common columns existance check? [Y/n/q]"
+            message = "do you want to use common columns existence check? [Y/n/q]"
             test = readInput(message, default="Y")
 
             if test[0] in ("n", "N"):

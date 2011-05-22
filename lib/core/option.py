@@ -1354,6 +1354,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.headersFp = {}
     kb.hintValue = None
     kb.htmlFp = []
+    kb.ignoreTimeout = False
     kb.injection = injectionDict()
     kb.injections = []
 

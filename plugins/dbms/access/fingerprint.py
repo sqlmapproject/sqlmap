@@ -50,7 +50,7 @@ class Fingerprint(GenericFingerprint):
         return retVal
 
     def __sysTablesCheck(self):
-        infoMsg = "executing system table(s) existance fingerprint"
+        infoMsg = "executing system table(s) existence fingerprint"
         logger.info(infoMsg)
 
         # Microsoft Access table reference updated on 01/2010
