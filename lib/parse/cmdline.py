@@ -552,6 +552,9 @@ def cmdLineParser():
         parser.add_option("--group-concat", dest="groupConcat", action="store_true",
                            default=False, help=SUPPRESS_HELP)
 
+        parser.add_option("--no-cast", dest="noCast", action="store_true",
+                           default=False, help=SUPPRESS_HELP)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(optimization)

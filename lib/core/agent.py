@@ -288,7 +288,7 @@ class Agent:
         if field.startswith("(CASE"):
             nulledCastedField = field
         else:
-            nulledCastedField = queries[Backend.getIdentifiedDbms()].cast.query % field
+            nulledCastedField = (queries[Backend.getIdentifiedDbms()].cast.query % field) if not conf.noCast else field
             if Backend.isDbms(DBMS.ACCESS):
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].isnull.query % (nulledCastedField, nulledCastedField)
             else:

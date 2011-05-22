@@ -95,6 +95,7 @@ class HTTPHEADER:
     USER_AGENT = "User-Agent"
 
 class WARNFLAGS:
+    NO_CAST = 'noCast'
     RANDOM_AGENT = 'randomAgent'
     DATA_TO_STDOUT = 'dataToStdout'
     THREADS = 'threads'

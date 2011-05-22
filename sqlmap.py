@@ -61,7 +61,8 @@ def main():
     """
     Main function of sqlmap when running from command line.
     """
-
+    import random
+    random.seed(456)
     paths.SQLMAP_ROOT_PATH = modulePath()
     setPaths()
     banner()
