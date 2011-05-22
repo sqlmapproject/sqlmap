@@ -86,10 +86,7 @@ class Connect:
         threadData = getCurrentThreadData()
         threadData.lastRequestUID += 1
 
-        # dirty hack because urllib2 just skips the other part of provided url
-        # splitted with space char while urlencoding it in the later phase
-        url = kwargs.get('url',                     conf.url).replace(" ", "%20")
-
+        url = kwargs.get('url',                     conf.url)
         get = kwargs.get('get',                     None)
         post = kwargs.get('post',                   None)
         method = kwargs.get('method',               None)
@@ -105,7 +102,13 @@ class Connect:
         response = kwargs.get('response',           False)
         ignoreTimeout = kwargs.get('ignoreTimeout', False)
         refreshing = kwargs.get('refreshing',       False)
-        target = kwargs.get('target',               True)
+
+        # flag to know if we are dealing with the same target host
+        target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
+
+        # fix for known issue when urllib2 just skips the other part of provided
+        # url splitted with space char while urlencoding it in the later phase
+        url = url.replace(" ", "%20")
 
         page = ""
         cookieStr = ""
@@ -116,7 +119,7 @@ class Connect:
         responseHeaders = None
         logHeaders = ""
 
-        # there are known issues when using url in unicode format
+        # fix for known issues when using url in unicode format
         # (e.g. UnicodeDecodeError: "url = url + '?' + query" in redirect case)
         url = unicodeencode(url)
 
