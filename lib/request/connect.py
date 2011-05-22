@@ -395,7 +395,7 @@ class Connect:
                 return None, None
             elif kb.testMode:
                 logger.warn(warnMsg)
-                return None
+                return None, None
             elif silent or (ignoreTimeout and any(map(lambda x: x in tbMsg, ["timed out", "IncompleteRead"]))):
                 return None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
