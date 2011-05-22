@@ -19,6 +19,7 @@ from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
 from lib.core.common import Backend
 from lib.core.common import getUnicode
+from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import parsePasswordHash
@@ -803,6 +804,10 @@ class Enumeration:
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in dbs))
         logger.info(infoMsg)
 
+        pushValue(kb.ignoreTimeout)
+        # some DBMSes (like MySQL) have (permission related) timeout issues when retrieving table names
+        kb.ignoreTimeout = True
+
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
@@ -896,13 +901,22 @@ class Enumeration:
                 if tables:
                     kb.data.cachedTables[db] = tables
                 else:
-                    warnMsg = "unable to retrieve the tables "
+                    warnMsg = "unable to retrieve the table names "
                     warnMsg += "for database '%s'" % db
                     logger.warn(warnMsg)
 
+        kb.ignoreTimeout = popValue()
+
+        if isNoneValue(kb.data.cachedTables):
+            kb.data.cachedTables.clear()
+
         if not kb.data.cachedTables:
-            errMsg = "unable to retrieve the tables for any database"
-            raise sqlmapNoneDataException, errMsg
+            errMsg = "unable to retrieve the table names for any database"
+            if bruteForce is None:
+                logger.error(errMsg)
+                return self.getTables(bruteForce=True)
+            else:
+                raise sqlmapNoneDataException, errMsg
 
         return kb.data.cachedTables
 

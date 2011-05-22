@@ -2573,3 +2573,19 @@ def isBinaryData(value):
     if isinstance(value, basestring):
        retVal = reduce(lambda x, y: x or not (y in string.printable or ord(y) > 255), value, False)
     return retVal
+
+def isNoneValue(value):
+    """
+    Returns whether the value contains implicit 'None' value
+    """
+
+    if isinstance(value, basestring):
+        return value == "None"
+    elif isinstance(value, list):
+        return value == [None]
+    elif isinstance(value, tuple):
+        return value == (None)
+    elif isinstance(value, dict):
+        return len(value) == 1 and any(map(lambda x: x in value, [None, "None"]))
+    else:
+        return value is None

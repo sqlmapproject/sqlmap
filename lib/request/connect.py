@@ -187,7 +187,7 @@ class Connect:
             if kb.proxyAuthHeader:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
-            headers[HTTPHEADER.HOST] = host or urlparse.urlparse(url).netloc
+            headers[HTTPHEADER.HOST] = host or urlparse.urlparse(url).netloc.split(':')[0]
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
