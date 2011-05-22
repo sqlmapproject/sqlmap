@@ -102,9 +102,14 @@ class Connect:
         response = kwargs.get('response',           False)
         ignoreTimeout = kwargs.get('ignoreTimeout', kb.ignoreTimeout)
         refreshing = kwargs.get('refreshing',       False)
+        retrying = kwargs.get('retrying',           False)
 
         # flag to know if we are dealing with the same target host
         target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
+
+        if not retrying:
+            # Reset the number of connection retries
+            threadData.retriesCount = 0
 
         # fix for known issue when urllib2 just skips the other part of provided
         # url splitted with space char while urlencoding it in the later phase
@@ -270,9 +275,6 @@ class Connect:
 
                 conf.redirectHandled = True
 
-            # Reset the number of connection retries
-            threadData.retriesCount = 0
-
             # Return response object
             if response:
                 return conn, None
@@ -425,9 +427,10 @@ class Connect:
                 time.sleep(1)
 
                 socket.setdefaulttimeout(conf.timeout)
+                kwargs['retrying'] = True
                 return Connect.__getPageProxy(**kwargs)
             elif kb.testMode:
-                logger.warn(warnMsg)
+                logger.critical(warnMsg)
                 return None, None
             else:
                 socket.setdefaulttimeout(conf.timeout)
