@@ -804,10 +804,6 @@ class Enumeration:
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in dbs))
         logger.info(infoMsg)
 
-        pushValue(kb.ignoreTimeout)
-        # some DBMSes (like MySQL) have (permission related) timeout issues when retrieving table names
-        kb.ignoreTimeout = True
-
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
@@ -904,8 +900,6 @@ class Enumeration:
                     warnMsg = "unable to retrieve the table names "
                     warnMsg += "for database '%s'" % db
                     logger.warn(warnMsg)
-
-        kb.ignoreTimeout = popValue()
 
         if isNoneValue(kb.data.cachedTables):
             kb.data.cachedTables.clear()
