@@ -393,9 +393,6 @@ class Connect:
             if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
                 return None, None
-            elif kb.testMode:
-                logger.warn(warnMsg)
-                return None, None
             elif silent or (ignoreTimeout and any(map(lambda x: x in tbMsg, ["timed out", "IncompleteRead"]))):
                 return None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
@@ -429,6 +426,9 @@ class Connect:
 
                 socket.setdefaulttimeout(conf.timeout)
                 return Connect.__getPageProxy(**kwargs)
+            elif kb.testMode:
+                logger.warn(warnMsg)
+                return None, None
             else:
                 socket.setdefaulttimeout(conf.timeout)
                 raise sqlmapConnectionException, warnMsg
