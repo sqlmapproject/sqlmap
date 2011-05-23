@@ -1096,6 +1096,9 @@ def expandAsteriskForColumns(expression):
 
         dbTbl = asterisk.group(1)
 
+        if dbTbl and ".." in dbTbl:
+            dbTbl = dbTbl.replace('..', '.dbo.')
+
         if dbTbl and "." in dbTbl:
             conf.db, conf.tbl = dbTbl.split(".", 1)
         else:
