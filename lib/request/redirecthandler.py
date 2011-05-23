@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import urllib2
+import urlparse
 
 from lib.core.data import conf
 from lib.core.data import logger
@@ -51,6 +52,10 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             result.redurl = headers.getheaders("location")[0].split("?")[0]
         elif "uri" in headers:
             result.redurl = headers.getheaders("uri")[0].split("?")[0]
+
+        if hasattr(result, 'redurl'):
+            if result.redurl.startswith('.') or result.redurl.startswith('/'):
+                result.redurl = urlparse.urljoin(conf.url, result.redurl)
 
         if "set-cookie" in headers:
             result.setcookie = headers["set-cookie"].split("; path")[0]

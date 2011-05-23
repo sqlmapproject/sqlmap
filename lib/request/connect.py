@@ -92,7 +92,6 @@ class Connect:
         method = kwargs.get('method',               None)
         cookie = kwargs.get('cookie',               None)
         ua = kwargs.get('ua',                       None)
-        host = kwargs.get('host',                   None)
         referer = kwargs.get('referer',             None)
         direct = kwargs.get('direct',               False)
         multipart = kwargs.get('multipart',         False)
@@ -103,6 +102,7 @@ class Connect:
         ignoreTimeout = kwargs.get('ignoreTimeout', kb.ignoreTimeout)
         refreshing = kwargs.get('refreshing',       False)
         retrying = kwargs.get('retrying',           False)
+        redirecting = kwargs.get('redirecting',     False)
 
         # flag to know if we are dealing with the same target host
         target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
@@ -192,7 +192,7 @@ class Connect:
             if kb.proxyAuthHeader:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
-            headers[HTTPHEADER.HOST] = host or urlparse.urlparse(url).netloc.split(':')[0]
+            headers[HTTPHEADER.HOST] = urlparse.urlparse(url).netloc.split(':')[0]
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
@@ -251,29 +251,20 @@ class Connect:
             if hasattr(conn, "setcookie"):
                 kb.redirectSetCookie = conn.setcookie
 
-            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and target and not conf.redirectHandled and not conf.realTest:
-                msg = "sqlmap got a %d redirect to " % conn.redcode
-                msg += "%s - What target address do you " % conn.redurl
-                msg += "want to use from now on? %s " % conf.url
-                msg += "(default) or provide another target address based "
-                msg += "also on the redirection got from the application\n"
+            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and target\
+              and not redirecting and not conf.realTest:
 
-                while True:
-                    choice = readInput(msg, default=None)
+                if kb.alwaysRedirect is None:
+                    msg = "sqlmap got a %d redirect to " % conn.redcode
+                    msg += "'%s'. do you want to follow redirects " % conn.redurl
+                    msg += "from now on (or stay on the original page)? [Y/n]"
+                    choice = readInput(msg, default="Y")
 
-                    if not choice:
-                        pass
-                    else:
-                        conf.url = choice
-                        try:
-                            parseTargetUrl()
-                            return Connect.__getPageProxy(**kwargs)
-                        except sqlmapSyntaxException:
-                            continue
+                    kb.alwaysRedirect = choice in ("n", "N")
 
-                    break
-
-                conf.redirectHandled = True
+                kwargs['url'] = conn.redurl if kb.alwaysRedirect else conf.url
+                kwargs['redirecting'] = True
+                return Connect.__getPageProxy(**kwargs)
 
             # Return response object
             if response:

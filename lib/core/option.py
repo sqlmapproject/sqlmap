@@ -1301,7 +1301,6 @@ def __setConfAttributes():
     conf.parameters = {}
     conf.path = None
     conf.port = None
-    conf.redirectHandled = False
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
@@ -1322,6 +1321,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.absFilePaths = set()
     kb.adjustTimeDelay = False
+    kb.alwaysRedirect = None
     kb.arch = None
     kb.authHeader = None
     kb.bannerFp = advancedDict()
