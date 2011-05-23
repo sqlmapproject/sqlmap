@@ -301,7 +301,7 @@ class Web:
                         else:
                             continue
 
-                    self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
+                    self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), backdoorName)
                     self.webDirectory = localPath
 
                 infoMsg = "the backdoor has probably been successfully "
