@@ -1527,37 +1527,40 @@ class Enumeration:
                     if not entries and query:
                         entries = inject.getValue(query, blind=False, dump=True)
 
-                    if entries:
-                        if isinstance(entries, basestring):
-                            entries = [ entries ]
+                    if isNoneValue(entries):
+                        entries = []
+                    elif isinstance(entries, basestring):
+                        entries = [ entries ]
+                    elif not isinstance(entries, (list, tuple)):
+                        entries = []
 
-                        entriesCount = len(entries)
-                        index = 0
+                    entriesCount = len(entries)
+                    index = 0
 
-                        for column in colList:
-                            colLen = len(column)
+                    for column in colList:
+                        colLen = len(column)
 
-                            if not kb.data.dumpedTable.has_key(column):
-                                kb.data.dumpedTable[column] = { "length": 0, "values": [] }
+                        if not kb.data.dumpedTable.has_key(column):
+                            kb.data.dumpedTable[column] = { "length": colLen, "values": [] }
 
-                            for entry in entries:
-                                if entry is None or len(entry) == 0:
-                                    continue
+                        for entry in entries:
+                            if entry is None or len(entry) == 0:
+                                continue
 
-                                if isinstance(entry, basestring):
-                                    colEntry = entry
-                                else:
-                                    colEntry = entry[index] if index < len(entry) else u''
+                            if isinstance(entry, basestring):
+                                colEntry = entry
+                            else:
+                                colEntry = entry[index] if index < len(entry) else u''
 
-                                colEntryLen = len(getUnicode(colEntry))
-                                maxLen = max(colLen, colEntryLen)
+                            colEntryLen = len(getUnicode(colEntry))
+                            maxLen = max(colLen, colEntryLen)
 
-                                if maxLen > kb.data.dumpedTable[column]["length"]:
-                                    kb.data.dumpedTable[column]["length"] = maxLen
+                            if maxLen > kb.data.dumpedTable[column]["length"]:
+                                kb.data.dumpedTable[column]["length"] = maxLen
 
-                                kb.data.dumpedTable[column]["values"].append(colEntry)
+                            kb.data.dumpedTable[column]["values"].append(colEntry)
 
-                            index += 1
+                        index += 1
 
                 if not kb.data.dumpedTable and not conf.direct:
                     infoMsg = "fetching number of "
@@ -1579,7 +1582,20 @@ class Enumeration:
                         query = rootQuery.blind.count % (conf.db, tbl)
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
-                    if not isNumPosStrValue(count):
+                    lengths = {}
+                    entries = {}
+
+                    if count == "0":
+                        warnMsg  = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                        warnMsg += "on database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
+                        warnMsg += "appears to be empty"
+                        logger.warn(warnMsg)
+
+                        for column in colList:
+                            lengths[column] = len(column)
+                            entries[column] = []
+
+                    elif not isNumPosStrValue(count):
                         warnMsg = "unable to retrieve the number of "
                         if conf.col:
                             warnMsg += "columns '%s' " % colString
@@ -1589,10 +1605,7 @@ class Enumeration:
 
                         continue
 
-                    lengths = {}
-                    entries = {}
-
-                    if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL):
+                    elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL):
                         if Backend.isDbms(DBMS.ACCESS):
                             table = tbl
                         elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
