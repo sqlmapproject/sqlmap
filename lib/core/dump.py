@@ -66,6 +66,9 @@ class Dump:
         if data:
             data = self.__formatString(data)
 
+            if data[-1] == '\n':
+                data = data[:-1]
+
             if "\n" in data:
                 self.__write("%s:\n---\n%s\n---\n" % (header, data))
             else:
