@@ -1319,10 +1319,17 @@ class Enumeration:
             else:
                 count = inject.getValue(query, blind=False)
 
-        if not count or count == "0":
-            infoMsg = "table '%s' is empty" % table
+        if count == "0":
+            infoMsg = "table '%s' appears to be empty" % table
             logger.info(infoMsg)
-            return entries
+
+            for column in colList:
+                lengths[column] = len(column)
+                entries[column] = []
+
+            return entries, lengths
+        elif not count:
+            return None
 
         for column in colList:
             lengths[column] = 0
@@ -1511,7 +1518,7 @@ class Enumeration:
                         query = rootQuery.inband.query % (colString, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         # Partial inband and error
-                        if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
+                        if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL) and not any([conf.limitStart, conf.limitStop]):
                             table = "%s.%s" % (conf.db, tbl)
 
                             retVal = self.__pivotDumpTable(table, colList, blind=False)
