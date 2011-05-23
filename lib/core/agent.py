@@ -198,7 +198,7 @@ class Agent:
         elif suffix is not None:
             expression += " %s" % suffix
 
-        return expression.rstrip()
+        return expression
 
     def cleanupPayload(self, payload, origValue=None):
         if payload is None:
