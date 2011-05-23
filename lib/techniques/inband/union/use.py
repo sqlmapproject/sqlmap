@@ -88,7 +88,7 @@ def __oneShotUnionUse(expression, unpack=True):
             warnMsg += trimmed
             logger.warn(warnMsg)
         elif Backend.isDbms(DBMS.MYSQL):
-            warnMsg = "if the problem persists with 'None' values please try to use  "
+            warnMsg = "if the problem persists with 'None' values please try to use "
             warnMsg += "hidden switch --no-cast (fixing problems with some collation "
             warnMsg += "issues)"
             singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.NO_CAST)
