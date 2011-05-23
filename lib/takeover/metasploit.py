@@ -398,8 +398,9 @@ class Metasploit:
 
         if not Backend.isOs(OS.WINDOWS):
             self.execCmd("chmod +x %s" % self.shellcodeexecRemote, silent=True)
-
-        cmd = "%s %s &" % (self.shellcodeexecRemote, self.shellcodeString)
+            cmd = "%s %s &" % (self.shellcodeexecRemote, self.shellcodeString)
+        else:
+            cmd = "\"%s\" %s" % (self.shellcodeexecRemote, self.shellcodeString)
 
         self.execCmd(cmd, silent=True)
 
