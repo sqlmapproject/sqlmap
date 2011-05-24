@@ -104,6 +104,9 @@ class Connect:
         retrying = kwargs.get('retrying',           False)
         redirecting = kwargs.get('redirecting',     False)
 
+        if not urlparse.urlsplit(url).netloc:
+            url = urlparse.urljoin(conf.url, url)
+
         # flag to know if we are dealing with the same target host
         target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
 

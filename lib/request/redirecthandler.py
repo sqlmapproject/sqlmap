@@ -54,7 +54,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             result.redurl = headers.getheaders("uri")[0].split("?")[0]
 
         if hasattr(result, 'redurl'):
-            if result.redurl.startswith('.') or result.redurl.startswith('/'):
+            if not urlparse.urlsplit(result.redurl).netloc:
                 result.redurl = urlparse.urljoin(conf.url, result.redurl)
 
         if "set-cookie" in headers:
