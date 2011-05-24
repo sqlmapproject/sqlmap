@@ -17,6 +17,7 @@ import urlparse
 import traceback
 
 from extra.multipart import multipartpost
+from extra.socks.socks import GeneralProxyError
 from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
@@ -361,7 +362,7 @@ class Connect:
                 page = processResponse(page, responseHeaders)
                 return page, responseHeaders
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, GeneralProxyError), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
