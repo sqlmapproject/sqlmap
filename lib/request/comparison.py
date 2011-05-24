@@ -72,7 +72,10 @@ def comparison(page, getRatioValue=False, pageLength=None):
     else:
         seqMatcher.set_seq1(getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a)
         seqMatcher.set_seq2(getFilteredPageContent(page, True) if conf.textOnly else page)
-        ratio = round(seqMatcher.quick_ratio(), 3)
+        if seqMatcher.a is None or seqMatcher.b is None:
+            ratio = None
+        else:
+            ratio = round(seqMatcher.quick_ratio(), 3)
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
