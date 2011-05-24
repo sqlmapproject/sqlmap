@@ -88,5 +88,5 @@ def update():
         if IS_WIN:
             infoMsg = "for Windows platform it's recommended "
             infoMsg += "to use a TortoiseSVN GUI client for updating "
-            infoMsg += "purposes (http://tortoisesvn.net/)"
+            infoMsg += "purposes (http://tortoisesvn.net/downloads.html)"
             logger.info(infoMsg)
