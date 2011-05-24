@@ -40,6 +40,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import exceptionsTuple
+from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
@@ -392,9 +393,11 @@ def start():
                         if not proceed:
                             break
 
-                        testSqlInj = True
+                        kb.vainRun = False
 
                         paramKey = (conf.hostname, conf.path, place, parameter)
+
+                        testSqlInj = True
 
                         if paramKey in kb.testedParams:
                             testSqlInj = False
@@ -458,7 +461,11 @@ def start():
                                 logger.warn(warnMsg)
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
-                if not conf.realTest:
+                if kb.vainRun and not conf.multipleTargets:
+                    errMsg = "no testable parameter(s) found in the provided data "
+                    errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
+                    raise sqlmapNoneDataException, errMsg
+                elif not conf.realTest:
                     errMsg = "all parameters are not injectable."
 
                     if conf.level < 5 or conf.risk < 3:

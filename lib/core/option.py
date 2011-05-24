@@ -1383,7 +1383,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.suppressSession = False
     kb.suppressResumeInfo = False
     kb.technique = None
-    kb.tested = []
     kb.testMode = False
     kb.testQueryCount = 0
     kb.threadContinue = True
@@ -1406,6 +1405,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.targetUrls = oset()
         kb.testedParams = set()
         kb.userAgents = None
+        kb.vainRun = True
         kb.wordlist = None
 
 def __useWizardInterface():
