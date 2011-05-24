@@ -1592,6 +1592,7 @@ def stdev(values):
         avg = average(values)
 
         for value in values:
+            value = value or 0
             summa += pow(value - avg, 2)
 
         retVal = sqrt(summa/(len(values) - 1))
