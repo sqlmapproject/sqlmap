@@ -17,7 +17,6 @@ import urlparse
 import traceback
 
 from extra.multipart import multipartpost
-from extra.socks.socks import GeneralProxyError
 from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
@@ -362,7 +361,7 @@ class Connect:
                 page = processResponse(page, responseHeaders)
                 return page, responseHeaders
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, GeneralProxyError), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
@@ -399,21 +398,10 @@ class Connect:
                 logger.critical(warnMsg)
 
                 if kb.originalPage is None:
-                    if conf.tor:
-                        warnMsg = "please make sure that you have "
-                        warnMsg += "Tor installed and running for "
-                        warnMsg += "you to be able to successfully use "
-                        warnMsg += "--tor switch "
-                        if IS_WIN:
-                            warnMsg += "(e.g. https://www.torproject.org/download/download.html.en)"
-                        else:
-                            warnMsg += "(e.g. https://help.ubuntu.com/community/Tor)"
-                        singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.TOR)
-                    else:
-                        warnMsg = "if the problem persists please try to rerun "
-                        warnMsg += "with the --random-agent switch turned on "
-                        warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
-                        singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
+                    warnMsg = "if the problem persists please try to rerun "
+                    warnMsg += "with the --random-agent switch turned on "
+                    warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
+                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
                 elif conf.threads > 1:
                     warnMsg = "if the problem persists please try to lower "
                     warnMsg += "the number of used threads (--threads)"

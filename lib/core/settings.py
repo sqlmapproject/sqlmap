@@ -333,3 +333,9 @@ CODECS_LIST_PAGE = 'http://docs.python.org/library/codecs.html#standard-encoding
 
 # Simple regular expression used to distinguish scalar from multiple-row commands (not sole condition)
 SQL_SCALAR_REGEX = r"\A(SELECT(?!\s+DISTINCT\(?))?\s*\w*\("
+
+# IP address of the localhost
+LOCALHOST = "127.0.0.1"
+
+# Default ports used in Tor proxy bundles
+DEFAULT_TOR_PORTS = (8118, 8123)

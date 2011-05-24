@@ -99,7 +99,6 @@ class WARNFLAGS:
     RANDOM_AGENT = 'randomAgent'
     DATA_TO_STDOUT = 'dataToStdout'
     THREADS = 'threads'
-    TOR = 'tor'
 
 class EXPECTED:
     BOOL = "bool"

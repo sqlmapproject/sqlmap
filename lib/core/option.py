@@ -62,6 +62,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
+from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapMissingDependence
@@ -74,6 +75,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import DEFAULT_PAGE_ENCODING
+from lib.core.settings import DEFAULT_TOR_PORTS
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
@@ -92,6 +94,7 @@ from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import BURP_SPLITTER
+from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_DELAY_CANDIDATES
@@ -1241,13 +1244,6 @@ def __cleanupOptions():
         conf.nullConnection = not conf.textOnly
         conf.threads = 3 if conf.threads < 3 else conf.threads
 
-    if conf.tor:
-        infoMsg = "setting Tor socks settings"
-        logger.info(infoMsg)
-
-        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, 'localhost', 9050)
-        socks.wrapmodule(urllib2)
-
     if conf.data:
         conf.data = urldecode(conf.data)
 
@@ -1575,6 +1571,42 @@ def __setTrafficOutputFP():
     if conf.trafficFile:
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
+def __setTorProxySettings():
+    if not conf.tor:
+        return
+
+    infoMsg = "setting Tor proxy settings"
+    logger.info(infoMsg)
+
+    found = None
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    for port in DEFAULT_TOR_PORTS:
+        try:
+            s.connect((LOCALHOST, port))
+            found = port
+            break
+        except socket.error:
+            pass
+
+    s.close()
+
+    if found:
+        conf.proxy = "http://%s:%d" % (LOCALHOST, found)
+    else:
+        errMsg = "can't establish connection with the Tor proxy. "
+        errMsg += "please make sure that you have "
+        errMsg += "some kind of Vidalia/Privoxy/Polipo "
+        errMsg += "Tor proxy bundle installed for "
+        errMsg += "you to be able to successfully use "
+        errMsg += "--tor switch "
+        if IS_WIN:
+            errMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
+        else:
+            errMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
+
+        raise sqlmapConnectionException, errMsg
+
 def __basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
         errMsg = "value for --start (limitStart) option must be an integer value greater than zero (>0)"
@@ -1670,6 +1702,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     __setRequestFromFile()
     __cleanupOptions()
     __basicOptionValidation()
+    __setTorProxySettings()
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()
