@@ -1426,11 +1426,11 @@ def __useWizardInterface():
         message = "POST data (--data) [Enter for None]: "
         conf.data = readInput(message, default=None)
 
-        if any(filter(lambda x: '=' in str(x), [conf.url, conf.data])):
+        if filter(lambda x: '=' in str(x), [conf.url, conf.data]) or '*' in conf.url:
             break
         else:
             conf.url = conf.data = None
-            warnMsg = "no testable parameter(s) found "
+            warnMsg = "no testable GET and/or POST parameter(s) found "
             warnMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
             logger.critical(warnMsg)
     choice = None
