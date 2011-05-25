@@ -530,9 +530,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if len(finalValue) > INFERENCE_BLANK_BREAK and finalValue[-INFERENCE_BLANK_BREAK:].isspace():
                 break
 
-    if finalValue:
-        finalValue = finalValue.rstrip(INFERENCE_UNKNOWN_CHAR)
-
     if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
 

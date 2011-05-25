@@ -9,8 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from difflib import SequenceMatcher
-
 from lib.core.common import getFilteredPageContent
 from lib.core.common import removeDynamicContent
 from lib.core.common import wasLastRequestDBMSError
@@ -19,6 +17,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import MIN_RATIO
 from lib.core.settings import MAX_RATIO
@@ -70,6 +69,13 @@ def comparison(page, getRatioValue=False, pageLength=None):
         if ratio > 1.:
             ratio = 1. / ratio
     else:
+        # Preventing "Unicode equal comparison failed to convert both arguments to Unicode"
+        # (e.g. if one page is PDF and the other is HTML)
+        if isinstance(seqMatcher.a, str) and isinstance(page, unicode):
+            page = page.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING)
+        elif isinstance(seqMatcher.a, unicode) and isinstance(page, str):
+            seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING)
+
         seqMatcher.set_seq1(getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a)
         seqMatcher.set_seq2(getFilteredPageContent(page, True) if conf.textOnly else page)
         if seqMatcher.a is None or seqMatcher.b is None:
