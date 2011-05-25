@@ -134,6 +134,9 @@ def __showInjections():
 
     conf.dumper.technic(header, data)
 
+    infoMsg = "for manual usage GET and POST payloads require url encoding"
+    logger.info(infoMsg)
+
 def __randomFillBlankFields(value):
     retVal = value
 
