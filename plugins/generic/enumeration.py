@@ -1238,9 +1238,9 @@ class Enumeration:
         self.getTables()
 
         infoMsg = "fetched tables: "
-        infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (db, ".." if \
+        infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (unsafeSQLIdentificatorNaming(db), ".." if \
                    Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) \
-                   else ".", t) for t in tbl) for db, tbl in \
+                   else ".", unsafeSQLIdentificatorNaming(t)) for t in tbl) for db, tbl in \
                    kb.data.cachedTables.items()])
         logger.info(infoMsg)
 
