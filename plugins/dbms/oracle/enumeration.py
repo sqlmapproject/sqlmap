@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import getRange
+from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import safeSQLIdentificatorNaming
@@ -64,7 +65,7 @@ class Enumeration(GenericEnumeration):
 
                 return self.getRoles(query2=True)
 
-            if values:
+            if not isNoneValue(values):
                 for value in values:
                     user = None
                     roles = set()
@@ -204,7 +205,7 @@ class Enumeration(GenericEnumeration):
                     query += colQuery
                     values = inject.getValue(query, blind=False)
 
-                    if values:
+                    if not isNoneValue(values):
                         if isinstance(values, basestring):
                             values = [ values ]
 

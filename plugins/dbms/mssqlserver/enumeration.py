@@ -11,6 +11,7 @@ from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import getRange
+from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import safeSQLIdentificatorNaming
@@ -93,7 +94,7 @@ class Enumeration(GenericEnumeration):
                 query = rootQuery.inband.query % db
                 value = inject.getValue(query, blind=False)
 
-                if value:
+                if not isNoneValue(value):
                     kb.data.cachedTables[db] = arrayizeValue(value)
 
         if not kb.data.cachedTables and not conf.direct:
@@ -186,7 +187,7 @@ class Enumeration(GenericEnumeration):
                     query += tblQuery
                     values = inject.getValue(query, blind=False)
 
-                    if values:
+                    if not isNoneValue(values):
                         if isinstance(values, basestring):
                             values = [ values ]
 
@@ -279,7 +280,7 @@ class Enumeration(GenericEnumeration):
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     values = inject.getValue(query, blind=False)
 
-                    if values:
+                    if not isNoneValue(values):
                         if isinstance(values, basestring):
                             values = [ values ]
 

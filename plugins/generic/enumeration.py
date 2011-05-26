@@ -175,7 +175,7 @@ class Enumeration:
                 query = rootQuery.inband.query
             value = inject.getValue(query, blind=False)
 
-            if value:
+            if not isNoneValue(value):
                 kb.data.cachedUsers = arrayizeValue(value)
 
         if not kb.data.cachedUsers and not conf.direct:
@@ -272,7 +272,7 @@ class Enumeration:
             else:
                 value = inject.getValue(query, blind=False)
 
-                if value:
+                if not isNoneValue(value):
                     for user, password in value:
                         if not user or user == " ":
                             continue
@@ -467,7 +467,7 @@ class Enumeration:
 
                 return self.getPrivileges(query2=True)
 
-            if values:
+            if not isNoneValue(values):
                 for value in values:
                     user = None
                     privileges = set()
@@ -683,7 +683,7 @@ class Enumeration:
                 query = rootQuery.inband.query
             value = inject.getValue(query, blind=False)
 
-            if value:
+            if not isNoneValue(value):
                 kb.data.cachedDbs = arrayizeValue(value)
 
         if not kb.data.cachedDbs and not conf.direct:
@@ -826,7 +826,7 @@ class Enumeration:
             value = inject.getValue(query, blind=False)
             value = filter(lambda x: x, value)
 
-            if value:
+            if not isNoneValue(value):
                 if Backend.isDbms(DBMS.SQLITE):
                     if isinstance(value, basestring):
                         value = [[ DBMS.SQLITE, value ]]
@@ -1073,12 +1073,12 @@ class Enumeration:
 
                 if Backend.isDbms(DBMS.SQLITE):
                     parseSqliteTableSchema(value)
-                elif value:
+                elif not isNoneValue(value):
                     table = {}
                     columns = {}
 
                     for columnData in value:
-                        if columnData[0] is not None:
+                        if not isNoneValue(columnData):
                             name = safeSQLIdentificatorNaming(columnData[0])
 
                             if len(columnData) == 1:
@@ -1836,7 +1836,7 @@ class Enumeration:
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
 
-                if values:
+                if not isNoneValue(values):
                     if isinstance(values, basestring):
                         values = [ values ]
 
@@ -1946,7 +1946,7 @@ class Enumeration:
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
 
-                if values:
+                if not isNoneValue(values):
                     if isinstance(values, basestring):
                         values = [ values ]
 
@@ -2109,7 +2109,7 @@ class Enumeration:
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
 
-                if values:
+                if not isNoneValue(values):
                     if isinstance(values, basestring):
                         values = [ values ]
 
