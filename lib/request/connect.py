@@ -226,7 +226,7 @@ class Connect:
             if not req.has_header(HTTPHEADER.ACCEPT_ENCODING):
                 requestHeaders += "%s: identity\n" % HTTPHEADER.ACCEPT_ENCODING
 
-            requestHeaders += "\n".join(["%s: %s" % (header, value) for header, value in req.header_items()])
+            requestHeaders += "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items()])
 
             if not req.has_header(HTTPHEADER.COOKIE) and cookieStr:
                 requestHeaders += "\n%s" % cookieStr[:-2]
