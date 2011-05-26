@@ -405,7 +405,7 @@ class Connect:
                     warnMsg += "from previous timed based payload. if the problem "
                     warnMsg += "persists please wait for few minutes and rerun "
                     warnMsg += "without flag T in --technique option "
-                    warnMsg += "(e.g. --technique=BEUS)"
+                    warnMsg += "(e.g. --flush-session --technique=BEUS)"
                     singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.TIME_UNRECOVERED)                
                 elif kb.originalPage is None:
                     warnMsg = "if the problem persists please try to rerun "
