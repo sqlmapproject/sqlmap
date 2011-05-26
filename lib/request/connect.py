@@ -42,6 +42,7 @@ from lib.core.data import logger
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
+from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapConnectionException
@@ -397,7 +398,16 @@ class Connect:
                 warnMsg += ", sqlmap is going to retry the request"
                 logger.critical(warnMsg)
 
-                if kb.originalPage is None:
+                if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
+                    # timed based payloads can cause web server unresponsiveness
+                    # if the injectable piece of code is some kind of JOIN-like query
+                    warnMsg = "most probably web server instance hasn't recovered yet "
+                    warnMsg += "from previous timed based payload. if the problem "
+                    warnMsg += "persists please wait for few minutes and rerun "
+                    warnMsg += "without flag T in --technique option "
+                    warnMsg += "(e.g. --technique=BEUS)"
+                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.TIME_UNRECOVERED)                
+                elif kb.originalPage is None:
                     warnMsg = "if the problem persists please try to rerun "
                     warnMsg += "with the --random-agent switch turned on "
                     warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"

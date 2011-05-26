@@ -414,6 +414,8 @@ def checkSqlInjection(place, parameter, value):
                                 # by unionTest() directly
                                 where = vector[6]
 
+                        kb.previousMethod = method
+
                     # If the injection test was successful feed the injection
                     # object with the test's details
                     if injectable is True:

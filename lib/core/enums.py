@@ -100,6 +100,7 @@ class WARNFLAGS:
     DATA_TO_STDOUT = 'dataToStdout'
     THREADS = 'threads'
     PIVOT_LIMIT = 'pivotLimit'
+    TIME_UNRECOVERED = 'timeUnrecovered'
 
 class EXPECTED:
     BOOL = "bool"
