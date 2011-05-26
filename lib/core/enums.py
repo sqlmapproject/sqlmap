@@ -99,6 +99,7 @@ class WARNFLAGS:
     RANDOM_AGENT = 'randomAgent'
     DATA_TO_STDOUT = 'dataToStdout'
     THREADS = 'threads'
+    PIVOT_LIMIT = 'pivotLimit'
 
 class EXPECTED:
     BOOL = "bool"

@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import logging
 import re
 import time
 
@@ -30,6 +31,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import strToHex
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -47,6 +49,7 @@ from lib.core.dicts import firebirdPrivs
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
+from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
@@ -1404,6 +1407,9 @@ class Enumeration:
 
                     if all([conf.limitStart, conf.limitStop]):
                         if (i + 1) < conf.limitStart:
+                            warnMsg  = "skipping first %d pivot " % conf.limitStart
+                            warnMsg += "point values"
+                            singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.PIVOT_LIMIT)
                             break
                         elif (i + 1) > conf.limitStop:
                             breakRetrieval = True
