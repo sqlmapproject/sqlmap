@@ -131,8 +131,8 @@ def checkSqlInjection(place, parameter, value):
             # value
             # Parse test's <risk>
             if test.risk > conf.risk:
-                debugMsg = "skipping test '%s' because the risk " % title
-                debugMsg += "is higher than the provided"
+                debugMsg = "skipping test '%s' because the risk (%d) " % (title, test.risk)
+                debugMsg += "is higher than the provided (%d)" % conf.risk
                 logger.debug(debugMsg)
                 continue
 
@@ -140,9 +140,8 @@ def checkSqlInjection(place, parameter, value):
             # value
             # Parse test's <level>
             if test.level > conf.level:
-                debugMsg = "skipping test '%s' because the level" % title
-                debugMsg += ", %d, is higher than the provided" % test.level
-                debugMsg += ", %d" % conf.level
+                debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
+                debugMsg += "is higher than the provided (%d)" % conf.level
                 logger.debug(debugMsg)
                 continue
 
