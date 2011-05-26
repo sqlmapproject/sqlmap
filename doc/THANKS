@@ -175,6 +175,9 @@ Kristian Erik Hermansen <kristian.hermansen@gmail.com>
 Alexander Hagenah <ah@primepage.de>
     for reporting a minor bug
 
+Dennis Hecken <mail@8dh.de>
+    for reporting a minor bug
+
 Jorge Hoya <aquinadie@gmail.com>
     for suggesting a minor enhancement
 
@@ -368,7 +371,7 @@ Tomoyuki Sakurai <cherry@trombik.org>
     for submitting to the FreeBSD project the sqlmap 0.5 port
 
 Pedro Jacques Santos Santiago <pedro__jacques@hotmail.com>
-    for reporting several bugs
+    for reporting considerable amount of bugs
 
 Marek Sarvas <marek.sarvas@gmail.com>
     for reporting several bugs
