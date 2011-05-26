@@ -491,7 +491,8 @@ def start():
                             errMsg += "page content is text)."
                         elif percent < LOW_TEXT_PERCENT:
                             errMsg = " Please retry with the --text-only switch "
-                            errMsg += "as this case looks like a perfect candidate "
+                            errMsg += "(along with --technique=BU) as this case "
+                            errMsg += "looks like a perfect candidate "
                             errMsg += "(low textual content along with inability "
                             errMsg += "of comparison engine to detect at least "
                             errMsg += "one dynamic parameter)."
