@@ -1402,6 +1402,13 @@ class Enumeration:
                         else:
                             pivotValue = safechardecode(value)
 
+                    if all([conf.limitStart, conf.limitStop]):
+                        if (i + 1) < conf.limitStart:
+                            break
+                        elif (i + 1) > conf.limitStop:
+                            breakRetrieval = True
+                            break
+
                     lengths[column] = max(lengths[column], len(value) if value else 0)
                     entries[column].append(value)
 
@@ -1518,7 +1525,7 @@ class Enumeration:
                         query = rootQuery.inband.query % (colString, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         # Partial inband and error
-                        if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL) and not any([conf.limitStart, conf.limitStop]):
+                        if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
                             retVal = self.__pivotDumpTable(table, colList, blind=False)
