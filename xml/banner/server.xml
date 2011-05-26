@@ -129,7 +129,7 @@
     </regexp>
 
     <regexp value="Apache/2\.2\.16 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="6.0" codename="testing squeeze|unstable sid"/>
+        <info type="Linux" distrib="Debian" release="6.0" codename="squeeze"/>
     </regexp>
 
     <!-- Apache: Fedora -->
@@ -204,6 +204,14 @@
 
     <regexp value="Apache/2\.2\.15 \(Fedora\)">
         <info type="Linux" distrib="Fedora" release="13" codename="Goddard"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.16 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="14" codename="Laughlin"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.17 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="15" codename="Lovelock"/>
     </regexp>
 
     <!-- Apache: FreeBSD -->
@@ -290,6 +298,14 @@
 
     <regexp value="Apache/2\.2\.15 \(FreeBSD\)">
         <info type="Linux" distrib="FreeBSD" release="8.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.17 \(FreeBSD\)">
+        <info type="Linux" distrib="FreeBSD" release="8.2"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.18 \(FreeBSD\)">
+        <info type="Linux" distrib="FreeBSD" release="8 stable|9 current"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
@@ -395,7 +411,11 @@
     </regexp>
 
     <regexp value="Apache/2\.2\.15 \(Mandriva Linux/">
-        <info type="Linux" distrib="Mandriva" release="2010.1"/>
+        <info type="Linux" distrib="Mandriva" release="2010.1|2010.2"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.19 \(Mandriva Linux/">
+        <info type="Linux" distrib="Mandriva" release="Cooker"/>
     </regexp>
 
     <!-- Apache: Red Hat -->
@@ -423,23 +443,23 @@
     <regexp value="Apache/1\.3\.9 \(Unix\)  \(Red Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="6.1" codename="Cartman"/>
     </regexp>
-    
+
     <regexp value="Apache/1\.3\.12 \(Unix\)  \(Red Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="6.2|7.0" codename="Zoot|Guinness"/>
     </regexp>
-	
+
     <regexp value="Apache/1\.3\.19 \(Unix\)  \(Red-Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="7.1" codename="Seawolf"/>
     </regexp>
- 	
+
     <regexp value="Apache/1\.3\.20 \(Unix\)  \(Red-Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="7.2" codename="Enigma"/>
     </regexp>
- 	
+
     <regexp value="Apache/1\.3\.23 \(Unix\)  \(Red-Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="7.3" codename="Valhalla"/>
     </regexp>
- 	
+
  	<regexp value="Apache/1\.3\.27 \(Unix\)  \(Red-Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="7.1|7.2|7.3" codename="Seawolf|Enigma|Valhalla" updated="True"/>
     </regexp>
@@ -447,7 +467,7 @@
     <regexp value="Apache/2\.0\.40 \(Red Hat Linux\)">
         <info type="Linux" distrib="Red Hat" release="8.0|9" codename="Psyche|Shrike"/>
     </regexp>
-    
+
     <regexp value="Apache/1\.3\.22 \(Unix\)  \(Red-Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="Enterprise 2.1" codename="Panama"/>
     </regexp>
@@ -462,6 +482,10 @@
 
     <regexp value="Apache/2\.2\.3 \(Red Hat\)">
         <info type="Linux" distrib="Red Hat" release="Enterprise 5" codename="Tikanga"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.15 \(Red Hat\)">
+        <info type="Linux" distrib="Red Hat" release="Enterprise 6" codename="Santiago"/>
     </regexp>
 
     <!-- Apache: SuSE -->
@@ -563,6 +587,10 @@
         <info type="Linux" distrib="SuSE" release="11.3"/>
     </regexp>
 
+    <regexp value="Apache/2\.2\.17 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="11.4"/>
+    </regexp>
+
     <!-- Apache: Ubuntu -->
 
     <regexp value="Apache/2\.0\.50 \(Ubuntu\)">
@@ -611,6 +639,10 @@
 
     <regexp value="Apache/2\.2\.16 \(Ubuntu\)">
         <info type="Linux" distrib="Ubuntu" release="10.10" codename="Maverick Meerkat"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.17 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="11.04" codename="Natty Narwhal"/>
     </regexp>
 
     <!-- Nginx -->
