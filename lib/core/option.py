@@ -24,7 +24,6 @@ from extra.clientform.clientform import ParseResponse
 from extra.clientform.clientform import ParseError
 from extra.keepalive import keepalive
 from extra.oset.pyoset import oset
-from extra.socks import socks
 from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
