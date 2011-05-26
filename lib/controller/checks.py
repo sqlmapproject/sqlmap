@@ -502,7 +502,7 @@ def checkSqlInjection(place, parameter, value):
 
 def checkFalsePositives(injection):
     """
-    Checks for false positives
+    Checks for false positives (only in single special cases)
     """
 
     retVal = injection
@@ -521,7 +521,8 @@ def checkFalsePositives(injection):
         while randInt1 == randInt2:
             randInt2 = int(randomInt(2)) + 1
 
-        # simple arithmetic operations like in Turing tests
+        # simple arithmetic operations which should show basic
+        # arithmetic ability of the backend if it's really injectable
         if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
             retVal = None
         elif checkBooleanExpression("%d=%d" % (randInt1, randInt2)):

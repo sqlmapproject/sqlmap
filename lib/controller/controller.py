@@ -48,6 +48,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
+from lib.core.settings import LOW_TEXT_PERCENT
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv
@@ -424,6 +425,8 @@ def start():
                             logger.warn(warnMsg)
 
                         else:
+                            kb.foundDynamicParameter = True
+
                             infoMsg = "%s parameter '%s' is dynamic" % (place, parameter)
                             logger.info(infoMsg)
 
@@ -469,7 +472,7 @@ def start():
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
                     raise sqlmapNoneDataException, errMsg
                 elif not conf.realTest:
-                    errMsg = "all parameters are not injectable."
+                    errMsg = "all parameters appear to be not injectable."
 
                     if conf.level < 5 or conf.risk < 3:
                         errMsg += " Try to increase --level/--risk values "
@@ -480,10 +483,19 @@ def start():
 
                     if not conf.textOnly and kb.originalPage:
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))
-                        errMsg += " Give it a go with the --text-only switch "
-                        errMsg += "if the target page has a low percentage of "
-                        errMsg += "textual content (~%.2f%% of " % percent
-                        errMsg += "page content is text)."
+
+                        if kb.dynamicParameters:
+                            errMsg += " Give it a go with the --text-only switch "
+                            errMsg += "if the target page has a low percentage of "
+                            errMsg += "textual content (~%.2f%% of " % percent
+                            errMsg += "page content is text)."
+                        elif percent < LOW_TEXT_PERCENT:
+                            errMsg = " Please retry with the --text-only switch "
+                            errMsg += "as this case looks like a perfect candidate "
+                            errMsg += "(low textual content along with inability "
+                            errMsg += "of comparison engine to detect at least "
+                            errMsg += "one dynamic parameter)."
+                            raise sqlmapNoneDataException, errMsg
 
                     if not conf.string and not conf.regexp:
                         errMsg += " Rerun by providing either a valid --string "

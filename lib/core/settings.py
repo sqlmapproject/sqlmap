@@ -339,3 +339,6 @@ LOCALHOST = "127.0.0.1"
 
 # Default ports used in Tor proxy bundles
 DEFAULT_TOR_PORTS = (8118, 8123)
+
+# Percentage below which comparison engine could have problems
+LOW_TEXT_PERCENT = 20

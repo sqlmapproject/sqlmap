@@ -1341,6 +1341,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.dep = None
     kb.docRoot = None
     kb.dynamicMarkings = []
+    kb.dynamicParameters = False
     kb.endDetection = False
     kb.httpErrorCodes = {}
     kb.errorIsNone = True
