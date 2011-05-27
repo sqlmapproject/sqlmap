@@ -490,7 +490,7 @@ def start():
                             errMsg += "if the target page has a low percentage of "
                             errMsg += "textual content (~%.2f%% of " % percent
                             errMsg += "page content is text)."
-                        elif percent < LOW_TEXT_PERCENT:
+                        elif percent < LOW_TEXT_PERCENT and not kb.errorIsNone:
                             errMsg += " Please retry with the --text-only switch "
                             errMsg += "(along with --technique=BU) as this case "
                             errMsg += "looks like a perfect candidate "
