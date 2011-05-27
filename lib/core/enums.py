@@ -101,6 +101,7 @@ class WARNFLAGS:
     THREADS = 'threads'
     PIVOT_LIMIT = 'pivotLimit'
     TIME_UNRECOVERED = 'timeUnrecovered'
+    SINGLE_THREAD = 'singleThread'
 
 class EXPECTED:
     BOOL = "bool"
