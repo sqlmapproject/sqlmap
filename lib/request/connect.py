@@ -121,7 +121,7 @@ class Connect:
 
         page = ""
         cookieStr = ""
-        requestMsg = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or conf.method)
+        requestMsg = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
         requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
         responseMsg = "HTTP response "
         requestHeaders = ""
@@ -158,11 +158,7 @@ class Connect:
                 return page
 
             elif refreshing:
-                # Reference(s): 
-                # http://vancouver-webpages.com/META/metatags.detail.html
-                # http://webdesign.about.com/od/metataglibraries/a/aa080300a.htm
-                get = None
-                post = None
+                pass
 
             elif target:
                 if conf.parameters.has_key(PLACE.GET) and not get:
@@ -292,6 +288,8 @@ class Connect:
 
                 threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
                 kwargs['refreshing'] = True
+                kwargs['get'] = None
+                kwargs['post'] = None
 
                 debugMsg = "got HTML meta refresh header"
                 logger.debug(debugMsg)
