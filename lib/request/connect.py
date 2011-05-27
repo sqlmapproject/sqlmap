@@ -260,7 +260,7 @@ class Connect:
                     msg += "from now on (or stay on the original page)? [Y/n]"
                     choice = readInput(msg, default="Y")
 
-                    kb.alwaysRedirect = choice in ("n", "N")
+                    kb.alwaysRedirect = choice not in ("n", "N")
 
                 kwargs['url'] = conn.redurl if kb.alwaysRedirect else conf.url
                 kwargs['redirecting'] = True
@@ -281,23 +281,33 @@ class Connect:
             if extractRegexResult(META_REFRESH_REGEX, page, re.DOTALL | re.IGNORECASE) and not refreshing:
                 url = extractRegexResult(META_REFRESH_REGEX, page, re.DOTALL | re.IGNORECASE)
 
-                if url.lower().startswith('http://'):
-                    kwargs['url'] = url
-                else:
-                    kwargs['url'] = conf.url[:conf.url.rfind('/')+1] + url
-
-                threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
-                kwargs['refreshing'] = True
-                kwargs['get'] = None
-                kwargs['post'] = None
-
                 debugMsg = "got HTML meta refresh header"
                 logger.debug(debugMsg)
 
-                try:
-                    return Connect.__getPageProxy(**kwargs)
-                except sqlmapSyntaxException:
-                    pass
+                if kb.alwaysRefresh is None:
+                    msg = "sqlmap got a refresh request "
+                    msg += "(redirect like response common to login pages). "
+                    msg += "do you want to apply the refresh "
+                    msg += "from now on (or stay on the original page)? [Y/n]"
+                    choice = readInput(msg, default="Y")
+
+                    kb.alwaysRefresh = choice not in ("n", "N")
+
+                if kb.alwaysRefresh:
+                    if url.lower().startswith('http://'):
+                        kwargs['url'] = url
+                    else:
+                        kwargs['url'] = conf.url[:conf.url.rfind('/')+1] + url
+
+                    threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
+                    kwargs['refreshing'] = True
+                    kwargs['get'] = None
+                    kwargs['post'] = None
+
+                    try:
+                        return Connect.__getPageProxy(**kwargs)
+                    except sqlmapSyntaxException:
+                        pass
 
             # Explicit closing of connection object
             if not conf.keepAlive:
