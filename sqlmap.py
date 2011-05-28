@@ -41,6 +41,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.option import init
 from lib.core.profiling import profile
+from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.core.xmldump import closeDumper
@@ -69,6 +70,8 @@ def main():
     # Store original command line options for possible later restoration
     cmdLineOptions.update(cmdLineParser().__dict__)
 
+    dataToStdout("[!] Legal Disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
+    
     dataToStdout("[*] starting at: %s\n\n" % time.strftime("%X"), forceOutput=True)
 
     try:
