@@ -61,6 +61,7 @@ def main():
     """
     Main function of sqlmap when running from command line.
     """
+
     paths.SQLMAP_ROOT_PATH = modulePath()
     setPaths()
     banner()
