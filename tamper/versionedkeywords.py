@@ -17,7 +17,7 @@ __priority__ = PRIORITY.NORMAL
 
 def tamper(payload):
     """
-    Encloses each keyword with versioned comment
+    Encloses each keyword with versioned MySQL comment
     Example: 'INSERT' will become '/*!INSERT*/'
     """
 
