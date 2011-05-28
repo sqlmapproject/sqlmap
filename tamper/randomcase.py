@@ -17,7 +17,7 @@ __priority__ = PRIORITY.NORMAL
 
 def tamper(payload):
     """
-    Replaces each character with random case value
+    Replaces each keyword character with random case value
     Example: 'INSERT' might become 'InsERt'
     """
 
