@@ -342,3 +342,7 @@ DEFAULT_TOR_PORTS = (8118, 8123)
 
 # Percentage below which comparison engine could have problems
 LOW_TEXT_PERCENT = 20
+
+# These MySQL keywords can't go (alone) into versioned comment form (/*!...*/)
+# Reference: http://dev.mysql.com/doc/refman/5.1/en/function-resolution.html
+IGNORE_SPACE_AFFECTED_KEYWORDS = ("CAST", "COUNT", "EXTRACT", "GROUP_CONCAT", "MAX", "MID", "MIN", "SESSION_USER", "SUBSTR", "SUBSTRING", "SUM", "SYSTEM_USER", "TRIM")

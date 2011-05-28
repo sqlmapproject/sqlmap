@@ -12,6 +12,7 @@ import re
 from lib.core.common import randomRange
 from lib.core.data import kb
 from lib.core.enums import PRIORITY
+from lib.core.settings import IGNORE_SPACE_AFFECTED_KEYWORDS
 
 __priority__ = PRIORITY.NORMAL
 
@@ -23,7 +24,7 @@ def tamper(payload):
 
     def process(match):
         word = match.group('word')
-        if word.upper() in kb.keywords and word.upper() not in ["CAST", "COUNT"]: # keywords that can't be commented out
+        if word.upper() in kb.keywords and word.upper() not in IGNORE_SPACE_AFFECTED_KEYWORDS:
             return match.group().replace(word, "/*!%s*/" % word)
         else:
             return match.group()
