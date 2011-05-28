@@ -81,25 +81,21 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
             maxItem = item
 
     if all(map(lambda x: x == min_ and x != max_, ratios)):
-        return maxItem[0]
+        retVal = maxItem[0]
 
     elif all(map(lambda x: x != min_ and x == max_, ratios)):
-        return minItem[0]
-
-    deviation = stdev(ratios)
-
-    if abs(max_ - min_) < MIN_STATISTICAL_RANGE:
-        kb.errorIsNone = popValue()
-        return None
-
-    lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
-
-    if min_ < lower:
         retVal = minItem[0]
 
-    if max_ > upper:
-        if retVal is None or abs(max_ - upper) > abs(min_ - lower):
-            retVal = maxItem[0]
+    elif abs(max_ - min_) >= MIN_STATISTICAL_RANGE:
+            deviation = stdev(ratios)
+            lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
+
+            if min_ < lower:
+                retVal = minItem[0]
+
+            if max_ > upper:
+                if retVal is None or abs(max_ - upper) > abs(min_ - lower):
+                    retVal = maxItem[0]
 
     kb.errorIsNone = popValue()
 
