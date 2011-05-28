@@ -23,7 +23,7 @@ def tamper(payload):
 
     def process(match):
         word = match.group('word')
-        if word.upper() in kb.keywords and word.upper() not in ["CAST"]: # CAST can't be commented out
+        if word.upper() in kb.keywords and word.upper() not in ["CAST", "COUNT"]: # keywords that can't be commented out
             return match.group().replace(word, "/*!%s*/" % word)
         else:
             return match.group()
