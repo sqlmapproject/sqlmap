@@ -49,7 +49,7 @@ def getCurrentThreadData():
         kb.threadData[threadUID] = ThreadData()
     return kb.threadData[threadUID]
 
-def runThreads(numThreads, threadFunction, cleanupFunction=None):
+def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True):
     threads = []
 
     kb.threadContinue = True
@@ -93,6 +93,9 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None):
 
         except KeyboardInterrupt:
             raise sqlmapThreadException, "user aborted (Ctrl+C was pressed multiple times)"
+
+        if forwardException:
+            raise
 
     finally:
         kb.threadContinue = True
