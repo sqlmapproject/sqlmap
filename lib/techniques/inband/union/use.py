@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import logging
 import re
+import threading
 import time
 
 from lib.core.agent import agent
@@ -39,6 +40,8 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
+from lib.core.threads import getCurrentThreadData
+from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -260,32 +263,60 @@ def unionUse(expression, unpack=True, dump=False):
                     infoMsg += "large number of rows (possible slowdown)"
                     logger.info(infoMsg)
 
-                for num in xrange(startLimit, stopLimit):
-                    if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                        field = expressionFieldsList[0]
-                    elif Backend.isDbms(DBMS.ORACLE):
-                        field = expressionFieldsList
-                    else:
-                        field = None
+                lockNames = ('limits', 'value')
+                for lock in lockNames:
+                    kb.locks[lock] = threading.Lock()
 
-                    limitedExpr = agent.limitQuery(num, expression, field)
-                    output = resume(limitedExpr, None)
+                threadData = getCurrentThreadData()
+                numThreads = min(conf.threads, stopLimit-startLimit)
+                threadData.shared.limits = range(startLimit, stopLimit)
+                threadData.shared.value = ""
 
-                    if not output:
-                        output = __oneShotUnionUse(limitedExpr, unpack)
+                def unionThread():
+                    threadData = getCurrentThreadData()
 
-                    if output:
-                        value += output
+                    while threadData.shared.limits and kb.threadContinue:
+                        kb.locks.limits.acquire()
+                        num = threadData.shared.limits[-1]
+                        del threadData.shared.limits[-1]
+                        kb.locks.limits.release()
 
-                        if conf.verbose == 1:
-                            if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
-                                items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
-                            else:
-                                items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
-                            status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
-                            if len(status) > width:
-                                status = "%s..." % status[:width - 3]
-                            dataToStdout(status, True)
+                        if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                            field = expressionFieldsList[0]
+                        elif Backend.isDbms(DBMS.ORACLE):
+                            field = expressionFieldsList
+                        else:
+                            field = None
+
+                        limitedExpr = agent.limitQuery(num, expression, field)
+                        output = resume(limitedExpr, None)
+
+                        if not output:
+                            output = __oneShotUnionUse(limitedExpr, unpack)
+
+                        if output:
+                            kb.locks.value.acquire()
+                            threadData.shared.value += output
+                            kb.locks.value.release()
+
+                            if conf.verbose == 1:
+                                if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
+                                    items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
+                                else:
+                                    items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
+
+                                status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
+
+                                if len(status) > width:
+                                    status = "%s..." % status[:width - 3]
+
+                                kb.locks.ioLock.acquire()
+                                dataToStdout(status, True)
+                                kb.locks.ioLock.release()
+
+                runThreads(numThreads, unionThread)
+
+                value = threadData.shared.value
 
                 if conf.verbose == 1:
                     clearConsoleLine(True)

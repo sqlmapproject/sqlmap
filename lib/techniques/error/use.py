@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
+import threading
 import time
 
 from lib.core.agent import agent
@@ -39,6 +40,7 @@ from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
+from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
@@ -159,7 +161,9 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
             output = __oneShotErrorUse(expressionReplaced, field)
 
             if output is not None:
+                kb.locks.ioLock.acquire()
                 dataToStdout("[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(output)))
+                kb.locks.ioLock.release()
 
         if isinstance(num, int):
             expression = origExpr
@@ -316,13 +320,39 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     infoMsg += "large number of rows (possible slowdown)"
                     logger.info(infoMsg)
 
-                for num in xrange(startLimit, stopLimit):
-                    output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
+                lockNames = ('limits', 'outputs')
+                for lock in lockNames:
+                    kb.locks[lock] = threading.Lock()
 
-                    if output and isinstance(output, list) and len(output) == 1:
-                        output = output[0]
+                threadData = getCurrentThreadData()
+                numThreads = min(conf.threads, stopLimit-startLimit)
+                threadData.shared.limits = range(startLimit, stopLimit)
+                threadData.shared.outputs = []
 
-                    outputs.append(output)
+                def errorThread():
+                    try:
+                        threadData = getCurrentThreadData()
+
+                        while threadData.shared.limits and kb.threadContinue:
+                            kb.locks.limits.acquire()
+                            num = threadData.shared.limits[-1]
+                            del threadData.shared.limits[-1]
+                            kb.locks.limits.release()
+
+                            output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
+
+                            if output and isinstance(output, list) and len(output) == 1:
+                                output = output[0]
+
+                            kb.locks.outputs.acquire()
+                            threadData.shared.outputs.append(output)
+                            kb.locks.outputs.release()
+                    except KeyboardInterrupt:
+                        raise
+
+                runThreads(numThreads, errorThread)
+
+                outputs = threadData.shared.outputs
 
             except KeyboardInterrupt:
                 warnMsg = "user aborted during enumeration. sqlmap "

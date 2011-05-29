@@ -1358,6 +1358,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.locks = advancedDict()
     kb.locks.cacheLock = threading.Lock()
     kb.locks.logLock = threading.Lock()
+    kb.locks.ioLock = threading.Lock()
 
     kb.matchRatio = None
     kb.nullConnection = None
