@@ -341,13 +341,19 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
                             output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
 
+                            if not kb.threadContinue:
+                                break
+
                             if output and isinstance(output, list) and len(output) == 1:
                                 output = output[0]
 
                             kb.locks.outputs.acquire()
                             threadData.shared.outputs.append(output)
                             kb.locks.outputs.release()
+
                     except KeyboardInterrupt:
+                        kb.threadContinue = False
+                        kb.threadException = True
                         raise
 
                 runThreads(numThreads, errorThread)

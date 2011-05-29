@@ -273,46 +273,55 @@ def unionUse(expression, unpack=True, dump=False):
                 threadData.shared.value = ""
 
                 def unionThread():
-                    threadData = getCurrentThreadData()
+                    try:
+                        threadData = getCurrentThreadData()
 
-                    while threadData.shared.limits and kb.threadContinue:
-                        kb.locks.limits.acquire()
-                        num = threadData.shared.limits[-1]
-                        del threadData.shared.limits[-1]
-                        kb.locks.limits.release()
+                        while threadData.shared.limits and kb.threadContinue:
+                            kb.locks.limits.acquire()
+                            num = threadData.shared.limits[-1]
+                            del threadData.shared.limits[-1]
+                            kb.locks.limits.release()
 
-                        if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                            field = expressionFieldsList[0]
-                        elif Backend.isDbms(DBMS.ORACLE):
-                            field = expressionFieldsList
-                        else:
-                            field = None
+                            if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                                field = expressionFieldsList[0]
+                            elif Backend.isDbms(DBMS.ORACLE):
+                                field = expressionFieldsList
+                            else:
+                                field = None
 
-                        limitedExpr = agent.limitQuery(num, expression, field)
-                        output = resume(limitedExpr, None)
+                            limitedExpr = agent.limitQuery(num, expression, field)
+                            output = resume(limitedExpr, None)
 
-                        if not output:
-                            output = __oneShotUnionUse(limitedExpr, unpack)
+                            if not output:
+                                output = __oneShotUnionUse(limitedExpr, unpack)
 
-                        if output:
-                            kb.locks.value.acquire()
-                            threadData.shared.value += output
-                            kb.locks.value.release()
+                            if not kb.threadContinue:
+                                break
 
-                            if conf.verbose == 1:
-                                if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
-                                    items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
-                                else:
-                                    items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
+                            if output:
+                                kb.locks.value.acquire()
+                                threadData.shared.value += output
+                                kb.locks.value.release()
 
-                                status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
+                                if conf.verbose == 1:
+                                    if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
+                                        items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
+                                    else:
+                                        items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
 
-                                if len(status) > width:
-                                    status = "%s..." % status[:width - 3]
+                                    status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
 
-                                kb.locks.ioLock.acquire()
-                                dataToStdout(status, True)
-                                kb.locks.ioLock.release()
+                                    if len(status) > width:
+                                        status = "%s..." % status[:width - 3]
+
+                                    kb.locks.ioLock.acquire()
+                                    dataToStdout(status, True)
+                                    kb.locks.ioLock.release()
+
+                    except KeyboardInterrupt:
+                        kb.threadContinue = False
+                        kb.threadException = True
+                        raise
 
                 runThreads(numThreads, unionThread)
 
