@@ -126,5 +126,8 @@ def main():
         kb.threadContinue = False
         kb.threadException = True
 
+        # just in case handling of leftover threads
+        raise SystemExit
+
 if __name__ == "__main__":
     main()
