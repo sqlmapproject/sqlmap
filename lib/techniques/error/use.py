@@ -160,6 +160,9 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
 
             output = __oneShotErrorUse(expressionReplaced, field)
 
+            if not kb.threadContinue:
+                return None
+
             if output is not None:
                 kb.locks.ioLock.acquire()
                 dataToStdout("[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(output)))
