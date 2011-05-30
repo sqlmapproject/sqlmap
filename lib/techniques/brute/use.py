@@ -159,7 +159,7 @@ def tableExists(tableFile, regex=None):
     dataToStdout("\n")
 
     if not retVal:
-        warnMsg = "no table found"
+        warnMsg = "no table(s) found"
         logger.warn(warnMsg)
     else:
         for item in retVal:
@@ -283,7 +283,7 @@ def columnExists(columnFile, regex=None):
     dataToStdout("\n")
 
     if not retVal:
-        warnMsg = "no column found"
+        warnMsg = "no column(s) found"
         logger.warn(warnMsg)
     else:
         columns = {}
