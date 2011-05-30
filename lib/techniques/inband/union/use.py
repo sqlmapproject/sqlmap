@@ -276,11 +276,15 @@ def unionUse(expression, unpack=True, dump=False):
                     try:
                         threadData = getCurrentThreadData()
 
-                        while threadData.shared.limits and kb.threadContinue:
+                        while kb.threadContinue:
                             kb.locks.limits.acquire()
-                            num = threadData.shared.limits[-1]
-                            del threadData.shared.limits[-1]
-                            kb.locks.limits.release()
+                            if threadData.shared.limits:
+                                num = threadData.shared.limits[-1]
+                                del threadData.shared.limits[-1]
+                                kb.locks.limits.release()
+                            else:
+                                kb.locks.limits.release()
+                                break
 
                             if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                                 field = expressionFieldsList[0]

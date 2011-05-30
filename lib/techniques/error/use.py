@@ -333,11 +333,15 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     try:
                         threadData = getCurrentThreadData()
 
-                        while threadData.shared.limits and kb.threadContinue:
+                        while kb.threadContinue:
                             kb.locks.limits.acquire()
-                            num = threadData.shared.limits[-1]
-                            del threadData.shared.limits[-1]
-                            kb.locks.limits.release()
+                            if threadData.shared.limits:
+                                num = threadData.shared.limits[-1]
+                                del threadData.shared.limits[-1]
+                                kb.locks.limits.release()
+                            else:
+                                kb.locks.limits.release()
+                                break
 
                             output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
 
