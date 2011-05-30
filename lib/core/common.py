@@ -2508,21 +2508,22 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
+        if regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)[0].lower() in content.lower(): # fast optimization check
+            retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
 
-        if retVal != content:
-            kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
-            if not suppressWarning:
-                debugMsg = "reflective value found and filtered out"
-                logger.debug(debugMsg)
-
-        elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
-            kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
-            if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
-                kb.reflectiveMechanism = False
+            if retVal != content:
+                kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
                 if not suppressWarning:
-                    debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
+                    debugMsg = "reflective value found and filtered out"
                     logger.debug(debugMsg)
+
+            elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
+                kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
+                if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
+                    kb.reflectiveMechanism = False
+                    if not suppressWarning:
+                        debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
+                        logger.debug(debugMsg)
 
     return retVal
 
