@@ -995,8 +995,11 @@ class Enumeration:
                         resumeAvailable = True
                         break
 
-            if resumeAvailable:
+            if resumeAvailable or colList:
                 columns = {}
+
+                for column in colList:
+                    columns[column] = None
 
                 for tbl in tblList:
                     for db, table, colName, colType in kb.brute.columns:
