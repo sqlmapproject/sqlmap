@@ -68,7 +68,7 @@ def tableExists(tableFile, regex=None):
             count[0] += 1
             tbllock.release()
 
-            if conf.db and not conf.db.endswith(METADB_SUFFIX):
+            if conf.db and METADB_SUFFIX not in conf.db:
                 fullTableName = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', table)
             else:
                 fullTableName = table
@@ -178,7 +178,7 @@ def columnExists(columnFile, regex=None):
     columns = getFileItems(columnFile, unique=True)
     columns = filterListValue(columns, regex)
 
-    if conf.db and not conf.db.endswith(METADB_SUFFIX):
+    if conf.db and METADB_SUFFIX not in conf.db:
         table = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', conf.tbl)
     else:
         table = conf.tbl
