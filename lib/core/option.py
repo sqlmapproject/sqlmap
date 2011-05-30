@@ -61,6 +61,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
+from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -1378,6 +1379,8 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.proxyAuthHeader = None
     kb.queryCounter = 0
     kb.redirectSetCookie = None
+    kb.reflectiveMechanism = True
+    kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS:0, REFLECTIVE_COUNTER.HIT:0}
     kb.responseTimes = []
     kb.resumedQueries = {}
     kb.singleLogFlags = set()

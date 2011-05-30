@@ -57,6 +57,10 @@ class NULLCONNECTION:
     HEAD = "HEAD"
     RANGE = "Range"
 
+class REFLECTIVE_COUNTER:
+    MISS = "MISS"
+    HIT = "HIT"
+
 class HASH:
     MYSQL = r'(?i)\A\*[0-9a-f]{40}\Z'
     MYSQL_OLD = r'(?i)\A[0-9a-f]{16}\Z'

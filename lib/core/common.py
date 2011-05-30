@@ -54,6 +54,7 @@ from lib.core.enums import HTTPHEADER
 from lib.core.enums import OS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
+from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.enums import SORTORDER
 from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapDataException
@@ -94,6 +95,7 @@ from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
+from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
@@ -2498,7 +2500,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
     retVal = content
 
-    if all([content, payload]):
+    if all([content, payload]) and kb.reflectiveMechanism:
         payload = payload.replace(PAYLOAD_DELIMITER, '')
 
         regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX)
@@ -2508,9 +2510,19 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
         retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
 
-        if retVal != content and not suppressWarning:
-            debugMsg = "reflective value found and filtered out"
-            logger.debug(debugMsg)
+        if retVal != content:
+            kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
+            if not suppressWarning:
+                debugMsg = "reflective value found and filtered out"
+                logger.debug(debugMsg)
+
+        elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
+            kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
+            if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
+                kb.reflectiveMechanism = False
+                if not suppressWarning:
+                    debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
+                    logger.debug(debugMsg)
 
     return retVal
 

@@ -302,7 +302,7 @@ EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREA
 REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
 
 # Regular expression used for marking non-alphanum characters
-REFLECTED_NON_ALPHA_NUM_REGEX = r'\W+?'
+REFLECTED_NON_ALPHA_NUM_REGEX = r'\W+'
 
 # Chars which can be used as a failsafe values in case of too long URL encoding value
 URLENCODE_FAILSAFE_CHARS = '()|,'
@@ -348,3 +348,6 @@ LOW_TEXT_PERCENT = 20
 IGNORE_SPACE_AFFECTED_KEYWORDS = ("CAST", "COUNT", "EXTRACT", "GROUP_CONCAT", "MAX", "MID", "MIN", "SESSION_USER", "SUBSTR", "SUBSTRING", "SUM", "SYSTEM_USER", "TRIM")
 
 LEGAL_DISCLAIMER = "usage of sqlmap for attacking web servers without prior mutual consent can be considered as an illegal activity. it is the final user's responsibility to obey all applicable local, state and federal laws. authors assume no liability and are not responsible for any misuse or damage caused by this program."
+
+# After this number of misses reflective removal mechanism is turned off (for speed up reasons)
+REFLECTIVE_MISS_THRESHOLD = 20
