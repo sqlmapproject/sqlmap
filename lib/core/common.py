@@ -2501,7 +2501,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     retVal = content
 
     if all([content, payload]) and kb.reflectiveMechanism:
-        payload = payload.replace(PAYLOAD_DELIMITER, '')
+        payload = urldecode(payload.replace(PAYLOAD_DELIMITER, ''))
 
         regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX)
 
