@@ -197,4 +197,4 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def forceDbmsEnum(self):
-        conf.db = "%s%s" % (DBMS.ACCESS, METADB_SUFFIX)
+        conf.db = ("%s%s" % (DBMS.ACCESS, METADB_SUFFIX)).replace(' ', '_')

@@ -20,7 +20,6 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import MAXDB_ALIASES
-from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 from lib.request.connect import Connect as Request
 
