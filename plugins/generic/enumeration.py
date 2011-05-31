@@ -1588,7 +1588,7 @@ class Enumeration:
                 if not kb.data.dumpedTable and not conf.direct:
                     infoMsg = "fetching number of "
                     if conf.col:
-                        infoMsg += "columns '%s' " % colString
+                        infoMsg += "column(s) '%s' " % colString
                     infoMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
