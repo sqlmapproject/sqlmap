@@ -440,7 +440,7 @@ def checkSqlInjection(place, parameter, value):
                                     if not isinstance(dValue, list):
                                         injection.dbms = Backend.setDbms(dValue)
                                     else:
-                                        Backend.forceDbms(dValue[0])
+                                        Backend.forceDbms(dValue[0], True)
                                 elif dKey == "dbms_version" and injection.dbms_version is None:
                                     injection.dbms_version = Backend.setVersion(dValue)
                                 elif dKey == "os" and injection.os is None:
@@ -496,6 +496,8 @@ def checkSqlInjection(place, parameter, value):
         finally:
             # Reset forced back-end DBMS value
             Backend.flushForcedDbms()
+
+    Backend.flushForcedDbms(True)
 
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:

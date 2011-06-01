@@ -1403,6 +1403,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.misc.space = ":%s:" % randomStr(length=1, lowercase=True)
     kb.misc.dollar = ":%s:" % randomStr(length=1, lowercase=True)
     kb.misc.forcedDbms = None
+    kb.misc.stickyFlag = False
 
     if flushAll:
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))

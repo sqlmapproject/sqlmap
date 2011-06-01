@@ -297,12 +297,15 @@ class Backend:
             logger.error("invalid format of versionsList")
 
     @staticmethod
-    def forceDbms(dbms):
-        kb.misc.forcedDbms = aliasToDbmsEnum(dbms)
+    def forceDbms(dbms, sticky=False):
+        if not kb.misc.stickyFlag:
+            kb.misc.forcedDbms = aliasToDbmsEnum(dbms)
+            kb.misc.stickyFlag = sticky
 
     @staticmethod
-    def flushForcedDbms():
-        kb.misc.forcedDbms = None
+    def flushForcedDbms(force=False):
+        if not kb.misc.stickyFlag or force:
+            kb.misc.forcedDbms = None
 
     @staticmethod
     def setOs(os):
