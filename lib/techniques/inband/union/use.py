@@ -75,11 +75,13 @@ def __oneShotUnionUse(expression, unpack=True):
 
     # Parse the returned page to get the exact union-based
     # sql injection output
-    output = extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
-            or extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
-            if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
+    output = reduce(lambda x, y: x if x is not None else y, [ \
+            extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
+            extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
+            if headers else None), payload, True), re.DOTALL | re.IGNORECASE)], \
+            None)
 
-    if output:
+    if output is not None:
         output = getUnicode(output, kb.pageEncoding)
     else:
         trimmed = extractRegexResult(trimcheck, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \

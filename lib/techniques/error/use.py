@@ -85,14 +85,16 @@ def __oneShotErrorUse(expression, field):
 
         # Parse the returned page to get the exact error-based
         # sql injection output
-        output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
-                or extractRegexResult(check, listToStrValue(headers.headers \
-                if headers else None), re.DOTALL | re.IGNORECASE) \
-                or extractRegexResult(check, threadData.lastRedirectMsg[1] \
+        output = reduce(lambda x, y: x if x is not None else y, [ \
+                extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
+                extractRegexResult(check, listToStrValue(headers.headers \
+                if headers else None), re.DOTALL | re.IGNORECASE), \
+                extractRegexResult(check, threadData.lastRedirectMsg[1] \
                 if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+                threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)], \
+                None)
 
-        if output:
+        if output is not None:
             output = getUnicode(output, kb.pageEncoding)
         else:
             trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
