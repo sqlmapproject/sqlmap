@@ -436,8 +436,11 @@ def checkSqlInjection(place, parameter, value):
                         # Feed with test details every time a test is successful
                         if hasattr(test, "details"):
                             for dKey, dValue in test.details.items():
-                                if dKey == "dbms" and not isinstance(dValue, list):
-                                    injection.dbms = Backend.setDbms(dValue)
+                                if dKey == "dbms":
+                                    if not isinstance(dValue, list):
+                                        injection.dbms = Backend.setDbms(dValue)
+                                    else:
+                                        Backend.forceDbms(dValue[0])
                                 elif dKey == "dbms_version" and injection.dbms_version is None:
                                     injection.dbms_version = Backend.setVersion(dValue)
                                 elif dKey == "os" and injection.os is None:
