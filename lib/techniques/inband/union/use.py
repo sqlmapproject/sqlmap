@@ -259,8 +259,8 @@ def unionUse(expression, unpack=True, dump=False):
             try:
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                     kb.suppressResumeInfo = True
-                    infoMsg = "suppressing resume console info because of "
-                    infoMsg += "large number of rows (possible slowdown)"
+                    infoMsg = "suppressing possible resume console info because of "
+                    infoMsg += "large number of rows (might take too much time)"
                     logger.info(infoMsg)
 
                 lockNames = ('limits', 'value')
