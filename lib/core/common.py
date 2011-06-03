@@ -2513,7 +2513,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        if regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)[0].lower() in content.lower(): # fast optimization check
+        if reduce(lambda x,y: x if x else y, regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)).lower() in content.lower(): # fast optimization check
             retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
 
             if retVal != content:
