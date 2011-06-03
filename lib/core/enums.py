@@ -106,6 +106,7 @@ class WARNFLAGS:
     PIVOT_LIMIT = 'pivotLimit'
     TIME_UNRECOVERED = 'timeUnrecovered'
     SINGLE_THREAD = 'singleThread'
+    UNION_APPEARS = 'unionAppears'
 
 class EXPECTED:
     BOOL = "bool"

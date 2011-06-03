@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import logging
 import random
 import re
 import time
@@ -24,6 +25,7 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import removeReflectiveValues
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
@@ -32,6 +34,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
+from lib.core.enums import WARNFLAGS
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import UNION_MIN_RESPONSE_CHARS
 from lib.core.settings import UNION_STDEV_COEFF
@@ -211,8 +214,9 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
         if not all([validPayload, vector]) and not conf.uChar:
             warnMsg = "please consider usage of --union-char option "
-            warnMsg += "(e.g. --union-char=1) to make it work"
-            logger.warn(warnMsg)
+            warnMsg += "(e.g. --union-char=1) and/or try to force "
+            warnMsg += "back-end DBMS (e.g. --dbms=mysql) to make it work"
+            singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.UNION_APPEARS)
 
     return validPayload, vector
 
