@@ -366,7 +366,7 @@ class Backend:
 
     @staticmethod
     def getDbms():
-        return aliasToDbmsEnum(kb.dbms)
+        return aliasToDbmsEnum(kb.dbms) if kb.get('dbms') else None
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -388,11 +388,13 @@ class Backend:
     def getIdentifiedDbms():
         dbms = None
 
-        if Backend.getForcedDbms() is not None:
+        if not kb:
+            pass
+        elif Backend.getForcedDbms() is not None:
             dbms = Backend.getForcedDbms()
         elif Backend.getDbms() is not None:
             dbms = kb.dbms
-        elif conf.dbms is not None:
+        elif conf.get('dbms'):
             dbms = conf.dbms
         elif len(Backend.getErrorParsedDBMSes()) > 0:
             dbms = Backend.getErrorParsedDBMSes()[0]
@@ -2422,7 +2424,7 @@ def unhandledExceptionMessage():
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
     errMsg += "Command line: %s\n" % " ".join(sys.argv)
-    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.technique else None)
+    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb and kb.technique else None)
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
     return maskSensitiveData(errMsg)
 
@@ -2433,7 +2435,7 @@ def maskSensitiveData(msg):
 
     retVal = msg
 
-    for item in filter(lambda x: x, [conf.hostname, conf.googleDork, conf.aCred, conf.tbl, conf.db, conf.col, conf.user, conf.cookie]):
+    for item in filter(lambda x: conf.get(x), ['hostname', 'googleDork', 'aCred', 'tbl', 'db', 'col', 'user', 'cookie']):
         regex = SENSITIVE_DATA_REGEX % item
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)

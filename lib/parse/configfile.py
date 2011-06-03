@@ -9,13 +9,14 @@ See the file 'doc/COPYING' for copying permission
 
 import codecs
 
-from ConfigParser import NoSectionError
+from ConfigParser import MissingSectionHeaderError
 
 from lib.core.common import checkFile
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapMissingMandatoryOptionException
+from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
 from lib.core.settings import UNICODE_ENCODING
 
@@ -60,11 +61,17 @@ def configFileParser(configFile):
 
     checkFile(configFile)
     configFP = codecs.open(configFile, "rb", UNICODE_ENCODING)
-    config = UnicodeRawConfigParser()
-    config.readfp(configFP)
+
+    try:
+        config = UnicodeRawConfigParser()
+        config.readfp(configFP)
+    except MissingSectionHeaderError:
+        errMsg = "you've provided a non-valid configuration file"
+        raise sqlmapSyntaxException, errMsg
 
     if not config.has_section("Target"):
-        raise NoSectionError, "Target in the configuration file is mandatory"
+        errMsg = "missing a mandatory section 'Target' in the configuration file"
+        raise sqlmapMissingMandatoryOptionException, errMsg
 
     condition = not config.has_option("Target", "url")
     condition &= not config.has_option("Target", "logFile")
