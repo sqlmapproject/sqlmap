@@ -51,7 +51,7 @@ def forgeHeaders(cookie, ua, referer):
         else:
             headers[header] = value
 
-    if kb.redirectSetCookie:
+    if kb.redirectSetCookie and not conf.dropSetCookie:
         if "Cookie" in headers:
             headers["Cookie"] = "%s; %s" % (headers["Cookie"], kb.redirectSetCookie)
         else:
