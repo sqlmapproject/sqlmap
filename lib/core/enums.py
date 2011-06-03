@@ -99,14 +99,14 @@ class HTTPHEADER:
     USER_AGENT = "User-Agent"
 
 class WARNFLAGS:
-    NO_CAST = 'noCast'
-    RANDOM_AGENT = 'randomAgent'
-    DATA_TO_STDOUT = 'dataToStdout'
-    THREADS = 'threads'
-    PIVOT_LIMIT = 'pivotLimit'
-    TIME_UNRECOVERED = 'timeUnrecovered'
-    SINGLE_THREAD = 'singleThread'
-    UNION_APPEARS = 'unionAppears'
+    NO_CAST = 'NO_CAST'
+    RANDOM_AGENT = 'RANDOM_AGENT'
+    DATA_TO_STDOUT = 'DATA_TO_STDOUT'
+    THREADS = 'THREADS'
+    PIVOT_LIMIT = 'PIVOT_LIMIT'
+    TIME_UNRECOVERED = 'TIME_UNRECOVERED'
+    SINGLE_THREAD = 'SINGLE_THREAD'
+    UNION_APPEARS = 'UNION_APPEARS'
 
 class EXPECTED:
     BOOL = "bool"
