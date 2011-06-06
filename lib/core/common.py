@@ -306,6 +306,7 @@ class Backend:
     def flushForcedDbms(force=False):
         if not kb.misc.stickyFlag or force:
             kb.misc.forcedDbms = None
+            kb.misc.stickyFlag = False
 
     @staticmethod
     def setOs(os):
