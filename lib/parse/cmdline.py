@@ -503,7 +503,7 @@ def cmdLineParser():
                                   action="store_true", default=False,
                                   help="Parse and test forms on target url")
 
-        miscellaneous.add_option("--gpage", dest="googlePage", type="int",
+        miscellaneous.add_option("--gpage", dest="googlePage", default=1, type="int",
                                   help="Use Google dork results from specified page number")
 
         miscellaneous.add_option("--mobile", dest="mobile",

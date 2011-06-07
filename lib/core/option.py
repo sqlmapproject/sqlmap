@@ -420,31 +420,43 @@ def __setGoogleDorking():
     googleObj = Google(handlers)
     googleObj.getCookie()
 
-    matches = googleObj.search(conf.googleDork)
+    def search():
+        matches = googleObj.search(conf.googleDork)
 
-    if not matches:
-        errMsg = "unable to find results for your "
-        errMsg += "Google dork expression"
-        raise sqlmapGenericException, errMsg
+        if not matches:
+            errMsg = "unable to find results for your "
+            errMsg += "Google dork expression"
+            raise sqlmapGenericException, errMsg
 
-    googleObj.getTargetUrls()
+        googleObj.getTargetUrls()
+        return matches
 
-    if kb.targetUrls:
-        infoMsg = "sqlmap got %d results for your " % len(matches)
-        infoMsg += "Google dork expression, "
+    while True:
+        matches = search()
+        if kb.targetUrls:
+            infoMsg = "sqlmap got %d results for your " % len(matches)
+            infoMsg += "Google dork expression, "
 
-        if len(matches) == len(kb.targetUrls):
-            infoMsg += "all "
+            if len(matches) == len(kb.targetUrls):
+                infoMsg += "all "
+            else:
+                infoMsg += "%d " % len(kb.targetUrls)
+
+            infoMsg += "of them are testable targets"
+            logger.info(infoMsg)
+            break
+
         else:
-            infoMsg += "%d " % len(kb.targetUrls)
+            message = "sqlmap got %d results " % len(matches)
+            message += "for your Google dork expression, but none of them "
+            message += "have GET parameters to test for SQL injection. "
+            message += "do you want to skip to the next result page? [Y/n]"
+            test = readInput(message, default="Y")
 
-        infoMsg += "of them are testable targets"
-        logger.info(infoMsg)
-    else:
-        errMsg = "sqlmap got %d results " % len(matches)
-        errMsg += "for your Google dork expression, but none of them "
-        errMsg += "have GET parameters to test for SQL injection"
-        raise sqlmapGenericException, errMsg
+            if test[0] in ("n", "N"):
+                raise sqlmapSilentQuitException
+            else:
+                conf.googlePage += 1
 
 def __setBulkMultipleTargets():
     if not conf.bulkFile:
