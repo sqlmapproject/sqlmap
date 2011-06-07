@@ -72,9 +72,9 @@ def comparison(page, getRatioValue=False, pageLength=None):
         # Preventing "Unicode equal comparison failed to convert both arguments to Unicode"
         # (e.g. if one page is PDF and the other is HTML)
         if isinstance(seqMatcher.a, str) and isinstance(page, unicode):
-            page = page.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING)
+            page = page.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, 'ignore')
         elif isinstance(seqMatcher.a, unicode) and isinstance(page, str):
-            seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING)
+            seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, 'ignore')
 
         seqMatcher.set_seq1(getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a)
         seqMatcher.set_seq2(getFilteredPageContent(page, True) if conf.textOnly else page)
