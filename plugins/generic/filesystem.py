@@ -125,7 +125,7 @@ class Filesystem:
                 infoMsg += ", same size as the local file '%s'" % wFile
             else:
                 infoMsg += ", but the size differs from the local "
-                infoMsg += " file '%s' (%d bytes)" % (wFile, wFileSize)
+                infoMsg += "file '%s' (%d bytes)" % (wFile, wFileSize)
 
             logger.info(infoMsg)
         else:
