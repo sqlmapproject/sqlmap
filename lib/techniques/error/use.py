@@ -335,35 +335,29 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 threadData.shared.outputs = []
 
                 def errorThread():
-                    try:
-                        threadData = getCurrentThreadData()
+                    threadData = getCurrentThreadData()
 
-                        while kb.threadContinue:
-                            kb.locks.limits.acquire()
-                            if threadData.shared.limits:
-                                num = threadData.shared.limits[-1]
-                                del threadData.shared.limits[-1]
-                                kb.locks.limits.release()
-                            else:
-                                kb.locks.limits.release()
-                                break
+                    while kb.threadContinue:
+                        kb.locks.limits.acquire()
+                        if threadData.shared.limits:
+                            num = threadData.shared.limits[-1]
+                            del threadData.shared.limits[-1]
+                            kb.locks.limits.release()
+                        else:
+                            kb.locks.limits.release()
+                            break
 
-                            output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
+                        output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
 
-                            if not kb.threadContinue:
-                                break
+                        if not kb.threadContinue:
+                            break
 
-                            if output and isinstance(output, list) and len(output) == 1:
-                                output = output[0]
+                        if output and isinstance(output, list) and len(output) == 1:
+                            output = output[0]
 
-                            kb.locks.outputs.acquire()
-                            threadData.shared.outputs.append(output)
-                            kb.locks.outputs.release()
-
-                    except KeyboardInterrupt:
-                        kb.threadContinue = False
-                        kb.threadException = True
-                        raise
+                        kb.locks.outputs.acquire()
+                        threadData.shared.outputs.append(output)
+                        kb.locks.outputs.release()
 
                 runThreads(numThreads, errorThread)
 

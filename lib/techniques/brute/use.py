@@ -32,6 +32,8 @@ from lib.core.exception import sqlmapThreadException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import METADB_SUFFIX
 from lib.core.session import safeFormatString
+from lib.core.threads import getCurrentThreadData
+from lib.core.threads import runThreads
 from lib.request import inject
 
 def tableExists(tableFile, regex=None):
@@ -184,31 +186,36 @@ def columnExists(columnFile, regex=None):
         table = conf.tbl
     table = safeSQLIdentificatorNaming(table)
 
-    retVal = []
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
 
-    count = [0]
-    length = len(columns)
-    threads = []
-    collock = threading.Lock()
-    iolock = threading.Lock()
     kb.threadContinue = True
     kb.bruteMode = True
 
+    threadData = getCurrentThreadData()
+    threadData.shared.count = 0
+    threadData.shared.limit = len(columns)
+    threadData.shared.outputs = []
+
     def columnExistsThread():
-        while count[0] < length and kb.threadContinue:
-            collock.acquire()
-            column = safeSQLIdentificatorNaming(columns[count[0]])
-            count[0] += 1
-            collock.release()
+        threadData = getCurrentThreadData()
+
+        while kb.threadContinue:
+            kb.locks.countLock.acquire()
+            if threadData.shared.count < threadData.shared.limit:
+                column = safeSQLIdentificatorNaming(columns[threadData.shared.count])
+                threadData.shared.count += 1
+                kb.locks.countLock.release()
+            else:
+                kb.locks.countLock.release()
+                break
 
             result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
 
-            iolock.acquire()
+            kb.locks.ioLock.acquire()
 
             if result:
-                retVal.append(column)
+                threadData.shared.outputs.append(column)
 
                 if conf.verbose in (1, 2):
                     clearConsoleLine(True)
@@ -216,79 +223,29 @@ def columnExists(columnFile, regex=None):
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
+                status = '%d/%d items (%d%s)' % (threadData.shared.count, threadData.shared.limit, round(100.0*threadData.shared.count/threadData.shared.limit), '%')
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
-            iolock.release()
+            kb.locks.ioLock.release()
 
-    if conf.threads > 1:
-        infoMsg = "starting %d threads" % conf.threads
-        logger.info(infoMsg)
-    else:
-        while True:
-            message = "please enter number of threads? [Enter for %d (current)] " % conf.threads
-            choice = readInput(message, default=str(conf.threads))
-            if choice and choice.isdigit():
-                if int(choice) > MAX_NUMBER_OF_THREADS:
-                    errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
-                    logger.critical(errMsg)
-                else:
-                    conf.threads = int(choice)
-                    break
-
-    if conf.threads == 1:
-        warnMsg = "running in a single-thread mode. This could take a while."
-        logger.warn(warnMsg)
-
-    # Start the threads
-    for numThread in range(conf.threads):
-        thread = threading.Thread(target=columnExistsThread, name=str(numThread))
-        thread.start()
-        threads.append(thread)
-
-    # And wait for them to all finish
     try:
-        alive = True
+        runThreads(conf.threads, columnExistsThread, threadChoice=True)
 
-        while alive:
-            alive = False
-
-            for thread in threads:
-                if thread.isAlive():
-                    alive = True
-                    thread.join(5)
     except KeyboardInterrupt:
-        kb.threadContinue = False
-        kb.threadException = True
-
-        print
-        logger.debug("waiting for threads to finish")
-
-        warnMsg = "user aborted during common column existence check. "
-        warnMsg += "sqlmap will display some columns only"
+        warnMsg = "user aborted during column existence "
+        warnMsg += "check. sqlmap will display partial output"
         logger.warn(warnMsg)
-
-        try:
-            while (threading.activeCount() > 1):
-                pass
-
-        except KeyboardInterrupt:
-            raise sqlmapThreadException, "user aborted"
-    finally:
-        kb.bruteMode = False
-        kb.threadContinue = True
-        kb.threadException = False
 
     clearConsoleLine(True)
     dataToStdout("\n")
 
-    if not retVal:
+    if not threadData.shared.outputs:
         warnMsg = "no column(s) found"
         logger.warn(warnMsg)
     else:
         columns = {}
 
-        for column in retVal:
+        for column in threadData.shared.outputs:
             result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
             if result:

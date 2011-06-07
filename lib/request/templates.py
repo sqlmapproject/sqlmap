@@ -7,8 +7,6 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import lib.core.common
-
 from lib.core.data import kb
 from lib.request.connect import Connect as Request
 
@@ -24,4 +22,3 @@ def getPageTemplate(payload, place):
 
     return retVal
 
-lib.core.common.getPageTemplate = getPageTemplate

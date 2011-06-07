@@ -20,6 +20,9 @@ import threading
 import urllib2
 import urlparse
 
+import lib.core.common
+import lib.core.threads
+
 from extra.clientform.clientform import ParseResponse
 from extra.clientform.clientform import ParseError
 from extra.keepalive import keepalive
@@ -109,6 +112,7 @@ from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
+from lib.request.templates import getPageTemplate
 from lib.utils.google import Google
 
 authHandler = urllib2.BaseHandler()
@@ -1360,8 +1364,10 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.locks.cacheLock = threading.Lock()
     kb.locks.logLock = threading.Lock()
     kb.locks.ioLock = threading.Lock()
+    kb.locks.countLock = threading.Lock()
 
     kb.matchRatio = None
+    kb.multiThreadMode = False
     kb.nullConnection = None
     kb.pageTemplate = None
     kb.pageTemplates = dict()
@@ -1701,6 +1707,10 @@ def __basicOptionValidation():
             errMsg += "to get the full list of supported charsets"
             raise sqlmapSyntaxException, errMsg
 
+def __resolveCrossReferences():
+    lib.core.threads.readInput = readInput
+    lib.core.common.getPageTemplate = getPageTemplate
+
 def init(inputOptions=advancedDict(), overrideOptions=False):
     """
     Set attributes into both configuration and knowledge base singletons
@@ -1720,6 +1730,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()
+    __resolveCrossReferences()
 
     parseTargetUrl()
     parseTargetDirect()

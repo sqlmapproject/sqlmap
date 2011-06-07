@@ -14,6 +14,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapThreadException
+from lib.core.settings import MAX_NUMBER_OF_THREADS
 
 shared = advancedDict()
 
@@ -39,6 +40,9 @@ class ThreadData():
 def getCurrentThreadUID():
     return hash(threading.currentThread())
 
+def readInput(message, default=None):
+    pass
+
 def getCurrentThreadData():
     """
     Returns current thread's dependent data
@@ -49,11 +53,39 @@ def getCurrentThreadData():
         kb.threadData[threadUID] = ThreadData()
     return kb.threadData[threadUID]
 
-def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True):
+def exceptionHandledFunction(threadFunction):
+    try:
+        threadFunction()
+    except KeyboardInterrupt:
+        kb.threadContinue = False
+        kb.threadException = True
+        raise
+    except:
+        kb.threadContinue = False
+        kb.threadException = True
+
+def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False):
     threads = []
 
+    kb.multiThreadMode = True
     kb.threadContinue = True
     kb.threadException = False
+
+    if threadChoice and numThreads == 1:
+        while True:
+            message = "please enter number of threads? [Enter for %d (current)] " % numThreads
+            choice = readInput(message, default=str(numThreads))
+            if choice and choice.isdigit():
+                if int(choice) > MAX_NUMBER_OF_THREADS:
+                    errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
+                    logger.critical(errMsg)
+                else:
+                    numThreads = int(choice)
+                    break
+
+        if numThreads == 1:
+            warnMsg = "running in a single-thread mode. This could take a while."
+            logger.warn(warnMsg)
 
     if numThreads > 1:
         infoMsg = "starting %d threads" % numThreads
@@ -64,7 +96,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
     # Start the threads
     for numThread in range(numThreads):
-        thread = threading.Thread(target=threadFunction, name=str(numThread))
+        thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[threadFunction])
         thread.start()
         threads.append(thread)
 
@@ -98,6 +130,8 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             raise
 
     finally:
+        kb.multiThreadMode = False
+        kb.bruteMode = False
         kb.threadContinue = True
         kb.threadException = False
 
