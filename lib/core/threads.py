@@ -60,9 +60,10 @@ def exceptionHandledFunction(threadFunction):
         kb.threadContinue = False
         kb.threadException = True
         raise
-    except:
-        kb.threadContinue = False
-        kb.threadException = True
+    except Exception, errMsg:
+        # thread is just going to be silently killed
+        print
+        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
 
 def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False):
     threads = []

@@ -390,7 +390,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             except (sqlmapConnectionException, sqlmapValueException), errMsg:
                 print
                 kb.threadException = True
-                logger.error("thread %d: %s" % (numThread + 1, errMsg))
+                logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
 
             except KeyboardInterrupt:
                 kb.threadException = True
@@ -409,7 +409,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 print
                 kb.threadException = True
                 errMsg = unhandledExceptionMessage()
-                logger.error("thread %d: %s" % (numThread + 1, errMsg))
+                logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
                 traceback.print_exc()
 
         # Start the threads
