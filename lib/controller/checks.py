@@ -481,16 +481,19 @@ def checkSqlInjection(place, parameter, value):
             warnMsg = "user aborted during detection phase"
             logger.warn(warnMsg)
 
-            message = "How do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
-            choice = readInput(message, default="S")
+            if not conf.batch:
+                message = "How do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
+                choice = readInput(message, default="S")
 
-            if not choice or choice[0] in ("s", "S"):
-                pass
-            elif choice[0] in ("n", "N"):
-                return None
-            elif choice[0] in ("e", "E"):
-                kb.endDetection = True
-            elif choice[0] in ("q", "Q"):
+                if choice[0] in ("s", "S"):
+                    pass
+                elif choice[0] in ("n", "N"):
+                    return None
+                elif choice[0] in ("e", "E"):
+                    kb.endDetection = True
+                elif choice[0] in ("q", "Q"):
+                    raise sqlmapUserQuitException
+            else:
                 raise sqlmapUserQuitException
 
         finally:
