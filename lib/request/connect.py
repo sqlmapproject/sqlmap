@@ -576,10 +576,11 @@ class Connect:
 
             _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
-            if kb.nullConnection == NULLCONNECTION.HEAD and HTTPHEADER.CONTENT_LENGTH in headers:
-                pageLength = int(headers[HTTPHEADER.CONTENT_LENGTH])
-            elif kb.nullConnection == NULLCONNECTION.RANGE and HTTPHEADER.CONTENT_RANGE in headers:
-                pageLength = int(headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
+            if headers:
+                if kb.nullConnection == NULLCONNECTION.HEAD and HTTPHEADER.CONTENT_LENGTH in headers:
+                    pageLength = int(headers[HTTPHEADER.CONTENT_LENGTH])
+                elif kb.nullConnection == NULLCONNECTION.RANGE and HTTPHEADER.CONTENT_RANGE in headers:
+                    pageLength = int(headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
 
         if not pageLength:
             page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)

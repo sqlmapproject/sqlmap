@@ -63,6 +63,9 @@ Pierre Chifflier <pollux@debian.org> and Mark Hymers <ftpmaster@debian.org>
     for uploading and accepting the sqlmap Debian package to the official
     Debian project repository
 
+Chris Clements <cclements@flatearth.net>
+    for reporting a minor bug
+
 Andreas Constantinides <megahz@megahz.org>
     for reporting a minor bug
 
