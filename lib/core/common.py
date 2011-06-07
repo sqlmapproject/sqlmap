@@ -644,7 +644,10 @@ def filePathToString(filePath):
 
     return strRepl
 
-def singleTimeLogMessage(message, level, flag):
+def singleTimeLogMessage(message, level=logging.WARN, flag=None):
+    if flag is None:
+        flag = hash(message)
+
     if flag not in kb.singleLogFlags:
         kb.singleLogFlags.add(flag)
         logger.log(level, message)

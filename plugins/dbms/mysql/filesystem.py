@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import kb
@@ -93,6 +94,10 @@ class Filesystem(GenericFilesystem):
 
         if confirm:
             self.askCheckWrittenFile(wFile, dFile, fileType)
+
+        warnMsg = "expect junk characters inside the "
+        warnMsg += "file as a leftover from UNION query"
+        singleTimeLogMessage(warnMsg)
 
     def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
         debugMsg = "creating a support table to write the hexadecimal "
