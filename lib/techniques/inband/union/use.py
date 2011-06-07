@@ -92,7 +92,7 @@ def __oneShotUnionUse(expression, unpack=True):
             warnMsg = "possible server trimmed output detected (due to its length): "
             warnMsg += trimmed
             logger.warn(warnMsg)
-        elif Backend.isDbms(DBMS.MYSQL):
+        elif Backend.isDbms(DBMS.MYSQL) and not kb.multiThreadMode:
             warnMsg = "if the problem persists with 'None' values please try to use "
             warnMsg += "hidden switch --no-cast (fixing problems with some collation "
             warnMsg += "issues)"

@@ -38,7 +38,6 @@ from lib.request import inject
 
 def tableExists(tableFile, regex=None):
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS), unique=True)
-    retVal = []
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
@@ -54,21 +53,25 @@ def tableExists(tableFile, regex=None):
             tables.append(word)
 
     tables = filterListValue(tables, regex)
-    count = [0]
-    length = len(tables)
-    threads = []
-    items = set()
-    tbllock = threading.Lock()
-    iolock = threading.Lock()
-    kb.threadContinue = True
-    kb.bruteMode = True
+
+    threadData = getCurrentThreadData()
+    threadData.shared.count = 0
+    threadData.shared.limit = len(tables)
+    threadData.shared.outputs = []
+    threadData.shared.unique = set()
 
     def tableExistsThread():
-        while count[0] < length and kb.threadContinue:
-            tbllock.acquire()
-            table = safeSQLIdentificatorNaming(tables[count[0]])
-            count[0] += 1
-            tbllock.release()
+        threadData = getCurrentThreadData()
+
+        while kb.threadContinue:
+            kb.locks.countLock.acquire()
+            if threadData.shared.count < threadData.shared.limit:
+                table = safeSQLIdentificatorNaming(tables[threadData.shared.count])
+                threadData.shared.count += 1
+                kb.locks.countLock.release()
+            else:
+                kb.locks.countLock.release()
+                break
 
             if conf.db and METADB_SUFFIX not in conf.db:
                 fullTableName = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', table)
@@ -77,12 +80,12 @@ def tableExists(tableFile, regex=None):
 
             result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), fullTableName)))
 
-            iolock.acquire()
+            kb.locks.ioLock.acquire()
 
-            if result and table.lower() not in items:
-                retVal.append(table)
+            if result and table.lower() not in threadData.shared.unique:
+                threadData.shared.outputs.append(table)
 
-                items.add(table.lower())
+                threadData.shared.unique.add(table.lower())
 
                 dataToSessionFile("[%s][%s][%s][TABLE_EXISTS][%s]\n" % (conf.url,\
                   kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]),\
@@ -94,77 +97,27 @@ def tableExists(tableFile, regex=None):
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = '%d/%d items (%d%s)' % (count[0], length, round(100.0*count[0]/length), '%')
+                status = '%d/%d items (%d%s)' % (threadData.shared.count, threadData.shared.limit, round(100.0*threadData.shared.count/threadData.shared.limit), '%')
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
-            iolock.release()
+            kb.locks.ioLock.release()
 
-    if conf.threads > 1:
-        infoMsg = "starting %d threads" % conf.threads
-        logger.info(infoMsg)
-    else:
-        while True:
-            message = "please enter number of threads? [Enter for %d (current)] " % conf.threads
-            choice = readInput(message, default=str(conf.threads))
-            if choice and choice.isdigit():
-                if int(choice) > MAX_NUMBER_OF_THREADS:
-                    errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
-                    logger.critical(errMsg)
-                else:
-                    conf.threads = int(choice)
-                    break
-
-    if conf.threads == 1:
-        warnMsg = "running in a single-thread mode. This could take a while."
-        logger.warn(warnMsg)
-
-    # Start the threads
-    for numThread in range(conf.threads):
-        thread = threading.Thread(target=tableExistsThread, name=str(numThread))
-        thread.start()
-        threads.append(thread)
-
-    # And wait for them to all finish
     try:
-        alive = True
+        runThreads(conf.threads, tableExistsThread, threadChoice=True)
 
-        while alive:
-            alive = False
-
-            for thread in threads:
-                if thread.isAlive():
-                    alive = True
-                    thread.join(5)
     except KeyboardInterrupt:
-        kb.threadContinue = False
-        kb.threadException = True
-
-        print
-        logger.debug("waiting for threads to finish")
-
-        warnMsg = "user aborted during common table existence check. "
-        warnMsg += "sqlmap will display some tables only"
+        warnMsg = "user aborted during table existence "
+        warnMsg += "check. sqlmap will display partial output"
         logger.warn(warnMsg)
-
-        try:
-            while (threading.activeCount() > 1):
-                pass
-
-        except KeyboardInterrupt:
-            raise sqlmapThreadException, "user aborted"
-    finally:
-        kb.bruteMode = False
-        kb.threadContinue = True
-        kb.threadException = False
 
     clearConsoleLine(True)
     dataToStdout("\n")
 
-    if not retVal:
+    if not threadData.shared.outputs:
         warnMsg = "no table(s) found"
         logger.warn(warnMsg)
     else:
-        for item in retVal:
+        for item in threadData.shared.outputs:
             if not kb.data.cachedTables.has_key(conf.db):
                 kb.data.cachedTables[conf.db] = [item]
             else:
