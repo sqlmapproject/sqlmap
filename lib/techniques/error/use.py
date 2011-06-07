@@ -319,6 +319,11 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 stopLimit = 1
 
             try:
+                threadData = getCurrentThreadData()
+                numThreads = min(conf.threads, stopLimit-startLimit)
+                threadData.shared.limits = range(startLimit, stopLimit)
+                threadData.shared.outputs = []
+
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                     kb.suppressResumeInfo = True
                     infoMsg = "suppressing possible resume console info because of "
@@ -328,11 +333,6 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 lockNames = ('limits', 'outputs')
                 for lock in lockNames:
                     kb.locks[lock] = threading.Lock()
-
-                threadData = getCurrentThreadData()
-                numThreads = min(conf.threads, stopLimit-startLimit)
-                threadData.shared.limits = range(startLimit, stopLimit)
-                threadData.shared.outputs = []
 
                 def errorThread():
                     threadData = getCurrentThreadData()
@@ -361,8 +361,6 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
                 runThreads(numThreads, errorThread)
 
-                outputs = threadData.shared.outputs
-
             except KeyboardInterrupt:
                 warnMsg = "user aborted during enumeration. sqlmap "
                 warnMsg += "will display partial output"
@@ -375,6 +373,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 logger.critical(errMsg)
 
             finally:
+                outputs = threadData.shared.outputs
                 kb.suppressResumeInfo = False
 
     if not outputs:

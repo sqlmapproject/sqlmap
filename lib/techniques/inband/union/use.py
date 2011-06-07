@@ -259,6 +259,11 @@ def unionUse(expression, unpack=True, dump=False):
                 stopLimit = 1
 
             try:
+                threadData = getCurrentThreadData()
+                numThreads = min(conf.threads, stopLimit-startLimit)
+                threadData.shared.limits = range(startLimit, stopLimit)
+                threadData.shared.value = ""
+
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                     kb.suppressResumeInfo = True
                     infoMsg = "suppressing possible resume console info because of "
@@ -268,11 +273,6 @@ def unionUse(expression, unpack=True, dump=False):
                 lockNames = ('limits', 'value')
                 for lock in lockNames:
                     kb.locks[lock] = threading.Lock()
-
-                threadData = getCurrentThreadData()
-                numThreads = min(conf.threads, stopLimit-startLimit)
-                threadData.shared.limits = range(startLimit, stopLimit)
-                threadData.shared.value = ""
 
                 def unionThread():
                     threadData = getCurrentThreadData()
@@ -325,8 +325,6 @@ def unionUse(expression, unpack=True, dump=False):
 
                 runThreads(numThreads, unionThread)
 
-                value = threadData.shared.value
-
                 if conf.verbose == 1:
                     clearConsoleLine(True)
 
@@ -342,6 +340,7 @@ def unionUse(expression, unpack=True, dump=False):
                 logger.critical(errMsg)
 
             finally:
+                value = threadData.shared.value
                 kb.suppressResumeInfo = False
 
     if not value:
