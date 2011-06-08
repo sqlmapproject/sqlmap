@@ -505,7 +505,7 @@ def checkSqlInjection(place, parameter, value):
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:
         if not conf.dropSetCookie and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data and injection.data[PAYLOAD.TECHNIQUE.BOOLEAN].vector.startswith('OR'):
-            warnMsg = "in OR boolean-based injections please consider usage "
+            warnMsg = "in OR boolean-based injections, please consider usage "
             warnMsg += "of switch --drop-set-cookie if you experience any "
             warnMsg += "problems during data retrieval"
             logger.warn(warnMsg)
@@ -532,11 +532,11 @@ def checkFalsePositives(injection):
         kb.injection = injection
         randInt1, randInt2 = int(randomInt(2)) + 1, int(randomInt(2)) + 1
 
-        # just in case (also, they have to be different than 0 because of the last test)
+        # Just in case (also, they have to be different than 0 because of the last test)
         while randInt1 == randInt2:
             randInt2 = int(randomInt(2)) + 1
 
-        # simple arithmetic operations which should show basic
+        # Simple arithmetic operations which should show basic
         # arithmetic ability of the backend if it's really injectable
         if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
             retVal = None
