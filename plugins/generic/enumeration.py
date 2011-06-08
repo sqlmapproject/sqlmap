@@ -1038,19 +1038,14 @@ class Enumeration:
                 infoMsg = "fetching columns "
 
                 if len(colList) > 0:
-                    message  = "do you want to use LIKE operator to "
-                    message += "retrieve column names similar to the "
-                    message += "ones provided with the -C option? [Y/n]"
+                    colConsider, colCondParam = self.likeOrExact("column")
+                    condQueryStr = "%%s%s" % colCondParam
+                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
 
-                    test = readInput(message, default="Y")
-
-                    if not (isinstance(test, basestring) and test.upper() == "N"):
-                        condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
+                    if colConsider == "1":
                         infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
                     else:
-                        condQuery = " AND (%s)" % " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
-
                 else:
                     condQuery = ""
 
