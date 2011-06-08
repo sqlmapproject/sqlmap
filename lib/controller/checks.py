@@ -399,7 +399,7 @@ def checkSqlInjection(place, parameter, value):
                                 warnMsg = "using unescaped version of the test "
                                 warnMsg += "because of zero knowledge of the "
                                 warnMsg += "back-end DBMS"
-                                singleTimeWarnMessage(warnMsg, logging.WARN, title)
+                                singleTimeWarnMessage(warnMsg)
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
