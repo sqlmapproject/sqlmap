@@ -189,7 +189,7 @@ def __saveToResultsFile():
     if not results:
         line = "%s,,,%s" % (conf.url, os.linesep)
         conf.resultsFP.writelines(line)
-    
+
 def start():
     """
     This function calls a function that performs checks on both URL

@@ -70,9 +70,8 @@ def main():
     # Store original command line options for possible later restoration
     cmdLineOptions.update(cmdLineParser().__dict__)
 
-    dataToStdout("[!] Legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
-    
-    dataToStdout("[*] starting at: %s\n\n" % time.strftime("%X"), forceOutput=True)
+    dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
+    dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
     try:
         init(cmdLineOptions)
@@ -121,7 +120,7 @@ def main():
         closeDumper(True)
 
     finally:
-        dataToStdout("\n[*] shutting down at: %s\n\n" % time.strftime("%X"), forceOutput=True)
+        dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
         kb.threadContinue = False
         kb.threadException = True

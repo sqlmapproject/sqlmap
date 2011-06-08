@@ -1052,7 +1052,7 @@ class Enumeration:
                     else:
                         condQuery = " AND (%s)" % " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
-                    
+
                 else:
                     condQuery = ""
 
