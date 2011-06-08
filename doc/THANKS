@@ -36,6 +36,9 @@ Anthony Boynes <aboynes@gmail.com>
 Velky Brat <velkybrat@gmail.com>
     for suggesting a minor enhancement to the bisection algorithm
 
+James Briggs <james.briggs@ngssecure.com>
+    for suggesting a minor enhancement
+
 Jack Butler <fattredd@hotmail.com>
     for providing me with the sqlmap site favicon
 
@@ -356,6 +359,9 @@ Andres Riancho <andres.riancho@gmail.com>
     for including sqlmap in his great web application audit and attack
     framework, w3af, http://w3af.sourceforge.net
     for suggesting a way for handling DNS caching
+
+Jamie Riden <jamie.riden@ngssecure.com>
+    for reporting a minor bug
 
 Antonio Riva <antonio.riva@gmail.com>
     for reporting a bug when running with python 2.5
