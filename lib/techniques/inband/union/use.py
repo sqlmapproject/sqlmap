@@ -7,7 +7,6 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import logging
 import re
 import threading
 import time
@@ -34,7 +33,6 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_TABLE
@@ -96,7 +94,7 @@ def __oneShotUnionUse(expression, unpack=True):
             warnMsg = "if the problem persists with 'None' values please try to use "
             warnMsg += "hidden switch --no-cast (fixing problems with some collation "
             warnMsg += "issues)"
-            singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.NO_CAST)
+            singleTimeLogMessage(warnMsg)
 
     return output
 

@@ -7,7 +7,6 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import logging
 import threading
 import time
 import traceback
@@ -34,7 +33,6 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapThreadException
@@ -118,7 +116,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     if conf.threads == 1 and not timeBasedCompare:
         warnMsg = "running in a single-thread mode. please consider usage of "
         warnMsg += "--threads option to declare higher number of threads"
-        singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.SINGLE_THREAD)
+        singleTimeLogMessage(warnMsg)
 
     if conf.verbose in (1, 2) and not showEta:
         if isinstance(length, int) and conf.threads > 1:

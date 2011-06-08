@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import httplib
-import logging
 import re
 import socket
 import time
@@ -44,7 +43,6 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
-from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_SILENT_TIMEOUT
@@ -415,16 +413,16 @@ class Connect:
                     warnMsg += "without flag T in --technique option "
                     warnMsg += "(e.g. --flush-session --technique=BEUS) or try to "
                     warnMsg += "lower the --time-sec value (e.g. --time-sec=2)"
-                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.TIME_UNRECOVERED)                
+                    singleTimeLogMessage(warnMsg)
                 elif kb.originalPage is None:
                     warnMsg = "if the problem persists please try to rerun "
                     warnMsg += "with the --random-agent switch turned on "
                     warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
-                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.RANDOM_AGENT)
+                    singleTimeLogMessage(warnMsg)
                 elif conf.threads > 1:
                     warnMsg = "if the problem persists please try to lower "
                     warnMsg += "the number of used threads (--threads)"
-                    singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.THREADS)
+                    singleTimeLogMessage(warnMsg)
 
                 time.sleep(1)
 

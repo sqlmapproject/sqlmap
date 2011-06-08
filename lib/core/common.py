@@ -56,7 +56,6 @@ from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.enums import SORTORDER
-from lib.core.enums import WARNFLAGS
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -665,7 +664,7 @@ def dataToStdout(data, forceOutput=False):
                         warnMsg += "replacement with '?' character. Please, find "
                         warnMsg += "proper character representation inside "
                         warnMsg += "coresponding output files. "
-                        singleTimeLogMessage(warnMsg, logging.WARN, WARNFLAGS.DATA_TO_STDOUT)
+                        singleTimeLogMessage(warnMsg)
 
                     sys.stdout.write(output)
                 else:

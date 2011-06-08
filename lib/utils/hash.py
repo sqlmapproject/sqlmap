@@ -210,7 +210,7 @@ def crypt_generic_passwd(password, salt, uppercase=False):
 
     retVal = crypt(password, salt)
 
-    return retVal.upper() if uppercase else retVal.lower()
+    return retVal.upper() if uppercase else retVal
 
 __functions__ = {
                     HASH.MYSQL: mysql_passwd, 
