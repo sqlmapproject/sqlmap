@@ -372,10 +372,10 @@ class Enumeration:
                     retrievedUsers.add(user)
 
         if not kb.data.cachedUsersPasswords:
-            errMsg = "unable to retrieve the password "
-            errMsg += "hashes for the database users "
-            errMsg += "(most probably due to problems "
-            errMsg += "with backend DBMS user permissions)"
+            errMsg = "unable to retrieve the password hashes for the "
+            errMsg += "database users (most probably because the session "
+            errMsg += "user has no read privileges over the relevant "
+            errMsg += "system database table)"
             raise sqlmapNoneDataException, errMsg
 
         message = "do you want to use dictionary attack on retrieved password hashes? [Y/n/q]"
