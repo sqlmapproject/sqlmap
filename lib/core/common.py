@@ -640,7 +640,10 @@ def filePathToString(filePath):
 
     return strRepl
 
-def singleTimeLogMessage(message, level=logging.WARN, flag=None):
+def singleTimeWarnMessage(message):
+    singleTimeLogMessage(message, logging.WARN)
+
+def singleTimeLogMessage(message, level=logging.INFO, flag=None):
     if flag is None:
         flag = hash(message)
 
@@ -664,7 +667,7 @@ def dataToStdout(data, forceOutput=False):
                         warnMsg += "replacement with '?' character. Please, find "
                         warnMsg += "proper character representation inside "
                         warnMsg += "coresponding output files. "
-                        singleTimeLogMessage(warnMsg)
+                        singleTimeWarnMessage(warnMsg)
 
                     sys.stdout.write(output)
                 else:

@@ -29,7 +29,7 @@ from lib.core.common import logHTTPTraffic
 from lib.core.common import parseTargetUrl
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
-from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import urlEncodeCookieValues
 from lib.core.common import wasLastRequestDelayed
@@ -413,16 +413,16 @@ class Connect:
                     warnMsg += "without flag T in --technique option "
                     warnMsg += "(e.g. --flush-session --technique=BEUS) or try to "
                     warnMsg += "lower the --time-sec value (e.g. --time-sec=2)"
-                    singleTimeLogMessage(warnMsg)
+                    singleTimeWarnMessage(warnMsg)
                 elif kb.originalPage is None:
                     warnMsg = "if the problem persists please try to rerun "
                     warnMsg += "with the --random-agent switch turned on "
                     warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
-                    singleTimeLogMessage(warnMsg)
+                    singleTimeWarnMessage(warnMsg)
                 elif conf.threads > 1:
                     warnMsg = "if the problem persists please try to lower "
                     warnMsg += "the number of used threads (--threads)"
-                    singleTimeLogMessage(warnMsg)
+                    singleTimeWarnMessage(warnMsg)
 
                 time.sleep(1)
 

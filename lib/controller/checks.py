@@ -32,7 +32,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import showStaticWords
-from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
@@ -399,7 +399,7 @@ def checkSqlInjection(place, parameter, value):
                                 warnMsg = "using unescaped version of the test "
                                 warnMsg += "because of zero knowledge of the "
                                 warnMsg += "back-end DBMS"
-                                singleTimeLogMessage(warnMsg, logging.WARN, title)
+                                singleTimeWarnMessage(warnMsg, logging.WARN, title)
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)

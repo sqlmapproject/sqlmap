@@ -30,7 +30,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
-from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import strToHex
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -1410,7 +1410,7 @@ class Enumeration:
                         if (i + 1) < conf.limitStart:
                             warnMsg  = "skipping first %d pivot " % conf.limitStart
                             warnMsg += "point values"
-                            singleTimeLogMessage(warnMsg)
+                            singleTimeWarnMessage(warnMsg)
                             break
                         elif (i + 1) > conf.limitStop:
                             breakRetrieval = True

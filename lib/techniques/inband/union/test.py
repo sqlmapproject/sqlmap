@@ -24,7 +24,7 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import removeReflectiveValues
-from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
@@ -214,7 +214,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
             warnMsg = "please consider usage of --union-char option "
             warnMsg += "(e.g. --union-char=1) and/or try to force "
             warnMsg += "back-end DBMS (e.g. --dbms=mysql) to make it work"
-            singleTimeLogMessage(warnMsg)
+            singleTimeWarnMessage(warnMsg)
 
     return validPayload, vector
 

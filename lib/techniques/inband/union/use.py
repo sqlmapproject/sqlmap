@@ -25,7 +25,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
-from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -94,7 +94,7 @@ def __oneShotUnionUse(expression, unpack=True):
             warnMsg = "if the problem persists with 'None' values please try to use "
             warnMsg += "hidden switch --no-cast (fixing problems with some collation "
             warnMsg += "issues)"
-            singleTimeLogMessage(warnMsg)
+            singleTimeWarnMessage(warnMsg)
 
     return output
 

@@ -25,7 +25,7 @@ from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
-from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unhandledExceptionMessage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -116,7 +116,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     if conf.threads == 1 and not timeBasedCompare:
         warnMsg = "running in a single-thread mode. please consider usage of "
         warnMsg += "--threads option to declare higher number of threads"
-        singleTimeLogMessage(warnMsg)
+        singleTimeWarnMessage(warnMsg)
 
     if conf.verbose in (1, 2) and not showEta:
         if isinstance(length, int) and conf.threads > 1:
