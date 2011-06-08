@@ -494,7 +494,7 @@ def checkSqlInjection(place, parameter, value):
                 elif choice[0] in ("q", "Q"):
                     raise sqlmapUserQuitException
             else:
-                raise sqlmapUserQuitException
+                kb.endDetection = True
 
         finally:
             # Reset forced back-end DBMS value
