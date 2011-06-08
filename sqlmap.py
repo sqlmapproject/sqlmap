@@ -70,7 +70,7 @@ def main():
     # Store original command line options for possible later restoration
     cmdLineOptions.update(cmdLineParser().__dict__)
 
-    dataToStdout("[!] Legal Disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
+    dataToStdout("[!] Legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
     
     dataToStdout("[*] starting at: %s\n\n" % time.strftime("%X"), forceOutput=True)
 

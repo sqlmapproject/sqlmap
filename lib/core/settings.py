@@ -347,7 +347,7 @@ LOW_TEXT_PERCENT = 20
 # Reference: http://dev.mysql.com/doc/refman/5.1/en/function-resolution.html
 IGNORE_SPACE_AFFECTED_KEYWORDS = ("CAST", "COUNT", "EXTRACT", "GROUP_CONCAT", "MAX", "MID", "MIN", "SESSION_USER", "SUBSTR", "SUBSTRING", "SUM", "SYSTEM_USER", "TRIM")
 
-LEGAL_DISCLAIMER = "usage of sqlmap for attacking web servers without prior mutual consent can be considered as an illegal activity. it is the final user's responsibility to obey all applicable local, state and federal laws. authors assume no liability and are not responsible for any misuse or damage caused by this program."
+LEGAL_DISCLAIMER = "usage of sqlmap for attacking targets without prior mutual is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Authors assume no liability and are not responsible for any misuse or damage caused by this program"
 
 # After this number of misses reflective removal mechanism is turned off (for speed up reasons)
 REFLECTIVE_MISS_THRESHOLD = 20
