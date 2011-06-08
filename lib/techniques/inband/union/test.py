@@ -212,7 +212,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
         if not all([validPayload, vector]) and not conf.uChar:
             warnMsg = "if UNION based SQL injection is not detected, "
-            warnMsg += "please consider to provide --union-char switch "
+            warnMsg += "please consider providing --union-char switch "
             warnMsg += "(e.g. --union-char=1) and/or try to force the "
             warnMsg += "back-end DBMS (e.g. --dbms=mysql) "
             singleTimeWarnMessage(warnMsg)
