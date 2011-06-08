@@ -20,6 +20,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     """
     This will run the program and present profiling data in a nice looking graph
     """
+
     try:
         from extra.gprof2dot import gprof2dot
         from extra.xdot import xdot
@@ -28,7 +29,9 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import pydot
     except ImportError, e:
         errMsg = "profiling requires third-party libraries (%s). " % getUnicode(e, UNICODE_ENCODING)
-        errMsg += "quick steps: 1) install http://code.google.com/p/pydot/ 2) sudo apt-get install python-profiler graphviz"
+        errMsg += "Quick steps:%s" % os.linesep
+        errMsg += "1) Install http://code.google.com/p/pydot/%s" % os.linesep
+        errMsg += "2) sudo apt-get install python-profiler graphviz"
         logger.error(errMsg)
 
         return

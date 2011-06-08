@@ -136,7 +136,7 @@ def __showInjections():
     conf.dumper.technic(header, data)
 
     if inj.place in (HTTPMETHOD.GET, HTTPMETHOD.POST):
-        infoMsg = "manual usage of %s payloads requires url encoding" % inj.place
+        infoMsg = "usage of injected %s payloads requires manual url-encoding" % inj.place
         logger.info(infoMsg)
 
 def __randomFillBlankFields(value):
@@ -166,11 +166,10 @@ def __saveToResultsFile():
     if not conf.resultsFP:
         return
 
+    found = False
+    results = {}
     techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
 
-    found = False
-
-    results = {}
     for inj in kb.injections:
         if inj.place is None or inj.parameter is None:
             continue
@@ -399,10 +398,8 @@ def start():
                             break
 
                         kb.vainRun = False
-
-                        paramKey = (conf.hostname, conf.path, place, parameter)
-
                         testSqlInj = True
+                        paramKey = (conf.hostname, conf.path, place, parameter)
 
                         if paramKey in kb.testedParams:
                             testSqlInj = False
@@ -578,8 +575,8 @@ def start():
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
 
     if conf.multipleTargets:
-        infoMsg  = "you can find results of scanning in multiple targets mode "
-        infoMsg += "inside the CSV file '%s'" % conf.resultsFilename
+        infoMsg  = "you can find results of scanning in multiple targets "
+        infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
         logger.info(infoMsg)
 
     return True
