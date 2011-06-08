@@ -433,6 +433,7 @@ def __setGoogleDorking():
 
     while True:
         matches = search()
+
         if kb.targetUrls:
             infoMsg = "sqlmap got %d results for your " % len(matches)
             infoMsg += "Google dork expression, "
@@ -450,7 +451,7 @@ def __setGoogleDorking():
             message = "sqlmap got %d results " % len(matches)
             message += "for your Google dork expression, but none of them "
             message += "have GET parameters to test for SQL injection. "
-            message += "do you want to skip to the next result page? [Y/n]"
+            message += "Do you want to skip to the next result page? [Y/n]"
             test = readInput(message, default="Y")
 
             if test[0] in ("n", "N"):
@@ -473,9 +474,11 @@ def __setBulkMultipleTargets():
         raise sqlmapFilePathException, errMsg
 
     f = open(conf.bulkFile, 'r')
+
     for line in f.xreadlines():
         if re.search(r"[^ ]+\?(.+)", line, re.I):
             kb.targetUrls.add((line, None, None, None))
+
     f.close()
 
 def __findPageForms():
@@ -1627,11 +1630,10 @@ def __setTorProxySettings():
         conf.proxy = "http://%s:%d" % (LOCALHOST, found)
     else:
         errMsg = "can't establish connection with the Tor proxy. "
-        errMsg += "please make sure that you have "
-        errMsg += "some kind of Vidalia/Privoxy/Polipo "
-        errMsg += "Tor proxy bundle installed for "
-        errMsg += "you to be able to successfully use "
-        errMsg += "--tor switch "
+        errMsg += "Please make sure that you have Vidalia, Privoxy or "
+        errMsg += "Polipo bundle installed for you to be able to "
+        errMsg += "successfully use --tor switch "
+
         if IS_WIN:
             errMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
         else:
@@ -1714,9 +1716,9 @@ def __basicOptionValidation():
         try:
             codecs.lookup(conf.charset)
         except LookupError:
-            errMsg  = "unknown charset '%s'. please visit page " % conf.charset
-            errMsg += "'%s' " % CODECS_LIST_PAGE
-            errMsg += "to get the full list of supported charsets"
+            errMsg = "unknown charset '%s'. Please visit " % conf.charset
+            errMsg += "'%s' to get the full list of " % CODECS_LIST_PAGE
+            errMsg += "supported charsets"
             raise sqlmapSyntaxException, errMsg
 
 def __resolveCrossReferences():

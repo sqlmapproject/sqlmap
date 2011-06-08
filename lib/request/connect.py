@@ -254,7 +254,7 @@ class Connect:
 
                 if kb.alwaysRedirect is None:
                     msg = "sqlmap got a %d redirect to " % conn.redcode
-                    msg += "'%s'. do you want to follow redirects " % conn.redurl
+                    msg += "'%s'. Do you want to follow redirects " % conn.redurl
                     msg += "from now on (or stay on the original page)? [Y/n]"
                     choice = readInput(msg, default="Y")
 
@@ -285,7 +285,7 @@ class Connect:
                 if kb.alwaysRefresh is None:
                     msg = "sqlmap got a refresh request "
                     msg += "(redirect like response common to login pages). "
-                    msg += "do you want to apply the refresh "
+                    msg += "Do you want to apply the refresh "
                     msg += "from now on (or stay on the original page)? [Y/n]"
                     choice = readInput(msg, default="Y")
 

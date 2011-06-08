@@ -16,7 +16,7 @@ optDict = {
                                "direct":            "string",
                                "url":               "string",
                                "logFile":           "string",
-                               "bulkFile":           "string",
+                               "bulkFile":          "string",
                                "requestFile":       "string",
                                "googleDork":        "string",
                                "configFile":        "string"
