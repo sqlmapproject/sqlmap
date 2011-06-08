@@ -69,6 +69,9 @@ def cmdLineParser():
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
 
+        request.add_option("--cookie-del", dest="cDel", default=";",
+                           help="Delimiter character used for splitting cookie values")
+
         request.add_option("--cookie-urlencode", dest="cookieUrlencode",
                              action="store_true", default=False,
                              help="URL Encode generated cookie injections")

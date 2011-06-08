@@ -488,10 +488,7 @@ def paramToDict(place, parameters=None):
     if place != PLACE.SOAP:
         parameters = parameters.replace(", ", ",")
 
-        if place == PLACE.COOKIE:
-            splitParams = parameters.split(";")
-        else:
-            splitParams = parameters.split("&")
+        splitParams = parameters.split(conf.cDel if place == PLACE.COOKIE else "&")
 
         for element in splitParams:
             elem = element.split("=")
