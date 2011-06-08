@@ -23,7 +23,7 @@ from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
 from lib.core.common import sanitizeAsciiString
-from lib.core.common import singleTimeWarnMessage
+from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -140,7 +140,7 @@ def checkCharEncoding(encoding):
     except LookupError:
         warnMsg = "unknown web page charset '%s'. " % encoding
         warnMsg += "Please report by e-mail to %s." % ML
-        singleTimeWarnMessage(warnMsg, logging.WARN, encoding)
+        singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
 
     return encoding
@@ -153,7 +153,7 @@ def getHeuristicCharEncoding(page):
     retVal = detect(page)['encoding']
 
     infoMsg = "heuristics detected web page charset '%s'" % retVal
-    singleTimeWarnMessage(infoMsg, logging.INFO, retVal)
+    singleTimeLogMessage(infoMsg, logging.INFO, retVal)
 
     return retVal
 
