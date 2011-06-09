@@ -1399,8 +1399,7 @@ def sanitizeAsciiString(subject):
 def getFilteredPageContent(page, onlyText=True):
     retVal = page
 
-    # only if the page's charset had been successfully identified
-    if isinstance(page, unicode):
+    if isinstance(page, basestring):
         retVal = re.sub(r"(?s)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page)
 
         while retVal.find("  ") != -1:
@@ -1413,8 +1412,7 @@ def getFilteredPageContent(page, onlyText=True):
 def getPageTextWordsSet(page):
     retVal = None
 
-    # only if the page's charset had been successfully identified
-    if isinstance(page, unicode):
+    if isinstance(page, basestring):
         page = getFilteredPageContent(page)
         retVal = set(re.findall(r"\w+", page))
 
