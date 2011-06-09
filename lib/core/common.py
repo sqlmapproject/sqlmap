@@ -754,7 +754,7 @@ def readInput(message, default=None):
         else:
             options = unicode()
 
-        infoMsg = "%s%s" % (message, options)
+        infoMsg = "%s%s" % (getUnicode(message), options)
         logger.info(infoMsg)
 
         debugMsg = "used the default behaviour, running in batch mode"
