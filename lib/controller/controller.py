@@ -139,6 +139,11 @@ def __showInjections():
         infoMsg = "usage of injected %s payloads requires manual url-encoding" % inj.place
         logger.info(infoMsg)
 
+    if conf.tamper:
+        infoMsg = "changes made by tampering scripts are not "
+        infoMsg += "included in shown payload content(s)"
+        logger.info(infoMsg)
+
 def __randomFillBlankFields(value):
     retVal = value
 
