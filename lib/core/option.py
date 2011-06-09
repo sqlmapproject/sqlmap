@@ -477,7 +477,7 @@ def __setBulkMultipleTargets():
 
     for line in f.xreadlines():
         if re.search(r"[^ ]+\?(.+)", line, re.I):
-            kb.targetUrls.add((line, None, None, None))
+            kb.targetUrls.add((line.strip(), None, None, None))
 
     f.close()
 
