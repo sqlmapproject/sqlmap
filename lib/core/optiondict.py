@@ -68,7 +68,8 @@ optDict = {
                                "risk":              "integer",
                                "string":            "string",
                                "regexp":            "string",
-                               "textOnly":          "boolean"
+                               "textOnly":          "boolean",
+                               "titles":            "boolean"
                              },
 
             "Techniques":    {

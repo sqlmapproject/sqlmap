@@ -351,3 +351,6 @@ LEGAL_DISCLAIMER = "usage of sqlmap for attacking targets without prior mutual i
 
 # After this number of misses reflective removal mechanism is turned off (for speed up reasons)
 REFLECTIVE_MISS_THRESHOLD = 20
+
+# Regular expression used for extracting HTML title
+HTML_TITLE_REGEX = "<title>(?P<result>[^<]+)</title>"

@@ -209,6 +209,10 @@ def cmdLineParser():
                              action="store_true", default=False,
                              help="Compare pages based only on the textual content")
 
+        detection.add_option("--titles", dest="titles",
+                             action="store_true", default=False,
+                             help="Compare pages based only on their titles")
+
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can be "
                                  "used to tweak testing of specific SQL "
