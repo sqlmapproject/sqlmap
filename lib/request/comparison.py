@@ -34,17 +34,21 @@ def comparison(page, getRatioValue=False, pageLength=None):
     seqMatcher = getCurrentThreadData().seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
+    if any([conf.string, conf.regexp]):
+        if page:
+            # String to match in page when the query is valid
+            if conf.string:
+                condition = conf.string in page
+                return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+
+            # Regular expression to match in page when the query is valid
+            if conf.regexp:
+                condition = re.search(conf.regexp, page, re.I | re.M) is not None
+                return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+        else:
+            return None
+
     if page:
-        # String to match in page when the query is valid
-        if conf.string:
-            condition = conf.string in page
-            return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
-
-        # Regular expression to match in page when the query is valid
-        if conf.regexp:
-            condition = re.search(conf.regexp, page, re.I | re.M) is not None
-            return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
-
         # In case of an DBMS error page return None
         if kb.errorIsNone and (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
             return None
