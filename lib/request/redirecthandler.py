@@ -48,19 +48,19 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
         logger.log(7, responseMsg)
 
-        if "location" in headers:
-            result.redurl = headers.getheaders("location")[0].split("?")[0]
-        elif "uri" in headers:
-            result.redurl = headers.getheaders("uri")[0].split("?")[0]
-
-        if hasattr(result, 'redurl'):
-            if not urlparse.urlsplit(result.redurl).netloc:
-                result.redurl = urlparse.urljoin(conf.url, result.redurl)
-
-        if "set-cookie" in headers:
-            result.setcookie = headers["set-cookie"].split("; path")[0]
-
         if result:
+            if "location" in headers:
+                result.redurl = headers.getheaders("location")[0].split("?")[0]
+            elif "uri" in headers:
+                result.redurl = headers.getheaders("uri")[0].split("?")[0]
+
+            if hasattr(result, 'redurl'):
+                if not urlparse.urlsplit(result.redurl).netloc:
+                    result.redurl = urlparse.urljoin(conf.url, result.redurl)
+
+            if "set-cookie" in headers:
+                result.setcookie = headers["set-cookie"].split("; path")[0]
+
             result.redcode = code
 
         return result
