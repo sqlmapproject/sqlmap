@@ -1260,7 +1260,7 @@ def __cleanupOptions():
     if conf.optimize:
         #conf.predictOutput = True
         conf.keepAlive = True
-        conf.nullConnection = not conf.textOnly
+        conf.nullConnection = not any([conf.textOnly, conf.titles])
         conf.threads = 3 if conf.threads < 3 else conf.threads
 
     if conf.data:
@@ -1272,7 +1272,7 @@ def __cleanupOptions():
     if conf.dbms:
         conf.dbms = conf.dbms.capitalize()
 
-    if conf.optimize and any([conf.data, conf.textOnly]):
+    if conf.optimize and any([conf.data, conf.textOnly, conf.titles]):
         conf.nullConnection = False
 
         debugMsg = "turning off --null-connection switch used indirectly by switch -o"
@@ -1666,6 +1666,10 @@ def __basicOptionValidation():
 
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch --text-only is incompatible with switch --null-connection"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.titles and conf.nullConnection:
+        errMsg = "switch --titles is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
     if conf.data and conf.nullConnection:

@@ -459,6 +459,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].matchRatio = kb.matchRatio
 
                         injection.conf.textOnly = conf.textOnly
+                        injection.conf.titles = conf.titles
                         injection.conf.string = conf.string
                         injection.conf.regexp = conf.regexp
 
