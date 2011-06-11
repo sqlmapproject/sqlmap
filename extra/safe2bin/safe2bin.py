@@ -22,7 +22,10 @@ from optparse import OptionParser
 HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
 
 # Raw chars that will be safe encoded to their slash (\) representations (e.g. newline to \n)
-SAFE_ENCODE_SLASH_REPLACEMENTS = "\\\t\n\r\x0b\x0c"
+SAFE_ENCODE_SLASH_REPLACEMENTS = "\t\n\r\x0b\x0c"
+
+# String used for temporary marking of slash characters
+SLASH_MARKER = "__SLASH__"
 
 def safecharencode(value):
     """
@@ -37,8 +40,13 @@ def safecharencode(value):
     retVal = value
 
     if isinstance(value, basestring):
+
+        retVal = retVal.replace('\\', SLASH_MARKER)
+
         for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
             retVal = retVal.replace(char, repr(char).strip('\''))
+
+        retVal = retVal.replace(SLASH_MARKER, '\\\\')
 
         retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\\x%02x' % ord(y)), retVal, unicode())
 
@@ -64,8 +72,12 @@ def safechardecode(value):
             else:
                 break
 
+        retVal = retVal.replace('\\\\', SLASH_MARKER)
+
         for char in SAFE_ENCODE_SLASH_REPLACEMENTS[::-1]:
             retVal = retVal.replace(repr(char).strip('\''), char)
+
+        retVal = retVal.replace(SLASH_MARKER, '\\')
 
     elif isinstance(value, (list, tuple)):
         for i in xrange(len(value)):
