@@ -174,6 +174,7 @@ optDict = {
                                "replicate":         "boolean",
                                "tor":               "boolean",
                                "wizard":            "boolean",
+                               "dependences":       "boolean",
                                "verbose":           "integer"
                              },
           }

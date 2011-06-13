@@ -537,6 +537,10 @@ def cmdLineParser():
                                   action="store_true", default=False,
                                   help="Simple wizard interface for beginner users")
 
+        miscellaneous.add_option("--dependences", dest="dependences",
+                                  action="store_true", default=False,
+                                  help="Show which sqlmap dependences are not available")
+
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
                           default=False, help=SUPPRESS_HELP)
@@ -586,8 +590,8 @@ def cmdLineParser():
         (args, _) = parser.parse_args(args)
 
         if not any([args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
-            args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard]):
-            errMsg = "missing a mandatory parameter ('-d', '-u', '-l', '-m', '-r', '-g', '-c', '--wizard' or '--update'), "
+            args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependences]):
+            errMsg = "missing a mandatory parameter (-d, -u, -l, -m, -r, -g, -c, --wizard, --update or --dependences), "
             errMsg += "-h for help"
             parser.error(errMsg)
 
