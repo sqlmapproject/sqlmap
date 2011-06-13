@@ -14,7 +14,7 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.settings import DBMS_DICT
 from lib.core.settings import IS_WIN
 
-def checkDependences():
+def checkDependencies():
     missing_libraries = set()
 
     for dbmsName, data in DBMS_DICT.items():
@@ -103,4 +103,4 @@ def checkDependences():
             missing_libraries.add('python-pyreadline')
 
     if len(missing_libraries) == 0:
-        infoMsg = "all dependences are installed"
+        infoMsg = "all dependencies are installed"

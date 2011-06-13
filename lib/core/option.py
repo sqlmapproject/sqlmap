@@ -113,7 +113,7 @@ from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
-from lib.utils.dependences import checkDependences
+from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
 
 authHandler = urllib2.BaseHandler()
@@ -1744,7 +1744,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     __saveCmdline()
     __setRequestFromFile()
     __cleanupOptions()
-    checkDependences()
+    checkDependencies()
     __basicOptionValidation()
     __setTorProxySettings()
     __setMultipleTargets()
