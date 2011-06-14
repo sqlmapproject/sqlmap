@@ -1212,6 +1212,14 @@ def __setHTTPTimeout():
 
     socket.setdefaulttimeout(conf.timeout)
 
+def __checkDependencies():
+    """
+    Checks for missing dependencies.
+    """
+
+    if conf.dependencies:
+        checkDependencies()
+
 def __cleanupOptions():
     """
     Cleanup configuration attributes.
@@ -1744,7 +1752,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
     __saveCmdline()
     __setRequestFromFile()
     __cleanupOptions()
-    checkDependencies()
+    __checkDependencies()
     __basicOptionValidation()
     __setTorProxySettings()
     __setMultipleTargets()

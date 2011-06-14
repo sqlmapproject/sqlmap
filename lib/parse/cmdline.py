@@ -539,7 +539,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--dependencies", dest="dependencies",
                                   action="store_true", default=False,
-                                  help="Show which sqlmap dependencies are not available")
+                                  help="Check for missing sqlmap dependencies")
 
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",

@@ -27,10 +27,10 @@ def checkDependencies():
                 import pymssql
 
                 if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
-                    debugMsg = "'%s' third-party library must be " % data[1]
-                    debugMsg += "version >= 1.0.2 to work properly. "
-                    debugMsg += "Download from %s" % data[2]
-                    logger.debug(debugMsg)
+                    warnMsg = "'%s' third-party library must be " % data[1]
+                    warnMsg += "version >= 1.0.2 to work properly. "
+                    warnMsg += "Download from %s" % data[2]
+                    logger.warn(warnMsg)
             elif dbmsName == DBMS.MYSQL:
                 import MySQLdb
             elif dbmsName == DBMS.PGSQL:
@@ -44,10 +44,10 @@ def checkDependencies():
             elif dbmsName == DBMS.FIREBIRD:
                 import kinterbasdb
         except ImportError, _:
-            debugMsg = "sqlmap requires '%s' third-party library " % data[1]
-            debugMsg += "in order to directly connect to the database "
-            debugMsg += "%s. Download from %s" % (dbmsName, data[2])
-            logger.debug(debugMsg)
+            warnMsg = "sqlmap requires '%s' third-party library " % data[1]
+            warnMsg += "in order to directly connect to the database "
+            warnMsg += "%s. Download from %s" % (dbmsName, data[2])
+            logger.warn(warnMsg)
             missing_libraries.add(data[1])
 
             continue
@@ -60,10 +60,10 @@ def checkDependencies():
         debugMsg = "'python-impacket' third-party library is found"
         logger.debug(debugMsg)
     except ImportError, _:
-        debugMsg = "sqlmap requires 'python-impacket' third-party library for "
-        debugMsg += "out-of-band takeover feature. Download from "
-        debugMsg += "http://code.google.com/p/impacket/"
-        logger.debug(debugMsg)
+        warnMsg = "sqlmap requires 'python-impacket' third-party library for "
+        warnMsg += "out-of-band takeover feature. Download from "
+        warnMsg += "http://code.google.com/p/impacket/"
+        logger.warn(warnMsg)
         missing_libraries.add('python-impacket')
 
     try:
@@ -71,10 +71,10 @@ def checkDependencies():
         debugMsg = "'python-ntlm' third-party library is found"
         logger.debug(debugMsg)
     except ImportError, _:
-        debugMsg = "sqlmap requires 'python-ntlm' third-party library for "
-        debugMsg += "if you plan to attack a web application behind NTLM "
-        debugMsg += "authentication. Download from http://code.google.com/p/python-ntlm/"
-        logger.debug(debugMsg)
+        warnMsg = "sqlmap requires 'python-ntlm' third-party library for "
+        warnMsg += "if you plan to attack a web application behind NTLM "
+        warnMsg += "authentication. Download from http://code.google.com/p/python-ntlm/"
+        logger.warn(warnMsg)
         missing_libraries.add('python-ntlm')
 
     try:
@@ -82,10 +82,10 @@ def checkDependencies():
         debugMsg = "'python-svn' third-party library is found"
         logger.debug(debugMsg)
     except ImportError, _:
-        debugMsg = "sqlmap requires 'python-svn' third-party library for "
-        debugMsg += "if you want to use the sqlmap update functionality. "
-        debugMsg += "Download from http://pysvn.tigris.org/"
-        logger.debug(debugMsg)
+        warnMsg = "sqlmap requires 'python-svn' third-party library for "
+        warnMsg += "if you want to use the sqlmap update functionality. "
+        warnMsg += "Download from http://pysvn.tigris.org/"
+        logger.warn(warnMsg)
         missing_libraries.add('python-svn')
 
     if IS_WIN:
@@ -94,12 +94,12 @@ def checkDependencies():
             debugMsg = "'python-pyreadline' third-party library is found"
             logger.debug(debugMsg)
         except ImportError, _:
-            debugMsg = "sqlmap requires 'pyreadline' third-party library to "
-            debugMsg += "be able to take advantage of the sqlmap TAB "
-            debugMsg += "completion and history support features in the SQL "
-            debugMsg += "shell and OS shell. Download from "
-            debugMsg += "http://ipython.scipy.org/moin/PyReadline/Intro"
-            logger.debug(debugMsg)
+            warnMsg = "sqlmap requires 'pyreadline' third-party library to "
+            warnMsg += "be able to take advantage of the sqlmap TAB "
+            warnMsg += "completion and history support features in the SQL "
+            warnMsg += "shell and OS shell. Download from "
+            warnMsg += "http://ipython.scipy.org/moin/PyReadline/Intro"
+            logger.warn(warnMsg)
             missing_libraries.add('python-pyreadline')
 
     if len(missing_libraries) == 0:
