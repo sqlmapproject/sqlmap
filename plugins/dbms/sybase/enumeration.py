@@ -217,7 +217,7 @@ class Enumeration(GenericEnumeration):
                     columns = {}
 
                     for name, type_ in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr]):
-                        columns[name] = sybaseTypes[type_] if type_ else None
+                        columns[name] = sybaseTypes.get(type_, type_)
 
                     table[tbl] = columns
                     kb.data.cachedColumns[conf.db] = table

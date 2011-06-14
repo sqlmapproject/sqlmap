@@ -1198,7 +1198,7 @@ class Enumeration:
                         colType = inject.getValue(query, inband=False, error=False)
 
                         if Backend.isDbms(DBMS.FIREBIRD):
-                            colType = firebirdTypes[colType] if colType in firebirdTypes else colType
+                            colType = firebirdTypes.get(colType, colType)
 
                         column = safeSQLIdentificatorNaming(column)
                         columns[column] = colType
