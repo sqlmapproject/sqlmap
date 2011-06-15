@@ -524,7 +524,7 @@
             <blind/>
         </columns>
         <dump_table>
-            <inband query="SELECT %s FROM %s..%s"/>
+            <inband query="SELECT %s FROM %s.%s"/>
             <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s) AS value_table"/>
         </dump_table>
         <search_db>
