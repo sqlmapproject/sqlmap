@@ -2614,3 +2614,69 @@ def isNoneValue(value):
         return not any(value)
     else:
         return value is None
+
+def expandMnemonics(mnemonics, parser, args):
+    """
+    Expand mnemonic options
+    """
+
+    class MnemonicNode:
+        def __init__(self):
+            self.next = {}
+            self.current = []
+
+    head = MnemonicNode()
+    pointer = None
+
+    for group in parser.option_groups:
+        for option in group.option_list:
+            for opt in option._long_opts + option._short_opts:
+                pointer = head
+                for char in opt:
+                    if char == "-":
+                        continue
+                    elif char not in pointer.next:
+                        pointer.next[char] = MnemonicNode()
+                    pointer = pointer.next[char]
+                    pointer.current.append(option)
+
+    for mnemonic in mnemonics.split(','):
+        found = None
+        name = mnemonic.split('=')[0].replace("-", "")
+        value = mnemonic.split('=')[1] if len(mnemonic.split('=')) > 1 else None
+        pointer = head
+        for char in name:
+            if char in pointer.next:
+                pointer = pointer.next[char]
+            else:
+                pointer = None
+
+        if pointer in (None, head):
+            errMsg = "mnemonic '%s' can't be resolved to any parameter name" % name
+            logger.error(errMsg)
+        elif len(pointer.current) > 1:
+            options = {}
+            for option in pointer.current:
+                for opt in option._long_opts + option._short_opts:
+                    options[opt.strip('-')] = option
+            if name in options:
+                found = name
+                debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
+                logger.debug(debugMsg)
+            else:
+                found = sorted(options.keys(), key=lambda x: len(x))[0]
+                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to %s). " % (name, ", ".join(options.keys()))
+                warnMsg += "resolved to shortest parameter name (%s)" % found
+                logger.warn(warnMsg)
+            found = options[found]
+        else:
+            found = pointer.current[0]
+            debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
+            logger.debug(debugMsg)
+
+        if found:
+            value = found.convert_value(found, value)
+            if value is not None:
+                setattr(args, found.dest, value)
+            else:
+                setattr(args, found.dest, True)

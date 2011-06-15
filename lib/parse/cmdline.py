@@ -14,6 +14,7 @@ from optparse import OptionGroup
 from optparse import OptionParser
 from optparse import SUPPRESS_HELP
 
+from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
 from lib.core.data import logger
 from lib.core.settings import IS_WIN
@@ -28,6 +29,7 @@ def cmdLineParser():
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % sys.argv[0] if " " in sys.argv[0] else sys.argv[0])
+
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
@@ -493,6 +495,9 @@ def cmdLineParser():
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
+        miscellaneous.add_option("-z", dest="mnemonics",
+                               help="Use mnemonics for shorter parameter setup")
+
         miscellaneous.add_option("--beep", dest="beep",
                                   action="store_true", default=False,
                                   help="Alert when sql injection found")
@@ -588,6 +593,11 @@ def cmdLineParser():
             args.append(getUnicode(arg, system=True))
 
         (args, _) = parser.parse_args(args)
+
+        for i in xrange(len(sys.argv)-1):
+            if sys.argv[i] == '-z':
+                expandMnemonics(sys.argv[i+1], parser, args)
+                break
 
         if not any([args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependencies]):
