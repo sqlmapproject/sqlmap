@@ -2642,7 +2642,7 @@ def expandMnemonics(mnemonics, parser, args):
 
     for mnemonic in mnemonics.split(','):
         found = None
-        name = mnemonic.split('=')[0].replace("-", "")
+        name = mnemonic.split('=')[0].replace("-", "").strip()
         value = mnemonic.split('=')[1] if len(mnemonic.split('=')) > 1 else None
         pointer = head
         for char in name:
