@@ -488,9 +488,9 @@ def start():
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))
 
                         if kb.dynamicParameters:
-                            errMsg += " Give it a go with the --text-only switch "
-                            errMsg += "if the target page has a low percentage of "
-                            errMsg += "textual content (~%.2f%% of " % percent
+                            errMsg += " You can give it a go with the --text-only "
+                            errMsg += "switch if the target page has a low percentage "
+                            errMsg += "of textual content (~%.2f%% of " % percent
                             errMsg += "page content is text)."
                         elif percent < LOW_TEXT_PERCENT and not kb.errorIsNone:
                             errMsg += " Please retry with the --text-only switch "
@@ -500,18 +500,27 @@ def start():
                             errMsg += "of comparison engine to detect at least "
                             errMsg += "one dynamic parameter)."
 
+                    if kb.heuristicTest:
+                        errMsg += " As heuristic test turned out positive you are "
+                        errMsg += "strongly advised to continue on with the tests. "
+                        errMsg += "Please, consider usage of tampering scripts as "
+                        errMsg += "your target might filter the queries."
+
                     if not conf.string and not conf.regexp:
-                        errMsg += " Rerun by providing either a valid --string "
+                        errMsg += " Also, you can try to rerun by providing "
+                        errMsg += "either a valid --string "
                         errMsg += "or a valid --regexp, refer to the user's "
                         errMsg += "manual for details"
                     elif conf.string:
-                        errMsg += " Rerun by providing a valid --string, perhaps "
-                        errMsg += "the string that you have choosen does not match "
-                        errMsg += "only on True responses"
+                        errMsg += " Also, you can try to rerun by providing a "
+                        errMsg += "valid --string as perhaps the string you "
+                        errMsg += "have choosen does not match "
+                        errMsg += "exclusively True responses"
                     elif conf.regexp:
-                        errMsg += " Rerun by providing a valid --regexp, perhaps "
-                        errMsg += "the regular expression that you have choosen "
-                        errMsg += "does not match only on True responses"
+                        errMsg += " Also, you can try to rerun by providing a "
+                        errMsg += "valid --regexp as perhaps the regular "
+                        errMsg += "expression that you have choosen "
+                        errMsg += "does not match exclusively True responses"
 
                     raise sqlmapNotVulnerableException, errMsg
                 else:

@@ -582,6 +582,8 @@ def heuristicCheckSqlInjection(place, parameter):
     infoMsg = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
+    kb.heuristicTest = result
+
     if result:
         infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
         logger.info(infoMsg)

@@ -1378,6 +1378,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.formNames = []
     kb.headersCount = 0
     kb.headersFp = {}
+    kb.heuristicTest = None
     kb.hintValue = None
     kb.htmlFp = []
     kb.ignoreTimeout = False
