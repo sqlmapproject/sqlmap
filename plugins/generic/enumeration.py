@@ -1395,7 +1395,7 @@ class Enumeration:
                         value = inject.getValue(query, blind=False)
 
                     if column == colList[0]:
-                        if isNoneValue(value):
+                        if isNoneValue(value) or not value:
                             breakRetrieval = True
                             break
                         else:
@@ -1410,6 +1410,8 @@ class Enumeration:
                         elif (i + 1) > conf.limitStop:
                             breakRetrieval = True
                             break
+
+                    value = "" if isNoneValue(value) else value
 
                     lengths[column] = max(lengths[column], len(value) if value else 0)
                     entries[column].append(value)
