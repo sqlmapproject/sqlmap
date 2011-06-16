@@ -2631,11 +2631,13 @@ def expandMnemonics(mnemonics, parser, args):
         for option in group.option_list:
             for opt in option._long_opts + option._short_opts:
                 pointer = head
+
                 for char in opt:
                     if char == "-":
                         continue
                     elif char not in pointer.next:
                         pointer.next[char] = MnemonicNode()
+
                     pointer = pointer.next[char]
                     pointer.current.append(option)
 
@@ -2644,6 +2646,7 @@ def expandMnemonics(mnemonics, parser, args):
         name = mnemonic.split('=')[0].replace("-", "").strip()
         value = mnemonic.split('=')[1] if len(mnemonic.split('=')) > 1 else None
         pointer = head
+
         for char in name:
             if char in pointer.next:
                 pointer = pointer.next[char]
@@ -2654,20 +2657,26 @@ def expandMnemonics(mnemonics, parser, args):
         if pointer in (None, head):
             errMsg = "mnemonic '%s' can't be resolved to any parameter name" % name
             raise sqlmapSyntaxException, errMsg
+
         elif len(pointer.current) > 1:
             options = {}
+
             for option in pointer.current:
                 for opt in option._long_opts + option._short_opts:
-                    options[opt.strip('-')] = option
+                    opt = opt.strip('-')
+                    if opt.startswith(name):
+                        options[opt] = option
+
             if name in options:
                 found = name
                 debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
                 logger.debug(debugMsg)
             else:
                 found = sorted(options.keys(), key=lambda x: len(x))[0]
-                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to %s). " % (name, ", ".join(options.keys()))
-                warnMsg += "resolved to shortest parameter name (%s)" % found
+                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to %s). " % (name, ", ".join("'%s'" % key for key in options.keys()))
+                warnMsg += "resolved to shortest of those available ('%s')" % found
                 logger.warn(warnMsg)
+
             found = options[found]
         else:
             found = pointer.current[0]
@@ -2676,6 +2685,7 @@ def expandMnemonics(mnemonics, parser, args):
 
         if found:
             value = found.convert_value(found, value)
+
             if value is not None:
                 setattr(args, found.dest, value)
             elif not found.type: # boolean
