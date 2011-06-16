@@ -412,15 +412,16 @@ def start():
                             infoMsg = "skipping previously processed %s parameter '%s'" % (place, parameter)
                             logger.info(infoMsg)
 
+                        elif parameter in conf.testParameter:
+                            pass
+
                         elif parameter.upper() in IGNORE_PARAMETERS:
                             testSqlInj = False
 
                             infoMsg = "ignoring %s parameter '%s'" % (place, parameter)
                             logger.info(infoMsg)
 
-                        # Avoid dinamicity test if the user provided the
-                        # parameter manually
-                        elif parameter in conf.testParameter or conf.realTest:
+                        elif conf.realTest:
                             pass
 
                         elif not checkDynParam(place, parameter, value):
