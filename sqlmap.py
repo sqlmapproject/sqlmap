@@ -110,6 +110,9 @@ def main():
         logger.error(errMsg)
         closeDumper(False, errMsg)
 
+    except SystemExit:
+        pass
+
     except:
         print
         errMsg = unhandledExceptionMessage()
