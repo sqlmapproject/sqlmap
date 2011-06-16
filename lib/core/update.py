@@ -68,7 +68,12 @@ def update():
 
         client = pysvn.Client()
         client.callback_notify = notify
-        client.update(rootDir)
+
+        try:
+            client.update(rootDir)
+        except pysvn.ClientError, e:
+            errMsg = "unable to update sqlmap from subversion: '%s'" % str(e)
+            logger.error(errMsg)
 
     except ImportError, _:
         debugMsg = "sqlmap will try to update itself using 'svn' command"
