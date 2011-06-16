@@ -2653,7 +2653,7 @@ def expandMnemonics(mnemonics, parser, args):
 
         if pointer in (None, head):
             errMsg = "mnemonic '%s' can't be resolved to any parameter name" % name
-            logger.error(errMsg)
+            raise sqlmapSyntaxException, errMsg
         elif len(pointer.current) > 1:
             options = {}
             for option in pointer.current:
@@ -2678,5 +2678,8 @@ def expandMnemonics(mnemonics, parser, args):
             value = found.convert_value(found, value)
             if value is not None:
                 setattr(args, found.dest, value)
-            else:
+            elif not found.type: # boolean
                 setattr(args, found.dest, True)
+            else:
+                errMsg = "mnemonic '%s' requires value of type '%s'" % (name, found.type)
+                raise sqlmapSyntaxException, errMsg
