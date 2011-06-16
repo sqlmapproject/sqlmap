@@ -58,6 +58,7 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import advancedDict
 from lib.core.datatype import injectionDict
+from lib.core.defaults import defaults
 from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
@@ -99,7 +100,6 @@ from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
-from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_DELAY_CANDIDATES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
@@ -1287,10 +1287,9 @@ def __cleanupOptions():
         debugMsg = "turning off --null-connection switch used indirectly by switch -o"
         logger.debug(debugMsg)
 
-    # to distinguish explicit usage of --time-sec
-    if conf.timeSec is None:
+    if conf.timeSec not in kb.explicitSettings:
         if conf.tor:
-            conf.timeSec = 2 * TIME_DEFAULT_DELAY
+            conf.timeSec = 2 * conf.timeSec
             kb.adjustTimeDelay = False
 
             warnMsg = "increasing default value for "
@@ -1298,7 +1297,6 @@ def __cleanupOptions():
             warnMsg += "--tor switch was provided"
             logger.warn(warnMsg)
         else:
-            conf.timeSec = TIME_DEFAULT_DELAY
             kb.adjustTimeDelay = True
     else:
         kb.adjustTimeDelay = False
@@ -1374,6 +1372,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.dynamicParameters = False
     kb.endDetection = False
     kb.httpErrorCodes = {}
+    kb.explicitSettings = set()
     kb.errorIsNone = True
     kb.formNames = []
     kb.headersCount = 0
@@ -1593,7 +1592,7 @@ def __setVerbosity():
 
 def __mergeOptions(inputOptions, overrideOptions):
     """
-    Merge command line options with configuration file options.
+    Merge command line options with configuration file and default options.
 
     @param inputOptions: optparse object with command line options.
     @type inputOptions: C{instance}
@@ -1608,7 +1607,15 @@ def __mergeOptions(inputOptions, overrideOptions):
         inputOptionsItems = inputOptions.__dict__.items()
 
     for key, value in inputOptionsItems:
-        if key not in conf or (not conf[key] and value) or overrideOptions:
+        if key not in conf or value not in (None, False) or overrideOptions:
+            conf[key] = value
+
+    for key, value in conf.items():
+        if value:
+            kb.explicitSettings.add(key)
+
+    for key, value in defaults.items():
+        if not conf[key]:
             conf[key] = value
 
 def __setTrafficOutputFP():

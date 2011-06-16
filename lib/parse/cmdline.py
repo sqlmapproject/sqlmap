@@ -17,8 +17,8 @@ from optparse import SUPPRESS_HELP
 from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
 from lib.core.data import logger
+from lib.core.defaults import defaults
 from lib.core.settings import IS_WIN
-from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import UNICODE_ENCODING
 
@@ -33,8 +33,8 @@ def cmdLineParser():
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
-        parser.add_option("-v", dest="verbose", type="int", default=1,
-                          help="Verbosity level: 0-6 (default 1)")
+        parser.add_option("-v", dest="verbose", type="int", 
+                          help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
 
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
@@ -71,22 +71,22 @@ def cmdLineParser():
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
 
-        request.add_option("--cookie-del", dest="cDel", default=";",
+        request.add_option("--cookie-del", dest="cDel",
                            help="Delimiter character used for splitting cookie values")
 
         request.add_option("--cookie-urlencode", dest="cookieUrlencode",
-                             action="store_true", default=False,
+                             action="store_true",
                              help="URL Encode generated cookie injections")
 
         request.add_option("--drop-set-cookie", dest="dropSetCookie",
-                           action="store_true", default=False,
+                           action="store_true",
                            help="Ignore Set-Cookie header from response")
 
         request.add_option("--user-agent", dest="agent",
                            help="HTTP User-Agent header")
 
         request.add_option("--random-agent", dest="randomAgent",
-                           action="store_true", default=False,
+                           action="store_true",
                            help="Use randomly selected HTTP User-Agent header")
 
         request.add_option("--referer", dest="referer",
@@ -115,18 +115,18 @@ def cmdLineParser():
                                 "(name:password)")
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
-                           default=False, help="Ignore system default HTTP proxy")
+                           help="Ignore system default HTTP proxy")
 
-        request.add_option("--delay", dest="delay", type="float", default=0,
+        request.add_option("--delay", dest="delay", type="float",
                            help="Delay in seconds between each HTTP request")
 
-        request.add_option("--timeout", dest="timeout", type="float", default=30,
+        request.add_option("--timeout", dest="timeout", type="float",
                            help="Seconds to wait before timeout connection "
-                                "(default 30)")
+                                "(default %d)" % defaults.timeout)
 
-        request.add_option("--retries", dest="retries", type="int", default=3,
+        request.add_option("--retries", dest="retries", type="int",
                            help="Retries when the connection timeouts "
-                                "(default 3)")
+                                "(default %d)" % defaults.retries)
 
         request.add_option("--scope", dest="scope", 
                            help="Regexp to filter targets from provided proxy log")
@@ -134,7 +134,7 @@ def cmdLineParser():
         request.add_option("--safe-url", dest="safUrl", 
                            help="Url address to visit frequently during testing")
 
-        request.add_option("--safe-freq", dest="saFreq", type="int", default=0,
+        request.add_option("--safe-freq", dest="saFreq", type="int",
                            help="Test requests between two visits to a given safe url")
 
         # Optimization options
@@ -143,21 +143,21 @@ def cmdLineParser():
                                "performance of sqlmap.")
 
         optimization.add_option("-o", dest="optimize",
-                                 action="store_true", default=False,
+                                 action="store_true",
                                  help="Turn on all optimization switches")
 
         optimization.add_option("--predict-output", dest="predictOutput", action="store_true",
-                          default=False, help="Predict common queries output")
+                          help="Predict common queries output")
 
         optimization.add_option("--keep-alive", dest="keepAlive", action="store_true",
-                           default=False, help="Use persistent HTTP(s) connections")
+                           help="Use persistent HTTP(s) connections")
 
         optimization.add_option("--null-connection", dest="nullConnection", action="store_true",
-                          default=False, help="Retrieve page length without actual HTTP response body")
+                          help="Retrieve page length without actual HTTP response body")
 
-        optimization.add_option("--threads", dest="threads", type="int", default=1,
+        optimization.add_option("--threads", dest="threads", type="int",
                            help="Max number of concurrent HTTP(s) "
-                                "requests (default 1)")
+                                "requests (default %d)" % defaults.threads)
 
         # Injection options
         injection = OptionGroup(parser, "Injection", "These options can be "
@@ -191,13 +191,13 @@ def cmdLineParser():
                                 "HTTP responses when using blind SQL "
                                 "injection technique.")
 
-        detection.add_option("--level", dest="level", default=1, type="int",
+        detection.add_option("--level", dest="level", type="int",
                              help="Level of tests to perform (1-5, "
-                                  "default 1)")
+                                  "default %d)" % defaults.level)
 
-        detection.add_option("--risk", dest="risk", default=1, type="int",
+        detection.add_option("--risk", dest="risk", type="int",
                              help="Risk of tests to perform (0-3, "
-                                  "default 1)")
+                                  "default %d)" % defaults.level)
 
         detection.add_option("--string", dest="string",
                              help="String to match in page when the "
@@ -208,11 +208,11 @@ def cmdLineParser():
                                   "query is valid")
 
         detection.add_option("--text-only", dest="textOnly",
-                             action="store_true", default=False,
+                             action="store_true",
                              help="Compare pages based only on the textual content")
 
         detection.add_option("--titles", dest="titles",
-                             action="store_true", default=False,
+                             action="store_true",
                              help="Compare pages based only on their titles")
 
         # Techniques options
@@ -220,14 +220,14 @@ def cmdLineParser():
                                  "used to tweak testing of specific SQL "
                                  "injection techniques.")
 
-        techniques.add_option("--technique", dest="tech", default="BEUST",
+        techniques.add_option("--technique", dest="tech",
                               help="SQL injection techniques to test for "
-                                   "(default BEUST)")
+                                   "(default %s)" % defaults.tech)
 
         techniques.add_option("--time-sec", dest="timeSec",
-                              type="int", default=None,
+                              type="int",
                               help="Seconds to delay the DBMS response "
-                                   "(default %s)" % TIME_DEFAULT_DELAY)
+                                   "(default %s)" % defaults.timeSec)
 
         techniques.add_option("--union-cols", dest="uCols",
                               help="Range of columns to test for UNION query SQL injection")
@@ -239,7 +239,7 @@ def cmdLineParser():
         fingerprint = OptionGroup(parser, "Fingerprint")
 
         fingerprint.add_option("-f", "--fingerprint", dest="extensiveFp",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Perform an extensive DBMS version fingerprint")
 
         # Enumeration options
@@ -250,58 +250,58 @@ def cmdLineParser():
                                   "you can run your own SQL statements.")
 
         enumeration.add_option("-b", "--banner", dest="getBanner",
-                               action="store_true", default=False, help="Retrieve DBMS banner")
+                               action="store_true", help="Retrieve DBMS banner")
 
         enumeration.add_option("--current-user", dest="getCurrentUser",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Retrieve DBMS current user")
 
         enumeration.add_option("--current-db", dest="getCurrentDb",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Retrieve DBMS current database")
 
         enumeration.add_option("--is-dba", dest="isDba",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Detect if the DBMS current user is DBA")
 
         enumeration.add_option("--users", dest="getUsers", action="store_true",
-                               default=False, help="Enumerate DBMS users")
+                               help="Enumerate DBMS users")
 
         enumeration.add_option("--passwords", dest="getPasswordHashes",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Enumerate DBMS users password hashes")
 
         enumeration.add_option("--privileges", dest="getPrivileges",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Enumerate DBMS users privileges")
 
         enumeration.add_option("--roles", dest="getRoles",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Enumerate DBMS users roles")
 
         enumeration.add_option("--dbs", dest="getDbs", action="store_true",
-                               default=False, help="Enumerate DBMS databases")
+                               help="Enumerate DBMS databases")
 
         enumeration.add_option("--tables", dest="getTables", action="store_true",
-                               default=False, help="Enumerate DBMS database tables")
+                               help="Enumerate DBMS database tables")
 
         enumeration.add_option("--columns", dest="getColumns", action="store_true",
-                               default=False, help="Enumerate DBMS database table columns")
+                               help="Enumerate DBMS database table columns")
 
         enumeration.add_option("--schema", dest="getSchema", action="store_true",
-                               default=False, help="Enumerate DBMS schema")
+                               help="Enumerate DBMS schema")
 
         enumeration.add_option("--count", dest="getCount", action="store_true",
-                               default=False, help="Retrieve number of entries for table(s)")
+                               help="Retrieve number of entries for table(s)")
 
         enumeration.add_option("--dump", dest="dumpTable", action="store_true",
-                               default=False, help="Dump DBMS database table entries")
+                               help="Dump DBMS database table entries")
 
         enumeration.add_option("--dump-all", dest="dumpAll", action="store_true",
-                               default=False, help="Dump all DBMS databases tables entries")
+                               help="Dump all DBMS databases tables entries")
 
         enumeration.add_option("--search", dest="search", action="store_true",
-                               default=False, help="Search column(s), table(s) and/or database name(s)")
+                               help="Search column(s), table(s) and/or database name(s)")
 
         enumeration.add_option("-D", dest="db",
                                help="DBMS database to enumerate")
@@ -316,7 +316,7 @@ def cmdLineParser():
                                help="DBMS user to enumerate")
 
         enumeration.add_option("--exclude-sysdbs", dest="excludeSysDbs",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Exclude DBMS system databases when "
                                     "enumerating tables")
 
@@ -336,7 +336,7 @@ def cmdLineParser():
                                help="SQL statement to be executed")
 
         enumeration.add_option("--sql-shell", dest="sqlShell",
-                               action="store_true", default=False,
+                               action="store_true",
                                help="Prompt for an interactive SQL shell")
 
         # User-defined function options
@@ -345,10 +345,10 @@ def cmdLineParser():
                           "checks.")
 
         brute.add_option("--common-tables", dest="commonTables", action="store_true",
-                               default=False, help="Check existence of common tables")
+                               help="Check existence of common tables")
 
         brute.add_option("--common-columns", dest="commonColumns", action="store_true",
-                               default=False, help="Check existence of common columns")
+                               help="Check existence of common columns")
 
         # User-defined function options
         udf = OptionGroup(parser, "User-defined function injection", "These "
@@ -356,7 +356,7 @@ def cmdLineParser():
                           "functions.")
 
         udf.add_option("--udf-inject", dest="udfInject", action="store_true",
-                       default=False, help="Inject custom user-defined functions")
+                       help="Inject custom user-defined functions")
 
         udf.add_option("--shared-lib", dest="shLib",
                        help="Local path of the shared library")
@@ -388,27 +388,27 @@ def cmdLineParser():
                             help="Execute an operating system command")
 
         takeover.add_option("--os-shell", dest="osShell",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Prompt for an interactive operating "
                                  "system shell")
 
         takeover.add_option("--os-pwn", dest="osPwn",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Prompt for an out-of-band shell, "
                                  "meterpreter or VNC")
 
         takeover.add_option("--os-smbrelay", dest="osSmb",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="One click prompt for an OOB shell, "
                                  "meterpreter or VNC")
 
         takeover.add_option("--os-bof", dest="osBof",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Stored procedure buffer overflow "
                                  "exploitation")
 
         takeover.add_option("--priv-esc", dest="privEsc",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Database process' user privilege escalation")
 
         takeover.add_option("--msf-path", dest="msfPath",
@@ -426,15 +426,15 @@ def cmdLineParser():
                                "registry.")
 
         windows.add_option("--reg-read", dest="regRead",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Read a Windows registry key value")
 
         windows.add_option("--reg-add", dest="regAdd",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Write a Windows registry key value data")
 
         windows.add_option("--reg-del", dest="regDel",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Delete a Windows registry key value")
 
         windows.add_option("--reg-key", dest="regKey",
@@ -465,31 +465,31 @@ def cmdLineParser():
                             "textual file")
 
         general.add_option("--batch", dest="batch",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Never ask for user input, use the default behaviour")
 
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
         general.add_option("--eta", dest="eta",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Display for each output the "
                                       "estimated time of arrival")
 
         general.add_option("--flush-session", dest="flushSession",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Flush session file for current target")
 
         general.add_option("--fresh-queries", dest="freshQueries",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Ignores query results stored in session file")
 
         general.add_option("--save", dest="saveCmdline",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Save options on a configuration INI file")
 
         general.add_option("--update", dest="updateAll",
-                            action="store_true", default=False,
+                            action="store_true",
                             help="Update sqlmap")
 
         # Miscellaneous options
@@ -499,77 +499,77 @@ def cmdLineParser():
                                help="Use mnemonics for shorter parameter setup")
 
         miscellaneous.add_option("--beep", dest="beep",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Alert when sql injection found")
 
         miscellaneous.add_option("--check-payload", dest="checkPayload",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="IDS detection testing of injection payloads")
 
         miscellaneous.add_option("--cleanup", dest="cleanup",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Clean up the DBMS by sqlmap specific "
                                   "UDF and tables")
 
         miscellaneous.add_option("--forms", dest="forms",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Parse and test forms on target url")
 
-        miscellaneous.add_option("--gpage", dest="googlePage", default=1, type="int",
+        miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")
 
         miscellaneous.add_option("--mobile", dest="mobile",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Imitate smartphone through HTTP User-Agent header")
 
         miscellaneous.add_option("--page-rank", dest="pageRank",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Display page rank (PR) for Google dork results")
 
         miscellaneous.add_option("--parse-errors", dest="parseErrors",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Parse and display DBMS error messages from responses")
 
         miscellaneous.add_option("--replicate", dest="replicate",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Replicate dumped data into a sqlite3 database")
 
         miscellaneous.add_option("--tor", dest="tor", 
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
 
         miscellaneous.add_option("--wizard", dest="wizard",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Simple wizard interface for beginner users")
 
         miscellaneous.add_option("--dependencies", dest="dependencies",
-                                  action="store_true", default=False,
+                                  action="store_true",
                                   help="Check for missing sqlmap dependencies")
 
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
+                          help=SUPPRESS_HELP)
 
-        parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int", default=10,
+        parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
+                          help=SUPPRESS_HELP)
 
         parser.add_option("--live-test", dest="liveTest", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
+                          help=SUPPRESS_HELP)
 
         parser.add_option("--real-test", dest="realTest", action="store_true",
-                          default=False, help=SUPPRESS_HELP)
+                          help=SUPPRESS_HELP)
 
         parser.add_option("--run-case", dest="runCase", type="int",
-                          default=None, help=SUPPRESS_HELP)
+                          help=SUPPRESS_HELP)
 
         parser.add_option("--group-concat", dest="groupConcat", action="store_true",
-                           default=False, help=SUPPRESS_HELP)
+                           help=SUPPRESS_HELP)
 
         parser.add_option("--no-cast", dest="noCast", action="store_true",
-                           default=False, help=SUPPRESS_HELP)
+                           help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)

@@ -91,7 +91,6 @@ from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REFLECTED_NON_ALPHA_NUM_REGEX
 from lib.core.settings import REFLECTED_VALUE_MARKER
-from lib.core.settings import TIME_DEFAULT_DELAY
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
