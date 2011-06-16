@@ -1608,8 +1608,7 @@ def __mergeOptions(inputOptions, overrideOptions):
         inputOptionsItems = inputOptions.__dict__.items()
 
     for key, value in inputOptionsItems:
-        if key not in conf or (conf[key] is False and value is True) or \
-           value not in (None, False) or overrideOptions:
+        if key not in conf or (not conf[key] and value) or overrideOptions:
             conf[key] = value
 
 def __setTrafficOutputFP():
