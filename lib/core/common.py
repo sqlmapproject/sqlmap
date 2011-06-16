@@ -2549,7 +2549,7 @@ def normalizeUnicode(value):
 
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
-    Returns a safe representation of SQL identificator name
+    Returns a safe representation of SQL identificator name (internal data format)
     """
 
     retVal = name

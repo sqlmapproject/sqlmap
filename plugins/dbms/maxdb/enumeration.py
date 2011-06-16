@@ -123,7 +123,7 @@ class Enumeration(GenericEnumeration):
                 raise sqlmapNoneDataException, errMsg
 
         for tbl in tblList:
-            tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl)
+            tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].columns
 
@@ -151,7 +151,7 @@ class Enumeration(GenericEnumeration):
                 columns = {}
 
                 for columnname, datatype, length in zip(retVal[0]["%s.columnname" % randStr], retVal[0]["%s.datatype" % randStr], retVal[0]["%s.len" % randStr]):
-                    columns[columnname] = "%s(%s)" % (datatype, length)
+                    columns[safeSQLIdentificatorNaming(columnname)] = "%s(%s)" % (datatype, length)
 
                 table[tbl] = columns
                 kb.data.cachedColumns[conf.db] = table

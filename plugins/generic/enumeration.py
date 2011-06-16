@@ -1005,9 +1005,9 @@ class Enumeration:
                             columns[colName] = colType
 
                     if conf.db in kb.data.cachedColumns:
-                        kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)][unsafeSQLIdentificatorNaming(tbl)] = columns
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = columns
                     else:
-                        kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)] = {unsafeSQLIdentificatorNaming(tbl): columns}
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {safeSQLIdentificatorNaming(tbl, True): columns}
 
                 return kb.data.cachedColumns
 
@@ -1086,10 +1086,10 @@ class Enumeration:
                                 columns[name] = columnData[1]
 
                     if conf.db in kb.data.cachedColumns:
-                        kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)][unsafeSQLIdentificatorNaming(tbl)] = columns
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = columns
                     else:
-                        table[unsafeSQLIdentificatorNaming(tbl)] = columns
-                        kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)] = table
+                        table[safeSQLIdentificatorNaming(tbl, True)] = columns
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
         if not kb.data.cachedColumns and not conf.direct:
             for tbl in tblList:
@@ -1208,10 +1208,10 @@ class Enumeration:
 
                 if columns:
                     if conf.db in kb.data.cachedColumns:
-                        kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)][unsafeSQLIdentificatorNaming(tbl)] = columns
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = columns
                     else:
-                        table[unsafeSQLIdentificatorNaming(tbl)] = columns
-                        kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)] = table
+                        table[safeSQLIdentificatorNaming(tbl, True)] = columns
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
         if not kb.data.cachedColumns:
             errMsg = "unable to retrieve the columns for any "
@@ -1261,13 +1261,13 @@ class Enumeration:
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=2)
 
         if count is not None and isinstance(count, basestring) and count.isdigit():
-            if unsafeSQLIdentificatorNaming(db) not in kb.data.cachedCounts:
-                kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)] = {}
+            if safeSQLIdentificatorNaming(db) not in kb.data.cachedCounts:
+                kb.data.cachedCounts[safeSQLIdentificatorNaming(db)] = {}
 
-            if int(count) in kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)]:
-                kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)][int(count)].append(unsafeSQLIdentificatorNaming(table))
+            if int(count) in kb.data.cachedCounts[safeSQLIdentificatorNaming(db)]:
+                kb.data.cachedCounts[safeSQLIdentificatorNaming(db)][int(count)].append(safeSQLIdentificatorNaming(table, True))
             else:
-                kb.data.cachedCounts[unsafeSQLIdentificatorNaming(db)][int(count)] = [unsafeSQLIdentificatorNaming(table)]
+                kb.data.cachedCounts[safeSQLIdentificatorNaming(db)][int(count)] = [safeSQLIdentificatorNaming(table, True)]
 
     def getCount(self):
         if not conf.tbl:
@@ -1481,10 +1481,10 @@ class Enumeration:
             self.getColumns(onlyColNames=True)
 
             try:
-                if not unsafeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
-                   or unsafeSQLIdentificatorNaming(tbl) not in \
-                   kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)] \
-                   or not kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)][unsafeSQLIdentificatorNaming(tbl)]:
+                if not safeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
+                   or safeSQLIdentificatorNaming(tbl, True) not in \
+                   kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] \
+                   or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
                     warnMsg = "unable to enumerate the columns for table "
                     warnMsg += "'%s' on database" % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += " '%s', skipping" % unsafeSQLIdentificatorNaming(conf.db)
@@ -1492,7 +1492,7 @@ class Enumeration:
 
                     continue
 
-                colList = kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)][unsafeSQLIdentificatorNaming(tbl)].keys()
+                colList = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)].keys()
                 colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
@@ -1678,8 +1678,8 @@ class Enumeration:
 
                 if len(kb.data.dumpedTable) > 0:
                     kb.data.dumpedTable["__infos__"] = { "count": entriesCount,
-                                                         "table": unsafeSQLIdentificatorNaming(tbl),
-                                                         "db":    unsafeSQLIdentificatorNaming(conf.db) }
+                                                         "table": safeSQLIdentificatorNaming(tbl, True),
+                                                         "db":    safeSQLIdentificatorNaming(conf.db) }
 
                     attackDumpedTable()
                     conf.dumper.dbTableValues(kb.data.dumpedTable)

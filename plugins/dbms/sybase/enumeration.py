@@ -212,8 +212,8 @@ class Enumeration(GenericEnumeration):
 
             if colList:
                 table = {}
-                table[unsafeSQLIdentificatorNaming(tbl)] = dict(map(lambda x: (x, None), colList))
-                kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)] = table
+                table[safeSQLIdentificatorNaming(tbl)] = dict(map(lambda x: (x, None), colList))
+                kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
                 continue
 
             infoMsg = "fetching columns "
@@ -233,8 +233,8 @@ class Enumeration(GenericEnumeration):
                     for name, type_ in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr]):
                         columns[name] = sybaseTypes.get(type_, type_)
 
-                    table[unsafeSQLIdentificatorNaming(tbl)] = columns
-                    kb.data.cachedColumns[unsafeSQLIdentificatorNaming(conf.db)] = table
+                    table[safeSQLIdentificatorNaming(tbl)] = columns
+                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
                     break
 
