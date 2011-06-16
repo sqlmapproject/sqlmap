@@ -2649,6 +2649,7 @@ def expandMnemonics(mnemonics, parser, args):
                 pointer = pointer.next[char]
             else:
                 pointer = None
+                break
 
         if pointer in (None, head):
             errMsg = "mnemonic '%s' can't be resolved to any parameter name" % name
