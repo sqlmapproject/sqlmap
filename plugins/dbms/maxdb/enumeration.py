@@ -129,8 +129,8 @@ class Enumeration(GenericEnumeration):
 
         for tbl in tblList:
             if conf.db is not None and len(kb.data.cachedColumns) > 0 \
-               and conf.db in kb.data.cachedColumns and tbl in \
-               kb.data.cachedColumns[conf.db]:
+              and conf.db in kb.data.cachedColumns and tbl in \
+              kb.data.cachedColumns[conf.db]:
                 infoMsg = "fetched tables' columns on "
                 infoMsg += "database '%s'" % conf.db
                 logger.info(infoMsg)

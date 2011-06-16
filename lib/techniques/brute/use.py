@@ -66,7 +66,7 @@ def tableExists(tableFile, regex=None):
         while kb.threadContinue:
             kb.locks.countLock.acquire()
             if threadData.shared.count < threadData.shared.limit:
-                table = safeSQLIdentificatorNaming(tables[threadData.shared.count])
+                table = safeSQLIdentificatorNaming(tables[threadData.shared.count], True)
                 threadData.shared.count += 1
                 kb.locks.countLock.release()
             else:
@@ -137,7 +137,7 @@ def columnExists(columnFile, regex=None):
         table = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', conf.tbl)
     else:
         table = conf.tbl
-    table = safeSQLIdentificatorNaming(table)
+    table = safeSQLIdentificatorNaming(table, True)
 
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)

@@ -2144,7 +2144,8 @@ class Enumeration:
 
                             self.getColumns(onlyColNames=True)
 
-                            dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
+                            if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
+                                dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
                             kb.data.cachedColumns = {}
                         else:
                             dbs[foundDb][foundTbl][column] = None
@@ -2240,7 +2241,8 @@ class Enumeration:
 
                                 self.getColumns(onlyColNames=True)
 
-                                dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
+                                if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
+                                    dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
                                 kb.data.cachedColumns = {}
                             else:
                                 dbs[db][tbl][column] = None
