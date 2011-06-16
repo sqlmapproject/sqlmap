@@ -68,13 +68,14 @@ def main():
         setPaths()
         banner()
 
-        # Store original command line options for possible later restoration
-        cmdLineOptions.update(cmdLineParser().__dict__)
-
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
+        # Store original command line options for possible later restoration
+        cmdLineOptions.update(cmdLineParser().__dict__)
+
         init(cmdLineOptions)
+
         if conf.profile:
             profile()
         elif conf.smokeTest:
