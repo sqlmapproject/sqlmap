@@ -98,7 +98,7 @@ def comparison(page, getRatioValue=False, pageLength=None):
             seqMatcher.set_seq2(seq2)
 
         if seq1 is None or seq2 is None:
-            ratio = None
+            return None
         else:
             ratio = round(seqMatcher.quick_ratio(), 3)
 
