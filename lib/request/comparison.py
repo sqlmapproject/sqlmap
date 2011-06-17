@@ -91,17 +91,13 @@ def comparison(page, getRatioValue=False, pageLength=None):
             seq1 = getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a
             seq2 = getFilteredPageContent(page, True) if conf.textOnly else page
 
-        if seq1:
+        if seq1 is not None:
             seqMatcher.set_seq1(seq1)
-        else:
-            seqMatcher.a = seq1
 
-        if seq2:
+        if seq2 is not None:
             seqMatcher.set_seq2(seq2)
-        else:
-            seqMatcher.b = seq2
 
-        if seqMatcher.a is None or seqMatcher.b is None:
+        if seq1 is None or seq2 is None:
             ratio = None
         else:
             ratio = round(seqMatcher.quick_ratio(), 3)
