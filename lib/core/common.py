@@ -503,8 +503,8 @@ def paramToDict(place, parameters=None):
                         errMsg = "you have provided tainted parameters with most "
                         errMsg += "probably leftovers from manual sql injection "
                         errMsg += "tests (%s). " % DUMMY_SQL_INJECTION_CHARS
-                        errMsg += "please, remove them so sqlmap could be able "
-                        errMsg += "to do a valid run."
+                        errMsg += "please, use valid parameter values so sqlmap "
+                        errMsg += "could be able to do a valid run."
                         raise sqlmapSyntaxException, errMsg
                     testableParameters[parameter] = elem[1]
     else:
