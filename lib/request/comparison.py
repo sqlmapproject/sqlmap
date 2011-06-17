@@ -82,12 +82,24 @@ def comparison(page, getRatioValue=False, pageLength=None):
         elif isinstance(seqMatcher.a, unicode) and isinstance(page, str):
             seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, 'ignore')
 
+        seq1, seq2 = None, None
+
         if conf.titles:
-            seqMatcher.set_seq1(extractRegexResult(HTML_TITLE_REGEX, seqMatcher.a))
-            seqMatcher.set_seq2(extractRegexResult(HTML_TITLE_REGEX, page))
+            seq1 = extractRegexResult(HTML_TITLE_REGEX, seqMatcher.a)
+            seq2 = extractRegexResult(HTML_TITLE_REGEX, page)
         else:
-            seqMatcher.set_seq1(getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a)
-            seqMatcher.set_seq2(getFilteredPageContent(page, True) if conf.textOnly else page)
+            seq1 = getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a
+            seq2 = getFilteredPageContent(page, True) if conf.textOnly else page
+
+        if seq1:
+            seqMatcher.set_seq1(seq1)
+        else:
+            seqMatcher.a = seq1
+
+        if seq2:
+            seqMatcher.set_seq2(seq2)
+        else:
+            seqMatcher.b = seq2
 
         if seqMatcher.a is None or seqMatcher.b is None:
             ratio = None
