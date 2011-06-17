@@ -500,7 +500,7 @@ def paramToDict(place, parameters=None):
 
                 if condition:
                     if elem[1].strip(DUMMY_SQL_INJECTION_CHARS) != elem[1]:
-                        errMsg = "you have provided parameters with most "
+                        errMsg = "you have provided tainted parameters with most "
                         errMsg += "probably leftovers from manual sql injection "
                         errMsg += "tests (%s). " % DUMMY_SQL_INJECTION_CHARS
                         errMsg += "please, remove them so sqlmap could be able "
