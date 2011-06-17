@@ -67,6 +67,7 @@ from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
 from lib.core.settings import DESCRIPTION
+from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
@@ -498,6 +499,13 @@ def paramToDict(place, parameters=None):
                 condition |= parameter in conf.testParameter
 
                 if condition:
+                    if elem[1].strip(DUMMY_SQL_INJECTION_CHARS) != elem[1]:
+                        errMsg = "you have provided parameters with most "
+                        errMsg += "probably leftovers from manual sql injection "
+                        errMsg += "tests (%s). " % DUMMY_SQL_INJECTION_CHARS
+                        errMsg += "please, remove them so sqlmap could be able "
+                        errMsg += "to do a valid run."
+                        raise sqlmapSyntaxException, errMsg
                     testableParameters[parameter] = elem[1]
     else:
         root = ET.XML(parameters)

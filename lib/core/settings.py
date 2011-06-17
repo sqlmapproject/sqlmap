@@ -351,3 +351,6 @@ REFLECTIVE_MISS_THRESHOLD = 20
 
 # Regular expression used for extracting HTML title
 HTML_TITLE_REGEX = "<title>(?P<result>[^<]+)</title>"
+
+# Chars used to quickly distinguish if the user provided tainted parameter values
+DUMMY_SQL_INJECTION_CHARS = ";()'"
