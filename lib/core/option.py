@@ -904,14 +904,12 @@ def __setHTTPProxy():
 
     # Patch for DNS leakage
     if conf.proxy:
-        if not re.match(GENERAL_IP_ADDRESS_REGEX, __hostname):
-            try:
-                addrinfo = socket.getaddrinfo(__hostname, __port)
-            except:
-                errMsg = "proxy host '%s' does not exist" % __hostname
-                raise sqlmapConnectionException, errMsg
-            __hostname = addrinfo[0][4][0]
-        conf.proxyDNSResponse = [(2, 1, 0, '', (__hostname, int(__port)))]
+        try:
+            addrinfo = socket.getaddrinfo(__hostname, __port)
+        except:
+            errMsg = "proxy host '%s' does not exist" % __hostname
+            raise sqlmapConnectionException, errMsg
+        conf.proxyDNSResponse = addrinfo
 
 def __setSafeUrl():
     """
