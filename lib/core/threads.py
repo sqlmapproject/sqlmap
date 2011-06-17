@@ -9,12 +9,14 @@ See the file 'doc/COPYING' for copying permission
 
 import difflib
 import threading
+import time
 
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import advancedDict
 from lib.core.exception import sqlmapThreadException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
+from lib.core.settings import PYVERSION
 
 shared = advancedDict()
 
@@ -98,20 +100,25 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     # Start the threads
     for numThread in range(numThreads):
         thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[threadFunction])
+
+        # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
+        if PYVERSION >= "2.6":
+            thread.daemon = True
+        else:
+            thread.setDaemon(True)
+
         thread.start()
         threads.append(thread)
 
     # And wait for them to all finish
     try:
         alive = True
-
         while alive:
             alive = False
-
             for thread in threads:
                 if thread.isAlive():
                     alive = True
-                    thread.join(1)
+                    time.sleep(1)
 
     except KeyboardInterrupt:
         kb.threadContinue = False

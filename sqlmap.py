@@ -129,8 +129,8 @@ def main():
         kb.threadContinue = False
         kb.threadException = True
 
-        # just in case handling of leftover threads
-        raise SystemExit
+        # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
+        os._exit(0)
 
 if __name__ == "__main__":
     main()

@@ -43,6 +43,7 @@ from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
+from lib.core.settings import PYVERSION
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -413,6 +414,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         # Start the threads
         for numThread in range(numThreads):
             thread = threading.Thread(target=downloadThread, name=str(numThread))
+
+            if PYVERSION >= "2.6":
+                thread.daemon = True
+            else:
+                thread.setDaemon(True)
+
             thread.start()
             threads.append(thread)
 
@@ -424,7 +431,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 for thread in threads:
                     if thread.isAlive():
                         alive = True
-                        thread.join(5)
+                        time.sleep(1)
+
         except KeyboardInterrupt:
             kb.threadContinue = False
             raise
