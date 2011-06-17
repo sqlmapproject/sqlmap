@@ -136,8 +136,8 @@ def __showInjections():
     conf.dumper.technic(header, data)
 
     if inj.place in (HTTPMETHOD.GET, HTTPMETHOD.POST):
-        infoMsg = "usage of injected %s payloads requires manual url-encoding" % inj.place
-        logger.info(infoMsg)
+        debugMsg = "usage of %s payloads requires manual url-encoding" % inj.place
+        logger.debug(debugMsg)
 
     if conf.tamper:
         infoMsg = "changes made by tampering scripts are not "
