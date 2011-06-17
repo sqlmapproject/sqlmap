@@ -80,6 +80,7 @@ from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_PORTS
+from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
@@ -829,8 +830,12 @@ def __setDNSCache():
     """
 
     def _getaddrinfo(*args, **kwargs):
-        if args in kb.cache:
+        if conf.proxyDNSResponse:
+            return conf.proxyDNSResponse
+
+        elif args in kb.cache:
             return kb.cache[args]
+
         else:
             kb.cache[args] = socket._getaddrinfo(*args, **kwargs)
             return kb.cache[args]
@@ -896,6 +901,17 @@ def __setHTTPProxy():
         proxyHandler = ProxyHTTPSHandler(__proxyString)
     else:
         proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
+
+    # Patch for DNS leakage
+    if conf.proxy:
+        if not re.match(GENERAL_IP_ADDRESS_REGEX, __hostname):
+            try:
+                addrinfo = socket.getaddrinfo(__hostname, __port)
+            except:
+                errMsg = "proxy host '%s' does not exist" % __hostname
+                raise sqlmapConnectionException, errMsg
+            __hostname = addrinfo[0][4][0]
+        conf.proxyDNSResponse = [(2, 1, 0, '', (__hostname, int(__port)))]
 
 def __setSafeUrl():
     """
@@ -1323,6 +1339,7 @@ def __setConfAttributes():
     conf.parameters = {}
     conf.path = None
     conf.port = None
+    conf.proxyDNSResponse = None
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
