@@ -1,14 +1,6 @@
 # Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 # See the file 'doc/COPYING' for copying permission
 
-Accoona-AI-Agent/1.1.2 (aicrawler at accoonabot dot com)
-Baiduspider ( http://www.baidu.com/search/spider.htm)
-GameSpyHTTP/1.0
-Gigabot/2.0
-Googlebot-Image/1.0
-Googlebot/2.1 (+http://www.google.com/bot.html)
-Jigsaw/2.2.5 W3C_CSS_Validator_JFouffa/2.0
-Microsoft Internet Explorer/4.0b1 (Windows 95)
 Mozilla/4.0 (compatible; MSIE 6.0; Linux i686 ; en) Opera 9.70
 Mozilla/4.0 (compatible; MSIE 6.0; Mac_PowerPC; en) Opera 9.24
 Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; de) Opera 9.50
@@ -1137,8 +1129,6 @@ Mozilla/6.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:2.0.0.0) Gecko/2006102
 Mozilla/6.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.8
 Mozilla/6.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.8 (.NET CLR 3.5.30729)
 Mozilla/6.0 (Windows; U; Windows NT 7.0; en-US; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.9 (.NET CLR 3.5.30729)
-msnbot/1.0 (+http://search.msn.com/msnbot.htm)
-OmniExplorer_Bot/6.70 (+http://www.omni-explorer.com) WorldIndexer
 Opera 9.4 (Windows NT 5.3; U; en)
 Opera 9.4 (Windows NT 6.1; U; en)
 Opera 9.7 (Windows NT 5.2; U; en)
@@ -1509,7 +1499,3 @@ Opera/9.80 (X11; Linux x86_64; U; it) Presto/2.2.15 Version/10.10
 Opera/9.80 (X11; Linux x86_64; U; pl) Presto/2.7.62 Version/11.00
 Opera/9.80 (X11; U; Linux i686; en-US; rv:1.9.2.3) Presto/2.2.15 Version/10.10
 Opera/9.99 (Windows NT 5.1; U; pl) Presto/9.9.9
-Scooter-3.2.EX
-W3C_Validator/1.432.2.10
-Wget/1.9
-Yahoo!-MMCrawler/3.x (mms dash mmcrawler dash support at yahoo dash inc dot com)
