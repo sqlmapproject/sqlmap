@@ -36,11 +36,8 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject
 
-def tableExists(tableFile, regex=None):
-    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS), unique=True)
-
-    infoMsg = "checking table existence using items from '%s'" % tableFile
-    logger.info(infoMsg)
+def __addPageTextWords():
+    wordsList = []
 
     infoMsg = "adding words used on web page to the check list"
     logger.info(infoMsg)
@@ -49,9 +46,18 @@ def tableExists(tableFile, regex=None):
     for word in pageWords:
         word = word.lower()
 
-        if len(word) > 2 and not word[0].isdigit() and word not in tables:
-            tables.append(word)
+        if len(word) > 2 and not word[0].isdigit() and word not in wordsList:
+            wordsList.append(word)
 
+    return wordsList
+
+def tableExists(tableFile, regex=None):
+    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS), unique=True)
+
+    infoMsg = "checking table existence using items from '%s'" % tableFile
+    logger.info(infoMsg)
+
+    tables.extend(__addPageTextWords())
     tables = filterListValue(tables, regex)
 
     threadData = getCurrentThreadData()
@@ -84,7 +90,6 @@ def tableExists(tableFile, regex=None):
 
             if result and table.lower() not in threadData.shared.unique:
                 threadData.shared.outputs.append(table)
-
                 threadData.shared.unique.add(table.lower())
 
                 dataToSessionFile("[%s][%s][%s][TABLE_EXISTS][%s]\n" % (conf.url,\
@@ -130,7 +135,11 @@ def columnExists(columnFile, regex=None):
         errMsg = "missing table parameter"
         raise sqlmapMissingMandatoryOptionException, errMsg
 
+    infoMsg = "checking column existence using items from '%s'" % columnFile
+    logger.info(infoMsg)
+
     columns = getFileItems(columnFile, unique=True)
+    columns.extend(__addPageTextWords())
     columns = filterListValue(columns, regex)
 
     if conf.db and METADB_SUFFIX not in conf.db:
@@ -138,9 +147,6 @@ def columnExists(columnFile, regex=None):
     else:
         table = conf.tbl
     table = safeSQLIdentificatorNaming(table, True)
-
-    infoMsg = "checking column existence using items from '%s'" % columnFile
-    logger.info(infoMsg)
 
     kb.threadContinue = True
     kb.bruteMode = True
