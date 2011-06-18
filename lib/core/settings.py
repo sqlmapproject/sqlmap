@@ -353,4 +353,4 @@ REFLECTIVE_MISS_THRESHOLD = 20
 HTML_TITLE_REGEX = "<title>(?P<result>[^<]+)</title>"
 
 # Chars used to quickly distinguish if the user provided tainted parameter values
-DUMMY_SQL_INJECTION_CHARS = ";()'"
+DUMMY_SQL_INJECTION_CHARS = ";()\"'"
