@@ -59,7 +59,7 @@ def smokeTest():
                 except Exception, msg:
                     retVal = False
                     dataToStdout("\r")
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(paths.SQLMAP_ROOT_PATH, ifile), msg)
+                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, ifile), msg)
                     logger.error(errMsg)
                 else:
                     # Run doc tests
