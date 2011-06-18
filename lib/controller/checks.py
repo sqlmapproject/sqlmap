@@ -61,8 +61,8 @@ from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
-from lib.techniques.inband.union.test import unionTest
-from lib.techniques.inband.union.use import configUnion
+from lib.techniques.union.test import unionTest
+from lib.techniques.union.use import configUnion
 
 def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to

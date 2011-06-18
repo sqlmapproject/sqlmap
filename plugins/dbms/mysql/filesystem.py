@@ -15,7 +15,7 @@ from lib.core.data import logger
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
-from lib.techniques.inband.union.use import unionUse
+from lib.techniques.union.use import unionUse
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 

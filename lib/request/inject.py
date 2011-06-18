@@ -45,7 +45,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
-from lib.techniques.inband.union.use import unionUse
+from lib.techniques.union.use import unionUse
 from lib.techniques.blind.inference import bisection
 from lib.techniques.error.use import errorUse
 from lib.utils.resume import queryOutputLength
