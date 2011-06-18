@@ -55,7 +55,7 @@ class Enumeration(GenericEnumeration):
             if conf.user:
                 users = conf.user.split(",")
                 query += " WHERE "
-                query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
+                query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
             values = inject.getValue(query, blind=False)
 

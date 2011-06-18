@@ -253,7 +253,7 @@ class Enumeration:
 
             if conf.user:
                 query += " WHERE "
-                query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
+                query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
             if Backend.isDbms(DBMS.SYBASE):
                 randStr = randomStr()
@@ -456,9 +456,9 @@ class Enumeration:
                 query += " WHERE "
 
                 if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
-                    query += " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in users)
+                    query += " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in sorted(users))
                 else:
-                    query += " OR ".join("%s = '%s'" % (condition, user) for user in users)
+                    query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
             values = inject.getValue(query, blind=False)
 
@@ -819,7 +819,7 @@ class Enumeration:
                     logger.info(infoMsg)
                 elif not Backend.isDbms(DBMS.SQLITE):
                     query += " WHERE "
-                    query += " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in dbs)
+                    query += " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in sorted(dbs))
 
             if Backend.isDbms(DBMS.MSSQL):
                 query = safeStringFormat(query, conf.db)
@@ -1040,12 +1040,12 @@ class Enumeration:
                 if len(colList) > 0:
                     colConsider, colCondParam = self.likeOrExact("column")
                     condQueryStr = "%%s%s" % colCondParam
-                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
+                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
                     if colConsider == "1":
-                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     else:
-                        infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                        infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                 else:
                     condQuery = ""
 
@@ -1105,8 +1105,8 @@ class Enumeration:
                 infoMsg = "fetching columns "
 
                 if len(colList) > 0:
-                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in colList)
-                    likeMsg = "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in colList)
+                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
+                    likeMsg = "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     infoMsg += likeMsg
                 else:
                     condQuery = ""
