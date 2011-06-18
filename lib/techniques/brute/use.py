@@ -16,7 +16,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import filterListValue
 from lib.core.common import getFileItems
 from lib.core.common import Backend
-from lib.core.common import getPageTextWordsSet
+from lib.core.common import getPageWordSet
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
@@ -41,7 +41,7 @@ def __addPageTextWords():
 
     infoMsg = "adding words used on web page to the check list"
     logger.info(infoMsg)
-    pageWords = getPageTextWordsSet(kb.originalPage)
+    pageWords = getPageWordSet(kb.originalPage)
 
     for word in pageWords:
         word = word.lower()

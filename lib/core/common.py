@@ -1418,7 +1418,7 @@ def getFilteredPageContent(page, onlyText=True):
 
     return retVal
 
-def getPageTextWordsSet(page):
+def getPageWordSet(page):
     retVal = None
 
     # only if the page's charset has been successfully identified
@@ -1436,7 +1436,7 @@ def showStaticWords(firstPage, secondPage):
     secondPage = getFilteredPageContent(secondPage)
     match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
     commonText = firstPage[match[0]:match[0]+match[2]]
-    commonWords = getPageTextWordsSet(commonText)
+    commonWords = getPageWordSet(commonText)
 
     infoMsg = "static words: "
 
