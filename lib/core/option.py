@@ -909,6 +909,7 @@ def __setHTTPProxy():
         except:
             errMsg = "proxy host '%s' does not exist" % __hostname
             raise sqlmapConnectionException, errMsg
+
         conf.proxyDNSResponse = addrinfo
 
 def __setSafeUrl():

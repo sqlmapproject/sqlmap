@@ -326,9 +326,9 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                     kb.suppressResumeInfo = True
-                    infoMsg = "suppressing possible resume console info because of "
-                    infoMsg += "large number of rows (might take too much time)"
-                    logger.info(infoMsg)
+                    debugMsg = "suppressing possible resume console info because of "
+                    debugMsg += "large number of rows. It might take too long"
+                    logger.debug(debugMsg)
 
                 lockNames = ('limits', 'outputs')
                 for lock in lockNames:
