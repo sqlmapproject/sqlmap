@@ -116,7 +116,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     if conf.threads == 1 and not timeBasedCompare:
         warnMsg = "running in a single-thread mode. Please consider "
-        warnMsg += "usage of --threads switch to speedup data fetching"
+        warnMsg += "usage of --threads switch for faster data retrieval"
         singleTimeWarnMessage(warnMsg)
 
     if conf.verbose in (1, 2) and not showEta:

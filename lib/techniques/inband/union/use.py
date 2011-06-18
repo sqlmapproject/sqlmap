@@ -113,7 +113,10 @@ def configUnion(char=None, columns=None):
             return
 
         columns = columns.replace(" ", "")
-        colsStart, colsStop = columns.split("-")
+        if "-" in columns:
+            colsStart, colsStop = columns.split("-")
+        else:
+            colsStart, colsStop = columns, columns
 
         if not colsStart.isdigit() or not colsStop.isdigit():
             raise sqlmapSyntaxException, "--union-cols must be a range of integers"

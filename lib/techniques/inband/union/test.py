@@ -196,7 +196,11 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     query = agent.prefixQuery("UNION ALL SELECT %s" % kb.uChar)
     total = conf.uColsStop+1 - conf.uColsStart
 
-    count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix)
+    # In case that user explicitly stated number of columns affected
+    if conf.uColsStop == conf.uColsStart:
+        count = conf.uColsStart
+    else:
+        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix)
 
     if count:
         if Backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):

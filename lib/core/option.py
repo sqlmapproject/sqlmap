@@ -1743,9 +1743,11 @@ def __basicOptionValidation():
         errMsg = "value for --time-sec option must be an integer greater than 0"
         raise sqlmapSyntaxException, errMsg
 
-    if isinstance(conf.uCols, basestring) and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
-        errMsg = "value for --union-cols must be a range with hyphon (e.g. 1-10)"
-        raise sqlmapSyntaxException, errMsg
+    if isinstance(conf.uCols, basestring):
+        if not conf.uCols.isdigit() and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
+            errMsg = "value for --union-cols must be a range with hyphon "
+            errMsg += "(e.g. 1-10) or integer value (e.g. 5)"
+            raise sqlmapSyntaxException, errMsg
 
     if conf.charset:
         try:
