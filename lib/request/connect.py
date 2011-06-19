@@ -71,6 +71,37 @@ class Connect:
         return Connect.getPage(**kwargs)
 
     @staticmethod
+    def __retryProxy(**kwargs):
+        threadData = getCurrentThreadData()
+        threadData.retriesCount += 1
+
+        if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
+            # timed based payloads can cause web server unresponsiveness
+            # if the injectable piece of code is some kind of JOIN-like query
+            warnMsg = "most probably web server instance hasn't recovered yet "
+            warnMsg += "from previous timed based payload. if the problem "
+            warnMsg += "persists please wait for few minutes and rerun "
+            warnMsg += "without flag T in --technique option "
+            warnMsg += "(e.g. --flush-session --technique=BEUS) or try to "
+            warnMsg += "lower the --time-sec value (e.g. --time-sec=2)"
+            singleTimeWarnMessage(warnMsg)
+        elif kb.originalPage is None:
+            warnMsg = "if the problem persists please check that the provided "
+            warnMsg += "target url is valid. If it is, you can try to rerun "
+            warnMsg += "with the --random-agent switch turned on "
+            warnMsg += "and/or proxy switches (--ignore-proxy, --proxy,...)"
+            singleTimeWarnMessage(warnMsg)
+        elif conf.threads > 1:
+            warnMsg = "if the problem persists please try to lower "
+            warnMsg += "the number of used threads (--threads)"
+            singleTimeWarnMessage(warnMsg)
+
+        time.sleep(1)
+
+        kwargs['retrying'] = True
+        return Connect.__getPageProxy(**kwargs)
+
+    @staticmethod
     def getPage(**kwargs):
         """
         This method connects to the target url or proxy and returns
@@ -133,6 +164,8 @@ class Connect:
         try:
             if silent:
                 socket.setdefaulttimeout(HTTP_SILENT_TIMEOUT)
+            else:
+                socket.setdefaulttimeout(conf.timeout)
 
             if direct:
                 if "?" in url:
@@ -362,6 +395,20 @@ class Connect:
             elif e.code == 404 and raise404:
                 errMsg = "page not found (%d)" % code
                 raise sqlmapConnectionException, errMsg
+            elif e.code == 504:
+                if ignoreTimeout:
+                    return None, None
+                else:
+                    warnMsg = "unable to connect to the target url (%d - %s)" % (e.code, httplib.responses[e.code])
+                    if threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
+                        warnMsg += ", sqlmap is going to retry the request"
+                        logger.critical(warnMsg)
+                        return Connect.__retryProxy(**kwargs)
+                    elif kb.testMode and kb.originalPage:
+                        logger.critical(warnMsg)
+                        return None, None
+                    else:
+                        raise sqlmapConnectionException, warnMsg
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
@@ -399,44 +446,17 @@ class Connect:
             elif silent or (ignoreTimeout and any(map(lambda x: x in tbMsg, ["timed out", "IncompleteRead"]))):
                 return None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
-                threadData.retriesCount += 1
-
                 warnMsg += ", sqlmap is going to retry the request"
                 logger.critical(warnMsg)
-
-                if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
-                    # timed based payloads can cause web server unresponsiveness
-                    # if the injectable piece of code is some kind of JOIN-like query
-                    warnMsg = "most probably web server instance hasn't recovered yet "
-                    warnMsg += "from previous timed based payload. if the problem "
-                    warnMsg += "persists please wait for few minutes and rerun "
-                    warnMsg += "without flag T in --technique option "
-                    warnMsg += "(e.g. --flush-session --technique=BEUS) or try to "
-                    warnMsg += "lower the --time-sec value (e.g. --time-sec=2)"
-                    singleTimeWarnMessage(warnMsg)
-                elif kb.originalPage is None:
-                    warnMsg = "if the problem persists please try to rerun "
-                    warnMsg += "with the --random-agent switch turned on "
-                    warnMsg += "and/or try to use proxy switches (--ignore-proxy, --proxy,...)"
-                    singleTimeWarnMessage(warnMsg)
-                elif conf.threads > 1:
-                    warnMsg = "if the problem persists please try to lower "
-                    warnMsg += "the number of used threads (--threads)"
-                    singleTimeWarnMessage(warnMsg)
-
-                time.sleep(1)
-
-                socket.setdefaulttimeout(conf.timeout)
-                kwargs['retrying'] = True
-                return Connect.__getPageProxy(**kwargs)
+                return Connect.__retryProxy(**kwargs)
             elif kb.testMode:
                 logger.critical(warnMsg)
                 return None, None
             else:
-                socket.setdefaulttimeout(conf.timeout)
                 raise sqlmapConnectionException, warnMsg
 
-        socket.setdefaulttimeout(conf.timeout)
+        finally:
+            socket.setdefaulttimeout(conf.timeout)
 
         page = processResponse(page, responseHeaders)
 
