@@ -404,7 +404,7 @@ class Connect:
                         warnMsg += ", sqlmap is going to retry the request"
                         logger.critical(warnMsg)
                         return Connect.__retryProxy(**kwargs)
-                    elif kb.testMode and kb.originalPage:
+                    elif kb.testMode:
                         logger.critical(warnMsg)
                         return None, None
                     else:
