@@ -394,7 +394,17 @@ def __setCrawler():
         return
 
     crawler = Crawler()
-    crawler.getTargetUrls()
+    depth = 1
+
+    infoMsg = "setting crawling options"
+    logger.info(infoMsg)
+
+    message = "please enter maximum depth [Enter for %d (default)] " % depth
+    choice = readInput(message, default=str(depth))
+    if choice and choice.isdigit():
+        depth = int(choice)
+
+    crawler.getTargetUrls(depth)
 
 def __setGoogleDorking():
     """

@@ -70,7 +70,7 @@ class Crawler:
             threadData.shared.deeper = set()
             threadData.shared.unprocessed = set([conf.url])
 
-            logger.info("starting crawling")
+            logger.info("starting crawler")
 
             for i in xrange(depth):
                 numThreads = min(conf.threads, len(threadData.shared.unprocessed))
