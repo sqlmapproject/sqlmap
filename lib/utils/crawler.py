@@ -96,7 +96,7 @@ class Crawler:
                 logger.info("searching for links with depth %d" % (i + 1))
                 runThreads(numThreads, crawlThread)
                 clearConsoleLine(True)
-                threadData.shared.unprocessed = threadData.shared.deeper
+                threadData.shared.unprocessed = set(threadData.shared.deeper)
 
         except KeyboardInterrupt:
             warnMsg = "user aborted during crawling. sqlmap "
