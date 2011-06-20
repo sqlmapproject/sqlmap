@@ -60,7 +60,7 @@ class Google:
         """
 
         for match in self.__matches:
-            if re.search(r"(.*?)\?(.+)", match, re.I):
+            if re.search(r"(.*?)\?(.+)", match):
                 kb.targetUrls.add(( htmlunescape(htmlunescape(match)), None, None, None ))
             elif re.search(URI_INJECTABLE_REGEX, match, re.I):
                 kb.targetUrls.add(( htmlunescape(htmlunescape("%s" % match)), None, None, None ))

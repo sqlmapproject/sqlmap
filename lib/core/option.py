@@ -114,6 +114,7 @@ from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
+from lib.utils.crawler import Crawler
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
 
@@ -387,6 +388,13 @@ def __setRequestFromFile():
         raise sqlmapFilePathException, errMsg
 
     __feedTargetsDict(conf.requestFile, addedTargetUrls)
+
+def __setCrawler():
+    if not conf.crawl:
+        return
+
+    crawler = Crawler()
+    crawler.getTargetUrls()
 
 def __setGoogleDorking():
     """
@@ -1278,7 +1286,7 @@ def __cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if conf.googleDork or conf.logFile or conf.bulkFile or conf.forms:
+    if conf.googleDork or conf.logFile or conf.bulkFile or conf.forms or conf.crawl:
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1800,6 +1808,7 @@ def init(inputOptions=advancedDict(), overrideOptions=False):
         __setDNSCache()
         __setSafeUrl()
         __setGoogleDorking()
+        __setCrawler()
         __setBulkMultipleTargets()
         __urllib2Opener()
         __findPageForms()

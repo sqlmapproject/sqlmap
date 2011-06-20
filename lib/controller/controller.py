@@ -589,7 +589,7 @@ def start():
     if kb.dataOutputFlag and not conf.multipleTargets:
         logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
 
-    if conf.multipleTargets:
+    if conf.multipleTargets and conf.resultsFilename:
         infoMsg  = "you can find results of scanning in multiple targets "
         infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
         logger.info(infoMsg)

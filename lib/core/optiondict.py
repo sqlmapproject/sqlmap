@@ -167,6 +167,8 @@ optDict = {
                                "beep":              "boolean",
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
+                               "crawl":             "boolean",
+                               "forms":             "boolean",
                                "googlePage":        "integer",
                                "mobile":            "boolean",
                                "pageRank":          "boolean",

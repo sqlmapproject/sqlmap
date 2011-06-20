@@ -511,6 +511,10 @@ def cmdLineParser():
                                   help="Clean up the DBMS by sqlmap specific "
                                   "UDF and tables")
 
+        miscellaneous.add_option("--crawl", dest="crawl",
+                                  action="store_true",
+                                  help="Crawl the website starting from the target url")
+
         miscellaneous.add_option("--forms", dest="forms",
                                   action="store_true",
                                   help="Parse and test forms on target url")
