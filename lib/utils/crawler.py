@@ -54,7 +54,7 @@ class Crawler:
 
                     content = None
                     try:
-                        if current.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
+                        if current:
                             content = Request.getPage(url=current, raise404=False)[0]
                     except sqlmapConnectionException, e:
                         errMsg = "connection exception detected (%s). skipping " % e
@@ -79,11 +79,12 @@ class Crawler:
                                 elif not target:
                                     continue
 
-                                kb.locks.outputs.acquire()
-                                threadData.shared.deeper.add(url)
-                                if re.search(r"(.*?)\?(.+)", url):
-                                    threadData.shared.outputs.add(url)
-                                kb.locks.outputs.release()
+                                if url.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
+                                    kb.locks.outputs.acquire()
+                                    threadData.shared.deeper.add(url)
+                                    if re.search(r"(.*?)\?(.+)", url):
+                                        threadData.shared.outputs.add(url)
+                                    kb.locks.outputs.release()
 
                     if conf.verbose in (1, 2):
                         kb.locks.ioLock.acquire()
