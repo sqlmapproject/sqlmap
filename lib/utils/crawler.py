@@ -18,6 +18,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
+from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request.connect import Connect as Request
@@ -51,10 +52,11 @@ class Crawler:
                         kb.locks.limits.release()
                         break
 
+                    content = None
                     try:
-                        content = Request.getPage(url=current, raise404=False)[0]
+                        if current.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
+                            content = Request.getPage(url=current, raise404=False)[0]
                     except sqlmapConnectionException, e:
-                        content = None
                         errMsg = "connection exception detected (%s). skipping " % e
                         errMsg += "url '%s'" % current
                         logger.critical(errMsg)
@@ -62,7 +64,7 @@ class Crawler:
                     if not kb.threadContinue:
                         break
 
-                    if content:
+                    if isinstance(content, unicode):
                         soup = BeautifulSoup(content)
                         for tag in soup('a'):
                             if tag.get("href"):
