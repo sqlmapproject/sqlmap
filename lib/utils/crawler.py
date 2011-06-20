@@ -49,7 +49,7 @@ class Crawler:
                         kb.locks.limits.release()
                         break
 
-                    content = Request.getPage(url=conf.url)[0]
+                    content = Request.getPage(url=current)[0]
 
                     if not kb.threadContinue:
                         break
