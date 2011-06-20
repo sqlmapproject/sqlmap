@@ -51,7 +51,13 @@ class Crawler:
                         kb.locks.limits.release()
                         break
 
-                    content = Request.getPage(url=current, raise404=False)[0]
+                    try:
+                        content = Request.getPage(url=current, raise404=False)[0]
+                    except sqlmapConnectionException, e:
+                        content = None
+                        errMsg = "connection exception detected (%s). skipping " % e
+                        errMsg += "url '%s'" % current
+                        logger.critical(errMsg)
 
                     if not kb.threadContinue:
                         break
@@ -102,12 +108,6 @@ class Crawler:
             warnMsg = "user aborted during crawling. sqlmap "
             warnMsg += "will use partial list"
             logger.warn(warnMsg)
-
-        except sqlmapConnectionException, e:
-            errMsg = "connection exception detected. sqlmap "
-            errMsg += "will use partial list"
-            errMsg += "'%s'" % e
-            logger.critical(errMsg)
 
         finally:
             clearConsoleLine(True)
