@@ -97,6 +97,10 @@ class Crawler:
             logger.critical(errMsg)
 
         finally:
-            for url in threadData.shared.outputs:
-                kb.targetUrls.add(( url, None, None, None ))
+            if not threadData.shared.outputs:
+                warnMsg = "no usable links found (with GET parameters)"
+                logger.warn(warnMsg)
+            else:
+                for url in threadData.shared.outputs:
+                    kb.targetUrls.add(( url, None, None, None ))
             kb.suppressResumeInfo = False
