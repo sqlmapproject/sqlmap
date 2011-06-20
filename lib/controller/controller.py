@@ -210,7 +210,7 @@ def start():
         action()
         return True
 
-    if conf.url and not conf.forms:
+    if conf.url and not any([conf.forms, conf.crawl]):
         kb.targetUrls.add(( conf.url, conf.method, conf.data, conf.cookie ))
 
     if conf.configFile and not kb.targetUrls:
