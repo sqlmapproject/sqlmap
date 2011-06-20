@@ -124,6 +124,8 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.threadContinue = False
         kb.threadException = True
 
+        print '\r',
+
         logger.info("waiting for threads to finish (Ctrl+C was pressed)")
 
         try:

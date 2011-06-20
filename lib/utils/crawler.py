@@ -10,7 +10,9 @@ See the file 'doc/COPYING' for copying permission
 import re
 import threading
 import urlparse
+import time
 
+from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import kb
@@ -33,7 +35,7 @@ class Crawler:
             threadData = getCurrentThreadData()
             threadData.shared.outputs = oset()
 
-            lockNames = ('limits', 'outputs')
+            lockNames = ('limits', 'outputs', 'ioLock')
             for lock in lockNames:
                 kb.locks[lock] = threading.Lock()
 
@@ -74,15 +76,25 @@ class Crawler:
                                 threadData.shared.outputs.add(url)
                             kb.locks.outputs.release()
 
+                    if conf.verbose in (1, 2):
+                        kb.locks.ioLock.acquire()
+                        threadData.shared.count += 1
+                        status = '%d/%d links visited (%d%s)' % (threadData.shared.count, threadData.shared.length, round(100.0*threadData.shared.count/threadData.shared.length), '%')
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+                        kb.locks.ioLock.release()
+
             threadData.shared.deeper = set()
             threadData.shared.unprocessed = set([conf.url])
 
             logger.info("starting crawler")
 
             for i in xrange(depth):
+                threadData.shared.count = 0
+                threadData.shared.length = len(threadData.shared.unprocessed)
                 numThreads = min(conf.threads, len(threadData.shared.unprocessed))
-                logger.debug("processing depth: %d" % i)
+                logger.info("searching for links with depth %d" % (i + 1))
                 runThreads(numThreads, crawlThread)
+                clearConsoleLine(True)
                 threadData.shared.unprocessed = threadData.shared.deeper
 
         except KeyboardInterrupt:
@@ -97,6 +109,8 @@ class Crawler:
             logger.critical(errMsg)
 
         finally:
+            clearConsoleLine(True)
+
             if not threadData.shared.outputs:
                 warnMsg = "no usable links found (with GET parameters)"
                 logger.warn(warnMsg)
