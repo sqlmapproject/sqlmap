@@ -674,7 +674,7 @@ def dataToStdout(data, forceOutput=False):
                         warnMsg += "unhandled occurances will result in "
                         warnMsg += "replacement with '?' character. Please, find "
                         warnMsg += "proper character representation inside "
-                        warnMsg += "coresponding output files. "
+                        warnMsg += "corresponding output files. "
                         singleTimeWarnMessage(warnMsg)
 
                     sys.stdout.write(output)
