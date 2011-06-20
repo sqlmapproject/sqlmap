@@ -51,30 +51,31 @@ class Crawler:
                         kb.locks.limits.release()
                         break
 
-                    content = Request.getPage(url=current)[0]
+                    content = Request.getPage(url=current, raise404=False)[0]
 
                     if not kb.threadContinue:
                         break
 
-                    soup = BeautifulSoup(content)
-                    for tag in soup('a'):
-                        if tag.get("href"):
-                            url = urlparse.urljoin(conf.url, tag.get("href"))
+                    if content:
+                        soup = BeautifulSoup(content)
+                        for tag in soup('a'):
+                            if tag.get("href"):
+                                url = urlparse.urljoin(conf.url, tag.get("href"))
 
-                            # flag to know if we are dealing with the same target host
-                            target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
+                                # flag to know if we are dealing with the same target host
+                                target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
 
-                            if conf.scope:
-                                if not re.search(conf.scope, url, re.I):
+                                if conf.scope:
+                                    if not re.search(conf.scope, url, re.I):
+                                        continue
+                                elif not target:
                                     continue
-                            elif not target:
-                                continue
 
-                            kb.locks.outputs.acquire()
-                            threadData.shared.deeper.add(url)
-                            if re.search(r"(.*?)\?(.+)", url):
-                                threadData.shared.outputs.add(url)
-                            kb.locks.outputs.release()
+                                kb.locks.outputs.acquire()
+                                threadData.shared.deeper.add(url)
+                                if re.search(r"(.*?)\?(.+)", url):
+                                    threadData.shared.outputs.add(url)
+                                kb.locks.outputs.release()
 
                     if conf.verbose in (1, 2):
                         kb.locks.ioLock.acquire()

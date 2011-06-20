@@ -754,6 +754,8 @@ def readInput(message, default=None):
     elif message[-1] == ']':
         message += " "
 
+    message = "\r%s" % message
+
     if conf.batch:
         if isinstance(default, (list, tuple, set)):
             options = ",".join([getUnicode(opt, UNICODE_ENCODING) for opt in default])
