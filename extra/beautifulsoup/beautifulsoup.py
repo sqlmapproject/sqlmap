@@ -549,6 +549,9 @@ class Tag(PageElement):
                                           val))
         self.attrs = map(convert, self.attrs)
 
+        # Reference: http://bytes.com/topic/python/answers/552874-py-2-5-bug-sgmllib
+        SGMLParser.convert_codepoint = lambda self, codepoint: unichr(codepoint)
+
     def getString(self):
         if (len(self.contents) == 1
             and isinstance(self.contents[0], NavigableString)):
