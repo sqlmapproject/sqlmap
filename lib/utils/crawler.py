@@ -58,14 +58,21 @@ class Crawler:
                     for tag in soup('a'):
                         if tag.get("href"):
                             url = urlparse.urljoin(conf.url, tag.get("href"))
+
                             # flag to know if we are dealing with the same target host
                             target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
-                            if target:
-                                kb.locks.outputs.acquire()
-                                threadData.shared.deeper.add(url)
-                                if re.search(r"(.*?)\?(.+)", url):
-                                    threadData.shared.outputs.add(url)
-                                kb.locks.outputs.release()
+
+                            if conf.scope:
+                                if not re.search(conf.scope, url, re.I):
+                                    continue
+                            elif not target:
+                                continue
+
+                            kb.locks.outputs.acquire()
+                            threadData.shared.deeper.add(url)
+                            if re.search(r"(.*?)\?(.+)", url):
+                                threadData.shared.outputs.add(url)
+                            kb.locks.outputs.release()
 
             threadData.shared.deeper = set()
             threadData.shared.unprocessed = set([conf.url])

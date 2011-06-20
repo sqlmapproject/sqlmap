@@ -192,7 +192,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 continue
 
             if conf.scope:
-                getPostReq &= re.search(conf.scope, url) is not None
+                getPostReq &= re.search(conf.scope, url, re.I) is not None
 
             if getPostReq:
                 if not kb.targetUrls or url not in addedTargetUrls:
