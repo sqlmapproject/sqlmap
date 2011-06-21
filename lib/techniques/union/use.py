@@ -261,8 +261,8 @@ def unionUse(expression, unpack=True, dump=False):
 
             try:
                 threadData = getCurrentThreadData()
-                numThreads = min(conf.threads, stopLimit-startLimit)
-                threadData.shared.limits = range(startLimit, stopLimit)
+                threadData.shared.limits = range(startLimit, stopLimit+1)
+                numThreads = min(conf.threads, len(threadData.shared.limits))
                 threadData.shared.value = ""
 
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
