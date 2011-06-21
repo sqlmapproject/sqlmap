@@ -356,6 +356,9 @@ Alberto Revelli <r00t@northernfortress.net>
     for his great Microsoft SQL Server take over tool, sqlninja,
     http://sqlninja.sourceforge.net
 
+David Rhoades <david.rhoades@mavensecurity.com>
+    for reporting a bug
+
 Andres Riancho <andres.riancho@gmail.com>
     for beta-testing sqlmap
     for reporting a bug and suggesting some features
