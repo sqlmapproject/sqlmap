@@ -320,7 +320,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
             try:
                 threadData = getCurrentThreadData()
-                threadData.shared.limits = range(startLimit, stopLimit+1)
+                threadData.shared.limits = range(startLimit, stopLimit)
                 numThreads = min(conf.threads, len(threadData.shared.limits))
                 threadData.shared.outputs = []
 
