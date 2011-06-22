@@ -329,7 +329,7 @@ def __loadQueries():
         if retVal is None:
             retVal = DictObject()
 
-        for child in node.findall("./"):
+        for child in node.findall("*"):
             instance = DictObject()
             retVal.__dict__[child.tag] = instance
             if child.attrib:
@@ -342,7 +342,7 @@ def __loadQueries():
     tree = ElementTree()
     tree.parse(paths.QUERIES_XML)
 
-    for node in tree.findall("./"):
+    for node in tree.findall("*"):
         queries[node.attrib['value']] = iterate(node)
 
 def __setMultipleTargets():
