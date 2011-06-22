@@ -57,7 +57,7 @@ for the database management system that you are going to attack:
 <item>Firebird: <htmlurl name="python-kinterbasdb" url="http://kinterbasdb.sourceforge.net/">.
 <item>Microsoft Access: <htmlurl name="python-pyodbc" url="http://pyodbc.googlecode.com/">.
 <item>Microsoft SQL Server: <htmlurl name="python-pymssql" url="http://pymssql.sourceforge.net/">.
-<item>MySQL: <htmlurl name="python-mysqldb" url="http://mysql-python.sourceforge.net/">.
+<item>MySQL: <htmlurl name="python pymysql" url="http://code.google.com/p/pymysql/">.
 <item>Oracle: <htmlurl name="python cx_Oracle" url="http://cx-oracle.sourceforge.net/">.
 <item>PostgreSQL: <htmlurl name="python-psycopg2" url="http://initd.org/psycopg/">.
 <item>SQLite: <htmlurl name="python-pysqlite2" url="http://pysqlite.googlecode.com/">.

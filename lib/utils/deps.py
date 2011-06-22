@@ -32,7 +32,7 @@ def checkDependencies():
                     warnMsg += "Download from %s" % data[2]
                     logger.warn(warnMsg)
             elif dbmsName == DBMS.MYSQL:
-                import MySQLdb
+                import pymysql
             elif dbmsName == DBMS.PGSQL:
                 import psycopg2
             elif dbmsName == DBMS.ORACLE:

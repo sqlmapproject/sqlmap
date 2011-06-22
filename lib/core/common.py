@@ -1036,7 +1036,7 @@ def parseTargetDirect():
                         raise sqlmapMissingDependence, errMsg
 
                 elif dbmsName == DBMS.MYSQL:
-                    import MySQLdb
+                    import pymysql
                 elif dbmsName == DBMS.PGSQL:
                     import psycopg2
                 elif dbmsName == DBMS.ORACLE:

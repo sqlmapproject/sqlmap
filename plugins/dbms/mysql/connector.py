@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 try:
-    import MySQLdb
+    import pymysql
 except ImportError, _:
     pass
 
@@ -20,11 +20,11 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     """
-    Homepage: http://mysql-python.sourceforge.net/
-    User guide: http://mysql-python.sourceforge.net/MySQLdb.html
-    API: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
-    Debian package: python-mysqldb
-    License: GPL
+    Homepage: http://code.google.com/p/pymysql/
+    User guide: http://code.google.com/p/pymysql/
+    API: http://code.google.com/p/pymysql/
+    Debian package: <none>
+    License: MIT
 
     Possible connectors: http://wiki.python.org/moin/MySQL
     """
@@ -36,8 +36,8 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = MySQLdb.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
-        except MySQLdb.OperationalError, msg:
+            self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
+        except pymysql.OperationalError, msg:
             raise sqlmapConnectionException, msg[1]
 
         self.setCursor()
@@ -46,16 +46,16 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except MySQLdb.ProgrammingError, msg:
+        except pymysql.ProgrammingError, msg:
             logger.warn(msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
-        except (MySQLdb.OperationalError, MySQLdb.ProgrammingError), msg:
+        except (pymysql.OperationalError, pymysql.ProgrammingError), msg:
             logger.warn(msg[1])
-        except MySQLdb.InternalError, msg:
+        except pymysql.InternalError, msg:
             raise sqlmapConnectionException, msg[1]
 
         self.connector.commit()
