@@ -775,7 +775,9 @@ def readInput(message, default=None):
         data = default
     else:
         logging._acquireLock()
-        data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
+        dataToStdout(message)
+        data = raw_input()
+        #data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
         logging._releaseLock()
 
         if not data:
