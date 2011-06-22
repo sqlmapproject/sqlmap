@@ -225,7 +225,7 @@ class Connect:
 
             headers[HTTPHEADER.HOST] = urlparse.urlparse(url).netloc
 
-            if headers[HTTPHEADER.HOST].endswith(':80'):
+            if any(map(lambda x: headers[HTTPHEADER.HOST].endswith(':%d' % x), [80, 443])):
                 headers[HTTPHEADER.HOST] = headers[HTTPHEADER.HOST].split(':')[0]
 
             if auxHeaders:
