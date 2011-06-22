@@ -215,6 +215,7 @@ def resumeConfKb(expression, url, value):
             test = readInput(message, default="N")
 
             if not test or test[0] in ("n", "N"):
+                conf.dbms = None
                 Backend.setDbms(dbms)
                 Backend.setVersionList(dbmsVersion)
         else:
