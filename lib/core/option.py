@@ -329,13 +329,13 @@ def __loadQueries():
         if retVal is None:
             retVal = DictObject()
 
-        for node in node.findall("./"):
+        for child in node.findall("./"):
             instance = DictObject()
-            retVal.__dict__[node.tag] = instance
-            if node.attrib:
-                instance.__dict__.update(node.attrib)
+            retVal.__dict__[child.tag] = instance
+            if child.attrib:
+                instance.__dict__.update(child.attrib)
             else:
-                iterate(node, instance)
+                iterate(child, instance)
 
         return retVal
 
