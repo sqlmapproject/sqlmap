@@ -663,6 +663,7 @@ def dataToStdout(data, forceOutput=False):
     if not ('threadException' in kb and kb.threadException):
         if forceOutput or not getCurrentThreadData().disableStdOut:
             try:
+                logging._acquireLock()
                 # Reference: http://bugs.python.org/issue1602
                 if IS_WIN:
                     output = data.encode('ascii', "replace")
@@ -684,6 +685,7 @@ def dataToStdout(data, forceOutput=False):
                 sys.stdout.write(data.encode(UNICODE_ENCODING))
             finally:
                 sys.stdout.flush()
+                logging._releaseLock()
 
 def dataToSessionFile(data):
     if not conf.sessionFile or kb.suppressSession:
@@ -772,7 +774,9 @@ def readInput(message, default=None):
 
         data = default
     else:
+        logging._acquireLock()
         data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
+        logging._releaseLock()
 
         if not data:
             data = default
