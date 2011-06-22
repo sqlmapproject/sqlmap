@@ -27,7 +27,6 @@ from extra.clientform.clientform import ParseResponse
 from extra.clientform.clientform import ParseError
 from extra.keepalive import keepalive
 from extra.oset.pyoset import oset
-from extra.xmlobject import xmlobject
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
@@ -117,6 +116,7 @@ from lib.request.templates import getPageTemplate
 from lib.utils.crawler import Crawler
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
+from xml.etree.ElementTree import ElementTree
 
 authHandler = urllib2.BaseHandler()
 keepAliveHandler = keepalive.HTTPHandler()
@@ -319,8 +319,31 @@ def __loadQueries():
     Loads queries from 'xml/queries.xml' file.
     """
 
-    for node in xmlobject.XMLFile(path=paths.QUERIES_XML, textfilter=sanitizeStr).root.dbms:
-        queries[node.value] = node
+    def iterate(node, retVal=None):
+        class DictObject(object):
+            def __init__(self):
+                self.__dict__ = {}
+            def __contains__(self, name):
+                return name in self.__dict__
+
+        if retVal is None:
+            retVal = DictObject()
+
+        for node in node.findall("./"):
+            instance = DictObject()
+            retVal.__dict__[node.tag] = instance
+            if node.attrib:
+                instance.__dict__.update(node.attrib)
+            else:
+                iterate(node, instance)
+
+        return retVal
+
+    tree = ElementTree()
+    tree.parse(paths.QUERIES_XML)
+
+    for node in tree.findall("./"):
+        queries[node.attrib['value']] = iterate(node)
 
 def __setMultipleTargets():
     """
