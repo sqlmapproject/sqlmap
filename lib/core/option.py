@@ -1325,8 +1325,11 @@ def __cleanupOptions():
     if conf.optimize:
         #conf.predictOutput = True
         conf.keepAlive = True
-        conf.nullConnection = not any([conf.textOnly, conf.titles])
         conf.threads = 3 if conf.threads < 3 else conf.threads
+        conf.nullConnection = not any([conf.data, conf.textOnly, conf.titles, conf.string, conf.regexp])
+        if not conf.nullConnection:
+            debugMsg = "turning off --null-connection switch used indirectly by switch -o"
+            logger.debug(debugMsg)
 
     if conf.data:
         conf.data = urldecode(conf.data)
@@ -1336,12 +1339,6 @@ def __cleanupOptions():
 
     if conf.dbms:
         conf.dbms = conf.dbms.capitalize()
-
-    if conf.optimize and any([conf.data, conf.textOnly, conf.titles]):
-        conf.nullConnection = False
-
-        debugMsg = "turning off --null-connection switch used indirectly by switch -o"
-        logger.debug(debugMsg)
 
     if conf.timeSec not in kb.explicitSettings:
         if conf.tor:
@@ -1747,6 +1744,14 @@ def __basicOptionValidation():
 
     if conf.data and conf.nullConnection:
         errMsg = "switch --data is incompatible with switch --null-connection"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.string and conf.nullConnection:
+        errMsg = "switch --string is incompatible with switch --null-connection"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.regexp and conf.nullConnection:
+        errMsg = "switch --regexp is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
     if conf.predictOutput and conf.threads > 1:
