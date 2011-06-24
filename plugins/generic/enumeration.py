@@ -915,7 +915,7 @@ class Enumeration:
 
         return kb.data.cachedTables
 
-    def getColumns(self, onlyColNames=False):
+    def getColumns(self, onlyColNames=False, colTuple=None):
         self.forceDbmsEnum()
 
         if conf.db is None or conf.db == "CD":
@@ -1038,7 +1038,10 @@ class Enumeration:
                 infoMsg = "fetching columns "
 
                 if len(colList) > 0:
-                    colConsider, colCondParam = self.likeOrExact("column")
+                    if colTuple is None:
+                        colConsider, colCondParam = self.likeOrExact("column")
+                    else:
+                        colConsider, colCondParam = colTuple
                     condQueryStr = "%%s%s" % colCondParam
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
@@ -1060,10 +1063,8 @@ class Enumeration:
                     query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl.upper())
                     query += condQuery
                 elif Backend.isDbms(DBMS.MSSQL):
-                    query = rootQuery.inband.query % (conf.db, conf.db,
-                                                      conf.db, conf.db,
-                                                      conf.db, conf.db,
-                                                      conf.db, unsafeSQLIdentificatorNaming(tbl))
+                    query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db,
+                                                      conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
                     query += condQuery.replace("[DB]", conf.db)
                 elif Backend.isDbms(DBMS.SQLITE):
                     query = rootQuery.inband.query % tbl
@@ -1169,10 +1170,8 @@ class Enumeration:
                         query += condQuery
                         field = None
                     elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                        query = rootQuery.blind.query % (conf.db, conf.db,
-                                                               conf.db, conf.db,
-                                                               conf.db, conf.db,
-                                                               unsafeSQLIdentificatorNaming(tbl))
+                        query = rootQuery.blind.query % (conf.db, conf.db, conf.db, conf.db,
+                                                         conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
                         query += condQuery.replace("[DB]", conf.db)
                         field = condition.replace("[DB]", conf.db)
                     elif Backend.isDbms(DBMS.FIREBIRD):
@@ -1189,9 +1188,8 @@ class Enumeration:
                         elif Backend.isDbms(DBMS.ORACLE):
                             query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
                         elif Backend.isDbms(DBMS.MSSQL):
-                            query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db,
-                                                                    conf.db, column, conf.db,
-                                                                    conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                            query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db,
+                                                              conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
                         elif Backend.isDbms(DBMS.FIREBIRD):
                             query = rootQuery.blind.query2 % (tbl, column)
 
@@ -1429,7 +1427,7 @@ class Enumeration:
 
         return entries, lengths
 
-    def dumpTable(self):
+    def dumpTable(self, foundData=None):
         self.forceDbmsEnum()
 
         if conf.db is None or conf.db == "CD":
@@ -1475,10 +1473,14 @@ class Enumeration:
 
         for tbl in tblList:
             conf.tbl = tbl
-            kb.data.cachedColumns = {}
             kb.data.dumpedTable = {}
 
-            self.getColumns(onlyColNames=True)
+
+            if foundData is None:
+                kb.data.cachedColumns = {}
+                self.getColumns(onlyColNames=True)
+            else:
+                kb.data.cachedColumns = foundData
 
             try:
                 if not safeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
@@ -1651,8 +1653,7 @@ class Enumeration:
                                     entries[column] = []
 
                                 if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                                    query = rootQuery.blind.query % (column, conf.db,
-                                                                     conf.tbl, index)
+                                    query = rootQuery.blind.query % (column, conf.db, conf.tbl, index)
                                 elif Backend.isDbms(DBMS.ORACLE):
                                     query = rootQuery.blind.query % (column, column,
                                                                      tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())),
@@ -1671,8 +1672,7 @@ class Enumeration:
                     for column, columnEntries in entries.items():
                         length = max(lengths[column], len(column))
 
-                        kb.data.dumpedTable[column] = { "length": length,
-                                                        "values": columnEntries }
+                        kb.data.dumpedTable[column] = { "length": length, "values": columnEntries }
 
                         entriesCount = len(columnEntries)
 
@@ -1802,7 +1802,7 @@ class Enumeration:
                 kb.data.cachedColumns = {}
                 kb.data.dumpedTable = {}
 
-                data = self.dumpTable()
+                data = self.dumpTable(dbs)
 
                 if data:
                     conf.dumper.dbTableValues(data)
@@ -2142,7 +2142,7 @@ class Enumeration:
                             conf.tbl = foundTbl
                             conf.col = column
 
-                            self.getColumns(onlyColNames=True)
+                            self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
 
                             if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
                                 dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
@@ -2239,7 +2239,7 @@ class Enumeration:
                                 conf.tbl = tbl
                                 conf.col = column
 
-                                self.getColumns(onlyColNames=True)
+                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
 
                                 if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
                                     dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
