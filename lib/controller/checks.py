@@ -868,11 +868,12 @@ def checkNullConnection():
     return kb.nullConnection is not None
 
 def checkConnection(suppressOutput=False):
-    try:
-        socket.getaddrinfo(conf.hostname, None)
-    except socket.gaierror:
-        errMsg = "host '%s' does not exist" % conf.hostname
-        raise sqlmapConnectionException, errMsg
+    if not conf.proxy:
+        try:
+            socket.getaddrinfo(conf.hostname, None)
+        except socket.gaierror:
+            errMsg = "host '%s' does not exist" % conf.hostname
+            raise sqlmapConnectionException, errMsg
 
     if not suppressOutput:
         infoMsg = "testing connection to the target url"
