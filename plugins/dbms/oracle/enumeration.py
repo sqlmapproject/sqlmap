@@ -169,22 +169,18 @@ class Enumeration(GenericEnumeration):
 
         return ( kb.data.cachedUsersRoles, areAdmins )
 
-    def searchDb(self):
-        warnMsg = "on Oracle it is not possible to search databases"
-        logger.warn(warnMsg)
-
-        return []
-
     def searchColumn(self):
         rootQuery = queries[Backend.getIdentifiedDbms()].search_column
         foundCols = {}
         dbs = { "USERS": {} }
         colList = conf.col.split(",")
         colCond = rootQuery.inband.condition
+
         colConsider, colCondParam = self.likeOrExact("column")
 
         for column in colList:
             column = safeSQLIdentificatorNaming(column)
+            column = column.upper()            
 
             infoMsg = "searching column"
             if colConsider == "1":
@@ -223,7 +219,7 @@ class Enumeration(GenericEnumeration):
                                 conf.tbl = foundTbl
                                 conf.col = column
 
-                                self.getColumns(onlyColNames=True)
+                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
 
                                 dbs[db][foundTbl].update(kb.data.cachedColumns[db][foundTbl])
                                 kb.data.cachedColumns = {}
@@ -276,9 +272,10 @@ class Enumeration(GenericEnumeration):
                             conf.tbl = tbl
                             conf.col = column
 
-                            self.getColumns(onlyColNames=True)
+                            self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
 
-                            dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
+                            if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
+                                dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
                             kb.data.cachedColumns = {}
                         else:
                             dbs[db][tbl][column] = None
