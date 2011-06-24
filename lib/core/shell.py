@@ -33,15 +33,6 @@ def loadHistory():
             warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, msg)
             logger.warn(warnMsg)
 
-def queriesForAutoCompletion():
-    autoComplQueries = {}
-
-    for item in queries[Backend.getIdentifiedDbms()]._toflat():
-        if item._has_key('query') and len(item.query) > 1 and item._name != 'blind':
-            autoComplQueries[item.query] = None
-
-    return autoComplQueries
-
 class CompleterNG(rlcompleter.Completer):
     def global_matches(self, text):
         """
@@ -66,9 +57,7 @@ def autoCompletion(sqlShell=False, osShell=False):
     if not readline._readline:
         return
 
-    if sqlShell:
-        completer = CompleterNG(queriesForAutoCompletion())
-    elif osShell:
+    if osShell:
         if Backend.isOs(OS.WINDOWS):
             # Reference: http://en.wikipedia.org/wiki/List_of_DOS_commands
             completer = CompleterNG({
@@ -87,8 +76,8 @@ def autoCompletion(sqlShell=False, osShell=False):
                                       "pwd": None, "uname": None, "id": None,
                                     })
 
-    readline.set_completer(completer.complete)
-    readline.parse_and_bind("tab: complete")
+        readline.set_completer(completer.complete)
+        readline.parse_and_bind("tab: complete")
 
     loadHistory()
     atexit.register(saveHistory)
