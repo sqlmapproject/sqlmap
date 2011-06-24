@@ -14,6 +14,7 @@ import time
 
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -99,6 +100,8 @@ class Crawler:
             logger.info("starting crawler")
 
             for i in xrange(conf.crawlDepth):
+                if i > 0 and conf.threads == 1:
+                    singleTimeWarnMessage("running in a single-thread mode. This could take a while.")
                 threadData.shared.count = 0
                 threadData.shared.length = len(threadData.shared.unprocessed)
                 numThreads = min(conf.threads, len(threadData.shared.unprocessed))
