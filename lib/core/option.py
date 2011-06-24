@@ -413,21 +413,11 @@ def __setRequestFromFile():
     __feedTargetsDict(conf.requestFile, addedTargetUrls)
 
 def __setCrawler():
-    if not conf.crawl:
+    if not conf.crawlDepth:
         return
 
     crawler = Crawler()
-    depth = 1
-
-    infoMsg = "setting crawling options"
-    logger.info(infoMsg)
-
-    message = "please enter maximum depth [Enter for %d (default)] " % depth
-    choice = readInput(message, default=str(depth))
-    if choice and choice.isdigit():
-        depth = int(choice)
-
-    crawler.getTargetUrls(depth)
+    crawler.getTargetUrls()
 
 def __setGoogleDorking():
     """
@@ -1319,7 +1309,7 @@ def __cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if conf.googleDork or conf.logFile or conf.bulkFile or conf.forms or conf.crawl:
+    if conf.googleDork or conf.logFile or conf.bulkFile or conf.forms or conf.crawlDepth:
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1786,7 +1776,7 @@ def __basicOptionValidation():
         errMsg = "switch --forms is compatible only with -u (--url) target switch"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.forms and conf.crawl:
+    if conf.forms and conf.crawlDepth:
         errMsg = "switch --forms is currently not compatible with --crawl switch"
         raise sqlmapSyntaxException, errMsg
 

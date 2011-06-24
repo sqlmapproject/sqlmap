@@ -31,7 +31,7 @@ class Crawler:
     line option '--crawl'
     """
 
-    def getTargetUrls(self, depth=1):
+    def getTargetUrls(self):
         try:
             threadData = getCurrentThreadData()
             threadData.shared.outputs = oset()
@@ -98,7 +98,7 @@ class Crawler:
 
             logger.info("starting crawler")
 
-            for i in xrange(depth):
+            for i in xrange(conf.crawlDepth):
                 threadData.shared.count = 0
                 threadData.shared.length = len(threadData.shared.unprocessed)
                 numThreads = min(conf.threads, len(threadData.shared.unprocessed))
