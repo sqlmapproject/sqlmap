@@ -133,6 +133,7 @@ class Connect:
         refreshing = kwargs.get('refreshing',       False)
         retrying = kwargs.get('retrying',           False)
         redirecting = kwargs.get('redirecting',     False)
+        crawling = kwargs.get('crawling',           False)
 
         if not urlparse.urlsplit(url).netloc:
             url = urlparse.urljoin(conf.url, url)
@@ -188,7 +189,7 @@ class Connect:
 
                 return page
 
-            elif refreshing:
+            elif any ([refreshing, crawling]):
                 pass
 
             elif target:

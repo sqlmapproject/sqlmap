@@ -55,7 +55,7 @@ class Crawler:
                     content = None
                     try:
                         if current:
-                            content = Request.getPage(url=current, raise404=False)[0]
+                            content = Request.getPage(url=current, crawling=True, raise404=False)[0]
                     except sqlmapConnectionException, e:
                         errMsg = "connection exception detected (%s). skipping " % e
                         errMsg += "url '%s'" % current
