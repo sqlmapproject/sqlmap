@@ -9,6 +9,8 @@ See the file 'doc/COPYING' for copying permission
 
 import logging
 import os
+import _socket
+import socket
 import subprocess
 import sys
 
@@ -359,4 +361,8 @@ DUMMY_SQL_INJECTION_CHARS = ";()\"'"
 CRAWL_EXCLUDE_EXTENSIONS = ("gif","jpg","jar","tif","bmp","war","ear","mpg","wmv","mpeg","scm","iso","dmp","dll","cab","so","avi","bin","exe","iso","tar","png","pdf","ps","mp3","zip","rar","gz")
 
 # Standard getaddrinfo response for raw IP addresses ((None,) -> ('ip', port))
-RAW_IP_ADDR_INFO = [[2, 1, 6, '', (None,)], [2, 2, 17, '', (None,)], [2, 3, 0, '', (None,)]]
+RAW_IP_ADDR_INFO =  [
+                        [_socket.AF_INET, _socket.SOCK_STREAM, socket.SOL_TCP, '', (None,)], 
+                        [_socket.AF_INET, _socket.SOCK_DGRAM, socket.SOL_UDP, '', (None,)], 
+                        [_socket.AF_INET, _socket.SOCK_RAW, socket.SOL_IP, '', (None,)]
+                    ]
