@@ -101,7 +101,6 @@ from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import TIME_DELAY_CANDIDATES
-from lib.core.settings import RAW_IP_ADDR_INFO
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.update import update
@@ -862,10 +861,7 @@ def __setDNSCache():
     """
 
     def _getaddrinfo(*args, **kwargs):
-        if conf.proxyDNSResponse:
-            return conf.proxyDNSResponse
-
-        elif args in kb.cache:
+        if args in kb.cache:
             return kb.cache[args]
 
         else:
@@ -933,21 +929,6 @@ def __setHTTPProxy():
         proxyHandler = ProxyHTTPSHandler(__proxyString)
     else:
         proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
-
-    # Just in case patch for eventual "DNS leakage"
-    if conf.proxy:
-        if re.match(GENERAL_IP_ADDRESS_REGEX, __hostname):
-            addrinfo = RAW_IP_ADDR_INFO
-            for item in addrinfo:
-                item[-1] = (__hostname, __port)
-        else:
-            try:
-                addrinfo = socket.getaddrinfo(__hostname, __port)
-            except:
-                errMsg = "proxy host '%s' does not exist" % __hostname
-                raise sqlmapConnectionException, errMsg
-
-        conf.proxyDNSResponse = addrinfo
 
 def __setSafeUrl():
     """
@@ -1372,7 +1353,6 @@ def __setConfAttributes():
     conf.parameters = {}
     conf.path = None
     conf.port = None
-    conf.proxyDNSResponse = None
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None

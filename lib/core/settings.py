@@ -359,10 +359,3 @@ DUMMY_SQL_INJECTION_CHARS = ";()\"'"
 
 # Extensions skipped by crawler
 CRAWL_EXCLUDE_EXTENSIONS = ("gif","jpg","jar","tif","bmp","war","ear","mpg","wmv","mpeg","scm","iso","dmp","dll","cab","so","avi","bin","exe","iso","tar","png","pdf","ps","mp3","zip","rar","gz")
-
-# Standard getaddrinfo response for raw IP addresses ((None,) -> ('ip', port))
-RAW_IP_ADDR_INFO =  [
-                        [_socket.AF_INET, _socket.SOCK_STREAM, socket.SOL_TCP, '', (None,)], 
-                        [_socket.AF_INET, _socket.SOCK_DGRAM, socket.SOL_UDP, '', (None,)], 
-                        [_socket.AF_INET, _socket.SOCK_RAW, socket.SOL_IP, '', (None,)]
-                    ]
