@@ -101,6 +101,7 @@ from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import TIME_DELAY_CANDIDATES
+from lib.core.settings import RAW_IP_ADDR_INFO
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.update import update
@@ -933,13 +934,18 @@ def __setHTTPProxy():
     else:
         proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
 
-    # Patch for DNS leakage
+    # Just in case patch for eventual "DNS leakage"
     if conf.proxy:
-        try:
-            addrinfo = socket.getaddrinfo(__hostname, __port)
-        except:
-            errMsg = "proxy host '%s' does not exist" % __hostname
-            raise sqlmapConnectionException, errMsg
+        if re.match(GENERAL_IP_ADDRESS_REGEX, __hostname):
+            addrinfo = RAW_IP_ADDR_INFO
+            for item in addrinfo:
+                item[-1] = (__hostname, __port)
+        else:
+            try:
+                addrinfo = socket.getaddrinfo(__hostname, __port)
+            except:
+                errMsg = "proxy host '%s' does not exist" % __hostname
+                raise sqlmapConnectionException, errMsg
 
         conf.proxyDNSResponse = addrinfo
 
