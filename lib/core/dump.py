@@ -457,8 +457,8 @@ class Dump:
             dumpFP.close()
             logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
 
-    def dbColumns(self, dbColumns, colConsider, dbs):
-        for column in dbColumns.keys():
+    def dbColumns(self, dbColumnsDict, colConsider, dbs):
+        for column in dbColumnsDict.keys():
             if colConsider == "1":
                 colConsiderStr = "s like '" + column + "' were"
             else:
