@@ -280,7 +280,11 @@
             <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT %s FROM (SELECT %s,ROWNUM AS LIMIT FROM %s) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
-        <search_db/>
+        <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
+        <search_db>
+            <inband query="SELECT OWNER FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES) WHERE " query2="" condition="OWNER" condition2=""/>
+            <blind query="SELECT OWNER FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES) WHERE " query2="" count="SELECT COUNT(DISTINCT(OWNER)) FROM SYS.ALL_TABLES WHERE " count2="" condition="OWNER" condition2=""/>
+        </search_db>
         <search_table>
             <inband query="SELECT OWNER,TABLE_NAME FROM SYS.ALL_TABLES WHERE " condition="TABLE_NAME" condition2="OWNER"/>
             <blind query="SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES WHERE " query2="SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE OWNER='%s'" count="SELECT COUNT(DISTINCT(OWNER)) FROM SYS.ALL_TABLES WHERE " count2="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE OWNER='%s'" condition="TABLE_NAME" condition2="OWNER"/>
