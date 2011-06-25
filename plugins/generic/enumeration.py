@@ -45,6 +45,7 @@ from lib.core.dicts import firebirdTypes
 from lib.core.dicts import mysqlPrivs
 from lib.core.dicts import pgsqlPrivs
 from lib.core.dicts import firebirdPrivs
+from lib.core.dicts import db2Privs
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
@@ -100,8 +101,14 @@ class Enumeration:
             infoMsg = "fetching banner"
             logger.info(infoMsg)
 
-            query = queries[Backend.getIdentifiedDbms()].banner.query
-            kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
+            # Needed for IBM DB2 versions < 9
+            if Backend.isDbms(DBMS.DB2) and int(Backend.getVersion().split(".")[0]) < 9:
+                query = queries[Backend.getIdentifiedDbms()].banner.query2
+                kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
+            else:
+                query = queries[Backend.getIdentifiedDbms()].banner.query
+                kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
+
             bannerParser(kb.data.banner)
 
             if conf.os and conf.os == "windows":
@@ -193,7 +200,7 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of database users"
                 raise sqlmapNoneDataException, errMsg
 
-            if Backend.isDbms(DBMS.ORACLE):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 plusOne = True
             else:
                 plusOne = False
@@ -228,7 +235,7 @@ class Enumeration:
 
         logger.info(infoMsg)
 
-        if conf.user and Backend.isDbms(DBMS.ORACLE):
+        if conf.user and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
             conf.user = conf.user.upper()
 
         if conf.user:
@@ -423,7 +430,7 @@ class Enumeration:
 
         logger.info(infoMsg)
 
-        if conf.user and Backend.isDbms(DBMS.ORACLE):
+        if conf.user and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
             conf.user = conf.user.upper()
 
         if conf.user:
@@ -499,6 +506,25 @@ class Enumeration:
                                 if privilege.upper() == "Y":
                                     privileges.add(mysqlPrivs[count])
 
+                            # In DB2 we get Y or G if the privilege is
+                            # True, N otherwise
+                            elif Backend.isDbms(DBMS.DB2):
+                                privs = privilege.split(",")
+                                privilege = privs[0]
+                                privs = privs[1]
+                                privs = list(privs.strip())
+                                i = 1
+
+                                for priv in privs:
+                                    if priv.upper() in ("Y", "G"):
+                                        for position, db2Priv in db2Privs.items():
+                                            if position == i:
+                                                privilege += ", " + db2Priv
+
+                                    i += 1
+
+                                privileges.add(privilege)  
+
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
 
@@ -563,7 +589,7 @@ class Enumeration:
 
                 privileges = set()
 
-                if Backend.isDbms(DBMS.ORACLE):
+                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     plusOne = True
                 else:
                     plusOne = False
@@ -621,6 +647,25 @@ class Enumeration:
                     elif Backend.isDbms(DBMS.FIREBIRD):
                         privileges.add(firebirdPrivs[privilege.strip()])
 
+                    # In DB2 we get Y or G if the privilege is
+                    # True, N otherwise
+                    elif Backend.isDbms(DBMS.DB2):
+                        privs = privilege.split(",")
+                        privilege = privs[0]
+                        privs = privs[1]
+                        privs = list(privs.strip())
+                        i = 1
+
+                        for priv in privs:
+                            if priv.upper() in ("Y", "G"):
+                                for position, db2Priv in db2Privs.items():
+                                    if position == i:
+                                        privilege += ", " + db2Priv
+
+                            i += 1
+
+                        privileges.add(privilege)
+
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
 
@@ -663,8 +708,15 @@ class Enumeration:
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
-        if Backend.isDbms(DBMS.ORACLE):
+        elif Backend.isDbms(DBMS.ORACLE):
             warnMsg = "schema names are going to be used on Oracle "
+            warnMsg += "for enumeration as the counterpart to database "
+            warnMsg += "names on other DBMSes"
+            logger.warn(warnMsg)
+
+            infoMsg = "fetching database (schema) names"
+        elif Backend.isDbms(DBMS.DB2):
+            warnMsg = "schema names are going to be used on IBM DB2 "
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             logger.warn(warnMsg)
@@ -701,7 +753,7 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of databases"
                 logger.error(errMsg)
             else:
-                if Backend.isDbms(DBMS.ORACLE):
+                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     plusOne = True
                 else:
                     plusOne = False
@@ -762,7 +814,7 @@ class Enumeration:
         if conf.db == "CD":
             conf.db = self.getCurrentDb()
 
-        if conf.db and Backend.isDbms(DBMS.ORACLE):
+        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
             conf.db = conf.db.upper()
 
         if conf.db:
@@ -874,7 +926,7 @@ class Enumeration:
 
                 tables = []
 
-                if Backend.isDbms(DBMS.ORACLE):
+                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     plusOne = True
                 else:
                     plusOne = False
@@ -928,7 +980,7 @@ class Enumeration:
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
-            if Backend.isDbms(DBMS.ORACLE):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 conf.db = conf.db.upper()
 
             if  ',' in conf.db:
@@ -939,7 +991,7 @@ class Enumeration:
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.col:
-            if Backend.isDbms(DBMS.ORACLE):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 conf.col = conf.col.upper()
 
             colList = conf.col.split(",")
@@ -950,7 +1002,7 @@ class Enumeration:
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
 
         if conf.tbl:
-            if Backend.isDbms(DBMS.ORACLE):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 conf.tbl = conf.tbl.upper()
 
             tblList = conf.tbl.split(",")
@@ -1059,7 +1111,7 @@ class Enumeration:
                 if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
-                elif Backend.isDbms(DBMS.ORACLE):
+                elif Backend.getIdentifiedDbms() in ( DBMS.ORACLE, DBMS.DB2):
                     query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl.upper())
                     query += condQuery
                 elif Backend.isDbms(DBMS.MSSQL):
@@ -1126,7 +1178,7 @@ class Enumeration:
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                elif Backend.isDbms(DBMS.ORACLE):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(tbl.upper())
                     query += condQuery
 
@@ -1165,7 +1217,7 @@ class Enumeration:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query += condQuery
                         field = None
-                    elif Backend.isDbms(DBMS.ORACLE):
+                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl.upper())
                         query += condQuery
                         field = None
@@ -1185,7 +1237,7 @@ class Enumeration:
                     if not onlyColNames:
                         if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                             query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
-                        elif Backend.isDbms(DBMS.ORACLE):
+                        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                             query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
                         elif Backend.isDbms(DBMS.MSSQL):
                             query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db,
@@ -1255,7 +1307,11 @@ class Enumeration:
         return kb.data.cachedColumns
 
     def __tableGetCount(self, db, table):
-        query = "SELECT COUNT(*) FROM %s.%s" % (safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
+        if Backend.isDbms(DBMS.DB2):
+            query = "SELECT COUNT(*) FROM %s.%s--" % (safeSQLIdentificatorNaming(db.upper()), safeSQLIdentificatorNaming(table.upper(), True))
+        else:
+            query = "SELECT COUNT(*) FROM %s.%s" % (safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
+
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=2)
 
         if count is not None and isinstance(count, basestring) and count.isdigit():
@@ -1451,7 +1507,7 @@ class Enumeration:
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.tbl:
-            if Backend.isDbms(DBMS.ORACLE):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 conf.tbl = conf.tbl.upper()
 
             tblList = conf.tbl.split(",")
@@ -1525,7 +1581,7 @@ class Enumeration:
                                 row = map(lambda x: x.replace(randStr, CONCAT_VALUE_DELIMITER).replace(randStr2, CONCAT_ROW_DELIMITER), row)
                                 entries.append(row)
 
-                    if Backend.isDbms(DBMS.ORACLE):
+                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.inband.query % (colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
                     elif Backend.isDbms(DBMS.SQLITE):
                         query = rootQuery.inband.query % (colString, tbl)
@@ -1590,7 +1646,7 @@ class Enumeration:
                     infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
-                    if Backend.isDbms(DBMS.ORACLE):
+                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.blind.count % (tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                         query = rootQuery.blind.count % tbl
@@ -1638,7 +1694,7 @@ class Enumeration:
                             entries, lengths = retVal
 
                     else:
-                        if Backend.isDbms(DBMS.ORACLE):
+                        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                             plusOne = True
                         else:
                             plusOne = False
@@ -1654,7 +1710,7 @@ class Enumeration:
 
                                 if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                                     query = rootQuery.blind.query % (column, conf.db, conf.tbl, index)
-                                elif Backend.isDbms(DBMS.ORACLE):
+                                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                                     query = rootQuery.blind.query % (column, column,
                                                                      tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())),
                                                                      index)
@@ -1822,6 +1878,9 @@ class Enumeration:
         for db in dbList:
             db = safeSQLIdentificatorNaming(db)
 
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                db = db.upper()
+
             infoMsg = "searching database"
             if dbConsider == "1":
                 infoMsg += "s like"
@@ -1887,6 +1946,8 @@ class Enumeration:
                         query = rootQuery.blind.query
                     query += dbQuery
                     query += exclDbsQuery
+                    if Backend.isDbms(DBMS.DB2):
+                        query += ") AS foobar"
                     query = agent.limitQuery(index, query, dbCond)
 
                     value = inject.getValue(query, inband=False, error=False)
@@ -1932,7 +1993,7 @@ class Enumeration:
         for tbl in tblList:
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            if Backend.isDbms(DBMS.ORACLE):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 tbl = tbl.upper()
 
             infoMsg = "searching table"
@@ -1999,6 +2060,8 @@ class Enumeration:
                     query = rootQuery.blind.query
                     query += tblQuery
                     query += exclDbsQuery
+                    if Backend.isDbms(DBMS.DB2):
+                        query += ") AS foobar"
                     query = agent.limitQuery(index, query)
                     foundDb = inject.getValue(query, inband=False, error=False)
                     foundDb = safeSQLIdentificatorNaming(foundDb)
@@ -2096,6 +2159,9 @@ class Enumeration:
         for column in colList:
             column = safeSQLIdentificatorNaming(column)
 
+            if Backend.isDbms(DBMS.DB2):
+                column = column.upper()            
+
             infoMsg = "searching column"
             if colConsider == "1":
                 infoMsg += "s like"
@@ -2181,6 +2247,8 @@ class Enumeration:
                     query = rootQuery.blind.query
                     query += colQuery
                     query += exclDbsQuery
+                    if Backend.isDbms(DBMS.DB2):
+                        query += ") AS foobar"
                     query = agent.limitQuery(index, query)
                     db = inject.getValue(query, inband=False, error=False)
                     db = safeSQLIdentificatorNaming(db)

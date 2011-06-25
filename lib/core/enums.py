@@ -34,6 +34,7 @@ class DBMS:
     PGSQL = "PostgreSQL"
     SQLITE = "SQLite"
     SYBASE = "Sybase"
+    DB2 = "IBM DB2"    
 
 class OS:
     LINUX = "Linux"

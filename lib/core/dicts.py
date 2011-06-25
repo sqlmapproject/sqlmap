@@ -98,3 +98,14 @@ firebirdPrivs = {
                     "R": "REFERENCES",
                     "E": "EXECUTE"
                 }
+
+db2Privs = {
+                    1: "CONTROLAUTH",
+                    2: "ALTERAUTH",
+                    3: "DELETEAUTH",
+                    4: "INDEXAUTH",
+                    5: "INSERTAUTH",
+                    6: "REFAUTH",
+                    7: "SELECTAUTH",
+                    8: "UPDATEAUTH"
+           }

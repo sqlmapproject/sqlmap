@@ -407,7 +407,7 @@ class Agent:
         if Backend.isDbms(DBMS.MYSQL):
             concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2):
             concatenatedQuery = "%s||%s" % (query1, query2)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
@@ -466,7 +466,7 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.misc.start, 1)
                 concatenatedQuery += "||'%s'" % kb.misc.stop
@@ -544,12 +544,15 @@ class Agent:
         inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if query.startswith("TOP"):
-            # TOP enumeration on DBMS.MSSQL is too specific and it has to go into it's own brackets
-            # because those NULLs cause problems with ORDER BY clause
+            # TOP enumeration on DBMS.MSSQL is too specific and it has to go
+            # into its own brackets because those NULLs cause problems with
+            # ORDER BY clause
             if Backend.isDbms(DBMS.MSSQL):
                 inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, range(0, count)))
                 inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
+
                 return inbandQuery
+
             topNum = re.search("\ATOP\s+([\d]+)\s+", query, re.I).group(1)
             query = query[len("TOP %s " % topNum):]
             inbandQuery += "TOP %s " % topNum
@@ -643,7 +646,7 @@ class Agent:
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num+1, num+1)
             limitedQuery += " %s" % limitStr
 
-        elif Backend.isDbms(DBMS.ORACLE):
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
             if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]

@@ -33,6 +33,10 @@ Daniele Bellucci <daniele.bellucci@gmail.com>
     for starting sqlmap project and developing it between July and August
     2006
 
+Sebastian Bittig <s.bittig@r-tec.net> and the rest of the team at
+r-tec IT Systeme GmbH
+    for providing with the DB2 fingerprint and enumeration support patch
+
 Anthony Boynes <aboynes@gmail.com>
     for reporting several bugs
 
