@@ -742,7 +742,7 @@ def strToHex(inpStr):
 
     return hexStr
 
-def readInput(message, default=None):
+def readInput(message, default=None, checkBatch=True):
     """
     @param message: message to display on terminal.
     @type message: C{str}
@@ -758,7 +758,7 @@ def readInput(message, default=None):
 
     message = "\r%s" % message
 
-    if conf.batch:
+    if checkBatch and conf.batch:
         if isinstance(default, (list, tuple, set)):
             options = ",".join([getUnicode(opt, UNICODE_ENCODING) for opt in default])
         elif default:
