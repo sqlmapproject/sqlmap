@@ -14,6 +14,7 @@ import time
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import advancedDict
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapThreadException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PYVERSION
@@ -74,7 +75,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     kb.threadContinue = True
     kb.threadException = False
 
-    if threadChoice and numThreads == 1:
+    if threadChoice and numThreads == 1 and any(map(lambda x: x in kb.injection.data, [PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION])):
         while True:
             message = "please enter number of threads? [Enter for %d (current)] " % numThreads
             choice = readInput(message, default=str(numThreads))

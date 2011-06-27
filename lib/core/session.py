@@ -253,6 +253,9 @@ def resumeConfKb(expression, url, value):
         infoMsg += "files directory '%s' from session file" % conf.tmpPath
         logger.info(infoMsg)
 
+    elif conf.freshQueries:
+        pass
+
     elif expression == "TABLE_EXISTS" and url == conf.url:
         table = unSafeFormatString(value[:-1])
         split = '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.'
