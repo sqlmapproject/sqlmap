@@ -168,6 +168,7 @@ optDict = {
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
                                "crawlDepth":        "integer",
+                               "dependencies":      "boolean",
                                "forms":             "boolean",
                                "googlePage":        "integer",
                                "mobile":            "boolean",
@@ -176,7 +177,6 @@ optDict = {
                                "replicate":         "boolean",
                                "tor":               "boolean",
                                "wizard":            "boolean",
-                               "dependencies":      "boolean",
                                "verbose":           "integer"
                              },
           }

@@ -514,6 +514,10 @@ def cmdLineParser():
         miscellaneous.add_option("--crawl", dest="crawlDepth", type="int",
                                   help="Crawl the website starting from the target url")
 
+        miscellaneous.add_option("--dependencies", dest="dependencies",
+                                  action="store_true",
+                                  help="Check for missing sqlmap dependencies")
+
         miscellaneous.add_option("--forms", dest="forms",
                                   action="store_true",
                                   help="Parse and test forms on target url")
@@ -544,10 +548,6 @@ def cmdLineParser():
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
                                   help="Simple wizard interface for beginner users")
-
-        miscellaneous.add_option("--dependencies", dest="dependencies",
-                                  action="store_true",
-                                  help="Check for missing sqlmap dependencies")
 
         # Hidden and/or experimental options
         parser.add_option("--profile", dest="profile", action="store_true",
