@@ -135,7 +135,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         hintlock.release()
 
         if hintValue is not None and len(hintValue) >= idx:
-            if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB):
+            if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
                 posValue = hintValue[idx-1]
             else:
                 posValue = ord(hintValue[idx-1])

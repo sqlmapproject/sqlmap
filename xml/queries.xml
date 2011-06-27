@@ -564,8 +564,7 @@
         <timedelay query=""/>
         <substring query="SUBSTR((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSIBM.SYSDUMMY1"/>
-        <!-- TODO: ASCII() not supported in all versions -->
-        <inference query="ASCII(SUBSTR((%s),%d,1)) > %d"/>
+        <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <!-- NOTE: We have to use the complicated UDB OLAP functions in query2 because sqlmap injects isnull query inside MAX function, else we would use: SELECT MAX(versionnumber) FROM sysibm.sysversions -->
         <banner query="SELECT service_level FROM TABLE (sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT, versionnumber FROM sysibm.sysversions) AS foobar WHERE LIMIT=1"/>
         <current_user query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
@@ -602,7 +601,7 @@
         </dump_table>
         <search_db>
             <inband query="SELECT schemaname FROM syscat.schemata WHERE " query2="" condition="schemaname" condition2=""/>
-            <blind query="SELECT schemaname FROM (SELECT DISTINCT(schemaname) FROM syscat.schemata WHERE " query2="" count="SELECT COUNT(DISTINCT(schemaname)) FROM syscat.schemata WHERE " count2="" condition="schemaname" condition2=""/>        
+            <blind query="SELECT schemaname FROM (SELECT DISTINCT(schemaname) FROM syscat.schemata WHERE " query2="" count="SELECT COUNT(DISTINCT(schemaname)) FROM syscat.schemata WHERE " count2="" condition="schemaname" condition2=""/>
         </search_db>
         <search_table>
             <inband query="SELECT tabschema, tabname FROM sysstat.tables WHERE " condition="tabname" condition2="tabschema"/>
