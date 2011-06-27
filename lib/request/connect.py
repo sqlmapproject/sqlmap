@@ -567,7 +567,7 @@ class Connect:
 
                 warnMsg = "time-based comparison needs larger statistical "
                 warnMsg += "model. Making a few dummy requests, please wait.."
-                logger.warn(warnMsg)
+                singleTimeWarnMessage(warnMsg)
 
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                     Connect.queryPage(content=True)
