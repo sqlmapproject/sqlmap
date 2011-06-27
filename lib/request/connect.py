@@ -579,6 +579,10 @@ class Connect:
                     warnMsg += "response(s). Please use as high value for "
                     warnMsg += "--time-sec option as possible (e.g. 10 or more)"
                     logger.critical(warnMsg)
+            elif not kb.testMode:
+                warnMsg = "it is very important not to stress the network adapter's "
+                warnMsg += "bandwidth during usage of time-based queries"
+                singleTimeWarnMessage(warnMsg)
 
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
