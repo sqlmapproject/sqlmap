@@ -193,10 +193,8 @@ class Agent:
         if where == PAYLOAD.WHERE.REPLACE:
             pass
 
-        elif kb.injection.suffix is not None:
-            expression += " %s" % kb.injection.suffix
-        elif suffix is not None:
-            expression += " %s" % suffix
+        elif any([kb.injection.suffix, suffix]):
+            expression += " %s" % (kb.injection.suffix or suffix)
 
         return expression
 
