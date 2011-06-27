@@ -2236,7 +2236,7 @@ Formats:
     </test>
 
     <test>
-        <title>DB2 AND time-based blind (heavy query)</title>
+        <title>IBM DB2 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>2</risk>
@@ -2250,12 +2250,12 @@ Formats:
             <time>[DELAYED]</time>
         </response>
         <details>
-            <dbms>DB2</dbms>
+            <dbms>IBM DB2</dbms>
         </details>
     </test>
 
     <test>
-        <title>DB2 AND time-based blind (heavy query - comment)</title>
+        <title>IBM DB2 AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>2</risk>
@@ -2270,7 +2270,7 @@ Formats:
             <time>[DELAYED]</time>
         </response>
         <details>
-            <dbms>DB2</dbms>
+            <dbms>IBM DB2</dbms>
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access -->
@@ -2475,7 +2475,7 @@ Formats:
     </test>
 
     <test>
-        <title>DB2 OR time-based blind (heavy query)</title>
+        <title>IBM DB2 OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>3</risk>
@@ -2489,7 +2489,7 @@ Formats:
             <time>[DELAYED]</time>
         </response>
         <details>
-            <dbms>DB2</dbms>
+            <dbms>IBM DB2</dbms>
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access -->
