@@ -3,23 +3,25 @@
 # Copyright (C) 2009-2010  Bernardo Damele A. G.
 # web: http://bernardodamele.blogspot.com/
 # email: bernardo.damele@gmail.com
-# 
+#
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Adapt the following settings to your environment
 USER="postgres"
+#PORT="5435"
+#VERSION="9.0"
 PORT="5434"
 VERSION="8.4"
 #PORT="5433"
@@ -40,6 +42,8 @@ if test $? -ne 0; then
 		echo "apt-get install postgresql-server-dev-8.3"
 	elif test "${VERSION}" == "8.4"; then
 		echo "apt-get install postgresql-server-dev-8.4"
+	elif test "${VERSION}" == "9.0"; then
+		echo "apt-get install postgresql-server-dev-9.0"
 	fi
 
 	exit 1
