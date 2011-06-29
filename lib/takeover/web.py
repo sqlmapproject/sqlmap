@@ -228,8 +228,8 @@ class Web:
                         else:
                             continue
 
-                localPath = os.path.normpath(localPath).rstrip('/')
-                uriPath = os.path.normpath(uriPath).rstrip('/')
+                localPath = posixpath.normpath(localPath).rstrip('/')
+                uriPath = posixpath.normpath(uriPath).rstrip('/')
 
                 # Upload the file stager
                 self.__webFileInject(stagerContent, stagerName, localPath)
