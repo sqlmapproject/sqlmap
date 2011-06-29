@@ -702,6 +702,8 @@ class Enumeration:
         if len(kb.data.cachedDbs) > 0:
             return kb.data.cachedDbs
 
+        infoMsg = None
+
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             warnMsg = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
@@ -725,7 +727,8 @@ class Enumeration:
         else:
             infoMsg = "fetching database names"
 
-        logger.info(infoMsg)
+        if infoMsg:
+            logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].dbs
 
