@@ -40,6 +40,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
+from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import DUMMY_USER_PREFIX
@@ -362,19 +363,43 @@ def dictionaryAttack(attack_dict):
             continue
 
         if not kb.wordlist:
-            if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
-                message = "what's the dictionary's location? [%s]" % paths.ORACLE_DEFAULT_PASSWD
-                dictpath = readInput(message, default=paths.ORACLE_DEFAULT_PASSWD)
 
-            else:
-                message = "what's the dictionary's location? [%s]" % paths.WORDLIST
-                dictpath = readInput(message, default=paths.WORDLIST)
+            while not kb.wordlist:
+                message = "what dictionary do you want to use?\n"
+                message += "[1] Default (Press Enter)\n"
+                message += "[2] Custom\n"
+                message += "[3] File with list of dictionary files"
+                choice = readInput(message, default="1")
 
-            checkFile(dictpath)
+                try:
+                    if choice == "2":
+                        message = "what's the custom dictionary's location?\n"
+                        dictPaths = [readInput(message)]
+                    elif choice == "3":
+                        message = "what's the list file location?\n"
+                        listPath = readInput(message)
+                        checkFile(listPath)
+                        dictPaths = getFileItems(listPath)
+                    else:
+                        if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
+                            dictPaths = [paths.ORACLE_DEFAULT_PASSWD]
+                        else:
+                            dictPaths = [paths.WORDLIST]
 
-            infoMsg = "loading dictionary from: '%s'" % dictpath
-            logger.info(infoMsg)
-            kb.wordlist = getFileItems(dictpath, None, False)
+                    kb.wordlist = []
+
+                    for dictPath in dictPaths:
+                        checkFile(dictPath)
+
+                        infoMsg = "loading dictionary from: '%s'" % dictPath
+                        logger.info(infoMsg)
+
+                        kb.wordlist.extend(getFileItems(dictPath, None, False))
+
+                except sqlmapFilePathException, msg:
+                    warnMsg = "there was a problem while loading dictionaries"
+                    warnMsg += " ('%s')" % msg
+                    logger.critical(warnMsg)
 
             message = "do you want to use common password suffixes? (slow!) [y/N] "
             test = readInput(message, default="N")

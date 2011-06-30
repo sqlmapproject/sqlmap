@@ -752,7 +752,7 @@ def readInput(message, default=None, checkBatch=True):
     """
 
     if "\n" in message:
-        message += "\n> "
+        message += "%s> " % ("\n" if message.count("\n") > 1 else "")
     elif message[-1] == ']':
         message += " "
 
