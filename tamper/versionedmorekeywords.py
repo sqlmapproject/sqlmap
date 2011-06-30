@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
 import re
 
 from lib.core.common import randomRange
@@ -30,7 +31,7 @@ def tamper(payload):
         else:
             return match.group()
 
-    singleTimeWarnMessage("This tamper script is only meant to be run against MySQL >= 5.1.13")
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against MySQL >= 5.1.13" % os.path.basename(__file__))
 
     retVal = payload
 
