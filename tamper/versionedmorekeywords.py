@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-$Id: versionedkeywords.py 4203 2011-06-30 06:39:32Z stamparm $
+$Id$
 
 Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
