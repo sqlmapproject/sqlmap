@@ -132,6 +132,62 @@ class UnicodeRawConfigParser(RawConfigParser):
 
             fp.write("\n")
 
+class Wordlist:
+    """
+    Iterator for looping over a large dictionaries
+    """
+
+    def __init__(self, filenames):
+        self.filenames = filenames
+        self.fp = None
+        self.index = 0
+        self.iter = None
+        self.cursize = 0
+        self.custom = []
+        self.adjust()
+
+    def __iter__(self):
+        return self
+
+    def adjust(self):
+        self.closeFP()
+        if self.index > len(self.filenames):
+            raise StopIteration
+        elif self.index == len(self.filenames):
+            self.iter = iter(self.custom)
+        else:
+            current = self.filenames[self.index]
+            infoMsg = "loading dictionary from: '%s'" % current
+            singleTimeLogMessage(infoMsg)
+            self.fp = open(current, "r")
+            self.cursize = os.path.getsize(current)
+            self.iter = self.fp.xreadlines()
+        self.index += 1
+
+    def append(self, value):
+        self.custom.append(value)
+        
+    def closeFP(self):
+        if self.fp:
+            self.fp.close()
+
+    def next(self):
+        try:
+            return self.iter.next().rstrip()
+        except StopIteration:
+            self.adjust()
+            return self.iter.next().rstrip()
+
+    def percentage(self):
+        retVal = 0
+        if self.fp:
+            retVal = round(100.0 * self.fp.tell() / self.cursize)
+        return retVal
+
+    def rewind(self):
+        self.index = 0
+        self.adjust()
+
 class DynamicContentItem:
     """
     Represents line in content page with dynamic properties (candidate

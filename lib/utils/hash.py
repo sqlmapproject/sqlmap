@@ -13,6 +13,7 @@ try:
 except ImportError, _:
     from extra.fcrypt.fcrypt import crypt
 
+import os
 import re
 import time
 
@@ -33,6 +34,8 @@ from lib.core.common import getPublicTypeMembers
 from lib.core.common import normalizeUnicode
 from lib.core.common import paths
 from lib.core.common import readInput
+from lib.core.common import singleTimeLogMessage
+from lib.core.common import Wordlist
 from lib.core.convert import hexdecode
 from lib.core.convert import hexencode
 from lib.core.convert import utf8encode
@@ -363,7 +366,6 @@ def dictionaryAttack(attack_dict):
             continue
 
         if not kb.wordlist:
-
             while not kb.wordlist:
                 message = "what dictionary do you want to use?\n"
                 message += "[1] Default (Press Enter)\n"
@@ -386,15 +388,10 @@ def dictionaryAttack(attack_dict):
                         else:
                             dictPaths = [paths.WORDLIST]
 
-                    kb.wordlist = []
-
                     for dictPath in dictPaths:
                         checkFile(dictPath)
 
-                        infoMsg = "loading dictionary from: '%s'" % dictPath
-                        logger.info(infoMsg)
-
-                        kb.wordlist.extend(getFileItems(dictPath, None, False))
+                    kb.wordlist = Wordlist(dictPaths)
 
                 except sqlmapFilePathException, msg:
                     warnMsg = "there was a problem while loading dictionaries"
@@ -416,14 +413,19 @@ def dictionaryAttack(attack_dict):
             if user:
                 kb.wordlist.append(normalizeUnicode(user))
 
-        length = len(kb.wordlist) * len(suffix_list)
-
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             count = 0
 
             for suffix in suffix_list:
                 if not attack_info:
                     break
+
+                if suffix:
+                    clearConsoleLine()
+                    infoMsg = "using suffix: '%s'" % suffix
+                    logger.info(infoMsg)
+
+                kb.wordlist.rewind()
 
                 for word in kb.wordlist:
                     if not attack_info:
@@ -458,8 +460,8 @@ def dictionaryAttack(attack_dict):
 
                                 attack_info.remove(item)
 
-                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                                status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                                status = 'current status: %d%s (%s...)' % (kb.wordlist.percentage(), '%', word.ljust(5)[:5])
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
                     except KeyboardInterrupt:
@@ -483,6 +485,13 @@ def dictionaryAttack(attack_dict):
                 for suffix in suffix_list:
                     if found:
                         break
+
+                    if suffix:
+                        clearConsoleLine()
+                        infoMsg = "using suffix: '%s'" % suffix
+                        logger.info(infoMsg)
+
+                    kb.wordlist.rewind()
 
                     for word in kb.wordlist:
                         current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
@@ -512,8 +521,8 @@ def dictionaryAttack(attack_dict):
 
                                 found = True
                                 break
-                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or count == length or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                                status = '%d/%d words (%d%s)' % (count, length, round(100.0*count/length), '%')
+                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                                status = 'current status: %d%s (%s...)' % (kb.wordlist.percentage(), '%', word.ljust(5)[:5])
                                 if not user.startswith(DUMMY_USER_PREFIX):
                                     status += ' (user: %s)' % user
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
