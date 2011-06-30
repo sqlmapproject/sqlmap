@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.common import randomRange
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import kb
 from lib.core.enums import PRIORITY
 from lib.core.settings import IGNORE_SPACE_AFFECTED_KEYWORDS
@@ -18,7 +19,7 @@ __priority__ = PRIORITY.NORMAL
 
 def tamper(payload):
     """
-    Encloses each keyword with versioned MySQL comment
+    Encloses each keyword with versioned MySQL comment (MySQL >= 5.1.13)
     Example: 'INSERT' will become '/*!INSERT*/'
     """
 
@@ -28,6 +29,8 @@ def tamper(payload):
             return match.group().replace(word, "/*!%s*/" % word)
         else:
             return match.group()
+
+    singleTimeWarnMessage("This tamper script is only meant to be run against MySQL >= 5.1.13")
 
     retVal = payload
 
