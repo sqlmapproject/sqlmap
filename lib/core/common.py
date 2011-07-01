@@ -157,11 +157,12 @@ class Wordlist:
             self.iter = iter(self.custom)
         else:
             current = self.filenames[self.index]
-            infoMsg = "loading dictionary from: '%s'" % current
+            infoMsg = "loading dictionary from '%s'" % current
             singleTimeLogMessage(infoMsg)
             self.fp = open(current, "r")
             self.cursize = os.path.getsize(current)
             self.iter = self.fp.xreadlines()
+
         self.index += 1
 
     def append(self, value):

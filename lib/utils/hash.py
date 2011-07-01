@@ -368,25 +368,32 @@ def dictionaryAttack(attack_dict):
         if not kb.wordlist:
             while not kb.wordlist:
                 message = "what dictionary do you want to use?\n"
-                message += "[1] Default (Press Enter)\n"
-                message += "[2] Custom\n"
-                message += "[3] File with list of dictionary files"
+                message += "[1] default dictionary file (press Enter)\n"
+                message += "[2] custom dictionary file\n"
+                message += "[3] file with list of dictionary files"
                 choice = readInput(message, default="1")
 
                 try:
                     if choice == "2":
                         message = "what's the custom dictionary's location?\n"
                         dictPaths = [readInput(message)]
+
+                        logger.info("using custom dictionary")
                     elif choice == "3":
                         message = "what's the list file location?\n"
                         listPath = readInput(message)
                         checkFile(listPath)
                         dictPaths = getFileItems(listPath)
+
+                        logger.info("using custom list of dictionaries")
                     else:
-                        if hash_regex == HASH.ORACLE_OLD: #it's the slowest of all methods hence smaller default dict
+                        # It is the slowest of all methods hence smaller default dict
+                        if hash_regex == HASH.ORACLE_OLD:
                             dictPaths = [paths.ORACLE_DEFAULT_PASSWD]
                         else:
                             dictPaths = [paths.WORDLIST]
+
+                        logger.info("using default dictionary")
 
                     for dictPath in dictPaths:
                         checkFile(dictPath)
@@ -452,16 +459,16 @@ def dictionaryAttack(attack_dict):
                                 infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
 
                                 if user and not user.startswith(DUMMY_USER_PREFIX):
-                                    infoMsg += " for user: '%s'\n" % user
+                                    infoMsg += " for user '%s'\n" % user
                                 else:
-                                    infoMsg += " for hash: '%s'\n" % hash_
+                                    infoMsg += " for hash '%s'\n" % hash_
 
                                 dataToStdout(infoMsg, True)
 
                                 attack_info.remove(item)
 
                             elif count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                                status = 'current status: %d%s (%s...)' % (kb.wordlist.percentage(), '%', word.ljust(5)[:5])
+                                status = 'current status: %d%s (%s...)' % (kb.wordlist.percentage(), '%', word.ljust(5)[:8])
                                 dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
                     except KeyboardInterrupt:
@@ -513,9 +520,9 @@ def dictionaryAttack(attack_dict):
                                 infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
 
                                 if user and not user.startswith(DUMMY_USER_PREFIX):
-                                    infoMsg += " for user: '%s'\n" % user
+                                    infoMsg += " for user '%s'\n" % user
                                 else:
-                                    infoMsg += " for hash: '%s'\n" % hash_
+                                    infoMsg += " for hash '%s'\n" % hash_
 
                                 dataToStdout(infoMsg, True)
 
