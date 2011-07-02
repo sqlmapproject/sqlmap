@@ -18,6 +18,7 @@ from lib.core.common import getUnicode
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import restoreDumpMarkedChars
+from lib.core.common import safeCSValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -392,9 +393,9 @@ class Dump:
 
                 if not conf.replicate:
                     if not conf.multipleTargets and field == fields:
-                        dataToDumpFile(dumpFP, "%s" % column)
+                        dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
                     elif not conf.multipleTargets:
-                        dataToDumpFile(dumpFP, "%s," % column)
+                        dataToDumpFile(dumpFP, "%s," % safeCSValue(column))
 
                 field += 1
 
@@ -432,9 +433,9 @@ class Dump:
 
                     if not conf.replicate:
                         if not conf.multipleTargets and field == fields:
-                            dataToDumpFile(dumpFP, "\"%s\"" % value)
+                            dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
                         elif not conf.multipleTargets:
-                            dataToDumpFile(dumpFP, "\"%s\"," % value)
+                            dataToDumpFile(dumpFP, "%s," % safeCSValue(value))
 
                     field += 1
 

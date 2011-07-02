@@ -2767,3 +2767,18 @@ def expandMnemonics(mnemonics, parser, args):
             else:
                 errMsg = "mnemonic '%s' requires value of type '%s'" % (name, found.type)
                 raise sqlmapSyntaxException, errMsg
+
+def safeCSValue(value):
+    """
+    Returns value safe for CSV dumping.
+    Reference: http://stackoverflow.com/questions/769621/dealing-with-commas-in-a-csv-file
+    """
+
+    retVal = value
+
+    if isinstance(retVal, basestring):
+        if not (retVal[0] == retVal[-1] == '"'):
+            if any(map(lambda x: x in retVal, ['"', ',', '\n'])):
+                retVal = '"%s"' % retVal.replace('"', '""')
+
+    return retVal

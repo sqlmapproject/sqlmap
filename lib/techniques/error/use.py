@@ -318,22 +318,22 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
                 stopLimit = 1
 
+            threadData = getCurrentThreadData()
+            threadData.shared.limits = range(startLimit, stopLimit)
+            numThreads = min(conf.threads, len(threadData.shared.limits))
+            threadData.shared.outputs = []
+
+            if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
+                kb.suppressResumeInfo = True
+                debugMsg = "suppressing possible resume console info because of "
+                debugMsg += "large number of rows. It might take too long"
+                logger.debug(debugMsg)
+
+            lockNames = ('limits', 'outputs')
+            for lock in lockNames:
+                kb.locks[lock] = threading.Lock()
+
             try:
-                threadData = getCurrentThreadData()
-                threadData.shared.limits = range(startLimit, stopLimit)
-                numThreads = min(conf.threads, len(threadData.shared.limits))
-                threadData.shared.outputs = []
-
-                if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
-                    kb.suppressResumeInfo = True
-                    debugMsg = "suppressing possible resume console info because of "
-                    debugMsg += "large number of rows. It might take too long"
-                    logger.debug(debugMsg)
-
-                lockNames = ('limits', 'outputs')
-                for lock in lockNames:
-                    kb.locks[lock] = threading.Lock()
-
                 def errorThread():
                     threadData = getCurrentThreadData()
 
@@ -365,12 +365,6 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 warnMsg = "user aborted during enumeration. sqlmap "
                 warnMsg += "will display partial output"
                 logger.warn(warnMsg)
-
-            except sqlmapConnectionException, e:
-                errMsg = "connection exception detected. sqlmap "
-                errMsg += "will display partial output"
-                errMsg += "'%s'" % e
-                logger.critical(errMsg)
 
             finally:
                 outputs = threadData.shared.outputs

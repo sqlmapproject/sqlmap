@@ -44,6 +44,8 @@ from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import PYVERSION
+from lib.core.threads import getCurrentThreadData
+from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
@@ -301,26 +303,31 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     # Go multi-threading (--threads > 1)
     if conf.threads > 1 and isinstance(length, int) and length > 1:
-        value = [ None ] * length
-        index = [ firstChar ]    # As list for python nested function scoping
-        idxlock = threading.Lock()
-        iolock = threading.Lock()
-        valuelock = threading.Lock()
-        kb.threadContinue = True
+        value = []
+        threadData = getCurrentThreadData()
 
-        def downloadThread():
-            try:
+        threadData.shared.value = [ None ] * length
+        threadData.shared.index = [ firstChar ]    # As list for python nested function scoping
+
+        lockNames = ('iolock', 'idxlock', 'valuelock')
+        for lock in lockNames:
+            kb.locks[lock] = threading.Lock()
+
+        try:
+            def blindThread():
+                threadData = getCurrentThreadData()
+
                 while kb.threadContinue:
-                    idxlock.acquire()
+                    kb.locks.idxlock.acquire()
 
-                    if index[0] >= length:
-                        idxlock.release()
+                    if threadData.shared.index[0] >= length:
+                        kb.locks.idxlock.release()
 
                         return
 
-                    index[0] += 1
-                    curidx = index[0]
-                    idxlock.release()
+                    threadData.shared.index[0] += 1
+                    curidx = threadData.shared.index[0]
+                    kb.locks.idxlock.release()
 
                     if kb.threadContinue:
                         charStart = time.time()
@@ -330,14 +337,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         break
 
-                    valuelock.acquire()
-                    value[curidx-1] = val
-                    currentValue = list(value)
-                    valuelock.release()
+                    kb.locks.valuelock.acquire()
+                    threadData.shared.value[curidx-1] = val
+                    currentValue = list(threadData.shared.value)
+                    kb.locks.valuelock.release()
 
                     if kb.threadContinue:
                         if showEta:
-                            etaProgressUpdate(time.time() - charStart, index[0])
+                            etaProgressUpdate(time.time() - charStart, threadData.shared.index[0])
                         elif conf.verbose >= 1:
                             startCharIndex = 0
                             endCharIndex = 0
@@ -370,14 +377,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
                                 output += status if count != length else " "*len(status)
 
-                                iolock.acquire()
+                                kb.locks.iolock.acquire()
                                 dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
-                                iolock.release()
+                                kb.locks.iolock.release()
 
                 if not kb.threadContinue:
                     if int(threading.currentThread().getName()) == numThreads - 1:
                         partialValue = unicode()
-                        for v in value:
+                        for v in threadData.shared.value:
                             if v is None:
                                 break
                             elif isinstance(v, basestring):
@@ -386,57 +393,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         if len(partialValue) > 0:
                             dataToSessionFile(replaceNewlineTabs(partialValue))
 
-            except (sqlmapConnectionException, sqlmapValueException), errMsg:
-                print
-                kb.threadException = True
-                logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
-
-            except KeyboardInterrupt:
-                kb.threadException = True
-
-                print
-                logger.debug("waiting for threads to finish")
-
-                try:
-                    while (threading.activeCount() > 1):
-                        pass
-
-                except KeyboardInterrupt:
-                    raise sqlmapThreadException, "user aborted"
-
-            except:
-                print
-                kb.threadException = True
-                errMsg = unhandledExceptionMessage()
-                logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
-                traceback.print_exc()
-
-        # Start the threads
-        for numThread in range(numThreads):
-            thread = threading.Thread(target=downloadThread, name=str(numThread))
-
-            if PYVERSION >= "2.6":
-                thread.daemon = True
-            else:
-                thread.setDaemon(True)
-
-            thread.start()
-            threads.append(thread)
-
-        # And wait for them to all finish
-        try:
-            alive = True
-            while alive:
-                alive = False
-                for thread in threads:
-                    if thread.isAlive():
-                        alive = True
-                        time.sleep(1)
+            runThreads(numThreads, blindThread, startThreadMsg=False)
 
         except KeyboardInterrupt:
-            kb.threadContinue = False
             raise
 
+        finally:
+            value = threadData.shared.value
+            
         infoMsg = None
 
         # If we have got one single character not correctly fetched it

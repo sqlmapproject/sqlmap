@@ -11,11 +11,15 @@ import difflib
 import threading
 import time
 
+from thread import error as threadError
+
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import advancedDict
 from lib.core.enums import PAYLOAD
+from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapThreadException
+from lib.core.exception import sqlmapValueException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PYVERSION
 
@@ -68,7 +72,7 @@ def exceptionHandledFunction(threadFunction):
         print
         logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
 
-def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False):
+def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False, startThreadMsg=True):
     threads = []
 
     kb.multiThreadMode = True
@@ -92,8 +96,9 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             logger.warn(warnMsg)
 
     if numThreads > 1:
-        infoMsg = "starting %d threads" % numThreads
-        logger.info(infoMsg)
+        if startThreadMsg:
+            infoMsg = "starting %d threads" % numThreads
+            logger.info(infoMsg)
     else:
         threadFunction()
         return
@@ -108,7 +113,13 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         else:
             thread.setDaemon(True)
 
-        thread.start()
+        try:
+            thread.start()
+        except threadError, errMsg:
+            errMsg = "error occured while starting new thread ('%s')" % errMsg
+            logger.critical(errMsg)
+            break
+
         threads.append(thread)
 
     # And wait for them to all finish
@@ -122,11 +133,9 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                     time.sleep(1)
 
     except KeyboardInterrupt:
+        print
         kb.threadContinue = False
         kb.threadException = True
-
-        print '\r',
-
         logger.info("waiting for threads to finish (Ctrl+C was pressed)")
 
         try:
@@ -138,6 +147,20 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
         if forwardException:
             raise
+
+    except (sqlmapConnectionException, sqlmapValueException), errMsg:
+        print
+        kb.threadException = True
+        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
+
+    except:
+        from lib.core.common import unhandledExceptionMessage
+
+        print
+        kb.threadException = True
+        errMsg = unhandledExceptionMessage()
+        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
+        traceback.print_exc()
 
     finally:
         kb.multiThreadMode = False

@@ -13,6 +13,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
+from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getRange
 from lib.core.common import getCompiledRegex
@@ -463,7 +464,7 @@ class Enumeration:
                 query += " WHERE "
 
                 if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
-                    query += " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in sorted(users))
+                    query += " OR ".join("%s LIKE '%s'" % (condition, user) for user in sorted(users))
                 else:
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
@@ -1161,7 +1162,7 @@ class Enumeration:
                 infoMsg = "fetching columns "
 
                 if len(colList) > 0:
-                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
+                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%s'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
                     likeMsg = "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     infoMsg += likeMsg
                 else:
@@ -1703,30 +1704,36 @@ class Enumeration:
                             plusOne = False
                         indexRange = getRange(count, dump=True, plusOne=plusOne)
 
-                        for index in indexRange:
-                            for column in colList:
-                                if column not in lengths:
-                                    lengths[column] = 0
+                        try:
+                            for index in indexRange:
+                                for column in colList:
+                                    if column not in lengths:
+                                        lengths[column] = 0
 
-                                if column not in entries:
-                                    entries[column] = []
+                                    if column not in entries:
+                                        entries[column] = []
 
-                                if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                                    query = rootQuery.blind.query % (column, conf.db, conf.tbl, index)
-                                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                                    query = rootQuery.blind.query % (column, column,
-                                                                     tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())),
-                                                                     index)
-                                elif Backend.isDbms(DBMS.SQLITE):
-                                    query = rootQuery.blind.query % (column, tbl, index)
+                                    if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                                        query = rootQuery.blind.query % (column, conf.db, conf.tbl, index)
+                                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                        query = rootQuery.blind.query % (column, column,
+                                                                        tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())),
+                                                                        index)
+                                    elif Backend.isDbms(DBMS.SQLITE):
+                                        query = rootQuery.blind.query % (column, tbl, index)
 
-                                elif Backend.isDbms(DBMS.FIREBIRD):
-                                    query = rootQuery.blind.query % (index, column, tbl)
+                                    elif Backend.isDbms(DBMS.FIREBIRD):
+                                        query = rootQuery.blind.query % (index, column, tbl)
 
-                                value = inject.getValue(query, inband=False, error=False, dump=True)
+                                    value = inject.getValue(query, inband=False, error=False, dump=True)
 
-                                lengths[column] = max(lengths[column], len(value) if value else 0)
-                                entries[column].append(value)
+                                    lengths[column] = max(lengths[column], len(value) if value else 0)
+                                    entries[column].append(value)
+
+                        except KeyboardInterrupt:
+                            clearConsoleLine()
+                            warnMsg = "Ctrl+C detected in dumping phase"
+                            logger.warn(warnMsg)
 
                     for column, columnEntries in entries.items():
                         length = max(lengths[column], len(column))
@@ -1749,10 +1756,6 @@ class Enumeration:
                     warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.warn(warnMsg)
-
-            except KeyboardInterrupt:
-                warnMsg = "Ctrl+C detected in dumping phase"
-                logger.warn(warnMsg)
 
             except sqlmapConnectionException, e:
                 errMsg = "connection exception detected in dumping phase: "
