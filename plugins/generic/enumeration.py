@@ -464,7 +464,7 @@ class Enumeration:
                 query += " WHERE "
 
                 if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
-                    query += " OR ".join("%s LIKE '%s'" % (condition, user) for user in sorted(users))
+                    query += " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in sorted(users))
                 else:
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
@@ -1162,7 +1162,7 @@ class Enumeration:
                 infoMsg = "fetching columns "
 
                 if len(colList) > 0:
-                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%s'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
+                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
                     likeMsg = "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     infoMsg += likeMsg
                 else:
