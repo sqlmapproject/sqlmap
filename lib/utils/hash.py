@@ -19,6 +19,7 @@ import time
 
 from hashlib import md5
 from hashlib import sha1
+from Queue import Queue
 from zipfile import ZipFile
 
 from extra.pydes.pyDes import des
@@ -35,6 +36,7 @@ from lib.core.common import normalizeUnicode
 from lib.core.common import paths
 from lib.core.common import readInput
 from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import Wordlist
 from lib.core.convert import hexdecode
 from lib.core.convert import hexencode
@@ -50,8 +52,12 @@ from lib.core.settings import DUMMY_USER_PREFIX
 from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import IS_WIN
+from lib.core.settings import PYVERSION
 from lib.core.settings import ML
 from lib.core.settings import UNICODE_ENCODING
+
+if PYVERSION >= "2.6":
+    import multiprocessing
 
 def mysql_passwd(password, uppercase=True):
     """
@@ -320,6 +326,7 @@ def dictionaryAttack(attack_dict):
     suffix_list = [""]
     hash_regexes = []
     results = []
+    processException = False
 
     for (_, hashes) in attack_dict.items():
         for hash_ in hashes:
@@ -421,10 +428,8 @@ def dictionaryAttack(attack_dict):
                 kb.wordlist.append(normalizeUnicode(user))
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
-            count = 0
-
             for suffix in suffix_list:
-                if not attack_info:
+                if not attack_info or processException:
                     break
 
                 if suffix:
@@ -434,53 +439,91 @@ def dictionaryAttack(attack_dict):
 
                 kb.wordlist.rewind()
 
-                for word in kb.wordlist:
-                    if not attack_info:
-                        break
-
-                    count += 1
-
-                    if not isinstance(word, basestring):
-                        continue
-
-                    if suffix:
-                        word = word + suffix
+                def bruteProcess(attack_info, hash_regex, wordlist, suffix, retVal, proc_id, proc_count):
+                    count = 0
 
                     try:
-                        current = __functions__[hash_regex](password = word, uppercase = False)
+                        for word in kb.wordlist:
+                            if not attack_info:
+                                break
 
-                        for item in attack_info:
-                            ((user, hash_), _) = item
+                            count += 1
 
-                            if hash_ == current:
-                                results.append((user, hash_, word))
-                                clearConsoleLine()
+                            if not isinstance(word, basestring):
+                                continue
 
-                                infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                            if suffix:
+                                word = word + suffix
 
-                                if user and not user.startswith(DUMMY_USER_PREFIX):
-                                    infoMsg += " for user '%s'\n" % user
-                                else:
-                                    infoMsg += " for hash '%s'\n" % hash_
+                            try:
+                                current = __functions__[hash_regex](password = word, uppercase = False)
 
-                                dataToStdout(infoMsg, True)
+                                for item in attack_info:
+                                    ((user, hash_), _) = item
 
-                                attack_info.remove(item)
+                                    if hash_ == current:
+                                        retVal.put((user, hash_, word))
 
-                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                                status = 'current status: %d%s (%s...)' % (kb.wordlist.percentage(), '%', word.ljust(5)[:8])
-                                dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                                        clearConsoleLine()
+
+                                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+
+                                        if user and not user.startswith(DUMMY_USER_PREFIX):
+                                            infoMsg += " for user '%s'\n" % user
+                                        else:
+                                            infoMsg += " for hash '%s'\n" % hash_
+
+                                        dataToStdout(infoMsg, True)
+
+                                        attack_info.remove(item)
+
+                                    elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                                        status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
+                                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+                            except KeyboardInterrupt:
+                                raise
+
+                            except:
+                                warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                                warnMsg += "Please report by e-mail to %s." % ML
+                                logger.critical(warnMsg)
 
                     except KeyboardInterrupt:
-                        print
-                        warnMsg = "user aborted during dictionary attack phase"
-                        logger.warn(warnMsg)
-                        return results
+                        pass
 
-                    except:
-                        warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                        warnMsg += "Please report by e-mail to %s." % ML
-                        logger.critical(warnMsg)
+                retVal = None
+
+                try:
+                    if PYVERSION >= "2.6":
+                        infoMsg = "starting %d hash attack processes " % multiprocessing.cpu_count()
+                        singleTimeLogMessage(infoMsg)
+
+                        processes = []
+                        retVal = multiprocessing.Queue()
+                        for i in xrange(multiprocessing.cpu_count()):
+                            p = multiprocessing.Process(target=bruteProcess, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, multiprocessing.cpu_count()))
+                            p.start()
+                            processes.append(p)
+
+                        for p in processes:
+                            p.join()
+
+                    else:
+                        warnMsg = "multiprocessing not supported on current version of "
+                        warnMsg += "Python (%s < 2.6)" % PYVERSION
+                        singleTimeWarnMessage(warnMsg)
+
+                        retVal = Queue()
+                        bruteProcess(attack_info, hash_regex, kb.wordlist, suffix, retVal, 0, 1)
+
+                except KeyboardInterrupt:
+                    print
+                    processException = True
+                    warnMsg = "user aborted during dictionary attack phase"
+                    logger.warn(warnMsg)
+
+                results = [retVal.get() for i in xrange(retVal.qsize())] if retVal else []
 
             clearConsoleLine()
 
@@ -490,7 +533,7 @@ def dictionaryAttack(attack_dict):
                 found = False
 
                 for suffix in suffix_list:
-                    if found:
+                    if found or processException:
                         break
 
                     if suffix:
@@ -500,50 +543,102 @@ def dictionaryAttack(attack_dict):
 
                     kb.wordlist.rewind()
 
-                    for word in kb.wordlist:
-                        current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
-                        count += 1
-
-                        if not isinstance(word, basestring):
-                            continue
-
-                        if suffix:
-                            word = word + suffix
+                    def bruteProcess(user, hash_, kwargs, hash_regex, wordlist, suffix, retVal, found, proc_id, proc_count):
+                        count = 0
 
                         try:
-                            if hash_ == current:
-                                if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
-                                    word = word.upper()
-                                results.append((user, hash_, word))
-                                clearConsoleLine()
+                            for word in kb.wordlist:
 
-                                infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                                current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
+                                count += 1
 
-                                if user and not user.startswith(DUMMY_USER_PREFIX):
-                                    infoMsg += " for user '%s'\n" % user
-                                else:
-                                    infoMsg += " for hash '%s'\n" % hash_
+                                if not isinstance(word, basestring):
+                                    continue
 
-                                dataToStdout(infoMsg, True)
+                                if suffix:
+                                    word = word + suffix
 
-                                found = True
-                                break
-                            elif count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                                status = 'current status: %d%s (%s...)' % (kb.wordlist.percentage(), '%', word.ljust(5)[:5])
-                                if not user.startswith(DUMMY_USER_PREFIX):
-                                    status += ' (user: %s)' % user
-                                dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                                try:
+                                    if hash_ == current:
+                                        if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
+                                            word = word.upper()
+
+                                        retVal.put((user, hash_, word))
+
+                                        clearConsoleLine()
+
+                                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+
+                                        if user and not user.startswith(DUMMY_USER_PREFIX):
+                                            infoMsg += " for user '%s'\n" % user
+                                        else:
+                                            infoMsg += " for hash '%s'\n" % hash_
+
+                                        dataToStdout(infoMsg, True)
+
+                                        found.value = True
+                                        break
+                                    elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                                        status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
+                                        if not user.startswith(DUMMY_USER_PREFIX):
+                                            status += ' (user: %s)' % user
+                                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+                                except KeyboardInterrupt:
+                                    raise
+
+                                except:
+                                    warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                                    warnMsg += "Please report by e-mail to %s." % ML
+                                    logger.critical(warnMsg)
 
                         except KeyboardInterrupt:
-                            print
-                            warnMsg = "user aborted during dictionary attack phase"
-                            logger.warn(warnMsg)
-                            return results
+                            pass
 
-                        except:
-                            warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                            warnMsg += "Please report by e-mail to %s." % ML
-                            logger.critical(warnMsg)
+                    retVal = None
+
+                    try:
+                        if PYVERSION >= "2.6":
+                            infoMsg = "starting %d hash attack processes " % multiprocessing.cpu_count()
+                            singleTimeLogMessage(infoMsg)
+
+                            processes = []
+                            retVal = multiprocessing.Queue()
+                            found_ = multiprocessing.Value('i', False)
+
+                            for i in xrange(multiprocessing.cpu_count()):
+                                p = multiprocessing.Process(target=bruteProcess, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, multiprocessing.cpu_count()))
+                                p.start()
+                                processes.append(p)
+
+                            for p in processes:
+                                p.join()
+
+                            found = found_.value != 0
+
+                        else:
+                            warnMsg = "multiprocessing not supported on current version of "
+                            warnMsg += "Python (%s < 2.6)" % PYVERSION
+                            singleTimeWarnMessage(warnMsg)
+
+                            class Value():
+                                pass
+
+                            retVal = Queue()
+                            found_ = Value()
+                            found_.value = False
+
+                            bruteProcess(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, 0, 1)
+
+                            found = found_.value
+
+                    except KeyboardInterrupt:
+                        print
+                        processException = True
+                        warnMsg = "user aborted during dictionary attack phase"
+                        logger.warn(warnMsg)
+
+                    results = [retVal.get() for i in xrange(retVal.qsize())] if retVal else []
 
                 clearConsoleLine()
 

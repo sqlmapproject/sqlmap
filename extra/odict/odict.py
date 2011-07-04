@@ -33,7 +33,7 @@ if INTP_VER < (2, 2):
 
 import types, warnings
 
-class OrderedDict(dict):
+class _OrderedDict(dict):
     """
     A class of dictionary that keeps the insertion order of keys.
 
@@ -868,6 +868,11 @@ class OrderedDict(dict):
         OrderedDict([(1, 4), (2, 2), (3, 3), (4, 1)])
         """
         self._sequence.sort(*args, **kwargs)
+
+if INTP_VER >= (2, 7):
+    from collections import OrderedDict
+else:
+    OrderedDict = _OrderedDict
 
 class Keys(object):
     # FIXME: should this object be a subclass of list?

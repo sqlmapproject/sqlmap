@@ -164,7 +164,7 @@ class Miscellaneous:
         if not choice or choice == "1":
             choice = "1"
             condParam = " LIKE '%%%s%%'"
-        elif choice.isdigit() and choice == "2":
+        elif choice == "2":
             condParam = "='%s'"
         else:
             errMsg = "invalid value"

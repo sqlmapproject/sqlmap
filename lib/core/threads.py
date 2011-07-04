@@ -25,7 +25,7 @@ from lib.core.settings import PYVERSION
 
 shared = advancedDict()
 
-class ThreadData():
+class _ThreadData(threading.local):
     """
     Represents thread independent data
     """
@@ -44,6 +44,8 @@ class ThreadData():
         self.shared = shared
         self.valueStack = []
 
+ThreadData = _ThreadData()
+
 def getCurrentThreadUID():
     return hash(threading.currentThread())
 
@@ -52,13 +54,12 @@ def readInput(message, default=None):
 
 def getCurrentThreadData():
     """
-    Returns current thread's dependent data
+    Returns current thread's local data
     """
 
-    threadUID = getCurrentThreadUID()
-    if threadUID not in kb.threadData:
-        kb.threadData[threadUID] = ThreadData()
-    return kb.threadData[threadUID]
+    global ThreadData
+
+    return ThreadData
 
 def exceptionHandledFunction(threadFunction):
     try:

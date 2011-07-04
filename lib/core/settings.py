@@ -300,7 +300,7 @@ MYSQL_ERROR_CHUNK_LENGTH = 50
 MSSQL_ERROR_CHUNK_LENGTH = 100
 
 # Do not unescape the injected statement if it contains any of the following SQL words
-EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", CHAR_INFERENCE_MARK)
+EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", "'%s'" % CHAR_INFERENCE_MARK)
 
 # Mark used for replacement of reflected values
 REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
@@ -364,3 +364,9 @@ DUMMY_SQL_INJECTION_CHARS = ";()\"'"
 
 # Extensions skipped by crawler
 CRAWL_EXCLUDE_EXTENSIONS = ("gif","jpg","jar","tif","bmp","war","ear","mpg","wmv","mpeg","scm","iso","dmp","dll","cab","so","avi","bin","exe","iso","tar","png","pdf","ps","mp3","zip","rar","gz")
+
+# Template used for common table existence check
+BRUTE_TABLE_EXISTS_TEMPLATE = "EXISTS(SELECT %d FROM %s)"
+
+# Template used for common column existence check
+BRUTE_COLUMN_EXISTS_TEMPLATE = "EXISTS(SELECT %s FROM %s)"

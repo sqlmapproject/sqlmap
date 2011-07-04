@@ -1453,7 +1453,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.testQueryCount = 0
     kb.threadContinue = True
     kb.threadException = False
-    kb.threadData = {}
     kb.uChar = "NULL"
     kb.xpCmdshellAvailable = False
 
@@ -1650,6 +1649,9 @@ def __mergeOptions(inputOptions, overrideOptions):
             conf[key] = value
 
 def __setTrafficOutputFP():
+    infoMsg = "setting file for logging HTTP traffic"
+    logger.info(infoMsg)
+
     if conf.trafficFile:
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 

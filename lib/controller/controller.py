@@ -60,17 +60,22 @@ def __selectInjection():
     Selection function for injection place, parameters and type.
     """
 
-    points = []
+    points = {}
 
-    for i in xrange(0, len(kb.injections)):
-        place = kb.injections[i].place
-        parameter = kb.injections[i].parameter
-        ptype = kb.injections[i].ptype
+    for injection in kb.injections:
+        place = injection.place
+        parameter = injection.parameter
+        ptype = injection.ptype
 
         point = (place, parameter, ptype)
 
         if point not in points:
-            points.append(point)
+            points[point] = injection
+        else:
+            for key in points[point].keys():
+                if key != 'data':
+                    points[point][key] = points[point][key] or injection[key]
+            points[point]['data'].update(injection['data'])
 
     if len(points) == 1:
         kb.injection = kb.injections[0]
@@ -126,18 +131,10 @@ def __formatInjection(inj):
 def __showInjections():
     header = "sqlmap identified the following injection points with "
     header += "a total of %d HTTP(s) requests" % kb.testQueryCount
-    data = ""
 
-    for inj in kb.injections:
-        data += __formatInjection(inj)
-
-    data = data.rstrip("\n")
+    data = "".join(set(map(lambda x: __formatInjection(x), kb.injections))).rstrip("\n")
 
     conf.dumper.technic(header, data)
-
-    if inj.place in (HTTPMETHOD.GET, HTTPMETHOD.POST):
-        debugMsg = "usage of %s payloads requires manual url-encoding" % inj.place
-        logger.debug(debugMsg)
 
     if conf.tamper:
         infoMsg = "changes made by tampering scripts are not "

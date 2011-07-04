@@ -20,6 +20,7 @@ from lib.core.common import getPageWordSet
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
@@ -27,10 +28,13 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapThreadException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import METADB_SUFFIX
+from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
+from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
 from lib.core.session import safeFormatString
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
@@ -52,6 +56,13 @@ def __addPageTextWords():
     return wordsList
 
 def tableExists(tableFile, regex=None):
+    result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
+    if result:
+        errMsg = "can't use table existence check because of detected invalid results "
+        errMsg += "(most probably caused by inability of the used injection "
+        errMsg += "to distinguish errornous results)"
+        raise sqlmapDataException, errMsg
+
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS), unique=True)
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
@@ -84,7 +95,7 @@ def tableExists(tableFile, regex=None):
             else:
                 fullTableName = table
 
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %d FROM %s)", (randomInt(1), fullTableName)))
+            result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
 
             kb.locks.ioLock.acquire()
 
@@ -135,6 +146,13 @@ def columnExists(columnFile, regex=None):
         errMsg = "missing table parameter"
         raise sqlmapMissingMandatoryOptionException, errMsg
 
+    result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (randomStr(), randomStr())))
+    if result:
+        errMsg = "can't use column existence check because of detected invalid results "
+        errMsg += "(most probably caused by inability of the used injection "
+        errMsg += "to distinguish errornous results)"
+        raise sqlmapDataException, errMsg
+
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
 
@@ -169,7 +187,7 @@ def columnExists(columnFile, regex=None):
                 kb.locks.countLock.release()
                 break
 
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s)", (column, table)))
+            result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (column, table)))
 
             kb.locks.ioLock.acquire()
 
