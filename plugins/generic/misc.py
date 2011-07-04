@@ -156,14 +156,14 @@ class Miscellaneous:
 
     def likeOrExact(self, what):
         message = "do you want sqlmap to consider provided %s(s):\n" % what
-        message += "[1] as LIKE %s names\n" % what
-        message += "[2] as exact %s names (default)" % what
+        message += "[1] as LIKE %s names (default)\n" % what
+        message += "[2] as exact %s names" % what
 
-        choice = readInput(message, default="2")
+        choice = readInput(message, default="1")
 
         if not choice or choice == "1":
             choice = "1"
-            condParam = " LIKE '%%%s%%'" # this doesn't work, neither not sure it ever did
+            condParam = " LIKE '%%%s%%'"
         elif choice.isdigit() and choice == "2":
             condParam = "='%s'"
         else:
