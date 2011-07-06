@@ -45,6 +45,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import IS_WIN
@@ -223,6 +224,8 @@ class Connect:
 
             if kb.proxyAuthHeader:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
+
+            headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
             headers[HTTPHEADER.HOST] = urlparse.urlparse(url).netloc
 
@@ -498,10 +501,11 @@ class Connect:
         page = None
         pageLength = None
         uri = None
-        raise404 = place != PLACE.URI if raise404 is None else raise404
 
         if not place:
-            place = kb.injection.place
+            place = kb.injection.place or PLACE.GET
+
+        raise404 = place != PLACE.URI if raise404 is None else raise404
 
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()

@@ -156,26 +156,25 @@ optDict = {
                                "trafficFile":       "string",
                                "batch":             "boolean",
                                "charset":           "string",
+                               "crawlDepth":        "integer",
                                "eta":               "boolean",
                                "flushSession":      "boolean",
                                "forms":             "boolean",
                                "freshQueries":      "boolean",
-                               "updateAll":         "boolean"
+                               "parseErrors":       "boolean",
+                               "replicate":         "boolean",
+                               "updateAll":         "boolean",
+                               "tor":               "boolean"
                              },
 
             "Miscellaneous": {
                                "beep":              "boolean",
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
-                               "crawlDepth":        "integer",
                                "dependencies":      "boolean",
-                               "forms":             "boolean",
                                "googlePage":        "integer",
                                "mobile":            "boolean",
                                "pageRank":          "boolean",
-                               "parseErrors":       "boolean",
-                               "replicate":         "boolean",
-                               "tor":               "boolean",
                                "wizard":            "boolean",
                                "verbose":           "integer"
                              },

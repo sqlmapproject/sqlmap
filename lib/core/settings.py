@@ -80,6 +80,9 @@ UNION_STDEV_COEFF = 7
 # length of queue for candidates for time delay adjustment
 TIME_DELAY_CANDIDATES = 3
 
+# standard value for HTTP Accept header
+HTTP_ACCEPT_HEADER_VALUE = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+
 # HTTP timeout in silent mode
 HTTP_SILENT_TIMEOUT = 3
 
@@ -370,3 +373,6 @@ BRUTE_TABLE_EXISTS_TEMPLATE = "EXISTS(SELECT %d FROM %s)"
 
 # Template used for common column existence check
 BRUTE_COLUMN_EXISTS_TEMPLATE = "EXISTS(SELECT %s FROM %s)"
+
+# Payload used for checking of existence of IDS/WAF (dummier the better)
+IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables"

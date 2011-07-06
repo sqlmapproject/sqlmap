@@ -981,8 +981,8 @@ def __setPrefixSuffix():
         else:
             boundary.ptype = 1
 
-        # Prepend user's provided boundaries to all others boundaries
-        conf.boundaries.insert(0, boundary)
+        # user who knows for --prefix/--suffix doesn't want other combinations
+        conf.boundaries = [boundary]
 
 def __setHTTPAuthentication():
     """
@@ -1021,7 +1021,7 @@ def __setHTTPAuthentication():
             errMsg = "HTTP %s authentication credentials " % aTypeLower
             errMsg += "value must be in format username:password"
         elif aTypeLower == "ntlm":
-            regExp = "^(.*?)\\\(.*?):(.*?)$"
+            regExp = "^(.*\\\\.*):(.*?)$"
             errMsg = "HTTP NTLM authentication credentials value must "
             errMsg += "be in format DOMAIN\username:password"
 

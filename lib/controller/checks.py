@@ -57,6 +57,7 @@ from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
+from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.inject import checkBooleanExpression
@@ -831,6 +832,60 @@ def checkRegexp():
         logger.warn(warnMsg)
 
     return True
+
+def checkWaf():
+    """
+    Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
+    """
+
+    if not conf.checkWaf:
+        return False
+
+    infoMsg = "testing if the target is protected by "
+    infoMsg += "some kind of WAF/IPS/IDS"
+    logger.info(infoMsg)
+
+    retVal = False
+
+    backup = dict(conf.parameters)
+
+    conf.parameters = dict(backup)
+    conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
+    conf.parameters[PLACE.GET] += "%s=%d %s" % (randomStr(), randomInt(), IDS_WAF_CHECK_PAYLOAD)
+
+    kb.matchRatio = None
+    _ = Request.queryPage()
+
+    if kb.errorIsNone and kb.matchRatio is None:
+        kb.matchRatio = LOWER_RATIO_BOUND
+
+    conf.parameters = dict(backup)
+    conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
+    conf.parameters[PLACE.GET] += "%s=%d" % (randomStr(), randomInt())
+
+    trueResult = Request.queryPage()
+
+    if trueResult:
+        conf.parameters = dict(backup)
+        conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
+        conf.parameters[PLACE.GET] += "%s=%d %s" % (randomStr(), randomInt(), IDS_WAF_CHECK_PAYLOAD)
+
+        falseResult = Request.queryPage()
+
+        if not falseResult:
+            retVal = True
+
+    conf.parameters = dict(backup)
+
+    if retVal:
+        warnMsg  = "it appears that the target is protected. "
+        warnMsg += "please consider usage of tampering scripts"
+        logger.warn(warnMsg)
+    else:
+        infoMsg = "it appears that the target is not protected"
+        logger.info(infoMsg)
+
+    return retVal
 
 def checkNullConnection():
     """

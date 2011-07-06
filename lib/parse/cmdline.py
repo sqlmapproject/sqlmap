@@ -471,6 +471,9 @@ def cmdLineParser():
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
+        general.add_option("--crawl", dest="crawlDepth", type="int",
+                                  help="Crawl the website starting from the target url")
+
         general.add_option("--eta", dest="eta",
                             action="store_true",
                             help="Display for each output the "
@@ -480,13 +483,29 @@ def cmdLineParser():
                             action="store_true",
                             help="Flush session file for current target")
 
+        general.add_option("--forms", dest="forms",
+                                  action="store_true",
+                                  help="Parse and test forms on target url")
+
         general.add_option("--fresh-queries", dest="freshQueries",
                             action="store_true",
                             help="Ignores query results stored in session file")
 
+        general.add_option("--parse-errors", dest="parseErrors",
+                                  action="store_true",
+                                  help="Parse and display DBMS error messages from responses")
+
+        general.add_option("--replicate", dest="replicate",
+                                  action="store_true",
+                                  help="Replicate dumped data into a sqlite3 database")
+
         general.add_option("--save", dest="saveCmdline",
                             action="store_true",
                             help="Save options on a configuration INI file")
+
+        general.add_option("--tor", dest="tor", 
+                                  action="store_true",
+                                  help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
 
         general.add_option("--update", dest="updateAll",
                             action="store_true",
@@ -504,23 +523,20 @@ def cmdLineParser():
 
         miscellaneous.add_option("--check-payload", dest="checkPayload",
                                   action="store_true",
-                                  help="IDS detection testing of injection payloads")
+                                  help="Offline WAF/IPS/IDS payload detection testing")
+
+        miscellaneous.add_option("--check-waf", dest="checkWaf",
+                                  action="store_true",
+                                  help="Check for existence of WAF/IPS/IDS protection")
 
         miscellaneous.add_option("--cleanup", dest="cleanup",
                                   action="store_true",
                                   help="Clean up the DBMS by sqlmap specific "
                                   "UDF and tables")
 
-        miscellaneous.add_option("--crawl", dest="crawlDepth", type="int",
-                                  help="Crawl the website starting from the target url")
-
         miscellaneous.add_option("--dependencies", dest="dependencies",
                                   action="store_true",
                                   help="Check for missing sqlmap dependencies")
-
-        miscellaneous.add_option("--forms", dest="forms",
-                                  action="store_true",
-                                  help="Parse and test forms on target url")
 
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")
@@ -532,18 +548,6 @@ def cmdLineParser():
         miscellaneous.add_option("--page-rank", dest="pageRank",
                                   action="store_true",
                                   help="Display page rank (PR) for Google dork results")
-
-        miscellaneous.add_option("--parse-errors", dest="parseErrors",
-                                  action="store_true",
-                                  help="Parse and display DBMS error messages from responses")
-
-        miscellaneous.add_option("--replicate", dest="replicate",
-                                  action="store_true",
-                                  help="Replicate dumped data into a sqlite3 database")
-
-        miscellaneous.add_option("--tor", dest="tor", 
-                                  action="store_true",
-                                  help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
 
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",

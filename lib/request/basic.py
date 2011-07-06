@@ -27,6 +27,7 @@ from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.exception import sqlmapDataException
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import UNICODE_ENCODING
@@ -172,7 +173,12 @@ def decodePage(page, contentEncoding, contentType):
         else:
             data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(page))
 
-        page = data.read()
+        try:
+            page = data.read()
+        except Exception, msg:
+            errMsg = "detected invalid data for declared content "
+            errMsg += "encoding '%s' ('%s')" % (contentEncoding, msg)
+            singleTimeLogMessage(errMsg, logging.ERROR)
 
     if not conf.charset:
         httpCharset, metaCharset = None, None

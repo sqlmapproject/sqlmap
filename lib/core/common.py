@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
+import copy
 import ctypes
 import inspect
 import logging
@@ -1924,7 +1925,7 @@ def pushValue(value):
     Push value to the stack (thread dependent)
     """
 
-    getCurrentThreadData().valueStack.append(value)
+    getCurrentThreadData().valueStack.append(copy.deepcopy(value))
 
 def popValue():
     """

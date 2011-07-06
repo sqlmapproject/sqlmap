@@ -429,7 +429,7 @@ def dictionaryAttack(attack_dict):
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             for suffix in suffix_list:
-                if not attack_info or processException:
+                if len(attack_info) == len(results) or processException:
                     break
 
                 if suffix:
@@ -496,8 +496,9 @@ def dictionaryAttack(attack_dict):
 
                 try:
                     if PYVERSION >= "2.6":
-                        infoMsg = "starting %d hash attack processes " % multiprocessing.cpu_count()
-                        singleTimeLogMessage(infoMsg)
+                        if multiprocessing.cpu_count() > 1:
+                            infoMsg = "starting %d processes " % multiprocessing.cpu_count()
+                            singleTimeLogMessage(infoMsg)
 
                         processes = []
                         retVal = multiprocessing.Queue()
@@ -523,7 +524,7 @@ def dictionaryAttack(attack_dict):
                     warnMsg = "user aborted during dictionary attack phase"
                     logger.warn(warnMsg)
 
-                results = [retVal.get() for i in xrange(retVal.qsize())] if retVal else []
+                results.extend([retVal.get() for i in xrange(retVal.qsize())] if retVal else [])
 
             clearConsoleLine()
 
@@ -599,8 +600,9 @@ def dictionaryAttack(attack_dict):
 
                     try:
                         if PYVERSION >= "2.6":
-                            infoMsg = "starting %d hash attack processes " % multiprocessing.cpu_count()
-                            singleTimeLogMessage(infoMsg)
+                            if multiprocessing.cpu_count() > 1:
+                                infoMsg = "starting %d processes " % multiprocessing.cpu_count()
+                                singleTimeLogMessage(infoMsg)
 
                             processes = []
                             retVal = multiprocessing.Queue()

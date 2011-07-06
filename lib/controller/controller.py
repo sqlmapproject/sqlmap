@@ -18,6 +18,7 @@ from lib.controller.checks import checkString
 from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
 from lib.controller.checks import checkNullConnection
+from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
 from lib.controller.checks import simpletonCheckSqlInjection
 from lib.core.agent import agent
@@ -319,6 +320,9 @@ def start():
 
             if not checkConnection(suppressOutput=conf.forms) or not checkString() or not checkRegexp():
                 continue
+
+            if conf.checkWaf:
+                checkWaf()
 
             if conf.nullConnection:
                 checkNullConnection()
