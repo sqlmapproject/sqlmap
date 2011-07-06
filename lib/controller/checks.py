@@ -878,8 +878,8 @@ def checkWaf():
     conf.parameters = dict(backup)
 
     if retVal:
-        warnMsg  = "it appears that the target is protected. "
-        warnMsg += "please consider usage of tampering scripts"
+        warnMsg = "it appears that the target is protected. Please "
+        warnMsg += "consider usage of tamper scripts (--tamper switch)"
         logger.warn(warnMsg)
     else:
         infoMsg = "it appears that the target is not protected"
