@@ -23,7 +23,7 @@ VERSION = "1.0-dev"
 REVISION = getRevisionNumber()
 VERSION_STRING = "sqlmap/%s (r%s)" % (VERSION, REVISION)
 DESCRIPTION = "automatic SQL injection and database takeover tool"
-SITE = "http://sqlmap.sourceforge.net"
+SITE = "http://www.sqlmap.org"
 ML = "sqlmap-users@lists.sourceforge.net"
 
 # minimum distance of ratio from kb.matchRatio to result in True
@@ -183,7 +183,7 @@ USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
 
 FROM_TABLE = {
                         DBMS.ORACLE: " FROM DUAL",
-                        DBMS.ACCESS: " FROM MSysObjects",
+                        DBMS.ACCESS: " FROM MSysAccessObjects%00",
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS",
                         DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"
