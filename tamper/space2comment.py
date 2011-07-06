@@ -11,10 +11,25 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
+def dependencies():
+    pass
+
 def tamper(payload):
     """
-    Replaces ' ' with '/**/'
-    Example: 'SELECT id FROM users' becomes 'SELECT/**/id/**/FROM/**/users'
+    Replaces space character (' ') with comments '/**/'
+
+    Example:
+        * Input: SELECT id FROM users
+        * Output: SELECT/**/id/**/FROM/**/users
+
+    Tested against:
+        * Microsoft SQL Server 2005
+        * MySQL 4, 5.0 and 5.5
+        * Oracle 10g
+        * PostgreSQL 8.3, 8.4, 9.0
+
+    Notes:
+        * Useful to bypass weak and bespoke web application firewalls
     """
 
     retVal = payload

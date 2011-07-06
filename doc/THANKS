@@ -26,6 +26,10 @@ Otavio Augusto <otavioarj@gmail.com>
 Simon Baker <simonb@sec-1.com>
     for reporting some bugs
 
+Ryan Barnett <RBarnett@trustwave.com>
+    for organizing the ModSecurity SQL injection challenge,
+    http://modsecurity.org/demo/challenge.html
+
 Emiliano Bazaes <emiliano@7espejos.com>
     for reporting a minor bug
 
@@ -295,6 +299,9 @@ David McNab <david@conscious.co.nz>
 Spencer J. McIntyre <smcintyre@securestate.com>
     for reporting a minor bug
 
+Ahmad Maulana <matdhule@gmail.com>
+    for providing one tamper scripts, halfversionedmorekeywords.py
+
 Enrico Milanese <enricomilanese@gmail.com>
     for reporting a bugs when using (-a) a single line User-Agent file
     for providing me with some ideas for the PHP backdoor
@@ -326,6 +333,9 @@ Roberto Nemirovsky <roberto.paes@gmail.com>
 Simone Onofri <simone.onofri@gmail.com>
     for patching the PHP web backdoor to make it work properly also on
     Windows
+
+Michele Orru <michele.orru@antisnatchor.com>
+    for reporting a minor bug
 
 Shaohua Pan <pan@knownsec.com>
     for reporting several bugs
@@ -545,7 +555,7 @@ pacman730 <pacman730@users.sourceforge.net>
     for reporting a bug
 
 Phat R. <phatthanaphol@gmail.com>
-    for reporting a minor bug
+    for reporting a few bugs
 
 Phil P <@superevr>
     for suggesting a minor enhancement

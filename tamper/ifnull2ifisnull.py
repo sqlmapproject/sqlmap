@@ -11,14 +11,31 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGHEST
 
+def dependencies():
+    pass
+
 def tamper(payload):
     """
-    Replaces 'IFNULL(A, B)' with 'IF(ISNULL(A), B, A)'
-    Example: 'IFNULL(1, 2)' becomes 'IF(ISNULL(1), 2, 1)'
+    Replaces instances like 'IFNULL(A, B)' with 'IF(ISNULL(A), B, A)'
+
+    Example:
+        * Input: IFNULL(1, 2)
+        * Output: IF(ISNULL(1), 2, 1)
+
+    Requirement:
+        * MySQL
+        * SQLite (possibly)
+        * SAP MaxDB (possibly)
+
+    Tested against:
+        * MySQL 5.0 and 5.5
+
+    Notes:
+        * Useful to bypass very weak and bespoke web application firewalls
+          that filter the IFNULL() function
     """
 
     if payload and payload.find("IFNULL") > -1:
-
         while payload.find("IFNULL(") > -1:
             index = payload.find("IFNULL(")
             deepness = 1

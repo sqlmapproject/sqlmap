@@ -10,16 +10,26 @@ See the file 'doc/COPYING' for copying permission
 import random
 import re
 
-from lib.core.common import randomRange
 from lib.core.data import kb
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
+def dependencies():
+    pass
+
 def tamper(payload):
     """
-    Adding multiple spaces around SQL keywords
-    Example: 'UNION SELECT' migth become '  UNION   SELECT  '
+    Adds multiple spaces around SQL keywords
+
+    Example:
+        * Input: UNION SELECT
+        * Output:  UNION   SELECT  
+
+    Notes:
+        * Useful to bypass very weak and bespoke web application firewalls
+          that has poorly written permissive regular expressions
+
     Reference: https://www.owasp.org/images/7/74/Advanced_SQL_Injection.ppt
     """
 

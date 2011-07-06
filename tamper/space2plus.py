@@ -11,10 +11,21 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
+def dependencies():
+    pass
+
 def tamper(payload):
     """
-    Replaces ' ' with '+'
-    Example: 'SELECT id FROM users' becomes 'SELECT+id+FROM+users'
+    Replaces space character (' ') with plus ('+')
+
+    Example:
+        * Input: SELECT id FROM users
+        * Output: SELECT+id+FROM+users
+
+    Notes:
+        * Is this any useful? The plus get's url-encoded by sqlmap engine
+          invalidating the query afterwards
+        * This tamper script works against all databases
     """
 
     retVal = payload

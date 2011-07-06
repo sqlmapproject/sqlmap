@@ -11,10 +11,28 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGHEST
 
+def dependencies():
+    pass
+
 def tamper(payload):
     """
-    Replaces '>' with 'NOT BETWEEN 0 AND #'
-    Example: 'A > B' becomes 'A NOT BETWEEN 0 AND B'
+    Replaces greater than operator ('>') with 'NOT BETWEEN 0 AND #'
+
+    Example:
+        * Input: 'A > B'
+        * Output: 'A NOT BETWEEN 0 AND B'
+
+    Tested against:
+        * Microsoft SQL Server 2005
+        * MySQL 4, 5.0 and 5.5
+        * Oracle 10g
+        * PostgreSQL 8.3, 8.4, 9.0
+
+    Notes:
+        * Useful to bypass weak and bespoke web application firewalls that
+          filter the greater than character
+        * The BETWEEN clause is SQL standard. Hence, this tamper script
+          should work against all (?) databases
     """
 
     retVal = payload

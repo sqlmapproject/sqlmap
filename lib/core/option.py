@@ -825,7 +825,7 @@ def __setTamperingFunctions():
                     if check_priority and priority > last_priority:
                         message = "it seems that you might have mixed "
                         message += "the order of tamper scripts.\n"
-                        message += "Do you want to auto resolve this? [Y/n/q]"
+                        message += "Do you want to auto resolve this? [Y/n/q] "
                         test = readInput(message, default="Y")
 
                         if not test or test[0] in ("y", "Y"):
@@ -841,6 +841,8 @@ def __setTamperingFunctions():
                     last_priority = priority
 
                     break
+                elif name == "dependencies":
+                    function()
 
             if not found:
                 raise sqlmapGenericException, "missing function 'tamper(value)' in tamper script '%s'" % tfile
@@ -981,8 +983,9 @@ def __setPrefixSuffix():
         else:
             boundary.ptype = 1
 
-        # user who knows for --prefix/--suffix doesn't want other combinations
-        conf.boundaries = [boundary]
+        # user who provides --prefix/--suffix does not want other boundaries
+        # to be tested for
+        conf.boundaries = [ boundary ]
 
 def __setHTTPAuthentication():
     """

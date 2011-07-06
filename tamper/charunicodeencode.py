@@ -10,14 +10,23 @@ See the file 'doc/COPYING' for copying permission
 import string
 
 from lib.core.enums import PRIORITY
-from lib.core.exception import sqlmapUnsupportedFeatureException
 
 __priority__ = PRIORITY.LOWEST
 
+def dependencies():
+    pass
+
 def tamper(payload):
     """
-    Replaces payload with unicode-urlencode of non-encoded chars in payload (not processing already encoded)
-    Example: 'SELECT FIELD%20FROM TABLE' becomes '%u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
+    Unicode-url-encodes non-encoded characters in a given payload (not
+    processing already encoded)
+
+    Example:
+        * Input: SELECT FIELD%20FROM TABLE
+        * Output: %u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
+
+    Notes:
+        * Does this ever work?
     """
 
     retVal = payload

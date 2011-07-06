@@ -7,14 +7,17 @@ Copyright (c) 2006-2011 sqlmap developers (http://sqlmap.sourceforge.net/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
 import random
 
+from lib.core.common import singleTimeWarnMessage
+from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
 def dependencies():
-    pass
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__)[:-3], DBMS.MYSQL))
 
 def tamper(payload):
     """
@@ -23,13 +26,10 @@ def tamper(payload):
 
     Example:
         * Input: SELECT id FROM users
-        * Output: SELECT\rid\tFROM\nusers
+        * Output: SELECT%0Bid%0BFROM%A0users
 
     Tested against:
-        * Microsoft SQL Server 2005
-        * MySQL 4, 5.0 and 5.5
-        * Oracle 10g
-        * PostgreSQL 8.3, 8.4, 9.0
+        * MySQL 5.1
 
     Notes:
         * Useful to bypass several web application firewalls
@@ -40,7 +40,9 @@ def tamper(payload):
     #   \n      0A      new line
     #   -       0C      new page
     #   \r      0D      carriage return
-    blanks = ['%09', '%0A', '%0C', '%0D']
+    #   -       0B      vertical TAB        (MySQL only)
+    #   -       A0      -                   (MySQL only)
+    blanks = ['%09', '%0A', '%0C', '%0D', '%0B', '%A0']
     retVal = payload
 
     if payload:

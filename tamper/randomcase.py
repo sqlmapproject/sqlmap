@@ -15,10 +15,27 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
+def dependencies():
+    pass
+
 def tamper(payload):
     """
     Replaces each keyword character with random case value
-    Example: 'INSERT' might become 'InsERt'
+
+    Example:
+        * Input: INSERT
+        * Output: InsERt
+
+    Tested against:
+        * Microsoft SQL Server 2005
+        * MySQL 4, 5.0 and 5.5
+        * Oracle 10g
+        * PostgreSQL 8.3, 8.4, 9.0
+
+    Notes:
+        * Useful to bypass very weak and bespoke web application firewalls
+          that has poorly written permissive regular expressions
+        * This tamper script should work against all (?) databases
     """
 
     retVal = payload
