@@ -28,6 +28,9 @@ def tamper(payload):
         * Input: SELECT id FROM users
         * Output: SELECT%0Bid%0BFROM%A0users
 
+    Requirement:
+        * MySQL
+
     Tested against:
         * MySQL 5.1
 
