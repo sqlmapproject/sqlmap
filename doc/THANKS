@@ -39,7 +39,8 @@ Daniele Bellucci <daniele.bellucci@gmail.com>
 
 Sebastian Bittig <s.bittig@r-tec.net> and the rest of the team at
 r-tec IT Systeme GmbH
-    for providing with the DB2 fingerprint and enumeration support patch
+    for contributing the DB2 support initial patch: fingerprint and
+    enumeration
 
 Anthony Boynes <aboynes@gmail.com>
     for reporting several bugs
@@ -54,7 +55,7 @@ Gianluca Brindisi <g@brindi.si>
     for reporting a couple of bugs
 
 Jack Butler <fattredd@hotmail.com>
-    for providing me with the sqlmap site favicon
+    for contributing the sqlmap site favicon
 
 Ulisses Castro <uss.thebug@gmail.com>
     for reporting a bug
@@ -70,7 +71,7 @@ Cesar Cerrudo <cesar@argeniss.com>
     http://www.argeniss.com/research/TokenKidnapping.pdf
 
 Karl Chen <quarl@cs.berkeley.edu>
-    for providing with the multithreading patch for the inference
+    for contributing the initial multi-threading patch for the inference
     algorithm
 
 Y P Chien <ypchien@cox.net>
@@ -113,9 +114,9 @@ Adam Faheem <faheem.adam@is.co.za>
     for reporting a few bugs
 
 James Fisher <www@sittinglittleduck.com>
-    for providing me with two very good feature requests
+    for contributing two very good feature requests
     for his great tool too brute force directories and files names on
-    web/application servers, Dir Buster, http://tinyurl.com/dirbuster
+    web/application servers, DirBuster, http://tinyurl.com/dirbuster
 
 Jim Forster <jimforster@goldenwest.com>
     for reporting a bug
@@ -161,7 +162,7 @@ Nico Golde <nico@ngolde.de>
 
 Oliver Gruskovnjak <oliver.gruskovnjak@gmail.com>
     for reporting a bug
-    for providing me with a minor patch
+    for contributing a minor patch
 
 Davide Guerri <d.guerri@caspur.it>
     for suggesting an enhancement
@@ -227,7 +228,7 @@ Sven Klemm <sven@c3d2.de>
     for reporting two minor bugs with PostgreSQL
 
 Anant Kochhar <anant.kochhar@secureyes.net>
-    for providing me with feedback on the user's manual
+    for providing with feedback on the user's manual
 
 Alexander Kornbrust <ak@red-database-security.com>
     for reporting a couple of bugs
@@ -239,10 +240,10 @@ Nicolas Krassas <krasn@deventum.com>
     for reporting a couple of bugs
 
 Oliver Kuckertz <oliver.kuckertz@mologie.de>
-    for providing a minor patch
+    for contributing a minor patch
 
 Alex Landa <landa.alex86@gmail.com>
-    for providing a patch adding support for XML output
+    for contributing a patch adding beta support for XML output
 
 Guido Landi <lists@keamera.org>
     for reporting a couple of bugs
@@ -262,7 +263,7 @@ John J. Lee <jjl@pobox.com> & others
     forms when --forms switch is specified
 
 Nico Leidecker <nico@leidecker.info>
-    for providing me with feedback on a few features
+    for providing with feedback on a few features
     for reporting a couple of bugs
     for his great tool icmpsh included in sqlmap tree to get a command
     prompt via an out-of-band tunnel over ICMP,
@@ -289,8 +290,7 @@ Michael Majchrowicz <mmajchrowicz@gmail.com>
     for suggesting a lot of ideas and features
 
 Ferruh Mavituna <ferruh@mavituna.com>
-    for providing me with ideas on the implementation of a couple of
-    new features
+    for sharing ideas on the implementation of a couple of features
 
 David McNab <david@conscious.co.nz>
     for his XMLObject module that allows XML files to be operated on 
@@ -300,11 +300,11 @@ Spencer J. McIntyre <smcintyre@securestate.com>
     for reporting a minor bug
 
 Ahmad Maulana <matdhule@gmail.com>
-    for providing one tamper scripts, halfversionedmorekeywords.py
+    for contributing one tamper scripts, halfversionedmorekeywords.py
 
 Enrico Milanese <enricomilanese@gmail.com>
-    for reporting a bugs when using (-a) a single line User-Agent file
-    for providing me with some ideas for the PHP backdoor
+    for reporting a minor bug
+    for sharing some ideas for the PHP backdoor
 
 Devon Mitchell <devon.mitchell1988@yahoo.com>
     for reporting a minor bug
@@ -342,7 +342,7 @@ Shaohua Pan <pan@knownsec.com>
     for suggesting a few features
 
 Antonio Parata <s4tan@ictsc.it>
-    for providing me with some ideas for the PHP backdoor
+    for sharing some ideas for the PHP backdoor
 
 Adrian Pastor <ap@gnucitizen.org>
     for donating to sqlmap development
@@ -358,7 +358,7 @@ Mark Pilgrim <mark@diveintomark.org>
 
 Steve Pinkham <steve.pinkham@gmail.com>
     for suggesting a feature
-    for providing a new sql injection vector (MSSQL time based)
+    for contributing a new SQL injection vector (MSSQL time-based blind)
     for donating to sqlmap development
 
 Adam Pridgen <adam.pridgen@gmail.com>
@@ -402,6 +402,9 @@ Richard Safran <allapplyhere@yahoo.com>
 Tomoyuki Sakurai <cherry@trombik.org>
     for submitting to the FreeBSD project the sqlmap 0.5 port
 
+Roberto Salgado <lightos@gmail.com>
+    for contributing two tamper scripts
+
 Pedro Jacques Santos Santiago <pedro__jacques@hotmail.com>
     for reporting considerable amount of bugs
 
@@ -415,7 +418,7 @@ Jorge Santos <jorge_a_santos@hotmail.com>
     for reporting a minor bug
 
 Sven Schluter <sschlueter@netzwerk.cc>
-    for providing with a patch for waiting a number of seconds between
+    for contributing a patch for waiting a number of seconds between
     each HTTP request
 
 Ryan Sears <rdsears@mtu.edu>
@@ -433,8 +436,7 @@ Brian Shura <bshura@appsecconsulting.com>
     for reporting a bug
 
 Sumit Siddharth <sid@notsosecure.com>
-    for providing me with ideas on the implementation of a couple of
-    features
+    for sharing ideas on the implementation of a couple of features
 
 Andre Silva <andreoaz@gmail.com>
     for reporting a bug
@@ -458,7 +460,7 @@ Jason Swan <jasoneswan@gmail.com>
     for suggesting a couple of improvements
 
 Chilik Tamir <phenoman@gmail.com>
-    for providing a patch for initial support SOAP requests
+    for contributing a patch for initial support SOAP requests
 
 Alessandro Tanasi <alessandro@tanasi.it>
     for extensively beta-testing sqlmap
@@ -466,7 +468,7 @@ Alessandro Tanasi <alessandro@tanasi.it>
     for reviewing the documentation
 
 Andres Tarasco <atarasco@gmail.com>
-    for providing me with good feedback
+    for contributing good feedback
 
 Tom Thumb <k1971@live.co.uk>
     for reporting a major bug
@@ -505,7 +507,7 @@ Carlos Gabriel Vergara <carlosgabrielvergara@gmail.com>
     for suggesting couple of good features
 
 Anthony Zboralski <anthony.zboralski@bellua.com>
-    for providing me with detailed feedback
+    for providing with detailed feedback
     for reporting a few minor bugs
     for donating to sqlmap development
 
