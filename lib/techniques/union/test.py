@@ -121,7 +121,6 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
     for position in positions:
         # Prepare expression with delimiters
         randQuery = randomStr(UNION_MIN_RESPONSE_CHARS)
-        phrase = "%s%s%s".lower() % (kb.misc.start, randQuery, kb.misc.stop)
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
@@ -135,14 +134,13 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
             removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
             payload, True) or "")
 
-        if content and phrase in content:
+        if content and randQuery in content:
             validPayload = payload
             vector = (position, count, comment, prefix, suffix, kb.uChar, where)
 
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
                 randQuery2 = randomStr(UNION_MIN_RESPONSE_CHARS)
-                phrase2 = "%s%s%s".lower() % (kb.misc.start, randQuery2, kb.misc.stop)
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 
@@ -154,7 +152,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
                 page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
                 content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
-                if content and ((phrase in content and phrase2 not in content) or (phrase not in content and phrase2 in content)):
+                if content and ((randQuery in content and randQuery2 not in content) or (randQuery not in content and randQuery2 in content)):
                     vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE)
 
             unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
