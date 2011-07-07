@@ -183,7 +183,7 @@ USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
 
 FROM_TABLE = {
                         DBMS.ORACLE: " FROM DUAL",
-                        DBMS.ACCESS: " FROM MSysAccessObjects%00",
+                        DBMS.ACCESS: " FROM MSysAccessObjects",
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS",
                         DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"

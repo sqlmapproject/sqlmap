@@ -500,6 +500,22 @@ class Agent:
             elif fieldsNoSelect:
                 concatenatedQuery = "'%s'+%s+'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
 
+        elif Backend.isDbms(DBMS.ACCESS):
+            if fieldsExists:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'&" % kb.misc.start, 1)
+                concatenatedQuery += "&'%s'" % kb.misc.stop
+            elif fieldsSelectCase:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'&(SELECT " % kb.misc.start, 1)
+                concatenatedQuery += ")&'%s'" % kb.misc.stop
+            elif fieldsSelectFrom:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'&" % kb.misc.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "&'%s' FROM " % kb.misc.stop, 1)
+            elif fieldsSelect:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'&" % kb.misc.start, 1)
+                concatenatedQuery += "&'%s'" % kb.misc.stop
+            elif fieldsNoSelect:
+                concatenatedQuery = "'%s'&%s&'%s'" % (kb.misc.start, concatenatedQuery, kb.misc.stop)
+
         else:
             concatenatedQuery = query
 
