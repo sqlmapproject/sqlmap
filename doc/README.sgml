@@ -6,7 +6,7 @@
 <author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
 <date>version 1.0-dev, XXX XX, 2011
 <abstract>
-This document is the user's manual to use <htmlurl url="http://sqlmap.sourceforge.net" name="sqlmap">.
+This document is the user's manual to use <htmlurl url="http://www.sqlmap.org" name="sqlmap">.
 </abstract>
 
 <toc>
@@ -488,7 +488,7 @@ name="MS10-015">).
 <p>
 <itemize>
 <item><bf>April 10</bf>, <htmlurl name="Bernardo and Miroslav"
-url="http://sqlmap.sourceforge.net/#developers"> release sqlmap
+url="http://www.sqlmap.org/#developers"> release sqlmap
 <bf>0.9</bf> featuring a totally rewritten and powerful SQL injection
 detection engine, the possibility to connect directly to a database
 server, support for time-based blind SQL injection and error-based SQL
@@ -500,7 +500,7 @@ injection, support for four new database management systems and much more.
 <p>
 <itemize>
 <item><bf>December</bf>, <htmlurl name="Bernardo and Miroslav"
-url="http://sqlmap.sourceforge.net/#developers"> have enhanced sqlmap a
+url="http://www.sqlmap.org/#developers"> have enhanced sqlmap a
 lot during the whole year and prepare to release sqlmap <bf>0.9</bf>
 within the first quarter of 2011.
 <item><bf>June 3</bf>, Bernardo <htmlurl name="presents"
@@ -508,7 +508,7 @@ url="http://www.slideshare.net/inquis/ath-con-2010bernardodamelegotdbownnet">
 a talk titled <em>Got database access? Own the network!</em> at AthCon
 2010 in Athens (Greece).
 <item><bf>March 14</bf>, <htmlurl name="Bernardo and Miroslav"
-url="http://sqlmap.sourceforge.net/#developers"> release stable version of 
+url="http://www.sqlmap.org/#developers"> release stable version of 
 sqlmap <bf>0.8</bf> featuring many features. Amongst these, support to
 enumerate and dump all databases' tables containing user provided
 column(s), stabilization and enhancements to the takeover functionalities,
@@ -537,7 +537,7 @@ achieved during these first three years of the project and launches a call
 for developers.
 
 <item><bf>December 4</bf>, sqlmap-devel mailing list has been merged into
-sqlmap-users <htmlurl name="mailing list" url="http://sqlmap.sourceforge.net/#ml">.
+sqlmap-users <htmlurl name="mailing list" url="http://www.sqlmap.org/#ml">.
 
 <item><bf>November 20</bf>, Bernardo and Guido present again their
 research on stealth database server takeover at CONfidence 2009 in Warsaw,
@@ -662,7 +662,7 @@ more options to enumerate and dump specific information are added, brand
 new installation packages for Debian, Red Hat, Windows and much more.
 
 <item><bf>August</bf>, two public <htmlurl name="mailing lists"
-url="http://sqlmap.sourceforge.net/#ml"> are created on SourceForge.
+url="http://www.sqlmap.org/#ml"> are created on SourceForge.
 
 <item><bf>January</bf>, sqlmap subversion development repository is moved
 away from SourceForge and goes private for a while.
@@ -763,7 +763,7 @@ $ svn update
 
 <p>
 This is strongly recommended <bf>before</bf> reporting any bug to the 
-<htmlurl url="http://sqlmap.sourceforge.net/#ml" name="mailing list">.
+<htmlurl url="http://www.sqlmap.org/#ml" name="mailing list">.
 
 
 <sect>Usage
@@ -773,7 +773,7 @@ This is strongly recommended <bf>before</bf> reporting any bug to the
 $ python sqlmap.py -h
 
     sqlmap/1.0 - automatic SQL injection and database takeover tool
-    http://sqlmap.sourceforge.net
+    http://www.sqlmap.org
 
 Usage: python sqlmap.py [options]
 
@@ -1162,7 +1162,7 @@ By default sqlmap performs HTTP requests with the following <tt>User-Agent</tt>
 header value:
 
 <tscreen><verb>
-sqlmap/0.9 (http://sqlmap.sourceforge.net)
+sqlmap/0.9 (http://www.sqlmap.org)
 </verb></tscreen>
 
 <p>
@@ -3142,7 +3142,7 @@ clicking on <tt>Update</tt>.
 
 <p>
 This is strongly recommended <bf>before</bf> reporting any bug to the
-<htmlurl name="mailing lists" url="http://sqlmap.sourceforge.net/#ml">.
+<htmlurl name="mailing lists" url="http://www.sqlmap.org/#ml">.
 
 
 <sect2>Save options in a configuration INI file
@@ -3314,7 +3314,7 @@ Do you really want to know?
 <p>
 sqlmap is released under the terms of the
 <htmlurl url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html" name="General Public License v2">.
-sqlmap is copyrighted by its <htmlurl url="http://sqlmap.sourceforge.net/#developers" name="developers">.
+sqlmap is copyrighted by its <htmlurl url="http://www.sqlmap.org/#developers" name="developers">.
 
 
 <sect>Disclaimer

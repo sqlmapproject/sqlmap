@@ -39,7 +39,7 @@ class Metasploit3 < Msf::Auxiliary
 			'Version'		=> '$Revision: 9212 $',
 			'References'	=>
 				[
-					['URL', 'http://sqlmap.sourceforge.net'],
+					['URL', 'http://www.sqlmap.org'],
 				]
 			))
 

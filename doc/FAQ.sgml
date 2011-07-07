@@ -7,7 +7,7 @@
 <htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
 <abstract>
 This document contains frequently asked questions for <htmlurl
-url="http://sqlmap.sourceforge.net" name="sqlmap">.
+url="http://www.sqlmap.org" name="sqlmap">.
 </abstract>
 
 <toc>
@@ -72,7 +72,7 @@ you are running the latest development version from the Subversion
 repository, read the user's manual carefully, have fun with it during your
 penetration tests.
 If you find bugs or have ideas for possible improvements, feel free to
-<htmlurl url="http://sqlmap.sourceforge.net/#ml" name="get in touch on the
+<htmlurl url="http://www.sqlmap.org/#ml" name="get in touch on the
 mailing list">. Many people have <htmlurl
 url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/doc/THANKS"
 name="contributed"> in different ways to the sqlmap development.
@@ -86,14 +86,14 @@ up to do security research, know about web application security, database
 assessment and takeover, software refactoring and are motivated to join
 the development team.
 If this sounds interesting to you, <htmlurl
-url="http://sqlmap.sourceforge.net/#developers" name="get in touch">!
+url="http://www.sqlmap.org/#developers" name="get in touch">!
 
 <sect1>How can I support the development?
 
 <p>
 If you think that sqlmap is a great tool, it really played well during
 your penetration tests, or you simply like it, you, or your boss, can
-<htmlurl url="http://sqlmap.sourceforge.net/#donate" name="donate
+<htmlurl url="http://www.sqlmap.org/#donate" name="donate
 some money"> to the developers via PayPal.
 
 <sect1>Can you hack a site for me?
