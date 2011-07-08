@@ -10,7 +10,7 @@ sqlmap (1.0-1) stable; urgency=low
   * Added --mobile switch to imitate a mobile device through HTTP
     User-Agent header (Miroslav)
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  XXX, XX XXX 2011 10:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  XXX, XX XXX 2011 10:00:00 +0000
 
 sqlmap (0.9-1) stable; urgency=low
 
@@ -62,7 +62,7 @@ sqlmap (0.9-1) stable; urgency=low
   * Major code refactoring (Bernardo and Miroslav).
   * User's manual updated (Bernardo).
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun, 10 Apr 2011 21:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun, 10 Apr 2011 21:00:00 +0000
 
 sqlmap (0.8-1) stable; urgency=low
 
@@ -127,7 +127,7 @@ sqlmap (0.8-1) stable; urgency=low
     (http://www.youtube.com/user/inquisb) and linked from
     http://sqlmap.sourceforge.net/demo.html (Bernardo).
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun, 14 Mar 2010 10:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun, 14 Mar 2010 10:00:00 +0000
 
 sqlmap (0.8rc1-1) stable; urgency=low
 
@@ -150,7 +150,7 @@ sqlmap (0.8rc1-1) stable; urgency=low
   * Minor bugs fixed.
   * Major code refactoring.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon, 21 Sep 2009 15:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Mon, 21 Sep 2009 15:00:00 +0000
 
 sqlmap (0.7-1) stable; urgency=low
 
@@ -174,7 +174,7 @@ sqlmap (0.7-1) stable; urgency=low
   * Fixed basic Microsoft SQL Server 2000 fingerprint.
   * Many minor bug fixes and code refactoring.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat, 25 Jul 2009 10:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sat, 25 Jul 2009 10:00:00 +0000
 
 sqlmap (0.7rc1-1) stable; urgency=low
 
@@ -206,7 +206,7 @@ sqlmap (0.7rc1-1) stable; urgency=low
     content very little;
   * Many minor bug fixes, minor enhancements and layout adjustments.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Wed, 22 Apr 2009 10:30:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Wed, 22 Apr 2009 10:30:00 +0000
 
 sqlmap (0.6.4-1) stable; urgency=low
 
@@ -237,7 +237,7 @@ sqlmap (0.6.4-1) stable; urgency=low
     provided;
   * Updated documentation.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Tue,  3 Feb 2009 23:30:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Tue,  3 Feb 2009 23:30:00 +0000
 
 sqlmap (0.6.3-1) stable; urgency=low
 
@@ -295,7 +295,7 @@ sqlmap (0.6.3-1) stable; urgency=low
   * Increased default output level from 0 to 1;
   * Updated documentation.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Thu, 18 Dec 2008 10:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Thu, 18 Dec 2008 10:00:00 +0000
 
 sqlmap (0.6.2-1) stable; urgency=low
 
@@ -321,7 +321,7 @@ sqlmap (0.6.2-1) stable; urgency=low
     identify MySQL 5.1.x, MySQL 6.0.x and PostgreSQL 8.3;
   * More user-friendly warning messages.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun,  2 Nov 2008 19:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun,  2 Nov 2008 19:00:00 +0000
 
 sqlmap (0.6.1-1) stable; urgency=low
 
@@ -342,7 +342,7 @@ sqlmap (0.6.1-1) stable; urgency=low
     not forcing the entries' order alphabetically anymore;
   * Minor bug fix to correctly handle parameters' value with % character.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri, 20 Oct 2008 10:00:00 +0000
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Fri, 20 Oct 2008 10:00:00 +0000
 
 sqlmap (0.6-1) stable; urgency=low
 
@@ -407,7 +407,7 @@ sqlmap (0.6-1) stable; urgency=low
   * Updated some docstrings;
   * Updated documentation files.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Mon,  1 Sep 2008 10:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Mon,  1 Sep 2008 10:00:00 +0100
 
 sqlmap (0.5-1) stable; urgency=low
 
@@ -454,7 +454,7 @@ sqlmap (0.5-1) stable; urgency=low
     libraries, many minor improvements;
   * Updated all documentation files.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sun,  4 Nov 2007 20:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun,  4 Nov 2007 20:00:00 +0100
 
 sqlmap (0.4-1) stable; urgency=low
 
@@ -499,7 +499,7 @@ sqlmap (0.4-1) stable; urgency=low
     moved to lib/union.py;
   * Updated documentation files.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Fri, 15 Jun 2007 20:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Fri, 15 Jun 2007 20:00:00 +0100
 
 sqlmap (0.3-1) stable; urgency=low
 
@@ -519,7 +519,7 @@ sqlmap (0.3-1) stable; urgency=low
   * Rewritten documentation files;
   * Complete code restyling.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Sat, 20 Jan 2007 20:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sat, 20 Jan 2007 20:00:00 +0100
 
 sqlmap (0.2-1) stable; urgency=low
 
@@ -550,4 +550,4 @@ sqlmap (0.2-1) stable; urgency=low
     new option/injection classes and improvements on catching of
     exceptions.
 
- -- Bernardo Damele A. G. <bernardo.damele@gmail.com>  Wed, 13 Dec 2006 20:00:00 +0100
+ -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Wed, 13 Dec 2006 20:00:00 +0100

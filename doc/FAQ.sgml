@@ -3,8 +3,8 @@
 <article>
 
 <title>sqlmap - Frequently Asked Questions
-<author>by <htmlurl url="mailto:bernardo.damele@gmail.com" name="Bernardo Damele A. G.">,
-<htmlurl url="mailto:miroslav.stampar@gmail.com" name="Miroslav Stampar">
+<author>by <htmlurl url="mailto:bernardo@sqlmap.org" name="Bernardo Damele A. G.">,
+<htmlurl url="mailto:miroslav@sqlmap.org" name="Miroslav Stampar">
 <abstract>
 This document contains frequently asked questions for <htmlurl
 url="http://www.sqlmap.org" name="sqlmap">.
