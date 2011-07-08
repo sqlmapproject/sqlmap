@@ -15,6 +15,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import getFilteredPageContent
 from lib.core.common import intersect
 from lib.core.common import readInput
+from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
 from lib.core.data import conf
@@ -166,7 +167,15 @@ def setXpCmdshellAvailability(available):
 
 def resumeConfKb(expression, url, value):
     if expression == "Injection data" and url == conf.url:
-        injection = base64unpickle(value[:-1])
+        try:
+            injection = base64unpickle(value[:-1])
+        except:
+            warnMsg = "there were some changes in data model "
+            warnMsg += "preventing normal resume of previously stored "
+            warnMsg += "injection data. please use the --flush-session "
+            warnMsg += "to have it fixed"
+            singleTimeWarnMessage(warnMsg)
+            return
 
         infoMsg = "resuming injection data from session file"
         logger.info(infoMsg)
