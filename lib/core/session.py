@@ -48,13 +48,22 @@ def setInjection(inj):
     session file.
     """
 
-    condition = ( not kb.resumedQueries
-                  or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Injection data"))
-                  or ( kb.resumedQueries[conf.url].has_key("Injection data")
-                  and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(),\
-                    inj.data.keys()) != inj.data.keys()
-                ) )
+    try:
+        condition = ( not kb.resumedQueries
+                    or ( kb.resumedQueries.has_key(conf.url) and
+                    not kb.resumedQueries[conf.url].has_key("Injection data"))
+                    or ( kb.resumedQueries[conf.url].has_key("Injection data")
+                    and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(),\
+                        inj.data.keys()) != inj.data.keys()
+                    ) )
+    except AttributeError:
+        warnMsg = "there were some changes in data model "
+        warnMsg += "preventing normal resume of previously stored "
+        warnMsg += "injection data. please use the --flush-session "
+        warnMsg += "to have it fixed"
+        singleTimeWarnMessage(warnMsg)
+
+        condition = False
 
     if condition:
         dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
@@ -169,7 +178,7 @@ def resumeConfKb(expression, url, value):
     if expression == "Injection data" and url == conf.url:
         try:
             injection = base64unpickle(value[:-1])
-        except:
+        except AttributeError:
             warnMsg = "there were some changes in data model "
             warnMsg += "preventing normal resume of previously stored "
             warnMsg += "injection data. please use the --flush-session "
