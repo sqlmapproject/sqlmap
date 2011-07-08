@@ -89,7 +89,7 @@ def urldecode(value, encoding=None):
 
     return result
 
-def urlencode(value, safe="%&=", convall=False, limit=False):
+def urlencode(value, safe="%&=", convall=False, limit=False, failsafe=True):
     if conf.direct or PLACE.SOAP in conf.paramDict:
         return value
 
@@ -104,7 +104,7 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
 
     # corner case when character % really needs to be
     # encoded (when not representing url encoded char)
-    if all(map(lambda x: '%' in x, [safe, value])):
+    if failsafe and all(map(lambda x: '%' in x, [safe, value])):
         value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value, re.DOTALL | re.IGNORECASE)
 
     while True:
