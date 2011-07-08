@@ -18,7 +18,7 @@ from lib.core.enums import PRIORITY
 __priority__ = PRIORITY.HIGHER
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__)[:-3], DBMS.MYSQL))
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
 def tamper(payload):
     """
@@ -32,9 +32,7 @@ def tamper(payload):
         * MySQL
 
     Tested against:
-        * MySQL 4.0.18
-        * MySQL 5.1.56
-        * MySQL 5.5.11
+        * MySQL 4.0.18, 5.1.56, 5.5.11
 
     Notes:
         * Useful to bypass several web application firewalls when the

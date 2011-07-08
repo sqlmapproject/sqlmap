@@ -21,7 +21,7 @@ from lib.core.settings import IGNORE_SPACE_AFFECTED_KEYWORDS
 __priority__ = PRIORITY.LOW
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s > 5.1.13" % (os.path.basename(__file__)[:-3], DBMS.MYSQL))
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s > 5.1.13" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
 def tamper(payload):
     """
@@ -40,6 +40,8 @@ def tamper(payload):
 
     Notes:
         * Useful to bypass several web application firewalls
+        * Used during the ModSecurity SQL injection challenge,
+          http://modsecurity.org/demo/challenge.html
     """
 
     def process(match):

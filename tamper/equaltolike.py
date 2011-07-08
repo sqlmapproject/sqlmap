@@ -17,7 +17,7 @@ from lib.core.enums import PRIORITY
 __priority__ = PRIORITY.HIGHEST
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is unlikely to work against %s" % (os.path.basename(__file__)[:-3], DBMS.PGSQL))
+    singleTimeWarnMessage("tamper script '%s' is unlikely to work against %s" % (os.path.basename(__file__).split(".")[0], DBMS.PGSQL))
 
 def tamper(payload):
     """
