@@ -1736,8 +1736,8 @@ def __basicOptionValidation():
         errMsg = "switch --regexp is incompatible with switch --null-connection"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.predictOutput and conf.threads > 1:
-        errMsg = "switch --predict-output is incompatible with switch --threads"
+    if conf.predictOutput and (conf.threads > 1 or conf.optimize):
+        errMsg = "switch --predict-output is incompatible with switch --threads and -o"
         raise sqlmapSyntaxException, errMsg
 
     if conf.threads > MAX_NUMBER_OF_THREADS:
