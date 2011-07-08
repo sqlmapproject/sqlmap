@@ -529,7 +529,7 @@ class Connect:
                 # throughly without safe chars (especially & and =)
                 # addendum: as we support url encoding in tampering
                 # functions therefore we need to use % as a safe char
-                payload = urlencode(payload, "%", False, True, not kb.tamperFunctions)
+                payload = urlencode(payload, "%", False, True)
                 value = agent.replacePayload(value, payload)
             elif place == PLACE.SOAP:
                 # payloads in SOAP should have chars > and < replaced

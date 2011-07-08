@@ -24,6 +24,7 @@ import urllib
 from extra.safe2bin.safe2bin import safecharencode
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import PLACE
 from lib.core.settings import UNICODE_ENCODING
@@ -89,7 +90,7 @@ def urldecode(value, encoding=None):
 
     return result
 
-def urlencode(value, safe="%&=", convall=False, limit=False, failsafe=True):
+def urlencode(value, safe="%&=", convall=False, limit=False):
     if conf.direct or PLACE.SOAP in conf.paramDict:
         return value
 
@@ -104,7 +105,8 @@ def urlencode(value, safe="%&=", convall=False, limit=False, failsafe=True):
 
     # corner case when character % really needs to be
     # encoded (when not representing url encoded char)
-    if failsafe and all(map(lambda x: '%' in x, [safe, value])):
+    # except in cases when tampering scripts are used
+    if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
         value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value, re.DOTALL | re.IGNORECASE)
 
     while True:
