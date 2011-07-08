@@ -356,7 +356,7 @@
         <comment query="%00"/>
         <timedelay/>
         <substring query="MID((%s),%d,%d)"/>
-        <case query="IIF(%s,1,0)"/>
+        <case query="SELECT (IIF(%s,1,0))"/>
         <banner/>
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>

@@ -283,7 +283,7 @@ class Agent:
         if Backend.isDbms(DBMS.SQLITE):
             return field
 
-        if field.startswith("(CASE"):
+        if field.startswith("(CASE") or field.startswith("(IIF"):
             nulledCastedField = field
         else:
             nulledCastedField = (queries[Backend.getIdentifiedDbms()].cast.query % field) if not conf.noCast else field
@@ -327,7 +327,7 @@ class Agent:
         if not Backend.getDbms():
             return fields
 
-        if fields.startswith("(CASE") or fields.startswith("SUBSTR") or fields.startswith("MID("):
+        if fields.startswith("(CASE") or fields.startswith("(IIF") or fields.startswith("SUBSTR") or fields.startswith("MID("):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ",")
@@ -598,7 +598,7 @@ class Agent:
             inbandQuery += query[conditionIndex:]
 
         if Backend.getIdentifiedDbms() in FROM_TABLE:
-            if " FROM " not in inbandQuery or "(CASE " in inbandQuery:
+            if " FROM " not in inbandQuery or "(CASE " in inbandQuery or "(IIF" in inbandQuery:
                 inbandQuery += FROM_TABLE[Backend.getIdentifiedDbms()]
 
         if intoRegExp:
@@ -748,7 +748,7 @@ class Agent:
         if Backend.getIdentifiedDbms() is not None and hasattr(queries[Backend.getIdentifiedDbms()], "case"):
             caseExpression = queries[Backend.getIdentifiedDbms()].case.query % expression
 
-            if Backend.getIdentifiedDbms() in FROM_TABLE and not caseExpression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+            if "(IIF" not in caseExpression and Backend.getIdentifiedDbms() in FROM_TABLE and not caseExpression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
                 caseExpression += FROM_TABLE[Backend.getIdentifiedDbms()]
 
         return caseExpression
