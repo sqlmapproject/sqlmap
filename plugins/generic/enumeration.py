@@ -881,19 +881,11 @@ class Enumeration:
                 query = safeStringFormat(query, conf.db)
 
             value = inject.getValue(query, blind=False)
-            value = filter(lambda x: x, value)
+            value = arrayizeValue(filter(lambda x: x, value))
 
             if not isNoneValue(value):
-                if Backend.isDbms(DBMS.SQLITE):
-                    if isinstance(value, basestring):
-                        value = [[ DBMS.SQLITE, value ]]
-                    elif isinstance(value, (list, tuple, set)):
-                        newValue = []
-
-                        for v in value:
-                            newValue.append([ DBMS.SQLITE, v])
-
-                        value = newValue
+                if len(value) > 0 and not isinstance(value[0], (list, tuple)):
+                    value = zip([conf.db for i in xrange(len(value))], value)
 
                 for db, table in value:
                     db = safeSQLIdentificatorNaming(db)

@@ -7,21 +7,21 @@ Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.datatype import advancedDict
+from lib.core.datatype import AttribDict
 from lib.core.settings import LOGGER
 
 # sqlmap paths
-paths = advancedDict()
+paths = AttribDict()
 
 # object to store original command line options
-cmdLineOptions = advancedDict()
+cmdLineOptions = AttribDict()
 
 # object to share within function and classes command
 # line options and settings
-conf = advancedDict()
+conf = AttribDict()
 
 # object to share within function and classes results
-kb = advancedDict()
+kb = AttribDict()
 
 # object with each database management system specific queries
 queries = {}

@@ -11,7 +11,7 @@ from xml.etree import ElementTree as et
 
 from lib.core.data import conf
 from lib.core.data import paths
-from lib.core.datatype import advancedDict
+from lib.core.datatype import AttribDict
 
 def cleanupVals(text, tag):
     if tag in ("clause", "where"):
@@ -42,7 +42,7 @@ def cleanupVals(text, tag):
 
 def parseXmlNode(node):
     for element in node.getiterator('boundary'):
-        boundary = advancedDict()
+        boundary = AttribDict()
 
         for child in element.getchildren():
             if child.text:
@@ -54,7 +54,7 @@ def parseXmlNode(node):
         conf.boundaries.append(boundary)
 
     for element in node.getiterator('test'):
-        test = advancedDict()
+        test = AttribDict()
 
         for child in element.getchildren():
             if child.text and child.text.strip():
@@ -65,7 +65,7 @@ def parseXmlNode(node):
                     test[child.tag] = None
                     continue
                 else:
-                    test[child.tag] = advancedDict()
+                    test[child.tag] = AttribDict()
 
                 for gchild in child.getchildren():
                     if gchild.tag in test[child.tag]:

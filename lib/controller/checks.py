@@ -41,8 +41,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.datatype import advancedDict
-from lib.core.datatype import injectionDict
+from lib.core.datatype import AttribDict
+from lib.core.datatype import InjectionDict
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
@@ -68,7 +68,7 @@ from lib.techniques.union.use import configUnion
 def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to
     # successfully inject
-    injection = injectionDict()
+    injection = InjectionDict()
 
     # Localized thread data needed for some methods
     threadData = getCurrentThreadData()
@@ -452,7 +452,7 @@ def checkSqlInjection(place, parameter, value):
                         if vector is None and "vector" in test and test.vector is not None:
                             vector = "%s%s" % (test.vector, comment)
 
-                        injection.data[stype] = advancedDict()
+                        injection.data[stype] = AttribDict()
                         injection.data[stype].title = title
                         injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload)
                         injection.data[stype].where = where

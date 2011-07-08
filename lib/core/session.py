@@ -20,7 +20,7 @@ from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.datatype import injectionDict
+from lib.core.datatype import InjectionDict
 from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD

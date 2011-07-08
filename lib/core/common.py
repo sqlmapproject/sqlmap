@@ -1925,9 +1925,7 @@ def pushValue(value):
     Push value to the stack (thread dependent)
     """
 
-    # TODO: quick fix
-    #getCurrentThreadData().valueStack.append(copy.deepcopy(value))
-    getCurrentThreadData().valueStack.append(value)
+    getCurrentThreadData().valueStack.append(copy.deepcopy(value))
 
 def popValue():
     """

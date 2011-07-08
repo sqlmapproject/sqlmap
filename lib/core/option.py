@@ -55,8 +55,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
-from lib.core.datatype import advancedDict
-from lib.core.datatype import injectionDict
+from lib.core.datatype import AttribDict
+from lib.core.datatype import InjectionDict
 from lib.core.defaults import defaults
 from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
@@ -963,7 +963,7 @@ def __setPrefixSuffix():
     if conf.prefix is not None and conf.suffix is not None:
         # Create a custom boundary object for user's supplied prefix
         # and suffix
-        boundary = advancedDict()
+        boundary = AttribDict()
 
         boundary.level = 1
         boundary.clause = [ 0 ]
@@ -1381,18 +1381,18 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.alwaysRefresh = None
     kb.arch = None
     kb.authHeader = None
-    kb.bannerFp = advancedDict()
+    kb.bannerFp = AttribDict()
 
-    kb.brute = advancedDict({'tables':[], 'columns':[]})
+    kb.brute = AttribDict({'tables':[], 'columns':[]})
     kb.bruteMode = False
 
-    kb.cache = advancedDict()
+    kb.cache = AttribDict()
     kb.cache.content = {}
     kb.cache.regex = {}
     kb.cache.stdev = {}
 
     kb.commonOutputs = None
-    kb.data = advancedDict()
+    kb.data = AttribDict()
     kb.dataOutputFlag = False
 
     # Active back-end DBMS fingerprint
@@ -1415,10 +1415,10 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.hintValue = None
     kb.htmlFp = []
     kb.ignoreTimeout = False
-    kb.injection = injectionDict()
+    kb.injection = InjectionDict()
     kb.injections = []
 
-    kb.locks = advancedDict()
+    kb.locks = AttribDict()
     kb.locks.cacheLock = threading.Lock()
     kb.locks.logLock = threading.Lock()
     kb.locks.ioLock = threading.Lock()
@@ -1459,7 +1459,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.uChar = "NULL"
     kb.xpCmdshellAvailable = False
 
-    kb.misc = advancedDict()
+    kb.misc = AttribDict()
     kb.misc.delimiter = randomStr(length=6, lowercase=True)
     kb.misc.start = ":%s:" % randomStr(length=3, lowercase=True)
     kb.misc.stop = ":%s:" % randomStr(length=3, lowercase=True)
@@ -1795,7 +1795,7 @@ def __resolveCrossReferences():
     lib.core.threads.readInput = readInput
     lib.core.common.getPageTemplate = getPageTemplate
 
-def init(inputOptions=advancedDict(), overrideOptions=False):
+def init(inputOptions=AttribDict(), overrideOptions=False):
     """
     Set attributes into both configuration and knowledge base singletons
     based upon command line and configuration file options.

@@ -8,10 +8,10 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
-from lib.core.datatype import advancedDict
+from lib.core.datatype import AttribDict
 from lib.core.settings import EXCLUDE_UNESCAPE
 
-class Unescaper(advancedDict):
+class Unescaper(AttribDict):
     def unescape(self, expression, quote=True, dbms=None):
         if expression is None:
             return expression

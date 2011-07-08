@@ -7,9 +7,12 @@ Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import copy
+import types
+
 from lib.core.exception import sqlmapDataException
 
-class advancedDict(dict):
+class AttribDict(dict):
     """
     This class defines the sqlmap object, inheriting from Python data
     type dictionary.
@@ -46,7 +49,7 @@ class advancedDict(dict):
         """
 
         # This test allows attributes to be set in the __init__ method
-        if not self.__dict__.has_key('_advancedDict__initialised'):
+        if not self.__dict__.has_key('_AttribDict__initialised'):
             return dict.__setattr__(self, item, value)
 
         # Any normal attributes are handled normally
@@ -62,9 +65,20 @@ class advancedDict(dict):
     def __setstate__(self, dict):
         self.__dict__ = dict
 
-class injectionDict(advancedDict):
+    def __deepcopy__(self, memo):
+        retVal = self.__class__()
+        memo[id(self)] = retVal
+        for attr in dir(self):
+            if not attr.startswith('_'):
+                value = getattr(self, attr)
+                if not isinstance(value, (types.BuiltinFunctionType, types.BuiltinFunctionType, types.FunctionType, types.MethodType)):
+                    setattr(retVal, attr, copy.deepcopy(value, memo))
+
+        return retVal
+
+class InjectionDict(AttribDict):
     def __init__(self):
-        advancedDict.__init__(self)
+        AttribDict.__init__(self)
 
         self.place = None
         self.parameter = None
@@ -75,11 +89,11 @@ class injectionDict(advancedDict):
 
         # data is a dict with various stype, each which is a dict with
         # all the information specific for that stype
-        self.data = advancedDict()
+        self.data = AttribDict()
 
         # conf is a dict which stores current snapshot of important
         # options used during detection
-        self.conf = advancedDict()
+        self.conf = AttribDict()
 
         self.dbms = None
         self.dbms_version = None

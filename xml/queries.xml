@@ -48,7 +48,7 @@
             <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
         </dbs>
         <tables>
-            <inband query="SELECT table_schema,table_name FROM information_schema.TABLES" condition="table_schema"/>
+            <inband query="SELECT table_name FROM information_schema.TABLES" condition="table_schema"/>
             <blind query="SELECT table_name FROM information_schema.TABLES WHERE table_schema='%s' LIMIT %d,1" count="SELECT COUNT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'"/>
         </tables>
         <columns>
@@ -366,6 +366,7 @@
         <dbs/>
         <!--MSysObjects have no read permission by default-->
         <tables>
+            <inband query="SELECT Name FROM MSysObjects WHERE Type=1"/>
             <blind query="SELECT MIN(Name) FROM MSysObjects WHERE Type=1 AND Name>'%s'" count="SELECT COUNT(Name) FROM MSysObjects WHERE Type=1"/>
         </tables>
         <dump_table>
@@ -465,7 +466,7 @@
         <tables>
             <inband query="SELECT tablename FROM domain.tables WHERE schemaname=%s AND type='TABLE'"/>
             <blind/>
-        </tables>
+        </tables> 
         <dbs>
             <inband query="SELECT DISTINCT(schemaname) FROM domain.tables"/>
             <blind/>
