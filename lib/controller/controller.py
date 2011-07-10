@@ -440,9 +440,11 @@ def start():
                         if testSqlInj:
                             check = heuristicCheckSqlInjection(place, parameter)
 
-                            if not check and conf.realTest and \
-                               not simpletonCheckSqlInjection(place, parameter, value):
-                                continue
+                            if not check:
+                                if conf.smart or conf.realTest and not simpletonCheckSqlInjection(place, parameter, value):
+                                    infoMsg = "skipping %s parameter '%s'" % (place, parameter)
+                                    logger.info(infoMsg)
+                                    continue
 
                             infoMsg = "testing sql injection on %s " % place
                             infoMsg += "parameter '%s'" % parameter

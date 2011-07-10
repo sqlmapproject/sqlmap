@@ -549,6 +549,10 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Display page rank (PR) for Google dork results")
 
+        miscellaneous.add_option("--smart", dest="smart",
+                                  action="store_true",
+                                  help="Conduct through tests only if positive heuristic(s)")
+
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
                                   help="Simple wizard interface for beginner users")
