@@ -143,6 +143,9 @@ Jose Fonseca <jose.r.fonseca@gmail.com>
 Alan Franzoni <alan.franzoni@gmail.com>
     for helping me out with Python subprocess library
 
+Harold Fry <harold@violaceo.us>
+    for suggesting a minor enhancement
+
 Daniel G. Gamonal <lgrecol@gmail.com>
     for reporting a minor bug
 
@@ -531,6 +534,9 @@ buawig <buawig@gmail.com>
 
 Bugtrace <bugtrace@gmail.com>
     for reporting several bugs
+
+clav <elclav@gmail.com>
+    for reporting a minor bug
 
 dragoun dash <dragoun.dash@gmail.com>
     for reporting a minor bug

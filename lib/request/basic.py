@@ -107,6 +107,8 @@ def checkCharEncoding(encoding):
     # popular typos/errors
     if '8858' in encoding:
         encoding = encoding.replace('8858', '8859') # iso-8858 -> iso-8859
+    elif '8559' in encoding:
+        encoding = encoding.replace('8559', '8859') # iso-8559 -> iso-8859
     elif '5889' in encoding:
         encoding = encoding.replace('5889', '8859') # iso-5889 -> iso-8859
     elif '2313' in encoding:
