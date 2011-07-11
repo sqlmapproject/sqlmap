@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import httplib
 import re
 import threading
 import urlparse
@@ -59,6 +60,10 @@ class Crawler:
                             content = Request.getPage(url=current, crawling=True, raise404=False)[0]
                     except sqlmapConnectionException, e:
                         errMsg = "connection exception detected (%s). skipping " % e
+                        errMsg += "url '%s'" % current
+                        logger.critical(errMsg)
+                    except httplib.InvalidURL, e:
+                        errMsg = "invalid url detected (%s). skipping " % e
                         errMsg += "url '%s'" % current
                         logger.critical(errMsg)
 

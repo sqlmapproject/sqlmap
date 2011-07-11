@@ -1652,10 +1652,10 @@ def __mergeOptions(inputOptions, overrideOptions):
             conf[key] = value
 
 def __setTrafficOutputFP():
-    infoMsg = "setting file for logging HTTP traffic"
-    logger.info(infoMsg)
-
     if conf.trafficFile:
+        infoMsg = "setting file for logging HTTP traffic"
+        logger.info(infoMsg)
+
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
 def __setTorProxySettings():
