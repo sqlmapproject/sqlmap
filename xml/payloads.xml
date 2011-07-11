@@ -2974,6 +2974,347 @@ Formats:
     </test>
 
     <test>
+        <title>Generic UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[CHAR]</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>NULL</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[RANDNUM]</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([CHAR]) - 1 to 10 columns</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[CHAR]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query (NULL) - 1 to 10 columns</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>NULL</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([RANDNUM]) - 1 to 10 columns</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[RANDNUM]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([CHAR]) - 11 to 20 columns</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[CHAR]</char>
+            <columns>11-20</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query (NULL) - 11 to 20 columns</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>NULL</char>
+            <columns>11-20</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([RANDNUM]) - 11 to 20 columns</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[RANDNUM]</char>
+            <columns>11-20</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([CHAR]) - 21 to 30 columns</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[CHAR]</char>
+            <columns>21-30</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query (NULL) - 21 to 30 columns</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>NULL</char>
+            <columns>21-30</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([RANDNUM]) - 21 to 30 columns</title>
+        <stype>3</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[RANDNUM]</char>
+            <columns>21-30</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([CHAR]) - 31 to 40 columns</title>
+        <stype>3</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[CHAR]</char>
+            <columns>31-40</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query (NULL) - 31 to 40 columns</title>
+        <stype>3</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>NULL</char>
+            <columns>31-40</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([RANDNUM]) - 31 to 40 columns</title>
+        <stype>3</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[RANDNUM]</char>
+            <columns>31-40</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([CHAR]) - 41 to 50 columns</title>
+        <stype>3</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[CHAR]</char>
+            <columns>41-50</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+    <test>
+        <title>Generic UNION query (NULL) - 41 to 50 columns</title>
+        <stype>3</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>NULL</char>
+            <columns>41-50</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query ([RANDNUM]) - 41 to 50 columns</title>
+        <stype>3</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>-- </comment>
+            <char>[RANDNUM]</char>
+            <columns>41-50</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
         <title>Microsoft Access UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
         <level>1</level>
@@ -3367,347 +3708,6 @@ Formats:
         <details>
             <dbms>Microsoft Access</dbms>
         </details>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[CHAR]</char>
-            <columns>[COLSTART]-[COLSTOP]</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>NULL</char>
-            <columns>[COLSTART]-[COLSTOP]</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[RANDNUM]</char>
-            <columns>[COLSTART]-[COLSTOP]</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([CHAR]) - 1 to 10 columns</title>
-        <stype>3</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[CHAR]</char>
-            <columns>1-10</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query (NULL) - 1 to 10 columns</title>
-        <stype>3</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>NULL</char>
-            <columns>1-10</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([RANDNUM]) - 1 to 10 columns</title>
-        <stype>3</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[RANDNUM]</char>
-            <columns>1-10</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([CHAR]) - 11 to 20 columns</title>
-        <stype>3</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[CHAR]</char>
-            <columns>11-20</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query (NULL) - 11 to 20 columns</title>
-        <stype>3</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>NULL</char>
-            <columns>11-20</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([RANDNUM]) - 11 to 20 columns</title>
-        <stype>3</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[RANDNUM]</char>
-            <columns>11-20</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([CHAR]) - 21 to 30 columns</title>
-        <stype>3</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[CHAR]</char>
-            <columns>21-30</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query (NULL) - 21 to 30 columns</title>
-        <stype>3</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>NULL</char>
-            <columns>21-30</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([RANDNUM]) - 21 to 30 columns</title>
-        <stype>3</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[RANDNUM]</char>
-            <columns>21-30</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([CHAR]) - 31 to 40 columns</title>
-        <stype>3</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[CHAR]</char>
-            <columns>31-40</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query (NULL) - 31 to 40 columns</title>
-        <stype>3</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>NULL</char>
-            <columns>31-40</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([RANDNUM]) - 31 to 40 columns</title>
-        <stype>3</stype>
-        <level>5</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[RANDNUM]</char>
-            <columns>31-40</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([CHAR]) - 41 to 50 columns</title>
-        <stype>3</stype>
-        <level>5</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[CHAR]</char>
-            <columns>41-50</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-    <test>
-        <title>Generic UNION query (NULL) - 41 to 50 columns</title>
-        <stype>3</stype>
-        <level>5</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>NULL</char>
-            <columns>41-50</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic UNION query ([RANDNUM]) - 41 to 50 columns</title>
-        <stype>3</stype>
-        <level>5</level>
-        <risk>1</risk>
-        <clause>1,2,3,4,5</clause>
-        <where>1</where>
-        <vector>[UNION]</vector>
-        <request>
-            <payload/>
-            <comment>-- </comment>
-            <char>[RANDNUM]</char>
-            <columns>41-50</columns>
-        </request>
-        <response>
-            <union/>
-        </response>
     </test>
     <!-- End of UNION query tests -->
 
