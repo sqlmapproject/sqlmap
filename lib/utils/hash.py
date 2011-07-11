@@ -322,6 +322,112 @@ def hashRecognition(value):
 
     return retVal
 
+def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, proc_id, proc_count):
+    count = 0
+
+    try:
+        for word in wordlist:
+            if not attack_info:
+                break
+
+            count += 1
+
+            if not isinstance(word, basestring):
+                continue
+
+            if suffix:
+                word = word + suffix
+
+            try:
+                current = __functions__[hash_regex](password = word, uppercase = False)
+
+                for item in attack_info:
+                    ((user, hash_), _) = item
+
+                    if hash_ == current:
+                        retVal.put((user, hash_, word))
+
+                        clearConsoleLine()
+
+                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+
+                        if user and not user.startswith(DUMMY_USER_PREFIX):
+                            infoMsg += " for user '%s'\n" % user
+                        else:
+                            infoMsg += " for hash '%s'\n" % hash_
+
+                        dataToStdout(infoMsg, True)
+
+                        attack_info.remove(item)
+
+                    elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                        status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+            except KeyboardInterrupt:
+                raise
+
+            except:
+                warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                warnMsg += "Please report by e-mail to %s." % ML
+                logger.critical(warnMsg)
+
+    except KeyboardInterrupt:
+        pass
+
+def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, retVal, found, proc_id, proc_count):
+    count = 0
+
+    try:
+        for word in wordlist:
+
+            current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
+            count += 1
+
+            if not isinstance(word, basestring):
+                continue
+
+            if suffix:
+                word = word + suffix
+
+            try:
+                if hash_ == current:
+                    if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
+                        word = word.upper()
+
+                    retVal.put((user, hash_, word))
+
+                    clearConsoleLine()
+
+                    infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+
+                    if user and not user.startswith(DUMMY_USER_PREFIX):
+                        infoMsg += " for user '%s'\n" % user
+                    else:
+                        infoMsg += " for hash '%s'\n" % hash_
+
+                    dataToStdout(infoMsg, True)
+
+                    found.value = True
+                    break
+                elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                    status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
+                    if not user.startswith(DUMMY_USER_PREFIX):
+                        status += ' (user: %s)' % user
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+            except KeyboardInterrupt:
+                raise
+
+            except:
+                warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
+                warnMsg += "Please report by e-mail to %s." % ML
+                logger.critical(warnMsg)
+
+    except KeyboardInterrupt:
+        pass
+
+
 def dictionaryAttack(attack_dict):
     suffix_list = [""]
     hash_regexes = []
@@ -439,63 +545,10 @@ def dictionaryAttack(attack_dict):
 
                 kb.wordlist.rewind()
 
-                def bruteProcess(attack_info, hash_regex, wordlist, suffix, retVal, proc_id, proc_count):
-                    count = 0
-
-                    try:
-                        for word in kb.wordlist:
-                            if not attack_info:
-                                break
-
-                            count += 1
-
-                            if not isinstance(word, basestring):
-                                continue
-
-                            if suffix:
-                                word = word + suffix
-
-                            try:
-                                current = __functions__[hash_regex](password = word, uppercase = False)
-
-                                for item in attack_info:
-                                    ((user, hash_), _) = item
-
-                                    if hash_ == current:
-                                        retVal.put((user, hash_, word))
-
-                                        clearConsoleLine()
-
-                                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
-
-                                        if user and not user.startswith(DUMMY_USER_PREFIX):
-                                            infoMsg += " for user '%s'\n" % user
-                                        else:
-                                            infoMsg += " for hash '%s'\n" % hash_
-
-                                        dataToStdout(infoMsg, True)
-
-                                        attack_info.remove(item)
-
-                                    elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                                        status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
-                                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
-
-                            except KeyboardInterrupt:
-                                raise
-
-                            except:
-                                warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                                warnMsg += "Please report by e-mail to %s." % ML
-                                logger.critical(warnMsg)
-
-                    except KeyboardInterrupt:
-                        pass
-
                 retVal = None
 
                 try:
-                    if PYVERSION >= "2.6":
+                    if PYVERSION >= "2.6" and not IS_WIN:
                         if multiprocessing.cpu_count() > 1:
                             infoMsg = "starting %d processes " % multiprocessing.cpu_count()
                             singleTimeLogMessage(infoMsg)
@@ -503,7 +556,7 @@ def dictionaryAttack(attack_dict):
                         processes = []
                         retVal = multiprocessing.Queue()
                         for i in xrange(multiprocessing.cpu_count()):
-                            p = multiprocessing.Process(target=bruteProcess, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, multiprocessing.cpu_count()))
+                            p = multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, multiprocessing.cpu_count()))
                             processes.append(p)
 
                         for p in processes:
@@ -513,12 +566,13 @@ def dictionaryAttack(attack_dict):
                             p.join()
 
                     else:
-                        warnMsg = "multiprocessing not supported on current version of "
-                        warnMsg += "Python (%s < 2.6)" % PYVERSION
-                        singleTimeWarnMessage(warnMsg)
+                        if not IS_WIN:
+                            warnMsg = "multiprocessing not supported on current version of "
+                            warnMsg += "Python (%s < 2.6)" % PYVERSION
+                            singleTimeWarnMessage(warnMsg)
 
                         retVal = Queue()
-                        bruteProcess(attack_info, hash_regex, kb.wordlist, suffix, retVal, 0, 1)
+                        __bruteProcessVariantA(attack_info, hash_regex, kb.wordlist, suffix, retVal, 0, 1)
 
                 except KeyboardInterrupt:
                     print
@@ -546,62 +600,10 @@ def dictionaryAttack(attack_dict):
 
                     kb.wordlist.rewind()
 
-                    def bruteProcess(user, hash_, kwargs, hash_regex, wordlist, suffix, retVal, found, proc_id, proc_count):
-                        count = 0
-
-                        try:
-                            for word in kb.wordlist:
-
-                                current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
-                                count += 1
-
-                                if not isinstance(word, basestring):
-                                    continue
-
-                                if suffix:
-                                    word = word + suffix
-
-                                try:
-                                    if hash_ == current:
-                                        if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
-                                            word = word.upper()
-
-                                        retVal.put((user, hash_, word))
-
-                                        clearConsoleLine()
-
-                                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
-
-                                        if user and not user.startswith(DUMMY_USER_PREFIX):
-                                            infoMsg += " for user '%s'\n" % user
-                                        else:
-                                            infoMsg += " for hash '%s'\n" % hash_
-
-                                        dataToStdout(infoMsg, True)
-
-                                        found.value = True
-                                        break
-                                    elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                                        status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
-                                        if not user.startswith(DUMMY_USER_PREFIX):
-                                            status += ' (user: %s)' % user
-                                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
-
-                                except KeyboardInterrupt:
-                                    raise
-
-                                except:
-                                    warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                                    warnMsg += "Please report by e-mail to %s." % ML
-                                    logger.critical(warnMsg)
-
-                        except KeyboardInterrupt:
-                            pass
-
                     retVal = None
 
                     try:
-                        if PYVERSION >= "2.6":
+                        if PYVERSION >= "2.6" and not IS_WIN:
                             if multiprocessing.cpu_count() > 1:
                                 infoMsg = "starting %d processes " % multiprocessing.cpu_count()
                                 singleTimeLogMessage(infoMsg)
@@ -611,7 +613,7 @@ def dictionaryAttack(attack_dict):
                             found_ = multiprocessing.Value('i', False)
 
                             for i in xrange(multiprocessing.cpu_count()):
-                                p = multiprocessing.Process(target=bruteProcess, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, multiprocessing.cpu_count()))
+                                p = multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, multiprocessing.cpu_count()))
                                 processes.append(p)
 
                             for p in processes:
@@ -623,9 +625,10 @@ def dictionaryAttack(attack_dict):
                             found = found_.value != 0
 
                         else:
-                            warnMsg = "multiprocessing not supported on current version of "
-                            warnMsg += "Python (%s < 2.6)" % PYVERSION
-                            singleTimeWarnMessage(warnMsg)
+                            if not IS_WIN:
+                                warnMsg = "multiprocessing not supported on current version of "
+                                warnMsg += "Python (%s < 2.6)" % PYVERSION
+                                singleTimeWarnMessage(warnMsg)
 
                             class Value():
                                 pass
@@ -634,7 +637,7 @@ def dictionaryAttack(attack_dict):
                             found_ = Value()
                             found_.value = False
 
-                            bruteProcess(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, 0, 1)
+                            __bruteProcessVariantB(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, 0, 1)
 
                             found = found_.value
 
