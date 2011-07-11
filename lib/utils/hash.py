@@ -504,8 +504,10 @@ def dictionaryAttack(attack_dict):
                         retVal = multiprocessing.Queue()
                         for i in xrange(multiprocessing.cpu_count()):
                             p = multiprocessing.Process(target=bruteProcess, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, multiprocessing.cpu_count()))
-                            p.start()
                             processes.append(p)
+
+                        for p in processes:
+                            p.start()
 
                         for p in processes:
                             p.join()
@@ -610,8 +612,10 @@ def dictionaryAttack(attack_dict):
 
                             for i in xrange(multiprocessing.cpu_count()):
                                 p = multiprocessing.Process(target=bruteProcess, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, multiprocessing.cpu_count()))
-                                p.start()
                                 processes.append(p)
+
+                            for p in processes:
+                                p.start()
 
                             for p in processes:
                                 p.join()
