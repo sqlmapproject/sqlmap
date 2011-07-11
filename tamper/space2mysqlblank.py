@@ -39,11 +39,11 @@ def tamper(payload):
     """
 
     # ASCII table:
-    #   \t      09      horizontal TAB
-    #   \n      0A      new line
-    #   -       0C      new page
-    #   \r      0D      carriage return
-    #   -       0B      vertical TAB        (MySQL only)
+    #   TAB     09      horizontal TAB
+    #   LF      0A      new line
+    #   FF      0C      new page
+    #   CR      0D      carriage return
+    #   VT      0B      vertical TAB        (MySQL and Microsoft SQL Server only)
     #   -       A0      -                   (MySQL only)
     blanks = ['%09', '%0A', '%0C', '%0D', '%0B', '%A0']
     retVal = payload
@@ -65,7 +65,7 @@ def tamper(payload):
             elif payload[i] == '"':
                 doublequote = not doublequote
 
-            elif payload[i]==" " and not doublequote and not quote:
+            elif payload[i] == " " and not doublequote and not quote:
                 retVal += random.choice(blanks)
                 continue
 
