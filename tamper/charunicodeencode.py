@@ -25,8 +25,14 @@ def tamper(payload):
         * Input: SELECT FIELD%20FROM TABLE
         * Output: %u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
 
+    Tested against:
+        * Microsoft SQL Server 2000
+        * Microsoft SQL Server 2005
+
     Notes:
-        * Does this ever work?
+        * Useful to bypass weak web application firewalls that do not
+          unicode url-decode the request before processing it through their
+          ruleset
     """
 
     retVal = payload
