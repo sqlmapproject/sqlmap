@@ -62,6 +62,9 @@ def tamper(payload):
             if payload[i].isspace():
                 randomStr = ''.join(random.choice(string.ascii_uppercase + string.lowercase) for x in range(random.randint(6, 12)))
                 retVal += "%%23%s%%0A" % randomStr
+            elif payload[i] == '#' or payload[i:i+3] == '-- ':
+                retVal += payload[i]
+                break
             else:
                 retVal += payload[i]
 
