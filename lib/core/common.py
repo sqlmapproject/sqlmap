@@ -92,6 +92,7 @@ from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REFLECTED_NON_ALPHA_NUM_REGEX
+from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
@@ -2596,6 +2597,10 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
         if all([part.lower() in content.lower() for part in regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)]): # fast optimization check
+            parts = regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)
+            if len(parts) > REFLECTED_MAX_REGEX_PARTS: # preventing CPU hogs
+                regex = "%s.+?%s" % (REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS/2]), REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS/2:]))
+
             retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
 
         if retVal != content:

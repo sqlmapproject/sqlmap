@@ -311,6 +311,9 @@ REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
 # Regular expression used for marking non-alphanum characters
 REFLECTED_NON_ALPHA_NUM_REGEX = r'[^\r\n]+?'
 
+# Maximum number of alpha-numerical parts in reflected regex (for speed purposes)
+REFLECTED_MAX_REGEX_PARTS = 10
+
 # Chars which can be used as a failsafe values in case of too long URL encoding value
 URLENCODE_FAILSAFE_CHARS = '()|,'
 
