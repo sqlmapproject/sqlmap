@@ -239,10 +239,11 @@ def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
         results = dictionaryAttack(kb.data.cachedUsersPasswords)
 
-        for (user, hash_, password) in results:
-            for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
-                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
+        for result in results:
+            for (user, hash_, password) in result:
+                for i in xrange(len(kb.data.cachedUsersPasswords[user])):
+                    if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
+                        kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
 def attackDumpedTable():
     if kb.data.dumpedTable:
@@ -289,19 +290,20 @@ def attackDumpedTable():
 
             results = dictionaryAttack(attack_dict)
 
-            for (user, hash_, password) in results:
-                for i in range(count):
-                    for column in columns:
-                        if column == colUser or column == '__infos__':
-                            continue
-                        if len(table[column]['values']) <= i:
-                            continue
+            for result in results:
+                for (user, hash_, password) in result:
+                    for i in range(count):
+                        for column in columns:
+                            if column == colUser or column == '__infos__':
+                                continue
+                            if len(table[column]['values']) <= i:
+                                continue
 
-                        value = table[column]['values'][i]
+                            value = table[column]['values'][i]
 
-                        if all(map(lambda x: x, [value, hash_])) and value.lower() == hash_.lower():
-                            table[column]['values'][i] += " (%s)" % password
-                            table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
+                            if all(map(lambda x: x, [value, hash_])) and value.lower() == hash_.lower():
+                                table[column]['values'][i] += " (%s)" % password
+                                table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value):
     retVal = None
@@ -369,7 +371,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
 
             except:
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                warnMsg += "Please report by e-mail to %s." % ML
+                warnMsg += "Please report by e-mail to %s" % ML
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -421,7 +423,7 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
             except:
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
-                warnMsg += "Please report by e-mail to %s." % ML
+                warnMsg += "Please report by e-mail to %s" % ML
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -580,7 +582,8 @@ def dictionaryAttack(attack_dict):
                     warnMsg = "user aborted during dictionary attack phase"
                     logger.warn(warnMsg)
 
-                results.extend([retVal.get() for i in xrange(retVal.qsize())] if retVal else [])
+                if retVal:
+                    results.append([retVal.get() for i in xrange(retVal.qsize())])
 
             clearConsoleLine()
 
@@ -647,13 +650,14 @@ def dictionaryAttack(attack_dict):
                         warnMsg = "user aborted during dictionary attack phase"
                         logger.warn(warnMsg)
 
-                    results = [retVal.get() for i in xrange(retVal.qsize())] if retVal else []
+                    if retVal:
+                        results.append([retVal.get() for i in xrange(retVal.qsize())])
 
                 clearConsoleLine()
 
     if len(hash_regexes) == 0:
-        warnMsg = "unknown hash Format. "
-        warnMsg += "Please report by e-mail to %s." % ML
+        warnMsg = "unknown hash format. "
+        warnMsg += "Please report by e-mail to %s" % ML
         logger.warn(warnMsg)
 
     if len(results) == 0:
