@@ -215,7 +215,7 @@
         <length query="LENGTH(%s)"/>
         <isnull query="NVL(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="ROWNUM AS LIMIT %s) WHERE LIMIT"/>
+        <limit query="ROWNUM AS LIMIT %s ORDER BY 1 ASC) WHERE LIMIT"/>
         <limitregexp query="ROWNUM\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+|ROWNUM\s*=\s*[\d]+"/>
         <limitgroupstart/>
         <limitgroupstop/>
