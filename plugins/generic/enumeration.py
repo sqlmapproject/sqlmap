@@ -1006,7 +1006,10 @@ class Enumeration:
             self.getTables()
 
             if len(kb.data.cachedTables) > 0:
-                tblList = kb.data.cachedTables.values()
+                if conf.db in kb.data.cachedTables:
+                    tblList = kb.data.cachedTables[conf.db]
+                else:
+                    tblList = kb.data.cachedTables.values()
 
                 if isinstance(tblList[0], (set, tuple, list)):
                     tblList = tblList[0]
