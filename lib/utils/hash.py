@@ -349,7 +349,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
 
                         clearConsoleLine()
 
-                        infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                        infoMsg = "[%s] [INFO] found password '%s'" % (time.strftime("%X"), word)
 
                         if user and not user.startswith(DUMMY_USER_PREFIX):
                             infoMsg += " for user '%s'\n" % user
@@ -392,14 +392,14 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
             try:
                 if hash_ == current:
-                    if regex == HASH.ORACLE_OLD: #only for cosmetic purposes
+                    if hash_regex == HASH.ORACLE_OLD: #only for cosmetic purposes
                         word = word.upper()
 
                     retVal.put((user, hash_, word))
 
                     clearConsoleLine()
 
-                    infoMsg = "[%s] [INFO] found: '%s'" % (time.strftime("%X"), word)
+                    infoMsg = "[%s] [INFO] found password '%s'" % (time.strftime("%X"), word)
 
                     if user and not user.startswith(DUMMY_USER_PREFIX):
                         infoMsg += " for user '%s'\n" % user
