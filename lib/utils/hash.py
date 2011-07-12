@@ -582,8 +582,7 @@ def dictionaryAttack(attack_dict):
                     warnMsg = "user aborted during dictionary attack phase"
                     logger.warn(warnMsg)
 
-                if retVal:
-                    results.append([retVal.get() for i in xrange(retVal.qsize())])
+                results.extend([retVal.get() for i in xrange(retVal.qsize())] if retVal else [])
 
             clearConsoleLine()
 
@@ -650,8 +649,7 @@ def dictionaryAttack(attack_dict):
                         warnMsg = "user aborted during dictionary attack phase"
                         logger.warn(warnMsg)
 
-                    if retVal:
-                        results.append([retVal.get() for i in xrange(retVal.qsize())])
+                    results.extend([retVal.get() for i in xrange(retVal.qsize())] if retVal else [])
 
                 clearConsoleLine()
 
