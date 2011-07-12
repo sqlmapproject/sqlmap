@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 $Id$
@@ -278,8 +277,8 @@ def attackDumpedTable():
                         attack_dict['%s%d' % (DUMMY_USER_PREFIX, i)] = [value]
 
         if attack_dict:
-            message = "recognized possible password hash values. "
-            message += "do you want to use dictionary attack on retrieved table items? [Y/n/q]"
+            message = "recognized possible password hashes. Do you want to "
+            message += "crack them via a dictionary-based attack? [Y/n/q]"
             test = readInput(message, default="Y")
 
             if test[0] in ("n", "N"):
@@ -349,7 +348,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
 
                         clearConsoleLine()
 
-                        infoMsg = "[%s] [INFO] found password '%s'" % (time.strftime("%X"), word)
+                        infoMsg = "[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
 
                         if user and not user.startswith(DUMMY_USER_PREFIX):
                             infoMsg += " for user '%s'\n" % user
@@ -401,7 +400,7 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
                     clearConsoleLine()
 
-                    infoMsg = "[%s] [INFO] found password '%s'" % (time.strftime("%X"), word)
+                    infoMsg = "[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
 
                     if user and not user.startswith(DUMMY_USER_PREFIX):
                         infoMsg += " for user '%s'\n" % user
@@ -445,7 +444,7 @@ def dictionaryAttack(attack_dict):
 
             if regex and regex not in hash_regexes:
                 hash_regexes.append(regex)
-                infoMsg = "using hash method: '%s'" % __functions__[regex].func_name
+                infoMsg = "using hash method '%s'" % __functions__[regex].func_name
                 logger.info(infoMsg)
 
     for hash_regex in hash_regexes:
@@ -525,7 +524,7 @@ def dictionaryAttack(attack_dict):
             if test[0] in ("y", "Y"):
                 suffix_list += COMMON_PASSWORD_SUFFIXES
 
-        infoMsg = "starting dictionary attack (%s)" % __functions__[hash_regex].func_name
+        infoMsg = "starting dictionary-based cracking (%s)" % __functions__[hash_regex].func_name
         logger.info(infoMsg)
 
         for item in attack_info:
@@ -541,7 +540,7 @@ def dictionaryAttack(attack_dict):
 
                 if suffix:
                     clearConsoleLine()
-                    infoMsg = "using suffix: '%s'" % suffix
+                    infoMsg = "using suffix '%s'" % suffix
                     logger.info(infoMsg)
 
                 kb.wordlist.rewind()
@@ -597,7 +596,7 @@ def dictionaryAttack(attack_dict):
 
                     if suffix:
                         clearConsoleLine()
-                        infoMsg = "using suffix: '%s'" % suffix
+                        infoMsg = "using suffix '%s'" % suffix
                         logger.info(infoMsg)
 
                     kb.wordlist.rewind()
