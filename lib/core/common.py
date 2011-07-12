@@ -172,13 +172,16 @@ class Wordlist:
     def closeFP(self):
         if self.fp:
             self.fp.close()
+            self.fp = None
 
     def next(self):
+        retVal = None
         try:
-            return self.iter.next().rstrip()
+            retVal = self.iter.next().rstrip()
         except StopIteration:
             self.adjust()
-            return self.iter.next().rstrip()
+            retVal = self.iter.next().rstrip()
+        return retVal
 
     def percentage(self):
         retVal = 0

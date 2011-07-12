@@ -239,11 +239,10 @@ def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
         results = dictionaryAttack(kb.data.cachedUsersPasswords)
 
-        for result in results:
-            for (user, hash_, password) in result:
-                for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                    if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
-                        kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
+        for (user, hash_, password) in results:
+            for i in xrange(len(kb.data.cachedUsersPasswords[user])):
+                if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower():
+                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
 def attackDumpedTable():
     if kb.data.dumpedTable:
@@ -290,20 +289,19 @@ def attackDumpedTable():
 
             results = dictionaryAttack(attack_dict)
 
-            for result in results:
-                for (user, hash_, password) in result:
-                    for i in range(count):
-                        for column in columns:
-                            if column == colUser or column == '__infos__':
-                                continue
-                            if len(table[column]['values']) <= i:
-                                continue
+            for (user, hash_, password) in results:
+                for i in range(count):
+                    for column in columns:
+                        if column == colUser or column == '__infos__':
+                            continue
+                        if len(table[column]['values']) <= i:
+                            continue
 
-                            value = table[column]['values'][i]
+                        value = table[column]['values'][i]
 
-                            if all(map(lambda x: x, [value, hash_])) and value.lower() == hash_.lower():
-                                table[column]['values'][i] += " (%s)" % password
-                                table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
+                        if all(map(lambda x: x, [value, hash_])) and value.lower() == hash_.lower():
+                            table[column]['values'][i] += " (%s)" % password
+                            table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value):
     retVal = None
@@ -363,7 +361,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
                         attack_info.remove(item)
 
                     elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                        status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
+                        status = 'current status: %d%s (%s...)' % (proc_count * wordlist.percentage(), '%', word.ljust(5)[:5])
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
@@ -382,6 +380,8 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
     try:
         for word in wordlist:
+            if found.value:
+                break
 
             current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
             count += 1
@@ -411,9 +411,8 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
                     dataToStdout(infoMsg, True)
 
                     found.value = True
-                    break
                 elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                    status = 'current status: %d%s (%s...)' % (proc_count * kb.wordlist.percentage(), '%', word.ljust(5)[:5])
+                    status = 'current status: %d%s (%s...)' % (proc_count * wordlist.percentage(), '%', word.ljust(5)[:5])
                     if not user.startswith(DUMMY_USER_PREFIX):
                         status += ' (user: %s)' % user
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
@@ -582,7 +581,8 @@ def dictionaryAttack(attack_dict):
                     warnMsg = "user aborted during dictionary attack phase"
                     logger.warn(warnMsg)
 
-                results.extend([retVal.get() for i in xrange(retVal.qsize())] if retVal else [])
+                while not retVal.empty():
+                    results.append(retVal.get())
 
             clearConsoleLine()
 
@@ -649,7 +649,8 @@ def dictionaryAttack(attack_dict):
                         warnMsg = "user aborted during dictionary attack phase"
                         logger.warn(warnMsg)
 
-                    results.extend([retVal.get() for i in xrange(retVal.qsize())] if retVal else [])
+                    while not retVal.empty():
+                        results.append(retVal.get())
 
                 clearConsoleLine()
 
