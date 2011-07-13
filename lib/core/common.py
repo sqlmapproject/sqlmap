@@ -2785,7 +2785,7 @@ def safeCSValue(value):
 
     retVal = value
 
-    if isinstance(retVal, basestring):
+    if retVal and isinstance(retVal, basestring):
         if not (retVal[0] == retVal[-1] == '"'):
             if any(map(lambda x: x in retVal, ['"', ',', '\n'])):
                 retVal = '"%s"' % retVal.replace('"', '""')
