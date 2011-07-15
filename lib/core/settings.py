@@ -324,7 +324,7 @@ URLENCODE_CHAR_LIMIT = 2000
 DEFAULT_MSSQL_SCHEMA = 'dbo'
 
 # Display hash attack info every mod number of items
-HASH_MOD_ITEM_DISPLAY = 1117
+HASH_MOD_ITEM_DISPLAY = 1597
 
 # Maximum integer value
 MAX_INT = sys.maxint
@@ -379,3 +379,6 @@ BRUTE_COLUMN_EXISTS_TEMPLATE = "EXISTS(SELECT %s FROM %s)"
 
 # Payload used for checking of existence of IDS/WAF (dummier the better)
 IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables"
+
+# Used for status representation in dictionary attack phase
+ROTATING_CHARS = ('\\', '|', '|', '/', '-')

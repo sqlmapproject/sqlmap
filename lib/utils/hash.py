@@ -54,6 +54,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import PYVERSION
 from lib.core.settings import ML
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import ROTATING_CHARS
 
 if PYVERSION >= "2.6":
     import multiprocessing
@@ -323,6 +324,7 @@ def hashRecognition(value):
 
 def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, proc_id, proc_count):
     count = 0
+    rotator = 0
 
     try:
         for word in wordlist:
@@ -360,13 +362,17 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
                         attack_info.remove(item)
 
                     elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                        status = 'current status: %d%s (%s...)' % (proc_count * wordlist.percentage(), '%', word.ljust(5)[:5])
+                        rotator += 1
+                        if rotator >= len(ROTATING_CHARS):
+                            rotator = 0
+                        status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
                 raise
 
-            except:
+            except Exception, msg:
+                print msg
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
                 warnMsg += "Please report by e-mail to %s" % ML
                 logger.critical(warnMsg)
@@ -376,6 +382,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
 
 def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, retVal, found, proc_id, proc_count):
     count = 0
+    rotator = 0
 
     try:
         for word in wordlist:
@@ -411,7 +418,10 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
                     found.value = True
                 elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                    status = 'current status: %d%s (%s...)' % (proc_count * wordlist.percentage(), '%', word.ljust(5)[:5])
+                    rotator += 1
+                    if rotator >= len(ROTATING_CHARS):
+                        rotator = 0
+                    status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
                     if not user.startswith(DUMMY_USER_PREFIX):
                         status += ' (user: %s)' % user
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
