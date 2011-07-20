@@ -414,8 +414,8 @@ class Metasploit:
 
         proc.stdin.write("use espia\n")
         proc.stdin.write("use incognito\n")
-        proc.stdin.write("use priv\n")
-        proc.stdin.write("use sniffer\n")
+        # NOTE: this extension freezes the connection on 64-bit systems
+        #proc.stdin.write("use sniffer\n")
         proc.stdin.write("sysinfo\n")
         proc.stdin.write("getuid\n")
 
@@ -540,7 +540,7 @@ class Metasploit:
         self.shellcodeexecLocal = paths.SQLMAP_SEXEC_PATH
 
         if Backend.isOs(OS.WINDOWS):
-            self.shellcodeexecLocal += "/windows/shellcodeexec.x%s.exe" % Backend.getArch()
+            self.shellcodeexecLocal += "/windows/shellcodeexec.x%s.exe" % "32"
         else:
             self.shellcodeexecLocal += "/linux/shellcodeexec.x%s" % Backend.getArch()
 
