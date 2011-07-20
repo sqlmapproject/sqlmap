@@ -18,7 +18,7 @@ try:
     _multiprocessing = multiprocessing
 
     # problems on FreeBSD (Reference: http://www.velocityreviews.com/forums/t716510-freebsd-and-multiprocessing.html)
-    import multiprocessing.queues
+    import multiprocessing.synchronize
 except ImportError, _:
     pass
 
