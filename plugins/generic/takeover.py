@@ -117,7 +117,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 warnMsg = "invalid value, valid values are 1 and 2"
                 logger.warn(warnMsg)
 
-        if tunnel == 2 and Backend.isOs(OS.WINDOWS):
+        if tunnel == 2 and not Backend.isOs(OS.WINDOWS):
                 errMsg = "icmpsh slave is only supported on Windows at "
                 errMsg += "the moment. The back-end database server is "
                 errMsg += "not. sqlmap will fallback to TCP (Metasploit)"
@@ -173,7 +173,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     msg = "how do you want to execute the Metasploit shellcode "
                     msg += "on the back-end database underlying operating system?"
                     msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
-                    msg += "\n[2] Via shellcodeexec (file system way)"
+                    msg += "\n[2] Via shellcodeexec (file system way, preferred on 64-bit systems)"
 
                     while True:
                         choice = readInput(msg, default=1)
