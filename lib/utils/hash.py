@@ -16,7 +16,10 @@ _multiprocessing = None
 try:
     import multiprocessing
     _multiprocessing = multiprocessing
-except ImportError, _: # problems on FreeBSD (Reference: http://www.velocityreviews.com/forums/t716510-freebsd-and-multiprocessing.html)
+
+    # problems on FreeBSD (Reference: http://www.velocityreviews.com/forums/t716510-freebsd-and-multiprocessing.html)
+    import multiprocessing.queues
+except ImportError, _:
     pass
 
 import os
