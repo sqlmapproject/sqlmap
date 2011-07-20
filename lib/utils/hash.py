@@ -12,6 +12,13 @@ try:
 except ImportError, _:
     from extra.fcrypt.fcrypt import crypt
 
+_multiprocessing = None
+try:
+    import multiprocessing
+    _multiprocessing = multiprocessing
+except ImportError, _: # problems on FreeBSD (Reference: http://www.velocityreviews.com/forums/t716510-freebsd-and-multiprocessing.html)
+    pass
+
 import os
 import re
 import time
@@ -55,9 +62,6 @@ from lib.core.settings import PYVERSION
 from lib.core.settings import ML
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
-
-if PYVERSION >= "2.6":
-    import multiprocessing
 
 def mysql_passwd(password, uppercase=True):
     """
@@ -558,15 +562,15 @@ def dictionaryAttack(attack_dict):
                 retVal = None
 
                 try:
-                    if PYVERSION >= "2.6" and not IS_WIN:
-                        if multiprocessing.cpu_count() > 1:
-                            infoMsg = "starting %d processes " % multiprocessing.cpu_count()
+                    if _multiprocessing and not IS_WIN:
+                        if _multiprocessing.cpu_count() > 1:
+                            infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                             singleTimeLogMessage(infoMsg)
 
                         processes = []
-                        retVal = multiprocessing.Queue()
-                        for i in xrange(multiprocessing.cpu_count()):
-                            p = multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, multiprocessing.cpu_count()))
+                        retVal = _multiprocessing.Queue()
+                        for i in xrange(_multiprocessing.cpu_count()):
+                            p = _multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, _multiprocessing.cpu_count()))
                             processes.append(p)
 
                         for p in processes:
@@ -576,10 +580,9 @@ def dictionaryAttack(attack_dict):
                             p.join()
 
                     else:
-                        if not IS_WIN:
-                            warnMsg = "multiprocessing not supported on current version of "
-                            warnMsg += "Python (%s < 2.6)" % PYVERSION
-                            singleTimeWarnMessage(warnMsg)
+                        warnMsg = "multiprocessing hash cracking is currently "
+                        warnMsg += "not supported on this platform"
+                        singleTimeWarnMessage(warnMsg)
 
                         retVal = Queue()
                         __bruteProcessVariantA(attack_info, hash_regex, kb.wordlist, suffix, retVal, 0, 1)
@@ -614,17 +617,17 @@ def dictionaryAttack(attack_dict):
                     retVal = None
 
                     try:
-                        if PYVERSION >= "2.6" and not IS_WIN:
-                            if multiprocessing.cpu_count() > 1:
-                                infoMsg = "starting %d processes " % multiprocessing.cpu_count()
+                        if _multiprocessing and not IS_WIN:
+                            if _multiprocessing.cpu_count() > 1:
+                                infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                                 singleTimeLogMessage(infoMsg)
 
                             processes = []
-                            retVal = multiprocessing.Queue()
-                            found_ = multiprocessing.Value('i', False)
+                            retVal = _multiprocessing.Queue()
+                            found_ = _multiprocessing.Value('i', False)
 
-                            for i in xrange(multiprocessing.cpu_count()):
-                                p = multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, multiprocessing.cpu_count()))
+                            for i in xrange(_multiprocessing.cpu_count()):
+                                p = _multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, _multiprocessing.cpu_count()))
                                 processes.append(p)
 
                             for p in processes:
@@ -636,10 +639,9 @@ def dictionaryAttack(attack_dict):
                             found = found_.value != 0
 
                         else:
-                            if not IS_WIN:
-                                warnMsg = "multiprocessing not supported on current version of "
-                                warnMsg += "Python (%s < 2.6)" % PYVERSION
-                                singleTimeWarnMessage(warnMsg)
+                            warnMsg = "multiprocessing hash cracking is currently "
+                            warnMsg += "not supported on this platform"
+                            singleTimeWarnMessage(warnMsg)
 
                             class Value():
                                 pass
