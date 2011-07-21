@@ -561,7 +561,8 @@ def paramToDict(place, parameters=None):
                 condition |= parameter in conf.testParameter
 
                 if condition:
-                    if elem[1].strip(DUMMY_SQL_INJECTION_CHARS) != elem[1]:
+                    testableParameters[parameter] = "=".join(elem[1:])
+                    if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]:
                         errMsg = "you have provided tainted parameter values "
                         errMsg += "(%s) with most probably leftover " % element
                         errMsg += "chars from manual sql injection "
@@ -569,7 +570,6 @@ def paramToDict(place, parameters=None):
                         errMsg += "please, always use only valid parameter values "
                         errMsg += "so sqlmap could be able to do a valid run."
                         raise sqlmapSyntaxException, errMsg
-                    testableParameters[parameter] = "=".join(elem[1:])
     else:
         root = ET.XML(parameters)
         iterator = root.getiterator()
