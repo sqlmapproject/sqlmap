@@ -554,7 +554,7 @@ def paramToDict(place, parameters=None):
         for element in splitParams:
             elem = element.split("=")
 
-            if len(elem) == 2:
+            if len(elem) >= 2:
                 parameter = elem[0].replace(" ", "")
 
                 condition = not conf.testParameter
@@ -569,7 +569,7 @@ def paramToDict(place, parameters=None):
                         errMsg += "please, always use only valid parameter values "
                         errMsg += "so sqlmap could be able to do a valid run."
                         raise sqlmapSyntaxException, errMsg
-                    testableParameters[parameter] = elem[1]
+                    testableParameters[parameter] = "=".join(elem[1:])
     else:
         root = ET.XML(parameters)
         iterator = root.getiterator()
