@@ -1463,6 +1463,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.misc.delimiter = randomStr(length=6, lowercase=True)
     kb.misc.start = ":%s:" % randomStr(length=3, lowercase=True)
     kb.misc.stop = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.misc.at = ":%s:" % randomStr(length=1, lowercase=True)
     kb.misc.space = ":%s:" % randomStr(length=1, lowercase=True)
     kb.misc.dollar = ":%s:" % randomStr(length=1, lowercase=True)
     kb.misc.forcedDbms = None

@@ -185,7 +185,7 @@ def __errorReplaceChars(value):
     retVal = value
 
     if value:
-        retVal = retVal.replace(kb.misc.space, " ").replace(kb.misc.dollar, "$")
+        retVal = retVal.replace(kb.misc.space, " ").replace(kb.misc.dollar, "$").replace(kb.misc.at, "@")
 
     return retVal
 

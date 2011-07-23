@@ -213,6 +213,7 @@ class Agent:
         payload = payload.replace("[RANDSTR1]", randStr1)
         payload = payload.replace("[DELIMITER_START]", kb.misc.start)
         payload = payload.replace("[DELIMITER_STOP]", kb.misc.stop)
+        payload = payload.replace("[AT_REPLACE]", kb.misc.at)
         payload = payload.replace("[SPACE_REPLACE]", kb.misc.space)
         payload = payload.replace("[DOLLAR_REPLACE]", kb.misc.dollar)
         payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
