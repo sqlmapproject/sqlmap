@@ -10,20 +10,21 @@ See the file 'doc/COPYING' for copying permission
 import codecs
 import copy
 import ctypes
+import httplib
 import inspect
 import logging
+import ntpath
 import os
+import pickle
+import posixpath
 import random
 import re
 import socket
 import string
+import struct
 import sys
 import time
 import urlparse
-import ntpath
-import posixpath
-import httplib
-import struct
 import unicodedata
 
 from ConfigParser import DEFAULTSECT
@@ -64,6 +65,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
+from lib.core.settings import BIGARRAY_CHUNK_LENGTH
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
@@ -193,6 +195,40 @@ class Wordlist:
     def rewind(self):
         self.index = 0
         self.adjust()
+
+class BigArray(list):
+    """
+    List-like object used for storing large amounts of data (disk cached)
+    """
+
+    def __init__(self):
+        self.chunks = [[]]
+        self.cache = None
+        self.length = 0
+
+    def append(self, value):
+        self.chunks[-1].append(value)
+        if len(self.chunks[-1]) >= BIGARRAY_CHUNK_LENGTH:
+            fp = tempfile.TemporaryFile()
+            pickle.dump(self.chunks[-1], fp)
+            del(self.chunks[-1][:])
+            self.chunks[-1] = fp
+            self.chunks.append([])
+
+    def __getitem__(self, y):
+        index = y / BIGARRAY_CHUNK_LENGTH
+        offset = y % BIGARRAY_CHUNK_LENGTH
+        chunk = self.chunks[index]
+        if isinstance(chunk, list):
+            return chunk[offset]
+        else:
+            if not (self.cache and self.cache[0] == index):
+                chunk.seek(0)
+                self.cache = (index, pickle.load(chunk))
+            return self.cache[1][offset]
+
+    def __len__(self):
+        return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * BIGARRAY_CHUNK_LENGTH + len(self.chunks[-1])
 
 class DynamicContentItem:
     """

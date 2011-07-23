@@ -382,3 +382,6 @@ IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM informat
 
 # Used for status representation in dictionary attack phase
 ROTATING_CHARS = ('\\', '|', '|', '/', '-')
+
+# Chunk length used in BigArray object (only last one is held in memory)
+BIGARRAY_CHUNK_LENGTH = 10000
