@@ -2727,7 +2727,13 @@ def isNoneValue(value):
     if isinstance(value, basestring):
         return value == "None"
     elif isinstance(value, (list, tuple)):
-        return isNoneValue(value[0]) if len(value) == 1 else not any(filter(lambda x: x and x != "None", value))
+        if len(value) == 1:
+            return isNoneValue(value[0])
+        else:
+            for i in xrange(len(value)):
+                if value[i] and value[i] != "None":
+                    return False
+            return True
     elif isinstance(value, dict):
         return not any(value)
     else:
