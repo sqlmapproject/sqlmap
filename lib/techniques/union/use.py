@@ -13,6 +13,7 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import BigArray
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
@@ -262,7 +263,7 @@ def unionUse(expression, unpack=True, dump=False):
             threadData = getCurrentThreadData()
             threadData.shared.limits = range(startLimit, stopLimit)
             numThreads = min(conf.threads, len(threadData.shared.limits))
-            threadData.shared.value = ""
+            threadData.shared.value = BigArray()
 
             if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                 kb.suppressResumeInfo = True
@@ -305,16 +306,15 @@ def unionUse(expression, unpack=True, dump=False):
                             break
 
                         if output:
-                            kb.locks.value.acquire()
-                            threadData.shared.value += output
-                            kb.locks.value.release()
+                            if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
+                                items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
+                                kb.locks.value.acquire()
+                                threadData.shared.value.append(items)
+                                kb.locks.value.release()
+                            else:
+                                items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
 
                             if conf.verbose == 1:
-                                if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
-                                    items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
-                                else:
-                                    items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
-
                                 status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
 
                                 if len(status) > width:

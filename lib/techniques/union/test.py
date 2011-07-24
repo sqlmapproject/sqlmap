@@ -19,7 +19,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import listToStrValue
-from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomStr
