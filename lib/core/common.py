@@ -1334,53 +1334,49 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 
     data = BigArray()
 
-    if isinstance(output, list):
-        for entry in output:
-            data.append(entry[0] if len(entry) == 1 else entry)            
-    else:
-        outCond1 = ( output.startswith(kb.misc.start) and output.endswith(kb.misc.stop) )
-        outCond2 = ( output.startswith(DUMP_START_MARKER) and output.endswith(DUMP_STOP_MARKER) )
+    outCond1 = ( output.startswith(kb.misc.start) and output.endswith(kb.misc.stop) )
+    outCond2 = ( output.startswith(DUMP_START_MARKER) and output.endswith(DUMP_STOP_MARKER) )
 
-        if outCond1 or outCond2:
-            if outCond1:
-                regExpr = '%s(.*?)%s' % (kb.misc.start, kb.misc.stop)
-            elif outCond2:
-                regExpr = '%s(.*?)%s' % (DUMP_START_MARKER, DUMP_STOP_MARKER)
+    if outCond1 or outCond2:
+        if outCond1:
+            regExpr = '%s(.*?)%s' % (kb.misc.start, kb.misc.stop)
+        elif outCond2:
+            regExpr = '%s(.*?)%s' % (DUMP_START_MARKER, DUMP_STOP_MARKER)
 
-            output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
-            if condition is None:
-                condition = (
-                            kb.resumedQueries and conf.url in kb.resumedQueries.keys()
-                            and expression in kb.resumedQueries[conf.url].keys()
-                            )
+        output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
+        if condition is None:
+            condition = (
+                        kb.resumedQueries and conf.url in kb.resumedQueries.keys()
+                        and expression in kb.resumedQueries[conf.url].keys()
+                        )
 
-            if partial or not condition:
-                logOutput = "".join(["%s%s%s" % (DUMP_START_MARKER, replaceNewlineTabs(value), DUMP_STOP_MARKER) for value in output])
-                dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, logOutput))
+        if partial or not condition:
+            logOutput = "".join(["%s%s%s" % (DUMP_START_MARKER, replaceNewlineTabs(value), DUMP_STOP_MARKER) for value in output])
+            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, logOutput))
 
-            if sort:
-                dict_ = {}
-                for entry in output:
-                    dict_[entry.lower()] = entry
-                output = dict_.values()
-
+        if sort:
+            dict_ = {}
             for entry in output:
-                info = []
+                dict_[entry.lower()] = entry
+            output = dict_.values()
 
-                if DUMP_DEL_MARKER in entry:
-                    entry = entry.split(DUMP_DEL_MARKER)
-                else:
-                    entry = entry.split(kb.misc.delimiter)
+        for entry in output:
+            info = []
 
-                if len(entry) == 1:
-                    data.append(entry[0])
-                else:
-                    for value in entry:
-                        info.append(value)
+            if DUMP_DEL_MARKER in entry:
+                entry = entry.split(DUMP_DEL_MARKER)
+            else:
+                entry = entry.split(kb.misc.delimiter)
 
-                    data.append(info)
-        else:
-            data = output
+            if len(entry) == 1:
+                data.append(entry[0])
+            else:
+                for value in entry:
+                    info.append(value)
+
+                data.append(info)
+    else:
+        data = output
 
     if len(data) == 1 and isinstance(data[0], basestring):
         data = data[0]

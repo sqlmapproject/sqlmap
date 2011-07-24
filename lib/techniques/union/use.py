@@ -309,7 +309,7 @@ def unionUse(expression, unpack=True, dump=False):
                             if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
                                 items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
                                 kb.locks.value.acquire()
-                                threadData.shared.value.append(items)
+                                threadData.shared.value.append(items[0] if len(items) == 1 else items)
                                 kb.locks.value.release()
                             else:
                                 items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
