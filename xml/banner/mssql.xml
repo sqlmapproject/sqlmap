@@ -1,5 +1,103 @@
 <?xml version="1.0" ?>
 <root>
+    <signatures release="2008 R2">
+        <signature>
+            <version>
+                10.50.2418
+            </version>
+            <servicepack>
+                1 CTP
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1797
+            </version>
+            <servicepack>
+                0+Cumulative Update 8
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1790
+            </version>
+            <servicepack>
+                0+Q2494086
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1777
+            </version>
+            <servicepack>
+                0+Cumulative Update 7
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1765
+            </version>
+            <servicepack>
+                0+Cumulative Update 6
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1753
+            </version>
+            <servicepack>
+                0+Cumulative Update 5
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1746
+            </version>
+            <servicepack>
+                0+Cumulative Update 4
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1734
+            </version>
+            <servicepack>
+                0+Cumulative Update 3
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1720
+            </version>
+            <servicepack>
+                0+Cumulative Update 2
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1702
+            </version>
+            <servicepack>
+                0+Cumulative Update 1
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1600.1
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                10.50.1450.3
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+    </signatures>
     <signatures release="2008">
         <signature>
             <version>
