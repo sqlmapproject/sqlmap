@@ -24,6 +24,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.replication import Replication
+from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 
 class Dump:
@@ -37,9 +38,10 @@ class Dump:
         self.__outputFile = None
         self.__outputFP = None
 
-    def __write(self, data, n=True):
+    def __write(self, data, n=True, console=True):
         text = "%s%s" % (data, "\n" if n else " ")
-        dataToStdout(text)
+        if console:
+            dataToStdout(text)
 
         self.__outputFP.write(text)
         self.__outputFP.flush()
@@ -407,7 +409,13 @@ class Dump:
         if conf.replicate:
             rtable.beginTransaction()
 
+        if count > TRIM_STDOUT_DUMP_SIZE:
+            warnMsg = "console output will be trimmed "
+            warnMsg += "due to the large table size"
+            logger.warning(warnMsg)
+
         for i in range(count):
+            console = (i >= count - TRIM_STDOUT_DUMP_SIZE)
             field = 1
             values = []
 
@@ -429,7 +437,7 @@ class Dump:
                     values.append(value)
                     maxlength = int(info["length"])
                     blank = " " * (maxlength - len(value))
-                    self.__write("| %s%s" % (value, blank), n=False)
+                    self.__write("| %s%s" % (value, blank), n=False, console=console)
 
                     if not conf.replicate:
                         if not conf.multipleTargets and field == fields:
@@ -442,7 +450,7 @@ class Dump:
             if conf.replicate:
                 rtable.insert(values)
 
-            self.__write("|")
+            self.__write("|", console=console)
 
             if not conf.multipleTargets and not conf.replicate:
                 dataToDumpFile(dumpFP, "\n")

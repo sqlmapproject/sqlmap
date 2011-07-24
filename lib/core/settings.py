@@ -383,5 +383,8 @@ IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM informat
 # Used for status representation in dictionary attack phase
 ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 
-# Chunk length used in BigArray object (only last one is held in memory)
-BIGARRAY_CHUNK_LENGTH = 10000
+# Chunk length (in items) used by BigArray objects (only last chunk and cached one are held in memory)
+BIGARRAY_CHUNK_LENGTH = 5000
+
+# Only console display last n table rows
+TRIM_STDOUT_DUMP_SIZE = 256

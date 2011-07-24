@@ -13,6 +13,7 @@ import time
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
+from lib.core.common import BigArray
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getRange
@@ -1385,7 +1386,7 @@ class Enumeration:
 
         for column in colList:
             lengths[column] = 0
-            entries[column] = []
+            entries[column] = BigArray()
 
         colList = sorted(colList, key=lambda x: len(x) if x else MAX_INT)
 
@@ -1706,7 +1707,7 @@ class Enumeration:
                                         lengths[column] = 0
 
                                     if column not in entries:
-                                        entries[column] = []
+                                        entries[column] = BigArray()
 
                                     if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                                         query = rootQuery.blind.query % (column, conf.db, conf.tbl, index)

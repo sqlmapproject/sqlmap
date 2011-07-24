@@ -23,7 +23,9 @@ import socket
 import string
 import struct
 import sys
+import tempfile
 import time
+import types
 import urlparse
 import unicodedata
 
@@ -205,15 +207,47 @@ class BigArray(list):
         self.chunks = [[]]
         self.cache = None
         self.length = 0
+        self.filenames = set()
 
     def append(self, value):
         self.chunks[-1].append(value)
         if len(self.chunks[-1]) >= BIGARRAY_CHUNK_LENGTH:
-            fp = tempfile.TemporaryFile()
-            pickle.dump(self.chunks[-1], fp)
+            filename = self._dump(self.chunks[-1])
             del(self.chunks[-1][:])
-            self.chunks[-1] = fp
+            self.chunks[-1] = filename
             self.chunks.append([])
+
+    def pop(self):
+        if len(self.chunks[-1]) < 1:
+            self.chunks.pop()
+            fp = open(self.chunks[-1], 'rb')
+            self.chunks[-1] = pickle.load(fp)
+            fp.close()
+        return self.chunks[-1].pop()
+
+    def index(self, value):
+        for index in xrange(len(self)):
+            if self[index] == value:
+                return index
+        return ValueError, "%s is not in list" % value
+
+    def _dump(self, value):
+        handle, filename = tempfile.mkstemp()
+        self.filenames.add(filename)
+        os.close(handle)
+        fp = open(filename, 'w+b')
+        pickle.dump(value, fp)
+        fp.close()
+        return filename
+
+    def _checkcache(self, index):
+        if (self.cache and self.cache[0] != index and self.cache[2]):
+            filename = self._dump(self.cache[1])
+            self.chunks[self.cache[0]] = filename
+        if not (self.cache and self.cache[0] == index):
+            fp = open(self.chunks[index], 'rb')
+            self.cache = [index, pickle.load(fp), False]
+            fp.close()
 
     def __getitem__(self, y):
         index = y / BIGARRAY_CHUNK_LENGTH
@@ -222,13 +256,36 @@ class BigArray(list):
         if isinstance(chunk, list):
             return chunk[offset]
         else:
-            if not (self.cache and self.cache[0] == index):
-                chunk.seek(0)
-                self.cache = (index, pickle.load(chunk))
+            self._checkcache(index)
             return self.cache[1][offset]
+
+    def __setitem__(self, y, value):
+        index = y / BIGARRAY_CHUNK_LENGTH
+        offset = y % BIGARRAY_CHUNK_LENGTH
+        chunk = self.chunks[index]
+        if isinstance(chunk, list):
+            chunk[offset] = value
+        else:
+            self._checkcache(index)
+            self.cache[1][offset] = value
+            self.cache[2] = True # dirty flag
+
+    def __repr__(self):
+        return "%s%s" % ("..." if len(self.chunks) > 1 else "", self.chunks[-1].__repr__())
+
+    def __iter__(self):
+        for i in xrange(len(self)):
+            yield self[i]
 
     def __len__(self):
         return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * BIGARRAY_CHUNK_LENGTH + len(self.chunks[-1])
+
+    def __del__(self):
+        for filename in self.filenames:
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
 
 class DynamicContentItem:
     """
@@ -560,6 +617,15 @@ class Backend:
     @staticmethod
     def isOs(os):
         return Backend.getOs() is not None and Backend.getOs().lower() == os.lower()
+
+# Reference: http://code.activestate.com/recipes/325205-cache-decorator-in-python-24/
+def cachedmethod(f, cache={}):
+    def g(*args, **kwargs):
+        key = ( f, tuple(args), frozenset(kwargs.items()) )
+        if key not in cache:
+            cache[key] = f(*args, **kwargs)
+        return cache[key]
+    return g
 
 def paramToDict(place, parameters=None):
     """
@@ -1266,7 +1332,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
     if output is None:
         return None
 
-    data = []
+    data = BigArray()
 
     outCond1 = ( output.startswith(kb.misc.start) and output.endswith(kb.misc.stop) )
     outCond2 = ( output.startswith(DUMP_START_MARKER) and output.endswith(DUMP_STOP_MARKER) )
@@ -2204,6 +2270,7 @@ def isNumPosStrValue(value):
 
     return value and isinstance(value, basestring) and value.isdigit() and value != "0"
 
+@cachedmethod
 def aliasToDbmsEnum(dbms):
     """
     Returns major DBMS name from a given alias
@@ -2730,8 +2797,8 @@ def isNoneValue(value):
         if len(value) == 1:
             return isNoneValue(value[0])
         else:
-            for i in xrange(len(value)):
-                if value[i] and value[i] != "None":
+            for item in value:
+                if item and item != "None":
                     return False
             return True
     elif isinstance(value, dict):

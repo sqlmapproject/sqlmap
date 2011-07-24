@@ -12,6 +12,7 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import BigArray
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
@@ -123,7 +124,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     count = None
     startLimit = 0
     stopLimit = None
-    outputs = []
+    outputs = BigArray()
     test = None
     untilLimitChar = None
     untilOrderChar = None

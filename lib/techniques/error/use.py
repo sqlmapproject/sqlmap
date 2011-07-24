@@ -13,6 +13,7 @@ import time
 
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import BigArray
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
@@ -321,7 +322,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
             threadData = getCurrentThreadData()
             threadData.shared.limits = range(startLimit, stopLimit)
             numThreads = min(conf.threads, len(threadData.shared.limits))
-            threadData.shared.outputs = []
+            threadData.shared.outputs = BigArray()
 
             if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                 kb.suppressResumeInfo = True

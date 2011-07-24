@@ -33,13 +33,12 @@ from zipfile import ZipFile
 
 from extra.pydes.pyDes import des
 from extra.pydes.pyDes import CBC
+from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
-from lib.core.common import Backend
-from lib.core.common import getCompiledRegex
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import normalizeUnicode
 from lib.core.common import paths
@@ -252,6 +251,8 @@ def attackCachedUsersPasswords():
                     kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
 def attackDumpedTable():
+    isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
+
     if kb.data.dumpedTable:
         table = kb.data.dumpedTable
         columns = table.keys()
@@ -275,7 +276,7 @@ def attackDumpedTable():
 
                 value = table[column]['values'][i]
 
-                if hashRecognition(value):
+                if hashRecognition(value, isOracle, isMySQL):
                     if colUser:
                         if table[colUser]['values'][i] not in attack_dict:
                             attack_dict[table[colUser]['values'][i]] = []
@@ -310,15 +311,15 @@ def attackDumpedTable():
                             table[column]['values'][i] += " (%s)" % password
                             table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
-def hashRecognition(value):
+def hashRecognition(value, isOracle=False, isMySQL=False):
     retVal = None
 
     if isinstance(value, basestring):
         for name, regex in getPublicTypeMembers(HASH):
             # Hashes for Oracle and old MySQL look the same hence these checks
-            if Backend.isDbms(DBMS.ORACLE) and regex == HASH.MYSQL_OLD:
+            if isOracle and regex == HASH.MYSQL_OLD:
                 continue
-            elif Backend.isDbms(DBMS.MYSQL) and regex == HASH.ORACLE_OLD:
+            elif isMySQL and regex == HASH.ORACLE_OLD:
                 continue
             elif regex == HASH.CRYPT_GENERIC:
                 if any([getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(value), value.lower() == value, value.upper() == value, value.isdigit()]):
