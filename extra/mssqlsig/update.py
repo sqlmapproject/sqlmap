@@ -47,7 +47,7 @@ def updateMSSQLXML():
 
         return
 
-    releases = re.findall("class=\"BCC_DV_01DarkBlueTitle\">SQL Server ([\d\.]+) Builds", mssqlVersionsHtmlString, re.I | re.M)
+    releases = re.findall("class=\"BCC_DV_01DarkBlueTitle\">SQL Server\s(.+?)\sBuilds", mssqlVersionsHtmlString, re.I | re.M)
     releasesCount = len(releases)
 
     # Create the minidom document
@@ -78,7 +78,7 @@ def updateMSSQLXML():
             stopIdx = mssqlVersionsHtmlString.index("SQL Server %s Builds" % releases[index + 1])
 
         mssqlVersionsReleaseString = mssqlVersionsHtmlString[startIdx:stopIdx]
-        servicepackVersion = re.findall("</td><td>[7\.0|2000|2005|2008]*(.*?)</td><td.*?([\d\.]+)</td>[\r]*\n", mssqlVersionsReleaseString, re.I | re.M)
+        servicepackVersion = re.findall("</td><td>[7\.0|2000|2005|2008|2008 R2]*(.*?)</td><td.*?([\d\.]+)</td>[\r]*\n", mssqlVersionsReleaseString, re.I | re.M)
 
         for servicePack, version in servicepackVersion:
             if servicePack.startswith(" "):
@@ -97,6 +97,7 @@ def updateMSSQLXML():
             servicePack = servicePack.replace("\t", " ")
             servicePack = servicePack.replace("No SP", "0")
             servicePack = servicePack.replace("RTM", "0")
+            servicePack = servicePack.replace("TM", "0")
             servicePack = servicePack.replace("SP", "")
             servicePack = servicePack.replace("Service Pack", "")
             servicePack = servicePack.replace("<a href=\"http:", "")
