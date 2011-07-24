@@ -459,7 +459,7 @@ Michael D. Stenner <mstenner@linux.duke.edu>
     HTTP 1.1 keep-alive connections
 
 Marek Stiefenhofer <m.stiefenhofer@r-tec.net>
-    for reporting a bug
+    for reporting a few bugs
 
 Jason Swan <jasoneswan@gmail.com>
     for reporting a bug when enumerating columns on Microsoft SQL Server
@@ -597,6 +597,9 @@ Sylphid <sylphid.su@sti.com.tw>
     for suggesting some features
 
 syssecurity.info <syssecurity7@googlemail.com>
+    for reporting a minor bug
+
+This LittlePiggy <thislittlepiggyhadroastbeef@hotmail.com>
     for reporting a minor bug
 
 ToR <sstidus@email.it>
