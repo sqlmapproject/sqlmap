@@ -2454,6 +2454,17 @@ def isTechniqueAvailable(technique=None):
     else:
         return getTechniqueData(technique) is not None
 
+def setOptimize():
+    #conf.predictOutput = True
+    conf.keepAlive = True
+    conf.threads = 3 if conf.threads < 3 else conf.threads
+    conf.nullConnection = not any([conf.data, conf.textOnly, conf.titles, conf.string, conf.regexp])
+
+    if not conf.nullConnection:
+        debugMsg = "turning off --null-connection switch used indirectly by switch -o"
+        logger.debug(debugMsg)
+
+
 def initTechnique(technique=None):
     """
     Prepares proper page template and match ratio for technique specified
@@ -2472,6 +2483,9 @@ def initTechnique(technique=None):
                     setattr(conf, key, value)
                     debugMsg = "resuming configuration option '%s' (%s)" % (key, value)
                     logger.debug(debugMsg)
+
+                    if value and key == "optimize":
+                        setOptimize()
         else:
             warnMsg = "there is no injection data available for technique "
             warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)

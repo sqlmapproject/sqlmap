@@ -48,6 +48,7 @@ from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
+from lib.core.common import setOptimize
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.convert import urldecode
 from lib.core.data import conf
@@ -1304,13 +1305,7 @@ def __cleanupOptions():
         conf.multipleTargets = True
 
     if conf.optimize:
-        #conf.predictOutput = True
-        conf.keepAlive = True
-        conf.threads = 3 if conf.threads < 3 else conf.threads
-        conf.nullConnection = not any([conf.data, conf.textOnly, conf.titles, conf.string, conf.regexp])
-        if not conf.nullConnection:
-            debugMsg = "turning off --null-connection switch used indirectly by switch -o"
-            logger.debug(debugMsg)
+        setOptimize()
 
     if conf.data:
         conf.data = urldecode(conf.data)
