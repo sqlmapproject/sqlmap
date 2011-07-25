@@ -1323,8 +1323,10 @@ def getRange(count, dump=False, plusOne=False):
 
     if plusOne:
         indexRange = range(limitStart, limitStop + 1)
-    else:
+    elif not dump:
         indexRange = range(limitStart - 1, limitStop)
+    else:
+        indexRange = range(limitStart, limitStop)
 
     return indexRange
 
@@ -2463,7 +2465,6 @@ def setOptimize():
     if not conf.nullConnection:
         debugMsg = "turning off --null-connection switch used indirectly by switch -o"
         logger.debug(debugMsg)
-
 
 def initTechnique(technique=None):
     """
