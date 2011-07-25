@@ -261,8 +261,8 @@ def unionUse(expression, unpack=True, dump=False):
                 stopLimit = 1
 
             threadData = getCurrentThreadData()
-            threadData.shared.limits = range(startLimit, stopLimit)
-            numThreads = min(conf.threads, len(threadData.shared.limits))
+            threadData.shared.limits = iter(xrange(startLimit, stopLimit))
+            numThreads = min(conf.threads, (stopLimit - startLimit))
             threadData.shared.value = BigArray()
 
             if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
@@ -281,13 +281,12 @@ def unionUse(expression, unpack=True, dump=False):
 
                     while kb.threadContinue:
                         kb.locks.limits.acquire()
-                        if threadData.shared.limits:
-                            num = threadData.shared.limits[-1]
-                            del threadData.shared.limits[-1]
-                            kb.locks.limits.release()
-                        else:
-                            kb.locks.limits.release()
+                        try:
+                            num = threadData.shared.limits.next()
+                        except StopIteration:
                             break
+                        finally:
+                            kb.locks.limits.release()
 
                         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                             field = expressionFieldsList[0]

@@ -384,7 +384,7 @@ IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM informat
 ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 
 # Chunk length (in items) used by BigArray objects (only last chunk and cached one are held in memory)
-BIGARRAY_CHUNK_LENGTH = 5000
+BIGARRAY_CHUNK_LENGTH = 4096
 
 # Only console display last n table rows
-TRIM_STDOUT_DUMP_SIZE = 256
+TRIM_STDOUT_DUMP_SIZE = 1024
