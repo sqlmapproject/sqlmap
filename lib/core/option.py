@@ -1442,6 +1442,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS:0, REFLECTIVE_COUNTER.HIT:0}
     kb.responseTimes = []
     kb.resumedQueries = {}
+    kb.safeCharEncode = False
     kb.singleLogFlags = set()
     kb.skipOthersDbms = None
     kb.suppressSession = False

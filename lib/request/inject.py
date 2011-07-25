@@ -28,7 +28,6 @@ from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
-from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -401,6 +400,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     (if selected).
     """
 
+    kb.safeCharEncode = safeCharEncode
+
     if suppressOutput is not None:
         pushValue(getCurrentThreadData().disableStdOut)
         getCurrentThreadData().disableStdOut = suppressOutput
@@ -499,8 +500,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         elif value == [None]:
             value = None
 
-    if safeCharEncode:
-        value = safecharencode(value)
+    kb.safeCharEncode = False
 
     return value
 

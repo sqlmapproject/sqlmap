@@ -27,6 +27,7 @@ from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unhandledExceptionMessage
+from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -521,4 +522,4 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     if kb.threadException:
         raise sqlmapThreadException, "something unexpected happened inside the threads"
 
-    return queriesCount[0], finalValue
+    return queriesCount[0], safecharencode(finalValue) if kb.safeCharEncode else finalValue

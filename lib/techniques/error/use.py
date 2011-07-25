@@ -131,7 +131,7 @@ def __oneShotErrorUse(expression, field):
 
     dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(retVal)))
 
-    return retVal
+    return safecharencode(retVal) if kb.safeCharEncode else retVal
 
 def __errorFields(expression, expressionFields, expressionFieldsList, expected=None, num=None, resumeValue=True):
     outputs = []
