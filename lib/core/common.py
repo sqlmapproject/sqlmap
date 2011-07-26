@@ -1323,10 +1323,8 @@ def getRange(count, dump=False, plusOne=False):
 
     if plusOne:
         indexRange = range(limitStart, limitStop + 1)
-    elif not dump:
-        indexRange = range(limitStart - 1, limitStop)
     else:
-        indexRange = range(limitStart, limitStop)
+        indexRange = range(limitStart - 1, limitStop)
 
     return indexRange
 
