@@ -283,7 +283,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     stopLimit += startLimit
             elif dump:
                 if conf.limitStart:
-                    startLimit = conf.limitStart
+                    startLimit = conf.limitStart - 1
                 if conf.limitStop:
                     stopLimit = conf.limitStop
 

@@ -1700,8 +1700,8 @@ def __basicOptionValidation():
         raise sqlmapSyntaxException, errMsg
 
     if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
-       conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop <= conf.limitStart:
-        errMsg = "value for --start (limitStart) option must be smaller than value for --stop (limitStop) option"
+       conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop < conf.limitStart:
+        errMsg = "value for --start (limitStart) option must be smaller or equal than value for --stop (limitStop) option"
         raise sqlmapSyntaxException, errMsg
 
     if conf.firstChar is not None and isinstance(conf.firstChar, int) and conf.firstChar > 0 and \
