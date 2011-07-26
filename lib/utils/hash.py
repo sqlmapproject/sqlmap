@@ -17,8 +17,8 @@ try:
     import multiprocessing
     _multiprocessing = multiprocessing
 
-    # problems on FreeBSD (Reference: http://www.velocityreviews.com/forums/t716510-freebsd-and-multiprocessing.html)
-    import multiprocessing.synchronize
+    # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
+    queue = _multiprocessing.Queue()
 except ImportError, _:
     pass
 
