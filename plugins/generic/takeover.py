@@ -117,14 +117,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             debugMsg += "the back-end DBMS is not Windows"
             logger.debug(debugMsg)
 
-        if tunnel == 2 and not Backend.isOs(OS.WINDOWS):
-            errMsg = "icmpsh slave is only supported on Windows at "
-            errMsg += "the moment. The back-end database server is "
-            errMsg += "not. sqlmap will fallback to TCP (Metasploit)"
-            logger.error(errMsg)
-
-            tunnel = 1
-
         if tunnel == 2:
             isAdmin = runningAsAdmin()
 
