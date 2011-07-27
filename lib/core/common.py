@@ -1957,27 +1957,31 @@ def getPartRun():
 
     retVal = None
     commonPartsDict = optDict["Enumeration"]
-    stack = [item[4][0] if isinstance(item[4], list) else '' for item in inspect.stack()]
-    reobj1 = getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')
-    reobj2 = getCompiledRegex('self\.(get[^(]+)\(\)')
 
-    # Goes backwards through the stack to find the conf.dbmsHandler method
-    # calling this function
-    for i in xrange(0, len(stack)-1):
-        for reobj in (reobj2, reobj1):
-            match = reobj.search(stack[i])
+    try:
+        stack = [item[4][0] if isinstance(item[4], list) else '' for item in inspect.stack()]
 
-            if match:
-                # This is the calling conf.dbmsHandler or self method
-                # (e.g. 'getDbms')
-                retVal = match.groups()[0]
+        # Goes backwards through the stack to find the conf.dbmsHandler method
+        # calling this function
+        for i in xrange(0, len(stack)-1):
+            for regex in (getCompiledRegex('self\.(get[^(]+)\(\)'), getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')):
+                match = regex.search(stack[i])
+
+                if match:
+                    # This is the calling conf.dbmsHandler or self method
+                    # (e.g. 'getDbms')
+                    retVal = match.groups()[0]
+                    break
+
+            if retVal is not None:
                 break
 
-        if retVal is not None:
-            break
+    # Reference: http://coding.derkeiler.com/Archive/Python/comp.lang.python/2004-06/2267.html
+    except TypeError:
+        pass
 
     # Return the INI tag to consider for common outputs (e.g. 'Databases')
-    return commonPartsDict[retVal][1] if retVal in commonPartsDict else retVal
+    return commonPartsDict[retVal][1] if isinstance(commonPartsDict.get(retVal), tuple) else retVal
 
 def getUnicode(value, encoding=None, system=False):
     """
