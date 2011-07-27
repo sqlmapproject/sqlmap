@@ -15,12 +15,13 @@ except ImportError, _:
 _multiprocessing = None
 try:
     import multiprocessing
-    _multiprocessing = multiprocessing
 
     # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
-    queue = _multiprocessing.Queue()
+    _ = multiprocessing.Queue()
 except ImportError, _:
     pass
+else:
+    _multiprocessing = multiprocessing
 
 import os
 import re
