@@ -78,7 +78,7 @@ class Enumeration(GenericEnumeration):
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in dbs))
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in sorted(dbs)))
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
