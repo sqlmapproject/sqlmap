@@ -859,7 +859,7 @@ class Enumeration:
                 return tableExists(paths.COMMON_TABLES)
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in dbs))
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in sorted(dbs)))
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
@@ -1551,7 +1551,7 @@ class Enumeration:
                     continue
 
                 colList = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)].keys()
-                colString = ", ".join(column for column in colList)
+                colString = ", ".join(column for column in sorted(colList))
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
                 infoMsg = "fetching"
@@ -1856,7 +1856,7 @@ class Enumeration:
                     continue
 
                 conf.tbl = table
-                conf.col = ",".join(column for column in columns)
+                conf.col = ",".join(column for column in sorted(columns))
                 kb.data.cachedColumns = {}
                 kb.data.dumpedTable = {}
 
