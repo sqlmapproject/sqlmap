@@ -1364,8 +1364,6 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
         for entry in output:
             entry = safecharencode(entry) if kb.safeCharEncode else entry
 
-            info = []
-
             if DUMP_DEL_MARKER in entry:
                 entry = entry.split(DUMP_DEL_MARKER)
             else:
@@ -1374,10 +1372,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
             if len(entry) == 1:
                 data.append(entry[0])
             else:
-                for value in entry:
-                    info.append(value)
-
-                data.append(info)
+                data.append(list(entry))
     else:
         data = output
 
