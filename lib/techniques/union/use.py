@@ -97,7 +97,7 @@ def __oneShotUnionUse(expression, unpack=True):
             warnMsg += "issues)"
             singleTimeWarnMessage(warnMsg)
 
-    return safecharencode(output) if kb.safeCharEncode else output
+    return output
 
 def configUnion(char=None, columns=None):
     def __configUnionChar(char):

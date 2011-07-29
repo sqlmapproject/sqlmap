@@ -51,6 +51,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.convert import htmlunescape
+from lib.core.convert import safecharencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
@@ -1361,6 +1362,8 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
             output = dict_.values()
 
         for entry in output:
+            entry = safecharencode(entry) if kb.safeCharEncode else entry
+
             info = []
 
             if DUMP_DEL_MARKER in entry:
