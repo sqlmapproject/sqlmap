@@ -252,6 +252,8 @@ class Enumeration:
         else:
             users = []
 
+        users = filter(None, users)
+
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
             if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                 query = rootQuery.inband.query2
@@ -446,6 +448,8 @@ class Enumeration:
                         users[users.index(user)] = parsedUser.groups()[0]
         else:
             users = []
+
+        users = filter(None, users)
 
         # Set containing the list of DBMS administrators
         areAdmins = set()
@@ -830,6 +834,8 @@ class Enumeration:
         for db in dbs:
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
 
+        dbs = filter(None, dbs)
+
         if bruteForce:
             resumeAvailable = False
 
@@ -997,6 +1003,8 @@ class Enumeration:
 
         for col in colList:
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
+
+        colList = filter(None, colList)
 
         if conf.tbl:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
@@ -1388,7 +1396,7 @@ class Enumeration:
             lengths[column] = 0
             entries[column] = BigArray()
 
-        colList = sorted(colList, key=lambda x: len(x) if x else MAX_INT)
+        colList = filter(None, sorted(colList, key=lambda x: len(x) if x else MAX_INT))
 
         for column in colList:
             infoMsg = "fetching number of distinct "
@@ -1550,7 +1558,7 @@ class Enumeration:
 
                     continue
 
-                colList = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)].keys()
+                colList = filter(None, kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)].keys())
                 colString = ", ".join(column for column in sorted(colList))
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
@@ -1856,7 +1864,7 @@ class Enumeration:
                     continue
 
                 conf.tbl = table
-                conf.col = ",".join(column for column in sorted(columns))
+                conf.col = ",".join(column for column in filter(None, sorted(columns)))
                 kb.data.cachedColumns = {}
                 kb.data.dumpedTable = {}
 

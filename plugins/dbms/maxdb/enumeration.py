@@ -64,7 +64,7 @@ class Enumeration(GenericEnumeration):
         else:
             dbs = self.getDbs()
 
-        for db in dbs:
+        for db in filter(None, dbs):
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
 
         infoMsg = "fetching tables for database"
