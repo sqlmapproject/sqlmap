@@ -93,7 +93,6 @@ class Enumeration:
         kb.data.cachedCounts = {}
         kb.data.dumpedTable = {}
         kb.data.processChar = None
-        self.alwaysRetrieveSqlOutput = False
 
     def getBanner(self):
         if not conf.getBanner:
@@ -2353,23 +2352,9 @@ class Enumeration:
             for sqlStatement in sqlStatements:
                 if query.lower().startswith(sqlStatement):
                     sqlType = sqlTitle
-
                     break
 
-        if not self.alwaysRetrieveSqlOutput:
-            message = "do you want to retrieve the SQL statement output? "
-
-            if not sqlType or 'SELECT' in sqlType:
-                message += "[Y/n/a] "
-                getOutput = readInput(message, default="Y")
-            else:
-                message += "[y/N/a] "
-                getOutput = readInput(message, default="N")
-
-            if getOutput in ("a", "A"):
-                self.alwaysRetrieveSqlOutput = True
-
-        if not getOutput or getOutput in ("y", "Y") or self.alwaysRetrieveSqlOutput:
+        if not sqlType or 'SELECT' in sqlType:
             infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             logger.info(infoMsg)
 
