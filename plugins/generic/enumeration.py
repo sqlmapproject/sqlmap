@@ -887,7 +887,7 @@ class Enumeration:
                 query = safeStringFormat(query, conf.db)
 
             value = inject.getValue(query, blind=False)
-            value = arrayizeValue(filter(lambda x: x, value))
+            value = arrayizeValue(filter(None, value))
 
             if not isNoneValue(value):
                 if len(value) > 0 and not isinstance(value[0], (list, tuple)):
