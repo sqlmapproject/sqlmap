@@ -18,7 +18,7 @@ try:
 
     # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
     _ = multiprocessing.Queue()
-except ImportError, _:
+except (ImportError, OSError):
     pass
 else:
     _multiprocessing = multiprocessing
