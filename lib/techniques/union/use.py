@@ -47,7 +47,7 @@ from lib.utils.resume import resume
 
 reqCount = 0
 
-def __oneShotUnionUse(expression, unpack=True):
+def __oneShotUnionUse(expression, unpack=True, limited=False):
     global reqCount
 
     check = "(?P<result>%s.*%s)" % (kb.misc.start, kb.misc.stop)
@@ -64,7 +64,7 @@ def __oneShotUnionUse(expression, unpack=True):
 
     # Forge the inband SQL injection request
     vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
-    query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5])
+    query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], None, limited)
     payload = agent.payload(newValue=query, where=where)
 
     # Perform the request
@@ -299,7 +299,7 @@ def unionUse(expression, unpack=True, dump=False):
                         output = resume(limitedExpr, None)
 
                         if not output:
-                            output = __oneShotUnionUse(limitedExpr, unpack)
+                            output = __oneShotUnionUse(limitedExpr, unpack, True)
 
                         if not kb.threadContinue:
                             break

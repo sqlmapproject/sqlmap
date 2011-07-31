@@ -522,7 +522,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, multipleUnions=None):
+    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, multipleUnions=None, limited=False):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -558,17 +558,16 @@ class Agent:
 
         inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
-        if query.startswith("TOP"):
-            # TOP enumeration on DBMS.MSSQL is too specific and it has to go
-            # into its own brackets because those NULLs cause problems with
-            # ORDER BY clause
-            if Backend.isDbms(DBMS.MSSQL):
-                inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, range(0, count)))
-                inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
+        if limited:
+            inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, range(0, count)))
+            inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
+            inbandQuery += FROM_TABLE.get(Backend.getIdentifiedDbms(), "")
 
-                return inbandQuery
+            return inbandQuery
 
-            topNum = re.search("\ATOP\s+([\d]+)\s+", query, re.I).group(1)
+        topNumRegex = re.search("\ATOP\s+([\d]+)\s+", query, re.I)
+        if topNumRegex:
+            topNum = topNumRegex.group(1)
             query = query[len("TOP %s " % topNum):]
             inbandQuery += "TOP %s " % topNum
 
