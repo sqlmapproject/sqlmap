@@ -1593,7 +1593,7 @@ class Enumeration:
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.inband.query % (colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
-                    elif Backend.isDbms(DBMS.SQLITE):
+                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB):
                         query = rootQuery.inband.query % (colString, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         # Partial inband and error
