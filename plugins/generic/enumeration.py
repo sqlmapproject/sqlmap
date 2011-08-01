@@ -1442,11 +1442,13 @@ class Enumeration:
                     break
 
                 for column in colList:
-                    if column == colList[0]:
-                        # Correction for pivotValues with unrecognized chars
-                        if pivotValue and '?' in pivotValue and pivotValue[0] != '?':
-                            pivotValue = pivotValue.split('?')[0]
+                    # Correction for pivotValues with unrecognized/problematic chars
+                    for char in ('\'', '?'):
+                        if pivotValue and char in pivotValue and pivotValue[0] != char:
+                            pivotValue = pivotValue.split(char)[0]
                             pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
+                            break
+                    if column == colList[0]:
                         query = dumpNode.query % (column, table, column, pivotValue)
                     else:
                         query = dumpNode.query2 % (column, table, colList[0], pivotValue)
