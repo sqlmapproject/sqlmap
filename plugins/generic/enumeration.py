@@ -887,9 +887,10 @@ class Enumeration:
                 query = safeStringFormat(query, conf.db)
 
             value = inject.getValue(query, blind=False)
-            value = arrayizeValue(filter(None, value))
 
             if not isNoneValue(value):
+                value = filter(None, arrayizeValue(value))
+
                 if len(value) > 0 and not isinstance(value[0], (list, tuple)):
                     value = zip([conf.db for i in xrange(len(value))], value)
 
