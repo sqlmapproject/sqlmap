@@ -278,7 +278,7 @@ def attackDumpedTable():
                 value = table[column]['values'][i]
 
                 if hashRecognition(value, isOracle, isMySQL):
-                    if colUser:
+                    if colUser and i < len(table[colUser]['values']):
                         if table[colUser]['values'][i] not in attack_dict:
                             attack_dict[table[colUser]['values'][i]] = []
 

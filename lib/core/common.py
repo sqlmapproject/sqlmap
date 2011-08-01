@@ -254,7 +254,7 @@ class BigArray(list):
         index = y / BIGARRAY_CHUNK_LENGTH
         offset = y % BIGARRAY_CHUNK_LENGTH
         chunk = self.chunks[index]
-        if isinstance(chunk, list) and len(chunk) >= offset:
+        if isinstance(chunk, list):
             return chunk[offset]
         else:
             self._checkcache(index)
