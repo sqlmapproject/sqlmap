@@ -1557,8 +1557,8 @@ class Enumeration:
 
                     continue
 
-                colList = filter(None, kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)].keys())
-                colString = ", ".join(column for column in sorted(colList))
+                colList = sorted(filter(None, kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)].keys()))
+                colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
                 infoMsg = "fetching"
