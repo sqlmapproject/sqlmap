@@ -310,14 +310,21 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                     infoMsg += "%d entries" % stopLimit
                     logger.info(infoMsg)
 
-            else:
+            elif count and not count.isdigit():
                 warnMsg = "it was not possible to count the number "
-                warnMsg += "of entries for the used SQL query. "
+                warnMsg += "of entries for the SQL query provided. "
                 warnMsg += "sqlmap will assume that it returns only "
                 warnMsg += "one entry"
                 logger.warn(warnMsg)
 
                 stopLimit = 1
+
+            elif (not count or int(count) == 0):
+                warnMsg = "the SQL query provided does not "
+                warnMsg += "return any output"
+                logger.warn(warnMsg)
+
+                return outputs
 
             threadData = getCurrentThreadData()
             threadData.shared.limits = iter(xrange(startLimit, stopLimit))
