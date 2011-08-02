@@ -416,7 +416,8 @@ def start():
                         elif parameter in conf.testParameter:
                             pass
 
-                        elif parameter.upper() in IGNORE_PARAMETERS:
+                        # Ignore session-like parameters for --level < 4
+                        elif conf.level < 4 and parameter.upper() in IGNORE_PARAMETERS:
                             testSqlInj = False
 
                             infoMsg = "ignoring %s parameter '%s'" % (place, parameter)
