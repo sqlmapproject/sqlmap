@@ -265,7 +265,7 @@ def unionUse(expression, unpack=True, dump=False):
                 warnMsg += "return any output"
                 logger.warn(warnMsg)
 
-                return outputs
+                return value
 
             threadData = getCurrentThreadData()
             threadData.shared.limits = iter(xrange(startLimit, stopLimit))
