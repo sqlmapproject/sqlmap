@@ -219,7 +219,7 @@ def checkSqlInjection(place, parameter, value):
             Backend.forceDbms(dbms[0] if isinstance(dbms, list) else dbms)
 
             # Parse test's <request>
-            comment = agent.getComment(test.request)
+            comment = agent.getComment(test.request) if len(conf.boundaries) > 1 else None
             fstPayload = agent.cleanupPayload(test.request.payload, origValue=value)
 
             for boundary in conf.boundaries:
