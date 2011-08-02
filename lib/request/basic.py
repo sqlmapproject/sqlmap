@@ -98,7 +98,7 @@ def checkCharEncoding(encoding):
         return encoding
 
     # http://www.destructor.de/charsets/index.htm
-    translate = { 'windows-874': 'iso-8859-11', 'en_us': 'utf8', 'macintosh': 'iso-8859-1', 'euc_tw': 'big5_tw' }
+    translate = { 'windows-874': 'iso-8859-11', 'en_us': 'utf8', 'macintosh': 'iso-8859-1', 'euc_tw': 'big5_tw', 'th': 'tis-620' }
 
     for delimiter in (';', ',', '('):
         if delimiter in encoding:
