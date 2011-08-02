@@ -260,6 +260,7 @@ def attackDumpedTable():
         count = table["__infos__"]["count"]
 
         colUser = ''
+        colPasswords = set()
         attack_dict = {}
 
         for column in columns:
@@ -286,8 +287,11 @@ def attackDumpedTable():
                     else:
                         attack_dict['%s%d' % (DUMMY_USER_PREFIX, i)] = [value]
 
+                    colPasswords.add(column)
+
         if attack_dict:
-            message = "recognized possible password hashes. Do you want to "
+            message = "recognized possible password hashes in column%s " % ("s" if len(colPasswords) > 1 else "")
+            message += "%s. Do you want to " % ", ".join(col for col in colPasswords)
             message += "crack them via a dictionary-based attack? [Y/n/q]"
             test = readInput(message, default="Y")
 
@@ -595,7 +599,7 @@ def dictionaryAttack(attack_dict):
                 except KeyboardInterrupt:
                     print
                     processException = True
-                    warnMsg = "user aborted during dictionary attack phase"
+                    warnMsg = "user aborted during dictionary-based attack phase"
                     logger.warn(warnMsg)
 
                 while not retVal.empty():
@@ -662,7 +666,7 @@ def dictionaryAttack(attack_dict):
                     except KeyboardInterrupt:
                         print
                         processException = True
-                        warnMsg = "user aborted during dictionary attack phase"
+                        warnMsg = "user aborted during dictionary-based attack phase"
                         logger.warn(warnMsg)
 
                     while not retVal.empty():

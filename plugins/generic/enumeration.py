@@ -386,7 +386,8 @@ class Enumeration:
             errMsg += "system database table)"
             raise sqlmapNoneDataException, errMsg
 
-        message = "do you want to use dictionary attack on retrieved password hashes? [Y/n/q]"
+        message = "do you want to perform a dictionary-based attack "
+        message += "against retrieved password hashes? [Y/n/q]"
         test = readInput(message, default="Y")
 
         if test[0] in ("n", "N"):
