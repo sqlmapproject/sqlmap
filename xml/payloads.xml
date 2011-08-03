@@ -3395,7 +3395,7 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <title>Generic UNION query with Microsoft Access comment ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -3411,13 +3411,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <title>Generic UNION query with Microsoft Access comment (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -3433,13 +3430,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <title>Generic UNION query with Microsoft Access comment ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3455,13 +3449,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([CHAR]) - 1 to 10 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([CHAR]) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -3477,13 +3468,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query (NULL) - 1 to 10 columns</title>
+        <title>Generic UNION query with Microsoft Access comment (NULL) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -3499,13 +3487,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([RANDNUM]) - 1 to 10 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([RANDNUM]) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3521,13 +3506,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([CHAR]) - 11 to 20 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([CHAR]) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3543,13 +3525,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query (NULL) - 11 to 20 columns</title>
+        <title>Generic UNION query with Microsoft Access comment (NULL) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3565,13 +3544,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([RANDNUM]) - 11 to 20 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([RANDNUM]) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3587,13 +3563,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([CHAR]) - 21 to 30 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([CHAR]) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3609,13 +3582,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query (NULL) - 21 to 30 columns</title>
+        <title>Generic UNION query with Microsoft Access comment (NULL) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3631,13 +3601,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([RANDNUM]) - 21 to 30 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([RANDNUM]) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3653,13 +3620,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([CHAR]) - 31 to 40 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([CHAR]) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3675,13 +3639,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query (NULL) - 31 to 40 columns</title>
+        <title>Generic UNION query with Microsoft Access comment (NULL) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3697,13 +3658,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([RANDNUM]) - 31 to 40 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([RANDNUM]) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3719,13 +3677,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([CHAR]) - 41 to 50 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([CHAR]) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3741,13 +3696,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query (NULL) - 41 to 50 columns</title>
+        <title>Generic UNION query with Microsoft Access comment (NULL) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3763,13 +3715,10 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
 
     <test>
-        <title>Microsoft Access UNION query ([RANDNUM]) - 41 to 50 columns</title>
+        <title>Generic UNION query with Microsoft Access comment ([RANDNUM]) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3785,9 +3734,6 @@ Formats:
         <response>
             <union/>
         </response>
-        <details>
-            <dbms>Microsoft Access</dbms>
-        </details>
     </test>
     <!-- End of UNION query tests -->
 
