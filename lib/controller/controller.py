@@ -123,8 +123,14 @@ def __formatInjection(inj):
     data += "Parameter: %s\n" % inj.parameter
 
     for stype, sdata in inj.data.items():
+        title = sdata.title
+        if stype == PAYLOAD.TECHNIQUE.UNION:
+            count = re.sub(r"\(.+\)", "", sdata.payload).count(",") + 1
+            title = re.sub(r"\d+ to \d+", str(count), title)
+            if count == 1:
+                title = title.replace("columns", "column")
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
-        data += "    Title: %s\n" % sdata.title
+        data += "    Title: %s\n" % title
         data += "    Payload: %s\n\n" % sdata.payload
 
     return data
