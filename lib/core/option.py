@@ -1424,6 +1424,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.nullConnection = None
     kb.pageTemplate = None
     kb.pageTemplates = dict()
+    kb.orderByColumns = None
     kb.originalPage = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)

@@ -2031,10 +2031,8 @@ class Enumeration:
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
 
-                if not isNoneValue(values):
-                    if isinstance(values, basestring):
-                        values = [ values ]
-
+                if not any([isNoneValue(values), isinstance(values, basestring)]):
+                    values = filter(lambda x: isinstance(x, (tuple, list, set)) and len(x) == 2, values)
                     for foundDb, foundTbl in values:
                         foundDb = safeSQLIdentificatorNaming(foundDb)
                         foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
