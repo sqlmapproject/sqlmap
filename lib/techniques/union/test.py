@@ -63,7 +63,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
         if __orderByTest(1) and not __orderByTest(randomInt()):
             infoMsg = "ORDER BY technique seems to be usable. "
-            infoMsg += "this should reduce the time needed "
+            infoMsg += "This should reduce the time needed "
             infoMsg += "to find the right number "
             infoMsg += "of query columns. Automatically extending the "
             infoMsg += "range for UNION query injection technique"
