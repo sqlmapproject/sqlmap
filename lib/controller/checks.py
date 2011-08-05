@@ -735,7 +735,7 @@ def checkStability():
             errMsg += "because of lack of content. please check the "
             errMsg += "page request results (and probable errors) by "
             errMsg += "using higher verbosity levels"
-            raise sqlmapNoneDataException, errMsg
+            logger.error(errMsg)
 
     else:
         warnMsg = "url is not stable, sqlmap will base the page "
@@ -938,7 +938,7 @@ def checkConnection(suppressOutput=False):
 
         kb.errorIsNone = False
 
-        if not kb.originalPage:
+        if not kb.originalPage and wasLastRequestHTTPError():
             errMsg = "unable to retrieve page content"
             raise sqlmapConnectionException, errMsg
         elif wasLastRequestDBMSError():

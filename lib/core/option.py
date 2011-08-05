@@ -1413,6 +1413,8 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.injection = InjectionDict()
     kb.injections = []
 
+    kb.lastParserStatus = None
+
     kb.locks = AttribDict()
     kb.locks.cacheLock = threading.Lock()
     kb.locks.logLock = threading.Lock()
