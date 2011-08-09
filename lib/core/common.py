@@ -2915,3 +2915,11 @@ def safeCSValue(value):
                 retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal
+
+def filterPairValues(values):
+    retVal = []
+
+    if not isNoneValue(values) and hasattr(values, '__iter__'):
+        retVal = filter(lambda x: isinstance(x, (tuple, list, set)) and len(x) == 2, values)
+
+    return retVal

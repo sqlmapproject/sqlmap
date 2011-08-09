@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
+from lib.core.common import filterPairValues
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import safeSQLIdentificatorNaming
@@ -232,7 +233,7 @@ class Enumeration(GenericEnumeration):
                     table = {}
                     columns = {}
 
-                    for name, type_ in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr]):
+                    for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr])):
                         columns[name] = sybaseTypes.get(type_, type_)
 
                     table[safeSQLIdentificatorNaming(tbl)] = columns

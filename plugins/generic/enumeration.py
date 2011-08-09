@@ -16,10 +16,10 @@ from lib.core.common import Backend
 from lib.core.common import BigArray
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import filterPairValues
 from lib.core.common import getRange
 from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
-from lib.core.common import Backend
 from lib.core.common import getUnicode
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
@@ -272,7 +272,7 @@ class Enumeration:
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=False)
 
                 if retVal:
-                    for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
+                    for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
                         # password = "0x%s" % strToHex(password)
                         if not kb.data.cachedUsersPasswords.has_key(user):
                             kb.data.cachedUsersPasswords[user] = [password]
@@ -283,17 +283,16 @@ class Enumeration:
             else:
                 value = inject.getValue(query, blind=False)
 
-                if not isNoneValue(value):
-                    for user, password in value:
-                        if not user or user == " ":
-                            continue
+                for user, password in filterPairValues(value):
+                    if not user or user == " ":
+                        continue
 
-                        password = parsePasswordHash(password)
+                    password = parsePasswordHash(password)
 
-                        if not kb.data.cachedUsersPasswords.has_key(user):
-                            kb.data.cachedUsersPasswords[user] = [password]
-                        else:
-                            kb.data.cachedUsersPasswords[user].append(password)
+                    if not kb.data.cachedUsersPasswords.has_key(user):
+                        kb.data.cachedUsersPasswords[user] = [password]
+                    else:
+                        kb.data.cachedUsersPasswords[user].append(password)
 
         if not kb.data.cachedUsersPasswords and not conf.direct:
             if not len(users):
@@ -315,7 +314,7 @@ class Enumeration:
                 retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=True)
 
                 if retVal:
-                    for user, password in zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr]):
+                    for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
                         password = "0x%s" % strToHex(password)
 
                         if not kb.data.cachedUsersPasswords.has_key(user):
@@ -895,7 +894,7 @@ class Enumeration:
                 if len(value) > 0 and not isinstance(value[0], (list, tuple)):
                     value = zip([conf.db for i in xrange(len(value))], value)
 
-                for db, table in value:
+                for db, table in filterPairValues(value):
                     db = safeSQLIdentificatorNaming(db)
                     table = safeSQLIdentificatorNaming(table, True)
 
@@ -2031,19 +2030,17 @@ class Enumeration:
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
 
-                if not any([isNoneValue(values), isinstance(values, basestring)]):
-                    values = filter(lambda x: isinstance(x, (tuple, list, set)) and len(x) == 2, values)
-                    for foundDb, foundTbl in values:
-                        foundDb = safeSQLIdentificatorNaming(foundDb)
-                        foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
+                for foundDb, foundTbl in filterPairValues(values):
+                    foundDb = safeSQLIdentificatorNaming(foundDb)
+                    foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
 
-                        if foundDb is None or foundTbl is None:
-                            continue
+                    if foundDb is None or foundTbl is None:
+                        continue
 
-                        if foundDb in foundTbls:
-                            foundTbls[foundDb].append(foundTbl)
-                        else:
-                            foundTbls[foundDb] = [ foundTbl ]
+                    if foundDb in foundTbls:
+                        foundTbls[foundDb].append(foundTbl)
+                    else:
+                        foundTbls[foundDb] = [ foundTbl ]
             else:
                 infoMsg = "fetching number of databases with table"
                 if tblConsider == "1":
@@ -2197,40 +2194,36 @@ class Enumeration:
                 query += exclDbsQuery
                 values = inject.getValue(query, blind=False)
 
-                if not isNoneValue(values):
-                    if isinstance(values, basestring):
-                        values = [ values ]
+                for foundDb, foundTbl in filterPairValues(values):
+                    foundDb = safeSQLIdentificatorNaming(foundDb)
+                    foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
 
-                    for foundDb, foundTbl in values:
-                        foundDb = safeSQLIdentificatorNaming(foundDb)
-                        foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
+                    if foundDb is None or foundTbl is None:
+                        continue
 
-                        if foundDb is None or foundTbl is None:
-                            continue
+                    if foundDb not in dbs:
+                        dbs[foundDb] = {}
 
-                        if foundDb not in dbs:
-                            dbs[foundDb] = {}
+                    if foundTbl not in dbs[foundDb]:
+                        dbs[foundDb][foundTbl] = {}
 
-                        if foundTbl not in dbs[foundDb]:
-                            dbs[foundDb][foundTbl] = {}
+                    if colConsider == "1":
+                        conf.db = foundDb
+                        conf.tbl = foundTbl
+                        conf.col = column
 
-                        if colConsider == "1":
-                            conf.db = foundDb
-                            conf.tbl = foundTbl
-                            conf.col = column
+                        self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
 
-                            self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
+                        if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
+                            dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
+                        kb.data.cachedColumns = {}
+                    else:
+                        dbs[foundDb][foundTbl][column] = None
 
-                            if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
-                                dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
-                            kb.data.cachedColumns = {}
-                        else:
-                            dbs[foundDb][foundTbl][column] = None
-
-                        if foundDb in foundCols[column]:
-                            foundCols[column][foundDb].append(foundTbl)
-                        else:
-                            foundCols[column][foundDb] = [ foundTbl ]
+                    if foundDb in foundCols[column]:
+                        foundCols[column][foundDb].append(foundTbl)
+                    else:
+                        foundCols[column][foundDb] = [ foundTbl ]
             else:
                 infoMsg = "fetching number of databases with tables containing column"
                 if colConsider == "1":
