@@ -285,7 +285,8 @@ Svyatoslav Lisin <sel@3d-tech.ru>
     for suggesting a minor feature
 
 Mark Lowe <larkmowe@gmail.com>
-    for reporting a couple of bugs
+    for reporting several bugs
+    for suggesting a few minor enhancements
 
 Truong Duc Luong <luongductruong@gmail.com>
     for reporting a minor bug
@@ -368,6 +369,9 @@ Christopher Patten <cpatten@sunera.com>
 Zack Payton <zack.payton@executiveinstruments.com>
     for reporting a minor bug
 
+Travis Phillips <perfect_insanity2004@yahoo.com>
+    for suggesting a minor enhancement
+
 Mark Pilgrim <mark@diveintomark.org>
     for porting chardet package (Universal Encoding Detector) to Python
 
@@ -410,6 +414,9 @@ Ethan Robish <ethan.robish@gmail.com>
 Andrea Rossi <andyroyalbattle@yahoo.it>
     for reporting a minor bug
     for suggesting a feature
+
+Vladimir Rutsky <rutsky.vladimir@gmail.com>
+    for suggesting a couple of minor enhancements
 
 Richard Safran <allapplyhere@yahoo.com>
     for donating the sqlmap.org domain
@@ -465,6 +472,9 @@ M Simkin <mlsimkin@cox.net>
 Konrads Smelkovs <konrads@smelkovs.com>
     for reporting a few bugs in --sql-shell and --sql-query on Microsoft
     SQL Server
+
+Chris Spencer <chris.spencer@ngssecure.com>
+    for reviewing the user's manual grammar
 
 Michael D. Stenner <mstenner@linux.duke.edu>
     for his keepalive module that allows handling of persistent 
