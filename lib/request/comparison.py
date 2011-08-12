@@ -11,6 +11,7 @@ import re
 
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
+from lib.core.common import listToStrValue
 from lib.core.common import removeDynamicContent
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
@@ -27,7 +28,7 @@ from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 
-def comparison(page, getRatioValue=False, pageLength=None):
+def comparison(page, headers, getRatioValue=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 
@@ -37,18 +38,17 @@ def comparison(page, getRatioValue=False, pageLength=None):
     seqMatcher.set_seq1(kb.pageTemplate)
 
     if any([conf.string, conf.regexp]):
-        if page:
-            # String to match in page when the query is valid
-            if conf.string:
-                condition = conf.string in page
-                return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+        rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
-            # Regular expression to match in page when the query is valid
-            if conf.regexp:
-                condition = re.search(conf.regexp, page, re.I | re.M) is not None
-                return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
-        else:
-            return None
+        # String to match in page when the query is valid
+        if conf.string:
+            condition = conf.string in rawResponse
+            return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+
+        # Regular expression to match in page when the query is valid
+        if conf.regexp:
+            condition = re.search(conf.regexp, rawResponse, re.I | re.M) is not None
+            return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
 
     if page:
         # In case of an DBMS error page return None

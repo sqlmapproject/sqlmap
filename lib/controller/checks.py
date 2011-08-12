@@ -804,13 +804,13 @@ def checkString():
     infoMsg += "target URL page content"
     logger.info(infoMsg)
 
-    page, _ = Request.queryPage(content=True)
+    page, headers = Request.queryPage(content=True)
+    rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
-    if conf.string not in page:
+    if conf.string not in rawResponse:
         warnMsg = "you provided '%s' as the string to " % conf.string
         warnMsg += "match, but such a string is not within the target "
-        warnMsg += "URL page content original request, sqlmap will "
-        warnMsg += "keep going anyway"
+        warnMsg += "URL raw response, sqlmap will carry on anyway"
         logger.warn(warnMsg)
 
     return True
@@ -823,13 +823,14 @@ def checkRegexp():
     infoMsg += "the target URL page content"
     logger.info(infoMsg)
 
-    page, _ = Request.queryPage(content=True)
+    page, headers = Request.queryPage(content=True)
+    rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
-    if not re.search(conf.regexp, page, re.I | re.M):
+    if not re.search(conf.regexp, rawResponse, re.I | re.M):
         warnMsg = "you provided '%s' as the regular expression to " % conf.regexp
         warnMsg += "match, but such a regular expression does not have any "
-        warnMsg += "match within the target URL page content, sqlmap "
-        warnMsg += "will keep going anyway"
+        warnMsg += "match within the target URL raw response, sqlmap "
+        warnMsg += "will carry on anyway"
         logger.warn(warnMsg)
 
     return True

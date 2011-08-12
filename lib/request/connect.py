@@ -643,8 +643,8 @@ class Connect:
         page = removeReflectiveValues(page, payload)
 
         if getRatioValue:
-            return comparison(page, getRatioValue=False, pageLength=pageLength), comparison(page, getRatioValue=True, pageLength=pageLength)
+            return comparison(page, headers, getRatioValue=False, pageLength=pageLength), comparison(page, headers, getRatioValue=True, pageLength=pageLength)
         elif pageLength or page:
-            return comparison(page, getRatioValue, pageLength)
+            return comparison(page, headers, getRatioValue, pageLength)
         else:
             return False
