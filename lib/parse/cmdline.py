@@ -200,12 +200,15 @@ def cmdLineParser():
                                   "default %d)" % defaults.level)
 
         detection.add_option("--string", dest="string",
-                             help="String to match in page when the "
+                             help="String to match in the response when "
                                   "query is valid")
 
         detection.add_option("--regexp", dest="regexp",
-                             help="Regexp to match in page when the "
+                             help="Regexp to match in the response when "
                                   "query is valid")
+
+        detection.add_option("--code", dest="code", type="int",
+                             help="HTTP response code to match when the query is valid")
 
         detection.add_option("--text-only", dest="textOnly",
                              action="store_true",

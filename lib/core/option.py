@@ -1330,6 +1330,9 @@ def __cleanupOptions():
     else:
         kb.adjustTimeDelay = False
 
+    if conf.code:
+        conf.code = int(conf.code)
+
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration

@@ -306,7 +306,7 @@ class Connect:
 
             # Return response object
             if response:
-                return conn, None
+                return conn, None, None
 
             # Get HTTP response
             page = conn.read()
@@ -369,7 +369,7 @@ class Connect:
                 warnMsg = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % e.code
                 logger.warn(warnMsg)
-                return None, None
+                return None, None, None
             except:
                 pass
 
@@ -409,7 +409,7 @@ class Connect:
                     processResponse(page, responseHeaders)
             elif e.code == 504:
                 if ignoreTimeout:
-                    return None, None
+                    return None, None, None
                 else:
                     warnMsg = "unable to connect to the target url (%d - %s)" % (e.code, httplib.responses[e.code])
                     if threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
@@ -418,14 +418,14 @@ class Connect:
                         return Connect.__retryProxy(**kwargs)
                     elif kb.testMode:
                         logger.critical(warnMsg)
-                        return None, None
+                        return None, None, None
                     else:
                         raise sqlmapConnectionException, warnMsg
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
                 processResponse(page, responseHeaders)
-                return page, responseHeaders
+                return page, responseHeaders, code
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
             tbMsg = traceback.format_exc()
@@ -454,16 +454,16 @@ class Connect:
 
             if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
-                return None, None
+                return None, None, None
             elif silent or (ignoreTimeout and any(map(lambda x: x in tbMsg, ["timed out", "IncompleteRead"]))):
-                return None, None
+                return None, None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
                 warnMsg += ", sqlmap is going to retry the request"
                 logger.critical(warnMsg)
                 return Connect.__retryProxy(**kwargs)
             elif kb.testMode:
                 logger.critical(warnMsg)
-                return None, None
+                return None, None, None
             else:
                 raise sqlmapConnectionException, warnMsg
 
@@ -485,7 +485,7 @@ class Connect:
 
         logger.log(7, responseMsg)
 
-        return page, responseHeaders
+        return page, responseHeaders, code
 
     @staticmethod
     def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None):
@@ -613,7 +613,7 @@ class Connect:
 
                 auxHeaders[HTTPHEADER.RANGE] = "bytes=-1"
 
-            _, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
+            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
             if headers:
                 if kb.nullConnection == NULLCONNECTION.HEAD and HTTPHEADER.CONTENT_LENGTH in headers:
@@ -622,7 +622,7 @@ class Connect:
                     pageLength = int(headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
 
         if not pageLength:
-            page, headers = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+            page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
@@ -643,8 +643,8 @@ class Connect:
         page = removeReflectiveValues(page, payload)
 
         if getRatioValue:
-            return comparison(page, headers, getRatioValue=False, pageLength=pageLength), comparison(page, headers, getRatioValue=True, pageLength=pageLength)
+            return comparison(page, headers, code, getRatioValue=False, pageLength=pageLength), comparison(page, headers, code, getRatioValue=True, pageLength=pageLength)
         elif pageLength or page:
-            return comparison(page, headers, getRatioValue, pageLength)
+            return comparison(page, headers, code, getRatioValue, pageLength)
         else:
             return False

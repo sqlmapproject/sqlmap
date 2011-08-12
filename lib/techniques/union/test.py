@@ -109,7 +109,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-        ratio = comparison(page, headers, True) or MIN_RATIO
+        ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
         ratios.append(ratio)
         min_, max_ = min(min_, ratio), max(max_, ratio)
         items.append((count, ratio))

@@ -28,7 +28,7 @@ from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 
-def comparison(page, headers, getRatioValue=False, pageLength=None):
+def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 
@@ -49,6 +49,9 @@ def comparison(page, headers, getRatioValue=False, pageLength=None):
         if conf.regexp:
             condition = re.search(conf.regexp, rawResponse, re.I | re.M) is not None
             return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+
+    if isinstance(code, int) and conf.code:
+        return code == conf.code
 
     if page:
         # In case of an DBMS error page return None

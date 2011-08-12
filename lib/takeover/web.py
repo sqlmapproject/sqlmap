@@ -62,7 +62,7 @@ class Web:
             cmd = conf.osCmd
 
         cmdUrl = "%s?cmd=%s" % (self.webBackdoorUrl, cmd)
-        page, _ = Request.getPage(url=cmdUrl, direct=True, silent=True)
+        page, _, _ = Request.getPage(url=cmdUrl, direct=True, silent=True)
 
         if page is not None:
             output = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
@@ -237,7 +237,7 @@ class Web:
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, uriPath)
                 self.webStagerUrl = "%s/%s" % (self.webBaseUrl, stagerName)
 
-                uplPage, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
+                uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
 
                 if "sqlmap file uploader" not in uplPage:
                     if localPath not in warned:
