@@ -576,12 +576,16 @@ class Connect:
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                     Connect.queryPage(content=True)
 
-                if stdev(kb.responseTimes) > WARN_TIME_STDEV:
+                deviation = stdev(kb.responseTimes)
+
+                if deviation > WARN_TIME_STDEV:
                     kb.adjustTimeDelay = False
 
-                    warnMsg = "there is considerable lagging in connection "
-                    warnMsg += "response(s). Please use as high value for "
-                    warnMsg += "--time-sec option as possible (e.g. 10 or more)"
+                    warnMsg = "there is considerable lagging (standard deviation: "
+                    warnMsg += "%f sec%s) " % (deviation, "s" if deviation > 1 else "")
+                    warnMsg += "in connection response(s). Please use as high "
+                    warnMsg += "value for --time-sec option as possible (e.g. "
+                    warnMsg += "%d or more)" % (conf.timeSec * 2)
                     logger.critical(warnMsg)
             elif not kb.testMode:
                 warnMsg = "it is very important not to stress the network adapter's "
