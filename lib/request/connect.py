@@ -407,7 +407,6 @@ class Connect:
                     debugMsg = "page not found (%d)" % code
                     logger.debug(debugMsg)
                     processResponse(page, responseHeaders)
-                    return page, responseHeaders
             elif e.code == 504:
                 if ignoreTimeout:
                     return None, None
