@@ -399,9 +399,15 @@ class Connect:
                 errMsg = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
                 raise sqlmapConnectionException, errMsg
-            elif e.code == 404 and raise404:
-                errMsg = "page not found (%d)" % code
-                raise sqlmapConnectionException, errMsg
+            elif e.code == 404
+                if raise404:
+                    errMsg = "page not found (%d)" % code
+                    raise sqlmapConnectionException, errMsg
+                else:
+                    debugMsg = "page not found (%d)" % code
+                    logger.debug(debugMsg)
+                    processResponse(page, responseHeaders)
+                    return page, responseHeaders
             elif e.code == 504:
                 if ignoreTimeout:
                     return None, None
