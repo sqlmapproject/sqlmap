@@ -399,7 +399,7 @@ class Connect:
                 errMsg = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
                 raise sqlmapConnectionException, errMsg
-            elif e.code == 404
+            elif e.code == 404:
                 if raise404:
                     errMsg = "page not found (%d)" % code
                     raise sqlmapConnectionException, errMsg
