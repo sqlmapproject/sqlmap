@@ -209,12 +209,11 @@ def decodePage(page, contentEncoding, contentType):
     return page
 
 def processResponse(page, responseHeaders):
-    parseResponse(page, responseHeaders)
+    if not kb.dumpMode:
+        parseResponse(page, responseHeaders)
 
     if conf.parseErrors:
         msg = extractErrorMessage(page)
 
         if msg:
             logger.info("parsed error message: '%s'" % msg) 
-
-    return page

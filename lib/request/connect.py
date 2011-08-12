@@ -419,7 +419,7 @@ class Connect:
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
-                page = processResponse(page, responseHeaders)
+                processResponse(page, responseHeaders)
                 return page, responseHeaders
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead), e:
@@ -465,7 +465,7 @@ class Connect:
         finally:
             socket.setdefaulttimeout(conf.timeout)
 
-        page = processResponse(page, responseHeaders)
+        processResponse(page, responseHeaders)
 
         responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
         if responseHeaders:

@@ -12,7 +12,7 @@ from lib.core.datatype import AttribDict
 _defaults =  {
                "timeSec":      5,
                "googlePage":   1,
-               "cpuThrottle":  10,
+               "cpuThrottle":  5,
                "verbose":      1,
                "cDel":         ";",
                "delay":        0,

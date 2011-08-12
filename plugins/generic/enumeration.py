@@ -1549,6 +1549,8 @@ class Enumeration:
                 kb.data.cachedColumns = foundData
 
             try:
+                kb.dumpMode = True
+
                 if not safeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
                    or safeSQLIdentificatorNaming(tbl, True) not in \
                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] \
@@ -1767,6 +1769,9 @@ class Enumeration:
                 errMsg = "connection exception detected in dumping phase: "
                 errMsg += "'%s'" % e
                 logger.critical(errMsg)
+
+            finally:
+                kb.dumpMode = False
 
     def dumpAll(self):
         if conf.db is not None and conf.tbl is None:
