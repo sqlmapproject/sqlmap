@@ -66,7 +66,7 @@ CONCAT_ROW_DELIMITER = ','
 CONCAT_VALUE_DELIMITER = '|'
 
 # coefficient used for a time-based query delay checking (must be >= 7)
-TIME_STDEV_COEFF = 10
+TIME_STDEV_COEFF = 7
 
 # standard deviation after which a warning message should be displayed about connection lags
 WARN_TIME_STDEV = 0.5
