@@ -6,7 +6,7 @@
 <author>by <htmlurl url="mailto:bernardo@sqlmap.org" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav@sqlmap.org" name="Miroslav Stampar">
 <date>version 1.0-dev, XXX XX, 2011
 <abstract>
-This document is the user's manual to use <htmlurl url="http://www.sqlmap.org" name="sqlmap">.
+This document is the user's manual for <htmlurl url="http://www.sqlmap.org" name="sqlmap">.
 </abstract>
 
 <toc>
@@ -28,29 +28,26 @@ on the operating system via out-of-band connections.
 
 <p>
 sqlmap is developed in <htmlurl url="http://www.python.org" name="Python">,
-a dynamic object-oriented interpreted programming language.
-This makes the tool independent from the operating system. It only
-requires the Python interpreter version <bf>2</bf> equal or higher than
-<bf>2.6</bf>.
-The interpreter is freely downloadable from its
-<htmlurl url="http://python.org/download/" name="official site">.
+a dynamic, object-oriented, interpreted programming language freely available from 
+<htmlurl url="http://python.org/download/" name="http://python.org/download/">.
+This makes sqlmap a cross-platform application which is independant of the 
+operating system. sqlmap requires Python version <bf>2.6</bf> or above.
 To make it even easier, many GNU/Linux distributions come out of the box
-with Python interpreter installed and other Unices and Mac OSX too provide
-it packaged in their formats and ready to be installed.
-Windows users can download and install the Python setup-ready installer
-for x86, AMD64 and Itanium too.
+with Python installed. Other Unices and Mac OSX also provide Python packaged
+and ready to be installed.
+Windows users can download and install the Python installer for x86, AMD64 and Itanium.
 
 sqlmap relies on the <htmlurl url="http://metasploit.com"
 name="Metasploit Framework"> for some of its post-exploitation takeover
-features. You need to grab a copy of it from the
+features. You need to grab a copy of the framework from the
 <htmlurl url="http://metasploit.com/download/" name="download">
 page - the required version is <bf>3.5</bf> or higher.
-For the ICMP tunneling out-of-band takeover technique, sqlmap requires
+For the ICMP tunneling out-of-band takeover technique, sqlmap requires the
 <htmlurl url="http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket"
 name="Impacket"> library too.
 
 If you are willing to connect directly to a database server (<tt>-d</tt> switch),
-without passing via a web application, you need to install Python bindings
+without passing through the web application, you need to install Python bindings
 for the database management system that you are going to attack:
 
 <itemize>
@@ -68,17 +65,17 @@ If you plan to attack a web application behind NTLM authentication or use
 the sqlmap update functionality (<tt>-</tt><tt>-update</tt> switch) you need to
 install respectively <htmlurl url="http://code.google.com/p/python-ntlm/"
 name="python-ntlm"> and <htmlurl url="http://pysvn.tigris.org/"
-name="python-svn"> libraries.
+name="python-svn"> libraries respectively.
 
-Optionally, if you are running sqlmap on Windows, you may wish to install
+Optionally, if you are running sqlmap on Windows, you may wish to install the
 <htmlurl url="http://ipython.scipy.org/moin/PyReadline/Intro" name="PyReadline">
-library to be able to take advantage of the sqlmap TAB completion and
+library in order to take advantage of the sqlmap TAB completion and
 history support features in the SQL shell and OS shell.
-Note that these functionalities are available natively by Python standard
+Note that these functionalities are available natively via the standard Python
 <htmlurl url="http://docs.python.org/library/readline.html" name="readline">
 library on other operating systems.
 
-You can also choose to install <htmlurl url="http://psyco.sourceforge.net/"
+You can also choose to install the <htmlurl url="http://psyco.sourceforge.net/"
 name="Psyco"> library to eventually speed up the sqlmap algorithmic
 operations.
 
@@ -88,13 +85,13 @@ operations.
 <sect2>Detect and exploit a SQL injection
 <p>
 Let's say that you are auditing a web application and found a web page
-that accepts dynamic user-provided values on <tt>GET</tt> or <tt>POST</tt>
-parameters or HTTP <tt>Cookie</tt> values or HTTP <tt>User-Agent</tt>
-header value.
+that accepts dynamic user-provided values via <tt>GET</tt>, <tt>POST</tt>
+or <tt>Cookie</tt> parameters or via the HTTP <tt>User-Agent</tt>
+request header.
 You now want to test if these are affected by a SQL injection
 vulnerability, and if so, exploit them to retrieve as much information as
-possible out of the web application's back-end database management system
-or even be able to access the underlying file system and operating system.
+possible from the back-end database management system, or even be able to
+access the underlying file system and operating system.
 
 In a simple world, consider that the target url is:
 
@@ -104,59 +101,56 @@ Assume that:
 
 <tscreen><tt>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=1</tt></tscreen>
 
-is the same page as the original one and:
+is the same page as the original one and (the condition evaluates to <bf>True<bf>):
 
 <tscreen><tt>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=2</tt></tscreen>
 
-differs from the original one, it means that you are in front of a SQL
+differs from the original one (the condition evaluates to <bf>False</bf>).
+This likely means that you are in front of a SQL
 injection vulnerability in the <tt>id</tt> <tt>GET</tt> parameter of the
-<tt>index.php</tt> web application page which means that potentially no
-IDS/IPS, no web application firewall, no parameters' value sanitization is
-performed on the server-side before sending the SQL statement to the
-back-end database management system the web application relies on.
+<tt>index.php</tt> page. Additionally, no sanitisation of user's supplied
+input is taking place before the SQL statement is sent to the
+back-end database management system.
 
-This is a quite common flaw in dynamic content web applications and it
+This is quite a common flaw in dynamic content web applications and it
 does not depend upon the back-end database management system nor on the web
-application programming language: it is a programmer code's security flaw.
+application programming language; it is a flaw within the application code.
 The <htmlurl url="http://www.owasp.org" name="Open Web Application Security Project">
-rated on 2010 in their <htmlurl url="http://www.owasp.org/index.php/Category:OWASP_Top_Ten_Project"
-name="OWASP Top Ten"> survey this vulnerability as the <htmlurl
+rated this class of vulnerability as the <htmlurl
 url="http://owasptop10.googlecode.com/files/OWASP%20Top%2010%20-%202010.pdf" name="most
-common"> and important web application vulnerability along with other
-injection flaws.
+common"> and serious web application vulnerability in their
+<htmlurl url="http://www.owasp.org/index.php/Category:OWASP_Top_Ten_Project"
+name="Top Ten"> list from 2010.
 
-Back to the scenario, probably the SQL <tt>SELECT</tt> statement into
-<tt>get_int.php</tt> has a syntax similar to the following SQL query, in
-pseudo PHP code:
+Now that you have found the vulnerable parameter, you can exploit it by
+manipulating the <tt>id</tt> parameter value in the HTTP request.
+
+Back to the scenario, we can make an educated guess about the probable
+syntax of the SQL <tt>SELECT</tt> statement where the user supplied value is
+being used in the <tt>get_int.php</tt> web page. In pseudo PHP code:
 
 <tscreen><tt>
 $query = "SELECT &#91;column(s) name&#93; FROM &#91;table name&#93; WHERE id=" . $_REQUEST['id'];
 </tt></tscreen>
 
-As you can see, appending any other syntatically valid SQL condition after
-a value for <tt>id</tt> such condition will take place when the web
-application passes the query to the back-end database management system
-that executes it, that is why the condition <tt>id=1 AND 1=1</tt> is valid
-(<em>True</em>) and returns the same page as the original one, with the
-same content. This is the case of a boolean-based blind SQL injection
-vulnerability. However, sqlmap is able to detect any type of SQL injection
-and adapt its work-flow accordingly. Read below for further details.
+As you can see, appending a syntactically valid SQL statement that will
+evaluate to a <em>True</em> condition after the value for the <tt>id</tt>
+parameter (such as <tt>id=1 AND 1=1</tt>) will result in the web application
+returning the same web page as in the original request (where no SQL
+statement is added).
+This is because the back-end database management system has evaluated the
+injected SQL statement.
+The previous example describes a simple boolean-based blind SQL injection
+vulnerability. 
+However, sqlmap is able to detect any type of SQL injection flaw and adapt
+its work-flow accordingly. 
 
-Moreover, in this simple and easy to inject scenario it would be also
-possible to append, not just one or more valid SQL condition(s), but also
-stacked SQL queries, for instance something like <tt>[...]&amp;id=1;
-ANOTHER SQL QUERY#</tt> if the web application technology supports
-<em>stacked queries</em>, also known as <em>multiple statements</em>.
+In this simple scenario it would also be possible to append, not just one or
+more valid SQL conditions, but also (depending on the DBMS) stacked SQL
+queries. For instance:  <tt>[...]&amp;id=1;ANOTHER SQL QUERY#</tt>.
 
-Now that you found this SQL injection vulnerable parameter, you can
-exploit it by manipulating the <tt>id</tt> parameter value in the HTTP
-request.
-
-There exist many <htmlurl url="http://delicious.com/inquis/sqlinjection" name="resources">
-on the Net explaining in depth how to prevent, detect and exploit SQL
-injection vulnerabilities in web application and it is recommended to read
-them if you are not familiar with the issue before going ahead with sqlmap.
-
+sqlmap can automate the process of identifying and exploiting this type of
+vulnerability. 
 Passing the original address, <tt>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1</tt>
 to sqlmap, the tool will automatically:
 
@@ -168,6 +162,13 @@ vulnerable parameter(s);
 <item>Depending on the user's options, it will extensively fingerprint,
 enumerate data or takeover the database server as a whole.
 </itemize>
+...and depending on supplied options, it will enumerate data or takeover the
+database server entirely.
+
+There exist many <htmlurl url="http://delicious.com/inquis/sqlinjection" name="resources">
+on the web explaining in depth how to detect, exploit and prevent SQL
+injection vulnerabilities in web applications. It is recommendeded that you read
+them before going much further with sqlmap.
 
 <sect2>Direct connection to the database management system
 <p>
