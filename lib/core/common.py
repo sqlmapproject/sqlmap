@@ -2098,11 +2098,12 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
         if all([x == candidate for x in kb.delayCandidates]) and candidate < conf.timeSec:
             print
 
-            warnMsg = "adjusting time delay to %d second%s " % (candidate, 's' if candidate > 1 else '')
-            warnMsg += "(due to good response times)"
-            logger.warn(warnMsg)
+            msg = "do you want to adjust the time delay to %d second%s " % (candidate, 's' if candidate > 1 else '')
+            msg += "(due to good response times)? [Y/n] "
+            inp = readInput(msg, default="Y")
 
-            conf.timeSec = candidate
+            if inp and inp[0].lower() == "y":
+                conf.timeSec = candidate
 
 def extractErrorMessage(page):
     """
