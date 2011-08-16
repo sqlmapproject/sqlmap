@@ -275,8 +275,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         kb.adjustTimeDelay = False
                                     return getChar(idx, originalTbl, continuousOrder, expand)
                                 else:
+                                    errMsg = "unable to properly validate character value. using last known value ('%s').." % decodeIntToUnicode(retVal)
+                                    logger.error(errMsg)
                                     conf.timeSec = kb.originalTimeDelay
-                                    return None
+                                    return decodeIntToUnicode(retVal)
                             else:
                                 return decodeIntToUnicode(retVal)
                         else:
