@@ -1432,6 +1432,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.pageTemplates = dict()
     kb.orderByColumns = None
     kb.originalPage = None
+    kb.originalTimeDelay = None
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing

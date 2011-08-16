@@ -44,6 +44,7 @@ from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
+from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
 from lib.core.settings import PYVERSION
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
@@ -259,16 +260,23 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 errMsg = "invalid character detected. retrying.."
                                 logger.error(errMsg)
 
-                                conf.timeSec += 1
-                                warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                                warnMsg += "(due to invalid char)"
-                                logger.warn(warnMsg)
+                                if not kb.originalTimeDelay:
+                                    kb.originalTimeDelay = conf.timeSec
 
-                                if kb.adjustTimeDelay:
-                                    dbgMsg = "turning off auto-adjustment mechanism"
-                                    logger.debug(dbgMsg)
-                                    kb.adjustTimeDelay = False
-                                return getChar(idx, originalTbl, continuousOrder, expand)
+                                conf.timeSec += 1
+                                if (conf.timeSec - kb.originalTimeDelay) <= MAX_TIME_REVALIDATION_STEPS:
+                                    warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                    warnMsg += "(due to invalid char)"
+                                    logger.warn(warnMsg)
+
+                                    if kb.adjustTimeDelay:
+                                        dbgMsg = "turning off auto-adjustment mechanism"
+                                        logger.debug(dbgMsg)
+                                        kb.adjustTimeDelay = False
+                                    return getChar(idx, originalTbl, continuousOrder, expand)
+                                else:
+                                    conf.timeSec = kb.originalTimeDelay
+                                    return None
                             else:
                                 return decodeIntToUnicode(retVal)
                         else:

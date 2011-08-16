@@ -391,3 +391,6 @@ TRIM_STDOUT_DUMP_SIZE = 1024
 
 # Step used in ORDER BY technique used for finding the right number of columns in UNION query injections
 ORDER_BY_STEP = 10
+
+# Maximum number of times for revalidation of a character in time-based injections
+MAX_TIME_REVALIDATION_STEPS = 5
