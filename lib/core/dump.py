@@ -211,10 +211,9 @@ class Dump:
 
                 for column in colList:
                     colType = columns[column]
-                    maxlength1 = max(maxlength1, len(column))
 
-                    if colType is not None:
-                        maxlength2 = max(maxlength2, len(colType))
+                    maxlength1 = max(maxlength1, len(column or ""))
+                    maxlength2 = max(maxlength2, len(colType or ""))
 
                 maxlength1 = max(maxlength1, len("COLUMN"))
                 lines1 = "-" * (maxlength1 + 2)

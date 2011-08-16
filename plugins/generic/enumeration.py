@@ -1141,10 +1141,11 @@ class Enumeration:
                         if not isNoneValue(columnData):
                             name = safeSQLIdentificatorNaming(columnData[0])
 
-                            if len(columnData) == 1:
-                                columns[name] = ""
-                            else:
-                                columns[name] = columnData[1]
+                            if name:
+                                if len(columnData) == 1:
+                                    columns[name] = ""
+                                else:
+                                    columns[name] = columnData[1]
 
                     if conf.db in kb.data.cachedColumns:
                         kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = columns
@@ -1242,27 +1243,28 @@ class Enumeration:
                     query = agent.limitQuery(index, query, field)
                     column = inject.getValue(query, inband=False, error=False)
 
-                    if not onlyColNames:
-                        if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                            query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
-                        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                            query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
-                        elif Backend.isDbms(DBMS.MSSQL):
-                            query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db,
-                                                              conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
-                        elif Backend.isDbms(DBMS.FIREBIRD):
-                            query = rootQuery.blind.query2 % (tbl, column)
+                    if not isNoneValue(column):
+                        if not onlyColNames:
+                            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                                query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
+                            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
+                            elif Backend.isDbms(DBMS.MSSQL):
+                                query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db,
+                                                                conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                            elif Backend.isDbms(DBMS.FIREBIRD):
+                                query = rootQuery.blind.query2 % (tbl, column)
 
-                        colType = inject.getValue(query, inband=False, error=False)
+                            colType = inject.getValue(query, inband=False, error=False)
 
-                        if Backend.isDbms(DBMS.FIREBIRD):
-                            colType = firebirdTypes.get(colType, colType)
+                            if Backend.isDbms(DBMS.FIREBIRD):
+                                colType = firebirdTypes.get(colType, colType)
 
-                        column = safeSQLIdentificatorNaming(column)
-                        columns[column] = colType
-                    else:
-                        column = safeSQLIdentificatorNaming(column)
-                        columns[column] = None
+                            column = safeSQLIdentificatorNaming(column)
+                            columns[column] = colType
+                        else:
+                            column = safeSQLIdentificatorNaming(column)
+                            columns[column] = None
 
                 if columns:
                     if conf.db in kb.data.cachedColumns:
