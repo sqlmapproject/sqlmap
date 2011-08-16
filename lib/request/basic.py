@@ -135,7 +135,7 @@ def checkCharEncoding(encoding):
     # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
         encoding = translate[encoding]
-    elif encoding == 'null':
+    elif encoding in ('null', '{charset}'):
         return None
 
     # http://www.iana.org/assignments/character-sets
