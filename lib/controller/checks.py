@@ -450,7 +450,7 @@ def checkSqlInjection(place, parameter, value):
                                     injection.os = Backend.setOs(dValue)
 
                         if vector is None and "vector" in test and test.vector is not None:
-                            vector = "%s%s" % (test.vector, comment)
+                            vector = "%s%s" % (test.vector, comment or "")
 
                         injection.data[stype] = AttribDict()
                         injection.data[stype].title = title
