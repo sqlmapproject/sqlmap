@@ -587,7 +587,7 @@ class Connect:
                     kb.adjustTimeDelay = False
 
                     warnMsg = "there is considerable lagging (standard deviation: "
-                    warnMsg += "%f sec%s) " % (deviation, "s" if deviation > 1 else "")
+                    warnMsg += "%.1f sec%s) " % (deviation, "s" if deviation > 1 else "")
                     warnMsg += "in connection response(s). Please use as high "
                     warnMsg += "value for --time-sec option as possible (e.g. "
                     warnMsg += "%d or more)" % (conf.timeSec * 2)
