@@ -96,35 +96,35 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             warnMsg = "running in a single-thread mode. This could take a while."
             logger.warn(warnMsg)
 
-    if numThreads > 1:
-        if startThreadMsg:
-            infoMsg = "starting %d threads" % numThreads
-            logger.info(infoMsg)
-    else:
-        threadFunction()
-        return
-
-    # Start the threads
-    for numThread in range(numThreads):
-        thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[threadFunction])
-
-        # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
-        if PYVERSION >= "2.6":
-            thread.daemon = True
-        else:
-            thread.setDaemon(True)
-
-        try:
-            thread.start()
-        except threadError, errMsg:
-            errMsg = "error occured while starting new thread ('%s')" % errMsg
-            logger.critical(errMsg)
-            break
-
-        threads.append(thread)
-
-    # And wait for them to all finish
     try:
+        if numThreads > 1:
+            if startThreadMsg:
+                infoMsg = "starting %d threads" % numThreads
+                logger.info(infoMsg)
+        else:
+            threadFunction()
+            return
+
+        # Start the threads
+        for numThread in range(numThreads):
+            thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[threadFunction])
+
+            # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
+            if PYVERSION >= "2.6":
+                thread.daemon = True
+            else:
+                thread.setDaemon(True)
+
+            try:
+                thread.start()
+            except threadError, errMsg:
+                errMsg = "error occured while starting new thread ('%s')" % errMsg
+                logger.critical(errMsg)
+                break
+
+            threads.append(thread)
+
+        # And wait for them to all finish
         alive = True
         while alive:
             alive = False
