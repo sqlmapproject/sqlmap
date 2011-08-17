@@ -104,6 +104,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         upperCount = lowerCount + MIN_UNION_RESPONSES
 
     min_, max_ = MAX_RATIO, MIN_RATIO
+    pages = {}
 
     for count in range(lowerCount, upperCount+1):
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar)
@@ -113,6 +114,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         ratios.append(ratio)
         min_, max_ = min(min_, ratio), max(max_, ratio)
         items.append((count, ratio))
+        pages[count] = page
 
     ratios.pop(ratios.index(min_))
     ratios.pop(ratios.index(max_))
@@ -141,6 +143,13 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
             if max_ > upper:
                 if retVal is None or abs(max_ - upper) > abs(min_ - lower):
                     retVal = maxItem[0]
+
+    if not retVal and kb.uChar:
+        for count, page in pages.items():
+            if not re.search(r'>\s*%s\s*<' % kb.uChar, page):
+                del pages[count]
+        if len(pages) == 1:
+            retVal = pages.keys()[0]
 
     kb.errorIsNone = popValue()
 
