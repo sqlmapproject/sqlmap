@@ -114,7 +114,8 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         ratios.append(ratio)
         min_, max_ = min(min_, ratio), max(max_, ratio)
         items.append((count, ratio))
-        pages[count] = page
+        if kb.uChar:
+            pages[count] = page
 
     ratios.pop(ratios.index(min_))
     ratios.pop(ratios.index(max_))
