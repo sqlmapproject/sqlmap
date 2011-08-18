@@ -970,7 +970,7 @@ class Enumeration:
 
         return kb.data.cachedTables
 
-    def getColumns(self, onlyColNames=False, colTuple=None):
+    def getColumns(self, onlyColNames=False, colTuple=None, bruteForce=None):
         self.forceDbmsEnum()
 
         if conf.db is None or conf.db == "CD":
@@ -1030,19 +1030,18 @@ class Enumeration:
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
 
-        bruteForce = False
+        if bruteForce is None:
+            if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
+                errMsg = "information_schema not available, "
+                errMsg += "back-end DBMS is MySQL < 5.0"
+                logger.error(errMsg)
+                bruteForce = True
 
-        if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-            errMsg = "information_schema not available, "
-            errMsg += "back-end DBMS is MySQL < 5.0"
-            logger.error(errMsg)
-            bruteForce = True
-
-        elif Backend.isDbms(DBMS.ACCESS):
-            errMsg = "cannot retrieve column names, "
-            errMsg += "back-end DBMS is Access"
-            logger.error(errMsg)
-            bruteForce = True
+            elif Backend.isDbms(DBMS.ACCESS):
+                errMsg = "cannot retrieve column names, "
+                errMsg += "back-end DBMS is Access"
+                logger.error(errMsg)
+                bruteForce = True
 
         if bruteForce:
             resumeAvailable = False
@@ -1277,6 +1276,9 @@ class Enumeration:
             errMsg = "unable to retrieve the columns for any "
             errMsg += "table on database '%s'" % conf.db
             logger.error(errMsg)
+
+            if bruteForce is None:
+                return self.getColumns(onlyColNames=onlyColNames, colTuple=colTuple, bruteForce=True)
 
         return kb.data.cachedColumns
 
