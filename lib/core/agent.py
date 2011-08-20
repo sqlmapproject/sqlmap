@@ -560,8 +560,8 @@ class Agent:
 
         if limited:
             inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, range(0, count)))
-            inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
             inbandQuery += FROM_TABLE.get(Backend.getIdentifiedDbms(), "")
+            inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
             return inbandQuery
 

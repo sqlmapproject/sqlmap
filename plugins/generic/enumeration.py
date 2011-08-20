@@ -2352,6 +2352,8 @@ class Enumeration:
         sqlType = None
         getOutput = None
 
+        query = query.rstrip(';')
+
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:
                 if query.lower().startswith(sqlStatement):
