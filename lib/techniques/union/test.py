@@ -110,47 +110,49 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-        ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
-        ratios.append(ratio)
-        min_, max_ = min(min_, ratio), max(max_, ratio)
-        items.append((count, ratio))
         if kb.uChar:
             pages[count] = page
+        else:
+            ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
+            ratios.append(ratio)
+            min_, max_ = min(min_, ratio), max(max_, ratio)
+            items.append((count, ratio))
 
-    ratios.pop(ratios.index(min_))
-    ratios.pop(ratios.index(max_))
+    if kb.uChar:
+        for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
+            contains = [(count, re.search(regex, page, re.IGNORECASE) is not None) for count, page in pages.items()]
+            if len(filter(lambda x: x[1], contains)) == 1:
+                retVal = filter(lambda x: x[1], contains)[0][0]
+                break
 
-    minItem, maxItem = None, None
+    else:
+        ratios.pop(ratios.index(min_))
+        ratios.pop(ratios.index(max_))
 
-    for item in items:
-        if item[1] == min_:
-            minItem = item
-        elif item[1] == max_:
-            maxItem = item
+        minItem, maxItem = None, None
 
-    if all(map(lambda x: x == min_ and x != max_, ratios)):
-        retVal = maxItem[0]
+        for item in items:
+            if item[1] == min_:
+                minItem = item
+            elif item[1] == max_:
+                maxItem = item
 
-    elif all(map(lambda x: x != min_ and x == max_, ratios)):
-        retVal = minItem[0]
+        if all(map(lambda x: x == min_ and x != max_, ratios)):
+            retVal = maxItem[0]
 
-    elif abs(max_ - min_) >= MIN_STATISTICAL_RANGE:
-            deviation = stdev(ratios)
-            lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
+        elif all(map(lambda x: x != min_ and x == max_, ratios)):
+            retVal = minItem[0]
 
-            if min_ < lower:
-                retVal = minItem[0]
+        elif abs(max_ - min_) >= MIN_STATISTICAL_RANGE:
+                deviation = stdev(ratios)
+                lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
 
-            if max_ > upper:
-                if retVal is None or abs(max_ - upper) > abs(min_ - lower):
-                    retVal = maxItem[0]
+                if min_ < lower:
+                    retVal = minItem[0]
 
-    if not retVal and kb.uChar:
-        for count, page in pages.items():
-            if not re.search(r'>\s*%s\s*<' % kb.uChar, page):
-                del pages[count]
-        if len(pages) == 1:
-            retVal = pages.keys()[0]
+                if max_ > upper:
+                    if retVal is None or abs(max_ - upper) > abs(min_ - lower):
+                        retVal = maxItem[0]
 
     kb.errorIsNone = popValue()
 
@@ -254,7 +256,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     if conf.uColsStop == conf.uColsStart:
         count = conf.uColsStart
     else:
-        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix)
+        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.NEGATIVE if kb.uChar else PAYLOAD.WHERE.ORIGINAL)
 
     if count:
         if Backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
