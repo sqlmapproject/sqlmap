@@ -112,11 +112,10 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
         if kb.uChar:
             pages[count] = page
-        else:
-            ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
-            ratios.append(ratio)
-            min_, max_ = min(min_, ratio), max(max_, ratio)
-            items.append((count, ratio))
+        ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
+        ratios.append(ratio)
+        min_, max_ = min(min_, ratio), max(max_, ratio)
+        items.append((count, ratio))
 
     if kb.uChar:
         for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
@@ -125,7 +124,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
                 retVal = filter(lambda x: x[1], contains)[0][0]
                 break
 
-    else:
+    if not retVal:
         ratios.pop(ratios.index(min_))
         ratios.pop(ratios.index(max_))
 
