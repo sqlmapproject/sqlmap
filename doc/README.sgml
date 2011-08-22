@@ -33,7 +33,7 @@ a dynamic, object-oriented, interpreted programming language freely available fr
 This makes sqlmap a cross-platform application which is independant of the 
 operating system. sqlmap requires Python version <bf>2.6</bf> or above.
 To make it even easier, many GNU/Linux distributions come out of the box
-with Python installed. Other Unices and Mac OSX also provide Python packaged
+with Python installed. Other Unixes and Mac OSX also provide Python packaged
 and ready to be installed.
 Windows users can download and install the Python installer for x86, AMD64 and Itanium.
 
