@@ -220,21 +220,21 @@ has been configured to disclose back-end database management system error
 messages.
 <item><bf>UNION query SQL injection</bf>, also known as <bf>inband SQL
 injection</bf>: sqlmap appends to the affected parameter a syntatically
-valid SQL statement string starting with a <tt>UNION ALL SELECT</tt>.
-This techique works when the web application page passes the output of the
-<tt>SELECT</tt> statement within a <tt>for</tt> cycle, or similar, so that
-each line of the query output is printed on the page content.
+valid SQL statement starting with an <tt>UNION ALL SELECT</tt>.
+This techique works when the web application page passes directly the output 
+of the <tt>SELECT</tt> statement within a <tt>for</tt> loop, or similar, so 
+that each line of the query output is printed on the page content.
 sqlmap is also able to exploit <bf>partial (single entry) UNION query SQL
 injection</bf> vulnerabilities which occur when the output of the
-statement is not cycled in a <tt>for</tt> construct whereas only the first
+statement is not cycled in a <tt>for</tt> construct, whereas only the first
 entry of the query output is displayed.
 <item><bf>Stacked queries SQL injection</bf>, also known as <bf>multiple
 statements SQL injection</bf>: sqlmap tests if the web application supports
-stacked queries then, in case it does support, it appends to the affected
+stacked queries and then, in case it does support, it appends to the affected
 parameter in the HTTP request, a semi-colon (<tt>;</tt>) followed by the
 SQL statement to be executed. This technique is useful to run SQL
-statements other than <tt>SELECT</tt> like, for instance, <em>data
-definition</em> or <em>data manipulation</em> statements possibly leading
+statements other than <tt>SELECT</tt>, like for instance, <em>data
+definition</em> or <em>data manipulation</em> statements, possibly leading
 to file system read and write access and operating system command
 execution depending on the underlying back-end database management system
 and the session user privileges.
