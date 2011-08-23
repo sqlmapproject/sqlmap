@@ -211,13 +211,13 @@ For each HTTP response, by making a comparison between the HTTP response
 time with the original request, the tool inference the output of
 the injected statement character by character. Like for boolean-based
 technique, the bisection algorithm is applied.
-<item><bf>Error-based SQL injection</bf>: sqlmap replaces or append to the
-affected parameter a database-specific syntatically wrong statement and
-parses the HTTP response headers and body in search of DBMS error messages
-containing the injected pre-defined chain of characters and the statement
-output within. This technique works when the web application has been
-configured to disclose back-end database management system error messages
-only.
+<item><bf>Error-based SQL injection</bf>: sqlmap replaces or appends to 
+the affected parameter a database-specific error message provoking statement 
+and parses the HTTP response headers and body in search of DBMS error messages 
+containing the injected pre-defined chain of characters and the subquery 
+statement output within. This technique works only when the web application 
+has been configured to disclose back-end database management system error 
+messages.
 <item><bf>UNION query SQL injection</bf>, also known as <bf>inband SQL
 injection</bf>: sqlmap appends to the affected parameter a syntatically
 valid SQL statement string starting with a <tt>UNION ALL SELECT</tt>.
