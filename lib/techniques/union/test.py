@@ -119,7 +119,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
     if kb.uChar:
         for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
-            contains = [(count, re.search(regex, page, re.IGNORECASE) is not None) for count, page in pages.items()]
+            contains = [(count, re.search(regex, page or "", re.IGNORECASE) is not None) for count, page in pages.items()]
             if len(filter(lambda x: x[1], contains)) == 1:
                 retVal = filter(lambda x: x[1], contains)[0][0]
                 break
