@@ -281,13 +281,13 @@ class Agent:
 
         # SQLite version 2 does not support neither CAST() nor IFNULL(),
         # introduced only in SQLite version 3
-        if Backend.isDbms(DBMS.SQLITE):
+        if Backend.isDbms(DBMS.SQLITE) or conf.noCast:
             return field
 
         if field.startswith("(CASE") or field.startswith("(IIF"):
             nulledCastedField = field
         else:
-            nulledCastedField = (queries[Backend.getIdentifiedDbms()].cast.query % field) if not conf.noCast else field
+            nulledCastedField = queries[Backend.getIdentifiedDbms()].cast.query % field
             if Backend.isDbms(DBMS.ACCESS):
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].isnull.query % (nulledCastedField, nulledCastedField)
             else:
