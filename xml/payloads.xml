@@ -449,6 +449,45 @@ Formats:
     <!-- End of WHERE/HAVING clause boundaries -->
 
 
+    <!-- Pre-WHERE generic boundaries (e.g. "UPDATE table SET '$_REQUEST["name"]' WHERE id=1" or "INSERT INTO table VALUES('$_REQUEST["value"]') WHERE id=1)"-->
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>) WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>') WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>' WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>" WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix></suffix>
+    </boundary>
+    <!-- End of generic boundaries -->
+
+
     <!-- Boolean-based blind tests - WHERE/HAVING clause -->
     <test>
         <title>AND boolean-based blind - WHERE or HAVING clause</title>
