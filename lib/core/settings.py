@@ -394,3 +394,6 @@ ORDER_BY_STEP = 10
 
 # Maximum number of times for revalidation of a character in time-based injections
 MAX_TIME_REVALIDATION_STEPS = 5
+
+# Characters that can be used to split parameter values in provided command line (e.g. in --tamper)
+PARAMETER_SPLITTING_REGEX = r'[,|;]'

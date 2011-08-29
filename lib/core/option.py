@@ -102,6 +102,7 @@ from lib.core.settings import DB2_ALIASES
 from lib.core.settings import BURP_SPLITTER
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
+from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import TIME_DELAY_CANDIDATES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
@@ -778,7 +779,7 @@ def __setTamperingFunctions():
         resolve_priorities = False
         priorities = []
 
-        for tfile in re.split(r'[,|;]', conf.tamper):
+        for tfile in re.split(PARAMETER_SPLITTING_REGEX, conf.tamper):
             found = False
 
             tfile = tfile.strip()
@@ -1276,12 +1277,18 @@ def __cleanupOptions():
     if conf.testParameter:
         conf.testParameter = urldecode(conf.testParameter)
         conf.testParameter = conf.testParameter.replace(" ", "")
-        conf.testParameter = conf.testParameter.split(",")
+        conf.testParameter = re.split(PARAMETER_SPLITTING_REGEX, conf.testParameter)
     else:
         conf.testParameter = []
 
     if conf.user:
         conf.user = conf.user.replace(" ", "")
+
+    if conf.rParam:
+        conf.rParam = conf.rParam.replace(" ", "")
+        conf.rParam = re.split(PARAMETER_SPLITTING_REGEX, conf.rParam)
+    else:
+        conf.rParam = []
 
     if conf.delay:
         conf.delay = float(conf.delay)

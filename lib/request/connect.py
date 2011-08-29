@@ -580,15 +580,16 @@ class Connect:
                     retVal = re.sub("%s=[^&;]+" % randomParameter, "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
                 return retVal
 
-            for item in [PLACE.GET, PLACE.POST, PLACE.COOKIE]:                
-                if item in conf.parameters:
-                    origValue = conf.parameters[item]
-                    if item == PLACE.GET and get:
-                        get = _randomizeParameter(get, conf.rParam)
-                    elif item == PLACE.POST and post:
-                        post = _randomizeParameter(post, conf.rParam)
-                    elif item == PLACE.COOKIE and cookie:
-                        cookie = _randomizeParameter(cookie, conf.rParam)
+            for randomParameter in conf.rParam:
+                for item in [PLACE.GET, PLACE.POST, PLACE.COOKIE]:
+                    if item in conf.parameters:
+                        origValue = conf.parameters[item]
+                        if item == PLACE.GET and get:
+                            get = _randomizeParameter(get, randomParameter)
+                        elif item == PLACE.POST and post:
+                            post = _randomizeParameter(post, randomParameter)
+                        elif item == PLACE.COOKIE and cookie:
+                            cookie = _randomizeParameter(cookie, randomParameter)
 
         get = urlencode(get, limit=True)
         post = urlencode(post)
