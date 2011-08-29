@@ -419,14 +419,20 @@ def start():
                             infoMsg = "skipping previously processed %s parameter '%s'" % (place, parameter)
                             logger.info(infoMsg)
 
+                        elif parameter in conf.testParameter:
+                            pass
+
                         elif parameter == conf.rParam:
                             testSqlInj = False
 
                             infoMsg = "skipping randomizing %s parameter '%s'" % (place, parameter)
                             logger.info(infoMsg)
 
-                        elif parameter in conf.testParameter:
-                            pass
+                        elif parameter in conf.skip:
+                            testSqlInj = False
+
+                            infoMsg = "skipping %s parameter '%s'" % (place, parameter)
+                            logger.info(infoMsg)
 
                         # Ignore session-like parameters for --level < 4
                         elif conf.level < 4 and parameter.upper() in IGNORE_PARAMETERS:

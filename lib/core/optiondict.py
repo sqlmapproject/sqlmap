@@ -61,6 +61,7 @@ optDict = {
                                "os":                "string",
                                "prefix":            "string",
                                "suffix":            "string",
+                               "skip":              "string",
                                "tamper":            "string"
                              },
 

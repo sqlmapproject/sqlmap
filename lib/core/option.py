@@ -1290,6 +1290,12 @@ def __cleanupOptions():
     else:
         conf.rParam = []
 
+    if conf.skip:
+        conf.skip = conf.skip.replace(" ", "")
+        conf.skip = re.split(PARAMETER_SPLITTING_REGEX, conf.skip)
+    else:
+        conf.skip = []
+
     if conf.delay:
         conf.delay = float(conf.delay)
 
@@ -1766,6 +1772,10 @@ def __basicOptionValidation():
 
     if conf.tor and conf.proxy:
         errMsg = "switch --tor is incompatible with switch --proxy"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.skip and conf.testParameter:
+        errMsg = "switch --skip is incompatible with switch -p"
         raise sqlmapSyntaxException, errMsg
 
     if conf.mobile and conf.agent:

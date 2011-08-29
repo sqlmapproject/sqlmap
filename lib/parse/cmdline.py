@@ -90,7 +90,7 @@ def cmdLineParser():
                            help="Use randomly selected HTTP User-Agent header")
 
         request.add_option("--randomize", dest="rParam",
-                           help="Randomly change value for the given parameter")
+                           help="Randomly change value for given parameter(s)")
 
         request.add_option("--referer", dest="referer",
                            help="HTTP Referer header")
@@ -183,6 +183,9 @@ def cmdLineParser():
 
         injection.add_option("--suffix", dest="suffix",
                              help="Injection payload suffix string")
+
+        injection.add_option("--skip", dest="skip",
+                           help="Skip testing for given parameter(s)")
 
         injection.add_option("--tamper", dest="tamper",
                              help="Use given script(s) for tampering injection data")
