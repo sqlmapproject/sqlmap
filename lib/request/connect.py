@@ -27,6 +27,7 @@ from lib.core.common import getFilteredPageContent
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import parseTargetUrl
+from lib.core.common import randomizeParameterValue
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeWarnMessage
@@ -548,10 +549,10 @@ class Connect:
             checkPayload(value)
 
         if PLACE.GET in conf.parameters:
-            get = urlencode(conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value, limit=True)
+            get = conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value
 
         if PLACE.POST in conf.parameters:
-            post = urlencode(conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value)
+            post = conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value
 
         if PLACE.SOAP in conf.parameters:
             post = conf.parameters[PLACE.SOAP] if place != PLACE.SOAP or not value else value
@@ -569,6 +570,28 @@ class Connect:
             uri = conf.url if place != PLACE.URI or not value else value
         else:
             uri = conf.url
+
+        if conf.rParam:
+            def _randomizeParameter(paramString, randomParameter):
+                retVal = paramString
+                match = re.search("%s=(?P<value>[^&;]+)" % randomParameter, paramString)
+                if match:
+                    origValue = match.group("value")
+                    retVal = re.sub("%s=[^&;]+" % randomParameter, "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
+                return retVal
+
+            for item in [PLACE.GET, PLACE.POST, PLACE.COOKIE]:                
+                if item in conf.parameters:
+                    origValue = conf.parameters[item]
+                    if item == PLACE.GET and get:
+                        get = _randomizeParameter(get, conf.rParam)
+                    elif item == PLACE.POST and post:
+                        post = _randomizeParameter(post, conf.rParam)
+                    elif item == PLACE.COOKIE and cookie:
+                        cookie = _randomizeParameter(cookie, conf.rParam)
+
+        get = urlencode(get, limit=True)
+        post = urlencode(post)
 
         if timeBasedCompare:
             if len(kb.responseTimes) < MIN_TIME_RESPONSES:

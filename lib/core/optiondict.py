@@ -30,6 +30,7 @@ optDict = {
                                "dropSetCookie":     "boolean",
                                "agent":             "string",
                                "randomAgent":       "boolean",
+                               "rParam":            "string",
                                "referer":           "string",
                                "headers":           "string",
                                "aType":             "string",

@@ -2924,3 +2924,17 @@ def filterPairValues(values):
         retVal = filter(lambda x: isinstance(x, (tuple, list, set)) and len(x) == 2, values)
 
     return retVal
+
+def randomizeParameterValue(value):
+    retVal = value
+
+    for match in re.finditer('[A-Z]+', value):
+        retVal = retVal.replace(match.group(), randomStr(len(match.group())).upper())
+
+    for match in re.finditer('[a-z]+', value):
+        retVal = retVal.replace(match.group(), randomStr(len(match.group())).lower())
+
+    for match in re.finditer('[0-9]+', value):
+        retVal = retVal.replace(match.group(), str(randomInt(len(match.group()))))
+
+    return retVal

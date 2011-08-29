@@ -89,6 +89,9 @@ def cmdLineParser():
                            action="store_true",
                            help="Use randomly selected HTTP User-Agent header")
 
+        request.add_option("--randomize", dest="rParam",
+                           help="Randomly change value for the given parameter")
+
         request.add_option("--referer", dest="referer",
                            help="HTTP Referer header")
 
