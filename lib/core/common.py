@@ -2679,7 +2679,7 @@ def getExceptionFrameLocals():
 
     return retVal
 
-def intersect(valueA, valueB):
+def intersect(valueA, valueB, lowerCase=False):
     """
     Returns intersection of the array-ized values
     """
@@ -2687,7 +2687,14 @@ def intersect(valueA, valueB):
     retVal = None
 
     if valueA and valueB:
-        retVal = [val for val in arrayizeValue(valueA) if val in arrayizeValue(valueB)]
+        valueA = arrayizeValue(valueA)
+        valueB = arrayizeValue(valueB)
+
+        if lowerCase:
+            valueA = [val.lower() if isinstance(val, basestring) else val for val in valueA]
+            valueB = [val.lower() if isinstance(val, basestring) else val for val in valueB]
+
+        retVal = [val for val in valueA if val in valueB]
 
     return retVal
 

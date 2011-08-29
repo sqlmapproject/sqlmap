@@ -394,8 +394,12 @@ def start():
                     # Test Cookie header only if --level >= 2
                     skip |= (place == PLACE.COOKIE and conf.level < 2)
 
-                    skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter))
-                    skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter))
+                    skip |= (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
+                    skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
+                    skip |= (place == PLACE.COOKIE and intersect('cookie', conf.skip, True) not in ([], None))
+
+                    skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
+                    skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
 
                     if skip:
                         continue
