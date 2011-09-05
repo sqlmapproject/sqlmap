@@ -1323,9 +1323,9 @@ def getRange(count, dump=False, plusOne=False):
             limitStart = conf.limitStart
 
     if plusOne:
-        indexRange = range(limitStart, limitStop + 1)
+        indexRange = xrange(limitStart, limitStop + 1)
     else:
-        indexRange = range(limitStart - 1, limitStop)
+        indexRange = xrange(limitStart - 1, limitStop)
 
     return indexRange
 
