@@ -80,6 +80,9 @@ class Agent:
         if place == PLACE.URI:
             origValue = origValue.split(URI_INJECTION_MARK_CHAR)[0]
             origValue = origValue[origValue.rfind('/') + 1:]
+            for char in ('?', '=', ':'):
+                if char in origValue:
+                    origValue = origValue[origValue.rfind(char) + 1:]
 
         if value is None:
             if where == PAYLOAD.WHERE.ORIGINAL:
