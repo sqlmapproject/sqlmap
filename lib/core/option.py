@@ -1443,6 +1443,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.nullConnection = None
     kb.pageTemplate = None
     kb.pageTemplates = dict()
+    kb.previousMethod = None
     kb.orderByColumns = None
     kb.originalPage = None
     kb.originalTimeDelay = None
