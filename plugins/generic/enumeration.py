@@ -1166,21 +1166,23 @@ class Enumeration:
                 infoMsg = "fetching columns "
 
                 if len(colList) > 0:
-                    condQuery = " AND (%s)" % " OR ".join("%s LIKE '%%%s%%'" % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
-                    likeMsg = "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
-                    infoMsg += likeMsg
+                    if colTuple is None:
+                        colConsider, colCondParam = self.likeOrExact("column")
+                    else:
+                        colConsider, colCondParam = colTuple
+                    condQueryStr = "%%s%s" % colCondParam
+                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
+
+                    if colConsider == "1":
+                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                    else:
+                        infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                 else:
                     condQuery = ""
-                    likeMsg = ""
 
                 infoMsg += "for table '%s' " % tbl
                 infoMsg += "on database '%s'" % conf.db
                 logger.info(infoMsg)
-
-                countMsg = "fetching number of columns %s" % likeMsg
-                countMsg += "for table '%s'" % tbl
-                countMsg += " on database '%s'" % conf.db
-                logger.info(countMsg)
 
                 if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
