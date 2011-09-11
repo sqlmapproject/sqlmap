@@ -1589,7 +1589,7 @@ def getFilteredPageContent(page, onlyText=True):
     return retVal
 
 def getPageWordSet(page):
-    retVal = None
+    retVal = set()
 
     # only if the page's charset has been successfully identified
     if isinstance(page, unicode):
