@@ -22,7 +22,8 @@ def dependencies():
 
 def tamper(payload):
     """
-    Replaces quote character (') with a multi-byte combo %bf%27 together with generic comment at the end (to make it work)
+    Replaces quote character (') with a multi-byte combo %bf%27 together with
+    generic comment at the end (to make it work)
 
     Example:
         * Input: 1' AND 1=1

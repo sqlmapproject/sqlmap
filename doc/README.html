@@ -11,7 +11,7 @@
 <A HREF="mailto:bernardo@sqlmap.org">Bernardo Damele A. G.</A>, 
 <A HREF="mailto:miroslav@sqlmap.org">Miroslav Stampar</A></H2>version 1.0-dev, XXX XX, 2011
 <HR>
-<EM>This document is the user's manual to use 
+<EM>This document is the user's manual for 
 <A HREF="http://www.sqlmap.org">sqlmap</A>.</EM>
 <HR>
 <P>
@@ -93,26 +93,23 @@ on the operating system via out-of-band connections.</P>
 
 <P>sqlmap is developed in 
 <A HREF="http://www.python.org">Python</A>,
-a dynamic object-oriented interpreted programming language.
-This makes the tool independent from the operating system. It only
-requires the Python interpreter version <B>2</B> equal or higher than
-<B>2.6</B>.
-The interpreter is freely downloadable from its
-<A HREF="http://python.org/download/">official site</A>.
+a dynamic, object-oriented, interpreted programming language freely available from 
+<A HREF="http://python.org/download/">http://python.org/download/</A>.
+This makes sqlmap a cross-platform application which is independant of the 
+operating system. sqlmap requires Python version <B>2.6</B> or above.
 To make it even easier, many GNU/Linux distributions come out of the box
-with Python interpreter installed and other Unices and Mac OSX too provide
-it packaged in their formats and ready to be installed.
-Windows users can download and install the Python setup-ready installer
-for x86, AMD64 and Itanium too.</P>
+with Python installed. Other Unixes and Mac OSX also provide Python packaged
+and ready to be installed.
+Windows users can download and install the Python installer for x86, AMD64 and Itanium.</P>
 <P>sqlmap relies on the 
 <A HREF="http://metasploit.com">Metasploit Framework</A> for some of its post-exploitation takeover
-features. You need to grab a copy of it from the
+features. You need to grab a copy of the framework from the
 <A HREF="http://metasploit.com/download/">download</A>
 page - the required version is <B>3.5</B> or higher.
-For the ICMP tunneling out-of-band takeover technique, sqlmap requires
+For the ICMP tunneling out-of-band takeover technique, sqlmap requires the
 <A HREF="http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket">Impacket</A> library too.</P>
 <P>If you are willing to connect directly to a database server (<CODE>-d</CODE> switch),
-without passing via a web application, you need to install Python bindings
+without passing through the web application, you need to install Python bindings
 for the database management system that you are going to attack:</P>
 <P>
 <UL>
@@ -138,15 +135,15 @@ for the database management system that you are going to attack:</P>
 the sqlmap update functionality (<CODE>-</CODE><CODE>-update</CODE> switch) you need to
 install respectively 
 <A HREF="http://code.google.com/p/python-ntlm/">python-ntlm</A> and 
-<A HREF="http://pysvn.tigris.org/">python-svn</A> libraries.</P>
-<P>Optionally, if you are running sqlmap on Windows, you may wish to install
+<A HREF="http://pysvn.tigris.org/">python-svn</A> libraries respectively.</P>
+<P>Optionally, if you are running sqlmap on Windows, you may wish to install the
 <A HREF="http://ipython.scipy.org/moin/PyReadline/Intro">PyReadline</A>
-library to be able to take advantage of the sqlmap TAB completion and
+library in order to take advantage of the sqlmap TAB completion and
 history support features in the SQL shell and OS shell.
-Note that these functionalities are available natively by Python standard
+Note that these functionalities are available natively via the standard Python
 <A HREF="http://docs.python.org/library/readline.html">readline</A>
 library on other operating systems.</P>
-<P>You can also choose to install 
+<P>You can also choose to install the 
 <A HREF="http://psyco.sourceforge.net/">Psyco</A> library to eventually speed up the sqlmap algorithmic
 operations.</P>
 
@@ -157,13 +154,13 @@ operations.</P>
 <H3>Detect and exploit a SQL injection</H3>
 
 <P>Let's say that you are auditing a web application and found a web page
-that accepts dynamic user-provided values on <CODE>GET</CODE> or <CODE>POST</CODE>
-parameters or HTTP <CODE>Cookie</CODE> values or HTTP <CODE>User-Agent</CODE>
-header value.
+that accepts dynamic user-provided values via <CODE>GET</CODE>, <CODE>POST</CODE>
+or <CODE>Cookie</CODE> parameters or via the HTTP <CODE>User-Agent</CODE>
+request header.
 You now want to test if these are affected by a SQL injection
 vulnerability, and if so, exploit them to retrieve as much information as
-possible out of the web application's back-end database management system
-or even be able to access the underlying file system and operating system.</P>
+possible from the back-end database management system, or even be able to
+access the underlying file system and operating system.</P>
 <P>In a simple world, consider that the target url is:</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -176,57 +173,53 @@ or even be able to access the underlying file system and operating system.</P>
 <CODE>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=1</CODE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>is the same page as the original one and:</P>
+<P>is the same page as the original one and (the condition evaluates to <B>True</B>):</P>
 <P>
 <BLOCKQUOTE><CODE>
 <CODE>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=2</CODE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>differs from the original one, it means that you are in front of a SQL
+<P>differs from the original one (the condition evaluates to <B>False</B>).
+This likely means that you are in front of a SQL
 injection vulnerability in the <CODE>id</CODE> <CODE>GET</CODE> parameter of the
-<CODE>index.php</CODE> web application page which means that potentially no
-IDS/IPS, no web application firewall, no parameters' value sanitization is
-performed on the server-side before sending the SQL statement to the
-back-end database management system the web application relies on.</P>
-<P>This is a quite common flaw in dynamic content web applications and it
+<CODE>index.php</CODE> page. Additionally, no sanitisation of user's supplied
+input is taking place before the SQL statement is sent to the
+back-end database management system.</P>
+<P>This is quite a common flaw in dynamic content web applications and it
 does not depend upon the back-end database management system nor on the web
-application programming language: it is a programmer code's security flaw.
+application programming language; it is a flaw within the application code.
 The 
 <A HREF="http://www.owasp.org">Open Web Application Security Project</A>
-rated on 2010 in their 
-<A HREF="http://www.owasp.org/index.php/Category:OWASP_Top_Ten_Project">OWASP Top Ten</A> survey this vulnerability as the 
-<A HREF="http://owasptop10.googlecode.com/files/OWASP%20Top%2010%20-%202010.pdf">most common</A> and important web application vulnerability along with other
-injection flaws.</P>
-<P>Back to the scenario, probably the SQL <CODE>SELECT</CODE> statement into
-<CODE>get_int.php</CODE> has a syntax similar to the following SQL query, in
-pseudo PHP code:</P>
+rated this class of vulnerability as the 
+<A HREF="http://owasptop10.googlecode.com/files/OWASP%20Top%2010%20-%202010.pdf">most common</A> and serious web application vulnerability in their
+<A HREF="http://www.owasp.org/index.php/Category:OWASP_Top_Ten_Project">Top Ten</A> list from 2010.</P>
+<P>Now that you have found the vulnerable parameter, you can exploit it by
+manipulating the <CODE>id</CODE> parameter value in the HTTP request.</P>
+<P>Back to the scenario, we can make an educated guess about the probable
+syntax of the SQL <CODE>SELECT</CODE> statement where the user supplied value is
+being used in the <CODE>get_int.php</CODE> web page. In pseudo PHP code:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <CODE>$query = "SELECT [column(s) name] FROM [table name] WHERE id=" . $_REQUEST['id'];</CODE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>As you can see, appending any other syntatically valid SQL condition after
-a value for <CODE>id</CODE> such condition will take place when the web
-application passes the query to the back-end database management system
-that executes it, that is why the condition <CODE>id=1 AND 1=1</CODE> is valid
-(<EM>True</EM>) and returns the same page as the original one, with the
-same content. This is the case of a boolean-based blind SQL injection
-vulnerability. However, sqlmap is able to detect any type of SQL injection
-and adapt its work-flow accordingly. Read below for further details.</P>
-<P>Moreover, in this simple and easy to inject scenario it would be also
-possible to append, not just one or more valid SQL condition(s), but also
-stacked SQL queries, for instance something like <CODE>[...]&amp;id=1;
-ANOTHER SQL QUERY#</CODE> if the web application technology supports
-<EM>stacked queries</EM>, also known as <EM>multiple statements</EM>.</P>
-<P>Now that you found this SQL injection vulnerable parameter, you can
-exploit it by manipulating the <CODE>id</CODE> parameter value in the HTTP
-request.</P>
-<P>There exist many 
-<A HREF="http://delicious.com/inquis/sqlinjection">resources</A>
-on the Net explaining in depth how to prevent, detect and exploit SQL
-injection vulnerabilities in web application and it is recommended to read
-them if you are not familiar with the issue before going ahead with sqlmap.</P>
-<P>Passing the original address, <CODE>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1</CODE>
+<P>As you can see, appending a syntactically valid SQL statement that will
+evaluate to a <EM>True</EM> condition after the value for the <CODE>id</CODE>
+parameter (such as <CODE>id=1 AND 1=1</CODE>) will result in the web application
+returning the same web page as in the original request (where no SQL
+statement is added).
+This is because the back-end database management system has evaluated the
+injected SQL statement.
+The previous example describes a simple boolean-based blind SQL injection
+vulnerability. 
+However, sqlmap is able to detect any type of SQL injection flaw and adapt
+its work-flow accordingly. </P>
+<P>In this simple scenario it would also be possible to append, not just one or
+more valid SQL conditions, but also (depending on the DBMS) stacked SQL
+queries. For instance:  <CODE>[...]&amp;id=1;ANOTHER SQL QUERY#</CODE>.</P>
+<P>sqlmap can automate the process of identifying and exploiting this type of
+vulnerability. 
+Passing the original address, <CODE>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1</CODE>
 to sqlmap, the tool will automatically:</P>
 <P>
 <UL>
@@ -237,7 +230,14 @@ vulnerable parameter(s);</LI>
 <LI>Depending on the user's options, it will extensively fingerprint,
 enumerate data or takeover the database server as a whole.</LI>
 </UL>
-</P>
+
+...and depending on supplied options, it will enumerate data or takeover the
+database server entirely.</P>
+<P>There exist many 
+<A HREF="http://delicious.com/inquis/sqlinjection">resources</A>
+on the web explaining in depth how to detect, exploit and prevent SQL
+injection vulnerabilities in web applications. It is recommendeded that you read
+them before going much further with sqlmap.</P>
 
 <H3>Direct connection to the database management system</H3>
 
@@ -280,30 +280,30 @@ For each HTTP response, by making a comparison between the HTTP response
 time with the original request, the tool inference the output of
 the injected statement character by character. Like for boolean-based
 technique, the bisection algorithm is applied.</LI>
-<LI><B>Error-based SQL injection</B>: sqlmap replaces or append to the
-affected parameter a database-specific syntatically wrong statement and
-parses the HTTP response headers and body in search of DBMS error messages
-containing the injected pre-defined chain of characters and the statement
-output within. This technique works when the web application has been
-configured to disclose back-end database management system error messages
-only.</LI>
+<LI><B>Error-based SQL injection</B>: sqlmap replaces or appends to 
+the affected parameter a database-specific error message provoking statement 
+and parses the HTTP response headers and body in search of DBMS error messages 
+containing the injected pre-defined chain of characters and the subquery 
+statement output within. This technique works only when the web application 
+has been configured to disclose back-end database management system error 
+messages.</LI>
 <LI><B>UNION query SQL injection</B>, also known as <B>inband SQL
 injection</B>: sqlmap appends to the affected parameter a syntatically
-valid SQL statement string starting with a <CODE>UNION ALL SELECT</CODE>.
-This techique works when the web application page passes the output of the
-<CODE>SELECT</CODE> statement within a <CODE>for</CODE> cycle, or similar, so that
-each line of the query output is printed on the page content.
+valid SQL statement starting with an <CODE>UNION ALL SELECT</CODE>.
+This techique works when the web application page passes directly the output 
+of the <CODE>SELECT</CODE> statement within a <CODE>for</CODE> loop, or similar, so 
+that each line of the query output is printed on the page content.
 sqlmap is also able to exploit <B>partial (single entry) UNION query SQL
 injection</B> vulnerabilities which occur when the output of the
-statement is not cycled in a <CODE>for</CODE> construct whereas only the first
+statement is not cycled in a <CODE>for</CODE> construct, whereas only the first
 entry of the query output is displayed.</LI>
 <LI><B>Stacked queries SQL injection</B>, also known as <B>multiple
 statements SQL injection</B>: sqlmap tests if the web application supports
-stacked queries then, in case it does support, it appends to the affected
+stacked queries and then, in case it does support, it appends to the affected
 parameter in the HTTP request, a semi-colon (<CODE>;</CODE>) followed by the
 SQL statement to be executed. This technique is useful to run SQL
-statements other than <CODE>SELECT</CODE> like, for instance, <EM>data
-definition</EM> or <EM>data manipulation</EM> statements possibly leading
+statements other than <CODE>SELECT</CODE>, like for instance, <EM>data
+definition</EM> or <EM>data manipulation</EM> statements, possibly leading
 to file system read and write access and operating system command
 execution depending on the underlying back-end database management system
 and the session user privileges.</LI>
@@ -1008,7 +1008,7 @@ Options:
     --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
     --os-bof            Stored procedure buffer overflow exploitation
     --priv-esc          Database process' user privilege escalation
-    --msf-path=MSFPATH  Local path where Metasploit Framework 3 is installed
+    --msf-path=MSFPATH  Local path where Metasploit Framework is installed
     --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
   Windows registry access:
@@ -2764,7 +2764,7 @@ operating system?
 [1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)
 [2] Stand-alone payload stager (file system way)
 > 
-[hh:mm:35] [INFO] creating Metasploit Framework 3 multi-stage shellcode 
+[hh:mm:35] [INFO] creating Metasploit Framework multi-stage shellcode 
 which connection type do you want to use?
 [1] Reverse TCP: Connect back from the database host to this machine (default)
 [2] Reverse TCP: Try to connect back from the database host to this machine, on all ports 
@@ -2779,7 +2779,7 @@ which payload do you want to use?
 [3] VNC
 > 
 [hh:mm:40] [INFO] creation in progress ... done
-[hh:mm:43] [INFO] running Metasploit Framework 3 command line interface locally, please wait..
+[hh:mm:43] [INFO] running Metasploit Framework command line interface locally, please wait..
 
                                   _
                                  | |      o
@@ -2801,7 +2801,7 @@ LPORT => 60641
 LHOST => 192.168.136.1
 [*] Started reverse handler on 192.168.136.1:60641 
 [*] Starting the payload handler...
-[hh:mm:48] [INFO] running Metasploit Framework 3 shellcode remotely via UDF 'sys_bineval', 
+[hh:mm:48] [INFO] running Metasploit Framework shellcode remotely via UDF 'sys_bineval', 
 please wait..
 [*] Sending stage (749056 bytes) to 192.168.136.129
 [*] Meterpreter session 1 opened (192.168.136.1:60641 -> 192.168.136.129:1689) at Mon Apr 11 

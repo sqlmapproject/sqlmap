@@ -608,13 +608,13 @@ def __setMetasploit():
                 break
 
         if condition:
-            debugMsg = "provided Metasploit Framework 3 path "
+            debugMsg = "provided Metasploit Framework path "
             debugMsg += "'%s' is valid" % conf.msfPath
             logger.debug(debugMsg)
 
             msfEnvPathExists = True
         else:
-            warnMsg = "the provided Metasploit Framework 3 path "
+            warnMsg = "the provided Metasploit Framework path "
             warnMsg += "'%s' is not valid. The cause could " % conf.msfPath
             warnMsg += "be that the path does not exists or that one "
             warnMsg += "or more of the needed Metasploit executables "
@@ -623,11 +623,11 @@ def __setMetasploit():
             logger.warn(warnMsg)
     else:
         warnMsg = "you did not provide the local path where Metasploit "
-        warnMsg += "Framework 3 is installed"
+        warnMsg += "Framework is installed"
         logger.warn(warnMsg)
 
     if not msfEnvPathExists:
-        warnMsg = "sqlmap is going to look for Metasploit Framework 3 "
+        warnMsg = "sqlmap is going to look for Metasploit Framework "
         warnMsg += "installation into the environment paths"
         logger.warn(warnMsg)
 
@@ -647,7 +647,7 @@ def __setMetasploit():
             condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfpayload")))
 
             if condition:
-                infoMsg = "Metasploit Framework 3 has been found "
+                infoMsg = "Metasploit Framework has been found "
                 infoMsg += "installed in the '%s' path" % envPath
                 logger.info(infoMsg)
 
@@ -657,7 +657,7 @@ def __setMetasploit():
                 break
 
     if not msfEnvPathExists:
-        errMsg = "unable to locate Metasploit Framework 3 installation. "
+        errMsg = "unable to locate Metasploit Framework installation. "
         errMsg += "Get it from http://metasploit.com/framework/download/"
         raise sqlmapFilePathException, errMsg
 

@@ -421,7 +421,7 @@ def cmdLineParser():
                             help="Database process' user privilege escalation")
 
         takeover.add_option("--msf-path", dest="msfPath",
-                            help="Local path where Metasploit Framework 3 "
+                            help="Local path where Metasploit Framework "
                                  "is installed")
 
         takeover.add_option("--tmp-path", dest="tmpPath",

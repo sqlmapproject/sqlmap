@@ -504,7 +504,7 @@ Kazim Bugra Tombul <mhackmail@gmail.com>
     for reporting a minor bug
 
 Efrain Torres <et@metasploit.com>
-    for helping me out to improve the Metasploit Framework 3 sqlmap
+    for helping me out to improve the Metasploit Framework sqlmap
     auxiliary module and for commiting it on the Metasploit official
     subversion repository
     for his great Metasploit WMAP Framework
@@ -694,7 +694,7 @@ AthCon Conference team <cfp@athcon.org>
     Slides: http://goo.gl/QMfjO
 
 Metasploit Framework development team <msfdev@metasploit.com>
-    for their powerful tool Metasploit Framework 3, used by sqlmap, among
+    for their powerful tool Metasploit Framework, used by sqlmap, among
     others things, to create the shellcode and establish an out-of-band
     connection between sqlmap and the database server
     Homepage: http://www.metasploit.com

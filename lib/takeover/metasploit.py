@@ -368,7 +368,7 @@ class Metasploit:
     def __runMsfCliSmbrelay(self):
         self.__forgeMsfCliCmdForSmbrelay()
 
-        infoMsg = "running Metasploit Framework 3 command line "
+        infoMsg = "running Metasploit Framework command line "
         infoMsg += "interface locally, please wait.."
         logger.info(infoMsg)
 
@@ -378,7 +378,7 @@ class Metasploit:
     def __runMsfCli(self, exitfunc):
         self.__forgeMsfCliCmd(exitfunc)
 
-        infoMsg = "running Metasploit Framework 3 command line "
+        infoMsg = "running Metasploit Framework command line "
         infoMsg += "interface locally, please wait.."
         logger.info(infoMsg)
 
@@ -386,14 +386,14 @@ class Metasploit:
         self.__msfCliProc = execute(self.__cliCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def __runMsfShellcodeRemote(self):
-        infoMsg = "running Metasploit Framework 3 shellcode "
+        infoMsg = "running Metasploit Framework shellcode "
         infoMsg += "remotely via UDF 'sys_bineval', please wait.."
         logger.info(infoMsg)
 
         self.udfExecCmd("'%s'" % self.shellcodeString, silent=True, udfName="sys_bineval")
 
     def __runMsfShellcodeRemoteViaSexec(self):
-        infoMsg = "running Metasploit Framework 3 shellcode remotely "
+        infoMsg = "running Metasploit Framework shellcode remotely "
         infoMsg += "via shellcodeexec, please wait.."
         logger.info(infoMsg)
 
@@ -495,7 +495,7 @@ class Metasploit:
                 return returncode
 
     def createMsfShellcode(self, exitfunc, format, extra, encode):
-        infoMsg = "creating Metasploit Framework 3 multi-stage shellcode "
+        infoMsg = "creating Metasploit Framework multi-stage shellcode "
         logger.info(infoMsg)
 
         self.__randStr = randomStr(lowercase=True)
@@ -574,7 +574,7 @@ class Metasploit:
         if self.connectionStr.startswith("bind"):
             func()
 
-        debugMsg = "Metasploit Framework 3 command line interface exited "
+        debugMsg = "Metasploit Framework command line interface exited "
         debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, func)
         logger.debug(debugMsg)
 
@@ -593,7 +593,7 @@ class Metasploit:
         else:
             self.uncPath = "\\\\%s\\%s" % (self.lhostStr, self.__randFile)
 
-        debugMsg = "Metasploit Framework 3 console exited with return "
+        debugMsg = "Metasploit Framework console exited with return "
         debugMsg += "code %s" % self.__controlMsfCmd(self.__msfCliProc, self.uncPathRequest)
         logger.debug(debugMsg)
 
@@ -603,6 +603,6 @@ class Metasploit:
         if self.connectionStr.startswith("bind"):
             self.spHeapOverflow()
 
-        debugMsg = "Metasploit Framework 3 command line interface exited "
+        debugMsg = "Metasploit Framework command line interface exited "
         debugMsg += "with return code %s" % self.__controlMsfCmd(self.__msfCliProc, self.spHeapOverflow)
         logger.debug(debugMsg)
