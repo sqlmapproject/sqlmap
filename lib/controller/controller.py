@@ -243,7 +243,7 @@ def start():
 
             testSqlInj = False
 
-            if PLACE.GET in conf.parameters:
+            if PLACE.GET in conf.parameters and not any([conf.data, conf.testParameter]):
                 for parameter in re.findall(r"([^=]+)=([^&]+&?|\Z)", conf.parameters[PLACE.GET]):
                     paramKey = (conf.hostname, conf.path, PLACE.GET, parameter[0])
 
