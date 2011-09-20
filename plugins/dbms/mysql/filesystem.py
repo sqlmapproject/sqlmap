@@ -7,8 +7,10 @@ Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import singleTimeWarnMessage
+from lib.core.common import isNumPosStrValue
 from lib.core.common import randomStr
+from lib.core.common import singleTimeWarnMessage
+from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -50,9 +52,9 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
         inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
 
-        length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=2)
+        length = unArrayizeValue(inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=2))
 
-        if length is None or not length.isdigit() or not len(length) or length in ( "0", "1" ):
+        if not isNumPosStrValue(length):
             errMsg = "unable to retrieve the content of the "
             errMsg += "file '%s'" % rFile
             raise sqlmapNoneDataException, errMsg
