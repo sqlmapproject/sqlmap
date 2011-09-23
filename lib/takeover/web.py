@@ -239,6 +239,8 @@ class Web:
 
                 uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
 
+                uplPage = uplPage or ""
+
                 if "sqlmap file uploader" not in uplPage:
                     if localPath not in warned:
                         warnMsg = "unable to upload the file stager "
