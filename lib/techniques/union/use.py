@@ -50,54 +50,59 @@ reqCount = 0
 def __oneShotUnionUse(expression, unpack=True, limited=False):
     global reqCount
 
-    check = "(?P<result>%s.*%s)" % (kb.misc.start, kb.misc.stop)
-    trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
+    retVal = conf.hashDB.retrieve(expression) if not conf.freshQueries else None
 
-    # Prepare expression with delimiters
-    expression = agent.concatQuery(expression, unpack)
-    expression = unescaper.unescape(expression)
+    if not retVal:
+        check = "(?P<result>%s.*%s)" % (kb.misc.start, kb.misc.stop)
+        trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
 
-    if conf.limitStart or conf.limitStop:
-        where = PAYLOAD.WHERE.NEGATIVE
-    else:
-        where = None
+        # Prepare expression with delimiters
+        expression = agent.concatQuery(expression, unpack)
+        expression = unescaper.unescape(expression)
 
-    # Forge the inband SQL injection request
-    vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
-    query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], None, limited)
-    payload = agent.payload(newValue=query, where=where)
+        if conf.limitStart or conf.limitStop:
+            where = PAYLOAD.WHERE.NEGATIVE
+        else:
+            where = None
 
-    # Perform the request
-    page, headers = Request.queryPage(payload, content=True, raise404=False)
+        # Forge the inband SQL injection request
+        vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
+        query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], None, limited)
+        payload = agent.payload(newValue=query, where=where)
 
-    reqCount += 1
+        # Perform the request
+        page, headers = Request.queryPage(payload, content=True, raise404=False)
 
-    # Parse the returned page to get the exact union-based
-    # sql injection output
-    output = reduce(lambda x, y: x if x is not None else y, [ \
-            extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
-            extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
-            if headers else None), payload, True), re.DOTALL | re.IGNORECASE)], \
-            None)
+        reqCount += 1
 
-    if output is not None:
-        output = getUnicode(output, kb.pageEncoding)
-    else:
-        trimmed = extractRegexResult(trimcheck, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
-                or extractRegexResult(trimcheck, removeReflectiveValues(listToStrValue(headers.headers \
-                if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
+        # Parse the returned page to get the exact union-based
+        # sql injection output
+        retVal = reduce(lambda x, y: x if x is not None else y, [ \
+                extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
+                extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
+                if headers else None), payload, True), re.DOTALL | re.IGNORECASE)], \
+                None)
 
-        if trimmed:
-            warnMsg = "possible server trimmed output detected (due to its length): "
-            warnMsg += trimmed
-            logger.warn(warnMsg)
-        elif Backend.isDbms(DBMS.MYSQL) and not kb.multiThreadMode:
-            warnMsg = "if the problem persists with 'None' values please try to use "
-            warnMsg += "hidden switch --no-cast (fixing problems with some collation "
-            warnMsg += "issues)"
-            singleTimeWarnMessage(warnMsg)
+        if retVal is not None:
+            retVal = getUnicode(retVal, kb.pageEncoding)
+        else:
+            trimmed = extractRegexResult(trimcheck, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
+                    or extractRegexResult(trimcheck, removeReflectiveValues(listToStrValue(headers.headers \
+                    if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
 
-    return output
+            if trimmed:
+                warnMsg = "possible server trimmed output detected (due to its length): "
+                warnMsg += trimmed
+                logger.warn(warnMsg)
+            elif Backend.isDbms(DBMS.MYSQL) and not kb.multiThreadMode:
+                warnMsg = "if the problem persists with 'None' values please try to use "
+                warnMsg += "hidden switch --no-cast (fixing problems with some collation "
+                warnMsg += "issues)"
+                singleTimeWarnMessage(warnMsg)
+
+        conf.hashDB.write(expression, retVal)
+
+    return retVal
 
 def configUnion(char=None, columns=None):
     def __configUnionChar(char):

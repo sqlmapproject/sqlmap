@@ -1360,6 +1360,8 @@ def __setConfAttributes():
     conf.dbmsConnector = None
     conf.dbmsHandler = None
     conf.dumpPath = None
+    conf.hashDB = None
+    conf.hashDBFile = None
     conf.httpHeaders = []
     conf.hostname = None
     conf.multipleTargets = False

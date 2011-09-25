@@ -53,83 +53,86 @@ def __oneShotErrorUse(expression, field):
 
     threadData = getCurrentThreadData()
 
-    retVal = None
+    retVal = conf.hashDB.retrieve(expression) if not conf.freshQueries else None
+
     offset = 1
     chunk_length = None
 
-    while True:
-        check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
-        trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
+    if not retVal:
+        while True:
+            check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
+            trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
 
-        nulledCastedField = agent.nullAndCastField(field)
+            nulledCastedField = agent.nullAndCastField(field)
 
-        if Backend.isDbms(DBMS.MYSQL):
-            chunk_length = MYSQL_ERROR_CHUNK_LENGTH
-            nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, chunk_length)
-        elif Backend.isDbms(DBMS.MSSQL):
-            chunk_length = MSSQL_ERROR_CHUNK_LENGTH
-            nulledCastedField = queries[DBMS.MSSQL].substring.query % (nulledCastedField, offset, chunk_length)
+            if Backend.isDbms(DBMS.MYSQL):
+                chunk_length = MYSQL_ERROR_CHUNK_LENGTH
+                nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, chunk_length)
+            elif Backend.isDbms(DBMS.MSSQL):
+                chunk_length = MSSQL_ERROR_CHUNK_LENGTH
+                nulledCastedField = queries[DBMS.MSSQL].substring.query % (nulledCastedField, offset, chunk_length)
 
-        # Forge the error-based SQL injection request
-        vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
-        query = agent.prefixQuery(vector)
-        query = agent.suffixQuery(query)
-        injExpression = expression.replace(field, nulledCastedField, 1)
-        injExpression = unescaper.unescape(injExpression)
-        injExpression = query.replace("[QUERY]", injExpression)
-        payload = agent.payload(newValue=injExpression)
+            # Forge the error-based SQL injection request
+            vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
+            query = agent.prefixQuery(vector)
+            query = agent.suffixQuery(query)
+            injExpression = expression.replace(field, nulledCastedField, 1)
+            injExpression = unescaper.unescape(injExpression)
+            injExpression = query.replace("[QUERY]", injExpression)
+            payload = agent.payload(newValue=injExpression)
 
-        # Perform the request
-        page, headers = Request.queryPage(payload, content=True)
+            # Perform the request
+            page, headers = Request.queryPage(payload, content=True)
 
-        reqCount += 1
+            reqCount += 1
 
-        # Parse the returned page to get the exact error-based
-        # sql injection output
-        output = reduce(lambda x, y: x if x is not None else y, [ \
-                extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
-                extractRegexResult(check, listToStrValue(headers.headers \
-                if headers else None), re.DOTALL | re.IGNORECASE), \
-                extractRegexResult(check, threadData.lastRedirectMsg[1] \
-                if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)], \
-                None)
+            # Parse the returned page to get the exact error-based
+            # sql injection output
+            output = reduce(lambda x, y: x if x is not None else y, [ \
+                    extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
+                    extractRegexResult(check, listToStrValue(headers.headers \
+                    if headers else None), re.DOTALL | re.IGNORECASE), \
+                    extractRegexResult(check, threadData.lastRedirectMsg[1] \
+                    if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                    threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)], \
+                    None)
 
-        if output is not None:
-            output = getUnicode(output, kb.pageEncoding)
-        else:
-            trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
-                or extractRegexResult(trimcheck, listToStrValue(headers.headers \
-                if headers else None), re.DOTALL | re.IGNORECASE) \
-                or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
-                if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+            if output is not None:
+                output = getUnicode(output, kb.pageEncoding)
+            else:
+                trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
+                    or extractRegexResult(trimcheck, listToStrValue(headers.headers \
+                    if headers else None), re.DOTALL | re.IGNORECASE) \
+                    or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
+                    if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                    threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
-            if trimmed:
-                warnMsg = "possible server trimmed output detected (due to its length): "
-                warnMsg += trimmed
-                logger.warn(warnMsg)
+                if trimmed:
+                    warnMsg = "possible server trimmed output detected (due to its length): "
+                    warnMsg += trimmed
+                    logger.warn(warnMsg)
 
-        if any(map(lambda dbms: Backend.isDbms(dbms), [DBMS.MYSQL, DBMS.MSSQL])):
-            if offset == 1:
+            if any(map(lambda dbms: Backend.isDbms(dbms), [DBMS.MYSQL, DBMS.MSSQL])):
+                if offset == 1:
+                    retVal = output
+                else:
+                    retVal += output if output else ''
+
+                if output and len(output) >= chunk_length:
+                    offset += chunk_length
+                else:
+                    break
+            else:
                 retVal = output
-            else:
-                retVal += output if output else ''
-
-            if output and len(output) >= chunk_length:
-                offset += chunk_length
-            else:
                 break
-        else:
-            retVal = output
-            break
 
-    if isinstance(retVal, basestring):
-        retVal = htmlunescape(retVal).replace("<br>", "\n")
+        if isinstance(retVal, basestring):
+            retVal = htmlunescape(retVal).replace("<br>", "\n")
 
-    retVal = __errorReplaceChars(retVal)
+        retVal = __errorReplaceChars(retVal)
 
-    dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(retVal)))
+        #dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(retVal)))
+        conf.hashDB.write(expression, retVal)
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 

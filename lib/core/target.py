@@ -40,6 +40,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import USER_AGENT_ALIASES
+from lib.utils.hashdb import HashDB
 from lib.core.xmldump import dumper as xmldumper
 from lib.request.connect import Connect as Request
 
@@ -174,6 +175,9 @@ def __setOutputResume():
     if not conf.sessionFile:
         conf.sessionFile = "%s%ssession" % (conf.outputPath, os.sep)
 
+    if not conf.hashDBFile:
+        conf.hashDBFile = "%s%shashdb" % (conf.outputPath, os.sep)
+
     logger.info("using '%s' as session file" % conf.sessionFile)
 
     if os.path.exists(conf.sessionFile):
@@ -223,6 +227,7 @@ def __setOutputResume():
         else:
             try:
                 os.remove(conf.sessionFile)
+                os.remove(conf.hashDBFile)
                 logger.info("flushing session file")
             except OSError, msg:
                 errMsg = "unable to flush the session file (%s)" % msg
@@ -230,6 +235,7 @@ def __setOutputResume():
 
     try:
         conf.sessionFP = codecs.open(conf.sessionFile, "a", UNICODE_ENCODING)
+        conf.hashDB = HashDB(conf.hashDBFile)
         dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
     except IOError:
         errMsg = "unable to write on the session file specified"
@@ -338,12 +344,16 @@ def initTargetEnv():
         if conf.sessionFP:
             conf.sessionFP.close()
 
+        if conf.hashDB:
+            conf.hashDB.close()
+
         if conf.cj:
             conf.cj.clear()
 
         conf.paramDict = {}
         conf.parameters = {}
         conf.sessionFile = None
+        conf.hashDBFile = None
 
         __setKnowledgeBaseAttributes(False)
         __restoreCmdLineOptions()
