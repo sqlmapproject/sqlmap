@@ -376,12 +376,6 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     partial = False
     data = None
 
-    if resumeValue:
-        output = resume(expression, None)
-
-        if not output or (output and (expected == EXPECTED.INT and not output.isdigit())):
-            partial = True
-
     if output is None:
         output = unionUse(expression, unpack=unpack, dump=dump)
 
