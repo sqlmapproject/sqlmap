@@ -453,15 +453,15 @@ class Backend:
 
     @staticmethod
     def forceDbms(dbms, sticky=False):
-        if not kb.misc.stickyFlag:
-            kb.misc.forcedDbms = aliasToDbmsEnum(dbms)
-            kb.misc.stickyFlag = sticky
+        if not kb.stickyFlag:
+            kb.forcedDbms = aliasToDbmsEnum(dbms)
+            kb.stickyFlag = sticky
 
     @staticmethod
     def flushForcedDbms(force=False):
-        if not kb.misc.stickyFlag or force:
-            kb.misc.forcedDbms = None
-            kb.misc.stickyFlag = False
+        if not kb.stickyFlag or force:
+            kb.forcedDbms = None
+            kb.stickyFlag = False
 
     @staticmethod
     def setOs(os):
@@ -518,7 +518,7 @@ class Backend:
     # Get methods
     @staticmethod
     def getForcedDbms():
-        return aliasToDbmsEnum(kb.misc.forcedDbms)
+        return aliasToDbmsEnum(kb.forcedDbms)
 
     @staticmethod
     def getDbms():
@@ -1026,7 +1026,7 @@ def replaceNewlineTabs(inpStr, stdout=False):
     else:
         replacedString = inpStr.replace("\n", DUMP_NEWLINE_MARKER).replace("\r", DUMP_CR_MARKER).replace("\t", DUMP_TAB_MARKER)
 
-    replacedString = replacedString.replace(kb.misc.delimiter, DUMP_DEL_MARKER)
+    replacedString = replacedString.replace(kb.chars.delimiter, DUMP_DEL_MARKER)
 
     return replacedString
 
@@ -1335,12 +1335,12 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 
     data = BigArray()
 
-    outCond1 = ( output.startswith(kb.misc.start) and output.endswith(kb.misc.stop) )
+    outCond1 = ( output.startswith(kb.chars.start) and output.endswith(kb.chars.stop) )
     outCond2 = ( output.startswith(DUMP_START_MARKER) and output.endswith(DUMP_STOP_MARKER) )
 
     if outCond1 or outCond2:
         if outCond1:
-            regExpr = '%s(.*?)%s' % (kb.misc.start, kb.misc.stop)
+            regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
         elif outCond2:
             regExpr = '%s(.*?)%s' % (DUMP_START_MARKER, DUMP_STOP_MARKER)
 
@@ -1367,7 +1367,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
             if DUMP_DEL_MARKER in entry:
                 entry = entry.split(DUMP_DEL_MARKER)
             else:
-                entry = entry.split(kb.misc.delimiter)
+                entry = entry.split(kb.chars.delimiter)
 
             if len(entry) == 1:
                 data.append(entry[0])
@@ -2478,6 +2478,7 @@ def initTechnique(technique=None):
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
             kb.matchRatio = data.matchRatio
+            kb.chars = kb.injection.chars
 
             # Restoring stored conf options
             for key, value in kb.injection.conf.items():

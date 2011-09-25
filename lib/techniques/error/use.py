@@ -60,8 +60,8 @@ def __oneShotErrorUse(expression, field):
 
     if not retVal:
         while True:
-            check = "%s(?P<result>.*?)%s" % (kb.misc.start, kb.misc.stop)
-            trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
+            check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
+            trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
 
             nulledCastedField = agent.nullAndCastField(field)
 
@@ -189,7 +189,7 @@ def __errorReplaceChars(value):
     retVal = value
 
     if value:
-        retVal = retVal.replace(kb.misc.space, " ").replace(kb.misc.dollar, "$").replace(kb.misc.at, "@")
+        retVal = retVal.replace(kb.chars.space, " ").replace(kb.chars.dollar, "$").replace(kb.chars.at, "@")
 
     return retVal
 

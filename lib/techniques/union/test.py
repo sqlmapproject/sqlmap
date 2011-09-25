@@ -176,7 +176,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
     for position in positions:
         # Prepare expression with delimiters
         randQuery = randomStr(UNION_MIN_RESPONSE_CHARS)
-        phrase = "%s%s%s".lower() % (kb.misc.start, randQuery, kb.misc.stop)
+        phrase = "%s%s%s".lower() % (kb.chars.start, randQuery, kb.chars.stop)
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
@@ -197,7 +197,7 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
                 randQuery2 = randomStr(UNION_MIN_RESPONSE_CHARS)
-                phrase2 = "%s%s%s".lower() % (kb.misc.start, randQuery2, kb.misc.stop)
+                phrase2 = "%s%s%s".lower() % (kb.chars.start, randQuery2, kb.chars.stop)
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 

@@ -467,6 +467,8 @@ def checkSqlInjection(place, parameter, value):
                         injection.conf.regexp = conf.regexp
                         injection.conf.optimize = conf.optimize
 
+                        injection.chars = kb.chars
+
                         if conf.beep or conf.realTest:
                             beep()
 

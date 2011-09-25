@@ -1422,6 +1422,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.httpErrorCodes = {}
     kb.explicitSettings = set()
     kb.errorIsNone = True
+    kb.forcedDbms = None
     kb.formNames = []
     kb.headersCount = 0
     kb.headersFp = {}
@@ -1469,6 +1470,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.safeCharEncode = False
     kb.singleLogFlags = set()
     kb.skipOthersDbms = None
+    kb.stickyFlag = False
     kb.suppressSession = False
     kb.suppressResumeInfo = False
     kb.technique = None
@@ -1479,15 +1481,13 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.uChar = "NULL"
     kb.xpCmdshellAvailable = False
 
-    kb.misc = AttribDict()
-    kb.misc.delimiter = randomStr(length=6, lowercase=True)
-    kb.misc.start = ":%s:" % randomStr(length=3, lowercase=True)
-    kb.misc.stop = ":%s:" % randomStr(length=3, lowercase=True)
-    kb.misc.at = ":%s:" % randomStr(length=1, lowercase=True)
-    kb.misc.space = ":%s:" % randomStr(length=1, lowercase=True)
-    kb.misc.dollar = ":%s:" % randomStr(length=1, lowercase=True)
-    kb.misc.forcedDbms = None
-    kb.misc.stickyFlag = False
+    kb.chars = AttribDict()
+    kb.chars.delimiter = randomStr(length=6, lowercase=True)
+    kb.chars.start = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.chars.stop = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.chars.at = ":%s:" % randomStr(length=1, lowercase=True)
+    kb.chars.space = ":%s:" % randomStr(length=1, lowercase=True)
+    kb.chars.dollar = ":%s:" % randomStr(length=1, lowercase=True)
 
     if flushAll:
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))

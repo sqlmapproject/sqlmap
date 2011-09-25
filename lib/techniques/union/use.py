@@ -53,12 +53,12 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
     retVal = conf.hashDB.retrieve(expression) if not conf.freshQueries else None
 
     if not retVal:
-        check = "(?P<result>%s.*%s)" % (kb.misc.start, kb.misc.stop)
-        trimcheck = "%s(?P<result>.*?)</" % (kb.misc.start)
+        check = "(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop)
+        trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
 
         # Prepare expression with delimiters
-        expression = agent.concatQuery(expression, unpack)
-        expression = unescaper.unescape(expression)
+        injExpression = agent.concatQuery(expression, unpack)
+        injExpression = unescaper.unescape(injExpression)
 
         if conf.limitStart or conf.limitStop:
             where = PAYLOAD.WHERE.NEGATIVE
@@ -67,7 +67,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
         # Forge the inband SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
-        query = agent.forgeInbandQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], None, limited)
+        query = agent.forgeInbandQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], None, limited)
         payload = agent.payload(newValue=query, where=where)
 
         # Perform the request
@@ -317,13 +317,13 @@ def unionUse(expression, unpack=True, dump=False):
                             break
 
                         if output:
-                            if all(map(lambda x: x in output, [kb.misc.start, kb.misc.stop])):
-                                items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.misc.start, kb.misc.stop), output, re.DOTALL | re.IGNORECASE).split(kb.misc.delimiter)
+                            if all(map(lambda x: x in output, [kb.chars.start, kb.chars.stop])):
+                                items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.chars.start, kb.chars.stop), output, re.DOTALL | re.IGNORECASE).split(kb.chars.delimiter)
                                 kb.locks.value.acquire()
                                 threadData.shared.value.append(items[0] if len(items) == 1 else items)
                                 kb.locks.value.release()
                             else:
-                                items = output.replace(kb.misc.start, "").replace(kb.misc.stop, "").split(kb.misc.delimiter)
+                                items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
                             if conf.verbose == 1:
                                 status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
