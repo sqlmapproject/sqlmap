@@ -1395,7 +1395,7 @@ class Enumeration:
                 entries[column] = []
 
             return entries, lengths
-        elif not count:
+        elif isNoneValue(count):
             return None
 
         for column in colList:
