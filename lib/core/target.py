@@ -167,6 +167,24 @@ def __setRequestParams():
         errMsg += "within the GET, POST and Cookie parameters"
         raise sqlmapGenericException, errMsg
 
+def __setHashDB():
+    """
+    Check and set the HashDB SQLite file for query resume functionality.
+    """
+    if not conf.hashDBFile:
+        conf.hashDBFile = "%s%shashdb" % (conf.outputPath, os.sep)
+
+    if os.path.exists(conf.hashDBFile):
+        if conf.flushSession:
+            try:
+                os.remove(conf.hashDBFile)
+                logger.info("flushing query storage file")
+            except OSError, msg:
+                errMsg = "unable to flush the hashdb file (%s)" % msg
+                raise sqlmapFilePathException, errMsg
+
+    conf.hashDB = HashDB(conf.hashDBFile)
+
 def __setOutputResume():
     """
     Check and set the output text file and the resume functionality.
@@ -174,9 +192,6 @@ def __setOutputResume():
 
     if not conf.sessionFile:
         conf.sessionFile = "%s%ssession" % (conf.outputPath, os.sep)
-
-    if not conf.hashDBFile:
-        conf.hashDBFile = "%s%shashdb" % (conf.outputPath, os.sep)
 
     logger.info("using '%s' as session file" % conf.sessionFile)
 
@@ -227,7 +242,6 @@ def __setOutputResume():
         else:
             try:
                 os.remove(conf.sessionFile)
-                os.remove(conf.hashDBFile)
                 logger.info("flushing session file")
             except OSError, msg:
                 errMsg = "unable to flush the session file (%s)" % msg
@@ -235,7 +249,6 @@ def __setOutputResume():
 
     try:
         conf.sessionFP = codecs.open(conf.sessionFile, "a", UNICODE_ENCODING)
-        conf.hashDB = HashDB(conf.hashDBFile)
         dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
     except IOError:
         errMsg = "unable to write on the session file specified"
@@ -363,4 +376,5 @@ def setupTargetEnv():
     __createTargetDirs()
     __setRequestParams()
     __setOutputResume()
+    __setHashDB()
     __setResultsFile()
