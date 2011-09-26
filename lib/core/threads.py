@@ -34,6 +34,7 @@ class _ThreadData(threading.local):
         global shared
 
         self.disableStdOut = False
+        self.hashDBCursor = None
         self.lastErrorPage = None
         self.lastHTTPError = None
         self.lastRedirectMsg = None

@@ -11,12 +11,23 @@ import hashlib
 import sqlite3
 
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.threads import getCurrentThreadData
 
-class HashDB:
+class HashDB(object):
     def __init__(self, filepath):
-        self.connection = sqlite3.connect(filepath)
-        self.cursor = self.connection.cursor()
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
+        self.filepath = filepath
+
+    def _get_cursor(self):
+        threadData = getCurrentThreadData()
+
+        if threadData.hashDBCursor is None:
+            connection = sqlite3.connect(self.filepath, isolation_level=None)
+            threadData.hashDBCursor = connection.cursor()
+            threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
+
+        return threadData.hashDBCursor
+
+    cursor = property(_get_cursor)
 
     def __del__(self):
         self.close()
@@ -24,7 +35,7 @@ class HashDB:
     def close(self):
         try:
             self.endTransaction()
-            self.connection.close()
+            self.cursor.connection.close()
         except:
             pass
 
@@ -32,19 +43,6 @@ class HashDB:
         key = key.encode(UNICODE_ENCODING) if isinstance(key, unicode) else repr(key)
         retVal = int(hashlib.md5(key).hexdigest()[:8], 16)
         return retVal
-
-    def beginTransaction(self):
-        """
-        Great speed improvement can be gained by using explicit transactions around multiple inserts.
-        Reference: http://stackoverflow.com/questions/4719836/python-and-sqlite3-adding-thousands-of-rows
-        """
-        self.cursor.execute('BEGIN TRANSACTION')
-
-    def endTransaction(self):
-        try:
-            self.cursor.execute('END TRANSACTION')
-        except sqlite3.OperationalError:
-            pass
 
     def retrieve(self, key):
         retVal = None
