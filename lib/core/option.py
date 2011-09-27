@@ -1690,6 +1690,12 @@ def __setTorProxySettings():
     infoMsg = "setting Tor proxy settings"
     logger.info(infoMsg)
 
+    warnMsg = "please make sure that you've configured "
+    warnMsg+= "either Privoxy (8118/tcp) or Polipo (8123/tcp) "
+    warnMsg+= "to forward the requests to your local SOCKS5 "
+    warnMsg+= "instance of TOR client (usually 9050/tcp)"
+    logger.warning(warnMsg)
+
     found = None
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
