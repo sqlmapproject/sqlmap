@@ -128,30 +128,32 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
-            # Skip test if the risk is higher than the provided (or default)
-            # value
-            # Parse test's <risk>
-            if test.risk > conf.risk:
-                debugMsg = "skipping test '%s' because the risk (%d) " % (title, test.risk)
-                debugMsg += "is higher than the provided (%d)" % conf.risk
-                logger.debug(debugMsg)
-                continue
-
-            # Skip test if the level is higher than the provided (or default)
-            # value
-            # Parse test's <level>
-            if test.level > conf.level:
-                debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
-                debugMsg += "is higher than the provided (%d)" % conf.level
-                logger.debug(debugMsg)
-                continue
-
             # Skip tests if title is not included by the given filter
-            if conf.testFilter and not re.search(conf.testFilter, test.title, re.I):
-                debugMsg = "skipping test '%s' because " % title
-                debugMsg += "it's name is not included by the given filter"
-                logger.debug(debugMsg)
-                continue
+            if conf.testFilter:
+                if not any(re.search(conf.testFilter, str(item), re.I) for item in [test.title, test.vector,\
+                test.details.dbms if "details" in test and "dbms" in test.details else ""]):
+                    debugMsg = "skipping test '%s' because " % title
+                    debugMsg += "it's name/vector/dbms is not included by the given filter"
+                    logger.debug(debugMsg)
+                    continue
+            else:
+                # Skip test if the risk is higher than the provided (or default)
+                # value
+                # Parse test's <risk>
+                if test.risk > conf.risk:
+                    debugMsg = "skipping test '%s' because the risk (%d) " % (title, test.risk)
+                    debugMsg += "is higher than the provided (%d)" % conf.risk
+                    logger.debug(debugMsg)
+                    continue
+
+                # Skip test if the level is higher than the provided (or default)
+                # value
+                # Parse test's <level>
+                if test.level > conf.level:
+                    debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
+                    debugMsg += "is higher than the provided (%d)" % conf.level
+                    logger.debug(debugMsg)
+                    continue
 
             # Skip DBMS-specific test if it does not match either the
             # previously identified or the user's provided DBMS (either
