@@ -146,6 +146,13 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
+            # Skip tests if title is not included by the given filter
+            if conf.testFilter and not re.search(conf.testFilter, test.title, re.I):
+                debugMsg = "skipping test '%s' because " % title
+                debugMsg += "it's name is not included by the given filter"
+                logger.debug(debugMsg)
+                continue
+
             # Skip DBMS-specific test if it does not match either the
             # previously identified or the user's provided DBMS (either
             # from program switch or from parsed error message(s))
@@ -160,14 +167,12 @@ def checkSqlInjection(place, parameter, value):
                     debugMsg += "the back-end DBMS identified is "
                     debugMsg += "%s" % injection.dbms
                     logger.debug(debugMsg)
-
                     continue
 
                 if conf.dbms is not None and not intersect(conf.dbms.lower(), [value.lower() for value in arrayizeValue(dbms)]):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the provided DBMS is %s" % conf.dbms
                     logger.debug(debugMsg)
-
                     continue
 
                 if len(Backend.getErrorParsedDBMSes()) > 0 and not intersect(dbms, Backend.getErrorParsedDBMSes()) and kb.skipOthersDbms is None:
@@ -186,7 +191,6 @@ def checkSqlInjection(place, parameter, value):
                     debugMsg += "that the back-end DBMS could be "
                     debugMsg += "%s" % Format.getErrorParsedDBMSes()
                     logger.debug(debugMsg)
-
                     continue
 
             # Skip test if it does not match the same SQL injection clause

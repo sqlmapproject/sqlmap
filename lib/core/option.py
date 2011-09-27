@@ -1329,6 +1329,10 @@ def __cleanupOptions():
     if conf.dbms:
         conf.dbms = conf.dbms.capitalize()
 
+    if conf.testFilter:
+        if not any([char in conf.testFilter for char in ('.', ')', '(', ']', '[')]):
+            conf.testFilter = conf.testFilter.replace('*', '.*')
+
     if conf.timeSec not in kb.explicitSettings:
         if conf.tor:
             conf.timeSec = 2 * conf.timeSec
