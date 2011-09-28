@@ -277,6 +277,8 @@ class Connect:
 
             requestMsg += "\n"
 
+            threadData.lastRequestMsg = requestMsg
+
             logger.log(8, requestMsg)
 
             conn = urllib2.urlopen(req)

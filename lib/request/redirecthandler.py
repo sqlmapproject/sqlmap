@@ -13,6 +13,7 @@ import urlparse
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.common import getUnicode
+from lib.core.common import logHTTPTraffic
 from lib.core.enums import HTTPHEADER
 from lib.core.exception import sqlmapConnectionException
 from lib.core.threads import getCurrentThreadData
@@ -41,10 +42,9 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         else:
             logHeaders = ""
 
-        if conf.verbose <= 5:
-            responseMsg += getUnicode(logHeaders)
-        elif conf.verbose > 5:
-            responseMsg += "%s\n\n%s\n" % (logHeaders, content)
+        logHTTPTraffic(threadData.lastRequestMsg, "%s%s" % (responseMsg, logHeaders))
+
+        responseMsg += getUnicode(logHeaders)
 
         logger.log(7, responseMsg)
 
