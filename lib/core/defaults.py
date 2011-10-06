@@ -14,7 +14,6 @@ _defaults =  {
                "googlePage":   1,
                "cpuThrottle":  5,
                "verbose":      1,
-               "cDel":         ";",
                "delay":        0,
                "timeout":      30,
                "retries":      3,

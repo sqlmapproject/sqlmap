@@ -68,11 +68,11 @@ def cmdLineParser():
         request.add_option("--data", dest="data",
                            help="Data string to be sent through POST")
 
+        request.add_option("--param-del", dest="pDel",
+                           help="Character used for splitting parameter values")
+
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
-
-        request.add_option("--cookie-del", dest="cDel",
-                           help="Delimiter character used for splitting cookie values")
 
         request.add_option("--cookie-urlencode", dest="cookieUrlencode",
                              action="store_true",
