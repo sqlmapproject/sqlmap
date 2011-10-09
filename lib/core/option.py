@@ -104,6 +104,7 @@ from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import TIME_DELAY_CANDIDATES
+from lib.core.settings import UNION_CHAR_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.update import update
@@ -1809,6 +1810,10 @@ def __basicOptionValidation():
 
     if conf.timeSec < 1:
         errMsg = "value for --time-sec option must be an integer greater than 0"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.uChar and not re.match(UNION_CHAR_REGEX, conf.uChar):
+        errMsg = "value for --union-char option must be an alpha-numeric value (e.g. 1)"
         raise sqlmapSyntaxException, errMsg
 
     if isinstance(conf.uCols, basestring):

@@ -397,3 +397,6 @@ MAX_TIME_REVALIDATION_STEPS = 5
 
 # Characters that can be used to split parameter values in provided command line (e.g. in --tamper)
 PARAMETER_SPLITTING_REGEX = r'[,|;]'
+
+# Regular expression describing possible union char value (e.g. used in --union-char)
+UNION_CHAR_REGEX = r'\A\w+\Z'
