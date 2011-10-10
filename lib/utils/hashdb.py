@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import hashlib
 import sqlite3
 
+from lib.core.data import conf
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 
@@ -45,7 +46,7 @@ class HashDB(object):
 
     def retrieve(self, key):
         retVal = None
-        if key:
+        if key and not any([conf.flushSession, conf.freshQueries]):
             hash_ = self.hashKey(key)
             while True:
                 try:
