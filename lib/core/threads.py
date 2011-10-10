@@ -133,7 +133,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             for thread in threads:
                 if thread.isAlive():
                     alive = True
-                    time.sleep(1)
+                    time.sleep(0.1)
 
     except KeyboardInterrupt:
         print
