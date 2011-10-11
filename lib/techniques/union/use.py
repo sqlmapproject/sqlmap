@@ -46,11 +46,12 @@ from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
 
 reqCount = 0
+resumed = False
 
 def __oneShotUnionUse(expression, unpack=True, limited=False):
     global reqCount
 
-    retVal = conf.hashDB.retrieve(expression) if not conf.freshQueries else None
+    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
 
     if retVal is None:
         check = "(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop)

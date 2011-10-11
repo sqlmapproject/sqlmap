@@ -53,7 +53,7 @@ def __oneShotErrorUse(expression, field):
 
     threadData = getCurrentThreadData()
 
-    retVal = conf.hashDB.retrieve(expression) if not conf.freshQueries else None
+    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
 
     offset = 1
     chunk_length = None

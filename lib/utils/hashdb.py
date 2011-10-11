@@ -46,7 +46,7 @@ class HashDB(object):
 
     def retrieve(self, key):
         retVal = None
-        if key and not any([conf.flushSession, conf.freshQueries]):
+        if key:
             hash_ = self.hashKey(key)
             while True:
                 try:
