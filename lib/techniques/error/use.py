@@ -58,7 +58,7 @@ def __oneShotErrorUse(expression, field):
     offset = 1
     chunk_length = None
 
-    if not retVal:
+    if retVal is None:
         while True:
             check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
             trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)

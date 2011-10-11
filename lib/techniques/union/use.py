@@ -52,7 +52,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
     retVal = conf.hashDB.retrieve(expression) if not conf.freshQueries else None
 
-    if not retVal:
+    if retVal is None:
         check = "(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop)
         trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
 
