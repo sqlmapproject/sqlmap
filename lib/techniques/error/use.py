@@ -51,9 +51,10 @@ reqCount = 0
 def __oneShotErrorUse(expression, field):
     global reqCount
 
-    threadData = getCurrentThreadData()
-
     retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
+
+    threadData = getCurrentThreadData()
+    threadData.resumed = retVal is not None
 
     offset = 1
     chunk_length = None
@@ -140,6 +141,8 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
     outputs = []
     origExpr = None
 
+    threadData = getCurrentThreadData()
+
     for field in expressionFieldsList:
         output = None
 
@@ -171,7 +174,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
 
             if output is not None:
                 kb.locks.ioLock.acquire()
-                dataToStdout("[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(output)))
+                dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
                 kb.locks.ioLock.release()
 
         if isinstance(num, int):

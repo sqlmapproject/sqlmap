@@ -41,6 +41,7 @@ class _ThreadData(threading.local):
         self.lastQueryDuration = 0
         self.lastRequestMsg = None
         self.lastRequestUID = 0
+        self.resumed = False
         self.retriesCount = 0
         self.seqMatcher = difflib.SequenceMatcher(None)
         self.shared = shared

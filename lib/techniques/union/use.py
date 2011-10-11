@@ -46,12 +46,14 @@ from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
 
 reqCount = 0
-resumed = False
 
 def __oneShotUnionUse(expression, unpack=True, limited=False):
     global reqCount
 
     retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
+
+    threadData = getCurrentThreadData()
+    threadData.resumed = retVal is not None
 
     if retVal is None:
         check = "(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop)
@@ -327,7 +329,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
                             if conf.verbose == 1:
-                                status = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
+                                status = "[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
 
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
