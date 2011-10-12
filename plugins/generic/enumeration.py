@@ -1619,7 +1619,7 @@ class Enumeration:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
 
                     if not entries and query:
-                        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+                        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                             query = "%s ORDER BY %s" % (query, sorted(colList, key=len)[0])
                         entries = inject.getValue(query, blind=False, dump=True)
 
