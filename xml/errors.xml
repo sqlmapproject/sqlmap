@@ -24,8 +24,8 @@
         <error regexp="(\W|\A)SQL Server.*Driver"/>
         <error regexp="Warning.*mssql_.*"/>
         <error regexp="(\W|\A)SQL Server.*[0-9a-fA-F]{8}"/>
-        <error regexp="Exception Details:.*\WSystem\.Data\.SqlClient\."/>
-        <error regexp="Exception Details:.*\WRoadhouse\.Cms\."/>
+        <error regexp="(?s)Exception.*\WSystem\.Data\.SqlClient\."/>
+        <error regexp="(?s)Exception.*\WRoadhouse\.Cms\."/>
     </dbms>
 
     <!-- Microsoft Access -->
