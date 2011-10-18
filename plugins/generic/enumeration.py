@@ -1615,12 +1615,12 @@ class Enumeration:
                                 entries = zip(*[entries[colName] for colName in colList])
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
+                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                        query = rootQuery.inband.query % (colString, conf.db, tbl, sorted(colList, key=len)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
 
                     if not entries and query:
-                        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                            query = "%s ORDER BY %s" % (query, sorted(colList, key=len)[0])
                         entries = inject.getValue(query, blind=False, dump=True)
 
                     if isNoneValue(entries):
@@ -1730,7 +1730,7 @@ class Enumeration:
                                         entries[column] = BigArray()
 
                                     if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-                                        query = rootQuery.blind.query % (column, conf.db, conf.tbl, index)
+                                        query = rootQuery.blind.query % (column, conf.db, conf.tbl, sorted(colList, key=len)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                                         query = rootQuery.blind.query % (column, column,
                                                                         tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())),

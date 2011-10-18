@@ -56,8 +56,8 @@
             <blind query="SELECT column_name FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" query2="SELECT column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
         </columns>
         <dump_table>
-            <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT %s FROM %s.%s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schema_name FROM information_schema.SCHEMATA WHERE " query2="SELECT db FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
@@ -128,8 +128,8 @@
             <blind query="SELECT attname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" query2="SELECT typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relname='%s' AND a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND attname='%s' AND nspname='%s'" count="SELECT COUNT(attname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
         </columns>
         <dump_table>
-            <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT %s FROM %s.%s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT datname FROM pg_database WHERE " query2="" condition="datname" condition2=""/>
