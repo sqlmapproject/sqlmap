@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import difflib
 import threading
 import time
+import traceback
 
 from thread import error as threadError
 
