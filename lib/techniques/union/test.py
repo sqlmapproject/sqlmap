@@ -117,7 +117,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         min_, max_ = min(min_, ratio), max(max_, ratio)
         items.append((count, ratio))
 
-    if kb.uChar:
+    if kb.uChar and kb.uChar != 'NULL':
         for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
             contains = [(count, re.search(regex, page or "", re.IGNORECASE) is not None) for count, page in pages.items()]
             if len(filter(lambda x: x[1], contains)) == 1:
