@@ -361,7 +361,7 @@ def start():
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
                 and (kb.injection.place is None or kb.injection.parameter is None):
 
-                if not conf.string and not conf.regexp:
+                if not conf.string and not conf.regexp and PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
                     checkStability()
@@ -442,15 +442,14 @@ def start():
                         elif conf.realTest:
                             pass
 
-                        elif not checkDynParam(place, parameter, value):
-                            warnMsg = "%s parameter '%s' appears to be not dynamic" % (place, parameter)
-                            logger.warn(warnMsg)
+                        elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
+                                if not checkDynParam(place, parameter, value):
+                                    warnMsg = "%s parameter '%s' appears to be not dynamic" % (place, parameter)
+                                    logger.warn(warnMsg)
 
-                        else:
-                            kb.foundDynamicParameter = True
-
-                            infoMsg = "%s parameter '%s' is dynamic" % (place, parameter)
-                            logger.info(infoMsg)
+                                else:
+                                    infoMsg = "%s parameter '%s' is dynamic" % (place, parameter)
+                                    logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)
 
