@@ -2830,6 +2830,12 @@ def isNoneValue(value):
     else:
         return value is None
 
+def isNullValue(value):
+    """
+    Returns whether the value contains explicit 'NULL' value
+    """
+    return isinstance(value,basestring) and value.upper() == "NULL"
+
 def expandMnemonics(mnemonics, parser, args):
     """
     Expand mnemonic options

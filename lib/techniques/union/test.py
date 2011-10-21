@@ -18,6 +18,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
+from lib.core.common import isNullValue
 from lib.core.common import listToStrValue
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -110,14 +111,14 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-        if kb.uChar:
+        if not isNullValue(kb.uChar):
             pages[count] = page
         ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
         ratios.append(ratio)
         min_, max_ = min(min_, ratio), max(max_, ratio)
         items.append((count, ratio))
 
-    if kb.uChar and kb.uChar.upper() != 'NULL':
+    if not isNullValue(kb.uChar):
         for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
             contains = [(count, re.search(regex, page or "", re.IGNORECASE) is not None) for count, page in pages.items()]
             if len(filter(lambda x: x[1], contains)) == 1:
@@ -255,7 +256,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     if conf.uColsStop == conf.uColsStart:
         count = conf.uColsStart
     else:
-        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if kb.uChar.upper() == "NULL" else PAYLOAD.WHERE.NEGATIVE)
+        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if isNullValue(kb.uChar) else PAYLOAD.WHERE.NEGATIVE)
 
     if count:
         if Backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
