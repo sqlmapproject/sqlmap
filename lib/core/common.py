@@ -1656,9 +1656,17 @@ def decloakToMkstemp(filepath, **kwargs):
     return retVal
 
 def isWindowsPath(filepath):
+    """
+    Returns True if given filepath is in Windows format
+    """
+
     return re.search("\A[\w]\:\\\\", filepath) is not None
 
 def isWindowsDriveLetterPath(filepath):
+    """
+    Returns True if given filepath starts with a Windows drive letter
+    """
+
     return re.search("\A[\w]\:", filepath) is not None
 
 def posixToNtSlashes(filepath):
@@ -1708,6 +1716,10 @@ def isHexEncodedString(subject):
     return re.match(r"\A[0-9a-fA-Fx]+\Z", subject) is not None
 
 def getConsoleWidth(default=80):
+    """
+    Returns console width
+    """
+
     width = None
 
     if 'COLUMNS' in os.environ and os.environ['COLUMNS'].isdigit():
@@ -1732,14 +1744,26 @@ def getConsoleWidth(default=80):
     return width if width else default
 
 def clearConsoleLine(forceOutput=False):
+    """
+    Clears current console line
+    """
+
     dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
 
 def parseXmlFile(xmlFile, handler):
+    """
+    Parses XML file by a given handler
+    """
+
     stream = StringIO(readCachedFileContent(xmlFile))
     parse(stream, handler)
     stream.close()
 
 def readCachedFileContent(filename, mode='rb'):
+    """
+    Cached reading of file content (avoiding multiple same file reading)
+    """
+
     if filename not in kb.cache.content:
         kb.locks.cacheLock.acquire()
 
@@ -1755,6 +1779,10 @@ def readCachedFileContent(filename, mode='rb'):
     return kb.cache.content[filename]
 
 def readXmlFile(xmlFile):
+    """
+    Reads XML file content and returns it's DOM representation
+    """
+
     checkFile(xmlFile)  
 
     xfile = codecs.open(xmlFile, 'r', UNICODE_ENCODING)
@@ -1793,6 +1821,7 @@ def average(values):
     """
     Computes the arithmetic mean of a list of numbers.
     """
+
     retVal = None
 
     if values:
@@ -1804,9 +1833,14 @@ def calculateDeltaSeconds(start):
     """
     Returns elapsed time from start till now
     """
+
     return time.time() - start
 
 def initCommonOutputs():
+    """
+    Initializes dictionary containing common output values used by "good samaritan" feature
+    """
+
     kb.commonOutputs = {}
     key = None
 
@@ -1831,6 +1865,10 @@ def initCommonOutputs():
     cfile.close()
 
 def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, unique=False):
+    """
+    Returns newline delimited items contained inside file
+    """
+
     retVal = []
 
     checkFile(filename)
@@ -2006,8 +2044,12 @@ def getUnicode(value, encoding=None, system=False):
         except:
             return getUnicode(value, UNICODE_ENCODING)
 
-# http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 def longestCommonPrefix(*sequences):
+    """
+    Returns longest common prefix occuring in given sequences
+    """
+    # Reference: http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
+
     if len(sequences) == 1:
         return sequences[0]
 
@@ -2066,6 +2108,7 @@ def wasLastRequestDelayed():
     # 99.9999999997440% of all non time-based sql injection affected
     # response times should be inside +-7*stdev([normal response times])
     # Math reference: http://www.answers.com/topic/standard-deviation
+
     deviation = stdev(kb.responseTimes)
     threadData = getCurrentThreadData()
 
@@ -2167,6 +2210,10 @@ def beep():
         _failsafe()
 
 def runningAsAdmin():
+    """
+    Returns True if the current process is run under admin privileges
+    """
+
     isAdmin = False
 
     if PLATFORM in ( "posix", "mac" ):
@@ -2834,7 +2881,8 @@ def isNullValue(value):
     """
     Returns whether the value contains explicit 'NULL' value
     """
-    return isinstance(value,basestring) and value.upper() == "NULL"
+
+    return isinstance(value, basestring) and value.upper() == "NULL"
 
 def expandMnemonics(mnemonics, parser, args):
     """
@@ -2940,6 +2988,10 @@ def filterPairValues(values):
     return retVal
 
 def randomizeParameterValue(value):
+    """
+    Randomize a parameter value based on occurances of alphanumeric characters
+    """
+
     retVal = value
 
     for match in re.finditer('[A-Z]+', value):
