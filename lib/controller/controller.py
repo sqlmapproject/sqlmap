@@ -334,15 +334,9 @@ def start():
                 checkNullConnection()
 
             if not conf.dropSetCookie and conf.cj:
-                for _, cookie in enumerate(conf.cj):
-                    cookie = getUnicode(cookie)
-                    index = cookie.index(" for ")
-
-                    cookieStr += "%s;" % cookie[8:index]
+                cookieStr = ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for _, cookie in enumerate(conf.cj))
 
                 if cookieStr:
-                    cookieStr = cookieStr[:-1]
-
                     if PLACE.COOKIE in conf.parameters:
                         message = "you provided an HTTP Cookie header value. "
                         message += "The target url provided its own Cookie within "
