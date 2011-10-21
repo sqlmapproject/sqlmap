@@ -2817,7 +2817,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
         parts = name.split('.')
 
-        for i in range(len(parts)):
+        for i in xrange(len(parts)):
             if not re.match(r"\A[A-Za-z0-9_]+\Z", parts[i]):
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
                     parts[i] = "`%s`" % parts[i].strip("`")

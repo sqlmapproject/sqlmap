@@ -74,7 +74,7 @@ class Fingerprint(GenericFingerprint):
         if index >= 0:
             prevVer = None
 
-            for version in range(versions[index][0], versions[index][1] + 1):
+            for version in xrange(versions[index][0], versions[index][1] + 1):
                 randInt = randomInt()
                 version = getUnicode(version)
                 result = inject.checkBooleanExpression("%d=%d/*!%s AND %d=%d*/" % (randInt, randInt, version, randInt, randInt + 1))

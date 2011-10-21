@@ -104,7 +104,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.SYBASE
             logger.info(infoMsg)
 
-            for version in range(12, 16):
+            for version in xrange(12, 16):
                 result = inject.checkBooleanExpression("@@VERSION_NUMBER/1000=%d" % version)
 
                 if result:

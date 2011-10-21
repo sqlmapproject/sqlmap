@@ -414,7 +414,7 @@ class Dump:
             warnMsg += "due to the large table size"
             logger.warning(warnMsg)
 
-        for i in range(count):
+        for i in xrange(count):
             console = (i >= count - TRIM_STDOUT_DUMP_SIZE)
             field = 1
             values = []

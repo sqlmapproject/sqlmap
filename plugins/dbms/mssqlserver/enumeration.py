@@ -122,7 +122,7 @@ class Enumeration(GenericEnumeration):
 
                 tables = []
 
-                for index in range(int(count)):
+                for index in xrange(int(count)):
                     query = rootQuery.blind.query % (db, index, db)
                     table = inject.getValue(query, inband=False, error=False)
                     kb.hintValue = table

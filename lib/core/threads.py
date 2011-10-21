@@ -110,7 +110,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             return
 
         # Start the threads
-        for numThread in range(numThreads):
+        for numThread in xrange(numThreads):
             thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[threadFunction])
 
             # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation

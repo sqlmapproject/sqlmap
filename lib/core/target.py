@@ -111,10 +111,10 @@ def __setRequestParams():
         conf.paramDict[PLACE.URI] = {}
         parts = conf.url.split(URI_INJECTION_MARK_CHAR)
 
-        for i in range(len(parts)-1):
+        for i in xrange(len(parts)-1):
             result = str()
 
-            for j in range(len(parts)):
+            for j in xrange(len(parts)):
                 result += parts[j]
 
                 if i == j:

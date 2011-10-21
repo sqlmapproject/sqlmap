@@ -65,7 +65,7 @@ class Filesystem(GenericFilesystem):
         if length > sustrLen:
             result = []
 
-            for i in range(1, length, sustrLen):
+            for i in xrange(1, length, sustrLen):
                 chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, sort=False, resumeValue=False, charsetType=3)
 
                 result.append(chunk)

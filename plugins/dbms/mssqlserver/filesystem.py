@@ -161,7 +161,7 @@ class Filesystem(GenericFilesystem):
 
             counter = 1
 
-            for i in range(0, wFileSize, debugSize):
+            for i in xrange(0, wFileSize, debugSize):
                 wFileChunk = wFileContent[i:i + debugSize]
                 chunkName = self.updateBinChunk(wFileChunk, tmpPath)
 

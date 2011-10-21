@@ -34,7 +34,7 @@ class Syntax(GenericSyntax):
                 #unescaped = "("
                 unescaped = ""
 
-                for i in range(firstIndex, lastIndex):
+                for i in xrange(firstIndex, lastIndex):
                     unescaped += "CHAR(%d)" % (ord(expression[i]))
                     if i < lastIndex - 1:
                         unescaped += "+"

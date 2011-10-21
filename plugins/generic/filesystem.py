@@ -75,7 +75,7 @@ class Filesystem:
         fileLines.append("%x" % fileSize)
         fileLines.append("f 0100 %x 00" % fileSize)
 
-        for fileLine in range(0, len(binaryData), lineLen):
+        for fileLine in xrange(0, len(binaryData), lineLen):
             scrString = ""
 
             for lineChar in binaryData[fileLine:fileLine+lineLen]:
@@ -168,7 +168,7 @@ class Filesystem:
             fcLength = len(fcEncodedStr)
 
             if fcLength > 256:
-                for i in range(0, fcLength, 256):
+                for i in xrange(0, fcLength, 256):
                     string = ""
 
                     if encoding == "hex":

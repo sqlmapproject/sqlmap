@@ -303,7 +303,7 @@ def attackDumpedTable():
             results = dictionaryAttack(attack_dict)
 
             for (user, hash_, password) in results:
-                for i in range(count):
+                for i in xrange(count):
                     for column in columns:
                         if column == colUser or column == '__infos__':
                             continue

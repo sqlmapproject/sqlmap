@@ -35,7 +35,7 @@ class Syntax(GenericSyntax):
                     old = "'%s'" % expression[firstIndex:lastIndex]
                     unescaped = ""
 
-                    for i in range(firstIndex, lastIndex):
+                    for i in xrange(firstIndex, lastIndex):
                         unescaped += "ASCII_CHAR(%d)" % (ord(expression[i]))
                         if i < lastIndex - 1:
                             unescaped += "||"

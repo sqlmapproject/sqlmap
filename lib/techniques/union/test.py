@@ -107,7 +107,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     min_, max_ = MAX_RATIO, MIN_RATIO
     pages = {}
 
-    for count in range(lowerCount, upperCount+1):
+    for count in xrange(lowerCount, upperCount+1):
         query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)

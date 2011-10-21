@@ -422,7 +422,7 @@ def comp(N, url):
 def fetch(N, url, delay=0):
     lens = []
     starttime = time.time()
-    for i in range(N):
+    for i in xrange(N):
         if delay and i > 0: time.sleep(delay)
         fo = urllib2.urlopen(url)
         foo = fo.read()

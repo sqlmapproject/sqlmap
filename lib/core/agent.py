@@ -562,7 +562,7 @@ class Agent:
         inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if limited:
-            inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, range(0, count)))
+            inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, xrange(0, count)))
             inbandQuery += FROM_TABLE.get(Backend.getIdentifiedDbms(), "")
             inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
@@ -583,7 +583,7 @@ class Agent:
         if Backend.getIdentifiedDbms() in FROM_TABLE and inbandQuery.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
             inbandQuery = inbandQuery[:-len(FROM_TABLE[Backend.getIdentifiedDbms()])]
 
-        for element in range(0, count):
+        for element in xrange(0, count):
             if element > 0:
                 inbandQuery += ", "
 
@@ -610,7 +610,7 @@ class Agent:
         if multipleUnions:
             inbandQuery += " UNION ALL SELECT "
 
-            for element in range(count):
+            for element in xrange(count):
                 if element > 0:
                     inbandQuery += ", "
 
