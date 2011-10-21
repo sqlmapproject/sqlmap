@@ -2594,7 +2594,7 @@ def openFile(filename, mode='r'):
     """
 
     try:
-        return codecs.open(filename, mode, UNICODE_ENCODING)
+        return codecs.open(filename, mode, UNICODE_ENCODING, errors="replace")
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
         errMsg += "Please check %s permissions on a file " % ("write" if \
