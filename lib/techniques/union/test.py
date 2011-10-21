@@ -117,7 +117,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         min_, max_ = min(min_, ratio), max(max_, ratio)
         items.append((count, ratio))
 
-    if kb.uChar and kb.uChar != 'NULL':
+    if kb.uChar and kb.uChar.upper() != 'NULL':
         for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
             contains = [(count, re.search(regex, page or "", re.IGNORECASE) is not None) for count, page in pages.items()]
             if len(filter(lambda x: x[1], contains)) == 1:
@@ -255,7 +255,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     if conf.uColsStop == conf.uColsStart:
         count = conf.uColsStart
     else:
-        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.NEGATIVE if kb.uChar else PAYLOAD.WHERE.ORIGINAL)
+        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if kb.uChar.upper() == "NULL" else PAYLOAD.WHERE.NEGATIVE)
 
     if count:
         if Backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
