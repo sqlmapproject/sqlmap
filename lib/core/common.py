@@ -696,21 +696,21 @@ def paramToDict(place, parameters=None):
         paramStr = ", ".join(test for test in conf.testParameter)
 
         if len(conf.testParameter) > 1:
-            warnMsg = "the testable parameters '%s' " % paramStr
-            warnMsg += "you provided are not inside the %s" % place
+            warnMsg = "provided parameters '%s' " % paramStr
+            warnMsg += "are not inside the %s" % place
         else:
             parameter = conf.testParameter[0]
 
-            warnMsg = "the testable parameter '%s' " % paramStr
-            warnMsg += "you provided is not inside the %s" % place
+            warnMsg = "provided parameter '%s' " % paramStr
+            warnMsg += "is not inside the %s" % place
 
         logger.warn(warnMsg)
 
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
             if not testableParameters.has_key(parameter):
-                warnMsg =  "the testable parameter '%s' " % parameter
-                warnMsg += "you provided is not inside the %s" % place
+                warnMsg =  "provided parameter '%s' " % parameter
+                warnMsg += "is not inside the %s" % place
                 logger.warn(warnMsg)
 
     return testableParameters
