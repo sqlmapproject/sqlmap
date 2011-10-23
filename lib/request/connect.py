@@ -135,7 +135,7 @@ class Connect:
         ignoreTimeout = kwargs.get('ignoreTimeout', kb.ignoreTimeout)
         refreshing = kwargs.get('refreshing',       False)
         retrying = kwargs.get('retrying',           False)
-        redirecting = kwargs.get('redirecting',     False)
+        redirecting = kwargs.get('redirecting',     None)
         crawling = kwargs.get('crawling',           False)
 
         if not urlparse.urlsplit(url).netloc:
@@ -309,7 +309,7 @@ class Connect:
                     kb.alwaysRedirect = choice not in ("n", "N")
 
                 kwargs['url'] = conn.redurl if kb.alwaysRedirect else conf.url
-                kwargs['redirecting'] = True
+                kwargs['redirecting'] = conn.redcode
                 return Connect.__getPageProxy(**kwargs)
 
             # Return response object
@@ -318,7 +318,7 @@ class Connect:
 
             # Get HTTP response
             page = conn.read()
-            code = conn.code
+            code = redirecting or conn.code
             responseHeaders = conn.info()
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
             page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
