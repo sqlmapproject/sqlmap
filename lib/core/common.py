@@ -974,7 +974,7 @@ def randomInt(length=4):
     @rtype: C{str}
     """
 
-    return int("".join([random.choice(string.digits) for _ in xrange(0, length)]))
+    return int("".join([random.choice(string.digits if i!=0 else string.digits.replace('0', '')) for i in xrange(0, length)]))
 
 def randomStr(length=4, lowercase=False, alphabet=None):
     """
