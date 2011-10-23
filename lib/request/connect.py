@@ -17,6 +17,7 @@ import traceback
 
 from extra.multipart import multipartpost
 from lib.core.agent import agent
+from lib.core.common import asciifyUrl
 from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
@@ -159,6 +160,10 @@ class Connect:
         requestHeaders = ""
         responseHeaders = None
         logHeaders = ""
+
+        # support for non-latin URLs (e.g. cyrilic) as urllib/urllib2 doesn't
+        # support those by default
+        url = asciifyUrl(url)
 
         # fix for known issues when using url in unicode format
         # (e.g. UnicodeDecodeError: "url = url + '?' + query" in redirect case)
