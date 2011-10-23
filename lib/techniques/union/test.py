@@ -59,8 +59,8 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
             query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
             payload = agent.payload(newValue=query, place=place, parameter=parameter, where=where)
-            page, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
-            return not re.search(r"((warning|error)[^\n]*order)|(order by)", page or "", re.I)
+            page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+            return not re.search(r"((warning|error)[^\n]*order)|(order by)", page or "", re.I) and comparison(page, headers)
 
         if __orderByTest(1) and not __orderByTest(randomInt()):
             infoMsg = "ORDER BY technique seems to be usable. "
