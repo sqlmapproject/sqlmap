@@ -275,7 +275,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
             warnMsg += "please consider "
             if not conf.uChar:
                 warnMsg += "providing --union-char switch "
-                warnMsg += "(e.g. --union-char=1)"
+                warnMsg += "(e.g. --union-char=1) "
             if not conf.dbms:
                 if not conf.uChar:
                     warnMsg += "and/or try to force the "
