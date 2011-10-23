@@ -666,11 +666,11 @@ def paramToDict(place, parameters=None):
                 if condition:
                     testableParameters[parameter] = "=".join(elem[1:])
                     if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
-                      or re.search(r'\A-[1-9]', testableParameters[parameter]):
+                      or re.search(r'(\A-[1-9])|(\A9{3,})', testableParameters[parameter]):
                         errMsg = "you have provided tainted parameter values "
                         errMsg += "(%s) with most probably leftover " % element
                         errMsg += "chars from manual sql injection "
-                        errMsg += "tests (%s) or negative numerical value. " % DUMMY_SQL_INJECTION_CHARS
+                        errMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
                         errMsg += "Please, always use only valid parameter values "
                         errMsg += "so sqlmap could be able to do a valid run."
                         raise sqlmapSyntaxException, errMsg
