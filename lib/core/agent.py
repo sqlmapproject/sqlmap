@@ -331,7 +331,7 @@ class Agent:
         if not Backend.getDbms():
             return fields
 
-        if fields.startswith("(CASE") or fields.startswith("(IIF") or fields.startswith("SUBSTR") or fields.startswith("MID("):
+        if fields.startswith("(CASE") or fields.startswith("(IIF") or fields.startswith("SUBSTR") or fields.startswith("MID(") or re.search(r"\A'[^']+'\Z", fields):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ",")
