@@ -161,7 +161,7 @@ class Connect:
         responseHeaders = None
         logHeaders = ""
 
-        # support for non-latin URLs (e.g. cyrilic) as urllib/urllib2 doesn't
+        # support for non-latin (e.g. cyrillic) URLs as urllib/urllib2 doesn't
         # support those by default
         url = asciifyUrl(url)
 

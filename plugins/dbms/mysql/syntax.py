@@ -7,8 +7,10 @@ Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.exception import sqlmapSyntaxException
+import binascii
+import re
 
+from lib.core.exception import sqlmapSyntaxException
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -18,35 +20,13 @@ class Syntax(GenericSyntax):
     @staticmethod
     def unescape(expression, quote=True):
         if quote:
-            while True:
-                index = expression.find("'")
-                if index == -1:
-                    break
-
-                firstIndex = index + 1
-                index = expression[firstIndex:].find("'")
-
-                if index == -1:
-                    raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
-
-                lastIndex = firstIndex + index
-                old = "'%s'" % expression[firstIndex:lastIndex]
-                unescaped = ""
-
-                for i in xrange(firstIndex, lastIndex):
-                    unescaped += "%d" % (ord(expression[i]))
-                    if i < lastIndex - 1:
-                        unescaped += ","
-
-                expression = expression.replace(old, "CHAR(%s)" % unescaped)
+            unescaped = expression
+            for item in re.findall(r"'[^']+'", expression, re.S):
+                unescaped = unescaped.replace(item, "0x%s" % binascii.hexlify(item.strip("'")))
         else:
-            unescaped = "CHAR("
-            unescaped += ",".join("%d" % ord(c) for c in expression)
-            unescaped += ")"
+            unescaped = "0x%s" % binascii.hexlify(expression)
 
-            expression = unescaped
-
-        return expression
+        return unescaped
 
     @staticmethod
     def escape(expression):
@@ -69,5 +49,9 @@ class Syntax(GenericSyntax):
 
             escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
             expression = expression.replace(old, escaped)
+
+        original = expression
+        for item in re.findall(r"0x[0-9a-fA-F]+", original, re.S):
+            expression = expression.replace(item, "'%s'" % binascii.unhexlify(item[2:]))
 
         return expression
