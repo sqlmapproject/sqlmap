@@ -234,7 +234,7 @@ def unionUse(expression, unpack=True, dump=False):
                     stopLimit = conf.limitStop
 
             # Count the number of SQL query entries output
-            countedExpression = expression.replace(expressionFields, "COUNT(*)", 1)
+            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
 
             if re.search(" ORDER BY ", expression, re.I):
                 untilOrderChar = countedExpression.index(" ORDER BY ")

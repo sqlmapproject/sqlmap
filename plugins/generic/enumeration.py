@@ -1322,9 +1322,9 @@ class Enumeration:
 
     def __tableGetCount(self, db, table):
         if Backend.isDbms(DBMS.DB2):
-            query = "SELECT COUNT(*) FROM %s.%s--" % (safeSQLIdentificatorNaming(db.upper()), safeSQLIdentificatorNaming(table.upper(), True))
+            query = "SELECT %s FROM %s.%s--" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db.upper()), safeSQLIdentificatorNaming(table.upper(), True))
         else:
-            query = "SELECT COUNT(*) FROM %s.%s" % (safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
+            query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
 
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=2)
 
