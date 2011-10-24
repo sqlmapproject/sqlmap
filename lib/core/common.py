@@ -26,6 +26,7 @@ import sys
 import tempfile
 import time
 import types
+import urllib
 import urlparse
 import unicodedata
 
