@@ -20,7 +20,6 @@ from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
-from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths

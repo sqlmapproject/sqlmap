@@ -22,7 +22,6 @@ from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import popValue
 from lib.core.common import pushValue
-from lib.core.common import readInput
 from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage

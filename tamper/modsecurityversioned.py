@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload):
     """
-    Replaces ...
+    Embraces complete query with versioned comment
 
     Example:
         * Input: 1 AND 2>1--
