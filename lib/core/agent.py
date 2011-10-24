@@ -88,10 +88,13 @@ class Agent:
             if where == PAYLOAD.WHERE.ORIGINAL:
                 value = origValue
             elif where == PAYLOAD.WHERE.NEGATIVE:
-                if newValue.startswith("-"):
-                    value = ""
+                if not conf.logicNegative:
+                    if newValue.startswith("-"):
+                        value = ""
+                    else:
+                        value = "-%s" % randomInt()
                 else:
-                    value = "-%s" % randomInt()
+                    value = "%s AND %s=%s" % (origValue, randomInt(2), randomInt(2))
             elif where == PAYLOAD.WHERE.REPLACE:
                 value = ""
             else:

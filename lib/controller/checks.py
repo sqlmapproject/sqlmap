@@ -289,7 +289,10 @@ def checkSqlInjection(place, parameter, value):
                         # Use different page template than the original
                         # one as we are changing parameters value, which
                         # will likely result in a different content
-                        origValue = "-%s" % randomInt()
+                        if not conf.logicNegative:
+                            origValue = "-%s" % randomInt()
+                        else:
+                            origValue = "%s AND %s=%s" % (origValue, randomInt(), randomInt())
                         templatePayload = agent.payload(place, parameter, newValue=origValue, where=where)
                     elif where == PAYLOAD.WHERE.REPLACE:
                         origValue = ""

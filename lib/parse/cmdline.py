@@ -184,6 +184,10 @@ def cmdLineParser():
         injection.add_option("--suffix", dest="suffix",
                              help="Injection payload suffix string")
 
+        injection.add_option("--logic-negative", dest="logicNegative",
+                             action="store_true",
+                             help="Use logic operation(s) instead of negating values")
+
         injection.add_option("--skip", dest="skip",
                            help="Skip testing for given parameter(s)")
 
