@@ -94,7 +94,9 @@ class Agent:
                     else:
                         value = "-%s" % randomInt()
                 else:
-                    value = "%s AND %s=%s" % (origValue, randomInt(2), randomInt(2))
+                    match = re.search(r'\A[^ ]+', newValue)
+                    newValue = newValue[len(match.group() if match else ""):]
+                    value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", randomInt(2), randomInt(2))
             elif where == PAYLOAD.WHERE.REPLACE:
                 value = ""
             else:
