@@ -497,7 +497,7 @@ class Connect:
         return page, responseHeaders, code
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None):
+    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -669,10 +669,11 @@ class Connect:
         elif noteResponseTime:
             kb.responseTimes.append(threadData.lastQueryDuration)
 
+        if not response and removeReflection:
+            page = removeReflectiveValues(page, payload)
+
         if content or response:
             return page, headers
-
-        page = removeReflectiveValues(page, payload)
 
         if getRatioValue:
             return comparison(page, headers, code, getRatioValue=False, pageLength=pageLength), comparison(page, headers, code, getRatioValue=True, pageLength=pageLength)
