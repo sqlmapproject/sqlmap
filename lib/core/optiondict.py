@@ -167,7 +167,8 @@ optDict = {
                                "parseErrors":       "boolean",
                                "replicate":         "boolean",
                                "updateAll":         "boolean",
-                               "tor":               "boolean"
+                               "tor":               "boolean",
+                               "checkTor":          "boolean"
                              },
 
             "Miscellaneous": {

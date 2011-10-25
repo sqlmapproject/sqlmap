@@ -520,6 +520,10 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
 
+        general.add_option("--check-tor", dest="checkTor", 
+                                  action="store_true",
+                                  help="Check to see if Tor is used properly")
+
         general.add_option("--update", dest="updateAll",
                             action="store_true",
                             help="Update sqlmap")

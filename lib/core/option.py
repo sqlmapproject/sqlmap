@@ -1732,6 +1732,19 @@ def __setTorProxySettings():
 
         raise sqlmapConnectionException, errMsg
 
+def __checkTor():
+    infoMsg = "checking Tor connection"
+    logger.info(infoMsg)
+
+    if conf.checkTor:
+        page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
+        if not page or 'Congratulations' not in page:
+            errMsg = "it seems that your Tor connection is not properly set"
+            raise sqlmapConnectionException, errMsg
+        else:
+            infoMsg = "Tor connection is properly set"
+            logger.info(infoMsg)
+
 def __basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
         errMsg = "value for --start (limitStart) option must be an integer value greater than zero (>0)"
@@ -1793,6 +1806,10 @@ def __basicOptionValidation():
 
     if conf.tor and conf.proxy:
         errMsg = "switch --tor is incompatible with switch --proxy"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.checkTor and not conf.tor:
+        errMsg = "switch --check-tor requires usage of switch --tor"
         raise sqlmapSyntaxException, errMsg
 
     if conf.skip and conf.testParameter:
@@ -1881,6 +1898,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
         __setGoogleDorking()
         __setBulkMultipleTargets()
         __urllib2Opener()
+        __checkTor()
         __setCrawler()
         __findPageForms()
         __setDBMS()
