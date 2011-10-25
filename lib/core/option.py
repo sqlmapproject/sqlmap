@@ -1109,7 +1109,10 @@ def __setHTTPExtraHeaders():
 
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
         conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
-        conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
+        if not conf.charset:
+            conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
+        else:
+            conf.httpHeaders.append(("Accept-Charset", "%s;q=0.7,*;q=0.1" % conf.charset))
 
         # Invalidating any caching mechanism in between
         # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
