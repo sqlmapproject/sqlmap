@@ -400,3 +400,6 @@ PARAMETER_SPLITTING_REGEX = r'[,|;]'
 
 # Regular expression describing possible union char value (e.g. used in --union-char)
 UNION_CHAR_REGEX = r'\A\w+\Z'
+
+# Attribute used for storing original parameter value in special cases (e.g. POST)
+UNENCODED_ORIGINAL_VALUE = 'original'

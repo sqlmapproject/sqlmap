@@ -36,6 +36,7 @@ from lib.core.session import resumeConfKb
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_REGEX
+from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import URI_INJECTION_MARK_CHAR
@@ -71,7 +72,12 @@ def __setRequestParams():
         raise sqlmapSyntaxException, errMsg
 
     if conf.data:
-        conf.data = conf.data.replace("\n", " ")
+        if hasattr(conf.data, UNENCODED_ORIGINAL_VALUE):
+            original = getattr(conf.data, UNENCODED_ORIGINAL_VALUE)
+            conf.data = type(conf.data)(conf.data.replace("\n", " "))
+            setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
+        else:
+            conf.data = conf.data.replace("\n", " ")
 
         # Check if POST data is in xml syntax
         if re.match(SOAP_REGEX, conf.data, re.I | re.M):

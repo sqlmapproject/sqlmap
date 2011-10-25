@@ -53,6 +53,7 @@ from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import IS_WIN
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import WARN_TIME_STDEV
+from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
@@ -600,7 +601,10 @@ class Connect:
                             cookie = _randomizeParameter(cookie, randomParameter)
 
         get = urlencode(get, limit=True)
-        post = urlencode(post)
+        if post and place != PLACE.POST and hasattr(post, UNENCODED_ORIGINAL_VALUE):
+            post = getattr(post, UNENCODED_ORIGINAL_VALUE)
+        else:
+            post = urlencode(post)
 
         if timeBasedCompare:
             if len(kb.responseTimes) < MIN_TIME_RESPONSES:

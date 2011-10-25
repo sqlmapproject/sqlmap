@@ -104,6 +104,7 @@ from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import TIME_DELAY_CANDIDATES
+from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNION_CHAR_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
@@ -1322,7 +1323,13 @@ def __cleanupOptions():
         setOptimize()
 
     if conf.data:
-        conf.data = urldecode(conf.data)
+        if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
+            original = conf.data
+            class _(unicode): pass
+            conf.data = _(urldecode(conf.data))
+            setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
+        else:
+            conf.data = urldecode(conf.data)
 
     if conf.os:
         conf.os = conf.os.capitalize()
