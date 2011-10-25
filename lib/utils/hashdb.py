@@ -30,12 +30,13 @@ class HashDB(object):
 
     cursor = property(_get_cursor)
 
-    def __del__(self):
-        self.close()
-
     def close(self):
+        threadData = getCurrentThreadData()
         try:
-            self.cursor.connection.close()
+            if threadData.hashDBCursor:
+                threadData.hashDBCursor.close()
+                threadData.hashDBCursor.connection.close()
+                threadData.hashDBCursor = None
         except:
             pass
 
