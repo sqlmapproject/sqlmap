@@ -1695,12 +1695,6 @@ def __setTorProxySettings():
     if not conf.tor:
         return
 
-    warnMsg = "please make sure that you've configured "
-    warnMsg+= "either Privoxy (8118/tcp) or Polipo (8123/tcp) "
-    warnMsg+= "to forward the requests to your local SOCKS5 "
-    warnMsg+= "instance of Tor client (usually 9050/tcp)"
-    logger.warning(warnMsg)
-
     infoMsg = "setting Tor proxy settings"
     logger.info(infoMsg)
 
@@ -1739,10 +1733,14 @@ def __checkTor():
     if conf.checkTor:
         page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
         if not page or 'Congratulations' not in page:
-            errMsg = "it seems that your Tor connection is not properly set"
+            errMsg = "it seems that Tor is not properly set. "
+            errMsg+= "Please make sure that you've configured "
+            errMsg+= "either Polipo (8123/tcp) or Privoxy (8118/tcp) "
+            errMsg+= "to forward the requests to your local SOCKS5 "
+            errMsg+= "instance of Tor client (usually 9050/tcp)"
             raise sqlmapConnectionException, errMsg
         else:
-            infoMsg = "Tor connection is properly set"
+            infoMsg = "Tor is properly set"
             logger.info(infoMsg)
 
 def __basicOptionValidation():
