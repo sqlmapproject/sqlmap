@@ -883,6 +883,9 @@ class Enumeration:
                     query += " WHERE "
                     query += " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in sorted(dbs))
 
+                if len(dbs) < 2 and ("%s," % condition) in query:
+                    query = query.replace("%s," % condition, "", 1)
+
             if Backend.isDbms(DBMS.MSSQL):
                 query = safeStringFormat(query, conf.db)
 
