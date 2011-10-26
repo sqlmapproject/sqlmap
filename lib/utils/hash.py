@@ -599,7 +599,7 @@ def dictionaryAttack(attack_dict):
                 except KeyboardInterrupt:
                     print
                     processException = True
-                    warnMsg = "user aborted during dictionary-based attack phase"
+                    warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
                     logger.warn(warnMsg)
 
                 while not retVal.empty():
@@ -609,6 +609,9 @@ def dictionaryAttack(attack_dict):
 
         else:
             for ((user, hash_), kwargs) in attack_info:
+                if processException:
+                    break
+
                 count = 0
                 found = False
 
@@ -666,7 +669,7 @@ def dictionaryAttack(attack_dict):
                     except KeyboardInterrupt:
                         print
                         processException = True
-                        warnMsg = "user aborted during dictionary-based attack phase"
+                        warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
                         logger.warn(warnMsg)
 
                     while not retVal.empty():
