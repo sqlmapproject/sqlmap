@@ -355,7 +355,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
             try:
                 current = __functions__[hash_regex](password = word, uppercase = False)
 
-                for item in attack_info:
+                for item in list(attack_info):
                     ((user, hash_), _) = item
 
                     count += 1
