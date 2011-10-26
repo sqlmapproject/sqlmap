@@ -344,8 +344,6 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
             if not attack_info:
                 break
 
-            count += 1
-
             if not isinstance(word, basestring):
                 continue
 
@@ -358,12 +356,14 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
                 for item in attack_info:
                     ((user, hash_), _) = item
 
+                    count += 1
+
                     if hash_ == current:
                         retVal.put((user, hash_, word))
 
                         clearConsoleLine()
 
-                        infoMsg = "[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+                        infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
 
                         if user and not user.startswith(DUMMY_USER_PREFIX):
                             infoMsg += " for user '%s'\n" % user
@@ -420,7 +420,7 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
                     clearConsoleLine()
 
-                    infoMsg = "[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+                    infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
 
                     if user and not user.startswith(DUMMY_USER_PREFIX):
                         infoMsg += " for user '%s'\n" % user
