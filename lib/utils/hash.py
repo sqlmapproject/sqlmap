@@ -255,6 +255,9 @@ def attackDumpedTable():
     isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
 
     if kb.data.dumpedTable:
+        infoMsg = "analyzing table dump for possible password hashes"
+        logger.info(infoMsg)
+
         table = kb.data.dumpedTable
         columns = table.keys()
         count = table["__infos__"]["count"]
@@ -291,7 +294,7 @@ def attackDumpedTable():
 
         if attack_dict:
             message = "recognized possible password hashes in column%s " % ("s" if len(colPasswords) > 1 else "")
-            message += "%s. Do you want to " % ", ".join(col for col in colPasswords)
+            message += "'%s'. Do you want to " % ", ".join(col for col in colPasswords)
             message += "crack them via a dictionary-based attack? [Y/n/q]"
             test = readInput(message, default="Y")
 
