@@ -305,19 +305,18 @@ def attackDumpedTable():
 
             results = dictionaryAttack(attack_dict)
 
-            for (user, hash_, password) in results:
+            for (_, hash_, password) in results:
+                if not hash_:
+                    continue
+
                 for i in xrange(count):
                     for column in columns:
-                        if column == colUser or column == '__infos__':
-                            continue
-                        if len(table[column]['values']) <= i:
-                            continue
+                        if not (column == colUser or column == '__infos__' or len(table[column]['values']) <= i):
+                            value = table[column]['values'][i]
 
-                        value = table[column]['values'][i]
-
-                        if all(map(lambda x: x, [value, hash_])) and value.lower() == hash_.lower():
-                            table[column]['values'][i] += " (%s)" % password
-                            table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
+                            if value and value.lower() == hash_.lower():
+                                table[column]['values'][i] += " (%s)" % password
+                                table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value, isOracle=False, isMySQL=False):
     retVal = None
@@ -481,11 +480,9 @@ def dictionaryAttack(attack_dict):
                 if not hash_:
                     continue
 
-                hash_ = hash_.split()[0]
+                hash_ = hash_.split()[0].lower()
 
                 if getCompiledRegex(hash_regex).match(hash_):
-                    hash_ = hash_.lower()
-
                     if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
                         attack_info.append([(user, hash_), {}])
 
@@ -556,7 +553,7 @@ def dictionaryAttack(attack_dict):
         for item in attack_info:
             ((user, _), _) = item
 
-            if user:
+            if user and not user.startswith(DUMMY_USER_PREFIX):
                 kb.wordlist.append(normalizeUnicode(user))
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
