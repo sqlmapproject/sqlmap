@@ -484,20 +484,21 @@ def dictionaryAttack(attack_dict):
                 hash_ = hash_.split()[0].lower()
 
                 if getCompiledRegex(hash_regex).match(hash_):
+                    item = None
+
                     if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
-                        attack_info.append([(user, hash_), {}])
-
+                        item = [(user, hash_), {}]
                     elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
-                        attack_info.append([(user, hash_), {'username': user}])
-
+                        item = [(user, hash_), {'username': user}]
                     elif hash_regex in (HASH.ORACLE):
-                        attack_info.append([(user, hash_), {'salt': hash_[-20:]}])
-
+                        item = [(user, hash_), {'salt': hash_[-20:]}]
                     elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD):
-                        attack_info.append([(user, hash_), {'salt': hash_[6:14]}])
-
+                        item = [(user, hash_), {'salt': hash_[6:14]}]
                     elif hash_regex in (HASH.CRYPT_GENERIC):
-                        attack_info.append([(user, hash_), {'salt': hash_[0:2]}])
+                        item = [(user, hash_), {'salt': hash_[0:2]}]
+
+                    if item and item not in attack_info:
+                        attack_info.append(item)
 
         if not attack_info:
             continue
