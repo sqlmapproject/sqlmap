@@ -252,8 +252,6 @@ def attackCachedUsersPasswords():
                     kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
 def attackDumpedTable():
-    isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
-
     if kb.data.dumpedTable:
         infoMsg = "analyzing table dump for possible password hashes"
         logger.info(infoMsg)
@@ -281,7 +279,7 @@ def attackDumpedTable():
 
                 value = table[column]['values'][i]
 
-                if hashRecognition(value, isOracle, isMySQL):
+                if hashRecognition(value):
                     if colUser and i < len(table[colUser]['values']):
                         if table[colUser]['values'][i] not in attack_dict:
                             attack_dict[table[colUser]['values'][i]] = []
@@ -318,8 +316,10 @@ def attackDumpedTable():
                                 table[column]['values'][i] += " (%s)" % password
                                 table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
-def hashRecognition(value, isOracle=False, isMySQL=False):
+def hashRecognition(value):
     retVal = None
+
+    isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
 
     if isinstance(value, basestring):
         for name, regex in getPublicTypeMembers(HASH):
