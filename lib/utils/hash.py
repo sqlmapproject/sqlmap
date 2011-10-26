@@ -569,6 +569,7 @@ def dictionaryAttack(attack_dict):
                 kb.wordlist.rewind()
 
                 retVal = None
+                processes = []
 
                 try:
                     if _multiprocessing and not IS_WIN:
@@ -576,7 +577,6 @@ def dictionaryAttack(attack_dict):
                             infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                             singleTimeLogMessage(infoMsg)
 
-                        processes = []
                         retVal = _multiprocessing.Queue()
                         for i in xrange(_multiprocessing.cpu_count()):
                             p = _multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, _multiprocessing.cpu_count()))
@@ -602,8 +602,12 @@ def dictionaryAttack(attack_dict):
                     warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
                     logger.warn(warnMsg)
 
+                    for process in processes:
+                        process.terminate()
+                        process.join()
+
                 while not retVal.empty():
-                    results.append(retVal.get())
+                    results.append(retVal.get(block=False))
 
             clearConsoleLine()
 
@@ -627,6 +631,7 @@ def dictionaryAttack(attack_dict):
                     kb.wordlist.rewind()
 
                     retVal = None
+                    processes = []
 
                     try:
                         if _multiprocessing and not IS_WIN:
@@ -634,7 +639,6 @@ def dictionaryAttack(attack_dict):
                                 infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                                 singleTimeLogMessage(infoMsg)
 
-                            processes = []
                             retVal = _multiprocessing.Queue()
                             found_ = _multiprocessing.Value('i', False)
 
@@ -672,8 +676,12 @@ def dictionaryAttack(attack_dict):
                         warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
                         logger.warn(warnMsg)
 
+                        for process in processes:
+                            process.terminate()
+                            process.join()
+
                     while not retVal.empty():
-                        results.append(retVal.get())
+                        results.append(retVal.get(block=False))
 
                 clearConsoleLine()
 
