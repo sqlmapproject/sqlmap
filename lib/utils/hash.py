@@ -474,7 +474,7 @@ def dictionaryAttack(attack_dict):
                 logger.info(infoMsg)
 
     for hash_regex in hash_regexes:
-        items = set()
+        keys = set()
         attack_info = []
 
         for (user, hashes) in attack_dict.items():
@@ -498,9 +498,10 @@ def dictionaryAttack(attack_dict):
                     elif hash_regex in (HASH.CRYPT_GENERIC):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
 
-                    if item and repr(item) not in items:
+                    key = hash(repr(item))
+                    if item and key not in keys:
                         attack_info.append(item)
-                        items.add(repr(item))
+                        keys.add(key)
 
         if not attack_info:
             continue
