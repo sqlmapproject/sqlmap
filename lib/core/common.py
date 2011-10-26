@@ -153,6 +153,7 @@ class Wordlist:
         self.cursize = 0
         self.custom = []
         self.adjust()
+        self.lock = None
 
     def __iter__(self):
         return self
@@ -162,14 +163,17 @@ class Wordlist:
         if self.index > len(self.filenames):
             raise StopIteration
         elif self.index == len(self.filenames):
-            self.iter = iter(self.custom)
+            if self.custom:
+                self.iter = iter(self.custom)
+            else:
+                raise StopIteration
         else:
             current = self.filenames[self.index]
             infoMsg = "loading dictionary from '%s'" % current
             singleTimeLogMessage(infoMsg)
             self.fp = open(current, "r")
             self.cursize = os.path.getsize(current)
-            self.iter = self.fp.xreadlines()
+            self.iter = iter(self.fp)
 
         self.index += 1
 
@@ -183,11 +187,16 @@ class Wordlist:
 
     def next(self):
         retVal = None
+        if self.lock:
+            self.lock.acquire()
         try:
             retVal = self.iter.next().rstrip()
         except StopIteration:
             self.adjust()
             retVal = self.iter.next().rstrip()
+        finally:
+            if self.lock:
+                self.lock.release()
         return retVal
 
     def percentage(self):

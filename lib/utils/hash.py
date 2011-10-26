@@ -541,6 +541,9 @@ def dictionaryAttack(attack_dict):
 
                     kb.wordlist = Wordlist(dictPaths)
 
+                    if _multiprocessing:
+                        kb.wordlist.lock = _multiprocessing.Lock()
+
                 except sqlmapFilePathException, msg:
                     warnMsg = "there was a problem while loading dictionaries"
                     warnMsg += " ('%s')" % msg
