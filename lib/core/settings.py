@@ -387,7 +387,7 @@ ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 BIGARRAY_CHUNK_LENGTH = 4096
 
 # Only console display last n table rows
-TRIM_STDOUT_DUMP_SIZE = 1024
+TRIM_STDOUT_DUMP_SIZE = 256
 
 # Step used in ORDER BY technique used for finding the right number of columns in UNION query injections
 ORDER_BY_STEP = 10
