@@ -1702,10 +1702,10 @@ def __setTorProxySettings():
     logger.info(infoMsg)
 
     found = None
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     for port in DEFAULT_TOR_PORTS:
         try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((LOCALHOST, port))
             found = port
             break
