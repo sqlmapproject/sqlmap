@@ -99,7 +99,7 @@ from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import DB2_ALIASES
-from lib.core.settings import BURP_SPLITTER
+from lib.core.settings import BURP_REQUEST_REGEX
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
@@ -211,20 +211,23 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         port = None
         scheme = None
 
-        reqResList = content.split(BURP_SPLITTER)
+        reqResList = re.findall(BURP_REQUEST_REGEX, content, re.I | re.S)
+
+        if not reqResList:
+            reqResList = [content]
 
         for request in reqResList:
             if scheme is None:
-                schemePort = re.search("\d\d[\:|\.]\d\d[\:|\.]\d\d\s+(http[\w]*)\:\/\/.*?\:([\d]+)", request, re.I)
+                schemePort = re.search("(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
 
                 if schemePort:
                     scheme = schemePort.group(1)
                     port = schemePort.group(2)
 
-            if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I):
+            if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
                 continue
 
-            if re.search("^[\n]*(GET|POST).*?\.(gif|jpg|png)\sHTTP\/", request, re.I):
+            if re.search("^[\n]*(GET|POST).*?\.(gif|jpg|png)\sHTTP\/", request, re.I | re.M):
                 continue
 
             getPostReq = False
