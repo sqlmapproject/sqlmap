@@ -48,6 +48,9 @@ class Enumeration(GenericEnumeration):
         if retVal:
             kb.data.cachedDbs = retVal[0].values()[0]
 
+        if kb.data.cachedDbs:
+            kb.data.cachedDbs.sort()
+
         return kb.data.cachedDbs
 
     def getTables(self, bruteForce=None):
