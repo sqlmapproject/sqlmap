@@ -15,6 +15,7 @@ import logging
 import os
 import re
 import socket
+import StringIO
 import sys
 import threading
 import urllib2
@@ -523,6 +524,13 @@ def __setBulkMultipleTargets():
     f.close()
 
 def __findPageForms():
+    class _(StringIO.StringIO):
+        def __init__(self, content, url):
+            StringIO.StringIO.__init__(self, content)
+            self._url = url
+        def geturl(self):
+            return self._url
+
     if not conf.forms:
         return
 
@@ -532,7 +540,7 @@ def __findPageForms():
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
-    response, _ = Request.queryPage(response=True)
+    response, headers = Request.queryPage(response=True)
 
     if response is None or isinstance(response, basestring):
         errMsg = "can't do form parsing as no valid response "
@@ -540,11 +548,18 @@ def __findPageForms():
         errMsg += "for connection issues"
         raise sqlmapGenericException, errMsg
 
+    response = _(response.read(), response.geturl())
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
-        errMsg = "badly formed HTML at the target url. can't parse forms"
-        raise sqlmapGenericException, errMsg
+        errMsg = "badly formed HTML at the target url. will try to filter it"
+        logger.error(errMsg)
+        response.seek(0)
+        filtered = _("".join(re.findall(r'<form.+?</form>', response.read(), re.I | re.S)), response.geturl())
+        try:
+            forms = ParseResponse(filtered, backwards_compat=False)
+        except ParseError:
+            raise sqlmapGenericException, "no success"
 
     if forms:
         for form in forms:
