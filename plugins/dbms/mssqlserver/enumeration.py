@@ -139,6 +139,10 @@ class Enumeration(GenericEnumeration):
         if not kb.data.cachedTables:
             errMsg = "unable to retrieve the tables for any database"
             raise sqlmapNoneDataException(errMsg)
+        else:
+            for db, tables in kb.data.cachedTables.items():
+                if tables:
+                    kb.data.cachedTables[db] = sorted(tables)
 
         return kb.data.cachedTables
 
