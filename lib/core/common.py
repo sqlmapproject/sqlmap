@@ -2150,7 +2150,7 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
 
         if all([x == candidate for x in kb.delayCandidates]) and candidate < conf.timeSec:
-            infoMsg = "due to good response times you are advised to "
+            infoMsg = "due to good response times you can "
             infoMsg += "try to adjust the time-delay to "
             infoMsg += "a more appropriate value (e.g. --time-sec=%d)" % candidate
             singleTimeLogMessage(infoMsg)
