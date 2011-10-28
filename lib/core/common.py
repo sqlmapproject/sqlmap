@@ -2141,7 +2141,7 @@ def wasLastRequestDelayed():
 
 def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     """
-    Adjusts time delay in time-based data retrieval
+    Provides tip for adjusting time delay in time-based data retrieval
     """
 
     candidate = 1 + int(round((1 - (lastQueryDuration - lowerStdLimit) / lastQueryDuration) * conf.timeSec))
@@ -2150,14 +2150,11 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
 
         if all([x == candidate for x in kb.delayCandidates]) and candidate < conf.timeSec:
-            print
-
-            msg = "do you want to adjust the time delay to %d second%s " % (candidate, 's' if candidate > 1 else '')
-            msg += "(due to good response times)? [Y/n] "
-            inp = readInput(msg, default="Y")
-
-            if inp and inp[0].lower() == "y":
-                conf.timeSec = candidate
+            infoMsg = "due to good response times you are advised to "
+            infoMsg += "try to adjust the time-delay to "
+            infoMsg += "a more appropriate value (e.g. --time-sec=%d)" % candidate
+            singleTimeLogMessage(infoMsg)
+            kb.adjustTimeDelay = False
 
 def extractErrorMessage(page):
     """
