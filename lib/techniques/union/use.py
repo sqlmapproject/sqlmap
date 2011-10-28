@@ -353,6 +353,7 @@ def unionUse(expression, unpack=True, dump=False):
                 kb.suppressResumeInfo = False
 
     if not value:
+        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full inband doesn't play well with ORDER BY
         value = __oneShotUnionUse(expression, unpack)
 
     duration = calculateDeltaSeconds(start)
