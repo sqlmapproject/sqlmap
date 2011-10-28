@@ -85,6 +85,9 @@ class Enumeration(GenericEnumeration):
                     else:
                         kb.data.cachedTables[db].append(table)
 
+        for db, tables in kb.data.cachedTables.items():
+            kb.data.cachedTables[db] = sorted(tables) if tables else tables
+
         return kb.data.cachedTables
 
     def getColumns(self, onlyColNames=False):

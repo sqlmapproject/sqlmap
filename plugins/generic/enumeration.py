@@ -974,8 +974,7 @@ class Enumeration:
                 raise sqlmapNoneDataException, errMsg
         else:
             for db, tables in kb.data.cachedTables.items():
-                if tables:
-                    kb.data.cachedTables[db] = sorted(tables)
+                kb.data.cachedTables[db] = sorted(tables) if tables else tables
 
         return kb.data.cachedTables
 
