@@ -789,6 +789,8 @@ class Enumeration:
             else:
                 errMsg = "unable to retrieve the database names"
                 raise sqlmapNoneDataException, errMsg
+        else:
+            kb.data.cachedDbs.sort()
 
         return kb.data.cachedDbs
 
@@ -970,6 +972,8 @@ class Enumeration:
                 return self.getTables(bruteForce=True)
             else:
                 raise sqlmapNoneDataException, errMsg
+        else:
+            kb.data.cachedTables.sort()
 
         return kb.data.cachedTables
 
