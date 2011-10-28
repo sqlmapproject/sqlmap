@@ -108,13 +108,15 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         progress = ProgressBar(maxValue=length)
         progressTime = []
 
+    if timeBasedCompare and conf.threads > 1:
+        warnMsg = "multi-threading is considered unsafe in time-based data retrieval. Going to switch it off automatically"
+        singleTimeWarnMessage(warnMsg)
+
     if numThreads > 1:
         if not timeBasedCompare:
             debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
             logger.debug(debugMsg)
         else:
-            debugMsg = "multi-threading is not considered safe in time-based data retrieval"
-            logger.debug(debugMsg)
             numThreads = 1
 
     if conf.threads == 1 and not timeBasedCompare:
