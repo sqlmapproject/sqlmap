@@ -15,7 +15,6 @@ import logging
 import os
 import re
 import socket
-import StringIO
 import sys
 import threading
 import urllib2
@@ -24,8 +23,6 @@ import urlparse
 import lib.core.common
 import lib.core.threads
 
-from extra.clientform.clientform import ParseResponse
-from extra.clientform.clientform import ParseError
 from extra.keepalive import keepalive
 from extra.oset.pyoset import oset
 from lib.controller.checks import checkConnection
@@ -34,6 +31,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
+from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
@@ -524,13 +522,6 @@ def __setBulkMultipleTargets():
     f.close()
 
 def __findPageForms():
-    class _(StringIO.StringIO):
-        def __init__(self, content, url):
-            StringIO.StringIO.__init__(self, content)
-            self._url = url
-        def geturl(self):
-            return self._url
-
     if not conf.forms:
         return
 
@@ -540,50 +531,9 @@ def __findPageForms():
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
-    response, headers = Request.queryPage(response=True)
+    page, _ = Request.queryPage(content=True)
 
-    if response is None or isinstance(response, basestring):
-        errMsg = "can't do form parsing as no valid response "
-        errMsg += "object found. please check previous log messages "
-        errMsg += "for connection issues"
-        raise sqlmapGenericException, errMsg
-
-    response = _(response.read(), response.geturl())
-    try:
-        forms = ParseResponse(response, backwards_compat=False)
-    except ParseError:
-        errMsg = "badly formed HTML at the target url. will try to filter it"
-        logger.error(errMsg)
-        response.seek(0)
-        filtered = _("".join(re.findall(r'<form.+?</form>', response.read(), re.I | re.S)), response.geturl())
-        try:
-            forms = ParseResponse(filtered, backwards_compat=False)
-        except ParseError:
-            raise sqlmapGenericException, "no success"
-
-    if forms:
-        for form in forms:
-            for control in form.controls:
-                if hasattr(control, 'items'):
-                    # if control has selectable items select first non-disabled
-                    for item in control.items:
-                        if not item.disabled:
-                            item.selected = True
-                            break
-            request = form.click()
-            url = urldecode(request.get_full_url(), kb.pageEncoding)
-            method = request.get_method()
-            data = urldecode(request.get_data(), kb.pageEncoding) if request.has_data() else None
-            if not data and method and method.upper() == HTTPMETHOD.POST:
-                debugMsg = "invalid POST form with blank data detected"
-                logger.debug(debugMsg)
-                continue
-            target = (url, method, data, conf.cookie)
-            kb.targetUrls.add(target)
-            kb.formNames.append(target)
-    else:
-        errMsg = "there were no forms found at the given target url"
-        raise sqlmapGenericException, errMsg
+    findPageForms(page, conf.url, True, True)
 
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
@@ -1456,7 +1406,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.explicitSettings = set()
     kb.errorIsNone = True
     kb.forcedDbms = None
-    kb.formNames = []
     kb.headersCount = 0
     kb.headersFp = {}
     kb.heuristicTest = None

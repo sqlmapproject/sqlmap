@@ -43,6 +43,8 @@ from xml.etree import ElementTree as ET
 from xml.dom import minidom
 from xml.sax import parse
 
+from extra.clientform.clientform import ParseResponse
+from extra.clientform.clientform import ParseError
 from extra.cloak.cloak import decloak
 from extra.magic import magic
 from extra.odict.odict import OrderedDict
@@ -53,10 +55,12 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.convert import htmlunescape
 from lib.core.convert import safecharencode
+from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTPMETHOD
 from lib.core.enums import OS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
@@ -3013,7 +3017,7 @@ def randomizeParameterValue(value):
 
     return retVal
 
-def asciifyUrl(url, force_quote=False):
+def asciifyUrl(url, forceQuote=False):
     """
     Attempts to make a unicode url usuable with ``urllib/urllib2``.
 
@@ -3046,7 +3050,7 @@ def asciifyUrl(url, force_quote=False):
         # Triggers on non-ascii characters - another option would be:
         #     urllib.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
-        if s.encode('ascii', 'replace') != s or force_quote:
+        if s.encode('ascii', 'replace') != s or forceQuote:
             return urllib.quote(s.encode('utf8'), safe=safe)
         return s
 
@@ -3066,3 +3070,65 @@ def asciifyUrl(url, force_quote=False):
         netloc += ':' + str(parts.port)
 
     return urlparse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment])
+
+def findPageForms(content, url, raise_=False, addToTargets=False):
+    class _(StringIO):
+        def __init__(self):
+            StringIO.__init__(self, unicodeencode(content, kb.pageEncoding) if isinstance(content, unicode) else content)
+            self._url = url
+        def geturl(self):
+            return self._url
+
+    if raise_ and not content:
+        errMsg = "can't parse forms as the page content appears to be blank"
+        raise sqlmapGenericException, errMsg
+
+    retVal = set()
+    response = _()
+    try:
+        forms = ParseResponse(response, backwards_compat=False)
+    except ParseError:
+        errMsg = "badly formed HTML at the target url. will try to filter it"
+        logger.error(errMsg)
+        response.seek(0)
+        filtered = _("".join(re.findall(r'<form.+?</form>', response.read(), re.I | re.S)), response.geturl())
+        try:
+            forms = ParseResponse(filtered, backwards_compat=False)
+        except ParseError:
+            errMsg = "no success"
+            if raise_:
+                raise sqlmapGenericException, errMsg
+            else:
+                logger.debug(errMsg)
+
+    if forms:
+        for form in forms:
+            for control in form.controls:
+                if hasattr(control, 'items'):
+                    # if control has selectable items select first non-disabled
+                    for item in control.items:
+                        if not item.disabled:
+                            item.selected = True
+                            break
+            request = form.click()
+            url = urldecode(request.get_full_url(), kb.pageEncoding)
+            method = request.get_method()
+            data = urldecode(request.get_data(), kb.pageEncoding) if request.has_data() else None
+            if not data and method and method.upper() == HTTPMETHOD.POST:
+                debugMsg = "invalid POST form with blank data detected"
+                logger.debug(debugMsg)
+                continue
+            target = (url, method, data, conf.cookie)
+            retVal.add(target)
+    else:
+        errMsg = "there were no forms found at the given target url"
+        if raise_:
+            raise sqlmapGenericException, errMsg
+        else:
+            logger.debug(errMsg)
+
+    if addToTargets and retVal:
+        for target in retVal:
+            kb.targetUrls.add(target)
+
+    return retVal
