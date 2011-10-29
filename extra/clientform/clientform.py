@@ -3363,6 +3363,9 @@ class HTMLForm:
             if self.enctype == "application/x-www-form-urlencoded":
                 return (uri, urlencode(self._pairs()),
                         [("Content-Type", self.enctype)])
+            elif self.enctype == "text/plain":
+                return (uri, self._pairs(),
+                        [("Content-Type", self.enctype)])
             elif self.enctype == "multipart/form-data":
                 data = StringIO()
                 http_hdrs = []

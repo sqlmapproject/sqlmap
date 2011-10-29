@@ -15,6 +15,7 @@ import time
 
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import findPageForms
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -91,6 +92,9 @@ class Crawler:
                                     if re.search(r"(.*?)\?(.+)", url):
                                         threadData.shared.outputs.add(url)
                                     kb.locks.outputs.release()
+
+                        if conf.forms:
+                            findPageForms(content, current, False, True)
 
                     if conf.verbose in (1, 2):
                         kb.locks.ioLock.acquire()

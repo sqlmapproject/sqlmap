@@ -3073,7 +3073,7 @@ def asciifyUrl(url, forceQuote=False):
 
 def findPageForms(content, url, raise_=False, addToTargets=False):
     class _(StringIO):
-        def __init__(self):
+        def __init__(self, content, url):
             StringIO.__init__(self, unicodeencode(content, kb.pageEncoding) if isinstance(content, unicode) else content)
             self._url = url
         def geturl(self):
@@ -3083,17 +3083,21 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         errMsg = "can't parse forms as the page content appears to be blank"
         raise sqlmapGenericException, errMsg
 
+    forms = None
     retVal = set()
-    response = _()
+    response = _(content, url)
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
         errMsg = "badly formed HTML at the target url. will try to filter it"
         logger.error(errMsg)
         response.seek(0)
-        filtered = _("".join(re.findall(r'<form.+?</form>', response.read(), re.I | re.S)), response.geturl())
+        filtered = re.findall(r'<form.+?</form>', response.read(), re.I | re.S)
+        for i in xrange(len(filtered)):
+            filtered[i] = filtered[i][filtered[i].lower().rfind("<form"):]
+        response = _("".join(filtered), response.geturl())
         try:
-            forms = ParseResponse(filtered, backwards_compat=False)
+            forms = ParseResponse(response, backwards_compat=False)
         except ParseError:
             errMsg = "no success"
             if raise_:

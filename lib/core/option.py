@@ -522,7 +522,7 @@ def __setBulkMultipleTargets():
     f.close()
 
 def __findPageForms():
-    if not conf.forms:
+    if not conf.forms or conf.crawlDepth:
         return
 
     if not checkConnection():
@@ -1794,10 +1794,6 @@ def __basicOptionValidation():
 
     if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
         errMsg = "switch --forms is compatible only with -u (--url) target switch"
-        raise sqlmapSyntaxException, errMsg
-
-    if conf.forms and conf.crawlDepth:
-        errMsg = "switch --forms is currently not compatible with --crawl switch"
         raise sqlmapSyntaxException, errMsg
 
     if conf.timeSec < 1:
