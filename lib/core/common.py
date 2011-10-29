@@ -3079,9 +3079,12 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         def geturl(self):
             return self._url
 
-    if raise_ and not content:
+    if not content:
         errMsg = "can't parse forms as the page content appears to be blank"
-        raise sqlmapGenericException, errMsg
+        if raise_:
+            raise sqlmapGenericException, errMsg
+        else:
+            logger.debug(errMsg)
 
     forms = None
     retVal = set()
@@ -3089,15 +3092,12 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
-        errMsg = "badly formed HTML at the target url. will try to filter it"
-        logger.error(errMsg)
+        warnMsg = "badly formed HTML at the given url ('%s'). Will try to filter it" % url
+        logger.warning(warnMsg)
         response.seek(0)
-        filtered = re.findall(r'<form.+?</form>', response.read(), re.I | re.S)
-        for i in xrange(len(filtered)):
-            filtered[i] = filtered[i][filtered[i].lower().rfind("<form"):]
-        response = _("".join(filtered), response.geturl())
+        filtered = _("".join(re.findall(r'<form(?!.+<form).+?</form>', response.read(), re.I | re.S)), response.geturl())
         try:
-            forms = ParseResponse(response, backwards_compat=False)
+            forms = ParseResponse(filtered, backwards_compat=False)
         except ParseError:
             errMsg = "no success"
             if raise_:
