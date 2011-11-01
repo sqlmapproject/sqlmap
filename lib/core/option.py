@@ -1710,7 +1710,7 @@ def __checkTor():
             errMsg+= "instance of Tor client (usually 9050/tcp)"
             raise sqlmapConnectionException, errMsg
         else:
-            infoMsg = "Tor is properly used"
+            infoMsg = "Tor is properly being used"
             logger.info(infoMsg)
 
 def __basicOptionValidation():
