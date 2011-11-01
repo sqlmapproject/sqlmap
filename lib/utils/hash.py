@@ -505,7 +505,7 @@ def dictionaryAttack(attack_dict):
                         if not resumed:
                             attack_info.append(item)
                         else:
-                            infoMsg = "resuming found '%s' ('%s')" % (resumed, hash_)
+                            infoMsg = "resuming '%s' for hash '%s'" % (resumed, hash_)
                             if user and not user.startswith(DUMMY_USER_PREFIX):
                                 infoMsg += " for user '%s'" % user
                             logger.info(infoMsg)
