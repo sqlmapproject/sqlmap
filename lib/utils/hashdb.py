@@ -40,7 +40,8 @@ class HashDB(object):
         except:
             pass
 
-    def hashKey(self, key):
+    @staticmethod
+    def hashKey(key):
         key = key.encode(UNICODE_ENCODING) if isinstance(key, unicode) else repr(key)
         retVal = int(hashlib.md5(key).hexdigest()[:8], 16)
         return retVal
@@ -48,7 +49,7 @@ class HashDB(object):
     def retrieve(self, key):
         retVal = None
         if key:
-            hash_ = self.hashKey(key)
+            hash_ = HashDB.hashKey(key)
             while True:
                 try:
                     for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
@@ -62,7 +63,7 @@ class HashDB(object):
 
     def write(self, key, value):
         if key:
-            hash_ = self.hashKey(key)
+            hash_ = HashDB.hashKey(key)
             while True:
                 try:
                     try:

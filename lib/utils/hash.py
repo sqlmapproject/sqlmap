@@ -50,6 +50,7 @@ from lib.core.common import Wordlist
 from lib.core.convert import hexdecode
 from lib.core.convert import hexencode
 from lib.core.convert import utf8encode
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
@@ -500,7 +501,15 @@ def dictionaryAttack(attack_dict):
 
                     key = hash(repr(item))
                     if item and key not in keys:
-                        attack_info.append(item)
+                        resumed = conf.hashDB.retrieve(hash_)
+                        if not resumed:
+                            attack_info.append(item)
+                        else:
+                            infoMsg = "resuming found '%s' ('%s')" % (resumed, hash_)
+                            if user and not user.startswith(DUMMY_USER_PREFIX):
+                                infoMsg += " for user '%s'" % user
+                            logger.info(infoMsg)
+                            results.append((user, hash_, resumed))
                         keys.add(key)
 
         if not attack_info:
@@ -615,7 +624,9 @@ def dictionaryAttack(attack_dict):
                         process.join()
 
                 while not retVal.empty():
-                    results.append(retVal.get(block=False))
+                    _, hash_, word = item = retVal.get(block=False)
+                    conf.hashDB.write(hash_, word)
+                    results.append(item)
 
             clearConsoleLine()
 
@@ -689,7 +700,9 @@ def dictionaryAttack(attack_dict):
                             process.join()
 
                     while not retVal.empty():
-                        results.append(retVal.get(block=False))
+                        _, hash_, word = item = retVal.get(block=False)
+                        conf.hashDB.write(hash_, word)
+                        results.append(item)
 
                 clearConsoleLine()
 
