@@ -247,11 +247,12 @@ def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
         results = dictionaryAttack(kb.data.cachedUsersPasswords)
 
-        for (user, hash_, password) in results:
-            for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower()\
-                  and 'clear-text password' not in kb.data.cachedUsersPasswords[user][i].lower():
-                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
+        for (_, hash_, password) in results:
+            for user in kb.data.cachedUsersPasswords.keys():
+                for i in xrange(len(kb.data.cachedUsersPasswords[user])):
+                    if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower()\
+                    and 'clear-text password' not in kb.data.cachedUsersPasswords[user][i].lower():
+                        kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
 
 def attackDumpedTable():
     if kb.data.dumpedTable:
@@ -304,19 +305,20 @@ def attackDumpedTable():
                 raise sqlmapUserQuitException
 
             results = dictionaryAttack(attack_dict)
+            lut = dict()
 
             for (_, hash_, password) in results:
-                if not hash_:
-                    continue
+                if hash_:
+                    lut[hash_.lower()] = password
 
-                for i in xrange(count):
-                    for column in columns:
-                        if not (column == colUser or column == '__infos__' or len(table[column]['values']) <= i):
-                            value = table[column]['values'][i]
+            for i in xrange(count):
+                for column in columns:
+                    if not (column == colUser or column == '__infos__' or len(table[column]['values']) <= i):
+                        value = table[column]['values'][i]
 
-                            if value and value.lower() == hash_.lower():
-                                table[column]['values'][i] += " (%s)" % password
-                                table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
+                        if value and value.lower() in lut:
+                            table[column]['values'][i] += " (%s)" % lut[value.lower()]
+                            table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value):
     retVal = None
@@ -459,6 +461,7 @@ def dictionaryAttack(attack_dict):
     suffix_list = [""]
     hash_regexes = []
     results = []
+    resumes = []
     processException = False
 
     for (_, hashes) in attack_dict.items():
@@ -499,8 +502,7 @@ def dictionaryAttack(attack_dict):
                     elif hash_regex in (HASH.CRYPT_GENERIC):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
 
-                    key = hash(repr(item))
-                    if item and key not in keys:
+                    if item and hash_ not in keys:
                         resumed = conf.hashDB.retrieve(hash_)
                         if not resumed:
                             attack_info.append(item)
@@ -509,8 +511,8 @@ def dictionaryAttack(attack_dict):
                             if user and not user.startswith(DUMMY_USER_PREFIX):
                                 infoMsg += " for user '%s'" % user
                             logger.info(infoMsg)
-                            results.append((user, hash_, resumed))
-                        keys.add(key)
+                            resumes.append((user, hash_, resumed))
+                        keys.add(hash_)
 
         if not attack_info:
             continue
@@ -705,6 +707,8 @@ def dictionaryAttack(attack_dict):
                         results.append(item)
 
                 clearConsoleLine()
+
+    results.extend(resumes)
 
     if len(hash_regexes) == 0:
         warnMsg = "unknown hash format. "
