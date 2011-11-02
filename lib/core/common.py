@@ -1117,7 +1117,7 @@ def setPaths():
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
-    paths.ORACLE_DEFAULT_PASSWD = os.path.join(paths.SQLMAP_TXT_PATH, "oracle-default-passwords.txt")
+    paths.SMALL_DICT = os.path.join(paths.SQLMAP_TXT_PATH, "smalldict.txt")
     paths.USER_AGENTS = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
     paths.WORDLIST = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.txt")
     paths.PHPIDS_RULES_XML = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")

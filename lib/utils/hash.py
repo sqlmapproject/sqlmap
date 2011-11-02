@@ -546,7 +546,7 @@ def dictionaryAttack(attack_dict):
                     else:
                         # It is the slowest of all methods hence smaller default dict
                         if hash_regex == HASH.ORACLE_OLD:
-                            dictPaths = [paths.ORACLE_DEFAULT_PASSWD]
+                            dictPaths = [paths.SMALL_DICT]
                         else:
                             dictPaths = [paths.WORDLIST]
 
