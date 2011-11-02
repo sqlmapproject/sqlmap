@@ -344,6 +344,7 @@ def hashRecognition(value):
 def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, proc_id, proc_count):
     count = 0
     rotator = 0
+    hashes = set([item[0][1] for item in attack_info])
 
     try:
         for word in wordlist:
@@ -359,33 +360,36 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
             try:
                 current = __functions__[hash_regex](password = word, uppercase = False)
 
-                for item in list(attack_info):
-                    ((user, hash_), _) = item
+                count += 1
 
-                    count += 1
+                if current in hashes:
+                    continue
 
-                    if hash_ == current:
-                        retVal.put((user, hash_, word))
+                    for item in list(attack_info):
+                        ((user, hash_), _) = item
 
-                        clearConsoleLine()
+                        if hash_ == current:
+                            retVal.put((user, hash_, word))
 
-                        infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+                            clearConsoleLine()
 
-                        if user and not user.startswith(DUMMY_USER_PREFIX):
-                            infoMsg += " for user '%s'\n" % user
-                        else:
-                            infoMsg += " for hash '%s'\n" % hash_
+                            infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
 
-                        dataToStdout(infoMsg, True)
+                            if user and not user.startswith(DUMMY_USER_PREFIX):
+                                infoMsg += " for user '%s'\n" % user
+                            else:
+                                infoMsg += " for hash '%s'\n" % hash_
 
-                        attack_info.remove(item)
+                            dataToStdout(infoMsg, True)
 
-                    elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
-                        rotator += 1
-                        if rotator >= len(ROTATING_CHARS):
-                            rotator = 0
-                        status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
-                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                            attack_info.remove(item)
+
+                elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                    rotator += 1
+                    if rotator >= len(ROTATING_CHARS):
+                        rotator = 0
+                    status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
                 raise
@@ -436,7 +440,7 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
                     dataToStdout(infoMsg, True)
 
                     found.value = True
-                elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex in (HASH.ORACLE_OLD) or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                     rotator += 1
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0

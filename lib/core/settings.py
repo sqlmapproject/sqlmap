@@ -324,7 +324,7 @@ URLENCODE_CHAR_LIMIT = 2000
 DEFAULT_MSSQL_SCHEMA = 'dbo'
 
 # Display hash attack info every mod number of items
-HASH_MOD_ITEM_DISPLAY = 1597
+HASH_MOD_ITEM_DISPLAY = 11
 
 # Maximum integer value
 MAX_INT = sys.maxint
