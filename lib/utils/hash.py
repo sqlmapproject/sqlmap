@@ -311,6 +311,9 @@ def attackDumpedTable():
                 if hash_:
                     lut[hash_.lower()] = password
 
+            infoMsg = "postprocessing table dump"
+            logger.info(infoMsg)
+
             for i in xrange(count):
                 for column in columns:
                     if not (column == colUser or column == '__infos__' or len(table[column]['values']) <= i):
