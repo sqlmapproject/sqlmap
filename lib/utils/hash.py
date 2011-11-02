@@ -630,10 +630,14 @@ def dictionaryAttack(attack_dict):
                         process.terminate()
                         process.join()
 
-                while not retVal.empty():
-                    _, hash_, word = item = retVal.get(block=False)
-                    conf.hashDB.write(hash_, word)
-                    results.append(item)
+                finally:
+                    if retVal:
+                        conf.hashDB.beginTransaction()
+                        while not retVal.empty():
+                            _, hash_, word = item = retVal.get(block=False)
+                            conf.hashDB.write(hash_, word)
+                            results.append(item)
+                        conf.hashDB.endTransaction()
 
             clearConsoleLine()
 
@@ -706,10 +710,14 @@ def dictionaryAttack(attack_dict):
                             process.terminate()
                             process.join()
 
-                    while not retVal.empty():
-                        _, hash_, word = item = retVal.get(block=False)
-                        conf.hashDB.write(hash_, word)
-                        results.append(item)
+                    finally:
+                        if retVal:
+                            conf.hashDB.beginTransaction()
+                            while not retVal.empty():
+                                _, hash_, word = item = retVal.get(block=False)
+                                conf.hashDB.write(hash_, word)
+                                results.append(item)
+                            conf.hashDB.endTransaction()
 
                 clearConsoleLine()
 

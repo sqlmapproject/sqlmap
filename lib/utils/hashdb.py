@@ -75,3 +75,9 @@ class HashDB(object):
                         raise
                 else:
                     break
+
+    def beginTransaction(self):
+        self.cursor.execute('BEGIN TRANSACTION')
+
+    def endTransaction(self):
+        self.cursor.execute('END TRANSACTION')
