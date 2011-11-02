@@ -154,7 +154,6 @@ class Wordlist:
         self.fp = None
         self.index = 0
         self.iter = None
-        self.cursize = 0
         self.custom = []
         self.adjust()
         self.lock = None
@@ -176,7 +175,6 @@ class Wordlist:
             infoMsg = "loading dictionary from '%s'" % current
             singleTimeLogMessage(infoMsg)
             self.fp = open(current, "r")
-            self.cursize = os.path.getsize(current)
             self.iter = iter(self.fp)
 
         self.index += 1
@@ -201,12 +199,6 @@ class Wordlist:
         finally:
             if self.lock:
                 self.lock.release()
-        return retVal
-
-    def percentage(self):
-        retVal = 0
-        if self.fp:
-            retVal = round(100.0 * self.fp.tell() / self.cursize)
         return retVal
 
     def rewind(self):
