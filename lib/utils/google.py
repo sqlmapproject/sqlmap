@@ -48,10 +48,10 @@ class Google:
 
         matches = []
 
-        regExpr = r'h3 class="?r"?><a href="(http[s]?://[^"]+?)"\sclass="?l"?'
-        matches = re.findall(regExpr, page, re.I | re.M)
+        regExpr = r'h3 class="?r"?><a href="(http[s]?://[^"]+?)"\s(class="?l"?|onmousedown=)'
+        matches = re.findall(regExpr, page, re.I | re.S)
 
-        return matches
+        return [match[0] for match in matches]
 
     def getTargetUrls(self):
         """
