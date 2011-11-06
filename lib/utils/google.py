@@ -102,7 +102,7 @@ class Google:
 
         url = "http://www.google.com/search?"
         url += "q=%s&" % urlencode(googleDork, convall=True)
-        url += "num=100&hl=en&safe=off&filter=0&btnG=Search"
+        url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
         url += "&start=%d" % ((gpage-1) * 100)
 
         try:
