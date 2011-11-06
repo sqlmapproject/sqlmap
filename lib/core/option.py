@@ -1473,6 +1473,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     if flushAll:
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
+        kb.scanOnlyGoogleGETs = None
         kb.tamperFunctions = []
         kb.targetUrls = oset()
         kb.testedParams = set()

@@ -14,6 +14,7 @@ import socket
 import urllib2
 
 from lib.core.common import getUnicode
+from lib.core.common import readInput
 from lib.core.convert import htmlunescape
 from lib.core.convert import urlencode
 from lib.core.data import conf
@@ -63,7 +64,12 @@ class Google:
             if re.search(r"(.*?)\?(.+)", match):
                 kb.targetUrls.add(( htmlunescape(htmlunescape(match)), None, None, None ))
             elif re.search(URI_INJECTABLE_REGEX, match, re.I):
-                kb.targetUrls.add(( htmlunescape(htmlunescape("%s" % match)), None, None, None ))
+                if kb.scanOnlyGoogleGETs is None:
+                    message = "do you want to scan only results containing GET parameters? [Y/n] "
+                    test = readInput(message, default="Y")
+                    kb.scanOnlyGoogleGETs = test.lower() != 'n'
+                if not kb.scanOnlyGoogleGETs:
+                    kb.targetUrls.add(( htmlunescape(htmlunescape("%s" % match)), None, None, None ))
 
     def getCookie(self):
         """
