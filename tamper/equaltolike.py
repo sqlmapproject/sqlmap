@@ -33,7 +33,7 @@ def tamper(payload):
 
     Notes:
         * Useful to bypass weak and bespoke web application firewalls that
-          filter the greater than character
+          filter the equal character ('=')
         * The LIKE operator is SQL standard. Hence, this tamper script
           should work against all (?) databases
     """
