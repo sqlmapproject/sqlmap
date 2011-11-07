@@ -26,7 +26,7 @@ def tamper(payload):
 
     Requirement:
         * MSSQL
-	* MySQL
+        * MySQL
 
     Notes:
         * Useful to bypass several web application firewalls
