@@ -83,7 +83,7 @@ class Connect:
             # timed based payloads can cause web server unresponsiveness
             # if the injectable piece of code is some kind of JOIN-like query
             warnMsg = "most probably web server instance hasn't recovered yet "
-            warnMsg += "from previous timed based payload. if the problem "
+            warnMsg += "from previous timed based payload. If the problem "
             warnMsg += "persists please wait for few minutes and rerun "
             warnMsg += "without flag T in --technique option "
             warnMsg += "(e.g. --flush-session --technique=BEUS) or try to "
