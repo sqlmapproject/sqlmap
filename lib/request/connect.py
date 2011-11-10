@@ -539,13 +539,14 @@ class Connect:
             value = urlEncodeCookieValues(value)
 
         elif place:
-            if place in (PLACE.GET, PLACE.POST):
+            if place in (PLACE.GET, PLACE.POST, PLACE.URI):
                 # payloads in GET and/or POST need to be urlencoded 
                 # throughly without safe chars (especially & and =)
                 # addendum: as we support url encoding in tampering
                 # functions therefore we need to use % as a safe char
-                payload = urlencode(payload, "%", False, True)
-                value = agent.replacePayload(value, payload)
+                if place != PLACE.URI or ('?' in value and value.find('?') < value.find(payload)):
+                    payload = urlencode(payload, "%", False, True)
+                    value = agent.replacePayload(value, payload)
             elif place == PLACE.SOAP:
                 # payloads in SOAP should have chars > and < replaced
                 # with their HTML encoded counterparts
