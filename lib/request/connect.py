@@ -153,7 +153,7 @@ class Connect:
         # url splitted with space char while urlencoding it in the later phase
         url = url.replace(" ", "%20")
 
-        page = ""
+        page = None
         cookieStr = ""
         requestMsg = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
         requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
@@ -304,21 +304,25 @@ class Connect:
                 if kb.alwaysRedirect is None:
                     msg = "sqlmap got a %d redirect to " % conn.redcode
                     msg += "'%s'. Do you want to follow redirects " % conn.redurl
-                    msg += "from now on (or stay on the original page)? [Y/n]"
+                    msg += "from now on (or stay on the original page otherwise)? [Y/n]"
                     choice = readInput(msg, default="Y")
 
                     kb.alwaysRedirect = choice not in ("n", "N")
 
-                kwargs['url'] = conn.redurl if kb.alwaysRedirect else conf.url
-                kwargs['redirecting'] = conn.redcode
-                return Connect.__getPageProxy(**kwargs)
+                if kb.alwaysRedirect:
+                    kwargs['url'] = conn.redurl
+                    kwargs['redirecting'] = conn.redcode
+                    return Connect.__getPageProxy(**kwargs)
+                else:
+                    redirecting = conn.redcode
+                    page = threadData.lastRedirectMsg[1]
 
             # Return response object
             if response:
                 return conn, None, None
 
             # Get HTTP response
-            page = conn.read()
+            page = conn.read() if page is None else page
             code = redirecting or conn.code
             responseHeaders = conn.info()
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
