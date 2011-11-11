@@ -12,6 +12,7 @@ import urlparse
 
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.common import getHostHeader
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.enums import HTTPHEADER
@@ -27,6 +28,16 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     # maximum total number of redirections (regardless of URL) before
     # assuming we're in a loop
     max_redirections = 10
+
+    def _get_header_redirect(self, headers):
+        retVal = None
+
+        if "location" in headers:
+            retVal = headers.getheaders("location")[0].split("?")[0]
+        elif "uri" in headers:
+            retVal = headers.getheaders("uri")[0].split("?")[0]
+
+        return retVal
 
     def common_http_redirect(self, result, headers, code, content, msg):
         content = decodePage(content, headers.get(HTTPHEADER.CONTENT_ENCODING), headers.get(HTTPHEADER.CONTENT_TYPE))
@@ -49,10 +60,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         logger.log(7, responseMsg)
 
         if result:
-            if "location" in headers:
-                result.redurl = headers.getheaders("location")[0].split("?")[0]
-            elif "uri" in headers:
-                result.redurl = headers.getheaders("uri")[0].split("?")[0]
+            if self._get_header_redirect(headers):
+                result.redurl = self._get_header_redirect(headers)
 
             if hasattr(result, 'redurl'):
                 if not urlparse.urlsplit(result.redurl).netloc:
@@ -76,6 +85,9 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
 
+        if self._get_header_redirect(headers):
+            req.headers[HTTPHEADER.HOST] = getHostHeader(self._get_header_redirect(headers))
+
         result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
         return self.common_http_redirect(result, headers, code, content, msg)
 
@@ -89,6 +101,9 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             dbgMsg = "there was a problem while retrieving "
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
+
+        if self._get_header_redirect(headers):
+            req.headers[HTTPHEADER.HOST] = getHostHeader(self._get_header_redirect(headers))
 
         result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         return self.common_http_redirect(result, headers, code, content, msg)

@@ -3128,3 +3128,11 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             kb.targetUrls.add(target)
 
     return retVal
+
+def getHostHeader(url):
+    retVal = urlparse.urlparse(url).netloc
+
+    if any(map(lambda x: retVal.endswith(':%d' % x), [80, 443])):
+        retVal = retVal.split(':')[0]
+
+    return retVal

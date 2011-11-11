@@ -25,6 +25,7 @@ from lib.core.common import cpuThrottle
 from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
+from lib.core.common import getHostHeader
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import parseTargetUrl
@@ -234,10 +235,7 @@ class Connect:
 
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
-            headers[HTTPHEADER.HOST] = urlparse.urlparse(url).netloc
-
-            if any(map(lambda x: headers[HTTPHEADER.HOST].endswith(':%d' % x), [80, 443])):
-                headers[HTTPHEADER.HOST] = headers[HTTPHEADER.HOST].split(':')[0]
+            headers[HTTPHEADER.HOST] = getHostHeader(url)
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
