@@ -543,6 +543,16 @@ Formats:
     </boundary>
     <!-- End of INSERT/UPDATE generic boundaries -->
 
+    <!-- AGAINST boolean full-text search boundaries (http://dev.mysql.com/doc/refman/5.5/en/fulltext-boolean.html) -->
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1</where>
+        <ptype>2</ptype>
+        <prefix>' IN BOOLEAN MODE)</prefix>
+        <suffix>#</suffix>
+    </boundary>
+    <!-- End of AGAINST boolean full-text search boundaries -->
 
     <!-- Boolean-based blind tests - WHERE/HAVING clause -->
     <test>
