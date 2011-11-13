@@ -1586,7 +1586,7 @@ def getFilteredPageContent(page, onlyText=True):
 
     # only if the page's charset has been successfully identified
     if isinstance(page, unicode):
-        retVal = re.sub(r"(?s)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page, flags=re.I)
+        retVal = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page)
 
         while retVal.find("  ") != -1:
             retVal = retVal.replace("  ", " ")
