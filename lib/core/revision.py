@@ -32,6 +32,8 @@ def getRevisionNumber():
 
             if revision:
                 retVal = revision.group(1)
+    except:
+        pass
 
     if not retVal:
         # Reference: http://stackoverflow.com/questions/242295/how-does-one-add-a-svn-repository-build-number-to-python-code
