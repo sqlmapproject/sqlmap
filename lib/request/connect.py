@@ -155,13 +155,13 @@ class Connect:
         url = url.replace(" ", "%20")
 
         page = None
-        cookieStr = ""
-        requestMsg = "HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
+        cookieStr = u""
+        requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
         requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
-        responseMsg = "HTTP response "
-        requestHeaders = ""
+        responseMsg = u"HTTP response "
+        requestHeaders = u""
         responseHeaders = None
-        logHeaders = ""
+        logHeaders = u""
 
         # support for non-latin (e.g. cyrillic) URLs as urllib/urllib2 doesn't
         # support those by default
