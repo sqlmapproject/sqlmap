@@ -1502,7 +1502,7 @@ def __useWizardInterface():
         if filter(lambda x: '=' in str(x), [conf.url, conf.data]) or '*' in conf.url:
             break
         else:
-            warnMsg = "no testable GET and/or POST parameter(s) found "
+            warnMsg = "no GET and/or POST parameter(s) found for testing "
             warnMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
             logger.critical(warnMsg)
 

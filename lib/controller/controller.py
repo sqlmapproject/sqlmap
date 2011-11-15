@@ -491,7 +491,7 @@ def start():
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if kb.vainRun and not conf.multipleTargets:
-                    errMsg = "no testable parameter(s) found in the provided data "
+                    errMsg = "no parameter(s) found for testing in the provided data "
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
                     raise sqlmapNoneDataException, errMsg
                 elif not conf.realTest:
