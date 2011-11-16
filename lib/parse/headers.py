@@ -39,7 +39,7 @@ def headersParser(headers):
                  }
 
     for header in headers:
-        if header in topHeaders.keys():
+        if header in topHeaders:
             value = headers[header]
             xmlfile = topHeaders[header]
 

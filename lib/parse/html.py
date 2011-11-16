@@ -28,8 +28,6 @@ class htmlHandler(ContentHandler):
 
         self.__dbms = None
         self.__page = page
-        self.__regexp = None
-        self.__match = None
 
         self.dbms = None
 
@@ -37,13 +35,9 @@ class htmlHandler(ContentHandler):
         if name == "dbms":
             self.__dbms = attrs.get("value")
 
-        if name == "error":
-            self.__regexp = attrs.get("regexp")
-            self.__match = re.search(self.__regexp, self.__page, re.I)
-
-            if self.__match:
+        elif name == "error":
+            if re.search(attrs.get("regexp"), self.__page, re.I):
                 self.dbms = self.__dbms
-                self.__match = None
                 threadData = getCurrentThreadData()
                 threadData.lastErrorPage = (threadData.lastRequestUID, self.__page)
 
