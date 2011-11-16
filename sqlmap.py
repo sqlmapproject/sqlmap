@@ -15,4 +15,6 @@ if PYVERSION >= "3" or PYVERSION < "2.6":
     exit("[CRITICAL] wrong Python version detected ('%s'). For successfully running sqlmap you have to use 2.6 <= Python < 3.0" % PYVERSION)
 else:
     from _sqlmap import main
+    # import needed for proper working of --profile switch
+    from lib.controller.controller import start
     main()
