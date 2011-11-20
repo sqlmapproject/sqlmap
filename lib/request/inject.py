@@ -319,7 +319,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
         expression += FROM_TABLE[Backend.getIdentifiedDbms()]
 
     outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
-    returnValue = ", ".join([output for output in outputs])
+    returnValue = ", ".join(output for output in outputs)
 
     return returnValue
 

@@ -69,7 +69,7 @@ class Syntax(GenericSyntax):
             oldUpper = oldUpper.lstrip("ASCII_CHAR(").rstrip(")")
             oldUpper = oldUpper.split("||")
 
-            escaped = "'%s'" % "".join([chr(int(char)) for char in oldUpper])
+            escaped = "'%s'" % "".join(chr(int(char)) for char in oldUpper)
             expression = expression.replace(old, escaped).replace("'||'", "")
 
         return expression

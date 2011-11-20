@@ -630,8 +630,8 @@ def cmdLineParser():
                 expandMnemonics(sys.argv[i+1], parser, args)
                 break
 
-        if not any([args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
-            args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependencies]):
+        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
+            args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependencies)):
             errMsg = "missing a mandatory parameter (-d, -u, -l, -m, -r, -g, -c, --wizard, --update or --dependencies), "
             errMsg += "-h for help"
             parser.error(errMsg)

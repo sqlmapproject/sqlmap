@@ -62,10 +62,10 @@ def md5hash(value):
 
 def orddecode(value):
     packedString = struct.pack("!"+"I" * len(value), *value)
-    return "".join([chr(char) for char in struct.unpack("!"+"I"*(len(packedString)/4), packedString)])
+    return "".join(chr(char) for char in struct.unpack("!"+"I"*(len(packedString)/4), packedString))
 
 def ordencode(value):
-    return tuple([ord(char) for char in value])
+    return tuple(ord(char) for char in value)
 
 def sha1hash(value):
     if sys.modules.has_key('hashlib'):

@@ -124,7 +124,7 @@ def resume(expression, payload):
 
             if logValue:
                 if kb.technique == PAYLOAD.TECHNIQUE.UNION:
-                    logValue = ", ".join([value.replace(DUMP_DEL_MARKER, ", ") for value in logValue])
+                    logValue = ", ".join(value.replace(DUMP_DEL_MARKER, ", ") for value in logValue)
                 else:
                     return None
             else:

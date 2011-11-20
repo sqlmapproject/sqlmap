@@ -152,30 +152,30 @@ SYBASE_SYSTEM_DBS = ( "master", "model", "sybsystemdb", "sybsystemprocs" )
 DB2_SYSTEM_DBS = ( "NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS",\
                    "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS" )
 
-MSSQL_ALIASES = [ "microsoft sql server", "mssqlserver", "mssql", "ms" ]
-MYSQL_ALIASES = [ "mysql", "my" ]
-PGSQL_ALIASES = [ "postgresql", "postgres", "pgsql", "psql", "pg" ]
-ORACLE_ALIASES = [ "oracle", "orcl", "ora", "or" ]
-SQLITE_ALIASES = [ "sqlite", "sqlite3" ]
-ACCESS_ALIASES = [ "msaccess", "access", "jet", "microsoft access" ]
-FIREBIRD_ALIASES = [ "firebird", "mozilla firebird", "interbase", "ibase", "fb" ]
-MAXDB_ALIASES = [ "maxdb", "sap maxdb", "sap db" ]
-SYBASE_ALIASES = [ "sybase", "sybase sql server" ]
-DB2_ALIASES = [ "db2", "ibm db2", "ibmdb2" ]
+MSSQL_ALIASES = ( "microsoft sql server", "mssqlserver", "mssql", "ms" )
+MYSQL_ALIASES = ( "mysql", "my" )
+PGSQL_ALIASES = ( "postgresql", "postgres", "pgsql", "psql", "pg" )
+ORACLE_ALIASES = ( "oracle", "orcl", "ora", "or" )
+SQLITE_ALIASES = ( "sqlite", "sqlite3" )
+ACCESS_ALIASES = ( "msaccess", "access", "jet", "microsoft access" )
+FIREBIRD_ALIASES = ( "firebird", "mozilla firebird", "interbase", "ibase", "fb" )
+MAXDB_ALIASES = ( "maxdb", "sap maxdb", "sap db" )
+SYBASE_ALIASES = ( "sybase", "sybase sql server" )
+DB2_ALIASES = ( "db2", "ibm db2", "ibmdb2" )
 
 SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES
 SUPPORTED_OS = ( "linux", "windows" )
 
-DBMS_DICT = { DBMS.MSSQL: [MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
-              DBMS.MYSQL: [MYSQL_ALIASES, "python pymysql", "http://code.google.com/p/pymysql/"],
-              DBMS.PGSQL: [PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"],
-              DBMS.ORACLE: [ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"],
-              DBMS.SQLITE: [SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"],
-              DBMS.ACCESS: [ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"],
-              DBMS.FIREBIRD: [FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"],
-              DBMS.MAXDB: [MAXDB_ALIASES, None, None],
-              DBMS.SYBASE: [SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"],
-              DBMS.DB2: [DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/"]
+DBMS_DICT = { DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
+              DBMS.MYSQL: (MYSQL_ALIASES, "python pymysql", "http://code.google.com/p/pymysql/"),
+              DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"),
+              DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"),
+              DBMS.SQLITE: (SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"),
+              DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"),
+              DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"),
+              DBMS.MAXDB: (MAXDB_ALIASES, None, None),
+              DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
+              DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/")
             }
 
 REFERER_ALIASES = ( "ref", "referer", "referrer" )
@@ -258,10 +258,10 @@ GENERAL_IP_ADDRESS_REGEX = r'\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z'
 SOAP_REGEX = r"\A(<\?xml[^>]+>)?\s*<soap.+</soap"
 
 # Reference: http://www.cs.ru.nl/bachelorscripties/2010/Martin_Devillers___0437999___Analyzing_password_strength.pdf
-COMMON_PASSWORD_SUFFIXES = ["1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18"]
+COMMON_PASSWORD_SUFFIXES = ("1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18")
 
 # Reference: http://www.the-interweb.com/serendipity/index.php?/archives/94-A-brief-analysis-of-40,000-leaked-MySpace-passwords.html
-COMMON_PASSWORD_SUFFIXES += ["!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@"]
+COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@")
 
 # Splitter used between requests in WebScarab log files
 WEBSCARAB_SPLITTER = "### Conversation"

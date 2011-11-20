@@ -348,7 +348,7 @@ class Agent:
                 nulledCastedFields.append(self.nullAndCastField(field))
 
             delimiterStr = "%s'%s'%s" % (dbmsDelimiter, kb.chars.delimiter, dbmsDelimiter)
-            nulledCastedConcatFields = delimiterStr.join([field for field in nulledCastedFields])
+            nulledCastedConcatFields = delimiterStr.join(field for field in nulledCastedFields)
 
         return nulledCastedConcatFields
 

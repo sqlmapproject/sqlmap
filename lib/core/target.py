@@ -147,7 +147,7 @@ def __setRequestParams():
                 # No need for url encoding/decoding the user agent
                 conf.parameters[PLACE.UA] = urldecode(headerValue)
 
-                condition = any([not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)])
+                condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
 
                 if condition:
                     conf.paramDict[PLACE.UA] = { PLACE.UA: headerValue }
@@ -157,7 +157,7 @@ def __setRequestParams():
                 # No need for url encoding/decoding the referer
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
-                condition = any([not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)])
+                condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
 
                 if condition:
                     conf.paramDict[PLACE.REFERER] = { PLACE.REFERER: headerValue }

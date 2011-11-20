@@ -897,7 +897,7 @@ class Enumeration:
                 value = filter(None, arrayizeValue(value))
 
                 if len(value) > 0 and not isinstance(value[0], (list, tuple)):
-                    value = zip([conf.db for i in xrange(len(value))], value)
+                    value = zip((conf.db for i in xrange(len(value))), value)
 
                 for db, table in filterPairValues(value):
                     db = safeSQLIdentificatorNaming(db)

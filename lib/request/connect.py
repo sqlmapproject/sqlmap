@@ -266,7 +266,7 @@ class Connect:
             if not req.has_header(HTTPHEADER.ACCEPT_ENCODING):
                 requestHeaders += "%s: identity\n" % HTTPHEADER.ACCEPT_ENCODING
 
-            requestHeaders += "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items()])
+            requestHeaders += "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items())
 
             if not req.has_header(HTTPHEADER.COOKIE) and cookieStr:
                 requestHeaders += "\n%s" % cookieStr[:-2]
@@ -396,7 +396,7 @@ class Connect:
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
-                logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items()])
+                logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
 
             logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page if isinstance(page, unicode) else getUnicode(page)))
 
@@ -486,7 +486,7 @@ class Connect:
 
         responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
         if responseHeaders:
-            logHeaders = "\n".join(["%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items()])
+            logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
 
         logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page if isinstance(page, unicode) else getUnicode(page)))
 
