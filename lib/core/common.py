@@ -309,7 +309,7 @@ class DynamicContentItem:
 class Format:
     @staticmethod
     def humanize(values, chain=" or "):
-        strJoin = "|".join([v for v in values])
+        strJoin = "|".join(v for v in values)
 
         return strJoin.replace("|", chain)
 
@@ -330,7 +330,7 @@ class Format:
         if versions is None:
             return Backend.getDbms()
         else:
-            return "%s %s" % (Backend.getDbms(), " and ".join([v for v in versions]))
+            return "%s %s" % (Backend.getDbms(), " and ".join(v for v in versions))
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -350,7 +350,7 @@ class Format:
         elif len(kb.htmlFp) == 1:
             htmlParsed = kb.htmlFp[0]
         elif len(kb.htmlFp) > 1:
-            htmlParsed = " or ".join([htmlFp for htmlFp in kb.htmlFp])
+            htmlParsed = " or ".join(htmlFp for htmlFp in kb.htmlFp)
 
         return htmlParsed
 
@@ -932,7 +932,7 @@ def readInput(message, default=None, checkBatch=True):
 
     if checkBatch and conf.batch:
         if isinstance(default, (list, tuple, set)):
-            options = ",".join([getUnicode(opt, UNICODE_ENCODING) for opt in default])
+            options = ",".join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
         elif default:
             options = getUnicode(default, UNICODE_ENCODING)
         else:
@@ -980,7 +980,7 @@ def randomInt(length=4):
     @rtype: C{str}
     """
 
-    return int("".join([random.choice(string.digits if i!=0 else string.digits.replace('0', '')) for i in xrange(0, length)]))
+    return int("".join(random.choice(string.digits if i!=0 else string.digits.replace('0', '')) for i in xrange(0, length)))
 
 def randomStr(length=4, lowercase=False, alphabet=None):
     """
@@ -992,11 +992,11 @@ def randomStr(length=4, lowercase=False, alphabet=None):
     """
 
     if alphabet:
-        rndStr = "".join([random.choice(alphabet) for _ in xrange(0, length)])    
+        rndStr = "".join(random.choice(alphabet) for _ in xrange(0, length))    
     elif lowercase:
-        rndStr = "".join([random.choice(string.lowercase) for _ in xrange(0, length)])
+        rndStr = "".join(random.choice(string.lowercase) for _ in xrange(0, length))
     else:
-        rndStr = "".join([random.choice(string.letters) for _ in xrange(0, length)])
+        rndStr = "".join(random.choice(string.letters) for _ in xrange(0, length))
 
     return rndStr
 
@@ -1307,7 +1307,7 @@ def expandAsteriskForColumns(expression):
         if columnsDict and conf.db in columnsDict and conf.tbl in columnsDict[conf.db]:
             columns = columnsDict[conf.db][conf.tbl].keys()
             columns.sort()
-            columnsStr = ", ".join([column for column in columns])
+            columnsStr = ", ".join(column for column in columns)
             expression = expression.replace("*", columnsStr, 1)
 
             infoMsg = "the query with column names is: "
@@ -1359,7 +1359,7 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
                         )
 
         if partial or not condition:
-            logOutput = "".join(["%s%s%s" % (DUMP_START_MARKER, replaceNewlineTabs(value), DUMP_STOP_MARKER) for value in output])
+            logOutput = "".join("%s%s%s" % (DUMP_START_MARKER, replaceNewlineTabs(value), DUMP_STOP_MARKER) for value in output)
             dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, logOutput))
 
         if sort:
@@ -2774,7 +2774,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        if all([part.lower() in content.lower() for part in regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)]): # fast optimization check
+        if all(part.lower() in content.lower() for part in regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)): # fast optimization check
             parts = regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)
             if len(parts) > REFLECTED_MAX_REGEX_PARTS: # preventing CPU hogs
                 regex = "%s.+?%s" % (REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS/2]), REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS/2:]))
