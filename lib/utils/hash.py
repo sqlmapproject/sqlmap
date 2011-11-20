@@ -58,10 +58,12 @@ from lib.core.enums import HASH
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
+from lib.core.settings import COMMON_USER_COLUMNS
 from lib.core.settings import DUMMY_USER_PREFIX
 from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import IS_WIN
+from lib.core.settings import ITOA64
 from lib.core.settings import PYVERSION
 from lib.core.settings import ML
 from lib.core.settings import UNICODE_ENCODING
@@ -214,6 +216,7 @@ def sha1_generic_passwd(password, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
+
 def crypt_generic_passwd(password, salt, uppercase=False):
     """
     Reference(s):
@@ -230,6 +233,60 @@ def crypt_generic_passwd(password, salt, uppercase=False):
 
     return retVal.upper() if uppercase else retVal
 
+def wordpress_passwd(password, salt, count, prefix, uppercase=False):
+    """
+    Reference(s):
+        http://packetstormsecurity.org/files/74448/phpassbrute.py.txt
+        http://scriptserver.mainframe8.com/wordpress_password_hasher.php
+
+    >>> wordpress_passwd(password='testpass', salt='dYPSjeF4', count=2048)
+    ''
+    """
+
+    def _encode64(input_, count):
+        output = ''
+        i = 0
+
+        while i < count:
+            value = ord(input_[i])
+            i += 1
+            output = output + ITOA64[value & 0x3f]
+
+            if i < count:
+                value = value | (ord(input_[i]) << 8)
+
+            output = output + ITOA64[(value>>6) & 0x3f]
+
+            i += 1
+            if i >= count:
+                break
+
+            if i < count:
+                value = value | (ord(input_[i]) << 16)
+
+            output = output + ITOA64[(value>>12) & 0x3f]
+
+            i += 1
+            if i >= count:
+                break
+
+            output = output + ITOA64[(value>>18) & 0x3f]
+
+        return output
+
+    cipher = md5(salt)
+    cipher.update(password)
+    hash_ = cipher.digest()
+
+    for i in xrange(count):
+        _ = md5(hash_)
+        _.update(password)
+        hash_ = _.digest()
+
+    retVal = prefix + _encode64(hash_, 16)
+
+    return retVal.upper() if uppercase else retVal
+
 __functions__ = {
                     HASH.MYSQL: mysql_passwd, 
                     HASH.MYSQL_OLD: mysql_old_passwd,
@@ -240,7 +297,8 @@ __functions__ = {
                     HASH.ORACLE_OLD: oracle_old_passwd, 
                     HASH.MD5_GENERIC: md5_generic_passwd, 
                     HASH.SHA1_GENERIC: sha1_generic_passwd,
-                    HASH.CRYPT_GENERIC: crypt_generic_passwd
+                    HASH.CRYPT_GENERIC: crypt_generic_passwd,
+                    HASH.WORDPRESS: wordpress_passwd
                 }
 
 def attackCachedUsersPasswords():
@@ -268,7 +326,7 @@ def attackDumpedTable():
         attack_dict = {}
 
         for column in columns:
-            if column and column.lower() in ('user', 'username', 'user_name'):
+            if column and column.lower() in COMMON_USER_COLUMNS:
                 colUser = column
                 break
 
@@ -385,7 +443,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
 
                             attack_info.remove(item)
 
-                elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                elif (proc_id == 0 or getattr(proc_count, 'value', 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                     rotator += 1
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
@@ -403,6 +461,10 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
 
     except KeyboardInterrupt:
         pass
+
+    finally:
+        if hasattr(proc_count, 'value'):
+            proc_count.value -= 1
 
 def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, retVal, found, proc_id, proc_count):
     count = 0
@@ -441,7 +503,8 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
                     dataToStdout(infoMsg, True)
 
                     found.value = True
-                elif proc_id == 0 and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+
+                elif (proc_id == 0 or getattr(proc_count, 'value', 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                     rotator += 1
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
@@ -461,6 +524,9 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
     except KeyboardInterrupt:
         pass
 
+    finally:
+        if hasattr(proc_count, 'value'):
+            proc_count.value -= 1
 
 def dictionaryAttack(attack_dict):
     suffix_list = [""]
@@ -491,10 +557,13 @@ def dictionaryAttack(attack_dict):
                 if not hash_:
                     continue
 
-                hash_ = hash_.split()[0].lower()
+                hash_ = hash_.split()[0]
 
                 if getCompiledRegex(hash_regex).match(hash_):
                     item = None
+
+                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.WORDPRESS):
+                        hash_ = hash_.lower()
 
                     if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
                         item = [(user, hash_), {}]
@@ -506,6 +575,8 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {'salt': hash_[6:14]}]
                     elif hash_regex in (HASH.CRYPT_GENERIC):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
+                    elif hash_regex in (HASH.WORDPRESS):
+                        item = [(user, hash_), {'salt': hash_[4:12], 'count': 1<<ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
 
                     if item and hash_ not in keys:
                         resumed = conf.hashDB.retrieve(hash_)
@@ -545,7 +616,7 @@ def dictionaryAttack(attack_dict):
                         logger.info("using custom list of dictionaries")
                     else:
                         # It is the slowest of all methods hence smaller default dict
-                        if hash_regex == HASH.ORACLE_OLD:
+                        if hash_regex in (HASH.ORACLE_OLD, HASH.WORDPRESS):
                             dictPaths = [paths.SMALL_DICT]
                         else:
                             dictPaths = [paths.WORDLIST]
@@ -602,8 +673,10 @@ def dictionaryAttack(attack_dict):
                             singleTimeLogMessage(infoMsg)
 
                         retVal = _multiprocessing.Queue()
+                        count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
+
                         for i in xrange(_multiprocessing.cpu_count()):
-                            p = _multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, _multiprocessing.cpu_count()))
+                            p = _multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, count))
                             processes.append(p)
 
                         for p in processes:
@@ -671,9 +744,10 @@ def dictionaryAttack(attack_dict):
 
                             retVal = _multiprocessing.Queue()
                             found_ = _multiprocessing.Value('i', False)
+                            count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
                             for i in xrange(_multiprocessing.cpu_count()):
-                                p = _multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, _multiprocessing.cpu_count()))
+                                p = _multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, count))
                                 processes.append(p)
 
                             for p in processes:

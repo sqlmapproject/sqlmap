@@ -73,6 +73,7 @@ class HASH:
     MD5_GENERIC = r'(?i)\A[0-9a-f]{32}\Z'
     SHA1_GENERIC = r'(?i)\A[0-9a-f]{40}\Z'
     CRYPT_GENERIC = r'(?i)\A[./0-9A-Za-z]{13}\Z'
+    WORDPRESS = r'(?i)\A\$P\$[./0-9A-Za-z]{31}\Z'
 
 # Reference: http://www.zytrax.com/tech/web/mobile_ids.html
 class MOBILES:

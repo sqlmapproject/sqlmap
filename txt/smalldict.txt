@@ -168,7 +168,6 @@ adi
 adidas
 adldemo
 admin
-admin
 admin1
 administrator
 adrian
@@ -402,7 +401,6 @@ bella
 belle
 belmont
 ben
-ben
 benjamin
 benji
 benny
@@ -633,7 +631,6 @@ cassie
 castle
 cat
 catalina
-catalog
 catalog
 catch22
 catfish
@@ -929,7 +926,6 @@ delete
 deliver
 delta
 demo
-demo
 demo8
 demo9
 demon
@@ -1142,7 +1138,6 @@ fiction
 fidel
 Figaro
 fii
-finance
 finance
 finprod
 fiona
@@ -1473,7 +1468,6 @@ hithere
 hitler
 hlw
 hobbes
-hobbes
 hobbit
 hockey
 hola
@@ -1684,7 +1678,6 @@ joelle
 joey
 johan
 johanna1
-john
 john
 john316
 johnny
@@ -2015,7 +2008,6 @@ mddemo
 mddemo_mgr
 mdsys
 me
-me
 meatloaf
 mech
 mechanic
@@ -2080,7 +2072,6 @@ miki
 milano
 miles
 millenium
-miller
 miller
 millie
 million
@@ -2402,12 +2393,10 @@ pascal
 pass
 passion
 passwd
-passwd
 passwo1
 passwo2
 passwo3
 passwo4
-password
 password
 Password
 pat
@@ -2417,7 +2406,6 @@ patrick
 patriots
 patrol
 patton
-paul
 paul
 paula
 pauline
@@ -2974,7 +2962,6 @@ snow
 snowball
 snowflake
 snowman
-snowman
 snowski
 snuffy
 sober1
@@ -3036,12 +3023,10 @@ starlight
 stars
 start
 starter
-starter
 startrek
 starwars
 station
 stealth
-steel
 steel
 steele
 steelers
@@ -3114,7 +3099,6 @@ Superman
 supersecret
 superstar
 support
-support
 supra
 surf
 surfer
@@ -3138,7 +3122,6 @@ swimming
 switzer
 Swoosh
 swordfish
-swordfish
 swpro
 swuser
 sydney
@@ -3152,7 +3135,6 @@ sysadmin
 sysman
 syspass
 sys_stnt
-system
 system
 system5
 systempass
@@ -3205,7 +3187,6 @@ terminal
 terry
 terry1
 test
-test
 test1
 test123
 test2
@@ -3213,6 +3194,7 @@ test3
 tester
 testi
 testing
+testpass
 testpilot
 testtest
 test_user
@@ -3243,10 +3225,8 @@ thx1138
 tibco
 tiffany
 tiger
-tiger
 tiger2
 tigers
-tigger
 tigger
 Tigger
 tightend
@@ -3291,7 +3271,6 @@ transport
 trapper
 trash
 travel
-travel
 travis
 tre
 treasure
@@ -3333,7 +3312,6 @@ twins
 tyler
 tyler1
 ultimate
-ultimate
 um_admin
 um_client
 undead
@@ -3347,7 +3325,6 @@ upsilon
 ursula
 user
 user0
-user1
 user1
 user2
 user3
@@ -3447,7 +3424,6 @@ Webster
 wedge
 weezer
 welcome
-welcome
 wendy
 wendy1
 wesley
@@ -3522,7 +3498,6 @@ wright
 wsh
 wsm
 www
-www
 wwwuser
 xademo
 xanadu
@@ -3541,7 +3516,6 @@ xnp
 xns
 xprt
 xtr
-xxx
 xxx
 xxx123
 xxxx

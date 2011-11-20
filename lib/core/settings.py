@@ -365,6 +365,9 @@ REFLECTIVE_MISS_THRESHOLD = 20
 # Regular expression used for extracting HTML title
 HTML_TITLE_REGEX = "<title>(?P<result>[^<]+)</title>"
 
+# Table used for Base64 conversion in WordPress hash cracking routine
+ITOA64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+
 # Chars used to quickly distinguish if the user provided tainted parameter values
 DUMMY_SQL_INJECTION_CHARS = ";()'"
 
@@ -403,3 +406,6 @@ UNION_CHAR_REGEX = r'\A\w+\Z'
 
 # Attribute used for storing original parameter value in special cases (e.g. POST)
 UNENCODED_ORIGINAL_VALUE = 'original'
+
+# Common column names containing usernames (used for hash cracking in some cases)
+COMMON_USER_COLUMNS = ('user', 'username', 'user_name', 'benutzername', 'benutzer', 'utilisateur', 'usager', 'consommateur', 'utente', 'utilizzatore', 'usufrutuario', 'korisnik', 'usuario', 'consumidor')
