@@ -613,6 +613,11 @@ class Connect:
             if len(kb.responseTimes) < MIN_TIME_RESPONSES:
                 clearConsoleLine()
 
+                if conf.tor:
+                    warnMsg = "it's highly recommended to avoid usage of --tor switch for "
+                    warnMsg += "time-based injections because of it's high latency time"
+                    singleTimeWarnMessage(warnMsg)
+
                 warnMsg = "time-based comparison needs larger statistical "
                 warnMsg += "model. Making a few dummy requests, please wait.."
                 singleTimeWarnMessage(warnMsg)
