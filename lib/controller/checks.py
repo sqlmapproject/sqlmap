@@ -556,9 +556,9 @@ def checkFalsePositives(injection):
             retVal = None
         elif checkBooleanExpression("%d=%d" % (randInt1, randInt2)):
             retVal = None
-        elif not checkBooleanExpression("%d=(%d-%d)" % (abs(randInt1 - randInt2), max(randInt1, randInt2), min(randInt1, randInt2))):
+        if not checkBooleanExpression("%d=(%d+%d)" % (randInt1 + randInt2, randInt1, randInt2)):
             retVal = None
-        elif checkBooleanExpression("(%d+%d)=(%d-%d)" % (randInt1, randInt2, randInt1, randInt2)):
+        elif checkBooleanExpression("%d=%d" % (randInt2, randInt1)):
             retVal = None
 
         if retVal is None:
