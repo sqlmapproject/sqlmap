@@ -51,6 +51,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setDynamicMarkings
 from lib.core.settings import CONSTANT_RATIO
@@ -966,6 +967,10 @@ def checkConnection(suppressOutput=False):
             kb.errorIsNone = True
     except sqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
-        raise sqlmapConnectionException, errMsg
+        logger.critical(errMsg)
+
+        msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
+        if readInput(msg, default="Y") not in ("n", "N"):
+            raise sqlmapSilentQuitException
 
     return True
