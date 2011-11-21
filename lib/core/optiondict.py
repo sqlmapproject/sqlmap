@@ -44,7 +44,8 @@ optDict = {
                                "retries":           "integer",
                                "scope":             "string",
                                "safUrl":            "string",
-                               "saFreq":            "integer"
+                               "saFreq":            "integer",
+                               "evalCode":          "string"
                              },
 
             "Optimization":  {

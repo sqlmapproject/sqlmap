@@ -63,7 +63,9 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression))
 
+    kb.inferenceMode = True
     count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)
+    kb.inferenceMode = False
 
     if not kb.bruteMode:
         debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))

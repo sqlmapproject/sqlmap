@@ -22,6 +22,7 @@ from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
+from lib.core.common import executeCode
 from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
@@ -603,6 +604,31 @@ class Connect:
                         elif item == PLACE.COOKIE and cookie:
                             cookie = _randomizeParameter(cookie, randomParameter)
 
+        if conf.evalCode:
+            variables = {}
+            originals = {}
+
+            if get:
+                executeCode(get.replace("&", ";"), variables)
+            if post:
+                executeCode(post.replace("&", ";"), variables)
+
+            originals.update(variables)
+            executeCode(conf.evalCode, variables)
+
+            for name, value in variables.items():
+                if name != "__builtins__" and originals.get(name, "") != value:
+                    if isinstance(value, (basestring, int)):
+                        value = unicode(value)
+                        if '%s=' % name in (get or ""):
+                            get = re.sub("(%s=)([^&]+)" % name, "\g<1>%s" % value, get)
+                        elif '%s=' % name in (post or ""):
+                            post = re.sub("(%s=)([^&]+)" % name, "\g<1>%s" % value, post)
+                        elif post:
+                            post += "&%s=%s" % (name, value)
+                        else:
+                            get += "&%s=%s" % (name, value)
+                
         get = urlencode(get, limit=True)
         if post and place != PLACE.POST and hasattr(post, UNENCODED_ORIGINAL_VALUE):
             post = getattr(post, UNENCODED_ORIGINAL_VALUE)

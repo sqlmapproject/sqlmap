@@ -140,6 +140,9 @@ def cmdLineParser():
         request.add_option("--safe-freq", dest="saFreq", type="int",
                            help="Test requests between two visits to a given safe url")
 
+        request.add_option("--eval", dest="evalCode",
+                           help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(str(id)).hexdigest()\")")
+
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "
                                "options can be used to optimize the "

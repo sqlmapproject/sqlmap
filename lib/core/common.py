@@ -3136,3 +3136,10 @@ def getHostHeader(url):
         retVal = retVal.split(':')[0]
 
     return retVal
+
+def executeCode(code, variables=None):
+    try:
+        exec(code, variables)
+    except Exception, ex:
+        errMsg = "an error occured while evaluating provided code ('%s'). " % ex
+        raise sqlmapGenericException, errMsg
