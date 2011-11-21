@@ -603,8 +603,15 @@ def dictionaryAttack(attack_dict):
 
         if not kb.wordlist:
             while not kb.wordlist:
+
+                # the slowest of all methods hence smaller default dict
+                if hash_regex in (HASH.ORACLE_OLD, HASH.WORDPRESS):
+                    dictPaths = [paths.SMALL_DICT]
+                else:
+                    dictPaths = [paths.WORDLIST]
+
                 message = "what dictionary do you want to use?\n"
-                message += "[1] default dictionary file (press Enter)\n"
+                message += "[1] default dictionary file '%s' (press Enter)\n" % dictPaths[0]
                 message += "[2] custom dictionary file\n"
                 message += "[3] file with list of dictionary files"
                 choice = readInput(message, default="1")
@@ -623,12 +630,6 @@ def dictionaryAttack(attack_dict):
 
                         logger.info("using custom list of dictionaries")
                     else:
-                        # It is the slowest of all methods hence smaller default dict
-                        if hash_regex in (HASH.ORACLE_OLD, HASH.WORDPRESS):
-                            dictPaths = [paths.SMALL_DICT]
-                        else:
-                            dictPaths = [paths.WORDLIST]
-
                         logger.info("using default dictionary")
 
                     for dictPath in dictPaths:
