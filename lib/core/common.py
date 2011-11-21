@@ -74,6 +74,8 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
+from lib.core.settings import DEFAULT_COOKIE_DELIMITER
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
@@ -658,7 +660,7 @@ def paramToDict(place, parameters=None):
     if place != PLACE.SOAP:
         parameters = parameters.replace(", ", ",")
 
-        splitParams = parameters.split(conf.pDel or (";" if place == PLACE.COOKIE else "&"))
+        splitParams = parameters.split(conf.pDel or (DEFAULT_COOKIE_DELIMITER if place == PLACE.COOKIE else DEFAULT_GET_POST_DELIMITER))
 
         for element in splitParams:
             elem = element.split("=")
@@ -1270,7 +1272,7 @@ def parseTargetUrl():
         conf.port = 80
 
     if __urlSplit[3]:
-        conf.parameters[PLACE.GET] = urldecode(__urlSplit[3])
+        conf.parameters[PLACE.GET] = urldecode(__urlSplit[3]) if __urlSplit[3] and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in __urlSplit[3] else __urlSplit[3]
 
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
@@ -3109,7 +3111,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             request = form.click()
             url = urldecode(request.get_full_url(), kb.pageEncoding)
             method = request.get_method()
-            data = urldecode(request.get_data(), kb.pageEncoding) if request.has_data() else None
+            data = request if request.has_data() else None
+            data = urldecode(data, kb.pageEncoding) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data
             if not data and method and method.upper() == HTTPMETHOD.POST:
                 debugMsg = "invalid POST form with blank data detected"
                 logger.debug(debugMsg)

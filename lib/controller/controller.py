@@ -47,6 +47,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import LOW_TEXT_PERCENT
@@ -157,8 +158,8 @@ def __randomFillBlankFields(value):
         if not test or test[0] in ("y", "Y"):
             while extractRegexResult(EMPTY_FORM_FIELDS_REGEX, retVal):
                 item = extractRegexResult(EMPTY_FORM_FIELDS_REGEX, retVal)
-                if item[-1] == '&':
-                    retVal = retVal.replace(item, "%s%s&" % (item[:-1], randomStr()))
+                if item[-1] == DEFAULT_GET_POST_DELIMITER:
+                    retVal = retVal.replace(item, "%s%s%s" % (item[:-1], randomStr(), DEFAULT_GET_POST_DELIMITER))
                 else:
                     retVal = retVal.replace(item, "%s%s" % (item, randomStr()))
 
@@ -288,7 +289,7 @@ def start():
                             message = "Edit POST data [default: %s]%s: " % (urlencode(conf.data) if conf.data else "None", " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
                             conf.data = __randomFillBlankFields(conf.data)
-                            conf.data = urldecode(conf.data)
+                            conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data
 
                         elif conf.method == HTTPMETHOD.GET:
                             if targetUrl.find("?") > -1:

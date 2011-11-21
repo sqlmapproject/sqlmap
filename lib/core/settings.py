@@ -409,3 +409,9 @@ UNENCODED_ORIGINAL_VALUE = 'original'
 
 # Common column names containing usernames (used for hash cracking in some cases)
 COMMON_USER_COLUMNS = ('user', 'username', 'user_name', 'benutzername', 'benutzer', 'utilisateur', 'usager', 'consommateur', 'utente', 'utilizzatore', 'usufrutuario', 'korisnik', 'usuario', 'consumidor')
+
+# Default delimiter in GET/POST values
+DEFAULT_GET_POST_DELIMITER = '&'
+
+# Default delimiter in cookie values
+DEFAULT_COOKIE_DELIMITER = ';'

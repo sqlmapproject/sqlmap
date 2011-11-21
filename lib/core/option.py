@@ -50,6 +50,7 @@ from lib.core.common import sanitizeStr
 from lib.core.common import setOptimize
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.convert import urldecode
+from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -77,6 +78,7 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_PORTS
 from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
@@ -307,7 +309,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     port = None
 
                 if not kb.targetUrls or url not in addedTargetUrls:
-                    kb.targetUrls.add((url, method, urldecode(data), cookie))
+                    kb.targetUrls.add((url, method, urldecode(data) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data, cookie))
                     addedTargetUrls.add(url)
 
     fp = openFile(reqFile, "rb")
@@ -1297,10 +1299,10 @@ def __cleanupOptions():
         if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
             original = conf.data
             class _(unicode): pass
-            conf.data = _(urldecode(conf.data))
+            conf.data = _(urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data)
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
         else:
-            conf.data = urldecode(conf.data)
+            conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data
 
     if conf.os:
         conf.os = conf.os.capitalize()
