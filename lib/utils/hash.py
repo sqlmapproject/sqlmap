@@ -714,10 +714,12 @@ def dictionaryAttack(attack_dict):
                 finally:
                     if retVal:
                         conf.hashDB.beginTransaction()
+
                         while not retVal.empty():
                             _, hash_, word = item = retVal.get(block=False)
                             conf.hashDB.write(hash_, word)
                             results.append(item)
+
                         conf.hashDB.endTransaction()
 
             clearConsoleLine()
@@ -795,10 +797,12 @@ def dictionaryAttack(attack_dict):
                     finally:
                         if retVal:
                             conf.hashDB.beginTransaction()
+
                             while not retVal.empty():
                                 _, hash_, word = item = retVal.get(block=False)
                                 conf.hashDB.write(hash_, word)
                                 results.append(item)
+
                             conf.hashDB.endTransaction()
 
                 clearConsoleLine()
