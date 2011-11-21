@@ -453,8 +453,8 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
             except KeyboardInterrupt:
                 raise
 
-            except Exception, msg:
-                print msg
+            except Exception, ex:
+                print ex
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
                 warnMsg += "Please report by e-mail to %s" % ML
                 logger.critical(warnMsg)
@@ -516,7 +516,8 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
             except KeyboardInterrupt:
                 raise
 
-            except:
+            except Exception, ex:
+                print ex
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
                 warnMsg += "Please report by e-mail to %s" % ML
                 logger.critical(warnMsg)
