@@ -141,7 +141,7 @@ def cmdLineParser():
                            help="Test requests between two visits to a given safe url")
 
         request.add_option("--eval", dest="evalCode",
-                           help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(str(id)).hexdigest()\")")
+                           help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
 
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "

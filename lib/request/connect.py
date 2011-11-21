@@ -605,13 +605,15 @@ class Connect:
                             cookie = _randomizeParameter(cookie, randomParameter)
 
         if conf.evalCode:
+            delimiter = conf.pDel or "&"
             variables = {}
             originals = {}
 
-            if get:
-                executeCode(get.replace("&", ";"), variables)
-            if post:
-                executeCode(post.replace("&", ";"), variables)
+            for item in filter(None, (get, post)):
+                for part in item.split(delimiter):
+                    if '=' in part:
+                        name, value = part.split('=', 1)
+                        executeCode("%s='%s'" % (name, value), variables)
 
             originals.update(variables)
             executeCode(conf.evalCode, variables)
@@ -621,13 +623,13 @@ class Connect:
                     if isinstance(value, (basestring, int)):
                         value = unicode(value)
                         if '%s=' % name in (get or ""):
-                            get = re.sub("(%s=)([^&]+)" % name, "\g<1>%s" % value, get)
+                            get = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, get)
                         elif '%s=' % name in (post or ""):
-                            post = re.sub("(%s=)([^&]+)" % name, "\g<1>%s" % value, post)
+                            post = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, post)
                         elif post:
-                            post += "&%s=%s" % (name, value)
+                            post += "%s%s=%s" % (delimiter, name, value)
                         else:
-                            get += "&%s=%s" % (name, value)
+                            get += "%s%s=%s" % (delimiter, name, value)
                 
         get = urlencode(get, limit=True)
         if post and place != PLACE.POST and hasattr(post, UNENCODED_ORIGINAL_VALUE):
