@@ -180,6 +180,7 @@ def oracle_old_passwd(password, username, uppercase=True): # prior to version '1
     >>> oracle_old_passwd(password='tiger', username='scott', uppercase=True)
     'F894844C34402B67'
     """
+
     IV, pad = "\0"*8, "\0"
 
     if isinstance(username, unicode):
@@ -239,8 +240,8 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
         http://packetstormsecurity.org/files/74448/phpassbrute.py.txt
         http://scriptserver.mainframe8.com/wordpress_password_hasher.php
 
-    >>> wordpress_passwd(password='testpass', salt='dYPSjeF4', count=2048)
-    ''
+    >>> wordpress_passwd(password='testpass', salt='aD9ZLmkp', count=2048, prefix='$P$9aD9ZLmkp', uppercase=False)
+    '$P$9aD9ZLmkpsN4A83G8MefaaP888gVKX0'
     """
 
     def _encode64(input_, count):
@@ -453,6 +454,9 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
             except KeyboardInterrupt:
                 raise
 
+            except UnicodeEncodeError:
+                pass # ignore possible encoding problems caused by some words in custom dictionaries
+
             except Exception, ex:
                 print ex
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
@@ -515,6 +519,9 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
             except KeyboardInterrupt:
                 raise
+
+            except UnicodeEncodeError:
+                pass # ignore possible encoding problems caused by some words in custom dictionaries
 
             except Exception, ex:
                 print ex
