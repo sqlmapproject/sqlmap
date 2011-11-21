@@ -454,7 +454,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
             except KeyboardInterrupt:
                 raise
 
-            except UnicodeEncodeError:
+            except (UnicodeEncodeError, UnicodeDecodeError):
                 pass # ignore possible encoding problems caused by some words in custom dictionaries
 
             except Exception, ex:
@@ -520,7 +520,7 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
             except KeyboardInterrupt:
                 raise
 
-            except UnicodeEncodeError:
+            except (UnicodeEncodeError, UnicodeDecodeError):
                 pass # ignore possible encoding problems caused by some words in custom dictionaries
 
             except Exception, ex:
