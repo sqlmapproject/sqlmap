@@ -44,7 +44,6 @@ from lib.core.settings import MIN_STATISTICAL_RANGE
 from lib.core.settings import MIN_UNION_RESPONSES
 from lib.core.settings import ORDER_BY_STEP
 from lib.core.unescaper import unescaper
-from lib.parse.html import htmlParser
 from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request
 

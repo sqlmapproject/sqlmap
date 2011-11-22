@@ -17,6 +17,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import intersect
 from lib.core.common import paramToDict
 from lib.core.common import readInput
+from lib.core.common import unserializeObject
 from lib.core.convert import urldecode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
@@ -177,6 +178,7 @@ def __setHashDB():
     """
     Check and set the HashDB SQLite file for query resume functionality.
     """
+
     if not conf.hashDBFile:
         conf.hashDBFile = "%s%shashdb" % (conf.outputPath, os.sep)
 
@@ -190,6 +192,13 @@ def __setHashDB():
                 raise sqlmapFilePathException, errMsg
 
     conf.hashDB = HashDB(conf.hashDBFile)
+
+def __resumeHashDBValues():
+    """
+    Resume stored data values from HashDB
+    """
+
+    kb.absFilePaths = unserializeObject(conf.hashDB.retrieve("kb.absFilePaths")) or kb.absFilePaths
 
 def __setOutputResume():
     """
@@ -383,4 +392,5 @@ def setupTargetEnv():
     __setRequestParams()
     __setOutputResume()
     __setHashDB()
+    __resumeHashDBValues()
     __setResultsFile()

@@ -26,6 +26,7 @@ from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import intersect
 from lib.core.common import listToStrValue
+from lib.core.common import parseFilePaths
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
@@ -589,7 +590,9 @@ def heuristicCheckSqlInjection(place, parameter):
 
     payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
     payload = agent.payload(place, parameter, newValue=payload)
-    Request.queryPage(payload, place, content=True, raise404=False)
+    page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+
+    parseFilePaths(page)
 
     result = wasLastRequestDBMSError()
 

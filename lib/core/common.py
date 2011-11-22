@@ -1390,6 +1390,23 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
 
     return data
 
+def parseFilePaths(page):
+    """
+    Detect (possible) absolute system paths inside the provided page content
+    """
+
+    if page:
+        for regex in ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" ):
+            for match in re.finditer(regex, page):
+                absFilePath = match.group("result").strip()
+                page = page.replace(absFilePath, "")
+
+                if isWindowsDriveLetterPath(absFilePath):
+                    absFilePath = posixToNtSlashes(absFilePath)
+
+                if absFilePath not in kb.absFilePaths:
+                    kb.absFilePaths.add(absFilePath)
+
 def getDelayQuery(andCond=False):
     query = None
 
@@ -3146,3 +3163,12 @@ def executeCode(code, variables=None):
     except Exception, ex:
         errMsg = "an error occured while evaluating provided code ('%s'). " % ex
         raise sqlmapGenericException, errMsg
+
+def serializeObject(object_):
+    return pickle.dumps(object_)
+
+def unserializeObject(value):
+    retVal = None
+    if value:
+        retVal = pickle.loads(value.encode(UNICODE_ENCODING)) # pickle has problems with Unicode
+    return retVal

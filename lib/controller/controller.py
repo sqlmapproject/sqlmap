@@ -31,7 +31,9 @@ from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import serializeObject
 from lib.core.common import showHttpErrorCodes
+from lib.core.common import unserializeObject
 from lib.core.convert import urlencode
 from lib.core.convert import urldecode
 from lib.core.data import conf
@@ -171,6 +173,12 @@ def __saveToSessionFile():
             continue
 
         setInjection(inj)
+
+def __saveAbsFilePaths():
+    key = "kb.absFilePaths"
+    value = unserializeObject(conf.hashDB.retrieve(key)) or set()
+    value.update(kb.absFilePaths)
+    conf.hashDB.write(key, serializeObject(value))
 
 def __saveToResultsFile():
     if not conf.resultsFP:
@@ -553,6 +561,7 @@ def start():
 
                 __saveToSessionFile()
                 __saveToResultsFile()
+                __saveAbsFilePaths()
                 __showInjections()
                 __selectInjection()
 

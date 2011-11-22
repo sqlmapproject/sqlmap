@@ -18,7 +18,6 @@ import zlib
 from extra.chardet import detect
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
-from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
@@ -73,23 +72,6 @@ def parseResponse(page, headers):
 
     if page:
         htmlParser(page)
-
-        # Detect injectable page absolute system path
-        # NOTE: this regular expression works if the remote web
-        # application is written in PHP and debug/error messages are
-        # enabled
-        for regex in ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" ):
-            regObj = getCompiledRegex(regex)
-
-            for match in regObj.finditer(page):
-                absFilePath = match.group("result").strip()
-                page = page.replace(absFilePath, "")
-
-                if isWindowsDriveLetterPath(absFilePath):
-                    absFilePath = posixToNtSlashes(absFilePath)
-
-                if absFilePath not in kb.absFilePaths:
-                    kb.absFilePaths.add(absFilePath)
 
 def checkCharEncoding(encoding):
     if encoding:
