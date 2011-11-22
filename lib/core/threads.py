@@ -181,7 +181,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.threadContinue = True
         kb.threadException = False
 
-        conf.hashDB.flush()
+        conf.hashDB.flush(True)
 
         if cleanupFunction:
             cleanupFunction()

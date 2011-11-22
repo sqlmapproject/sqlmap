@@ -415,3 +415,6 @@ DEFAULT_GET_POST_DELIMITER = '&'
 
 # Default delimiter in cookie values
 DEFAULT_COOKIE_DELIMITER = ';'
+
+# Skip unforced HashDB flush requests below the threshold number of cached items
+HASHDB_FLUSH_THRESHOLD = 10

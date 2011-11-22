@@ -12,6 +12,7 @@ import sqlite3
 import threading
 
 from lib.core.data import conf
+from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import getCurrentThreadName
@@ -54,15 +55,17 @@ class HashDB(object):
         retVal = None
         if key:
             hash_ = HashDB.hashKey(key)
-            while True:
-                try:
-                    for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
-                        retVal = row[0]
-                except sqlite3.OperationalError, ex:
-                    if not 'locked' in ex.message:
-                        raise
-                else:
-                    break
+            retVal = self._write_cache.get(hash_, None)
+            if not retVal:
+                while True:
+                    try:
+                        for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
+                            retVal = row[0]
+                    except sqlite3.OperationalError, ex:
+                        if not 'locked' in ex.message:
+                            raise
+                    else:
+                        break
         return retVal
 
     def write(self, key, value):
@@ -75,8 +78,11 @@ class HashDB(object):
         if getCurrentThreadName() in ('0', 'MainThread'):
             self.flush()
 
-    def flush(self):
+    def flush(self, forced=False):
         if not self._write_cache:
+            return
+
+        if not forced and len(self._write_cache) < HASHDB_FLUSH_THRESHOLD:
             return
 
         self._cache_lock.acquire()
