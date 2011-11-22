@@ -86,13 +86,13 @@ class HashDB(object):
             return
 
         self._cache_lock.acquire()
-        items = self._write_cache.items()
-        self._write_cache.clear()
+        _ = self._write_cache
+        self._write_cache = {}
         self._cache_lock.release()
 
         try:
             self.beginTransaction()
-            for hash_, value in items:
+            for hash_, value in _.items():
                 while True:
                     try:
                         try:
