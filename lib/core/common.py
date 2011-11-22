@@ -2433,19 +2433,10 @@ def removeDynamicContent(page):
 def filterStringValue(value, regex, replace=None):
     """
     Returns string value consisting only of chars satisfying supplied
-    regular expression
+    regular expression (note: it has to be in form [...])
     """
 
-    retVal = ""
-
-    if value:
-        for char in value:
-            if re.search(regex, char):
-                retVal += char
-            elif replace:
-                retVal += replace
-
-    return retVal
+    return re.sub(regex.replace("[", "[^"), "", value or "")
 
 def filterControlChars(value):
     """

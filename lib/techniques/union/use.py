@@ -18,7 +18,6 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
-from lib.core.common import filterStringValue
 from lib.core.common import getConsoleWidth
 from lib.core.common import getUnicode
 from lib.core.common import initTechnique
