@@ -29,6 +29,7 @@ from lib.core.data import logger
 from lib.core.exception import sqlmapDataException
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
+from lib.core.settings import PARSE_HEADERS_LIMIT
 from lib.core.settings import UNICODE_ENCODING
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
@@ -191,8 +192,10 @@ def decodePage(page, contentEncoding, contentType):
     return page
 
 def processResponse(page, responseHeaders):
+    kb.processResponseCounter += 1
+
     if not kb.dumpMode:
-        parseResponse(page, responseHeaders)
+        parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None)
 
     if conf.parseErrors:
         msg = extractErrorMessage(page)

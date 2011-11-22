@@ -22,12 +22,6 @@ def headersParser(headers):
     and the web application technology
     """
 
-    # It is enough to parse the headers on first four HTTP responses
-    if kb.headersCount > 3:
-        return
-
-    kb.headersCount += 1
-
     topHeaders = {
                    "cookie":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
                    "microsoftsharepointteamservices": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "sharepoint.xml"),

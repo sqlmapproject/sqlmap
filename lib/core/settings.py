@@ -392,6 +392,9 @@ BIGARRAY_CHUNK_LENGTH = 4096
 # Only console display last n table rows
 TRIM_STDOUT_DUMP_SIZE = 256
 
+# Parse response headers only first couple of times
+PARSE_HEADERS_LIMIT = 3
+
 # Step used in ORDER BY technique used for finding the right number of columns in UNION query injections
 ORDER_BY_STEP = 10
 
