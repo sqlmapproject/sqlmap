@@ -76,6 +76,9 @@ class HashDB(object):
             self.flush()
 
     def flush(self):
+        if not self._write_cache:
+            return
+
         self._cache_lock.acquire()
         items = self._write_cache.items()
         self._write_cache.clear()

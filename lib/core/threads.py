@@ -14,6 +14,7 @@ import traceback
 
 from thread import error as threadError
 
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
@@ -179,6 +180,8 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.bruteMode = False
         kb.threadContinue = True
         kb.threadException = False
+
+        conf.hashDB.flush()
 
         if cleanupFunction:
             cleanupFunction()
