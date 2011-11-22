@@ -3111,7 +3111,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             request = form.click()
             url = urldecode(request.get_full_url(), kb.pageEncoding)
             method = request.get_method()
-            data = request if request.has_data() else None
+            data = request.get_data() if request.has_data() else None
             data = urldecode(data, kb.pageEncoding) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data
             if not data and method and method.upper() == HTTPMETHOD.POST:
                 debugMsg = "invalid POST form with blank data detected"
