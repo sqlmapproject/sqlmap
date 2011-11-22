@@ -9,14 +9,18 @@ See the file 'doc/COPYING' for copying permission
 
 import hashlib
 import sqlite3
+import threading
 
 from lib.core.data import conf
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
+from lib.core.threads import getCurrentThreadName
 
 class HashDB(object):
     def __init__(self, filepath):
         self.filepath = filepath
+        self._write_cache = {}
+        self._cache_lock = threading.Lock()
 
     def _get_cursor(self):
         threadData = getCurrentThreadData()
@@ -64,6 +68,21 @@ class HashDB(object):
     def write(self, key, value):
         if key:
             hash_ = HashDB.hashKey(key)
+            self._cache_lock.acquire()
+            self._write_cache[hash_] = value
+            self._cache_lock.release()
+
+        if getCurrentThreadName() in ('0', 'MainThread'):
+            self.flush()
+
+    def flush(self):
+        self._cache_lock.acquire()
+        items = self._write_cache.items()
+        self._write_cache.clear()
+        self._cache_lock.release()
+
+        self.beginTransaction()
+        for hash_, value in items:
             while True:
                 try:
                     try:
@@ -75,6 +94,7 @@ class HashDB(object):
                         raise
                 else:
                     break
+        self.endTransaction()
 
     def beginTransaction(self):
         self.cursor.execute('BEGIN TRANSACTION')

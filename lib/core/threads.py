@@ -65,6 +65,13 @@ def getCurrentThreadData():
 
     return ThreadData
 
+def getCurrentThreadName():
+    """
+    Returns current's thread name
+    """
+
+    return threading.current_thread().getName()
+
 def exceptionHandledFunction(threadFunction):
     try:
         threadFunction()

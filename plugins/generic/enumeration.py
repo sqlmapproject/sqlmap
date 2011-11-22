@@ -1564,6 +1564,7 @@ class Enumeration:
 
             try:
                 kb.dumpMode = True
+                #conf.hashDB.beginTransaction()
 
                 if not safeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
                    or safeSQLIdentificatorNaming(tbl, True) not in \
@@ -1788,6 +1789,7 @@ class Enumeration:
 
             finally:
                 kb.dumpMode = False
+                #conf.hashDB.endTransaction()
 
     def dumpAll(self):
         if conf.db is not None and conf.tbl is None:
