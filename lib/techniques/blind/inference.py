@@ -258,17 +258,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
                             if timeBasedCompare and not validateChar(idx, retVal):
-                                errMsg = "invalid character detected. retrying.."
-                                logger.error(errMsg)
-
                                 if not kb.originalTimeDelay:
                                     kb.originalTimeDelay = conf.timeSec
 
-                                conf.timeSec += 1
-                                if (conf.timeSec - kb.originalTimeDelay) <= MAX_TIME_REVALIDATION_STEPS:
+                                if (conf.timeSec - kb.originalTimeDelay) < MAX_TIME_REVALIDATION_STEPS:
+                                    errMsg = "invalid character detected. retrying.."
+                                    logger.error(errMsg)
+
                                     warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                                    warnMsg += "(due to invalid char)"
                                     logger.warn(warnMsg)
+
+                                    conf.timeSec += 1
 
                                     if kb.adjustTimeDelay:
                                         dbgMsg = "turning off auto-adjustment mechanism"
@@ -276,7 +276,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         kb.adjustTimeDelay = False
                                     return getChar(idx, originalTbl, continuousOrder, expand)
                                 else:
-                                    errMsg = "unable to properly validate character value. using last known value ('%s').." % decodeIntToUnicode(retVal)
+                                    errMsg = "unable to properly validate last character value ('%s').." % decodeIntToUnicode(retVal)
                                     logger.error(errMsg)
                                     conf.timeSec = kb.originalTimeDelay
                                     return decodeIntToUnicode(retVal)
