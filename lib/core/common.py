@@ -1256,7 +1256,7 @@ def parseTargetUrl():
     conf.path = __urlSplit[2].strip()
     conf.hostname = __hostnamePort[0].strip()
 
-    if re.search(r'\s', conf.hostname):
+    if any((re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'))):
         errMsg = "invalid target url"
         raise sqlmapSyntaxException, errMsg
 
