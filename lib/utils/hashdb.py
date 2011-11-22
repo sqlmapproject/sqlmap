@@ -90,20 +90,22 @@ class HashDB(object):
         self._write_cache.clear()
         self._cache_lock.release()
 
-        self.beginTransaction()
-        for hash_, value in items:
-            while True:
-                try:
+        try:
+            self.beginTransaction()
+            for hash_, value in items:
+                while True:
                     try:
-                        self.cursor.execute("INSERT INTO storage VALUES (?, ?)", (hash_, value,))
-                    except sqlite3.IntegrityError:
-                        self.cursor.execute("UPDATE storage SET value=? WHERE id=?", (value, hash_,))
-                except sqlite3.OperationalError, ex:
-                    if not 'locked' in ex.message:
-                        raise
-                else:
-                    break
-        self.endTransaction()
+                        try:
+                            self.cursor.execute("INSERT INTO storage VALUES (?, ?)", (hash_, value,))
+                        except sqlite3.IntegrityError:
+                            self.cursor.execute("UPDATE storage SET value=? WHERE id=?", (value, hash_,))
+                    except sqlite3.OperationalError, ex:
+                        if not 'locked' in ex.message:
+                            raise
+                    else:
+                        break
+        finally:
+            self.endTransaction()
 
     def beginTransaction(self):
         self.cursor.execute('BEGIN TRANSACTION')

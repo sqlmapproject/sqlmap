@@ -417,4 +417,4 @@ DEFAULT_GET_POST_DELIMITER = '&'
 DEFAULT_COOKIE_DELIMITER = ';'
 
 # Skip unforced HashDB flush requests below the threshold number of cached items
-HASHDB_FLUSH_THRESHOLD = 10
+HASHDB_FLUSH_THRESHOLD = 32
