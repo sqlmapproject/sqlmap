@@ -347,8 +347,8 @@ SQL_SCALAR_REGEX = r"\A(SELECT(?!\s+DISTINCT\(?))?\s*\w*\("
 # IP address of the localhost
 LOCALHOST = "127.0.0.1"
 
-# Default ports used in Tor proxy bundles
-DEFAULT_TOR_PORTS = (8123, 8118)
+# Default port used by Tor
+DEFAULT_TOR_SOCKS_PORT = 9050
 
 # Percentage below which comparison engine could have problems
 LOW_TEXT_PERCENT = 20

@@ -81,7 +81,7 @@ from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
-from lib.core.settings import DEFAULT_TOR_PORTS
+from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
 from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -1682,43 +1682,8 @@ def __setTorSocksProxySettings():
     infoMsg = "setting Tor SOCKS proxy settings"
     logger.info(infoMsg)
 
-    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, 'localhost', 9050)
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
     socks.wrapmodule(urllib2)
-
-def __setTorHTTPProxySettings():
-    if not conf.tor:
-        return
-
-    infoMsg = "setting Tor HTTP proxy settings"
-    logger.info(infoMsg)
-
-    found = None
-
-    for port in DEFAULT_TOR_PORTS:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((LOCALHOST, port))
-            found = port
-            break
-        except socket.error:
-            pass
-
-    s.close()
-
-    if found:
-        conf.proxy = "http://%s:%d" % (LOCALHOST, found)
-    else:
-        errMsg = "can't establish connection with the Tor proxy. "
-        errMsg += "Please make sure that you have Vidalia, Privoxy or "
-        errMsg += "Polipo bundle installed for you to be able to "
-        errMsg += "successfully use --tor switch "
-
-        if IS_WIN:
-            errMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
-        else:
-            errMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
-
-        raise sqlmapConnectionException, errMsg
 
 def __checkTor():
     if conf.checkTor:
