@@ -25,6 +25,7 @@ import lib.core.threads
 
 from extra.keepalive import keepalive
 from extra.oset.pyoset import oset
+from extra.socks import socks
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
@@ -1674,11 +1675,21 @@ def __setTrafficOutputFP():
 
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
-def __setTorProxySettings():
+def __setTorSocksProxySettings():
     if not conf.tor:
         return
 
-    infoMsg = "setting Tor proxy settings"
+    infoMsg = "setting Tor SOCKS proxy settings"
+    logger.info(infoMsg)
+
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, 'localhost', 9050)
+    socks.wrapmodule(urllib2)
+
+def __setTorHTTPProxySettings():
+    if not conf.tor:
+        return
+
+    infoMsg = "setting Tor HTTP proxy settings"
     logger.info(infoMsg)
 
     found = None
@@ -1852,7 +1863,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __cleanupOptions()
     __checkDependencies()
     __basicOptionValidation()
-    __setTorProxySettings()
+    __setTorSocksProxySettings()
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()
