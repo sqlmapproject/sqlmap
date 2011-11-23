@@ -22,6 +22,7 @@ class HashDB(object):
         self.filepath = filepath
         self._write_cache = {}
         self._cache_lock = threading.Lock()
+        self._in_transaction = False
 
     def _get_cursor(self):
         threadData = getCurrentThreadData()
@@ -108,7 +109,11 @@ class HashDB(object):
             self.endTransaction()
 
     def beginTransaction(self):
-        self.cursor.execute('BEGIN TRANSACTION')
+        if not self._in_transaction:
+            self.cursor.execute('BEGIN TRANSACTION')
+            self._in_transaction = True
 
     def endTransaction(self):
-        self.cursor.execute('END TRANSACTION')
+        if self._in_transaction:
+            self.cursor.execute('END TRANSACTION')
+            self._in_transaction = False
