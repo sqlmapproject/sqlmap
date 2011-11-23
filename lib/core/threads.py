@@ -33,10 +33,16 @@ class _ThreadData(threading.local):
     """
 
     def __init__(self):
-        global shared
+        self.reset()
+
+    def reset(self):
+        """
+        Resets thread data model
+        """
 
         self.disableStdOut = False
         self.hashDBCursor = None
+        self.inTransaction = False
         self.lastErrorPage = None
         self.lastHTTPError = None
         self.lastRedirectMsg = None

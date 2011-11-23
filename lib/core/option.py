@@ -109,6 +109,7 @@ from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNION_CHAR_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import WEBSCARAB_SPLITTER
+from lib.core.threads import getCurrentThreadData
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
@@ -1330,6 +1331,9 @@ def __cleanupOptions():
 
     if conf.code:
         conf.code = int(conf.code)
+
+    threadData = getCurrentThreadData()
+    threadData.reset()
 
 def __setConfAttributes():
     """
