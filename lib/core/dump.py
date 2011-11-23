@@ -318,7 +318,7 @@ class Dump:
 
         if conf.replicate:
             replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, db))
-        elif not conf.multipleTargets:
+        else:
             dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, db)
 
             if not os.path.isdir(dumpDbPath):
@@ -394,16 +394,16 @@ class Dump:
                 self.__write("| %s%s" % (column, blank), n=False)
 
                 if not conf.replicate:
-                    if not conf.multipleTargets and field == fields:
+                    if field == fields:
                         dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
-                    elif not conf.multipleTargets:
+                    else:
                         dataToDumpFile(dumpFP, "%s," % safeCSValue(column))
 
                 field += 1
 
         self.__write("|\n%s" % separator)
 
-        if not conf.multipleTargets and not conf.replicate:
+        if not conf.replicate:
             dataToDumpFile(dumpFP, "\n")
 
         if conf.replicate:
@@ -440,9 +440,9 @@ class Dump:
                     self.__write("| %s%s" % (value, blank), n=False, console=console)
 
                     if not conf.replicate:
-                        if not conf.multipleTargets and field == fields:
+                        if field == fields:
                             dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
-                        elif not conf.multipleTargets:
+                        else:
                             dataToDumpFile(dumpFP, "%s," % safeCSValue(value))
 
                     field += 1
@@ -452,7 +452,7 @@ class Dump:
 
             self.__write("|", console=console)
 
-            if not conf.multipleTargets and not conf.replicate:
+            if not conf.replicate:
                 dataToDumpFile(dumpFP, "\n")
 
         self.__write("%s\n" % separator)
@@ -461,7 +461,7 @@ class Dump:
             rtable.endTransaction()
             logger.info("Table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
 
-        elif not conf.multipleTargets:
+        else:
             dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
             logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
