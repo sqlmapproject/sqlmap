@@ -129,7 +129,7 @@ def main():
         kb.threadContinue = False
         kb.threadException = True
 
-        if conf.hashDB:
+        if conf.get('hashDB', None):
             conf.hashDB.flush(True)
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
