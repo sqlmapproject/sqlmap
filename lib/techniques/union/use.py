@@ -163,6 +163,10 @@ def unionUse(expression, unpack=True, dump=False):
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
+    if expressionFieldsList and len(expressionFieldsList) > 1 and " ORDER BY " in expression:
+        # No need for it in and just slowing down on large table dumps
+        expression = expression[:expression.rindex(" ORDER BY ")]
+
     # We have to check if the SQL query might return multiple entries
     # and in such case forge the SQL limiting the query output one
     # entry per time
