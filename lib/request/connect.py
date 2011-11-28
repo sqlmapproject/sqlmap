@@ -559,7 +559,7 @@ class Connect:
                 # throughly without safe chars (especially & and =)
                 # addendum: as we support url encoding in tampering
                 # functions therefore we need to use % as a safe char
-                if place != PLACE.URI or ('?' in value and value.find('?') < value.find(payload)):
+                if place != PLACE.URI or (value and '?' in value and value.find('?') < value.find(payload)):
                     payload = urlencode(payload, "%", False, True)
                     value = agent.replacePayload(value, payload)
             elif place == PLACE.SOAP:
@@ -642,7 +642,7 @@ class Connect:
                             post += "%s%s=%s" % (delimiter, name, value)
                         else:
                             get += "%s%s=%s" % (delimiter, name, value)
-                
+
         get = urlencode(get, limit=True)
         if post and place != PLACE.POST and hasattr(post, UNENCODED_ORIGINAL_VALUE):
             post = getattr(post, UNENCODED_ORIGINAL_VALUE)
