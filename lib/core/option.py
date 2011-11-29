@@ -289,11 +289,11 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     # Avoid to add a static content length header to
                     # conf.httpHeaders and consider the following lines as
                     # POSTed data
-                    if key == "Content-Length":
+                    if key == HTTPHEADER.CONTENT_LENGTH:
                         params = True
 
                     # Avoid proxy and connection type related headers
-                    elif key not in ( "Proxy-Connection", "Connection" ):
+                    elif key not in ( HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION ):
                         conf.httpHeaders.append((str(key), str(value)))
 
             if conf.scope:
@@ -1080,16 +1080,16 @@ def __setHTTPExtraHeaders():
                 conf.httpHeaders.append((header, value))
 
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
-        conf.httpHeaders.append(("Accept-Language", "en-us,en;q=0.5"))
+        conf.httpHeaders.append((HTTPHEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
         if not conf.charset:
-            conf.httpHeaders.append(("Accept-Charset", "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
+            conf.httpHeaders.append((HTTPHEADER.ACCEPT_CHARSET, "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
         else:
-            conf.httpHeaders.append(("Accept-Charset", "%s;q=0.7,*;q=0.1" % conf.charset))
+            conf.httpHeaders.append((HTTPHEADER.ACCEPT_CHARSET, "%s;q=0.7,*;q=0.1" % conf.charset))
 
         # Invalidating any caching mechanism in between
         # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-        conf.httpHeaders.append(("Cache-Control", "no-cache,no-store"))
-        conf.httpHeaders.append(("Pragma", "no-cache"))
+        conf.httpHeaders.append((HTTPHEADER.CACHE_CONTROL, "no-cache,no-store"))
+        conf.httpHeaders.append((HTTPHEADER.PRAGMA, "no-cache"))
 
 def __defaultHTTPUserAgent():
     """

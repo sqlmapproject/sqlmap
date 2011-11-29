@@ -26,6 +26,7 @@ from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import HTTPHEADER
 from lib.core.exception import sqlmapDataException
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
@@ -43,20 +44,20 @@ def forgeHeaders(cookie, ua, referer):
     headers = {}
 
     for header, value in conf.httpHeaders:
-        if cookie and header == "Cookie":
+        if cookie and header == HTTPHEADER.COOKIE:
             headers[header] = cookie
-        elif ua and header == "User-Agent":
+        elif ua and header == HTTPHEADER.USER_AGENT:
             headers[header] = ua
-        elif referer and header == "Referer":
+        elif referer and header == HTTPHEADER.REFERER:
             headers[header] = referer
         else:
             headers[header] = value
 
     if kb.redirectSetCookie and not conf.dropSetCookie:
-        if "Cookie" in headers:
-            headers["Cookie"] = "%s; %s" % (headers["Cookie"], kb.redirectSetCookie)
+        if HTTPHEADER.COOKIE in headers:
+            headers[HTTPHEADER.COOKIE] = "%s; %s" % (headers[HTTPHEADER.COOKIE], kb.redirectSetCookie)
         else:
-            headers["Cookie"] = kb.redirectSetCookie
+            headers[HTTPHEADER.COOKIE] = kb.redirectSetCookie
 
     return headers
 

@@ -39,6 +39,7 @@ from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
@@ -358,7 +359,7 @@ def start():
                             setCookieAsInjectable = False
 
                     if setCookieAsInjectable:
-                        conf.httpHeaders.append(("Cookie", cookieStr))
+                        conf.httpHeaders.append((HTTPHEADER.COOKIE, cookieStr))
                         conf.parameters[PLACE.COOKIE] = cookieStr
                         __paramDict = paramToDict(PLACE.COOKIE, cookieStr)
 

@@ -87,8 +87,11 @@ class MOBILES:
 
 class HTTPHEADER:
     ACCEPT = "Accept"
+    ACCEPT_CHARSET = "Accept-Charset"
     ACCEPT_ENCODING = "Accept-Encoding"
+    ACCEPT_LANGUAGE = "Accept-Language"
     AUTHORIZATION = "Authorization"
+    CACHE_CONTROL = "Cache-Control"
     CONNECTION = "Connection"
     CONTENT_ENCODING = "Content-Encoding"
     CONTENT_LENGTH = "Content-Length"
@@ -96,7 +99,9 @@ class HTTPHEADER:
     CONTENT_TYPE = "Content-Type"
     COOKIE = "Cookie"
     HOST = "Host"
-    PROXY_AUTHORIZATION = "Proxy-authorization"
+    PRAGMA = "Pragma"
+    PROXY_AUTHORIZATION = "Proxy-Authorization"
+    PROXY_CONNECTION = "Proxy-Connection"
     RANGE = "Range"
     REFERER = "Referer"
     USER_AGENT = "User-Agent"
