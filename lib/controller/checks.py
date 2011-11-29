@@ -738,7 +738,7 @@ def checkStability():
 
     firstPage = kb.originalPage # set inside checkConnection()
     time.sleep(1)
-    secondPage, _ = Request.queryPage(content=True)
+    secondPage, _ = Request.queryPage(content=True, raise404=False)
 
     kb.pageStable = (firstPage == secondPage)
 
