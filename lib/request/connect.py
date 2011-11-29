@@ -15,7 +15,7 @@ import urllib2
 import urlparse
 import traceback
 
-from extra.socks.socks import GeneralProxyError
+from extra.socks.socks import ProxyError
 from extra.multipart import multipartpost
 
 from lib.core.agent import agent
@@ -452,7 +452,7 @@ class Connect:
                 processResponse(page, responseHeaders)
                 return page, responseHeaders, code
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, GeneralProxyError), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
