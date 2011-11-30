@@ -24,7 +24,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.replication import Replication
-from lib.core.settings import DEFAULT_CSV_DELIMITER
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 
@@ -398,7 +397,7 @@ class Dump:
                     if field == fields:
                         dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
                     else:
-                        dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), DEFAULT_CSV_DELIMITER))
+                        dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
 
                 field += 1
 
@@ -444,7 +443,7 @@ class Dump:
                         if field == fields:
                             dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
                         else:
-                            dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), DEFAULT_CSV_DELIMITER))
+                            dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
 
                     field += 1
 

@@ -161,7 +161,9 @@ optDict = {
                                "trafficFile":       "string",
                                "batch":             "boolean",
                                "charset":           "string",
+                               "checkTor":          "boolean",
                                "crawlDepth":        "integer",
+                               "csvDel":            "string",
                                "eta":               "boolean",
                                "flushSession":      "boolean",
                                "forms":             "boolean",
@@ -170,7 +172,6 @@ optDict = {
                                "replicate":         "boolean",
                                "updateAll":         "boolean",
                                "tor":               "boolean",
-                               "checkTor":          "boolean"
                              },
 
             "Miscellaneous": {

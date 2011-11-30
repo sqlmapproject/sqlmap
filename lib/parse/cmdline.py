@@ -238,12 +238,12 @@ def cmdLineParser():
 
         techniques.add_option("--technique", dest="tech",
                               help="SQL injection techniques to test for "
-                                   "(default %s)" % defaults.tech)
+                                   "(default \"%s\")" % defaults.tech)
 
         techniques.add_option("--time-sec", dest="timeSec",
                               type="int",
                               help="Seconds to delay the DBMS response "
-                                   "(default %s)" % defaults.timeSec)
+                                   "(default %d)" % defaults.timeSec)
 
         techniques.add_option("--union-cols", dest="uCols",
                               help="Range of columns to test for UNION query SQL injection")
@@ -487,8 +487,16 @@ def cmdLineParser():
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
+        general.add_option("--check-tor", dest="checkTor", 
+                                  action="store_true",
+                                  help="Check to see if Tor is used properly")
+
         general.add_option("--crawl", dest="crawlDepth", type="int",
                                   help="Crawl the website starting from the target url")
+
+        general.add_option("--csv-del", dest="csvDel",
+                                  help="Delimiting character used in CSV output "
+                                  "(default \"%s\")" % defaults.csvDel)
 
         general.add_option("--eta", dest="eta",
                             action="store_true",
@@ -522,10 +530,6 @@ def cmdLineParser():
         general.add_option("--tor", dest="tor", 
                                   action="store_true",
                                   help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
-
-        general.add_option("--check-tor", dest="checkTor", 
-                                  action="store_true",
-                                  help="Check to see if Tor is used properly")
 
         general.add_option("--update", dest="updateAll",
                             action="store_true",
