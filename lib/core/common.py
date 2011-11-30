@@ -79,6 +79,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
+from lib.core.settings import DEFAULT_CSV_DELIMITER
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
 from lib.core.settings import IS_WIN
@@ -2988,7 +2989,7 @@ def safeCSValue(value):
 
     if retVal and isinstance(retVal, basestring):
         if not (retVal[0] == retVal[-1] == '"'):
-            if any(map(lambda x: x in retVal, ['"', ',', '\n'])):
+            if any(map(lambda x: x in retVal, [DEFAULT_CSV_DELIMITER, '"', '\n'])):
                 retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal
