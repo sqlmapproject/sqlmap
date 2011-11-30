@@ -2981,7 +2981,7 @@ def expandMnemonics(mnemonics, parser, args):
 def safeCSValue(value):
     """
     Returns value safe for CSV dumping.
-    Reference: http://stackoverflow.com/questions/769621/dealing-with-commas-in-a-csv-file
+    Reference: http://tools.ietf.org/html/rfc4180
     """
 
     retVal = value
