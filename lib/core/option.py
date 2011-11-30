@@ -1333,6 +1333,9 @@ def __cleanupOptions():
     if conf.code:
         conf.code = int(conf.code)
 
+    if conf.csvDel:
+        conf.csvDel = conf.csvDel.decode('string_escape') # e.g. '\\t' -> '\t'
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
