@@ -1768,8 +1768,8 @@ def __basicOptionValidation():
         errMsg = "switch --tor is incompatible with switch --proxy"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.checkTor and not conf.tor:
-        errMsg = "switch --check-tor requires usage of switch --tor"
+    if conf.checkTor and not (conf.tor or conf.proxy):
+        errMsg = "switch --check-tor requires usage of switch --tor (or --proxy with HTTP proxy address using Tor)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.skip and conf.testParameter:
