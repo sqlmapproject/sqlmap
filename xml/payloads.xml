@@ -3500,7 +3500,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3519,7 +3519,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <title>Generic UNION query (NUL comment) (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3538,7 +3538,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3557,7 +3557,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([CHAR]) - 1 to 10 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3576,7 +3576,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment (NULL) - 1 to 10 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3595,7 +3595,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([RANDNUM]) - 1 to 10 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 1 to 10 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3614,7 +3614,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([CHAR]) - 11 to 20 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3633,7 +3633,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment (NULL) - 11 to 20 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3652,7 +3652,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([RANDNUM]) - 11 to 20 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 11 to 20 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3671,7 +3671,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([CHAR]) - 21 to 30 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3690,7 +3690,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment (NULL) - 21 to 30 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3709,7 +3709,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([RANDNUM]) - 21 to 30 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 21 to 30 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3728,7 +3728,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([CHAR]) - 31 to 40 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3747,7 +3747,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment (NULL) - 31 to 40 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3766,7 +3766,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([RANDNUM]) - 31 to 40 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 31 to 40 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3785,7 +3785,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([CHAR]) - 41 to 50 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3804,7 +3804,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment (NULL) - 41 to 50 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3823,7 +3823,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query with Microsoft Access (%00) comment ([RANDNUM]) - 41 to 50 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 41 to 50 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
