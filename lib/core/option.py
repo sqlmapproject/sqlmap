@@ -681,7 +681,7 @@ def __setTechnique():
     validLetters = map(lambda x: x[0][0].upper(), validTechniques)
 
     if conf.tech and isinstance(conf.tech, basestring):
-        selTechniques = []
+        _ = []
 
         for letter in conf.tech.upper():
             if letter not in validLetters:
@@ -692,10 +692,10 @@ def __setTechnique():
 
             for validTech, validInt in validTechniques:
                 if letter == validTech[0]:
-                    selTechniques.append(validInt)
+                    _.append(validInt)
                     break
 
-        conf.tech = selTechniques
+        conf.tech = _
 
     if len(conf.tech) > 0:
         # TODO: consider MySQL/PHP/ASP/web backdoor case where stacked
