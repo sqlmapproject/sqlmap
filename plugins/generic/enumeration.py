@@ -2193,7 +2193,7 @@ class Enumeration:
         for column in colList:
             column = safeSQLIdentificatorNaming(column)
 
-            if Backend.isDbms(DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 column = column.upper()
 
             infoMsg = "searching column"
@@ -2259,43 +2259,49 @@ class Enumeration:
                     else:
                         foundCols[column][foundDb] = [ foundTbl ]
             else:
-                infoMsg = "fetching number of databases with tables containing column"
-                if colConsider == "1":
-                    infoMsg += "s like"
-                infoMsg += " '%s'" % column
-                logger.info(infoMsg)
-
-                query = rootQuery.blind.count
-                query += colQuery
-                query += whereDbsQuery
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
-
-                if not isNumPosStrValue(count):
-                    warnMsg = "no databases have tables containing column"
+                if not conf.db:
+                    infoMsg = "fetching number of databases with tables containing column"
                     if colConsider == "1":
-                        warnMsg += "s like"
-                    warnMsg += " '%s'" % column
-                    logger.warn(warnMsg)
+                        infoMsg += "s like"
+                    infoMsg += " '%s'" % column
+                    logger.info(infoMsg)
 
-                    continue
-
-                indexRange = getRange(count)
-
-                for index in indexRange:
-                    query = rootQuery.blind.query
+                    query = rootQuery.blind.count
                     query += colQuery
                     query += whereDbsQuery
-                    if Backend.isDbms(DBMS.DB2):
-                        query += ") AS foobar"
-                    query = agent.limitQuery(index, query)
-                    db = inject.getValue(query, inband=False, error=False)
-                    db = safeSQLIdentificatorNaming(db)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
-                    if db not in dbs:
+                    if not isNumPosStrValue(count):
+                        warnMsg = "no databases have tables containing column"
+                        if colConsider == "1":
+                            warnMsg += "s like"
+                        warnMsg += " '%s'" % column
+                        logger.warn(warnMsg)
+
+                        continue
+
+                    indexRange = getRange(count)
+
+                    for index in indexRange:
+                        query = rootQuery.blind.query
+                        query += colQuery
+                        query += whereDbsQuery
+                        if Backend.isDbms(DBMS.DB2):
+                            query += ") AS foobar"
+                        query = agent.limitQuery(index, query)
+                        db = inject.getValue(query, inband=False, error=False)
+                        db = safeSQLIdentificatorNaming(db)
+
+                        if db not in dbs:
+                            dbs[db] = {}
+
+                        if db not in foundCols[column]:
+                            foundCols[column][db] = []
+                else:
+                    for db in conf.db.split(","):
                         dbs[db] = {}
-
-                    if db not in foundCols[column]:
-                        foundCols[column][db] = []
+                        if db not in foundCols[column]:
+                            foundCols[column][db] = []
 
                 for column, dbData in foundCols.items():
                     colQuery = "%s%s" % (colCond, colCondParam)
@@ -2358,6 +2364,11 @@ class Enumeration:
         self.dumpFoundColumn(dbs, foundCols, colConsider)
 
     def search(self):
+        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            for item in ('db', 'tbl', 'col'):
+                if getattr(conf, item, None):
+                    setattr(conf, item, getattr(conf, item).upper())
+
         if conf.col:
             self.searchColumn()
 
