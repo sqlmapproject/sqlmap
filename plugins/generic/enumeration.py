@@ -879,7 +879,7 @@ class Enumeration:
                 if conf.excludeSysDbs:
                     query += " WHERE "
                     query += " AND ".join("%s != '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                    infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                    infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                     logger.info(infoMsg)
                 elif not Backend.isDbms(DBMS.SQLITE):
                     query += " WHERE "
@@ -1922,7 +1922,7 @@ class Enumeration:
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
@@ -2035,12 +2035,17 @@ class Enumeration:
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
             logger.info(infoMsg)
 
-            if conf.excludeSysDbs:
-                exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+            if conf.db and conf.db != "CD":
+                _ = conf.db.split(",")
+                whereDbsQuery = "".join(" AND '%s' = %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in _)
+                infoMsg = "for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+                logger.info(infoMsg)
+            elif conf.excludeSysDbs:
+                whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
+                infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
-                exclDbsQuery = ""
+                whereDbsQuery = ""
 
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % tbl
@@ -2048,7 +2053,7 @@ class Enumeration:
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
                 query = rootQuery.inband.query
                 query += tblQuery
-                query += exclDbsQuery
+                query += whereDbsQuery
                 values = inject.getValue(query, blind=False)
 
                 for foundDb, foundTbl in filterPairValues(values):
@@ -2071,7 +2076,7 @@ class Enumeration:
 
                 query = rootQuery.blind.count
                 query += tblQuery
-                query += exclDbsQuery
+                query += whereDbsQuery
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
@@ -2088,7 +2093,7 @@ class Enumeration:
                 for index in indexRange:
                     query = rootQuery.blind.query
                     query += tblQuery
-                    query += exclDbsQuery
+                    query += whereDbsQuery
                     if Backend.isDbms(DBMS.DB2):
                         query += ") AS foobar"
                     query = agent.limitQuery(index, query)
@@ -2189,7 +2194,7 @@ class Enumeration:
             column = safeSQLIdentificatorNaming(column)
 
             if Backend.isDbms(DBMS.DB2):
-                column = column.upper()            
+                column = column.upper()
 
             infoMsg = "searching column"
             if colConsider == "1":
@@ -2199,21 +2204,29 @@ class Enumeration:
 
             foundCols[column] = {}
 
-            if conf.excludeSysDbs:
-                exclDbsQuery = "".join(" AND '%s' != %s" % (db, dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system database%s: %s" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+            if conf.db and conf.db != "CD":
+                _ = conf.db.split(",")
+                whereDbsQuery = "".join(" AND '%s' = %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in _)
+                infoMsg = "for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+                logger.info(infoMsg)
+            elif conf.excludeSysDbs:
+                whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
+                infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
-                exclDbsQuery = ""
+                whereDbsQuery = ""
 
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
-                query = rootQuery.inband.query
-                query += colQuery
-                query += exclDbsQuery
-                values = inject.getValue(query, blind=False)
+                if not all((conf.db, conf.tbl)):
+                    query = rootQuery.inband.query
+                    query += colQuery
+                    query += whereDbsQuery
+                    values = inject.getValue(query, blind=False)
+                else:
+                    values = ((conf.db, conf.tbl),)
 
                 for foundDb, foundTbl in filterPairValues(values):
                     foundDb = safeSQLIdentificatorNaming(foundDb)
@@ -2254,7 +2267,7 @@ class Enumeration:
 
                 query = rootQuery.blind.count
                 query += colQuery
-                query += exclDbsQuery
+                query += whereDbsQuery
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
@@ -2271,7 +2284,7 @@ class Enumeration:
                 for index in indexRange:
                     query = rootQuery.blind.query
                     query += colQuery
-                    query += exclDbsQuery
+                    query += whereDbsQuery
                     if Backend.isDbms(DBMS.DB2):
                         query += ") AS foobar"
                     query = agent.limitQuery(index, query)
@@ -2345,16 +2358,16 @@ class Enumeration:
         self.dumpFoundColumn(dbs, foundCols, colConsider)
 
     def search(self):
-        if conf.db:
-            conf.dumper.lister("found databases", self.searchDb())
-
-        if conf.tbl:
-            conf.dumper.dbTables(self.searchTable())
-
         if conf.col:
             self.searchColumn()
 
-        if not conf.db and not conf.tbl and not conf.col:
+        elif conf.tbl:
+            conf.dumper.dbTables(self.searchTable())
+
+        elif conf.db:
+            conf.dumper.lister("found databases", self.searchDb())
+
+        else:
             errMsg = "missing parameter, provide -D, -T or -C together "
             errMsg += "with --search"
             raise sqlmapMissingMandatoryOptionException, errMsg
