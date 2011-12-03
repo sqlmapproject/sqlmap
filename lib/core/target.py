@@ -212,48 +212,52 @@ def __setOutputResume():
 
     if os.path.exists(conf.sessionFile):
         if not conf.flushSession:
-            readSessionFP = codecs.open(conf.sessionFile, "r", UNICODE_ENCODING, 'replace')
-            __url_cache = set()
-            __expression_cache = {}
+            try:
+                readSessionFP = codecs.open(conf.sessionFile, "r", UNICODE_ENCODING, 'replace')
+                __url_cache = set()
+                __expression_cache = {}
 
-            for line in readSessionFP.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
-                if line.count("][") == 4:
-                    line = line.split("][")
+                for line in readSessionFP.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
+                    if line.count("][") == 4:
+                        line = line.split("][")
 
-                    if len(line) != 5:
-                        continue
+                        if len(line) != 5:
+                            continue
 
-                    url, _, _, expression, value = line
+                        url, _, _, expression, value = line
 
-                    if not value:
-                        continue
+                        if not value:
+                            continue
 
-                    if url[0] == "[":
-                        url = url[1:]
+                        if url[0] == "[":
+                            url = url[1:]
 
-                    value = value.rstrip('\r\n') # Strips both chars independently
+                        value = value.rstrip('\r\n') # Strips both chars independently
 
-                    if url not in ( conf.url, conf.hostname ):
-                        continue
+                        if url not in ( conf.url, conf.hostname ):
+                            continue
 
-                    if url not in __url_cache:
-                        kb.resumedQueries[url] = {}
-                        kb.resumedQueries[url][expression] = value
-                        __url_cache.add(url)
-                        __expression_cache[url] = set(expression)
+                        if url not in __url_cache:
+                            kb.resumedQueries[url] = {}
+                            kb.resumedQueries[url][expression] = value
+                            __url_cache.add(url)
+                            __expression_cache[url] = set(expression)
 
-                    resumeConfKb(expression, url, value)
+                        resumeConfKb(expression, url, value)
 
-                    if expression not in __expression_cache[url]:
-                        kb.resumedQueries[url][expression] = value
-                        __expression_cache[url].add(value)
-                    elif len(value) >= len(kb.resumedQueries[url][expression]):
-                        kb.resumedQueries[url][expression] = value
+                        if expression not in __expression_cache[url]:
+                            kb.resumedQueries[url][expression] = value
+                            __expression_cache[url].add(value)
+                        elif len(value) >= len(kb.resumedQueries[url][expression]):
+                            kb.resumedQueries[url][expression] = value
 
-            if kb.injection.place is not None and kb.injection.parameter is not None:
-                kb.injections.append(kb.injection)
-
-            readSessionFP.close()
+                if kb.injection.place is not None and kb.injection.parameter is not None:
+                    kb.injections.append(kb.injection)
+            except IOError, msg:
+                errMsg = "unable to properly open the session file (%s)" % msg
+                raise sqlmapFilePathException, errMsg
+            else:
+                readSessionFP.close()
         else:
             try:
                 os.remove(conf.sessionFile)
