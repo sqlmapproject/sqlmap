@@ -31,45 +31,45 @@
         <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0,1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0,1)='%s'"/>
         <users>
-            <inband query="SELECT grantee FROM information_schema.USER_PRIVILEGES" query2="SELECT user FROM mysql.user"/>
-            <blind query="SELECT DISTINCT(grantee) FROM information_schema.USER_PRIVILEGES LIMIT %d,1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d,1" count="SELECT COUNT(DISTINCT(grantee)) FROM information_schema.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
+            <inband query="SELECT grantee FROM INFORMATION_SCHEMA.USER_PRIVILEGES" query2="SELECT user FROM mysql.user"/>
+            <blind query="SELECT DISTINCT(grantee) FROM INFORMATION_SCHEMA.USER_PRIVILEGES LIMIT %d,1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d,1" count="SELECT COUNT(DISTINCT(grantee)) FROM INFORMATION_SCHEMA.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
         </users>
         <passwords>
             <inband query="SELECT user,password FROM mysql.user" condition="user"/>
             <blind query="SELECT DISTINCT(password) FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(password)) FROM mysql.user WHERE user='%s'"/>
         </passwords>
         <privileges>
-            <inband query="SELECT grantee,privilege_type FROM information_schema.USER_PRIVILEGES" condition="grantee" query2="SELECT user,select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user" condition2="user"/>
-            <blind query="SELECT DISTINCT(privilege_type) FROM information_schema.USER_PRIVILEGES WHERE grantee%s'%s' LIMIT %d,1" query2="SELECT select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM information_schema.USER_PRIVILEGES WHERE grantee%s'%s'" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
+            <inband query="SELECT grantee,privilege_type FROM INFORMATION_SCHEMA.USER_PRIVILEGES" condition="grantee" query2="SELECT user,select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user" condition2="user"/>
+            <blind query="SELECT DISTINCT(privilege_type) FROM INFORMATION_SCHEMA.USER_PRIVILEGES WHERE grantee%s'%s' LIMIT %d,1" query2="SELECT select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM INFORMATION_SCHEMA.USER_PRIVILEGES WHERE grantee%s'%s'" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
         </privileges>
         <roles/>
         <dbs>
-            <inband query="SELECT schema_name FROM information_schema.SCHEMATA" query2="SELECT db FROM mysql.db"/>
-            <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
+            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA" query2="SELECT db FROM mysql.db"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM INFORMATION_SCHEMA.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
         </dbs>
         <tables>
-            <inband query="SELECT table_schema,table_name FROM information_schema.TABLES" condition="table_schema"/>
-            <blind query="SELECT table_name FROM information_schema.TABLES WHERE table_schema='%s' LIMIT %d,1" count="SELECT COUNT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'"/>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES" condition="table_schema"/>
+            <blind query="SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s' LIMIT %d,1" count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT column_name,column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
-            <blind query="SELECT column_name FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" query2="SELECT column_type FROM information_schema.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM information_schema.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <inband query="SELECT column_name,column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <blind query="SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" query2="SELECT column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
             <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
-            <inband query="SELECT schema_name FROM information_schema.SCHEMATA WHERE " query2="SELECT db FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
-            <blind query="SELECT DISTINCT(schema_name) FROM information_schema.SCHEMATA WHERE " query2="SELECT DISTINCT(db) FROM mysql.db WHERE " count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.SCHEMATA WHERE " count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
+            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE " query2="SELECT db FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE " query2="SELECT DISTINCT(db) FROM mysql.db WHERE " count="SELECT COUNT(DISTINCT(schema_name)) FROM INFORMATION_SCHEMA.SCHEMATA WHERE " count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
         </search_db>
         <search_table>
-            <inband query="SELECT table_schema,table_name FROM information_schema.TABLES WHERE " condition="table_name" condition2="table_schema"/>
-            <blind query="SELECT DISTINCT(table_schema) FROM information_schema.TABLES WHERE " query2="SELECT DISTINCT(table_name) FROM information_schema.TABLES WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM information_schema.TABLES WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM information_schema.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES WHERE " condition="table_name" condition2="table_schema"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.TABLES WHERE " query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.TABLES WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
         </search_table>
         <search_column>
-            <inband query="SELECT table_schema,table_name FROM information_schema.COLUMNS WHERE " condition="column_name" condition2="table_schema"/>
-            <blind query="SELECT DISTINCT(table_schema) FROM information_schema.COLUMNS WHERE " query2="SELECT DISTINCT(table_name) FROM information_schema.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM information_schema.COLUMNS WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM information_schema.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema"/>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE " condition="column_name" condition2="table_schema"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE " query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE " count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema"/>
         </search_column>
     </dbms>
 
