@@ -1685,7 +1685,7 @@ def __setTorSocksProxySettings():
     infoMsg = "setting Tor SOCKS proxy settings"
     logger.info(infoMsg)
 
-    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
     socks.wrapmodule(urllib2)
 
 def __checkTor():
@@ -1695,11 +1695,7 @@ def __checkTor():
 
         page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
         if not page or 'Congratulations' not in page:
-            errMsg = "it seems that Tor is not properly set. "
-            errMsg+= "Please make sure that you've configured "
-            errMsg+= "either Polipo (8123/tcp) or Privoxy (8118/tcp) "
-            errMsg+= "to forward the requests to your local SOCKS5 "
-            errMsg+= "instance of Tor client (usually 9050/tcp)"
+            errMsg = "it seems that Tor is not properly set"
             raise sqlmapConnectionException, errMsg
         else:
             infoMsg = "Tor is properly being used"
