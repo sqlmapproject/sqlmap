@@ -1685,7 +1685,8 @@ def __setTorSocksProxySettings():
     infoMsg = "setting Tor SOCKS proxy settings"
     logger.info(infoMsg)
 
-    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
+    # Has to be SOCKS5 to prevent DNS leaks (http://en.wikipedia.org/wiki/Tor_%28anonymity_network%29)
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
     socks.wrapmodule(urllib2)
 
 def __checkTor():
