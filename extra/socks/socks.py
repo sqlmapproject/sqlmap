@@ -107,11 +107,13 @@ def wrapmodule(module):
     """
     if _defaultproxy != None:
         module.socket.socket = socksocket
+        module.socket.create_connection = create_connection
     else:
         raise GeneralProxyError((4, "no proxy specified"))
 
 def unwrapmodule(module):
     module.socket.socket = socket.socket
+    module.socket.create_connection = socket.create_connection
 
 class socksocket(socket.socket):
     """socksocket([family[, type[, proto]]]) -> socket object
@@ -385,3 +387,30 @@ class socksocket(socket.socket):
             _orgsocket.connect(self, (destpair[0], destpair[1]))
         else:
             raise GeneralProxyError((4, _generalerrors[4]))
+
+def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+                    source_address=None):
+    """
+    Patched for DNS-leakage
+    """
+    host, port = address
+    err = None
+    sock = None
+    try:
+        sock = socksocket(socket.AF_INET, socket.SOCK_STREAM)
+        if timeout is not socket._GLOBAL_DEFAULT_TIMEOUT:
+            sock.settimeout(timeout)
+        if source_address:
+            sock.bind(source_address)
+        sock.connect(address)
+        return sock
+
+    except error as _:
+        err = _
+        if sock is not None:
+            sock.close()
+
+    if err is not None:
+        raise err
+    else:
+        raise error("connection problem")
