@@ -1383,7 +1383,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.absFilePaths = set()
     kb.adjustTimeDelay = False
-    kb.alwaysRedirect = None
     kb.alwaysRefresh = None
     kb.arch = None
     kb.authHeader = None
@@ -1455,6 +1454,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.processResponseCounter = 0
     kb.proxyAuthHeader = None
     kb.queryCounter = 0
+    kb.redirectChoice = None
     kb.redirectSetCookie = None
     kb.reflectiveMechanism = True
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS:0, REFLECTIVE_COUNTER.HIT:0}

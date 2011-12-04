@@ -49,6 +49,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
+from lib.core.enums import REDIRECTION
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
@@ -312,21 +313,23 @@ class Connect:
             if hasattr(conn, "redurl") and hasattr(conn, "redcode") and target\
               and not redirecting and not conf.realTest:
 
-                if kb.alwaysRedirect is None:
+                if kb.redirectChoice is None:
                     msg = "sqlmap got a %d redirect to " % conn.redcode
-                    msg += "'%s'. Do you want to follow redirects " % conn.redurl
-                    msg += "from now on (or stay on the original page otherwise)? [Y/n]"
-                    choice = readInput(msg, default="Y")
+                    msg += "'%s'. What do you want to do? " % conn.redurl
+                    msg += "\n[1] Follow the redirection (default)"
+                    msg += "\n[2] Stay on the original page"
+                    msg += "\n[3] Ignore"
+                    choice = readInput(msg, default="1")
 
-                    kb.alwaysRedirect = choice not in ("n", "N")
+                    kb.redirectChoice = choice
 
-                if kb.alwaysRedirect:
-                    kwargs['url'] = conn.redurl
-                    kwargs['redirecting'] = conn.redcode
-                    return Connect.__getPageProxy(**kwargs)
-                else:
+                if kb.redirectChoice == REDIRECTION.IGNORE:
                     redirecting = conn.redcode
                     page = threadData.lastRedirectMsg[1]
+                else:
+                    kwargs['url'] = conf.url if kb.redirectChoice == REDIRECTION.ORIGINAL else conn.redurl
+                    kwargs['redirecting'] = conn.redcode
+                    return Connect.__getPageProxy(**kwargs)
 
             # Return response object
             if response:

@@ -110,6 +110,11 @@ class EXPECTED:
     BOOL = "bool"
     INT = "int"
 
+class REDIRECTION:
+    FOLLOW = "1"
+    ORIGINAL = "2"
+    IGNORE = "3"
+
 class PAYLOAD:
     SQLINJECTION = {
                      1: "boolean-based blind",
