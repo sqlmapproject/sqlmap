@@ -412,5 +412,3 @@ def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
 
     if err is not None:
         raise err
-    else:
-        raise error("connection problem")
