@@ -529,7 +529,7 @@ def cmdLineParser():
 
         general.add_option("--tor", dest="tor", 
                                   action="store_true",
-                                  help="Use default Tor (Vidalia/Privoxy/Polipo) proxy address")
+                                  help="Use default Tor SOCKS5 proxy address")
 
         general.add_option("--update", dest="updateAll",
                             action="store_true",
