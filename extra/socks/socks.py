@@ -396,7 +396,6 @@ def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
     Patched for DNS-leakage
     """
     host, port = address
-    err = None
     sock = None
     try:
         sock = socksocket(socket.AF_INET, socket.SOCK_STREAM)
@@ -405,12 +404,8 @@ def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
         if source_address:
             sock.bind(source_address)
         sock.connect(address)
-        return sock
-
-    except error as _:
-        err = _
+    except socket.error:
         if sock is not None:
             sock.close()
-
-    if err is not None:
-        raise err
+        raise
+    return sock
