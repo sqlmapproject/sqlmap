@@ -34,7 +34,7 @@ for tunneling connections through SOCKS proxies.
 
 """
 Minor modifications made by Miroslav Stampar (http://www.sqlmap.org/)
-for patching DNS-leakage occuring in create_connection()
+for patching DNS-leakage occuring in socket.create_connection()
 
 Minor modifications made by Christopher Gilbert (http://motomastyle.com/)
 for use in PyLoris (http://pyloris.sourceforge.net/)
@@ -392,9 +392,7 @@ class socksocket(socket.socket):
 
 def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
                     source_address=None):
-    """
-    Patched for DNS-leakage
-    """
+    # Patched for a DNS-leakage
     host, port = address
     sock = None
     try:

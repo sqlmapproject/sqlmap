@@ -177,6 +177,8 @@ class Connect:
         responseHeaders = None
         logHeaders = u""
 
+        raise404 = raise404 and not kb.ignoreNotFound
+
         # support for non-latin (e.g. cyrillic) URLs as urllib/urllib2 doesn't
         # support those by default
         url = asciifyUrl(url)

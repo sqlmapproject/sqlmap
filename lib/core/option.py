@@ -1420,6 +1420,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.htmlFp = []
     kb.httpErrorCodes = {}
     kb.inferenceMode = False
+    kb.ignoreNotFound = False
     kb.ignoreTimeout = False
     kb.injection = InjectionDict()
     kb.injections = []

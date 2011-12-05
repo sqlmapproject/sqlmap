@@ -975,5 +975,7 @@ def checkConnection(suppressOutput=False):
         msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
         if readInput(msg, default="Y") not in ("n", "N"):
             raise sqlmapSilentQuitException
+        else:
+            kb.ignoreNotFound = True
 
     return True
