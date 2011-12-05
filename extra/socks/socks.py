@@ -33,6 +33,8 @@ for tunneling connections through SOCKS proxies.
 """
 
 """
+Minor modifications made by Miroslav Stampar (http://www.sqlmap.org/)
+for patching DNS-leakage occuring in create_connection()
 
 Minor modifications made by Christopher Gilbert (http://motomastyle.com/)
 for use in PyLoris (http://pyloris.sourceforge.net/)
