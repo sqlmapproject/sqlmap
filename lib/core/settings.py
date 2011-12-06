@@ -205,34 +205,35 @@ SQL_STATEMENTS = {
                              " offset ",
                              " union all ",
                              " rownum as ",
-                             "(case ",         ),
+                             "(case ",          ),
 
                        "SQL data definition":   (
                              "create ",
                              "declare ",
                              "drop ",
                              "truncate ",
-                             "alter ",         ),
+                             "alter ",          ),
 
                        "SQL data manipulation": (
                              "insert ",
                              "update ",
                              "delete ",
-                             "merge ",         ),
+                             "merge ",
+                             "load ",           ),
 
                        "SQL data control":      (
-                             "grant ",         ),
+                             "grant ",          ),
 
                        "SQL data execution":    (
                              " exec ",
-                             "execute ",       ),
+                             "execute ",        ),
 
                        "SQL transaction":       (
                              "start transaction ",
                              "begin work ",
                              "begin transaction ",
                              "commit ",
-                             "rollback ",      ),
+                             "rollback ",       ),
                      }
 
 # Regular expressions used for parsing error messages (--parse-errors)
