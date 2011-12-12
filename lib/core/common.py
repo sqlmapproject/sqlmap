@@ -674,7 +674,7 @@ def paramToDict(place, parameters=None):
                 if condition:
                     testableParameters[parameter] = "=".join(elem[1:])
                     if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
-                      or re.search(r'(\A-[1-9])|(\A9{3,})', testableParameters[parameter]):
+                      or re.search(r'\A9{3,}', testableParameters[parameter]):
                         errMsg = "you have provided tainted parameter values "
                         errMsg += "(%s) with most probably leftover " % element
                         errMsg += "chars from manual sql injection "
@@ -1630,21 +1630,28 @@ def showStaticWords(firstPage, secondPage):
 
     firstPage = getFilteredPageContent(firstPage)
     secondPage = getFilteredPageContent(secondPage)
-    match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
-    commonText = firstPage[match[0]:match[0]+match[2]]
-    commonWords = getPageWordSet(commonText)
 
     infoMsg = "static words: "
+
+    if firstPage and secondPage:
+        match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
+        commonText = firstPage[match[0]:match[0]+match[2]]
+        commonWords = getPageWordSet(commonText)
+    else:
+        commonWords = None
 
     if commonWords:
         commonWords = list(commonWords)
         commonWords.sort(lambda a, b: cmp(a.lower(), b.lower()))
 
-    for word in commonWords:
-        if len(word) > 2:
-            infoMsg += "'%s', " % word
+        for word in commonWords:
+            if len(word) > 2:
+                infoMsg += "'%s', " % word
 
-    infoMsg = infoMsg.rstrip(", ")
+        infoMsg = infoMsg.rstrip(", ")
+    else:
+        infoMsg += "None"
+
     logger.info(infoMsg)
 
 def decloakToNamedTemporaryFile(filepath, name=None):
