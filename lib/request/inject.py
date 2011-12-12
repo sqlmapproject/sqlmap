@@ -384,7 +384,7 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     if isinstance(output, list):
         data = output
     else:
-        data = parseUnionPage(output, expression, partial, None, sort)
+        data = parseUnionPage(output, expression, partial, sort)
 
     return data
 

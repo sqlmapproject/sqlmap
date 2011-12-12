@@ -1338,7 +1338,7 @@ def getRange(count, dump=False, plusOne=False):
 
     return indexRange
 
-def parseUnionPage(output, expression, partial=False, condition=None, sort=True):
+def parseUnionPage(output, expression, partial=False, sort=True):
     if output is None:
         return None
 
@@ -1354,15 +1354,6 @@ def parseUnionPage(output, expression, partial=False, condition=None, sort=True)
             regExpr = '%s(.*?)%s' % (DUMP_START_MARKER, DUMP_STOP_MARKER)
 
         output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
-        if condition is None:
-            condition = (
-                        kb.resumedQueries and conf.url in kb.resumedQueries.keys()
-                        and expression in kb.resumedQueries[conf.url].keys()
-                        )
-
-        if partial or not condition:
-            logOutput = "".join("%s%s%s" % (DUMP_START_MARKER, replaceNewlineTabs(value), DUMP_STOP_MARKER) for value in output)
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, logOutput))
 
         if sort:
             dict_ = {}
