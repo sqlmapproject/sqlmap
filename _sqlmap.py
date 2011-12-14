@@ -53,10 +53,7 @@ def modulePath():
     using py2exe
     """
 
-    if weAreFrozen():
-        return os.path.dirname(getUnicode(sys.executable, sys.getfilesystemencoding()))
-    else:
-        return os.path.dirname(os.path.realpath(__file__))
+    return os.path.dirname(getUnicode(sys.executable if weAreFrozen() else __file__, sys.getfilesystemencoding()))
 
 def main():
     """
