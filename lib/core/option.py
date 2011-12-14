@@ -81,6 +81,7 @@ from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
+from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
 from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import IS_WIN
@@ -1679,8 +1680,45 @@ def __setTrafficOutputFP():
 
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
+def __setTorHttpProxySettings():
+    if not conf.torHttp:
+        return
+
+    infoMsg = "setting Tor HTTP proxy settings"
+    logger.info(infoMsg)
+
+    found = None
+
+    for port in DEFAULT_TOR_HTTP_PORTS:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((LOCALHOST, port))
+            found = port
+            break
+        except socket.error:
+            pass
+
+    s.close()
+
+    if found:
+        conf.proxy = "http://%s:%d" % (LOCALHOST, found)
+    else:
+        errMsg = "can't establish connection with the Tor proxy. "
+        errMsg += "Please make sure that you have Vidalia, Privoxy or "
+        errMsg += "Polipo bundle installed for you to be able to "
+        errMsg += "successfully use --tor switch "
+
+        if IS_WIN:
+            errMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
+        else:
+            errMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
+
+        raise sqlmapConnectionException, errMsg
+
+    conf.tor = True
+
 def __setTorSocksProxySettings():
-    if not conf.tor:
+    if not conf.tor or conf.torHttp:
         return
 
     infoMsg = "setting Tor SOCKS proxy settings"
@@ -1691,17 +1729,19 @@ def __setTorSocksProxySettings():
     socks.wrapmodule(urllib2)
 
 def __checkTor():
-    if conf.checkTor:
-        infoMsg = "checking Tor connection"
-        logger.info(infoMsg)
+    if not conf.checkTor:
+        return
 
-        page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
-        if not page or 'Congratulations' not in page:
-            errMsg = "it seems that Tor is not properly set"
-            raise sqlmapConnectionException, errMsg
-        else:
-            infoMsg = "Tor is properly being used"
-            logger.info(infoMsg)
+    infoMsg = "checking Tor connection"
+    logger.info(infoMsg)
+
+    page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
+    if not page or 'Congratulations' not in page:
+        errMsg = "it seems that Tor is not properly set"
+        raise sqlmapConnectionException, errMsg
+    else:
+        infoMsg = "Tor is properly being used"
+        logger.info(infoMsg)
 
 def __basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
@@ -1766,7 +1806,11 @@ def __basicOptionValidation():
         errMsg = "switch --tor is incompatible with switch --proxy"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.checkTor and not (conf.tor or conf.proxy):
+    if conf.torHttp and conf.proxy:
+        errMsg = "switch --tor-http is incompatible with switch --proxy"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.checkTor and not any([conf.tor, conf.torHttp, conf.proxy]):
         errMsg = "switch --check-tor requires usage of switch --tor (or --proxy with HTTP proxy address using Tor)"
         raise sqlmapSyntaxException, errMsg
 
@@ -1780,6 +1824,10 @@ def __basicOptionValidation():
 
     if conf.proxy and conf.ignoreProxy:
         errMsg = "switch --proxy is incompatible with switch --ignore-proxy"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.tor and conf.torHttp:
+        errMsg = "switch --tor is incompatible with switch --tor-http"
         raise sqlmapSyntaxException, errMsg
 
     if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
@@ -1830,6 +1878,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __checkDependencies()
     __basicOptionValidation()
     __setTorSocksProxySettings()
+    __setTorHttpProxySettings()
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()

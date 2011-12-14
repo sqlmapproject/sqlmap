@@ -99,7 +99,8 @@ class Connect:
                 warnMsg = "please make sure that you have "
                 warnMsg += "Tor installed and running so "
                 warnMsg += "you could successfully use "
-                warnMsg += "--tor switch "
+                warnMsg += "--tor switch (or try hidden "
+                warnMsg += "switch --tor-http)"
                 if IS_WIN:
                     warnMsg += "(e.g. https://www.torproject.org/download/download.html.en)"
                 else:

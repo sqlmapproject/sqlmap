@@ -609,6 +609,9 @@ def cmdLineParser():
         parser.add_option("--test-filter", dest="testFilter",
                            help=SUPPRESS_HELP)
 
+        parser.add_option("--tor-http", dest="torHttp", action="store_true",
+                           help=SUPPRESS_HELP)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(optimization)

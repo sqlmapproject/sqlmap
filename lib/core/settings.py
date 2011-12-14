@@ -351,6 +351,9 @@ LOCALHOST = "127.0.0.1"
 # Default port used by Tor
 DEFAULT_TOR_SOCKS_PORT = 9050
 
+# Default ports used in Tor proxy bundles
+DEFAULT_TOR_HTTP_PORTS = (8123, 8118)
+
 # Percentage below which comparison engine could have problems
 LOW_TEXT_PERCENT = 20
 
