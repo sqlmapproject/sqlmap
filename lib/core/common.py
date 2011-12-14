@@ -3112,7 +3112,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                     # if control has selectable items select first non-disabled
                     for item in control.items:
                         if not item.disabled:
-                            item.selected = True
+                            if not item.selected:
+                                item.selected = True
                             break
             request = form.click()
             url = urldecode(request.get_full_url(), kb.pageEncoding)
