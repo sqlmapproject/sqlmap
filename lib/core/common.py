@@ -2824,6 +2824,8 @@ def safeSQLIdentificatorNaming(name, isTable=False):
     retVal = name
 
     if isinstance(name, basestring):
+        name = getUnicode(name)
+
         if isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and '.' not in name:
             name = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, name)
 
