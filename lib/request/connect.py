@@ -99,12 +99,13 @@ class Connect:
                 warnMsg = "please make sure that you have "
                 warnMsg += "Tor installed and running so "
                 warnMsg += "you could successfully use "
-                warnMsg += "--tor switch (or try hidden "
-                warnMsg += "switch --tor-http)"
+                warnMsg += "--tor switch "
                 if IS_WIN:
                     warnMsg += "(e.g. https://www.torproject.org/download/download.html.en)"
                 else:
                     warnMsg += "(e.g. https://help.ubuntu.com/community/Tor)"
+                warnMsg += " (or try hidden switch --tor-http "
+                warnMsg += " if you want to utilize Tor proxy bundles)"
             else:
                 warnMsg = "if the problem persists please check that the provided "
                 warnMsg += "target url is valid. If it is, you can try to rerun "
