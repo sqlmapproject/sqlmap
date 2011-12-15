@@ -972,10 +972,13 @@ def checkConnection(suppressOutput=False):
         errMsg = getUnicode(errMsg)
         logger.critical(errMsg)
 
-        msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
-        if readInput(msg, default="Y") not in ("n", "N"):
-            raise sqlmapSilentQuitException
+        if any(code in kb.httpErrorCodes for code in (404, )):
+            msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
+            if readInput(msg, default="Y") not in ("n", "N"):
+                raise sqlmapSilentQuitException
+            else:
+                kb.ignoreNotFound = True
         else:
-            kb.ignoreNotFound = True
+            raise
 
     return True
