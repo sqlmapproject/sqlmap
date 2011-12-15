@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import httplib
 import logging
 import re
 import socket
@@ -972,7 +973,7 @@ def checkConnection(suppressOutput=False):
         errMsg = getUnicode(errMsg)
         logger.critical(errMsg)
 
-        if any(code in kb.httpErrorCodes for code in (404, )):
+        if any(code in kb.httpErrorCodes for code in (httplib.NOT_FOUND, )):
             msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
             if readInput(msg, default="Y") not in ("n", "N"):
                 raise sqlmapSilentQuitException

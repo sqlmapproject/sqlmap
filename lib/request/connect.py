@@ -425,11 +425,11 @@ class Connect:
 
             logger.log(7, responseMsg)
 
-            if e.code == 401:
+            if e.code == httplib.UNAUTHORIZED:
                 errMsg = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
                 raise sqlmapConnectionException, errMsg
-            elif e.code == 404:
+            elif e.code == httplib.NOT_FOUND:
                 if raise404:
                     errMsg = "page not found (%d)" % code
                     raise sqlmapConnectionException, errMsg
@@ -437,7 +437,7 @@ class Connect:
                     debugMsg = "page not found (%d)" % code
                     logger.debug(debugMsg)
                     processResponse(page, responseHeaders)
-            elif e.code == 504:
+            elif e.code == httplib.GATEWAY_TIMEOUT:
                 if ignoreTimeout:
                     return None, None, None
                 else:
