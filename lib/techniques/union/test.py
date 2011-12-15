@@ -157,7 +157,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
     if retVal:
         infoMsg = "target url appears to be UNION injectable with %d columns" % retVal
-        logger.info(infoMsg)
+        singleTimeLogMessage(infoMsg)
 
     return retVal
 
