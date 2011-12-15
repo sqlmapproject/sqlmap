@@ -487,8 +487,8 @@ def start():
                                     break
 
                                 msg = "%s parameter '%s' " % (injection.place, injection.parameter)
-                                msg += "is vulnerable. Do you want to keep testing the others? [y/N] "
-                                test = readInput(msg, default="N")
+                                msg += "is vulnerable. Do you want to keep testing the others? [Y/n] "
+                                test = readInput(msg, default="Y")
 
                                 if test[0] in ("n", "N"):
                                     proceed = False

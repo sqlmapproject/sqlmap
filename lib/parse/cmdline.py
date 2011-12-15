@@ -529,7 +529,10 @@ def cmdLineParser():
 
         general.add_option("--tor", dest="tor", 
                                   action="store_true",
-                                  help="Use default Tor SOCKS5 proxy address")
+                                  help="Use Tor anonymity network")
+
+        general.add_option("--tor-type", dest="torType", 
+                                  help="Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)")
 
         general.add_option("--update", dest="updateAll",
                             action="store_true",
@@ -607,9 +610,6 @@ def cmdLineParser():
                            help=SUPPRESS_HELP)
 
         parser.add_option("--test-filter", dest="testFilter",
-                           help=SUPPRESS_HELP)
-
-        parser.add_option("--tor-http", dest="torHttp", action="store_true",
                            help=SUPPRESS_HELP)
 
         parser.add_option_group(target)

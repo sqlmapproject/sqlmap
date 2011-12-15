@@ -66,6 +66,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
+from lib.core.enums import PROXYTYPE
 from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapFilePathException
@@ -1337,6 +1338,9 @@ def __cleanupOptions():
     if conf.csvDel:
         conf.csvDel = conf.csvDel.decode('string_escape') # e.g. '\\t' -> '\t'
 
+    if conf.torType:
+        conf.torType = conf.torType.upper()
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
@@ -1680,10 +1684,16 @@ def __setTrafficOutputFP():
 
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
-def __setTorHttpProxySettings():
-    if not conf.torHttp:
+def __setTorProxySettings():
+    if not conf.tor:
         return
 
+    if conf.torType == PROXYTYPE.HTTP:
+        __setTorHttpProxySettings()
+    else:
+        __setTorSocksProxySettings()
+
+def __setTorHttpProxySettings():
     infoMsg = "setting Tor HTTP proxy settings"
     logger.info(infoMsg)
 
@@ -1715,17 +1725,12 @@ def __setTorHttpProxySettings():
 
         raise sqlmapConnectionException, errMsg
 
-    conf.tor = True
-
 def __setTorSocksProxySettings():
-    if not conf.tor or conf.torHttp:
-        return
-
     infoMsg = "setting Tor SOCKS proxy settings"
     logger.info(infoMsg)
 
     # Has to be SOCKS5 to prevent DNS leaks (http://en.wikipedia.org/wiki/Tor_%28anonymity_network%29)
-    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXYTYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
     socks.wrapmodule(urllib2)
 
 def __checkTor():
@@ -1806,12 +1811,12 @@ def __basicOptionValidation():
         errMsg = "switch --tor is incompatible with switch --proxy"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.torHttp and conf.proxy:
-        errMsg = "switch --tor-http is incompatible with switch --proxy"
+    if conf.checkTor and not any([conf.tor, conf.proxy]):
+        errMsg = "switch --check-tor requires usage of switch --tor (or --proxy with HTTP proxy address using Tor)"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.checkTor and not any([conf.tor, conf.torHttp, conf.proxy]):
-        errMsg = "switch --check-tor requires usage of switch --tor (or --proxy with HTTP proxy address using Tor)"
+    if conf.torType not in getPublicTypeMembers(PROXYTYPE, True):
+        errMsg = "switch --tor-type accepts one of following values: %s" % ", ".join(getPublicTypeMembers(PROXYTYPE, True))
         raise sqlmapSyntaxException, errMsg
 
     if conf.skip and conf.testParameter:
@@ -1824,10 +1829,6 @@ def __basicOptionValidation():
 
     if conf.proxy and conf.ignoreProxy:
         errMsg = "switch --proxy is incompatible with switch --ignore-proxy"
-        raise sqlmapSyntaxException, errMsg
-
-    if conf.tor and conf.torHttp:
-        errMsg = "switch --tor is incompatible with switch --tor-http"
         raise sqlmapSyntaxException, errMsg
 
     if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
@@ -1877,8 +1878,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __cleanupOptions()
     __checkDependencies()
     __basicOptionValidation()
-    __setTorSocksProxySettings()
-    __setTorHttpProxySettings()
+    __setTorProxySettings()
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()

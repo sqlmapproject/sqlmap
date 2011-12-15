@@ -104,8 +104,6 @@ class Connect:
                     warnMsg += "(e.g. https://www.torproject.org/download/download.html.en)"
                 else:
                     warnMsg += "(e.g. https://help.ubuntu.com/community/Tor)"
-                warnMsg += " (or try hidden switch --tor-http "
-                warnMsg += " if you want to utilize Tor proxy bundles)"
             else:
                 warnMsg = "if the problem persists please check that the provided "
                 warnMsg += "target url is valid. If it is, you can try to rerun "

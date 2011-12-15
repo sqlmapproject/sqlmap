@@ -22,7 +22,8 @@ _defaults =  {
                "threads":      1,
                "level":        1,
                "risk":         1,
-               "tech":         "BEUST"
+               "tech":         "BEUST",
+               "torType":      "HTTP"
              }
 
 defaults = AttribDict(_defaults)

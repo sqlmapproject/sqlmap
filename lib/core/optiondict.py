@@ -172,6 +172,7 @@ optDict = {
                                "replicate":         "boolean",
                                "updateAll":         "boolean",
                                "tor":               "boolean",
+                               "torType":           "string",
                              },
 
             "Miscellaneous": {

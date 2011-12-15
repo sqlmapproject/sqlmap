@@ -85,6 +85,11 @@ class MOBILES:
     NEXUS = "Google Nexus One;Mozilla/5.0 (Linux; U; Android 2.2; en-US; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
     NOKIA = "Nokia N97;Mozilla/5.0 (SymbianOS/9.4; Series60/5.0 NokiaN97-1/10.0.012; Profile/MIDP-2.1 Configuration/CLDC-1.1; en-us) AppleWebKit/525 (KHTML, like Gecko) WicKed/7.1.12344"
 
+class PROXYTYPE:
+    HTTP = "HTTP"
+    SOCKS4 = "SOCKS4"
+    SOCKS5 = "SOCKS5"
+
 class HTTPHEADER:
     ACCEPT = "Accept"
     ACCEPT_CHARSET = "Accept-Charset"
