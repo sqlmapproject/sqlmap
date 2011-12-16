@@ -93,7 +93,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                query = rootQuery.inband.query % (db, db)
+                query = rootQuery.inband.query.replace("%s", db)
                 value = inject.getValue(query, blind=False)
 
                 if not isNoneValue(value):
@@ -123,7 +123,7 @@ class Enumeration(GenericEnumeration):
                 tables = []
 
                 for index in xrange(int(count)):
-                    query = rootQuery.blind.query % (db, db, index, db, db)
+                    query = rootQuery.blind.query.replace("%s", db).replace("%d", index)
                     table = inject.getValue(query, inband=False, error=False)
                     kb.hintValue = table
                     table = safeSQLIdentificatorNaming(table, True)
