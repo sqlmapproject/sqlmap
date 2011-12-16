@@ -123,7 +123,7 @@ class Enumeration(GenericEnumeration):
                 tables = []
 
                 for index in xrange(int(count)):
-                    query = rootQuery.blind.query.replace("%s", db).replace("%d", index)
+                    query = rootQuery.blind.query.replace("%s", db).replace("%d", str(index))
                     table = inject.getValue(query, inband=False, error=False)
                     kb.hintValue = table
                     table = safeSQLIdentificatorNaming(table, True)
