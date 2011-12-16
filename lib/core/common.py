@@ -2428,13 +2428,16 @@ def removeDynamicContent(page):
 
     return page
 
-def filterStringValue(value, regex, replace=None):
+def filterStringValue(value, regex, replacement=""):
     """
     Returns string value consisting only of chars satisfying supplied
     regular expression (note: it has to be in form [...])
     """
 
-    return re.sub(regex.replace("[", "[^"), "", value or "")
+    retVal = value
+    if value:
+        retVal = re.sub(regex.replace("[", "[^") if "[^" not in regex else regex.replace("[^", "["), replacement, value)
+    return retVal
 
 def filterControlChars(value):
     """
@@ -2777,7 +2780,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism:
         payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, '')))
 
-        regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX)
+        regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX.encode("string-escape"))
 
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
