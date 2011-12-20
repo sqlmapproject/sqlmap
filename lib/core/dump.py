@@ -19,6 +19,7 @@ from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import restoreDumpMarkedChars
 from lib.core.common import safeCSValue
+from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -317,14 +318,14 @@ class Dump:
         table = tableValues["__infos__"]["table"]
 
         if conf.replicate:
-            replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, db))
+            replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
         else:
-            dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, db)
+            dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db))
 
             if not os.path.isdir(dumpDbPath):
                 os.makedirs(dumpDbPath, 0755)
 
-            dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, table)
+            dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, unsafeSQLIdentificatorNaming(table))
             dumpFP = openFile(dumpFileName, "wb")
 
         count = int(tableValues["__infos__"]["count"])
