@@ -425,7 +425,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
                 count += 1
 
                 if current in hashes:
-                    for item in list(attack_info):
+                    for item in attack_info[:]:
                         ((user, hash_), _) = item
 
                         if hash_ == current:

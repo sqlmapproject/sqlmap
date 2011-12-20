@@ -2379,9 +2379,7 @@ def findDynamicContent(firstPage, secondPage):
     kb.dynamicMarkings = []
 
     # Removing too small matching blocks
-    i = 0
-    while i < len(blocks):
-        block = blocks[i]
+    while block in blocks[:]:
         (_, _, length) = block
 
         if length <= DYNAMICITY_MARK_LENGTH:
