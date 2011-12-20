@@ -1479,13 +1479,13 @@ class Enumeration:
                         else:
                             pivotValue = safechardecode(value)
 
-                    if all([conf.limitStart, conf.limitStop]):
-                        if (i + 1) < conf.limitStart:
+                    if conf.limitStart or conf.limitStop:
+                        if conf.limitStart and (i + 1) < conf.limitStart:
                             warnMsg  = "skipping first %d pivot " % conf.limitStart
                             warnMsg += "point values"
                             singleTimeWarnMessage(warnMsg)
                             break
-                        elif (i + 1) > conf.limitStop:
+                        elif conf.limitStop and (i + 1) > conf.limitStop:
                             breakRetrieval = True
                             break
 
