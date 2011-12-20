@@ -158,7 +158,7 @@ class Connect:
             url = urlparse.urljoin(conf.url, url)
 
         # flag to know if we are dealing with the same target host
-        target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
+        target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url or ""]))
 
         if not retrying:
             # Reset the number of connection retries
