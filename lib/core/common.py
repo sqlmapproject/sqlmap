@@ -232,9 +232,8 @@ class BigArray(list):
     def pop(self):
         if len(self.chunks[-1]) < 1:
             self.chunks.pop()
-            fp = open(self.chunks[-1], 'rb')
-            self.chunks[-1] = pickle.load(fp)
-            fp.close()
+            with open(self.chunks[-1], 'rb') as fp:
+                self.chunks[-1] = pickle.load(fp)
         return self.chunks[-1].pop()
 
     def index(self, value):
@@ -247,9 +246,8 @@ class BigArray(list):
         handle, filename = tempfile.mkstemp()
         self.filenames.add(filename)
         os.close(handle)
-        fp = open(filename, 'w+b')
-        pickle.dump(value, fp)
-        fp.close()
+        with open(filename, 'w+b') as fp:
+            pickle.dump(value, fp)
         return filename
 
     def _checkcache(self, index):
@@ -257,9 +255,8 @@ class BigArray(list):
             filename = self._dump(self.cache[1])
             self.chunks[self.cache[0]] = filename
         if not (self.cache and self.cache[0] == index):
-            fp = open(self.chunks[index], 'rb')
-            self.cache = [index, pickle.load(fp), False]
-            fp.close()
+            with open(self.chunks[index], 'rb') as fp:
+                self.cache = (index, pickle.load(fp), False)
 
     def __getitem__(self, y):
         index = y / BIGARRAY_CHUNK_LENGTH
@@ -2773,7 +2770,7 @@ def intersect(valueA, valueB, lowerCase=False):
 
 def cpuThrottle(value):
     """
-    Does a CPU throttling for a lesser CPU consumption
+    Does a CPU throttling for lesser CPU consumption
     """
 
     delay = 0.00001 * (value ** 2)
