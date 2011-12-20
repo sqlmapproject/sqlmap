@@ -88,6 +88,9 @@ from lib.core.settings import VERSION
 from lib.core.settings import REVISION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import SITE
+from lib.core.settings import HOST_ALIASES
+from lib.core.settings import REFERER_ALIASES
+from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import PRINTABLE_CHAR_REGEX
 from lib.core.settings import SQL_STATEMENTS
@@ -706,13 +709,14 @@ def paramToDict(place, parameters=None):
         if len(conf.testParameter) > 1:
             warnMsg = "provided parameters '%s' " % paramStr
             warnMsg += "are not inside the %s" % place
+            logger.warn(warnMsg)
         else:
             parameter = conf.testParameter[0]
 
-            warnMsg = "provided parameter '%s' " % paramStr
-            warnMsg += "is not inside the %s" % place
-
-        logger.warn(warnMsg)
+            if not intersect(USER_AGENT_ALIASES + REFERER_ALIASES + HOST_ALIASES, parameter, True):
+                warnMsg = "provided parameter '%s' " % paramStr
+                warnMsg += "is not inside the %s" % place
+                logger.warn(warnMsg)
 
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
@@ -1277,11 +1281,17 @@ def parseTargetUrl():
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
-    if not conf.referer and conf.level >= 3:
+    if not conf.referer and (conf.level >= 3 or intersect(REFERER_ALIASES, conf.testParameter, True)):
         debugMsg = "setting the HTTP Referer header to the target url"
         logger.debug(debugMsg)
         conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.REFERER, conf.httpHeaders)
         conf.httpHeaders.append((HTTPHEADER.REFERER, conf.url))
+
+    if not conf.host and (conf.level >= 5 or intersect(HOST_ALIASES, conf.testParameter, True)):
+        debugMsg = "setting the HTTP Host header to the target url"
+        logger.debug(debugMsg)
+        conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.HOST, conf.httpHeaders)
+        conf.httpHeaders.append((HTTPHEADER.HOST, getHostHeader(conf.url)))
 
 def expandAsteriskForColumns(expression):
     # If the user provided an asterisk rather than the column(s)

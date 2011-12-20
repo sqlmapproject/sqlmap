@@ -31,6 +31,7 @@ optDict = {
                                "agent":             "string",
                                "randomAgent":       "boolean",
                                "rParam":            "string",
+                               "host":              "string",
                                "referer":           "string",
                                "headers":           "string",
                                "aType":             "string",

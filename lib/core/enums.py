@@ -48,6 +48,7 @@ class PLACE:
     COOKIE = "Cookie"
     UA = "User-Agent"
     REFERER = "Referer"
+    HOST = "Host"
 
 class HTTPMETHOD:
     GET = "GET"

@@ -142,6 +142,7 @@ class Connect:
         cookie = kwargs.get('cookie',               None)
         ua = kwargs.get('ua',                       None)
         referer = kwargs.get('referer',             None)
+        host = kwargs.get('host',                   conf.host)
         direct = kwargs.get('direct',               False)
         multipart = kwargs.get('multipart',         False)
         silent = kwargs.get('silent',               False)
@@ -237,7 +238,7 @@ class Connect:
 
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
-            # Perform HTTP request
+            # Prepare HTTP headers
             headers = forgeHeaders(cookie, ua, referer)
 
             if conf.realTest:
@@ -251,7 +252,7 @@ class Connect:
 
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
-            headers[HTTPHEADER.HOST] = getHostHeader(url)
+            headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
@@ -533,6 +534,7 @@ class Connect:
         cookie = None
         ua = None
         referer = None
+        host = None
         page = None
         pageLength = None
         uri = None
@@ -595,6 +597,9 @@ class Connect:
 
         if PLACE.REFERER in conf.parameters:
             referer = conf.parameters[PLACE.REFERER] if place != PLACE.REFERER or not value else value
+
+        if PLACE.HOST in conf.parameters:
+            host = conf.parameters[PLACE.HOST] if place != PLACE.HOST or not value else value
 
         if PLACE.URI in conf.parameters:
             uri = conf.url if place != PLACE.URI or not value else value
@@ -688,7 +693,7 @@ class Connect:
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
             if kb.queryCounter % conf.saFreq == 0:
-                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer)
+                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
 
         start = time.time()
 
@@ -701,7 +706,7 @@ class Connect:
 
                 auxHeaders[HTTPHEADER.RANGE] = "bytes=-1"
 
-            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
+            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
             if headers:
                 if kb.nullConnection == NULLCONNECTION.HEAD and HTTPHEADER.CONTENT_LENGTH in headers:
@@ -710,7 +715,7 @@ class Connect:
                     pageLength = int(headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
 
         if not pageLength:
-            page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+            page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
 

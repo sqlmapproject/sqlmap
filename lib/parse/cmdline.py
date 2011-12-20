@@ -92,6 +92,9 @@ def cmdLineParser():
         request.add_option("--randomize", dest="rParam",
                            help="Randomly change value for given parameter(s)")
 
+        request.add_option("--host", dest="host",
+                           help="HTTP Host header")
+
         request.add_option("--referer", dest="referer",
                            help="HTTP Referer header")
 

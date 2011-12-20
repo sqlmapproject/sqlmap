@@ -178,8 +178,9 @@ DBMS_DICT = { DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sour
               DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/")
             }
 
-REFERER_ALIASES = ( "ref", "referer", "referrer" )
 USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
+REFERER_ALIASES = ( "ref", "referer", "referrer" )
+HOST_ALIASES = ( "host", )
 
 FROM_TABLE = {
                         DBMS.ORACLE: " FROM DUAL",

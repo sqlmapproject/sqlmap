@@ -54,6 +54,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import LOW_TEXT_PERCENT
+from lib.core.settings import HOST_ALIASES
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv
@@ -395,6 +396,10 @@ def start():
                     skip = (place == PLACE.UA and conf.level < 3)
                     skip |= (place == PLACE.REFERER and conf.level < 3)
 
+                    # Test Host header only if
+                    # --level >= 5
+                    skip |= (place == PLACE.HOST and conf.level < 5)
+
                     # Test Cookie header only if --level >= 2
                     skip |= (place == PLACE.COOKIE and conf.level < 2)
 
@@ -404,6 +409,7 @@ def start():
 
                     skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
+                    skip &= not (place == PLACE.HOST and intersect(HOST_ALIASES, conf.testParameter, True))
 
                     if skip:
                         continue

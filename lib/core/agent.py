@@ -116,7 +116,7 @@ class Agent:
             retValue = ET.tostring(root)
         elif place == PLACE.URI:
             retValue = paramString.replace("%s%s" % (origValue, URI_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue))
-        elif place in (PLACE.UA, PLACE.REFERER):
+        elif place in (PLACE.UA, PLACE.REFERER, PLACE.HOST):
             retValue = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
             retValue = paramString.replace("%s=%s" % (parameter, origValue),

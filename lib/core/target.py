@@ -34,6 +34,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
+from lib.core.settings import HOST_ALIASES
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_REGEX
@@ -141,7 +142,7 @@ def __setRequestParams():
             conf.paramDict[PLACE.COOKIE] = __paramDict
             __testableParameters = True
 
-    # Perform checks on User-Agent header value
+    # Perform checks on header values
     if conf.httpHeaders:
         for httpHeader, headerValue in conf.httpHeaders:
             if httpHeader == PLACE.UA:
@@ -164,9 +165,19 @@ def __setRequestParams():
                     conf.paramDict[PLACE.REFERER] = { PLACE.REFERER: headerValue }
                     __testableParameters = True
 
+            elif httpHeader == PLACE.HOST:
+                # No need for url encoding/decoding the host
+                conf.parameters[PLACE.HOST] = urldecode(headerValue)
+
+                condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))
+
+                if condition:
+                    conf.paramDict[PLACE.HOST] = { PLACE.HOST: headerValue }
+                    __testableParameters = True
+
     if not conf.parameters:
         errMsg = "you did not provide any GET, POST and Cookie "
-        errMsg += "parameter, neither an User-Agent or Referer header"
+        errMsg += "parameter, neither an User-Agent, Referer or Host header value"
         raise sqlmapGenericException, errMsg
 
     elif not __testableParameters:
