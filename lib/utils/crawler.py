@@ -72,29 +72,32 @@ class Crawler:
                         break
 
                     if isinstance(content, unicode):
-                        soup = BeautifulSoup(content)
-                        for tag in soup('a'):
-                            if tag.get("href"):
-                                url = urlparse.urljoin(conf.url, tag.get("href"))
-
-                                # flag to know if we are dealing with the same target host
-                                target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
-
-                                if conf.scope:
-                                    if not re.search(conf.scope, url, re.I):
+                        try:
+                            soup = BeautifulSoup(content)
+                            for tag in soup('a'):
+                                if tag.get("href"):
+                                    url = urlparse.urljoin(conf.url, tag.get("href"))
+    
+                                    # flag to know if we are dealing with the same target host
+                                    target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
+    
+                                    if conf.scope:
+                                        if not re.search(conf.scope, url, re.I):
+                                            continue
+                                    elif not target:
                                         continue
-                                elif not target:
-                                    continue
-
-                                if url.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
-                                    kb.locks.outputs.acquire()
-                                    threadData.shared.deeper.add(url)
-                                    if re.search(r"(.*?)\?(.+)", url):
-                                        threadData.shared.outputs.add(url)
-                                    kb.locks.outputs.release()
-
-                        if conf.forms:
-                            findPageForms(content, current, False, True)
+    
+                                    if url.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
+                                        kb.locks.outputs.acquire()
+                                        threadData.shared.deeper.add(url)
+                                        if re.search(r"(.*?)\?(.+)", url):
+                                            threadData.shared.outputs.add(url)
+                                        kb.locks.outputs.release()
+                        except UnicodeEncodeError: # for non-HTML files
+                            pass
+                        finally:
+                            if conf.forms:
+                                findPageForms(content, current, False, True)
 
                     if conf.verbose in (1, 2):
                         kb.locks.ioLock.acquire()
