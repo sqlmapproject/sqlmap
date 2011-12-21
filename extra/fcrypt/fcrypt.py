@@ -475,7 +475,7 @@ def _set_key(password):
 
     k = [0] * (_ITERATIONS * 2)
 
-    for i in range(_ITERATIONS):
+    for i in xrange(_ITERATIONS):
         # Only operates on top 28 bits.
         if shifts2[i]:
             c = (c >> 2) | (c << 26)
@@ -513,9 +513,9 @@ def _body(ks, E0, E1):
     # Copy global variable into locals for loop.
     SP0, SP1, SP2, SP3, SP4, SP5, SP6, SP7 = _SPtrans
 
-    inner = range(0, _ITERATIONS*2, 2)
+    inner = xrange(0, _ITERATIONS*2, 2)
     l = r = 0
-    for j in range(25):
+    for j in xrange(25):
         l,r = r,l
         for i in inner:
             t = r ^ ((r >> 16) & 0xffff)
@@ -602,7 +602,7 @@ crypt supported by the OpenBSD C library.
           t2 >> 18 & 0x3f, t2 >> 12 & 0x3f, t2 >> 6 & 0x3f, t2 & 0x3f,
           t3 >> 18 & 0x3f, t3 >> 12 & 0x3f, t3 >> 6 & 0x3f ]
     # Convert to characters.
-    for i in range(len(r)):
+    for i in xrange(len(r)):
         r[i] = _cov_2char[r[i]]
     return salt[:2] + string.join(r, '')
 

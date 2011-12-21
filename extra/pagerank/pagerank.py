@@ -23,16 +23,16 @@ def get_pagerank(url):
         rank = '0'
     return rank
 
-def int_str(string, integer, factor):
-    for i in range(len(string)) :
+def int_str(string_, integer, factor):
+    for i in xrange(len(string_)) :
         integer *= factor
         integer &= 0xFFFFFFFF
-        integer += ord(string[i])
+        integer += ord(string_[i])
     return integer
 
-def hash_url(string):
-    c1 = int_str(string, 0x1505, 0x21)
-    c2 = int_str(string, 0, 0x1003F)
+def hash_url(string_):
+    c1 = int_str(string_, 0x1505, 0x21)
+    c2 = int_str(string_, 0, 0x1003F)
 
     c1 >>= 2
     c1 = ((c1 >> 4) & 0x3FFFFC0) | (c1 & 0x3F)

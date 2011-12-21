@@ -57,7 +57,7 @@ def updateMSSQLXML():
     root = doc.createElement("root")
     doc.appendChild(root)
 
-    for index in range(0, releasesCount):
+    for index in xrange(0, releasesCount):
         release = releases[index]
 
         # Skip Microsoft SQL Server 6.5 because the HTML

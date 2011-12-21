@@ -40,7 +40,6 @@ def safecharencode(value):
     retVal = value
 
     if isinstance(value, basestring):
-
         retVal = retVal.replace('\\', SLASH_MARKER)
 
         for char in SAFE_ENCODE_SLASH_REPLACEMENTS:

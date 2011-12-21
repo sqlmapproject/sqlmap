@@ -621,7 +621,7 @@ class Tag(PageElement):
         self._getAttrMap()
         self.attrMap[key] = value
         found = False
-        for i in range(0, len(self.attrs)):
+        for i in xrange(0, len(self.attrs)):
             if self.attrs[i][0] == key:
                 self.attrs[i] = (key, value)
                 found = True
@@ -664,7 +664,7 @@ class Tag(PageElement):
             return True
         if not hasattr(other, 'name') or not hasattr(other, 'attrs') or not hasattr(other, 'contents') or self.name != other.name or self.attrs != other.attrs or len(self) != len(other):
             return False
-        for i in range(0, len(self.contents)):
+        for i in xrange(0, len(self.contents)):
             if self.contents[i] != other.contents[i]:
                 return False
         return True
@@ -1267,14 +1267,14 @@ class BeautifulStoneSoup(Tag, SGMLParser):
 
         numPops = 0
         mostRecentTag = None
-        for i in range(len(self.tagStack)-1, 0, -1):
+        for i in xrange(len(self.tagStack)-1, 0, -1):
             if name == self.tagStack[i].name:
                 numPops = len(self.tagStack)-i
                 break
         if not inclusivePop:
             numPops = numPops - 1
 
-        for i in range(0, numPops):
+        for i in xrange(0, numPops):
             mostRecentTag = self.popTag()
         return mostRecentTag
 
@@ -1301,7 +1301,7 @@ class BeautifulStoneSoup(Tag, SGMLParser):
         isResetNesting = self.RESET_NESTING_TAGS.has_key(name)
         popTo = None
         inclusive = True
-        for i in range(len(self.tagStack)-1, 0, -1):
+        for i in xrange(len(self.tagStack)-1, 0, -1):
             p = self.tagStack[i]
             if (not p or p.name == name) and not isNestable:
                 #Non-nestable tags get popped to the top or to their
@@ -1579,7 +1579,7 @@ class BeautifulSoup(BeautifulStoneSoup):
         contentTypeIndex = None
         tagNeedsEncodingSubstitution = False
 
-        for i in range(0, len(attrs)):
+        for i in xrange(0, len(attrs)):
             key, value = attrs[i]
             key = key.lower()
             if key == 'http-equiv':
@@ -1968,7 +1968,7 @@ class UnicodeDammit:
                     250,251,252,253,254,255)
             import string
             c.EBCDIC_TO_ASCII_MAP = string.maketrans( \
-            ''.join(map(chr, range(256))), ''.join(map(chr, emap)))
+            ''.join(map(chr, xrange(256))), ''.join(map(chr, emap)))
         return s.translate(c.EBCDIC_TO_ASCII_MAP)
 
     MS_CHARS = { '\x80' : ('euro', '20AC'),

@@ -152,6 +152,9 @@ def htmlescape(value):
     return value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;').replace(' ', '&nbsp;')
 
 def htmlunescape(value):
-    retVal = value.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'").replace('&nbsp;', ' ')
-    retVal = re.sub('&#(\d+);', lambda x: unichr(int(x.group(1))), retVal)
+    retVal = value
+    if value and isinstance(value, basestring):
+        if '&' in retVal:
+            retVal = retVal.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&nbsp;', ' ')
+            retVal = re.sub('&#(\d+);', lambda x: unichr(int(x.group(1))), retVal)
     return retVal

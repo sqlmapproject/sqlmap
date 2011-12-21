@@ -1389,10 +1389,7 @@ class Enumeration:
 
         if not count:
             query = dumpNode.count % table
-            if blind:
-                count = inject.getValue(query, inband=False, error=False)
-            else:
-                count = inject.getValue(query, blind=False)
+            count = inject.getValue(query, inband=False, error=False) if blind else count = inject.getValue(query, blind=False)
 
         if count == "0":
             infoMsg = "table '%s' appears to be empty" % table
@@ -1403,6 +1400,7 @@ class Enumeration:
                 entries[column] = []
 
             return entries, lengths
+
         elif isNoneValue(count):
             return None
 

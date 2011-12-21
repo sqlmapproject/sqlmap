@@ -384,7 +384,7 @@ class MimeWriter:
             # 2.2 urllib2 doesn't normalize header case
             self._http_hdrs.append((key.capitalize(), value))
         else:
-            for i in range(1, len(lines)):
+            for i in xrange(1, len(lines)):
                 lines[i] = "    " + lines[i].strip()
             value = "\r\n".join(lines) + "\r\n"
             line = key.title() + ": " + value
@@ -1129,7 +1129,7 @@ def _ParseFileEx(file, base_uri,
             forms, labels, id_to_labels, backwards_compat)
         form._urlparse = _urlparse
         form._urlunparse = _urlunparse
-        for ii in range(len(controls)):
+        for ii in xrange(len(controls)):
             type, name, attrs = controls[ii]
             # index=ii*10 allows ImageControl to return multiple ordered pairs
             form.new_control(
@@ -2020,7 +2020,7 @@ class ListControl(Control):
             # always count nameless elements as separate controls
             Control.add_to_form(self, form)
         else:
-            for ii in range(len(form.controls)-1, -1, -1):
+            for ii in xrange(len(form.controls)-1, -1, -1):
                 control = form.controls[ii]
                 if control.name == self.name and control.type == self.type:
                     if control._closed:
@@ -2151,7 +2151,7 @@ class ListControl(Control):
                 names[nn] = 1
         for name, count in names.items():
             on, off = self._get_items(name, count)
-            for i in range(count):
+            for i in xrange(count):
                 if on:
                     item = on[0]
                     del on[0]
@@ -2850,7 +2850,7 @@ class HTMLForm:
             control = klass(type, name, a, index)
 
         if type == "select" and len(attrs) == 1:
-            for ii in range(len(self.controls)-1, -1, -1):
+            for ii in xrange(len(self.controls)-1, -1, -1):
                 ctl = self.controls[ii]
                 if ctl.type == "select":
                     ctl.close_control()
@@ -3333,7 +3333,7 @@ class HTMLForm:
         control_index is the index of the control in self.controls
         """
         pairs = []
-        for control_index in range(len(self.controls)):
+        for control_index in xrange(len(self.controls)):
             control = self.controls[control_index]
             for ii, key, val in control._totally_ordered_pairs():
                 pairs.append((ii, key, val, control_index))
