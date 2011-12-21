@@ -1402,6 +1402,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.stdev = {}
 
     kb.commonOutputs = None
+    kb.counters = {}
     kb.data = AttribDict()
     kb.dataOutputFlag = False
 

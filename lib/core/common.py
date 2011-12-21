@@ -101,8 +101,6 @@ from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
 from lib.core.settings import DUMP_DEL_MARKER
 from lib.core.settings import DUMP_TAB_MARKER
-from lib.core.settings import DUMP_START_MARKER
-from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -1047,7 +1045,6 @@ def restoreDumpMarkedChars(inpStr, onlyNewlineTab=False):
         replacedString = replacedString.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_CR_MARKER, "\r").replace(DUMP_TAB_MARKER, "\t")
 
         if not onlyNewlineTab:
-            replacedString = replacedString.replace(DUMP_START_MARKER, "").replace(DUMP_STOP_MARKER, "")
             replacedString = replacedString.replace(DUMP_DEL_MARKER, ", ")
 
     return replacedString
@@ -1351,14 +1348,8 @@ def parseUnionPage(output, expression, partial=False, sort=True):
 
     data = BigArray()
 
-    outCond1 = ( output.startswith(kb.chars.start) and output.endswith(kb.chars.stop) )
-    outCond2 = ( output.startswith(DUMP_START_MARKER) and output.endswith(DUMP_STOP_MARKER) )
-
-    if outCond1 or outCond2:
-        if outCond1:
-            regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
-        elif outCond2:
-            regExpr = '%s(.*?)%s' % (DUMP_START_MARKER, DUMP_STOP_MARKER)
+    if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
+        regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
 
         output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
 
@@ -2536,11 +2527,12 @@ def setOptimize():
 
 def initTechnique(technique=None):
     """
-    Prepares proper page template and match ratio for technique specified
+    Prepares data for technique specified
     """
 
     try:
         data = getTechniqueData(technique)
+        resetCounter(technique)
 
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
@@ -3172,3 +3164,11 @@ def unserializeObject(value):
     if value:
         retVal = pickle.loads(value.encode(UNICODE_ENCODING)) # pickle has problems with Unicode
     return retVal
+
+def resetCounter(counter):
+    kb.counters[counter] = 0
+
+def incrementCounter(counter):
+    if counter not in kb.counters:
+        resetCounter(counter)
+    kb.counters[counter] += 1

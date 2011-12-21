@@ -19,6 +19,7 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
+from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
@@ -46,11 +47,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
 
-reqCount = 0
-
 def __oneShotErrorUse(expression, field):
-    global reqCount
-
     retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
 
     threadData = getCurrentThreadData()
@@ -85,7 +82,7 @@ def __oneShotErrorUse(expression, field):
             # Perform the request
             page, headers = Request.queryPage(payload, content=True)
 
-            reqCount += 1
+            incrementCounter(PAYLOAD.TECHNIQUE.ERROR)
 
             # Parse the returned page to get the exact error-based
             # sql injection output
@@ -204,8 +201,6 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
     initTechnique(PAYLOAD.TECHNIQUE.ERROR)
 
-    global reqCount
-
     count = None
     start = time.time()
     startLimit = 0
@@ -213,7 +208,6 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
     outputs = []
     untilLimitChar = None
     untilOrderChar = None
-    reqCount = 0
 
     if resumeValue:
         output = resume(expression, None)
@@ -392,7 +386,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
+        debugMsg = "performed %d queries in %d seconds" % (kb.counters[PAYLOAD.TECHNIQUE.ERROR], duration)
         logger.debug(debugMsg)
 
     return outputs

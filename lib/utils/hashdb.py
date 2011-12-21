@@ -116,5 +116,9 @@ class HashDB(object):
     def endTransaction(self):
         threadData = getCurrentThreadData()
         if threadData.inTransaction:
-            self.cursor.execute('END TRANSACTION')
-            threadData.inTransaction = False
+            try:
+                self.cursor.execute('END TRANSACTION')
+            except sqlite3.OperationalError, ex:
+                pass
+            finally:
+                threadData.inTransaction = False

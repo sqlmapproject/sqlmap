@@ -27,8 +27,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
-from lib.core.settings import DUMP_START_MARKER
-from lib.core.settings import DUMP_STOP_MARKER
 from lib.core.settings import DUMP_DEL_MARKER
 
 def queryOutputLength(expression, payload):
@@ -120,20 +118,11 @@ def resume(expression, payload):
             resumedValue = resumedValue[:-1]
 
             infoMsg = "read from file '%s': " % conf.sessionFile
-            logValue = getCompiledRegex("%s(.*?)%s" % (DUMP_START_MARKER, DUMP_STOP_MARKER), re.S).findall(resumedValue)
 
-            if logValue:
-                if kb.technique == PAYLOAD.TECHNIQUE.UNION:
-                    logValue = ", ".join(value.replace(DUMP_DEL_MARKER, ", ") for value in logValue)
-                else:
-                    return None
+            if "\n" in resumedValue:
+                infoMsg += "%s..." % resumedValue.split("\n")[0]
             else:
-                logValue = resumedValue
-
-            if "\n" in logValue:
-                infoMsg += "%s..." % logValue.split("\n")[0]
-            else:
-                infoMsg += logValue
+                infoMsg += resumedValue
 
             if not kb.suppressResumeInfo:
                 dataToStdout("[%s] [INFO] %s\n" % (time.strftime("%X"), infoMsg))

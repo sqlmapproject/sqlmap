@@ -20,6 +20,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getConsoleWidth
 from lib.core.common import getUnicode
+from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
@@ -44,11 +45,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.resume import resume
 
-reqCount = 0
-
 def __oneShotUnionUse(expression, unpack=True, limited=False):
-    global reqCount
-
     retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
 
     threadData = getCurrentThreadData()
@@ -59,13 +56,9 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
         trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
 
         # Prepare expression with delimiters
-        injExpression = agent.concatQuery(expression, unpack)
-        injExpression = unescaper.unescape(injExpression)
+        injExpression = unescaper.unescape(agent.concatQuery(expression, unpack))
 
-        if conf.limitStart or conf.limitStop:
-            where = PAYLOAD.WHERE.NEGATIVE
-        else:
-            where = None
+        where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else None
 
         # Forge the inband SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
@@ -75,7 +68,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
         # Perform the request
         page, headers = Request.queryPage(payload, content=True, raise404=False)
 
-        reqCount += 1
+        incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 
         # Parse the returned page to get the exact union-based
         # sql injection output
@@ -129,8 +122,7 @@ def configUnion(char=None, columns=None):
         if not colsStart.isdigit() or not colsStop.isdigit():
             raise sqlmapSyntaxException, "--union-cols must be a range of integers"
 
-        conf.uColsStart = int(colsStart)
-        conf.uColsStop = int(colsStop)
+        conf.uColsStart, conf.uColsStop = int(colsStart), int(colsStop)
 
         if conf.uColsStart > conf.uColsStop:
             errMsg = "--union-cols range has to be from lower to "
@@ -149,15 +141,13 @@ def unionUse(expression, unpack=True, dump=False):
 
     initTechnique(PAYLOAD.TECHNIQUE.UNION)
 
-    global reqCount
-
     count = None
     origExpr = expression
     startLimit = 0
     stopLimit = None
     test = True
     value = ""
-    reqCount = 0
+
     width = getConsoleWidth()
     start = time.time()
 
@@ -362,7 +352,7 @@ def unionUse(expression, unpack=True, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d queries in %d seconds" % (reqCount, duration)
+        debugMsg = "performed %d queries in %d seconds" % (kb.counters[PAYLOAD.TECHNIQUE.UNION], duration)
         logger.debug(debugMsg)
 
     return value
