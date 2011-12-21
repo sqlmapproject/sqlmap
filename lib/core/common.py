@@ -1340,10 +1340,14 @@ def parseUnionPage(output, expression, partial=False, sort=True):
         output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
 
         if sort:
-            dict_ = {}
+            _ = []
+            unique = set()
             for entry in output:
-                dict_[entry.lower()] = entry
-            output = dict_.values()
+                key = entry.lower()
+                if key not in unique:
+                    unique.add(key)
+                    _.append(entry)
+            output = _
 
         for entry in output:
             entry = safecharencode(entry) if kb.safeCharEncode else entry
@@ -1356,7 +1360,7 @@ def parseUnionPage(output, expression, partial=False, sort=True):
             if len(entry) == 1:
                 data.append(entry[0])
             else:
-                data.append(list(entry))
+                data.append(entry)
     else:
         data = output
 

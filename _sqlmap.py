@@ -95,13 +95,13 @@ def main():
         logger.critical(e)
         closeDumper(False, e)
 
-    except KeyboardInterrupt, _:
+    except KeyboardInterrupt:
         print
         errMsg = "user aborted"
         logger.error(errMsg)
         closeDumper(False, errMsg)
 
-    except EOFError, _:
+    except EOFError:
         print
         errMsg = "exit"
         logger.error(errMsg)
@@ -127,7 +127,10 @@ def main():
         kb.threadException = True
 
         if conf.get('hashDB', None):
-            conf.hashDB.flush(True)
+            try:
+                conf.hashDB.flush(True)
+            except KeyboardInterrupt:
+                pass
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if hasattr(conf, "threads") and conf.threads > 1:
