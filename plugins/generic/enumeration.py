@@ -1389,7 +1389,7 @@ class Enumeration:
 
         if not count:
             query = dumpNode.count % table
-            count = inject.getValue(query, inband=False, error=False) if blind else count = inject.getValue(query, blind=False)
+            count = inject.getValue(query, inband=False, error=False) if blind else inject.getValue(query, blind=False)
 
         if count == "0":
             infoMsg = "table '%s' appears to be empty" % table
