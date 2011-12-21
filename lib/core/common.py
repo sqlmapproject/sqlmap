@@ -1867,37 +1867,35 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     Returns newline delimited items contained inside file
     """
 
-    retVal = []
+    retVal = list() if not unique else set()
 
     checkFile(filename)
 
-    if unicode_:
-        f = codecs.open(filename, 'r', UNICODE_ENCODING)
-    else:
-        f = open(filename, 'r')
+    with codecs.open(filename, 'r', UNICODE_ENCODING) if unicode_ else open(filename, 'r') as f:
+        for line in (f.readlines() if unicode_ else f.xreadlines()): # xreadlines doesn't return unicode strings when codec.open() is used
+            if commentPrefix:
+                if line.find(commentPrefix) != -1:
+                    line = line[:line.find(commentPrefix)]
 
-    for line in f.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
-        if commentPrefix:
-            if line.find(commentPrefix) != -1:
-                line = line[:line.find(commentPrefix)]
+            line = line.strip()
 
-        line = line.strip()
+            if not unicode_:
+                try:
+                    line = str.encode(line)
+                except UnicodeDecodeError:
+                    continue
 
-        if not unicode_:
-            try:
-                line = str.encode(line)
-            except UnicodeDecodeError:
-                continue
-        if line:
-            if lowercase:
-                line = line.lower()
+            if line:
+                if lowercase:
+                    line = line.lower()
 
-            if unique and line in retVal:
-                continue
+                if unique and line in retVal:
+                    continue
 
-            retVal.append(line)
-
-    f.close()
+                if unique:
+                    retVal.add(line)
+                else:
+                    retVal.append(line)
 
     return retVal
 
@@ -3019,8 +3017,11 @@ def asciifyUrl(url, forceQuote=False):
         # apparently not an url
         return url
 
+    if all(char in string.printable for char in url):
+        return url
+
     # idna-encode domain
-    hostname = parts.hostname.encode('idna')
+    hostname = parts.hostname.encode("idna")
 
     # UTF8-quote the other parts. We check each part individually if
     # if needs to be quoted - that should catch some additional user
@@ -3031,14 +3032,14 @@ def asciifyUrl(url, forceQuote=False):
         # Triggers on non-ascii characters - another option would be:
         #     urllib.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
-        if s.encode('ascii', 'replace') != s or forceQuote:
-            return urllib.quote(s.encode('utf8'), safe=safe)
+        if s.encode("ascii", "replace") != s or forceQuote:
+            return urllib.quote(s.encode("utf8"), safe=safe)
         return s
 
     username = quote(parts.username, '')
     password = quote(parts.password, safe='')
     path = quote(parts.path, safe='/')
-    query = quote(parts.query, safe='&=')
+    query = quote(parts.query, safe="&=")
 
     # put everything back together
     netloc = hostname
@@ -3076,7 +3077,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         warnMsg = "badly formed HTML at the given url ('%s'). Will try to filter it" % url
         logger.warning(warnMsg)
         response.seek(0)
-        filtered = _("".join(re.findall(r'<form(?!.+<form).+?</form>', response.read(), re.I | re.S)), response.geturl())
+        filtered = _("".join(re.findall(r"<form(?!.+<form).+?</form>", response.read(), re.I | re.S)), response.geturl())
         try:
             forms = ParseResponse(filtered, backwards_compat=False)
         except ParseError:
@@ -3089,7 +3090,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     if forms:
         for form in forms:
             for control in form.controls:
-                if hasattr(control, 'items'):
+                if hasattr(control, "items"):
                     # if control has selectable items select first non-disabled
                     for item in control.items:
                         if not item.disabled:

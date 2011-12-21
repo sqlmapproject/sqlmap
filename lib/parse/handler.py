@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
+
 from xml.sax.handler import ContentHandler
 from lib.core.common import sanitizeStr
 
@@ -33,19 +34,20 @@ class FingerprintHandler(ContentHandler):
         if value in ( None, "None" ):
             return
 
-        if key in ( "dbmsVersion" ):
+        if key == "dbmsVersion":
             self.__info[key] = value
         else:
             if key not in self.__info.keys():
                 self.__info[key] = set()
 
-            for v in value.split("|"):
-                self.__info[key].add(v)
+            for _ in value.split("|"):
+                self.__info[key].add(_)
 
     def startElement(self, name, attrs):
         if name == "regexp":
             self.__regexp = sanitizeStr(attrs.get("value"))
             _ = re.match("\A[A-Za-z0-9]+", self.__regexp) # minor trick avoiding compiling of large amount of regexes
+
             if _ and _.group(0).lower() in self.__banner.lower() or not _:
                 self.__match = re.search(self.__regexp, self.__banner, re.I | re.M)
             else:

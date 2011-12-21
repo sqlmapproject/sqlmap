@@ -19,7 +19,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import filterPairValues
 from lib.core.common import getRange
 from lib.core.common import getCompiledRegex
-from lib.core.common import getFileItems
 from lib.core.common import getUnicode
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue

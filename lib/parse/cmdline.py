@@ -545,7 +545,7 @@ def cmdLineParser():
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
         miscellaneous.add_option("-z", dest="mnemonics",
-                               help="Use mnemonics for shorter parameter setup")
+                               help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
 
         miscellaneous.add_option("--beep", dest="beep",
                                   action="store_true",

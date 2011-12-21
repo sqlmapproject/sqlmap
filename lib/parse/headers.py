@@ -7,6 +7,7 @@ Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import itertools
 import os
 
 from lib.core.common import checkFile
@@ -15,6 +16,7 @@ from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.handler import FingerprintHandler
 
+
 def headersParser(headers):
     """
     This function calls a class that parses the input HTTP headers to
@@ -22,24 +24,23 @@ def headersParser(headers):
     and the web application technology
     """
 
-    topHeaders = {
-                   "cookie":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
-                   "microsoftsharepointteamservices": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "sharepoint.xml"),
-                   "server":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "server.xml"),
-                   "servlet-engine":                  os.path.join(paths.SQLMAP_XML_BANNER_PATH, "servlet.xml"),
-                   "set-cookie":                      os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
-                   "x-aspnet-version":                os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-aspnet-version.xml"),
-                   "x-powered-by":                    os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml")
-                 }
+    if not kb.headerPaths:
+        kb.headerPaths = {
+            "cookie":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
+            "microsoftsharepointteamservices": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "sharepoint.xml"),
+            "server":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "server.xml"),
+            "servlet-engine":                  os.path.join(paths.SQLMAP_XML_BANNER_PATH, "servlet.xml"),
+            "set-cookie":                      os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
+            "x-aspnet-version":                os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-aspnet-version.xml"),
+            "x-powered-by":                    os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml")
+        }
 
-    for header in headers:
-        if header in topHeaders:
-            value = headers[header]
-            xmlfile = topHeaders[header]
+    for header in itertools.ifilter(lambda x: x in kb.headerPaths, headers):
+        value = headers[header]
+        xmlfile = kb.headerPaths[header]
+        checkFile(xmlfile)
 
-            checkFile(xmlfile)
+        handler = FingerprintHandler(value, kb.headersFp)
 
-            handler = FingerprintHandler(value, kb.headersFp)
-
-            parseXmlFile(xmlfile, handler)
-            parseXmlFile(paths.GENERIC_XML, handler)
+        parseXmlFile(xmlfile, handler)
+        parseXmlFile(paths.GENERIC_XML, handler)

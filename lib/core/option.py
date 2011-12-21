@@ -1490,6 +1490,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.chars.dollar = ":%s:" % randomStr(length=1, lowercase=True)
 
     if flushAll:
+        kb.headerPaths = {}
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
         kb.scanOnlyGoogleGETs = None
         kb.tamperFunctions = []
