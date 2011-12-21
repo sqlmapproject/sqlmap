@@ -339,7 +339,9 @@ class Connect:
                 return conn, None, None
 
             # Get HTTP response
-            page = conn.read() if page is None else page
+            if page is None:
+                page = conn.read()
+
             code = redirecting or conn.code
             responseHeaders = conn.info()
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
@@ -486,7 +488,7 @@ class Connect:
             if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
                 return None, None, None
-            elif silent or (ignoreTimeout and any(map(lambda x: x in tbMsg, ["timed out", "IncompleteRead"]))):
+            elif silent or (ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead"))):
                 return None, None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
                 warnMsg += ", sqlmap is going to retry the request"

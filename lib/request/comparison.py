@@ -32,8 +32,6 @@ def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     if page is None and pageLength is None:
         return None
 
-    regExpResults = None
-
     seqMatcher = getCurrentThreadData().seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 

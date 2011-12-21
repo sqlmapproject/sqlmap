@@ -145,7 +145,6 @@ def unionUse(expression, unpack=True, dump=False):
     origExpr = expression
     startLimit = 0
     stopLimit = None
-    test = True
     value = ""
 
     width = getConsoleWidth()

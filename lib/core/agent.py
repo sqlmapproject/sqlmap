@@ -559,7 +559,7 @@ class Agent:
         inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if limited:
-            inbandQuery += ",".join(map(lambda x: char if x != position else '(SELECT %s)' % query, xrange(0, count)))
+            inbandQuery += ",".join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
             inbandQuery += FROM_TABLE.get(Backend.getIdentifiedDbms(), "")
             inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 

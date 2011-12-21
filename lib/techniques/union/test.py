@@ -161,7 +161,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
     return retVal
 
-def __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=PAYLOAD.WHERE.ORIGINAL):
+def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.ORIGINAL):
     validPayload = None
     vector = None
 
@@ -224,18 +224,18 @@ def __unionPosition(comment, place, parameter, value, prefix, suffix, count, whe
 
     return validPayload, vector
 
-def __unionConfirm(comment, place, parameter, value, prefix, suffix, count):
+def __unionConfirm(comment, place, parameter, prefix, suffix, count):
     validPayload = None
     vector = None
 
     # Confirm the inband SQL injection and get the exact column
     # position which can be used to extract data
-    validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, count)
+    validPayload, vector = __unionPosition(comment, place, parameter, prefix, suffix, count)
 
     # Assure that the above function found the exploitable full inband
     # SQL injection position
     if not validPayload:
-        validPayload, vector = __unionPosition(comment, place, parameter, value, prefix, suffix, count, where=PAYLOAD.WHERE.NEGATIVE)
+        validPayload, vector = __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.NEGATIVE)
 
     return validPayload, vector
 
@@ -249,7 +249,6 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     validPayload = None
     vector = None
     query = agent.prefixQuery("UNION ALL SELECT %s" % kb.uChar)
-    total = conf.uColsStop+1 - conf.uColsStart
 
     # In case that user explicitly stated number of columns affected
     if conf.uColsStop == conf.uColsStart:
@@ -267,7 +266,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         if Backend.getIdentifiedDbms() in FROM_TABLE:
             query += FROM_TABLE[Backend.getIdentifiedDbms()]
 
-        validPayload, vector = __unionConfirm(comment, place, parameter, value, prefix, suffix, count)
+        validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
 
         if not all([validPayload, vector]) and not all([conf.uChar, conf.dbms]):
             warnMsg = "if UNION based SQL injection is not detected, "

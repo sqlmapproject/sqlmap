@@ -46,7 +46,6 @@ mainly to merge bug fixes found in Sourceforge
 
 import socket
 import struct
-import sys
 
 PROXY_TYPE_SOCKS4 = 1
 PROXY_TYPE_SOCKS5 = 2

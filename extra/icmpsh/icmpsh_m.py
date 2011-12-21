@@ -57,7 +57,7 @@ def main(src, dst):
     # with the returned data
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-    except socket.error, e:
+    except socket.error:
         sys.stderr.write('You need to run icmpsh master with administrator privileges\n')
         sys.exit(1)
 

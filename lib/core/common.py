@@ -2346,14 +2346,11 @@ def findDynamicContent(firstPage, secondPage):
     kb.dynamicMarkings = []
 
     # Removing too small matching blocks
-    while block in blocks[:]:
+    for block in blocks[:]:
         (_, _, length) = block
 
         if length <= DYNAMICITY_MARK_LENGTH:
             blocks.remove(block)
-
-        else:
-            i += 1
 
     # Making of dynamic markings based on prefix/suffix principle
     if len(blocks) > 0:
@@ -2965,7 +2962,7 @@ def safeCSValue(value):
 
     if retVal and isinstance(retVal, basestring):
         if not (retVal[0] == retVal[-1] == '"'):
-            if any(map(lambda x: x in retVal, (conf.csvDel, '"', '\n'))):
+            if any(_ in retVal for _ in (conf.csvDel, '"', '\n')):
                 retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal
@@ -3124,7 +3121,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 def getHostHeader(url):
     retVal = urlparse.urlparse(url).netloc
 
-    if any(map(lambda x: retVal.endswith(':%d' % x), [80, 443])):
+    if any(retVal.endswith(':%d' % _) for _ in [80, 443]):
         retVal = retVal.split(':')[0]
 
     return retVal

@@ -9,8 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import logging
 import os
-import _socket
-import socket
 import subprocess
 import sys
 

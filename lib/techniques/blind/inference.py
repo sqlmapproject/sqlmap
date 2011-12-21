@@ -102,7 +102,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     showEta = conf.eta and isinstance(length, int)
     numThreads = min(conf.threads, length)
-    threads = []
 
     if showEta:
         progress = ProgressBar(maxValue=length)

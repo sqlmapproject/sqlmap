@@ -1594,7 +1594,7 @@ class Enumeration:
                         randStr, randStr2 = randomStr(), randomStr()
                         filterFunction = "REPLACE(REPLACE(IFNULL(%s, ' '),'%s','%s'),'%s','%s')"\
                           % ('%s', CONCAT_VALUE_DELIMITER, randStr, CONCAT_ROW_DELIMITER, randStr2)
-                        concats = ",".join(map(lambda x: "CONCAT(%s, '|')" % (filterFunction % x), colList[:-1]))
+                        concats = ",".join("CONCAT(%s, '|')" % (filterFunction % _) for _ in colList[:-1])
                         concats += ",%s" % (filterFunction % colList[-1])
                         query = "SELECT GROUP_CONCAT(%s) FROM %s.%s" % (concats, conf.db, tbl)
                         value = inject.getValue(query, blind=False)
