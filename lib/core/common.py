@@ -65,7 +65,7 @@ from lib.core.enums import OS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import REFLECTIVE_COUNTER
-from lib.core.enums import SORTORDER
+from lib.core.enums import SORT_ORDER
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -1001,20 +1001,17 @@ def randomStr(length=4, lowercase=False, alphabet=None):
 
     return rndStr
 
-def sanitizeStr(inpStr):
+def sanitizeStr(value):
     """
-    @param inpStr: inpStr to sanitize: cast to str datatype and replace
+    @param value: value to sanitize: cast to str datatype and replace
     newlines with one space and strip carriage returns.
-    @type inpStr: C{str}
+    @type value: C{str}
 
-    @return: sanitized inpStr
+    @return: sanitized value
     @rtype: C{str}
     """
 
-    cleanString = getUnicode(inpStr)
-    cleanString = cleanString.replace("\n", " ").replace("\r", "")
-
-    return cleanString
+    return getUnicode(value).replace("\n", " ").replace("\r", "")
 
 def checkFile(filename):
     """
@@ -1025,45 +1022,37 @@ def checkFile(filename):
     if not os.path.exists(filename):
         raise sqlmapFilePathException, "unable to read file '%s'" % filename
 
-def replaceNewlineTabs(inpStr, stdout=False):
-    if inpStr is None:
+def replaceNewlineTabs(value, stdout=False):
+    if value is None:
         return
 
     if stdout:
-        replacedString = inpStr.replace("\n", " ").replace("\r", " ").replace("\t", " ")
+        retVal = value.replace("\n", " ").replace("\r", " ").replace("\t", " ")
     else:
-        replacedString = inpStr.replace("\n", DUMP_NEWLINE_MARKER).replace("\r", DUMP_CR_MARKER).replace("\t", DUMP_TAB_MARKER)
+        retVal = value.replace("\n", DUMP_NEWLINE_MARKER).replace("\r", DUMP_CR_MARKER).replace("\t", DUMP_TAB_MARKER)
 
-    replacedString = replacedString.replace(kb.chars.delimiter, DUMP_DEL_MARKER)
+    retVal = retVal.replace(kb.chars.delimiter, DUMP_DEL_MARKER)
 
-    return replacedString
+    return retVal
 
-def restoreDumpMarkedChars(inpStr, onlyNewlineTab=False):
-    replacedString = inpStr
+def restoreDumpMarkedChars(value, onlyNewlineTab=False):
+    retVal = value
 
-    if isinstance(replacedString, basestring):
-        replacedString = replacedString.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_CR_MARKER, "\r").replace(DUMP_TAB_MARKER, "\t")
+    if isinstance(retVal, basestring):
+        retVal = retVal.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_CR_MARKER, "\r").replace(DUMP_TAB_MARKER, "\t")
 
         if not onlyNewlineTab:
-            replacedString = replacedString.replace(DUMP_DEL_MARKER, ", ")
+            retVal = retVal.replace(DUMP_DEL_MARKER, ", ")
 
-    return replacedString
+    return retVal
 
 def banner():
     """
     This function prints sqlmap banner with its version
     """
 
-    ban = """
-    %s - %s
-    %s\n
-""" % (VERSION_STRING, DESCRIPTION, SITE)
-
-    # Reference: http://www.frexx.de/xterm-256-notes/
-    #if not any([IS_WIN, os.getenv('ANSI_COLORS_DISABLED')]):
-    #    ban = "\033[1;34m%s\033[0m" % ban
-
-    dataToStdout(ban, forceOutput=True)
+    _ = """\n    %s - %s\n    %s\n\n""" % (VERSION_STRING, DESCRIPTION, SITE)
+    dataToStdout(_, forceOutput=True)
 
 def parsePasswordHash(password):
     blank = " " * 8
@@ -1335,10 +1324,7 @@ def getRange(count, dump=False, plusOne=False):
         if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
             limitStart = conf.limitStart
 
-    if plusOne:
-        indexRange = xrange(limitStart, limitStop + 1)
-    else:
-        indexRange = xrange(limitStart - 1, limitStop)
+    indexRange = xrange(limitStart, limitStop + 1) if plusOne else xrange(limitStart - 1, limitStop)
 
     return indexRange
 
@@ -1445,46 +1431,43 @@ def getFileType(filePath):
     except:
         return "unknown"
 
-    if "ASCII" in magicFileType or "text" in magicFileType:
-        return "text"
-    else:
-        return "binary"
+    return "text" if "ASCII" in magicFileType or "text" in magicFileType else "binary"
 
 def getCharset(charsetType=None):
     asciiTbl = []
 
     if charsetType is None:
-        asciiTbl = range(0, 128)
+        asciiTbl.extend(xrange(0, 128))
 
     # 0 or 1
     elif charsetType == 1:
         asciiTbl.extend([ 0, 1 ])
-        asciiTbl.extend(range(47, 50))
+        asciiTbl.extend(xrange(47, 50))
 
     # Digits
     elif charsetType == 2:
         asciiTbl.extend([ 0, 1 ])
-        asciiTbl.extend(range(47, 58))
+        asciiTbl.extend(xrange(47, 58))
 
     # Hexadecimal
     elif charsetType == 3:
         asciiTbl.extend([ 0, 1 ])
-        asciiTbl.extend(range(47, 58))
-        asciiTbl.extend(range(64, 71))
-        asciiTbl.extend(range(96, 103))
+        asciiTbl.extend(xrange(47, 58))
+        asciiTbl.extend(xrange(64, 71))
+        asciiTbl.extend(xrange(96, 103))
 
     # Characters
     elif charsetType == 4:
         asciiTbl.extend([ 0, 1 ])
-        asciiTbl.extend(range(64, 91))
-        asciiTbl.extend(range(96, 123))
+        asciiTbl.extend(xrange(64, 91))
+        asciiTbl.extend(xrange(96, 123))
 
     # Characters and digits
     elif charsetType == 5:
         asciiTbl.extend([ 0, 1 ])
-        asciiTbl.extend(range(47, 58))
-        asciiTbl.extend(range(64, 91))
-        asciiTbl.extend(range(96, 123))
+        asciiTbl.extend(xrange(47, 58))
+        asciiTbl.extend(xrange(64, 91))
+        asciiTbl.extend(xrange(96, 123))
 
     return asciiTbl
 
@@ -1492,10 +1475,7 @@ def searchEnvPath(fileName):
     envPaths = os.environ["PATH"]
     result = None
 
-    if IS_WIN:
-        envPaths = envPaths.split(";")
-    else:
-        envPaths = envPaths.split(":")
+    envPaths = envPaths.split(";") if IS_WIN else envPaths.split(":")
 
     for envPath in envPaths:
         envPath = envPath.replace(";", "")
@@ -1557,8 +1537,7 @@ def safeStringFormat(formatStr, params):
     if isinstance(params, basestring):
         retVal = retVal.replace("%s", params)
     else:
-        count = 0
-        index = 0
+        count, index = 0, 0
 
         while index != -1:
             index = retVal.find("%s")
@@ -1791,10 +1770,9 @@ def readCachedFileContent(filename, mode='rb'):
 
         if filename not in kb.cache.content:
             checkFile(filename)
-            xfile = codecs.open(filename, mode, UNICODE_ENCODING)
-            content = xfile.read()
-            kb.cache.content[filename] = content
-            xfile.close()
+            with codecs.open(filename, mode, UNICODE_ENCODING) as f:
+                content = f.read()
+                kb.cache.content[filename] = content
 
         kb.locks.cacheLock.release()
 
@@ -1807,10 +1785,8 @@ def readXmlFile(xmlFile):
 
     checkFile(xmlFile)  
 
-    xfile = codecs.open(xmlFile, 'r', UNICODE_ENCODING)
-    retVal = minidom.parse(xfile).documentElement
-
-    xfile.close()
+    with codecs.open(xmlFile, 'r', UNICODE_ENCODING) as f:
+        retVal = minidom.parse(f).documentElement
 
     return retVal
 
@@ -1825,8 +1801,10 @@ def stdev(values):
 
     key = (values[0], values[-1], len(values))
 
+    retVal = None
+
     if key in kb.cache.stdev:
-        return kb.cache.stdev[key]
+        retVal = kb.cache.stdev[key]
     else:
         summa = 0.0
         avg = average(values)
@@ -1837,7 +1815,8 @@ def stdev(values):
 
         retVal = sqrt(summa/(len(values) - 1))
         kb.cache.stdev[key] = retVal
-        return retVal
+
+    return retVal
 
 def average(values):
     """
@@ -1866,25 +1845,22 @@ def initCommonOutputs():
     kb.commonOutputs = {}
     key = None
 
-    cfile = codecs.open(paths.COMMON_OUTPUTS, 'r', UNICODE_ENCODING)
+    with codecs.open(paths.COMMON_OUTPUTS, 'r', UNICODE_ENCODING) as f:
+        for line in f.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
+            if line.find('#') != -1:
+                line = line[:line.find('#')]
 
-    for line in cfile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
-        if line.find('#') != -1:
-            line = line[:line.find('#')]
+            line = line.strip()
 
-        line = line.strip()
+            if len(line) > 1:
+                if line.startswith('[') and line.endswith(']'):
+                    key = line[1:-1]
+                elif key:
+                    if key not in kb.commonOutputs:
+                        kb.commonOutputs[key] = set()
 
-        if len(line) > 1:
-            if line.startswith('[') and line.endswith(']'):
-                key = line[1:-1]
-            elif key:
-                if key not in kb.commonOutputs:
-                    kb.commonOutputs[key] = set()
-
-                if line not in kb.commonOutputs[key]:
-                    kb.commonOutputs[key].add(line)
-
-    cfile.close()
+                    if line not in kb.commonOutputs[key]:
+                        kb.commonOutputs[key].add(line)
 
 def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, unique=False):
     """
@@ -1896,11 +1872,11 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     checkFile(filename)
 
     if unicode_:
-        ifile = codecs.open(filename, 'r', UNICODE_ENCODING)
+        f = codecs.open(filename, 'r', UNICODE_ENCODING)
     else:
-        ifile = open(filename, 'r')
+        f = open(filename, 'r')
 
-    for line in ifile.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
+    for line in f.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
         if commentPrefix:
             if line.find(commentPrefix) != -1:
                 line = line[:line.find(commentPrefix)]
@@ -1920,6 +1896,8 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
                 continue
 
             retVal.append(line)
+
+    f.close()
 
     return retVal
 
@@ -2001,11 +1979,11 @@ def getCompiledRegex(regex, flags=0):
     """
 
     if (regex, flags) in kb.cache.regex:
-        return kb.cache.regex[(regex, flags)]
+        retVal = kb.cache.regex[(regex, flags)]
     else:
         retVal = re.compile(regex, flags)
         kb.cache.regex[(regex, flags)] = retVal
-        return retVal
+    return retVal
 
 def getPartRun():
     """
@@ -2590,16 +2568,16 @@ def getSortedInjectionTests():
     retVal = conf.tests
 
     def priorityFunction(test):
-        retVal = SORTORDER.FIRST
+        retVal = SORT_ORDER.FIRST
 
         if test.stype == PAYLOAD.TECHNIQUE.UNION:
-            retVal = SORTORDER.LAST
+            retVal = SORT_ORDER.LAST
 
         elif 'details' in test and 'dbms' in test.details:
             if test.details.dbms in Backend.getErrorParsedDBMSes():
-                retVal = SORTORDER.SECOND
+                retVal = SORT_ORDER.SECOND
             else:
-                retVal = SORTORDER.THIRD
+                retVal = SORT_ORDER.THIRD
 
         return retVal
 
@@ -2615,7 +2593,7 @@ def filterListValue(value, regex):
     """
 
     if isinstance(value, list) and regex:
-        retVal = filter(lambda word: getCompiledRegex(regex, re.I).search(word), value)
+        retVal = filter(lambda x: getCompiledRegex(regex, re.I).search(x), value)
     else:
         retVal = value
 
@@ -2688,6 +2666,7 @@ def unhandledExceptionMessage():
     errMsg += "Command line: %s\n" % " ".join(sys.argv)
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb and kb.technique else None)
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
+
     return maskSensitiveData(errMsg)
 
 def maskSensitiveData(msg):
@@ -2751,8 +2730,8 @@ def intersect(valueA, valueB, lowerCase=False):
         valueB = arrayizeValue(valueB)
 
         if lowerCase:
-            valueA = [val.lower() if isinstance(val, basestring) else val for val in valueA]
-            valueB = [val.lower() if isinstance(val, basestring) else val for val in valueB]
+            valueA = (val.lower() if isinstance(val, basestring) else val for val in valueA)
+            valueB = (val.lower() if isinstance(val, basestring) else val for val in valueB)
 
         retVal = [val for val in valueA if val in valueB]
 
@@ -2957,8 +2936,8 @@ def expandMnemonics(mnemonics, parser, args):
                 logger.debug(debugMsg)
             else:
                 found = sorted(options.keys(), key=lambda x: len(x))[0]
-                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to %s). " % (name, ", ".join("'%s'" % key for key in options.keys()))
-                warnMsg += "resolved to shortest of those available ('%s')" % found
+                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to: %s). " % (name, ", ".join("'%s'" % key for key in options.keys()))
+                warnMsg += "Resolved to shortest of those ('%s')" % found
                 logger.warn(warnMsg)
 
             found = options[found]
@@ -2988,7 +2967,7 @@ def safeCSValue(value):
 
     if retVal and isinstance(retVal, basestring):
         if not (retVal[0] == retVal[-1] == '"'):
-            if any(map(lambda x: x in retVal, [conf.csvDel, '"', '\n'])):
+            if any(map(lambda x: x in retVal, (conf.csvDel, '"', '\n'))):
                 retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal

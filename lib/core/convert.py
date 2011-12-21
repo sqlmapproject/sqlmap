@@ -45,11 +45,7 @@ def base64unpickle(value):
 
 def hexdecode(value):
     value = value.lower()
-
-    if value.startswith("0x"):
-        value = value[2:]
-
-    return value.decode("hex")
+    return (value[2:] if value.startswith("0x") else value).decode("hex")
 
 def hexencode(value):
     return value.encode("hex")
@@ -149,12 +145,13 @@ def utf8decode(value):
     return value.decode("utf-8")
 
 def htmlescape(value):
-    return value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;').replace(' ', '&nbsp;')
+    _ = (('&', '&amp;'), ('<', '&lt;'), ('>', '&gt;'), ('"', '&quot;'), ("'", '&#39;'), (' ', '&nbsp;'))
+    return reduce(lambda x, y: x.replace(y[0], y[1]), _, value)
 
 def htmlunescape(value):
     retVal = value
     if value and isinstance(value, basestring):
-        if '&' in retVal:
-            retVal = retVal.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&nbsp;', ' ')
-            retVal = re.sub('&#(\d+);', lambda x: unichr(int(x.group(1))), retVal)
+        _ = (('&amp;', '&'), ('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '))
+        retVal = reduce(lambda x, y: x.replace(y[0], y[1]), _, retVal)
+        retVal = re.sub('&#(\d+);', lambda x: unichr(int(x.group(1))), retVal)
     return retVal

@@ -215,16 +215,13 @@ class Agent:
         randStr = randomStr()
         randStr1 = randomStr()
 
-        payload = payload.replace("[RANDNUM]", str(randInt))
-        payload = payload.replace("[RANDNUM1]", str(randInt1))
-        payload = payload.replace("[RANDSTR]", randStr)
-        payload = payload.replace("[RANDSTR1]", randStr1)
-        payload = payload.replace("[DELIMITER_START]", kb.chars.start)
-        payload = payload.replace("[DELIMITER_STOP]", kb.chars.stop)
-        payload = payload.replace("[AT_REPLACE]", kb.chars.at)
-        payload = payload.replace("[SPACE_REPLACE]", kb.chars.space)
-        payload = payload.replace("[DOLLAR_REPLACE]", kb.chars.dollar)
-        payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+        _ = (
+                ("[RANDNUM]", str(randInt)), ("[RANDNUM1]", str(randInt1)), ("[RANDSTR]", randStr),\
+                ("[RANDSTR1]", randStr1), ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
+                ("[AT_REPLACE]", kb.chars.at), ("[SPACE_REPLACE]", kb.chars.space), ("[DOLLAR_REPLACE]", kb.chars.dollar),\
+                ("[SLEEPTIME]", str(conf.timeSec))
+            )
+        payload = reduce(lambda x, y: x.replace(y[0], y[1]), _, payload)
 
         if origValue is not None:
             payload = payload.replace("[ORIGVALUE]", origValue)
@@ -249,13 +246,8 @@ class Agent:
 
         return payload
 
-    def getComment(self, reqObj):
-        if "comment" in reqObj:
-            comment = reqObj.comment
-        else:
-            comment = ""
-
-        return comment
+    def getComment(self, request):
+        return request.comment if "comment" in request else ""
 
     def nullAndCastField(self, field):
         """

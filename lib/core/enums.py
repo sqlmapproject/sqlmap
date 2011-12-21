@@ -16,7 +16,7 @@ class PRIORITY:
     HIGHER = 50
     HIGHEST = 100
 
-class SORTORDER:
+class SORT_ORDER:
     FIRST = 0
     SECOND = 1
     THIRD = 2

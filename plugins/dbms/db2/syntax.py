@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.data import logger
 from lib.core.exception import sqlmapSyntaxException
-
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):

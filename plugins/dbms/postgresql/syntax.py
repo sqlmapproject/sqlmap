@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.exception import sqlmapSyntaxException
-
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
