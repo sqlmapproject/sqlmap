@@ -27,7 +27,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
-from lib.core.settings import DUMP_DEL_MARKER
 
 def queryOutputLength(expression, payload):
     """

@@ -24,7 +24,6 @@ from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import randomInt
-from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.convert import htmlunescape
 from lib.core.convert import safecharencode
@@ -129,7 +128,6 @@ def __oneShotErrorUse(expression, field):
 
         retVal = __errorReplaceChars(retVal)
 
-        #dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression, replaceNewlineTabs(retVal)))
         conf.hashDB.write(expression, retVal)
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal

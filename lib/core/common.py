@@ -93,13 +93,13 @@ from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import PRINTABLE_CHAR_REGEX
+from lib.core.settings import DUMP_DEL_MARKER
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
-from lib.core.settings import DUMP_DEL_MARKER
 from lib.core.settings import DUMP_TAB_MARKER
 from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
@@ -1350,7 +1350,7 @@ def parseUnionPage(output, unique=True):
                     continue
 
             entry = safecharencode(entry) if kb.safeCharEncode else entry
-            entry = entry.split(DUMP_DEL_MARKER if DUMP_DEL_MARKER in entry else kb.chars.delimiter)
+            entry = entry.split(kb.chars.delimiter)
 
             data.append(entry[0] if len(entry) == 1 else entry)
     else:
