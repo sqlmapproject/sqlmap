@@ -115,6 +115,9 @@ UNKNOWN_DBMS_VERSION = "Unknown"
 # dynamicity mark length used in dynamicity removal engine
 DYNAMICITY_MARK_LENGTH = 32
 
+# length of FIFO buffer for removing possible duplicates in union/inband data retrieval
+UNION_UNIQUE_FIFO_LENGTH = 10
+
 # dummy user prefix used in dictionary attack
 DUMMY_USER_PREFIX = "__dummy__"
 

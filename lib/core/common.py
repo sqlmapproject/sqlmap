@@ -112,6 +112,7 @@ from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SUPPORTED_OS
+from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
 from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.threads import getCurrentThreadData
@@ -1336,7 +1337,7 @@ def parseUnionPage(output, unique=True):
     if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
         regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
         output = re.finditer(regExpr, output, re.DOTALL | re.IGNORECASE)
-        _ = set()
+        _ = []
 
         for entry in output:
             entry = entry.group(1)
@@ -1344,7 +1345,9 @@ def parseUnionPage(output, unique=True):
             if unique:
                 key = entry.lower()
                 if key not in _:
-                    _.add(key)
+                    _.append(key)
+                    if len(_) > UNION_UNIQUE_FIFO_LENGTH:
+                        _.pop(0)
                 else:
                     continue
 
