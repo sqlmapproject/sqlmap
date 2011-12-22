@@ -368,7 +368,7 @@ def __goError(expression, expected=None, resumeValue=True, dump=False):
 
     return output
 
-def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=True, dump=False):
+def __goInband(expression, expected=None, unique=True, resumeValue=True, unpack=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
     injection vulnerability on the affected parameter.
@@ -384,11 +384,11 @@ def __goInband(expression, expected=None, sort=True, resumeValue=True, unpack=Tr
     if isinstance(output, list):
         data = output
     else:
-        data = parseUnionPage(output, expression, partial, sort)
+        data = parseUnionPage(output, expression, partial, unique)
 
     return data
 
-def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, sort=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
+def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, unique=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -429,9 +429,9 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
 
                 if expected == EXPECTED.BOOL:
-                    value = __goInband(forgeCaseExpression, expected, sort, resumeValue, unpack, dump)
+                    value = __goInband(forgeCaseExpression, expected, unique, resumeValue, unpack, dump)
                 else:
-                    value = __goInband(query, expected, sort, resumeValue, unpack, dump)
+                    value = __goInband(query, expected, unique, resumeValue, unpack, dump)
 
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE

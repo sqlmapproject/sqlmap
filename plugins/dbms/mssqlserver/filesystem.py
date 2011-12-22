@@ -94,7 +94,7 @@ class Filesystem(GenericFilesystem):
         inject.goStacked(binToHexQuery)
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), sort=False, resumeValue=False, blind=False, error=False)
+            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), unique=False, resumeValue=False, blind=False, error=False)
 
         if not result:
             result = []
@@ -108,7 +108,7 @@ class Filesystem(GenericFilesystem):
             indexRange = getRange(count)
 
             for index in indexRange:
-                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, sort=False, charsetType=3)
+                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, unique=False, charsetType=3)
                 result.append(chunk)
 
         inject.goStacked("DROP TABLE %s" % hexTbl)

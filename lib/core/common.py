@@ -1328,7 +1328,7 @@ def getRange(count, dump=False, plusOne=False):
 
     return indexRange
 
-def parseUnionPage(output, expression, partial=False, sort=True):
+def parseUnionPage(output, expression, partial=False, unique=True):
     if output is None:
         return None
 
@@ -1336,31 +1336,21 @@ def parseUnionPage(output, expression, partial=False, sort=True):
 
     if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
         regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
-
         output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
-
-        if sort:
-            _ = []
-            unique = set()
-            for entry in output:
-                key = entry.lower()
-                if key not in unique:
-                    unique.add(key)
-                    _.append(entry)
-            output = _
+        _ = set()
 
         for entry in output:
+            if unique:
+                key = entry.lower()
+                if key not in _:
+                    _.add(key)
+                else:
+                    continue
+
             entry = safecharencode(entry) if kb.safeCharEncode else entry
+            entry = entry.split(DUMP_DEL_MARKER if DUMP_DEL_MARKER in entry else kb.chars.delimiter)
 
-            if DUMP_DEL_MARKER in entry:
-                entry = entry.split(DUMP_DEL_MARKER)
-            else:
-                entry = entry.split(kb.chars.delimiter)
-
-            if len(entry) == 1:
-                data.append(entry[0])
-            else:
-                data.append(entry)
+            data.append(entry[0] if len(entry) == 1 else entry)
     else:
         data = output
 
