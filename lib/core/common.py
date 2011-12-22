@@ -1331,8 +1331,6 @@ def parseUnionPage(output, unique=True):
     if output is None:
         return None
 
-    import pdb
-    pdb.set_trace()
     data = BigArray()
 
     if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
