@@ -101,6 +101,7 @@ from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
 from lib.core.settings import DUMP_TAB_MARKER
+from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -1333,6 +1334,10 @@ def parseUnionPage(output, unique=True):
         return None
 
     if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
+        if len(output) > LARGE_OUTPUT_THRESHOLD:
+            warnMsg = "large output detected. This might take a while"
+            logger.warn(warnMsg)
+
         data = BigArray()
         _ = []
 

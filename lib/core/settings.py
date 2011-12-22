@@ -425,3 +425,6 @@ DEFAULT_COOKIE_DELIMITER = ';'
 
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32
+
+# Warn user of possible delay due to large page dump in full UNION query injections
+LARGE_OUTPUT_THRESHOLD = 1024**2
