@@ -1328,7 +1328,7 @@ def getRange(count, dump=False, plusOne=False):
 
     return indexRange
 
-def parseUnionPage(output, expression, partial=False, unique=True):
+def parseUnionPage(output, unique=True):
     if output is None:
         return None
 
@@ -1336,10 +1336,12 @@ def parseUnionPage(output, expression, partial=False, unique=True):
 
     if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
         regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
-        output = re.findall(regExpr, output, re.DOTALL | re.IGNORECASE)
+        output = re.finditer(regExpr, output, re.DOTALL | re.IGNORECASE)
         _ = set()
 
         for entry in output:
+            entry = entry.group(1)
+
             if unique:
                 key = entry.lower()
                 if key not in _:

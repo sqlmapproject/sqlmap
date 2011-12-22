@@ -233,13 +233,13 @@ def unionUse(expression, unpack=True, dump=False):
                 countedExpression = countedExpression[:untilOrderChar]
 
             count = resume(countedExpression, None)
-            count = parseUnionPage(count, countedExpression)
+            count = parseUnionPage(count)
 
             if not count or not count.isdigit():
                 output = __oneShotUnionUse(countedExpression, unpack)
 
                 if output:
-                    count = parseUnionPage(output, countedExpression)
+                    count = parseUnionPage(output)
 
             if isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
