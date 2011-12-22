@@ -131,8 +131,8 @@ def __oneShotErrorUse(expression, field):
         conf.hashDB.write(expression, retVal)
 
     else:
-        check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-        retVal = extractRegexResult(check, retVal, re.DOTALL | re.IGNORECASE) or retVal
+        _ = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
+        retVal = extractRegexResult(_, retVal, re.DOTALL | re.IGNORECASE) or retVal
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 
