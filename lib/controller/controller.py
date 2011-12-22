@@ -176,11 +176,15 @@ def __saveToSessionFile():
 
         setInjection(inj)
 
-def __saveAbsFilePaths():
+def __saveToHashDB():
     key = "kb.absFilePaths"
     value = unserializeObject(conf.hashDB.retrieve(key)) or set()
     value.update(kb.absFilePaths)
     conf.hashDB.write(key, serializeObject(value))
+
+    key = "kb.chars"
+    if not conf.hashDB.retrieve(key):
+        conf.hashDB.write(key, serializeObject(kb.chars))
 
 def __saveToResultsFile():
     if not conf.resultsFP:
@@ -568,7 +572,7 @@ def start():
 
                 __saveToSessionFile()
                 __saveToResultsFile()
-                __saveAbsFilePaths()
+                __saveToHashDB()
                 __showInjections()
                 __selectInjection()
 

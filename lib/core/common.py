@@ -2505,7 +2505,6 @@ def initTechnique(technique=None):
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
             kb.matchRatio = data.matchRatio
-            kb.chars = data.chars
 
             # Restoring stored conf options
             for key, value in kb.injection.conf.items():

@@ -210,6 +210,7 @@ def __resumeHashDBValues():
     """
 
     kb.absFilePaths = unserializeObject(conf.hashDB.retrieve("kb.absFilePaths")) or kb.absFilePaths
+    kb.chars = unserializeObject(conf.hashDB.retrieve("kb.chars")) or kb.chars
 
 def __setOutputResume():
     """
