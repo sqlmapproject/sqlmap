@@ -62,6 +62,7 @@ from lib.core.settings import COMMON_USER_COLUMNS
 from lib.core.settings import DUMMY_USER_PREFIX
 from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
+from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
 from lib.core.settings import IS_WIN
 from lib.core.settings import ITOA64
 from lib.core.settings import PYVERSION
@@ -322,6 +323,7 @@ def attackDumpedTable():
         columns = table.keys()
         count = table["__infos__"]["count"]
 
+        found = False
         colUser = ''
         colPasswords = set()
         attack_dict = {}
@@ -332,6 +334,9 @@ def attackDumpedTable():
                 break
 
         for i in xrange(count):
+            if not found and i > HASH_RECOGNITION_QUIT_THRESHOLD:
+                break
+
             for column in columns:
                 if column == colUser or column == '__infos__':
                     continue
@@ -342,6 +347,8 @@ def attackDumpedTable():
                 value = table[column]['values'][i]
 
                 if hashRecognition(value):
+                    found = True
+
                     if colUser and i < len(table[colUser]['values']):
                         if table[colUser]['values'][i] not in attack_dict:
                             attack_dict[table[colUser]['values'][i]] = []

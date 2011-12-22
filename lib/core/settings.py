@@ -431,3 +431,6 @@ LARGE_OUTPUT_THRESHOLD = 1024**2
 
 # On huge tables there is a considerable slowdown if every row retrieval requires ORDER BY (most noticable in table dumping using ERROR injections)
 SLOW_ORDER_COUNT_THRESHOLD = 10000
+
+# Give up on hash recognition if nothing was found in first given number of rows
+HASH_RECOGNITION_QUIT_THRESHOLD = 10000

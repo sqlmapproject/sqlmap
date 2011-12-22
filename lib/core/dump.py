@@ -411,8 +411,9 @@ class Dump:
             rtable.beginTransaction()
 
         if count > TRIM_STDOUT_DUMP_SIZE:
-            warnMsg = "console output will be trimmed "
-            warnMsg += "due to the large table size"
+            warnMsg = "console output will be trimmed to "
+            warnMsg += "last %d rows due to " % TRIM_STDOUT_DUMP_SIZE
+            warnMsg += "large table size"
             logger.warning(warnMsg)
 
         for i in xrange(count):
