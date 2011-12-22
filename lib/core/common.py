@@ -112,7 +112,6 @@ from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SUPPORTED_OS
-from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.threads import getCurrentThreadData
@@ -1332,6 +1331,8 @@ def parseUnionPage(output, unique=True):
     if output is None:
         return None
 
+    import pdb
+    pdb.set_trace()
     data = BigArray()
 
     if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
@@ -2506,7 +2507,7 @@ def initTechnique(technique=None):
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
             kb.matchRatio = data.matchRatio
-            kb.chars = kb.injection.chars
+            kb.chars = data.chars
 
             # Restoring stored conf options
             for key, value in kb.injection.conf.items():
@@ -2524,7 +2525,7 @@ def initTechnique(technique=None):
 
     except sqlmapDataException, _:
         errMsg = "missing data in old session file(s). "
-        errMsg += "please use '--flush-session' to deal "
+        errMsg += "Please use '--flush-session' to deal "
         errMsg += "with this error"
         raise sqlmapNoneDataException, errMsg
 

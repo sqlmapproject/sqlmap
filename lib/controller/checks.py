@@ -472,14 +472,13 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].comment = comment
                         injection.data[stype].templatePayload = templatePayload
                         injection.data[stype].matchRatio = kb.matchRatio
+                        injection.data[stype].chars = kb.chars
 
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.titles = conf.titles
                         injection.conf.string = conf.string
                         injection.conf.regexp = conf.regexp
                         injection.conf.optimize = conf.optimize
-
-                        injection.chars = kb.chars
 
                         if conf.beep or conf.realTest:
                             beep()
