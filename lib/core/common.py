@@ -1863,7 +1863,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     Returns newline delimited items contained inside file
     """
 
-    retVal = list() if not unique else set()
+    retVal = list() if not unique else OrderedDict()
 
     checkFile(filename)
 
@@ -1889,11 +1889,11 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
                     continue
 
                 if unique:
-                    retVal.add(line)
+                    retVal[line] = True
                 else:
                     retVal.append(line)
 
-    return retVal
+    return retVal if not unique else retVal.keys()
 
 def goGoodSamaritan(prevValue, originalCharset):
     """
