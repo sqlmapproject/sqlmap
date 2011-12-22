@@ -1332,12 +1332,12 @@ def parseUnionPage(output, unique=True):
     if output is None:
         return None
 
-    data = BigArray()
-
     if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
+        data = BigArray()
+        _ = []
+
         regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
         output = re.finditer(regExpr, output, re.DOTALL | re.IGNORECASE)
-        _ = []
 
         for entry in output:
             entry = entry.group(1)
