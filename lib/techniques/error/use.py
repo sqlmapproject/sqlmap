@@ -24,6 +24,7 @@ from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import randomInt
+from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.convert import htmlunescape
 from lib.core.convert import safecharencode
@@ -38,6 +39,7 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import FROM_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
+from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -292,9 +294,8 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
             # Count the number of SQL query entries output
             countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
 
-            if re.search(" ORDER BY ", expression, re.I):
-                untilOrderChar = countedExpression.index(" ORDER BY ")
-                countedExpression = countedExpression[:untilOrderChar]
+            if " ORDER BY " in expression:
+                countedExpression = countedExpression[:countedExpression.index(" ORDER BY ")]
 
             count = resume(countedExpression, None)
 
@@ -327,6 +328,14 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 logger.warn(warnMsg)
 
                 return outputs
+
+            if " ORDER BY " in expression and (stopLimit - startLimit) > SLOW_ORDER_COUNT_THRESHOLD:
+                message = "due to huge table size do you want to remove "
+                message += "ORDER BY clause gaining speed over consistency? [y/N] "
+                output = readInput(message, default="N")
+
+                if output and output[0] in ("y", "Y"):
+                    expression = expression[:expression.index(" ORDER BY ")]
 
             threadData = getCurrentThreadData()
             threadData.shared.limits = iter(xrange(startLimit, stopLimit))

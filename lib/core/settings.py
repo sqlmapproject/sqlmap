@@ -428,3 +428,6 @@ HASHDB_FLUSH_THRESHOLD = 32
 
 # Warn user of possible delay due to large page dump in full UNION query injections
 LARGE_OUTPUT_THRESHOLD = 1024**2
+
+# On huge tables there is a considerable slowdown if every row retrieval requires ORDER BY (most noticable in table dumping using ERROR injections)
+SLOW_ORDER_COUNT_THRESHOLD = 10000
