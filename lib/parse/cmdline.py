@@ -534,6 +534,9 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Use Tor anonymity network")
 
+        general.add_option("--tor-port", dest="torPort", 
+                                  help="Set Tor proxy port other than default")
+
         general.add_option("--tor-type", dest="torType", 
                                   help="Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)")
 

@@ -173,6 +173,7 @@ optDict = {
                                "replicate":         "boolean",
                                "updateAll":         "boolean",
                                "tor":               "boolean",
+                               "torPort":           "integer",
                                "torType":           "string",
                              },
 

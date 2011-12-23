@@ -1338,6 +1338,9 @@ def __cleanupOptions():
     if conf.csvDel:
         conf.csvDel = conf.csvDel.decode('string_escape') # e.g. '\\t' -> '\t'
 
+    if conf.torPort and conf.torPort.isdigit():
+        conf.torPort = int(conf.torPort)
+
     if conf.torType:
         conf.torType = conf.torType.upper()
 
@@ -1701,7 +1704,7 @@ def __setTorHttpProxySettings():
 
     found = None
 
-    for port in DEFAULT_TOR_HTTP_PORTS:
+    for port in (DEFAULT_TOR_HTTP_PORTS if not conf.torPort else (conf.torPort, )):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((LOCALHOST, port))
@@ -1732,7 +1735,7 @@ def __setTorSocksProxySettings():
     logger.info(infoMsg)
 
     # Has to be SOCKS5 to prevent DNS leaks (http://en.wikipedia.org/wiki/Tor_%28anonymity_network%29)
-    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXYTYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, DEFAULT_TOR_SOCKS_PORT)
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXYTYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, conf.torPort or DEFAULT_TOR_SOCKS_PORT)
     socks.wrapmodule(urllib2)
 
 def __checkTor():
@@ -1819,6 +1822,10 @@ def __basicOptionValidation():
 
     if conf.checkTor and not any([conf.tor, conf.proxy]):
         errMsg = "switch --check-tor requires usage of switch --tor (or --proxy with HTTP proxy address using Tor)"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.torPort is not None and not (isinstance(conf.torPort, int) and conf.torPort > 0):
+        errMsg = "value for --tor-port (torPort) option must be an integer value greater than zero (>0)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.torType not in getPublicTypeMembers(PROXYTYPE, True):
