@@ -60,6 +60,7 @@ from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.defaults import defaults
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
@@ -1648,11 +1649,11 @@ def __setVerbosity():
     elif conf.verbose == 2:
         logger.setLevel(logging.DEBUG)
     elif conf.verbose == 3:
-        logger.setLevel(9)
+        logger.setLevel(CUSTOM_LOGGING.PAYLOAD)
     elif conf.verbose == 4:
-        logger.setLevel(8)
+        logger.setLevel(CUSTOM_LOGGING.TRAFFIC_OUT)
     elif conf.verbose >= 5:
-        logger.setLevel(7)
+        logger.setLevel(CUSTOM_LOGGING.TRAFFIC_IN)
 
 def __mergeOptions(inputOptions, overrideOptions):
     """

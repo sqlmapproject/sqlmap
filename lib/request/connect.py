@@ -44,6 +44,7 @@ from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
@@ -300,7 +301,7 @@ class Connect:
 
             threadData.lastRequestMsg = requestMsg
 
-            logger.log(8, requestMsg)
+            logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
             conn = urllib2.urlopen(req)
 
@@ -426,7 +427,7 @@ class Connect:
             elif conf.verbose > 5:
                 responseMsg += "%s\n\n%s\n" % (logHeaders, page)
 
-            logger.log(7, responseMsg)
+            logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
             if e.code == httplib.UNAUTHORIZED:
                 errMsg = "not authorized, try to provide right HTTP "
@@ -516,7 +517,7 @@ class Connect:
         elif conf.verbose > 5:
             responseMsg += "%s\n\n%s\n" % (logHeaders, page)
 
-        logger.log(7, responseMsg)
+        logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
         return page, responseHeaders, code
 
@@ -556,7 +557,7 @@ class Connect:
 
                 value = agent.replacePayload(value, payload)
 
-            logger.log(9, payload)
+            logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
 
         if place == PLACE.COOKIE and conf.cookieUrlencode:
             value = agent.removePayloadDelimiters(value)

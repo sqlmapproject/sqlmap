@@ -1804,19 +1804,12 @@ def stdev(values):
 
     key = (values[0], values[-1], len(values))
 
-    retVal = None
-
     if key in kb.cache.stdev:
         retVal = kb.cache.stdev[key]
     else:
-        summa = 0.0
         avg = average(values)
-
-        for value in values:
-            value = value or 0
-            summa += pow(value - avg, 2)
-
-        retVal = sqrt(summa/(len(values) - 1))
+        _ = reduce(lambda x, y: x + pow((y or 0) - avg, 2), values, 0.0)
+        retVal = sqrt(_/(len(values) - 1))
         kb.cache.stdev[key] = retVal
 
     return retVal
@@ -2240,6 +2233,9 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
     """
     Logs HTTP traffic to the output file
     """
+
+    if not conf.trafficFile:
+        return
 
     kb.locks.logLock.acquire()
 

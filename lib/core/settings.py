@@ -12,6 +12,7 @@ import os
 import subprocess
 import sys
 
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import PLACE
 from lib.core.revision import getRevisionNumber
@@ -33,9 +34,9 @@ LOWER_RATIO_BOUND = 0.02
 UPPER_RATIO_BOUND = 0.98
 
 # sqlmap logger
-logging.addLevelName(9, "PAYLOAD")
-logging.addLevelName(8, "TRAFFIC OUT")
-logging.addLevelName(7, "TRAFFIC IN")
+logging.addLevelName(CUSTOM_LOGGING.PAYLOAD, "PAYLOAD")
+logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_OUT, "TRAFFIC OUT")
+logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_IN, "TRAFFIC IN")
 
 LOGGER = logging.getLogger("sqlmapLog")
 LOGGER_HANDLER = logging.StreamHandler(sys.stdout)

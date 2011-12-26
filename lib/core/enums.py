@@ -36,6 +36,11 @@ class DBMS:
     SYBASE = "Sybase"
     DB2 = "IBM DB2"    
 
+class CUSTOM_LOGGING:
+    PAYLOAD = 9
+    TRAFFIC_OUT = 8
+    TRAFFIC_IN = 7
+
 class OS:
     LINUX = "Linux"
     WINDOWS = "Windows"
