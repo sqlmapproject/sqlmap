@@ -14,6 +14,7 @@ import httplib
 import inspect
 import logging
 import ntpath
+import optparse
 import os
 import pickle
 import posixpath
@@ -35,6 +36,7 @@ from ConfigParser import RawConfigParser
 from StringIO import StringIO
 from difflib import SequenceMatcher
 from math import sqrt
+from optparse import OptionValueError
 from subprocess import PIPE
 from subprocess import Popen as execute
 from tempfile import NamedTemporaryFile
@@ -2940,7 +2942,10 @@ def expandMnemonics(mnemonics, parser, args):
             logger.debug(debugMsg)
 
         if found:
-            value = found.convert_value(found, value)
+            try:
+                value = found.convert_value(found, value)
+            except OptionValueError:
+                value = None
 
             if value is not None:
                 setattr(args, found.dest, value)
