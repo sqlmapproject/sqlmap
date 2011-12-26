@@ -491,6 +491,7 @@ class des(_baseDes):
     def __des_crypt(self, block, crypt_type):
         """Crypt the block of data through DES bit-manipulation"""
         block = self.__permutate(des.__ip, block)
+        Bn = [0] * 32
         self.L = block[:32]
         self.R = block[32:]
 
@@ -525,7 +526,6 @@ class des(_baseDes):
 
             # Permutate B[1] to B[8] using the S-Boxes
             j = 0
-            Bn = [0] * 32
             pos = 0
             while j < 8:
                 # Work out the offsets
