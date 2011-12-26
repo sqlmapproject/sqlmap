@@ -155,8 +155,9 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         print
         kb.threadContinue = False
         kb.threadException = True
-        logger.info("waiting for threads to finish (Ctrl+C was pressed)")
 
+        if numThreads > 1:
+            logger.info("waiting for threads to finish (Ctrl+C was pressed)")
         try:
             while (threading.activeCount() > 1):
                 pass
