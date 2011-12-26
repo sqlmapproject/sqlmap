@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-#Copyright (c) 2010, Miroslav Stampar <miroslav.stampar@gmail.com>
-#Added formatXML method
-
 #Copyright (c) 2010, Chris Hall <chris.hall@mod10.net>
 #All rights reserved.
 
