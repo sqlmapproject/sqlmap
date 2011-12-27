@@ -60,7 +60,6 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
 from lib.core.settings import DUMMY_USER_PREFIX
-from lib.core.settings import GENERAL_IP_ADDRESS_REGEX
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
 from lib.core.settings import IS_WIN
@@ -402,7 +401,7 @@ def hashRecognition(value):
             elif isMySQL and regex == HASH.ORACLE_OLD:
                 continue
             elif regex == HASH.CRYPT_GENERIC:
-                if any((getCompiledRegex(GENERAL_IP_ADDRESS_REGEX).match(value), value.lower() == value, value.upper() == value, value.isdigit())):
+                if any((value.lower() == value, value.upper() == value)):
                     continue
             elif getCompiledRegex(regex).match(value):
                 retVal = regex

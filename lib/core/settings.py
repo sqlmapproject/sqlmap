@@ -253,9 +253,6 @@ META_REFRESH_REGEX = r'<meta http-equiv="?refresh"?[^>]+content="?[^">]+url=(?P<
 # Regular expression used for parsing empty fields in tested form data
 EMPTY_FORM_FIELDS_REGEX = r'(?P<result>[^=]+=(&|\Z))'
 
-# Regular expression for general IP address matching
-GENERAL_IP_ADDRESS_REGEX = r'\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z'
-
 # Regular expression for soap message recognition
 SOAP_REGEX = r"\A(<\?xml[^>]+>)?\s*<soap.+</soap"
 
