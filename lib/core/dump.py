@@ -24,6 +24,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
@@ -450,7 +451,10 @@ class Dump:
                     field += 1
 
             if conf.replicate:
-                rtable.insert(values)
+                try:
+                    rtable.insert(values)
+                except sqlmapValueException:
+                    pass
 
             self.__write("|", console=console)
 
