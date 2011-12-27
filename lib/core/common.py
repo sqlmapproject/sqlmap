@@ -836,10 +836,11 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         logger.log(level, message)
 
 def dataToStdout(data, forceOutput=False):
-    if not ('threadException' in kb and kb.threadException):
+    if not kb.get("threadException"):
         if forceOutput or not getCurrentThreadData().disableStdOut:
             try:
-                logging._acquireLock()
+                if kb.get("multiThreadMode"):
+                    logging._acquireLock()
                 # Reference: http://bugs.python.org/issue1602
                 if IS_WIN:
                     output = data.encode('ascii', "replace")
@@ -861,7 +862,8 @@ def dataToStdout(data, forceOutput=False):
                 sys.stdout.write(data.encode(UNICODE_ENCODING))
             finally:
                 sys.stdout.flush()
-                logging._releaseLock()
+                if kb.get("multiThreadMode"):
+                    logging._releaseLock()
 
 def dataToSessionFile(data):
     if not conf.sessionFile or kb.suppressSession:
