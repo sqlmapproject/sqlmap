@@ -278,10 +278,6 @@ def unionUse(expression, unpack=True, dump=False):
                 debugMsg += "large number of rows. It might take too long"
                 logger.debug(debugMsg)
 
-            lockNames = ('limits', 'value')
-            for lock in lockNames:
-                kb.locks[lock] = threading.Lock()
-
             try:
                 def unionThread():
                     threadData = getCurrentThreadData()
@@ -326,9 +322,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
 
-                                kb.locks.ioLock.acquire()
                                 dataToStdout(status, True)
-                                kb.locks.ioLock.release()
 
                 runThreads(numThreads, unionThread)
 

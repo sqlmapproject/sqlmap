@@ -81,13 +81,13 @@ def tableExists(tableFile, regex=None):
         threadData = getCurrentThreadData()
 
         while kb.threadContinue:
-            kb.locks.countLock.acquire()
+            kb.locks.count.acquire()
             if threadData.shared.count < threadData.shared.limit:
                 table = safeSQLIdentificatorNaming(tables[threadData.shared.count], True)
                 threadData.shared.count += 1
-                kb.locks.countLock.release()
+                kb.locks.count.release()
             else:
-                kb.locks.countLock.release()
+                kb.locks.count.release()
                 break
 
             if conf.db and METADB_SUFFIX not in conf.db:
@@ -97,7 +97,7 @@ def tableExists(tableFile, regex=None):
 
             result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
 
-            kb.locks.ioLock.acquire()
+            kb.locks.io.acquire()
 
             if result and table.lower() not in threadData.shared.unique:
                 threadData.shared.outputs.append(table)
@@ -112,7 +112,7 @@ def tableExists(tableFile, regex=None):
                 status = '%d/%d items (%d%s)' % (threadData.shared.count, threadData.shared.limit, round(100.0*threadData.shared.count/threadData.shared.limit), '%')
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
-            kb.locks.ioLock.release()
+            kb.locks.io.release()
 
     try:
         runThreads(conf.threads, tableExistsThread, threadChoice=True)
@@ -180,18 +180,18 @@ def columnExists(columnFile, regex=None):
         threadData = getCurrentThreadData()
 
         while kb.threadContinue:
-            kb.locks.countLock.acquire()
+            kb.locks.count.acquire()
             if threadData.shared.count < threadData.shared.limit:
                 column = safeSQLIdentificatorNaming(columns[threadData.shared.count])
                 threadData.shared.count += 1
-                kb.locks.countLock.release()
+                kb.locks.count.release()
             else:
-                kb.locks.countLock.release()
+                kb.locks.count.release()
                 break
 
             result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (column, table)))
 
-            kb.locks.ioLock.acquire()
+            kb.locks.io.acquire()
 
             if result:
                 threadData.shared.outputs.append(column)
@@ -205,7 +205,7 @@ def columnExists(columnFile, regex=None):
                 status = '%d/%d items (%d%s)' % (threadData.shared.count, threadData.shared.limit, round(100.0*threadData.shared.count/threadData.shared.limit), '%')
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
-            kb.locks.ioLock.release()
+            kb.locks.io.release()
 
     try:
         runThreads(conf.threads, columnExistsThread, threadChoice=True)

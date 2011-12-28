@@ -173,9 +173,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
                 return None
 
             if output is not None:
-                kb.locks.ioLock.acquire()
                 dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
-                kb.locks.ioLock.release()
 
         if isinstance(num, int):
             expression = origExpr
@@ -346,10 +344,6 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 debugMsg = "suppressing possible resume console info because of "
                 debugMsg += "large number of rows. It might take too long"
                 logger.debug(debugMsg)
-
-            lockNames = ('limits', 'outputs')
-            for lock in lockNames:
-                kb.locks[lock] = threading.Lock()
 
             try:
                 def errorThread():

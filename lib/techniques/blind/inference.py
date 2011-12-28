@@ -320,25 +320,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         threadData.shared.value = [ None ] * length
         threadData.shared.index = [ firstChar ]    # As list for python nested function scoping
 
-        lockNames = ('iolock', 'idxlock', 'valuelock')
-        for lock in lockNames:
-            kb.locks[lock] = threading.Lock()
-
         try:
             def blindThread():
                 threadData = getCurrentThreadData()
 
                 while kb.threadContinue:
-                    kb.locks.idxlock.acquire()
+                    kb.locks.index.acquire()
 
                     if threadData.shared.index[0] >= length:
-                        kb.locks.idxlock.release()
+                        kb.locks.index.release()
 
                         return
 
                     threadData.shared.index[0] += 1
                     curidx = threadData.shared.index[0]
-                    kb.locks.idxlock.release()
+                    kb.locks.index.release()
 
                     if kb.threadContinue:
                         charStart = time.time()
@@ -348,10 +344,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         break
 
-                    kb.locks.valuelock.acquire()
+                    kb.locks.value.acquire()
                     threadData.shared.value[curidx-1] = val
                     currentValue = list(threadData.shared.value)
-                    kb.locks.valuelock.release()
+                    kb.locks.value.release()
 
                     if kb.threadContinue:
                         if showEta:
@@ -388,9 +384,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
                                 output += status if count != length else " "*len(status)
 
-                                kb.locks.iolock.acquire()
                                 dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
-                                kb.locks.iolock.release()
 
                 if not kb.threadContinue:
                     if int(threading.currentThread().getName()) == numThreads - 1:

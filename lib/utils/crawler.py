@@ -39,10 +39,6 @@ class Crawler:
             threadData = getCurrentThreadData()
             threadData.shared.outputs = oset()
 
-            lockNames = ('limits', 'outputs', 'ioLock')
-            for lock in lockNames:
-                kb.locks[lock] = threading.Lock()
-
             def crawlThread():
                 threadData = getCurrentThreadData()
 
@@ -100,11 +96,9 @@ class Crawler:
                                 findPageForms(content, current, False, True)
 
                     if conf.verbose in (1, 2):
-                        kb.locks.ioLock.acquire()
                         threadData.shared.count += 1
                         status = '%d/%d links visited (%d%s)' % (threadData.shared.count, threadData.shared.length, round(100.0*threadData.shared.count/threadData.shared.length), '%')
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
-                        kb.locks.ioLock.release()
 
             threadData.shared.deeper = set()
             threadData.shared.unprocessed = set([conf.url])

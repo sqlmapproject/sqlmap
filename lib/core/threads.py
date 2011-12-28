@@ -188,6 +188,10 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.threadContinue = True
         kb.threadException = False
 
+        for lock in kb.locks.values():
+            if lock.locked_lock():
+                lock.release()
+
         if conf.get("hashDB", None):
             conf.hashDB.flush(True)
 

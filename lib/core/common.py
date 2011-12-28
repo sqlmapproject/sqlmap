@@ -1773,7 +1773,7 @@ def readCachedFileContent(filename, mode='rb'):
     """
 
     if filename not in kb.cache.content:
-        kb.locks.cacheLock.acquire()
+        kb.locks.cache.acquire()
 
         if filename not in kb.cache.content:
             checkFile(filename)
@@ -1781,7 +1781,7 @@ def readCachedFileContent(filename, mode='rb'):
                 content = f.read()
                 kb.cache.content[filename] = content
 
-        kb.locks.cacheLock.release()
+        kb.locks.cache.release()
 
     return kb.cache.content[filename]
 
@@ -2241,13 +2241,13 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
     if not conf.trafficFile:
         return
 
-    kb.locks.logLock.acquire()
+    kb.locks.log.acquire()
 
     dataToTrafficFile("%s%s" % (requestLogMsg, os.linesep))
     dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
     dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
-    kb.locks.logLock.release()
+    kb.locks.log.release()
 
 def getPageTemplate(payload, place):
     """
