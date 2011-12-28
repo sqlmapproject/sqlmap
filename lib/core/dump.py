@@ -8,8 +8,10 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
+import cStringIO
 import re
 import os
+import threading
 
 from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
@@ -26,6 +28,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
+from lib.core.settings import BUFFERED_LOG_SIZE
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 
@@ -39,16 +42,32 @@ class Dump:
     def __init__(self):
         self.__outputFile = None
         self.__outputFP = None
+        self.__outputBP = None
+        self.__lock = threading.Lock()
 
     def __write(self, data, n=True, console=True):
         text = "%s%s" % (data, "\n" if n else " ")
         if console:
             dataToStdout(text)
 
-        self.__outputFP.write(text)
-        self.__outputFP.flush()
+        if kb.get("multiThreadMode"):
+            self.__lock.acquire()
+
+        self.__outputBP.write(text)
+
+        if self.__outputBP.tell() > BUFFERED_LOG_SIZE:
+            self.flush()
+
+        if kb.get("multiThreadMode"):
+            self.__lock.release()
 
         kb.dataOutputFlag = True
+
+    def flush(self):
+        if self.__outputBP and self.__outputFP and self.__outputBP.tell() > 0:
+            _ = self.__outputBP.getvalue()
+            self.__outputBP.reset()
+            self.__outputFP.write(_)
 
     def __formatString(self, inpStr):
         return restoreDumpMarkedChars(getUnicode(inpStr))
@@ -56,6 +75,7 @@ class Dump:
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
         self.__outputFP = codecs.open(self.__outputFile, "ab", UNICODE_ENCODING)
+        self.__outputBP = cStringIO.StringIO()
 
     def getOutputFile(self):
         return self.__outputFile

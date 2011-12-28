@@ -35,6 +35,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.dump import dumper
 from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapSilentQuitException
@@ -44,7 +45,6 @@ from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
-from lib.core.xmldump import closeDumper
 from lib.parse.cmdline import cmdLineParser
 
 def modulePath():
@@ -85,27 +85,23 @@ def main():
     except sqlmapUserQuitException:
         errMsg = "user quit"
         logger.error(errMsg)
-        closeDumper(False, errMsg)
 
     except sqlmapSilentQuitException:
-        closeDumper(False)
+        pass
 
     except exceptionsTuple, e:
         e = getUnicode(e)
         logger.critical(e)
-        closeDumper(False, e)
 
     except KeyboardInterrupt:
         print
         errMsg = "user aborted"
         logger.error(errMsg)
-        closeDumper(False, errMsg)
 
     except EOFError:
         print
         errMsg = "exit"
         logger.error(errMsg)
-        closeDumper(False, errMsg)
 
     except SystemExit:
         pass
@@ -115,10 +111,6 @@ def main():
         errMsg = unhandledExceptionMessage()
         logger.critical(errMsg)
         traceback.print_exc()
-        closeDumper(False, errMsg)
-
-    else:
-        closeDumper(True)
 
     finally:
         dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
@@ -126,11 +118,13 @@ def main():
         kb.threadContinue = False
         kb.threadException = True
 
-        if conf.get('hashDB', None):
+        if conf.get("hashDB", None):
             try:
                 conf.hashDB.flush(True)
             except KeyboardInterrupt:
                 pass
+
+        dumper.flush()
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if hasattr(conf, "threads") and conf.threads > 1:

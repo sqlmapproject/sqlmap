@@ -432,3 +432,6 @@ SLOW_ORDER_COUNT_THRESHOLD = 10000
 
 # Give up on hash recognition if nothing was found in first given number of rows
 HASH_RECOGNITION_QUIT_THRESHOLD = 10000
+
+# Size of a buffer used for log file output
+BUFFERED_LOG_SIZE = 10000
