@@ -11,6 +11,8 @@ import hashlib
 import sqlite3
 import threading
 
+from lib.core.common import serializeObject
+from lib.core.common import unserializeObject
 from lib.core.data import conf
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
@@ -51,7 +53,7 @@ class HashDB(object):
         retVal = int(hashlib.md5(key).hexdigest()[:8], 16)
         return retVal
 
-    def retrieve(self, key):
+    def retrieve(self, key, unserialize=False):
         retVal = None
         if key:
             hash_ = HashDB.hashKey(key)
@@ -66,13 +68,13 @@ class HashDB(object):
                             raise
                     else:
                         break
-        return retVal
+        return retVal if not unserialize else unserializeObject(retVal)
 
-    def write(self, key, value):
+    def write(self, key, value, serialize=False):
         if key:
             hash_ = HashDB.hashKey(key)
             self._cache_lock.acquire()
-            self._write_cache[hash_] = value
+            self._write_cache[hash_] = value if not serialize else serializeObject(value)
             self._cache_lock.release()
 
         if getCurrentThreadName() in ('0', 'MainThread'):

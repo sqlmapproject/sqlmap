@@ -17,7 +17,6 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import intersect
 from lib.core.common import paramToDict
 from lib.core.common import readInput
-from lib.core.common import unserializeObject
 from lib.core.convert import urldecode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
@@ -25,6 +24,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.dump import dumper
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapFilePathException
@@ -209,8 +209,10 @@ def __resumeHashDBValues():
     Resume stored data values from HashDB
     """
 
-    kb.absFilePaths = unserializeObject(conf.hashDB.retrieve("kb.absFilePaths")) or kb.absFilePaths
-    kb.chars = unserializeObject(conf.hashDB.retrieve("kb.chars")) or kb.chars
+    kb.absFilePaths = conf.hashDB.retrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or kb.absFilePaths
+    kb.chars = conf.hashDB.retrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
+    kb.brute.tables = conf.hashDB.retrieve(HASHDB_KEYS.KB_BRUTE_TABLES, True) or kb.brute.tables
+    kb.brute.columns = conf.hashDB.retrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
 
 def __setOutputResume():
     """

@@ -274,37 +274,6 @@ def resumeConfKb(expression, url, value):
     elif conf.freshQueries:
         pass
 
-    elif expression == "TABLE_EXISTS" and url == conf.url:
-        table = unSafeFormatString(value[:-1])
-        split = '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.'
-
-        if split in table:
-            db, table = table.split(split)
-        else:
-            db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
-
-        infoMsg = "resuming brute forced table name "
-        infoMsg += "'%s' from session file" % table
-        logger.info(infoMsg)
-
-        kb.brute.tables.append((db, table))
-
-    elif expression == "COLUMN_EXISTS" and url == conf.url:
-        table, column = unSafeFormatString(value[:-1]).split('|')
-        colName, colType = column.split(' ')
-        split = '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.'
-
-        if split in table:
-            db, table = table.split(split)
-        else:
-            db = "%s%s" % (Backend.getIdentifiedDbms(), METADB_SUFFIX)
-
-        infoMsg = "resuming brute forced column name "
-        infoMsg += "'%s' for table '%s' from session file" % (colName, table)
-        logger.info(infoMsg)
-
-        kb.brute.columns.append((db, table, colName, colType))
-
     elif expression == "xp_cmdshell availability" and url == conf.url:
         kb.xpCmdshellAvailable = True if unSafeFormatString(value[:-1]).lower() == "true" else False
         infoMsg = "resuming xp_cmdshell availability"

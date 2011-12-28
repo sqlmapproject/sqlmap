@@ -11,7 +11,6 @@ import threading
 import time
 
 from lib.core.common import clearConsoleLine
-from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import filterListValue
 from lib.core.common import getFileItems
@@ -28,6 +27,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import HASHDB_KEYS
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapThreadException
@@ -103,10 +103,6 @@ def tableExists(tableFile, regex=None):
                 threadData.shared.outputs.append(table)
                 threadData.shared.unique.add(table.lower())
 
-                dataToSessionFile("[%s][%s][%s][TABLE_EXISTS][%s]\n" % (conf.url,\
-                  kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]),\
-                  safeFormatString(fullTableName)))
-
                 if conf.verbose in (1, 2):
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), table)
@@ -138,6 +134,12 @@ def tableExists(tableFile, regex=None):
                 kb.data.cachedTables[conf.db] = [item]
             else:
                 kb.data.cachedTables[conf.db].append(item)
+
+    for _ in map(lambda x: (conf.db, x), threadData.shared.outputs):
+        if _ not in kb.brute.tables:
+            kb.brute.tables.append(_)
+
+    conf.hashDB.write(HASHDB_KEYS.KB_BRUTE_TABLES, kb.brute.tables, True)
 
     return kb.data.cachedTables
 
@@ -230,10 +232,12 @@ def columnExists(columnFile, regex=None):
             else:
                 columns[column] = 'non-numeric'
 
-            dataToSessionFile("[%s][%s][%s][COLUMN_EXISTS][%s|%s %s]\n" % (conf.url, kb.injection.place,\
-              safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(table),\
-              safeFormatString(column), safeFormatString(columns[column])))
-
         kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
+
+        for _ in map(lambda x: (conf.db, conf.tbl, x[0], x[1]), columns.items()):
+            if _ not in kb.brute.columns:
+                kb.brute.columns.append(_)
+
+        conf.hashDB.write(HASHDB_KEYS.KB_BRUTE_COLUMNS, kb.brute.columns, True)
 
     return kb.data.cachedColumns

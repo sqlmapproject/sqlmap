@@ -31,14 +31,13 @@ from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.common import serializeObject
 from lib.core.common import showHttpErrorCodes
-from lib.core.common import unserializeObject
 from lib.core.convert import urlencode
 from lib.core.convert import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
@@ -177,14 +176,12 @@ def __saveToSessionFile():
         setInjection(inj)
 
 def __saveToHashDB():
-    key = "kb.absFilePaths"
-    value = unserializeObject(conf.hashDB.retrieve(key)) or set()
-    value.update(kb.absFilePaths)
-    conf.hashDB.write(key, serializeObject(value))
+    _ = conf.hashDB.retrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
+    _.update(kb.absFilePaths)
+    conf.hashDB.write(HASHDB_KEYS.KB_ABS_FILE_PATHS, _, True)
 
-    key = "kb.chars"
-    if not conf.hashDB.retrieve(key):
-        conf.hashDB.write(key, serializeObject(kb.chars))
+    if not conf.hashDB.retrieve(HASHDB_KEYS.KB_CHARS):
+        conf.hashDB.write(HASHDB_KEYS.KB_CHARS, kb.chars, True)
 
 def __saveToResultsFile():
     if not conf.resultsFP:

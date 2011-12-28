@@ -15,7 +15,6 @@ from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import BigArray
 from lib.core.common import calculateDeltaSeconds
-from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
