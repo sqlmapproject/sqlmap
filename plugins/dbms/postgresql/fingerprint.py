@@ -183,8 +183,8 @@ class Fingerprint(GenericFingerprint):
         if conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
             conf.db = "public"
 
-            warnMsg = "on %s it is only possible to enumerate " % DBMS.PGSQL
-            warnMsg += "on the current schema and on system databases, "
-            warnMsg += "sqlmap is going to use 'public' schema as "
+            warnMsg = "on %s it is possible to enumerate " % DBMS.PGSQL
+            warnMsg += "only on the current schema and/or system databases. "
+            warnMsg += "sqlmap is going to use 'public' schema as a "
             warnMsg += "database name"
             logger.warn(warnMsg)
