@@ -411,7 +411,7 @@ def checkSqlInjection(place, parameter, value):
                             if not Backend.getIdentifiedDbms():
                                 warnMsg = "using unescaped version of the test "
                                 warnMsg += "because of zero knowledge of the "
-                                warnMsg += "back-end DBMS. you can try to "
+                                warnMsg += "back-end DBMS. You can try to "
                                 warnMsg += "explicitly set it using the --dbms "
                                 warnMsg += "option"
                                 singleTimeWarnMessage(warnMsg)

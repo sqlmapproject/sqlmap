@@ -8,9 +8,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
-import cStringIO
 import re
 import os
+import StringIO
 import threading
 
 from lib.core.common import Backend
@@ -75,7 +75,7 @@ class Dump:
     def setOutputFile(self):
         self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
         self.__outputFP = codecs.open(self.__outputFile, "ab", UNICODE_ENCODING)
-        self.__outputBP = cStringIO.StringIO()
+        self.__outputBP = StringIO.StringIO()
 
     def getOutputFile(self):
         return self.__outputFile
