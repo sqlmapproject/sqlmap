@@ -66,7 +66,7 @@ class Dump:
     def flush(self):
         if self.__outputBP and self.__outputFP and self.__outputBP.tell() > 0:
             _ = self.__outputBP.getvalue()
-            self.__outputBP.reset()
+            self.__outputBP.truncate(0)
             self.__outputFP.write(_)
 
     def __formatString(self, inpStr):
