@@ -22,7 +22,10 @@ class Syntax(GenericSyntax):
         if quote:
             unescaped = expression
             for item in re.findall(r"'[^']+'", expression, re.S):
-                unescaped = unescaped.replace(item, "0x%s" % binascii.hexlify(item.strip("'")))
+                try:
+                    unescaped = unescaped.replace(item, "0x%s" % binascii.hexlify(item.strip("'")))
+                except UnicodeEncodeError:
+                    unescaped = unescaped.replace(item, "CHAR(0x%s USING utf8)" % "".join(("%.2x" % ord(_)) if ord(_) < 256 else ("%.4x" % ord(_)) for _ in item.strip("'")))
         else:
             unescaped = "0x%s" % binascii.hexlify(expression)
 
