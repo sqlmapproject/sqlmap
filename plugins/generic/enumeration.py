@@ -887,9 +887,6 @@ class Enumeration:
                 if len(dbs) < 2 and ("%s," % condition) in query:
                     query = query.replace("%s," % condition, "", 1)
 
-            if Backend.isDbms(DBMS.MSSQL):
-                query = safeStringFormat(query, conf.db)
-
             value = inject.getValue(query, blind=False)
 
             if not isNoneValue(value):

@@ -93,8 +93,11 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                query = rootQuery.inband.query.replace("%s", db)
-                value = inject.getValue(query, blind=False)
+                for query in (rootQuery.inband.query, rootQuery.inband.query2):
+                    query = query.replace("%s", db)
+                    value = inject.getValue(query, blind=False)
+                    if not isNoneValue(value):
+                        break
 
                 if not isNoneValue(value):
                     kb.data.cachedTables[db] = arrayizeValue(value)

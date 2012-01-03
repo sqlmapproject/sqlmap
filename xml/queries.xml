@@ -184,7 +184,7 @@
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE xtype IN ('u', 'v')"/>
+            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE xtype IN ('u', 'v')" query2="SELECT table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s'"/>
             <blind query="SELECT TOP 1 %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE xtype IN ('u', 'v') AND %s..sysusers.name+'.'+%s..sysobjects.name NOT IN (SELECT TOP %d %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE xtype IN ('u', 'v') ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name) ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')"/>
         </tables>
         <columns>
