@@ -295,7 +295,7 @@ class Connect:
             requestMsg += "\n%s" % requestHeaders
 
             if post:
-                requestMsg += "\n\n%s" % post
+                requestMsg += "\n\n%s" % getUnicode(post)
 
             requestMsg += "\n"
 
