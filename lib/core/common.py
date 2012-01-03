@@ -2727,8 +2727,8 @@ def intersect(valueA, valueB, lowerCase=False):
         valueB = arrayizeValue(valueB)
 
         if lowerCase:
-            valueA = (val.lower() if isinstance(val, basestring) else val for val in valueA)
-            valueB = (val.lower() if isinstance(val, basestring) else val for val in valueB)
+            valueA = [val.lower() if isinstance(val, basestring) else val for val in valueA]
+            valueB = [val.lower() if isinstance(val, basestring) else val for val in valueB]
 
         retVal = [val for val in valueA if val in valueB]
 
