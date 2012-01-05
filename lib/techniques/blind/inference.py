@@ -405,7 +405,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         finally:
             value = threadData.shared.value
-            
+
         infoMsg = None
 
         # If we have got one single character not correctly fetched it

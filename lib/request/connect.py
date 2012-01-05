@@ -551,6 +551,9 @@ class Connect:
         threadData = getCurrentThreadData()
 
         if payload:
+            if timeBasedCompare:
+                payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+
             if kb.tamperFunctions:
                 for function in kb.tamperFunctions:
                     payload = function(payload)

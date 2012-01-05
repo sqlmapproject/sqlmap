@@ -135,7 +135,7 @@ def __formatInjection(inj):
                 title = title.replace("columns", "column")
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % title
-        data += "    Payload: %s\n\n" % sdata.payload
+        data += "    Payload: %s\n\n" % (sdata.payload if stype != PAYLOAD.TECHNIQUE.TIME else sdata.payload.replace("[SLEEPTIME]", str(conf.timeSec)))
 
     return data
 
