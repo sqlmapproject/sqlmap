@@ -169,7 +169,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         return not result
 
-    def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None):
+    def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None, shiftTable=None):
         """
         continuousOrder means that distance between each two neighbour's
         numerical values is exactly 1
@@ -182,7 +182,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         originalTbl = list(charTbl)
 
-        if continuousOrder:
+        if continuousOrder and shiftTable is None:
             # Used for gradual expanding into unicode charspace
             shiftTable = [5, 4]
 
@@ -273,7 +273,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         dbgMsg = "turning off auto-adjustment mechanism"
                                         logger.debug(dbgMsg)
                                         kb.adjustTimeDelay = False
-                                    return getChar(idx, originalTbl, continuousOrder, expand)
+                                    return getChar(idx, originalTbl, continuousOrder, expand, shiftTable)
                                 else:
                                     errMsg = "unable to properly validate last character value ('%s').." % decodeIntToUnicode(retVal)
                                     logger.error(errMsg)
