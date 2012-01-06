@@ -275,7 +275,7 @@ UNICODE_ENCODING = "utf8"
 URI_HTTP_HEADER = "URI"
 
 # Uri format which could be injectable (e.g. www.site.com/id82)
-URI_INJECTABLE_REGEX = r".*/([^\.*?]+)\Z"
+URI_INJECTABLE_REGEX = r"//[^/]*/([^\.*?]+)\Z"
 
 # Regex used for masking sensitive data
 SENSITIVE_DATA_REGEX = "(\s|=)(?P<result>[^\s=]*%s[^\s]*)\s"
