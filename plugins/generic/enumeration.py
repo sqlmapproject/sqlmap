@@ -1696,7 +1696,7 @@ class Enumeration:
                     elif not isNumPosStrValue(count):
                         warnMsg = "unable to retrieve the number of "
                         if conf.col:
-                            warnMsg += "columns '%s' " % colString
+                            warnMsg += "column(s) '%s' " % colString
                         warnMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                         logger.warn(warnMsg)
