@@ -1574,10 +1574,10 @@ class Enumeration:
                 colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
-                infoMsg = "fetching"
+                infoMsg = "fetching entries"
                 if conf.col:
-                    infoMsg += " column(s) '%s'" % colString
-                infoMsg += " entries for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    infoMsg += " of column(s) '%s'" % colString
+                infoMsg += " for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += " on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
