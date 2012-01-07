@@ -78,6 +78,7 @@ from lib.core.optiondict import optDict
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
+from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
@@ -675,13 +676,13 @@ def paramToDict(place, parameters=None):
                 if condition:
                     testableParameters[parameter] = "=".join(elem[1:])
                     if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
-                      or re.search(r'\A9{3,}', testableParameters[parameter]):
+                      or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
                         errMsg = "you have provided tainted parameter values "
-                        errMsg += "(%s) with most probably leftover " % element
+                        errMsg += "('%s') with most probably leftover " % element
                         errMsg += "chars from manual sql injection "
                         errMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
                         errMsg += "Please, always use only valid parameter values "
-                        errMsg += "so sqlmap could be able to do a valid run."
+                        errMsg += "so sqlmap could be able to properly run"
                         raise sqlmapSyntaxException, errMsg
     else:
         root = ET.XML(parameters)
