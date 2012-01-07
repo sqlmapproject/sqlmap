@@ -1076,10 +1076,11 @@ def __setHTTPExtraHeaders():
         conf.headers = conf.headers.split("\n")
 
         for headerValue in conf.headers:
-            header, value = headerValue.split(": ")
+            if ":" in headerValue:
+                header, value = headerValue.split(":")
 
-            if header and value:
-                conf.httpHeaders.append((header, value))
+                if header and value:
+                    conf.httpHeaders.append((header, value))
 
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
         conf.httpHeaders.append((HTTPHEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
