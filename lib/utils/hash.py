@@ -315,12 +315,15 @@ def attackCachedUsersPasswords():
 
 def attackDumpedTable():
     if kb.data.dumpedTable:
-        infoMsg = "analyzing table dump for possible password hashes"
-        logger.info(infoMsg)
-
         table = kb.data.dumpedTable
         columns = table.keys()
         count = table["__infos__"]["count"]
+
+        if not count:
+            return
+
+        infoMsg = "analyzing table dump for possible password hashes"
+        logger.info(infoMsg)
 
         found = False
         colUser = ''

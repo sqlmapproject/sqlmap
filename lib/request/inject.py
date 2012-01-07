@@ -291,16 +291,18 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                         stopLimit = 1
 
                     elif (not count or int(count) == 0):
-                        warnMsg = "the SQL query provided does not "
-                        warnMsg += "return any output"
-                        logger.warn(warnMsg)
+                        if not count:
+                            warnMsg = "the SQL query provided does not "
+                            warnMsg += "return any output"
+                            logger.warn(warnMsg)
 
                         return None
 
                 elif (not count or int(count) == 0) and (not stopLimit or stopLimit == 0):
-                    warnMsg = "the SQL query provided does not "
-                    warnMsg += "return any output"
-                    logger.warn(warnMsg)
+                    if not count:
+                        warnMsg = "the SQL query provided does not "
+                        warnMsg += "return any output"
+                        logger.warn(warnMsg)
 
                     return None
 
