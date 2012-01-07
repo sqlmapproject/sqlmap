@@ -2486,7 +2486,7 @@ def getTechniqueData(technique=None):
 
     return retVal
 
-def isTechniqueAvailable(technique=None):
+def isTechniqueAvailable(technique):
     """
     Returns True if there is injection data which sqlmap could use for
     technique specified
@@ -2496,6 +2496,9 @@ def isTechniqueAvailable(technique=None):
         return False
     else:
         return getTechniqueData(technique) is not None
+
+def isInferenceAvailable():
+    return any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.STACKED, PAYLOAD.TECHNIQUE.TIME))
 
 def setOptimize():
     #conf.predictOutput = True

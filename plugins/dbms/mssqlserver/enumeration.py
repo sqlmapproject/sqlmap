@@ -11,6 +11,7 @@ from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import getRange
+from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -85,7 +86,7 @@ class Enumeration(GenericEnumeration):
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -102,7 +103,7 @@ class Enumeration(GenericEnumeration):
                 if not isNoneValue(value):
                     kb.data.cachedTables[db] = arrayizeValue(value)
 
-        if not kb.data.cachedTables and not conf.direct:
+        if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -190,7 +191,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+                if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                     query = rootQuery.inband.query % db
                     query += tblQuery
                     values = inject.getValue(query, blind=False)
@@ -283,7 +284,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+                if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                     query = rootQuery.inband.query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     values = inject.getValue(query, blind=False)

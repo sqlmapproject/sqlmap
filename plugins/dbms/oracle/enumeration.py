@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import getRange
+from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -44,7 +45,7 @@ class Enumeration(GenericEnumeration):
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             if query2:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -90,7 +91,7 @@ class Enumeration(GenericEnumeration):
                     else:
                         kb.data.cachedUsersRoles[user] = list(roles)
 
-        if not kb.data.cachedUsersRoles and not conf.direct:
+        if not kb.data.cachedUsersRoles and isInferenceAvailable() and not conf.direct:
             conditionChar = "="
 
             if conf.user:

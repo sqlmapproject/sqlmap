@@ -36,7 +36,7 @@ class Enumeration(GenericEnumeration):
         randStr = randomStr()
         query = rootQuery.inband.query
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             blinds = [False, True]
         else:
             blinds = [True]
@@ -90,7 +90,7 @@ class Enumeration(GenericEnumeration):
         randStr = randomStr()
         query = rootQuery.inband.query
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             blinds = [False, True]
         else:
             blinds = [True]
@@ -130,7 +130,7 @@ class Enumeration(GenericEnumeration):
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in sorted(dbs)))
         logger.info(infoMsg)
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             blinds = [False, True]
         else:
             blinds = [True]
@@ -204,7 +204,7 @@ class Enumeration(GenericEnumeration):
 
         rootQuery = queries[Backend.getIdentifiedDbms()].columns
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             blinds = [False, True]
         else:
             blinds = [True]

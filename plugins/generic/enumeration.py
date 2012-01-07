@@ -20,6 +20,7 @@ from lib.core.common import filterPairValues
 from lib.core.common import getRange
 from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
+from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -176,7 +177,7 @@ class Enumeration:
         condition = ( Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")) )
         condition |= ( Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema )
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             if condition:
                 query = rootQuery.inband.query2
             else:
@@ -186,7 +187,7 @@ class Enumeration:
             if not isNoneValue(value):
                 kb.data.cachedUsers = arrayizeValue(value)
 
-        if not kb.data.cachedUsers and not conf.direct:
+        if not kb.data.cachedUsers and isInferenceAvailable() and not conf.direct:
             infoMsg = "fetching number of database users"
             logger.info(infoMsg)
 
@@ -252,7 +253,7 @@ class Enumeration:
 
         users = filter(None, users)
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                 query = rootQuery.inband.query2
             else:
@@ -293,7 +294,7 @@ class Enumeration:
                     else:
                         kb.data.cachedUsersPasswords[user].append(password)
 
-        if not kb.data.cachedUsersPasswords and not conf.direct:
+        if not kb.data.cachedUsersPasswords and isInferenceAvailable() and not conf.direct:
             if not len(users):
                 users = self.getUsers()
 
@@ -452,7 +453,7 @@ class Enumeration:
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -537,7 +538,7 @@ class Enumeration:
                     else:
                         kb.data.cachedUsersPrivileges[user] = list(privileges)
 
-        if not kb.data.cachedUsersPrivileges and not conf.direct:
+        if not kb.data.cachedUsersPrivileges and isInferenceAvailable() and not conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
                 conditionChar = " LIKE "
             else:
@@ -736,7 +737,7 @@ class Enumeration:
 
         rootQuery = queries[Backend.getIdentifiedDbms()].dbs
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
             else:
@@ -746,7 +747,7 @@ class Enumeration:
             if not isNoneValue(value):
                 kb.data.cachedDbs = arrayizeValue(value)
 
-        if not kb.data.cachedDbs and not conf.direct:
+        if not kb.data.cachedDbs and isInferenceAvailable() and not conf.direct:
             infoMsg = "fetching number of databases"
             logger.info(infoMsg)
 
@@ -870,7 +871,7 @@ class Enumeration:
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             query = rootQuery.inband.query
             condition = rootQuery.inband.condition if 'condition' in rootQuery.inband else None
 
@@ -904,7 +905,7 @@ class Enumeration:
                     else:
                         kb.data.cachedTables[db].append(table)
 
-        if not kb.data.cachedTables and not conf.direct:
+        if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -1087,7 +1088,7 @@ class Enumeration:
         rootQuery = queries[Backend.getIdentifiedDbms()].columns
         condition = rootQuery.blind.condition if 'condition' in rootQuery.blind else None
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             for tbl in tblList:
                 if conf.db is not None and len(kb.data.cachedColumns) > 0 \
                    and conf.db in kb.data.cachedColumns and tbl in \
@@ -1156,7 +1157,7 @@ class Enumeration:
                         table[safeSQLIdentificatorNaming(tbl, True)] = columns
                         kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
-        if not kb.data.cachedColumns and not conf.direct:
+        if not kb.data.cachedColumns and isInferenceAvailable() and not conf.direct:
             for tbl in tblList:
                 if conf.db is not None and len(kb.data.cachedColumns) > 0 \
                    and conf.db in kb.data.cachedColumns and tbl in \
@@ -1565,7 +1566,8 @@ class Enumeration:
                    or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
                     warnMsg = "unable to enumerate the columns for table "
                     warnMsg += "'%s' on database" % unsafeSQLIdentificatorNaming(tbl)
-                    warnMsg += " '%s', skipping" % unsafeSQLIdentificatorNaming(conf.db)
+                    warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    warnMsg += ", skipping" if len(tblList) > 1 else ""
                     logger.warn(warnMsg)
 
                     continue
@@ -1660,7 +1662,7 @@ class Enumeration:
 
                         index += 1
 
-                if not kb.data.dumpedTable and not conf.direct:
+                if not kb.data.dumpedTable and isInferenceAvailable() and not conf.direct:
                     infoMsg = "fetching number of "
                     if conf.col:
                         infoMsg += "column(s) '%s' " % colString
@@ -1924,7 +1926,7 @@ class Enumeration:
             dbQuery = "%s%s" % (dbCond, dbCondParam)
             dbQuery = dbQuery % unsafeSQLIdentificatorNaming(db)
 
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                 if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                     query = rootQuery.inband.query2
                 else:
@@ -2044,7 +2046,7 @@ class Enumeration:
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % tbl
 
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                 query = rootQuery.inband.query
                 query += tblQuery
                 query += whereDbsQuery
@@ -2213,7 +2215,7 @@ class Enumeration:
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                 if not all((conf.db, conf.tbl)):
                     query = rootQuery.inband.query
                     query += colQuery
