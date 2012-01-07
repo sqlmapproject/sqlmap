@@ -71,7 +71,14 @@ def update():
         try:
             client.update(rootDir)
         except pysvn.ClientError, e:
-            errMsg = "unable to update sqlmap from subversion: '%s'" % str(e)
+            errMsg = "unable to update sqlmap from subversion: '%s'. " % str(e)
+            errMsg += "You are strongly advised to checkout "
+            errMsg += "the clean copy from repository manually "
+            if IS_WIN:
+                errMsg += "(e.g. Right click -> TortoiseSVN -> Checkout... and type "
+                errMsg += "\"https://svn.sqlmap.org/sqlmap/trunk/sqlmap\" into field \"URL of repository\")"
+            else:
+                errMsg += "(e.g. \"svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev\")"
             logger.error(errMsg)
 
     except ImportError, _:
