@@ -1073,11 +1073,11 @@ def __setHTTPExtraHeaders():
         debugMsg = "setting extra HTTP headers"
         logger.debug(debugMsg)
 
-        conf.headers = conf.headers.split("\n")
+        conf.headers = conf.headers.split("\n") if "\n" in conf.headers else conf.headers.split("\\n")
 
         for headerValue in conf.headers:
             if ":" in headerValue:
-                header, value = headerValue.split(":")
+                header, value = (_.lstrip() for _ in headerValue.split(":"))
 
                 if header and value:
                     conf.httpHeaders.append((header, value))

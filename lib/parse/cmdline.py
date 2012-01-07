@@ -99,7 +99,7 @@ def cmdLineParser():
                            help="HTTP Referer header")
 
         request.add_option("--headers", dest="headers",
-                           help="Extra HTTP headers newline separated")
+                           help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
 
         request.add_option("--auth-type", dest="aType",
                            help="HTTP authentication type "
