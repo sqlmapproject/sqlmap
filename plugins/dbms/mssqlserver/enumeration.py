@@ -115,20 +115,25 @@ class Enumeration(GenericEnumeration):
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
-                query = rootQuery.blind.count % db
-                count = inject.getValue(query, inband=False, error=False, charsetType=2)
+                for query in (rootQuery.blind.count, rootQuery.blind.count2):
+                    _ = query % db
+                    count = inject.getValue(_, inband=False, error=False, charsetType=2)
+                    if not isNoneValue(count):
+                        break
 
                 if not isNumPosStrValue(count):
-                    warnMsg = "unable to retrieve the number of "
-                    warnMsg += "tables for database '%s'" % db
-                    logger.warn(warnMsg)
+                    if count != "0":
+                        warnMsg = "unable to retrieve the number of "
+                        warnMsg += "tables for database '%s'" % db
+                        logger.warn(warnMsg)
                     continue
 
                 tables = []
 
                 for index in xrange(int(count)):
-                    query = rootQuery.blind.query.replace("%s", db) % index
-                    table = inject.getValue(query, inband=False, error=False)
+                    _ = (rootQuery.blind.query if query == rootQuery.blind.count else rootQuery.blind.query2).replace("%s", db) % index
+
+                    table = inject.getValue(_, inband=False, error=False)
                     kb.hintValue = table
                     table = safeSQLIdentificatorNaming(table, True)
                     tables.append(table)
