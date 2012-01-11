@@ -125,7 +125,7 @@ sqlmap (0.8-1) stable; urgency=low
   * Updated user's manual (Bernardo and Miroslav).
   * Created several demo videos, hosted on YouTube
     (http://www.youtube.com/user/inquisb) and linked from
-    http://sqlmap.sourceforge.net/demo.html (Bernardo).
+    http://www.sqlmap.org/demo.html (Bernardo).
 
  -- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun, 14 Mar 2010 10:00:00 +0000
 
@@ -470,7 +470,7 @@ sqlmap (0.4-1) stable; urgency=low
     hash on MySQL and PostgreSQL (--passwords);
   * Added docstrings to all functions, classes and methods, consequently
     released the sqlmap development documentation
-    <http://sqlmap.sourceforge.net/dev/>;
+    <http://www.sqlmap.org/dev/>;
   * Implemented Google dorking feature (-g) to take advantage of Google
     results affected by SQL injection to perform other command line
     argument on their DBMS;
