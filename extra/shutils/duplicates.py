@@ -4,7 +4,7 @@
 """
 $Id$
 
-Copyright (c) 2006-2011 sqlmap developers (http://www.sqlmap.org/)
+Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 
 # Removes duplicate entries in wordlist like files
