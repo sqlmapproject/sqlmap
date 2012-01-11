@@ -240,7 +240,7 @@ class Connect:
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
             # Prepare HTTP headers
-            headers = forgeHeaders(cookie, ua, referer)
+            headers = forgeHeaders({ HTTPHEADER.COOKIE: cookie, HTTPHEADER.USER_AGENT: ua, HTTPHEADER.REFERER: referer })
 
             if conf.realTest:
                 headers[HTTPHEADER.REFERER] = "%s://%s" % (conf.scheme, conf.hostname)
@@ -271,23 +271,13 @@ class Connect:
             else:
                 req = urllib2.Request(url, post, headers)
 
-            if not conf.dropSetCookie and conf.cj:
-                for _, cookie in enumerate(conf.cj):
-                    if not cookieStr:
-                        cookieStr = "Cookie: "
-
-                    cookie = getUnicode(cookie)
-                    index = cookie.index(" for ")
-
-                    cookieStr += "%s; " % cookie[8:index]
-
             if not req.has_header(HTTPHEADER.ACCEPT_ENCODING):
                 requestHeaders += "%s: identity\n" % HTTPHEADER.ACCEPT_ENCODING
 
             requestHeaders += "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items())
 
-            if not req.has_header(HTTPHEADER.COOKIE) and cookieStr:
-                requestHeaders += "\n%s" % cookieStr[:-2]
+            if not req.has_header(HTTPHEADER.COOKIE) and conf.cj:
+                requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in conf.cj))
 
             if not req.has_header(HTTPHEADER.CONNECTION):
                 requestHeaders += "\n%s: close" % HTTPHEADER.CONNECTION
@@ -727,9 +717,6 @@ class Connect:
 
         if kb.testMode:
             kb.testQueryCount += 1
-
-            if conf.cj:
-                conf.cj.clear()
 
         if timeBasedCompare:
             return wasLastRequestDelayed()

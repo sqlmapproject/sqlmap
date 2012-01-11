@@ -109,6 +109,7 @@ class HTTPHEADER:
     CONTENT_RANGE = "Content-Range"
     CONTENT_TYPE = "Content-Type"
     COOKIE = "Cookie"
+    SET_COOKIE = "Set-Cookie"
     HOST = "Host"
     PRAGMA = "Pragma"
     PROXY_AUTHORIZATION = "Proxy-Authorization"

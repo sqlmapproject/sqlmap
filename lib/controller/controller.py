@@ -49,6 +49,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setInjection
+from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
@@ -241,7 +242,6 @@ def start():
 
     hostCount = 0
     cookieStr = ""
-    setCookieAsInjectable = True
 
     for targetUrl, targetMethod, targetData, targetCookie in kb.targetUrls:
         try:
@@ -344,31 +344,6 @@ def start():
 
             if conf.nullConnection:
                 checkNullConnection()
-
-            if not conf.dropSetCookie and conf.cj:
-                cookieStr = ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for _, cookie in enumerate(conf.cj))
-
-                if cookieStr:
-                    if PLACE.COOKIE in conf.parameters:
-                        message = "you provided an HTTP Cookie header value. "
-                        message += "The target url provided its own Cookie within "
-                        message += "the HTTP Set-Cookie header. Do you want to "
-                        message += "continue using the HTTP Cookie values that "
-                        message += "you provided? [Y/n] "
-                        test = readInput(message, default="Y")
-
-                        if not test or test[0] in ("y", "Y"):
-                            setCookieAsInjectable = False
-
-                    if setCookieAsInjectable:
-                        conf.httpHeaders.append((HTTPHEADER.COOKIE, cookieStr))
-                        conf.parameters[PLACE.COOKIE] = cookieStr
-                        __paramDict = paramToDict(PLACE.COOKIE, cookieStr)
-
-                        if __paramDict:
-                            conf.paramDict[PLACE.COOKIE] = __paramDict
-                            # TODO: consider the following line in __setRequestParams()
-                            # __testableParameters = True
 
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
                 and (kb.injection.place is None or kb.injection.parameter is None):

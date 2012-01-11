@@ -21,13 +21,16 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
+from lib.core.common import readInput
 from lib.core.common import sanitizeAsciiString
 from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import HTTPHEADER
+from lib.core.enums import PLACE
 from lib.core.exception import sqlmapDataException
+from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
@@ -35,27 +38,48 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
-def forgeHeaders(cookie, ua, referer):
+def forgeHeaders(items=None):
     """
     Prepare HTTP Cookie, HTTP User-Agent and HTTP Referer headers to use when performing
     the HTTP requests
     """
 
-    headers = {}
+    headers = dict(conf.httpHeaders)
+    headers.update(items or {})
 
-    for header, value in conf.httpHeaders:
-        if cookie and header == HTTPHEADER.COOKIE:
-            headers[header] = cookie
-        elif ua and header == HTTPHEADER.USER_AGENT:
-            headers[header] = ua
-        elif referer and header == HTTPHEADER.REFERER:
-            headers[header] = referer
-        else:
-            headers[header] = value
+    for _ in headers.keys():
+        if headers[_] is None:
+            del headers[_]
+
+    if conf.cj:
+        if HTTPHEADER.COOKIE in headers:
+            for cookie in conf.cj:
+                if ("%s=" % cookie.name) in headers[HTTPHEADER.COOKIE]:
+                    if kb.mergeCookies is None:
+                        message = "you provided a HTTP %s header value. " % HTTPHEADER.COOKIE
+                        message += "The target url provided it's own cookies within "
+                        message += "the HTTP %s header which intersect with yours. " % HTTPHEADER.SET_COOKIE
+                        message += "Do you want to merge them in futher requests? [Y/n] "
+                        test = readInput(message, default="Y")
+                        kb.mergeCookies = not test or test[0] in ("y", "Y")
+
+                    if kb.mergeCookies:
+                        _ = lambda x: re.sub("%s=[^%s]+" % (cookie.name, DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, cookie.value), x, re.I)
+                        headers[HTTPHEADER.COOKIE] = _(headers[HTTPHEADER.COOKIE])
+
+                        if PLACE.COOKIE in conf.parameters:
+                            conf.parameters[PLACE.COOKIE] = _(conf.parameters[PLACE.COOKIE])
+                        conf.httpHeaders = [(item[0], item[1] if item[0] != HTTPHEADER.COOKIE else _(item[1])) for item in conf.httpHeaders]
+
+                elif not kb.testMode:
+                    headers[HTTPHEADER.COOKIE] += "%s %s=%s" % (DEFAULT_COOKIE_DELIMITER, cookie.name, cookie.value)
+
+        if kb.testMode:
+            conf.cj.clear()
 
     if kb.redirectSetCookie and not conf.dropSetCookie:
         if HTTPHEADER.COOKIE in headers:
-            headers[HTTPHEADER.COOKIE] = "%s; %s" % (headers[HTTPHEADER.COOKIE], kb.redirectSetCookie)
+            headers[HTTPHEADER.COOKIE] += "%s %s" % (DEFAULT_COOKIE_DELIMITER, kb.redirectSetCookie)
         else:
             headers[HTTPHEADER.COOKIE] = kb.redirectSetCookie
 
