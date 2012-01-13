@@ -2116,7 +2116,7 @@ def wasLastRequestDelayed():
     deviation = stdev(kb.responseTimes)
     threadData = getCurrentThreadData()
 
-    if deviation:
+    if deviation and not conf.direct:
         if len(kb.responseTimes) < MIN_TIME_RESPONSES:
             warnMsg = "time-based standard deviation method used on a model "
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
