@@ -513,11 +513,11 @@ class Backend:
 
     @staticmethod
     def setOsServicePack(sp):
-        if version is None:
+        if sp is None:
             return None
 
-        elif kb.osSP is None and isinstance(version, int):
-            kb.osSP = version
+        elif kb.osSP is None and isinstance(sp, int):
+            kb.osSP = sp
 
     @staticmethod
     def setArch():
