@@ -88,8 +88,8 @@ class Enumeration(GenericEnumeration):
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             for db in dbs:
-                if not isinstance(db, basestring):
-                    db = db[0]
+                if isinstance(db, (tuple, list)):
+                    db = db[0] if db else ""
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db

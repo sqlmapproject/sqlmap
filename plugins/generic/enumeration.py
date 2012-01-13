@@ -897,8 +897,8 @@ class Enumeration:
                     value = map(lambda x: (dbs[0], x), value)
 
                 for db, table in filterPairValues(value):
-                    if not isinstance(db, basestring):
-                        db = db[0]
+                    if isinstance(db, (tuple, list)):
+                        db = db[0] if db else ""
 
                     db = safeSQLIdentificatorNaming(db)
                     table = safeSQLIdentificatorNaming(table, True)
