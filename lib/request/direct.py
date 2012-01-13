@@ -62,7 +62,9 @@ def direct(query, content=True):
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
     threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
-    if output is None or len(output) == 0:
+    if isinstance(output, bool):
+        return output
+    elif output is None or len(output) == 0:
         return None
     elif content:
         if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
