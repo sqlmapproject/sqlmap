@@ -2173,6 +2173,14 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
             singleTimeLogMessage(infoMsg)
             kb.adjustTimeDelay = False
 
+def getLastRequestHTTPError():
+    """
+    Returns last HTTP error code
+    """
+
+    threadData = getCurrentThreadData()
+    return threadData.lastHTTPError[1] if threadData.lastHTTPError else None
+
 def extractErrorMessage(page):
     """
     Returns reported error message from page if it founds one

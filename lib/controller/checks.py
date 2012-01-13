@@ -23,6 +23,7 @@ from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getComparePageRatio
 from lib.core.common import getCompiledRegex
+from lib.core.common import getLastRequestHTTPError
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import intersect
@@ -658,25 +659,30 @@ def checkDynParam(place, parameter, value):
     """
 
     kb.matchRatio = None
+    dynResult = None
+    randInt = randomInt()
 
     infoMsg = "testing if %s parameter '%s' is dynamic" % (place, parameter)
     logger.info(infoMsg)
 
-    randInt = randomInt()
-    payload = agent.payload(place, parameter, value, getUnicode(randInt))
-    dynResult = Request.queryPage(payload, place, raise404=False)
+    try:
+        payload = agent.payload(place, parameter, value, getUnicode(randInt))
+        dynResult = Request.queryPage(payload, place, raise404=False)
 
-    if True == dynResult:
-        return False
+        if not dynResult:
+            infoMsg = "confirming that %s parameter '%s' is dynamic" % (place, parameter)
+            logger.info(infoMsg)
 
-    infoMsg = "confirming that %s parameter '%s' is dynamic" % (place, parameter)
-    logger.info(infoMsg)
+            randInt = randomInt()
+            payload = agent.payload(place, parameter, value, getUnicode(randInt))
+            dynResult = Request.queryPage(payload, place, raise404=False)
+    except sqlmapConnectionException:
+        pass
 
-    randInt = randomInt()
-    payload = agent.payload(place, parameter, value, getUnicode(randInt))
-    dynResult = Request.queryPage(payload, place, raise404=False)
-
-    return not dynResult
+    if dynResult is None:
+        return None
+    else:
+        return not dynResult
 
 def checkDynamicContent(firstPage, secondPage):
     """
@@ -965,7 +971,7 @@ def checkConnection(suppressOutput=False):
             warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
         elif wasLastRequestHTTPError():
-            warnMsg = "the web server responded with an HTTP error code "
+            warnMsg = "the web server responded with an HTTP error code (%d) " % getLastRequestHTTPError()
             warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
         else:
