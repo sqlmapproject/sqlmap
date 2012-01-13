@@ -19,8 +19,9 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD
-from lib.core.exception import exceptionsTuple
+from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapThreadException
+from lib.core.exception import sqlmapValueException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PYVERSION
 
@@ -167,10 +168,10 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if forwardException:
             raise
 
-    except exceptionsTuple, errMsg:
+    except (sqlmapConnectionException, sqlmapValueException), errMsg:
         print
         kb.threadException = True
-        logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
+        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
 
     except:
         from lib.core.common import unhandledExceptionMessage
@@ -178,7 +179,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         print
         kb.threadException = True
         errMsg = unhandledExceptionMessage()
-        logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
+        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
         traceback.print_exc()
 
     finally:
