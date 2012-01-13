@@ -39,6 +39,8 @@ class Miscellaneous:
     def getRemoteTempPath(self):
         if not conf.tmpPath:
             if Backend.isOs(OS.WINDOWS):
+                self.checkDbmsOs(detailed=True)
+
                 if Backend.getOsVersion() == "2000":
                     conf.tmpPath = "C:/WINNT/Temp"
                 else:

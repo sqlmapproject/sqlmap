@@ -150,10 +150,11 @@ class Fingerprint(GenericFingerprint):
 
         # Get back-end DBMS underlying operating system version
         for version, data in versions.items():
-            query =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
-            query += "LIKE '%Windows NT " + data[0] + "%')>0"
+            query = "SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query += "LIKE '%Windows NT " + data[0] + "%'"
+            result = inject.goStacked(query)
 
-            if inject.checkBooleanExpression(query):
+            if result is not None and result.isdigit():
                 Backend.setOsVersion(version)
                 infoMsg += " %s" % Backend.getOsVersion()
                 break
@@ -175,10 +176,11 @@ class Fingerprint(GenericFingerprint):
         sps = versions[Backend.getOsVersion()][1]
 
         for sp in sps:
-            query =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
-            query += "LIKE '%Service Pack " + getUnicode(sp) + "%')>0"
+            query = "SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query += "LIKE '%Service Pack " + getUnicode(sp) + "%'"
+            result = inject.goStacked(query)
 
-            if inject.checkBooleanExpression(query):
+            if result is not None and result.isdigit():
                 Backend.setOsServicePack(sp)
                 break
 
