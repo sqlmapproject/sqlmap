@@ -168,19 +168,10 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if forwardException:
             raise
 
-    except (sqlmapConnectionException, sqlmapValueException), errMsg:
+    except Exception, errMsg:
         print
         kb.threadException = True
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
-
-    except:
-        from lib.core.common import unhandledExceptionMessage
-
-        print
-        kb.threadException = True
-        errMsg = unhandledExceptionMessage()
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
-        traceback.print_exc()
+        logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
 
     finally:
         kb.multiThreadMode = False
