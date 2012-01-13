@@ -48,7 +48,7 @@ def direct(query, content=True):
 
     start = time.time()
     if not select:
-        output = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
+        _ = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
     elif conf.hostname in kb.resumedQueries and query in kb.resumedQueries[conf.hostname] and "sqlmapoutput" not in query and "sqlmapfile" not in query:
         try:
             output = base64unpickle(kb.resumedQueries[conf.hostname][query][:-1])
@@ -62,9 +62,7 @@ def direct(query, content=True):
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
     threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
-    if isinstance(output, bool):
-        return output
-    elif output is None or len(output) == 0:
+    if not select or output is None or len(output) == 0:
         return None
     elif content:
         if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
