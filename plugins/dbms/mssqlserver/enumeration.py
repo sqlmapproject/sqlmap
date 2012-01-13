@@ -16,6 +16,7 @@ from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
@@ -88,8 +89,7 @@ class Enumeration(GenericEnumeration):
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             for db in dbs:
-                if isinstance(db, (tuple, list)):
-                    db = db[0] if db else ""
+                db = unArrayizeValue(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db

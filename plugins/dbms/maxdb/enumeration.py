@@ -11,6 +11,7 @@ from lib.core.common import Backend
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
@@ -77,8 +78,7 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         for db in dbs:
-            if isinstance(db, (tuple, list)):
-                db = db[0] if db else ""
+            db = unArrayizeValue(db)
 
             randStr = randomStr()
             query = rootQuery.inband.query % (("'%s'" % db) if db != "USER" else 'USER')

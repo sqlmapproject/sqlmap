@@ -2581,7 +2581,7 @@ def arrayizeValue(value):
     itself
     """
 
-    if not isinstance(value, (list, tuple, set)):
+    if not isinstance(value, (list, tuple)):
         value = [ value ]
 
     return value
@@ -2592,7 +2592,7 @@ def unArrayizeValue(value):
     itself
     """
 
-    if isinstance(value, (list, tuple, set)):
+    if isinstance(value, (list, tuple)):
         value = value[0] if len(value) > 0 else None
 
     return value
