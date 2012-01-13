@@ -504,6 +504,22 @@ class Backend:
         return kb.os
 
     @staticmethod
+    def setOsVersion(version):
+        if version is None:
+            return None
+
+        elif kb.osVersion is None and isinstance(version, basestring):
+            kb.osVersion = version
+
+    @staticmethod
+    def setOsServicePack(sp):
+        if version is None:
+            return None
+
+        elif kb.osSP is None and isinstance(version, int):
+            kb.osSP = version
+
+    @staticmethod
     def setArch():
         msg = "what is the back-end database management system architecture?"
         msg += "\n[1] 32-bit (default)"
@@ -584,6 +600,14 @@ class Backend:
     @staticmethod
     def getOs():
         return kb.os
+
+    @staticmethod
+    def getOsVersion():
+        return kb.osVersion
+
+    @staticmethod
+    def getOsServicePack():
+        return kb.osSP
 
     @staticmethod
     def getArch():

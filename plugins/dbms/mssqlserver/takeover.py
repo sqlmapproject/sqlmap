@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import binascii
 
+from lib.core.common import Backend
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -55,7 +56,7 @@ class Takeover(GenericTakeover):
             version, sp = versionSp.split("-")
             sp = int(sp)
 
-            if kb.osVersion == version and kb.osSP == sp:
+            if Backend.getOsVersion() == version and Backend.getOsServicePack() == sp:
                 addrs = data
 
                 break
@@ -64,7 +65,7 @@ class Takeover(GenericTakeover):
             errMsg = "sqlmap can not exploit the stored procedure buffer "
             errMsg += "overflow because it does not have a valid return "
             errMsg += "code for the underlying operating system (Windows "
-            errMsg += "%s Service Pack %d)" % (kb.osVersion, kb.osSP)
+            errMsg += "%s Service Pack %d)" % (Backend.getOsVersion(), Backend.getOsServicePack())
             raise sqlmapUnsupportedFeatureException(errMsg)
 
         shellcodeChar = ""

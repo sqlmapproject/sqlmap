@@ -123,7 +123,7 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def checkDbmsOs(self, detailed=False):
-        if Backend.getOs() and kb.osVersion and kb.osSP:
+        if Backend.getOs() and Backend.getOsVersion() and Backend.getOsServicePack():
             return
 
         if not Backend.getOs():
@@ -154,17 +154,17 @@ class Fingerprint(GenericFingerprint):
             query += "LIKE '%Windows NT " + data[0] + "%')>0"
 
             if inject.checkBooleanExpression(query):
-                infoMsg += " %s" % kb.osVersion
-                kb.osVersion = version
+                Backend.setOsVersion(version)
+                infoMsg += " %s" % Backend.getOsVersion()
                 break
 
-        if not kb.osVersion:
-            kb.osVersion = "2003"
-            kb.osSP = 2
+        if not Backend.getOsVersion():
+            Backend.setOsVersion("2003")
+            Backend.setOsServicePack(2)
 
             warnMsg = "unable to fingerprint the underlying operating "
             warnMsg += "system version, assuming it is Windows "
-            warnMsg += "%s Service Pack %d" % (kb.osVersion, kb.osSP)
+            warnMsg += "%s Service Pack %d" % (Backend.getOsVersion(), Backend.getOsServicePack())
             logger.warn(warnMsg)
 
             self.cleanup(onlyFileTbl=True)
@@ -172,24 +172,24 @@ class Fingerprint(GenericFingerprint):
             return
 
         # Get back-end DBMS underlying operating system service pack
-        sps = versions[kb.osVersion][1]
+        sps = versions[Backend.getOsVersion()][1]
 
         for sp in sps:
             query =  "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
             query += "LIKE '%Service Pack " + getUnicode(sp) + "%')>0"
 
             if inject.checkBooleanExpression(query):
-                kb.osSP = sp
+                Backend.setOsServicePack(sp)
                 break
 
-        if not kb.osSP:
+        if not Backend.getOsServicePack():
             debugMsg = "assuming the operating system has no service pack"
             logger.debug(debugMsg)
 
-            kb.osSP = 0
+            Backend.setOsServicePack(0)
 
-        if kb.osVersion:
-            infoMsg += " Service Pack %d" % kb.osSP
+        if Backend.getOsVersion():
+            infoMsg += " Service Pack %d" % Backend.getOsServicePack()
 
         logger.info(infoMsg)
 
