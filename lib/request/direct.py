@@ -62,8 +62,8 @@ def direct(query, content=True):
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
     threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
-    if not select or output is None or len(output) == 0:
-        return None
+    if not output:
+        return output
     elif content:
         if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
             dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.hostname, kb.injection.place, conf.parameters[kb.injection.place], query, base64pickle(output)))
