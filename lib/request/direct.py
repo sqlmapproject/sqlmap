@@ -7,9 +7,13 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import time
+
 from lib.core.agent import agent
 from lib.core.common import dataToSessionFile
 from lib.core.common import Backend
+from lib.core.common import calculateDeltaSeconds
+from lib.core.common import getCurrentThreadData
 from lib.core.common import getUnicode
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
@@ -26,6 +30,7 @@ def direct(query, content=True):
     output = None
     select = True
     query = agent.payloadDirect(query)
+    threadData = getCurrentThreadData()
 
     if Backend.isDbms(DBMS.ORACLE) and query.startswith("SELECT ") and " FROM " not in query:
         query = "%s FROM DUAL" % query
@@ -41,6 +46,7 @@ def direct(query, content=True):
 
     logger.log(9, query)
 
+    start = time.time()
     if not select:
         output = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
     elif conf.hostname in kb.resumedQueries and query in kb.resumedQueries[conf.hostname] and "sqlmapoutput" not in query and "sqlmapfile" not in query:
@@ -54,6 +60,7 @@ def direct(query, content=True):
         logger.info(infoMsg)
     else:
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
+    threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
     if output is None or len(output) == 0:
         return None
