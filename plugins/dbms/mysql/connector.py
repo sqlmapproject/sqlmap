@@ -51,8 +51,11 @@ class Connector(GenericConnector):
             return None
 
     def execute(self, query):
+        retVal = False
+
         try:
             self.cursor.execute(query)
+            retVal = True
         except (pymysql.OperationalError, pymysql.ProgrammingError), msg:
             logger.warn(msg[1])
         except pymysql.InternalError, msg:
@@ -60,6 +63,12 @@ class Connector(GenericConnector):
 
         self.connector.commit()
 
+        return retVal
+
     def select(self, query):
-        self.execute(query)
-        return self.fetchall()
+        retVal = None
+
+        if self.execute(query):
+            retVal = self.fetchall()
+
+        return retVal

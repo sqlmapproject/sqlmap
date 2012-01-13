@@ -60,8 +60,11 @@ class Connector(GenericConnector):
             return None
 
     def execute(self, query):
+        retVal = False
+
         try:
             self.cursor.execute(utf8encode(query))
+            retVal = True
         except (cx_Oracle.DatabaseError), msg:
             logger.warn(msg)
         except cx_Oracle.InternalError, msg:
@@ -69,6 +72,12 @@ class Connector(GenericConnector):
 
         self.connector.commit()
 
+        return retVal
+
     def select(self, query):
-        self.execute(query)
-        return self.fetchall()
+        retVal = None
+
+        if self.execute(query):
+            retVal = self.fetchall()
+
+        return retVal

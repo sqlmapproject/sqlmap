@@ -55,8 +55,11 @@ class Connector(GenericConnector):
             return None
 
     def execute(self, query):
+        retVal = False
+
         try:
             self.cursor.execute(query)
+            retVal = True
         except (psycopg2.OperationalError, psycopg2.ProgrammingError), msg:
             logger.warn(msg)
         except psycopg2.InternalError, msg:
@@ -64,6 +67,12 @@ class Connector(GenericConnector):
 
         self.connector.commit()
 
+        return retVal
+
     def select(self, query):
-        self.execute(query)
-        return self.fetchall()
+        retVal = None
+
+        if self.execute(query):
+            retVal = self.fetchall()
+
+        return retVal

@@ -56,20 +56,27 @@ class Connector(GenericConnector):
             return None
 
     def execute(self, query):
+        retVal = False
+
         try:
             self.cursor.execute(utf8encode(query))
+            retVal = True
         except (pymssql.OperationalError, pymssql.ProgrammingError), msg:
             logger.warn(msg)
         except pymssql.InternalError, msg:
             raise sqlmapConnectionException, msg
 
+        return retVal
+
     def select(self, query):
-        self.execute(query)
-        value = self.fetchall()
+        retVal = None
 
-        try:
-            self.connector.commit()
-        except pymssql.OperationalError:
-            pass
+        if self.execute(query):
+            retVal = self.fetchall()
 
-        return value
+            try:
+                self.connector.commit()
+            except pymssql.OperationalError:
+                pass
+
+        return retVal
