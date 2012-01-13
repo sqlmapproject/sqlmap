@@ -216,6 +216,7 @@ SQL_STATEMENTS = {
                              "alter ",          ),
 
                        "SQL data manipulation": (
+                             "bulk ",
                              "insert ",
                              "update ",
                              "delete ",
@@ -226,7 +227,7 @@ SQL_STATEMENTS = {
                              "grant ",          ),
 
                        "SQL data execution":    (
-                             " exec ",
+                             "exec ",
                              "execute ",        ),
 
                        "SQL transaction":       (
