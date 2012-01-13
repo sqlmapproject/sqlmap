@@ -866,7 +866,7 @@ class Enumeration:
                 return tableExists(paths.COMMON_TABLES)
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in sorted(dbs)))
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
@@ -897,6 +897,9 @@ class Enumeration:
                     value = map(lambda x: (dbs[0], x), value)
 
                 for db, table in filterPairValues(value):
+                    if not isinstance(db, basestring):
+                        db = db[0]
+
                     db = safeSQLIdentificatorNaming(db)
                     table = safeSQLIdentificatorNaming(table, True)
 
@@ -1027,6 +1030,8 @@ class Enumeration:
 
                 if isinstance(tblList[0], (set, tuple, list)):
                     tblList = tblList[0]
+
+                tblList = list(tblList)
             else:
                 errMsg = "unable to retrieve the tables"
                 errMsg += "on database '%s'" % conf.db

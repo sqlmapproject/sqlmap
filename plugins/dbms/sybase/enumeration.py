@@ -127,7 +127,7 @@ class Enumeration(GenericEnumeration):
         dbs = filter(None, dbs)
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db for db in sorted(dbs)))
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
@@ -138,6 +138,9 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         for db in dbs:
+            if not isinstance(db, basestring):
+                db = db[0]
+
             for blind in blinds:
                 randStr = randomStr()
                 query = rootQuery.inband.query % db

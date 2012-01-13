@@ -142,9 +142,11 @@ class Fingerprint(GenericFingerprint):
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "@@VERSION"))
 
         versions = { "2003": ("5.2", (2, 1)),
+                     # TODO: verify this
                      #"2003": ("6.0", (2, 1)),
                      "2008": ("7.0", (1,)),
                      "2000": ("5.0", (4, 3, 2, 1)),
+                     "7": ("6.1", (1, 0)),
                      "XP": ("5.1", (2, 1)),
                      "NT": ("4.0", (6, 5, 4, 3, 2, 1)) }
 
@@ -154,7 +156,7 @@ class Fingerprint(GenericFingerprint):
             query += "LIKE '%Windows NT " + data[0] + "%'"
             result = inject.goStacked(query)
 
-            if result is not None and result.isdigit():
+            if result is not None and len(result) > 0 and result[0].isdigit():
                 Backend.setOsVersion(version)
                 infoMsg += " %s" % Backend.getOsVersion()
                 break
@@ -180,7 +182,7 @@ class Fingerprint(GenericFingerprint):
             query += "LIKE '%Service Pack " + getUnicode(sp) + "%'"
             result = inject.goStacked(query)
 
-            if result is not None and result.isdigit():
+            if result is not None and len(result) > 0 and result[0].isdigit():
                 Backend.setOsServicePack(sp)
                 break
 

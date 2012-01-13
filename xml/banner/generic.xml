@@ -19,7 +19,14 @@
         <info type="Windows" distrib="Vista"/>
     </regexp>
 
+    <regexp value="Windows.*6\.1">
+        <info type="Windows" distrib="7"/>
+    </regexp>
+
     <regexp value="Windows.*6\.0">
+        <!-- TODO: verify this
+        <info type="Windows" distrib="Vista"/>
+        -->
         <info type="Windows" distrib="2003"/>
     </regexp>
 
