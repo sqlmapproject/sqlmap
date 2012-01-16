@@ -182,13 +182,11 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         """
 
         reqResList = content.split(WEBSCARAB_SPLITTER)
-        getPostReq = False
 
         for request in reqResList:
             url = extractRegexResult(r"URL: (?P<result>.+?)\n", request, re.I)
             method = extractRegexResult(r"METHOD: (?P<result>.+?)\n", request, re.I)
             cookie = extractRegexResult(r"COOKIE: (?P<result>.+?)\n", request, re.I)
-            getPostReq = True
 
             if not method or not url:
                 logger.debug("not a valid WebScarab log data")
@@ -201,10 +199,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 logger.warning(warnMsg)
                 continue
 
-            if conf.scope:
-                getPostReq &= re.search(conf.scope, url, re.I) is not None
-
-            if getPostReq:
+            if not(conf.scope and not re.search(conf.scope, url, re.I)):
                 if not kb.targetUrls or url not in addedTargetUrls:
                     kb.targetUrls.add((url, method, None, cookie))
                     addedTargetUrls.add(url)
@@ -298,9 +293,6 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     elif key not in ( HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION ):
                         conf.httpHeaders.append((str(key), str(value)))
 
-            if conf.scope:
-                getPostReq &= re.search(conf.scope, host) is not None
-
             if getPostReq and (params or cookie):
                 if not port and isinstance(scheme, basestring) and scheme.lower() == "https":
                     port = "443"
@@ -312,9 +304,10 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     scheme = None
                     port = None
 
-                if not kb.targetUrls or url not in addedTargetUrls:
-                    kb.targetUrls.add((url, method, urldecode(data) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data, cookie))
-                    addedTargetUrls.add(url)
+                if not(conf.scope and not re.search(conf.scope, url, re.I)):
+                    if not kb.targetUrls or url not in addedTargetUrls:
+                        kb.targetUrls.add((url, method, urldecode(data) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data, cookie))
+                        addedTargetUrls.add(url)
 
     fp = openFile(reqFile, "rb")
 
