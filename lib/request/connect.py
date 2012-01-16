@@ -394,8 +394,12 @@ class Connect:
                 warnMsg += "to get error page information (%d)" % e.code
                 logger.warn(warnMsg)
                 return None, None, None
+            except KeyboardInterrupt:
+                raise
             except:
                 pass
+            finally:
+                page = page if isinstance(page, unicode) else getUnicode(page)
 
             code = e.code
             threadData.lastHTTPError = (threadData.lastRequestUID, code)
@@ -410,7 +414,7 @@ class Connect:
             if responseHeaders:
                 logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
 
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page if isinstance(page, unicode) else getUnicode(page)))
+            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
             if conf.verbose <= 5:
                 responseMsg += getUnicode(logHeaders)
@@ -492,6 +496,7 @@ class Connect:
                 raise sqlmapConnectionException, warnMsg
 
         finally:
+            page = page if isinstance(page, unicode) else getUnicode(page)
             socket.setdefaulttimeout(conf.timeout)
 
         processResponse(page, responseHeaders)
@@ -500,7 +505,7 @@ class Connect:
         if responseHeaders:
             logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
 
-        logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page if isinstance(page, unicode) else getUnicode(page)))
+        logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
         if conf.verbose <= 5:
             responseMsg += getUnicode(logHeaders)
