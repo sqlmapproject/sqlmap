@@ -32,9 +32,9 @@ def configFileProxy(section, option, boolean=False, integer=False):
 
     if config.has_option(section, option):
         if boolean:
-            value = config.getboolean(section, option)
+            value = config.getboolean(section, option) if config.get(section, option) else False
         elif integer:
-            value = config.getint(section, option)
+            value = config.getint(section, option) if config.get(section, option) else 0
         else:
             value = config.get(section, option)
 
