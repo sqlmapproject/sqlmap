@@ -50,9 +50,13 @@ class Connector:
         return self.cursor
 
     def close(self):
-        self.cursor.close()
-        self.connector.close()
-        self.closed()
+        try:
+            self.cursor.close()
+            self.connector.close()
+        except Exception, msg:
+            logger.debug(msg)
+        finally:
+            self.closed()
 
     def checkFileDb(self):
         if not os.path.exists(self.db):
