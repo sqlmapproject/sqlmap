@@ -139,6 +139,8 @@ def checkCharEncoding(encoding):
         encoding = 'iso%s' % encoding[4:]
     elif encoding.find('ascii') > 0:
         encoding = 'ascii'
+    elif encoding.find('utf8') > 0:
+        encoding = 'utf8'
 
     # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
