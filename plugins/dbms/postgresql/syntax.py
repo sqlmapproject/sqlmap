@@ -34,6 +34,7 @@ class Syntax(GenericSyntax):
                 unescaped = ""
 
                 for i in xrange(firstIndex, lastIndex):
+                    # Postgres CHR() function already accepts Unicode code point of character(s)
                     unescaped += "CHR(%d)" % (ord(expression[i]))
                     if i < lastIndex - 1:
                         unescaped += "||"
