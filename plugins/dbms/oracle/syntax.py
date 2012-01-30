@@ -34,7 +34,7 @@ class Syntax(GenericSyntax):
                 unescaped = ""
 
                 for i in xrange(firstIndex, lastIndex):
-                    unescaped += "CHR(%d)" % (ord(expression[i]))
+                    unescaped += "%s(%d)" % ("CHR" if ord(expression[i]) < 256 else "NCHR", ord(expression[i]))
                     if i < lastIndex - 1:
                         unescaped += "||"
 
