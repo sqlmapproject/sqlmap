@@ -211,7 +211,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 # e.g.: ... > '%c' -> ... > ORD(..)
                 markingValue = "'%s'" % CHAR_INFERENCE_MARK
-                unescapedCharValue = unescaper.unescape(markingValue % decodeIntToUnicode(posValue))
+                unescapedCharValue = unescaper.unescape("'%s'" % decodeIntToUnicode(posValue))
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
             queriesCount[0] += 1
