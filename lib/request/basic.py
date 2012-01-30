@@ -44,12 +44,14 @@ def forgeHeaders(items=None):
     the HTTP requests
     """
 
+    items = items or {}
+
+    for _ in items.keys():
+        if items[_] is None:
+            del items[_]
+
     headers = dict(conf.httpHeaders)
     headers.update(items or {})
-
-    for _ in headers.keys():
-        if headers[_] is None:
-            del headers[_]
 
     if conf.cj:
         if HTTPHEADER.COOKIE in headers:
