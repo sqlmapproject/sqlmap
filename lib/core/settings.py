@@ -96,7 +96,7 @@ MIN_TIME_RESPONSES = 10
 MIN_UNION_RESPONSES = 5
 
 # after these number of blanks at the end inference should stop (just in case)
-INFERENCE_BLANK_BREAK = 15
+INFERENCE_BLANK_BREAK = 10
 
 # use this replacement character for cases when inference is not able to retrieve the proper character value
 INFERENCE_UNKNOWN_CHAR = '?'
