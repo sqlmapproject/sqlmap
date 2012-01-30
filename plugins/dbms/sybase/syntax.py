@@ -31,11 +31,10 @@ class Syntax(GenericSyntax):
 
                 lastIndex = firstIndex + index
                 old = "'%s'" % expression[firstIndex:lastIndex]
-                #unescaped = "("
                 unescaped = ""
 
                 for i in xrange(firstIndex, lastIndex):
-                    unescaped += "CHAR(%d)" % (ord(expression[i]))
+                    unescaped += "%s(%d)" % ("CHAR" if ord(expression[i]) < 256 else "TO_UNICHAR", ord(expression[i]))
                     if i < lastIndex - 1:
                         unescaped += "+"
 

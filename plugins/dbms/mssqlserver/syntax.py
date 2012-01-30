@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.exception import sqlmapSyntaxException
+
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -30,7 +31,6 @@ class Syntax(GenericSyntax):
 
                 lastIndex = firstIndex + index
                 old = "'%s'" % expression[firstIndex:lastIndex]
-                #unescaped = "("
                 unescaped = ""
 
                 for i in xrange(firstIndex, lastIndex):
