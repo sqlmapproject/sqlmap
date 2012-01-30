@@ -1030,7 +1030,7 @@ class Enumeration:
 
                 tblList = list(tblList)
             else:
-                errMsg = "unable to retrieve the tables"
+                errMsg = "unable to retrieve the tables "
                 errMsg += "on database '%s'" % conf.db
                 raise sqlmapNoneDataException, errMsg
 
