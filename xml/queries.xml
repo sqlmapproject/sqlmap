@@ -162,7 +162,7 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <inference query="ASCII(SUBSTRING((%s),%d,1)) > %d"/>
+        <inference query="UNICODE(SUBSTRING((%s),%d,1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
         <current_db query="SELECT DB_NAME()"/>
