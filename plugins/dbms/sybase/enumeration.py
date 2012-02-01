@@ -198,7 +198,7 @@ class Enumeration(GenericEnumeration):
                 if isinstance(tblList[0], (set, tuple, list)):
                     tblList = tblList[0]
             else:
-                errMsg = "unable to retrieve the tables"
+                errMsg = "unable to retrieve the tables "
                 errMsg += "on database '%s'" % conf.db
                 raise sqlmapNoneDataException, errMsg
 
