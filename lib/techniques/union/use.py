@@ -152,9 +152,9 @@ def unionUse(expression, unpack=True, dump=False):
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
-    if expressionFieldsList and len(expressionFieldsList) > 1 and " ORDER BY " in expression:
+    if expressionFieldsList and len(expressionFieldsList) > 1 and " ORDER BY " in expression.upper():
         # No need for it in multicolumn dumps (one row is retrieved per request) and just slowing down on large table dumps
-        expression = expression[:expression.rindex(" ORDER BY ")]
+        expression = expression[:expression.upper().rindex(" ORDER BY ")]
 
     # We have to check if the SQL query might return multiple entries
     # and in such case forge the SQL limiting the query output one
@@ -228,9 +228,9 @@ def unionUse(expression, unpack=True, dump=False):
             # Count the number of SQL query entries output
             countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
 
-            if re.search(" ORDER BY ", expression, re.I):
-                untilOrderChar = countedExpression.index(" ORDER BY ")
-                countedExpression = countedExpression[:untilOrderChar]
+            if " ORDER BY " in countedExpression.upper():
+                _ = countedExpression.upper().rindex(" ORDER BY ")
+                countedExpression = countedExpression[:_]
 
             count = resume(countedExpression, None)
             count = parseUnionPage(count)
