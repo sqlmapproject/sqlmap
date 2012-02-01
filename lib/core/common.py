@@ -2682,7 +2682,11 @@ def decodeIntToUnicode(value):
     Decodes inferenced integer value with usage of current page encoding
     """
     try:
-        return unichr(value)
+        # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+            return struct.pack('B' if value<256 else '<H', value).decode(kb.pageEncoding or UNICODE_ENCODING)
+        else:
+            return unichr(value)
     except:
         return INFERENCE_UNKNOWN_CHAR
 

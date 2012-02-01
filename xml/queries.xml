@@ -224,9 +224,9 @@
         <count query="COUNT(%s)"/>
         <comment query="--"/>
         <timedelay query="BEGIN DBMS_LOCK.SLEEP(%d); END" query2="EXEC DBMS_LOCK.SLEEP(%d.00)" query3="EXEC USER_LOCK.SLEEP(%d.00)"/>
-        <substring query="SUBSTR((%s),%d,%d)"/>
+        <substring query="SUBSTRC((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <inference query="ASCII(SUBSTR((%s),%d,1)) > %d"/>
+        <inference query="ASCII(SUBSTRC((%s),%d,1)) > %d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>
         <!--
