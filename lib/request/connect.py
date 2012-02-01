@@ -91,9 +91,9 @@ class Connect:
             warnMsg = "most probably web server instance hasn't recovered yet "
             warnMsg += "from previous timed based payload. If the problem "
             warnMsg += "persists please wait for few minutes and rerun "
-            warnMsg += "without flag T in --technique option "
+            warnMsg += "without flag T in option '--technique' "
             warnMsg += "(e.g. --flush-session --technique=BEUS) or try to "
-            warnMsg += "lower the --time-sec value (e.g. --time-sec=2)"
+            warnMsg += "lower the value of option '--time-sec' (e.g. --time-sec=2)"
             singleTimeWarnMessage(warnMsg)
         elif kb.originalPage is None:
             if conf.tor:
@@ -470,7 +470,7 @@ class Connect:
             elif "BadStatusLine" in tbMsg:
                 warnMsg = "the target url responded with an unknown HTTP "
                 warnMsg += "status code, try to force the HTTP User-Agent "
-                warnMsg += "header with option --user-agent or --random-agent"
+                warnMsg += "header with option '--user-agent' or switch '--random-agent'"
             elif "IncompleteRead" in tbMsg:
                 warnMsg = "there was an incomplete read error while retrieving data "
                 warnMsg += "from the target url"
@@ -683,7 +683,7 @@ class Connect:
 
                     warnMsg = "there is considerable lagging "
                     warnMsg += "in connection response(s). Please use as high "
-                    warnMsg += "value for --time-sec option as possible (e.g. "
+                    warnMsg += "value for option '--time-sec' as possible (e.g. "
                     warnMsg += "%d or more)" % (conf.timeSec * 2)
                     logger.critical(warnMsg)
             elif not kb.testMode:
