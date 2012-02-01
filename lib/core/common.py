@@ -2682,7 +2682,7 @@ def decodeIntToUnicode(value):
     Decodes inferenced integer value with usage of current page encoding
     """
     try:
-        return struct.pack('B' if value<256 else '>H', value).decode(kb.pageEncoding or UNICODE_ENCODING)
+        return unichr(value)
     except:
         return INFERENCE_UNKNOWN_CHAR
 
