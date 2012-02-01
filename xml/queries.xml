@@ -184,8 +184,8 @@
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE xtype IN ('u', 'v')" query2="SELECT table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s'"/>
-            <blind query="SELECT TOP 1 %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE xtype IN ('u', 'v') AND %s..sysusers.name+'.'+%s..sysobjects.name NOT IN (SELECT TOP %d %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE xtype IN ('u', 'v') ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name) ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')" query2="SELECT TOP 1 table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' AND table_schema+'.'+table_name NOT IN (SELECT TOP %d table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' ORDER BY table_schema+'.'+table_name) ORDER BY table_schema+'.'+table_name" count2="SELECT LTRIM(STR(COUNT(table_name))) FROM information_schema.tables WHERE table_catalog='%s'"/>
+            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u', 'v')" query2="SELECT table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s'"/>
+            <blind query="SELECT TOP 1 %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u', 'v') AND %s..sysusers.name+'.'+%s..sysobjects.name NOT IN (SELECT TOP %d %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u', 'v') ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name) ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT TOP 1 table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' AND table_schema+'.'+table_name NOT IN (SELECT TOP %d table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' ORDER BY table_schema+'.'+table_name) ORDER BY table_schema+'.'+table_name" count2="SELECT LTRIM(STR(COUNT(table_name))) FROM information_schema.tables WHERE table_catalog='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
@@ -200,12 +200,12 @@
             <blind query="SELECT name FROM master..sysdatabases WHERE " count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE " condition="name"/>
         </search_db>
         <search_table>
-            <inband query="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v') AND " condition="name" condition2="name"/>
-            <blind query="" query2="SELECT name FROM %s..sysobjects WHERE xtype IN ('u','v') " count="" count2="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE xtype IN ('u','v')" condition="name" condition2="name"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') AND " condition="name" condition2="name"/>
+            <blind query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') " count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" condition="name" condition2="name"/>
         </search_table>
         <search_column>
             <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name"/>
-            <blind query="" query2="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" count="" count2="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name"/>
+            <blind query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" count="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name"/>
         </search_column>
     </dbms>
 

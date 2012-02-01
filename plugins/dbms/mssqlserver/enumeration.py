@@ -119,7 +119,7 @@ class Enumeration(GenericEnumeration):
                 logger.info(infoMsg)
 
                 for query in (rootQuery.blind.count, rootQuery.blind.count2):
-                    _ = query % db
+                    _ = query.replace("%s", db)
                     count = inject.getValue(_, inband=False, error=False, charsetType=2)
                     if not isNoneValue(count):
                         break
@@ -200,7 +200,7 @@ class Enumeration(GenericEnumeration):
                     continue
 
                 if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
-                    query = rootQuery.inband.query % db
+                    query = rootQuery.inband.query.replace("%s", db)
                     query += tblQuery
                     values = inject.getValue(query, blind=False)
 
@@ -220,8 +220,8 @@ class Enumeration(GenericEnumeration):
                     infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
                     logger.info(infoMsg)
 
-                    query = rootQuery.blind.count2
-                    query = query % db
+                    query = rootQuery.blind.count
+                    query = query.replace("%s", db)
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
@@ -238,8 +238,8 @@ class Enumeration(GenericEnumeration):
                     indexRange = getRange(count)
 
                     for index in indexRange:
-                        query = rootQuery.blind.query2
-                        query = query % db
+                        query = rootQuery.blind.query
+                        query = query.replace("%s", db)
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query, tblCond)
                         tbl = inject.getValue(query, inband=False, error=False)
@@ -337,7 +337,7 @@ class Enumeration(GenericEnumeration):
                     infoMsg += " '%s' in database '%s'" % (column, db)
                     logger.info(infoMsg)
 
-                    query = rootQuery.blind.count2
+                    query = rootQuery.blind.count
                     query = query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
@@ -355,7 +355,7 @@ class Enumeration(GenericEnumeration):
                     indexRange = getRange(count)
 
                     for index in indexRange:
-                        query = rootQuery.blind.query2
+                        query = rootQuery.blind.query
                         query = query % (db, db, db, db, db, db)
                         query += " AND %s" % colQuery.replace("[DB]", db)
                         query = agent.limitQuery(index, query, colCond.replace("[DB]", db))
