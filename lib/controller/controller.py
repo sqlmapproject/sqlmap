@@ -494,7 +494,7 @@ def start():
                         errMsg += "to perform more tests."
 
                     if isinstance(conf.tech, list) and len(conf.tech) < 5:
-                        errMsg += " Rerun without providing the --technique switch."
+                        errMsg += " Rerun without providing the option '--technique'."
 
                     if not conf.textOnly and kb.originalPage:
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))

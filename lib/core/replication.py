@@ -22,7 +22,7 @@ class Replication:
         try:
             import sqlite3
         except ImportError, _:
-            errMsg = "missing module 'sqlite3' needed by --replicate switch"
+            errMsg = "missing module 'sqlite3' needed by switch '--replicate'"
             raise sqlmapMissingDependence, errMsg
 
         self.dbpath = dbpath

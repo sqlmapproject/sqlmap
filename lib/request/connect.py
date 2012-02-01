@@ -100,7 +100,7 @@ class Connect:
                 warnMsg = "please make sure that you have "
                 warnMsg += "Tor installed and running so "
                 warnMsg += "you could successfully use "
-                warnMsg += "--tor switch "
+                warnMsg += "switch '--tor' "
                 if IS_WIN:
                     warnMsg += "(e.g. https://www.torproject.org/download/download.html.en)"
                 else:
@@ -108,7 +108,7 @@ class Connect:
             else:
                 warnMsg = "if the problem persists please check that the provided "
                 warnMsg += "target url is valid. If it is, you can try to rerun "
-                warnMsg += "with the --random-agent switch turned on "
+                warnMsg += "with the switch '--random-agent' turned on "
                 warnMsg += "and/or proxy switches (--ignore-proxy, --proxy,...)"
             singleTimeWarnMessage(warnMsg)
         elif conf.threads > 1:
@@ -665,7 +665,7 @@ class Connect:
                 clearConsoleLine()
 
                 if conf.tor:
-                    warnMsg = "it's highly recommended to avoid usage of --tor switch for "
+                    warnMsg = "it's highly recommended to avoid usage of switch '--tor' for "
                     warnMsg += "time-based injections because of it's high latency time"
                     singleTimeWarnMessage(warnMsg)
 

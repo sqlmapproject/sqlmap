@@ -39,7 +39,7 @@ def cmdLineParser():
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
                              "options has to be specified to set the source "
-                             "to get target urls from.")
+                             "to get target urls from")
 
         target.add_option("-d", dest="direct", help="Direct "
                           "connection to the database")
@@ -63,7 +63,7 @@ def cmdLineParser():
 
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
-                              "to specify how to connect to the target url.")
+                              "to specify how to connect to the target url")
 
         request.add_option("--data", dest="data",
                            help="Data string to be sent through POST")
@@ -149,7 +149,7 @@ def cmdLineParser():
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "
                                "options can be used to optimize the "
-                               "performance of sqlmap.")
+                               "performance of sqlmap")
 
         optimization.add_option("-o", dest="optimize",
                                  action="store_true",
@@ -172,7 +172,7 @@ def cmdLineParser():
         injection = OptionGroup(parser, "Injection", "These options can be "
                                 "used to specify which parameters to test "
                                 "for, provide custom injection payloads and "
-                                "optional tampering scripts.")
+                                "optional tampering scripts")
 
         injection.add_option("-p", dest="testParameter",
                              help="Testable parameter(s)")
@@ -205,7 +205,7 @@ def cmdLineParser():
                                 "used to specify how to parse "
                                 "and compare page content from "
                                 "HTTP responses when using blind SQL "
-                                "injection technique.")
+                                "injection technique")
 
         detection.add_option("--level", dest="level", type="int",
                              help="Level of tests to perform (1-5, "
@@ -237,7 +237,7 @@ def cmdLineParser():
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can be "
                                  "used to tweak testing of specific SQL "
-                                 "injection techniques.")
+                                 "injection techniques")
 
         techniques.add_option("--technique", dest="tech",
                               help="SQL injection techniques to test for "
@@ -266,7 +266,7 @@ def cmdLineParser():
                                   "be used to enumerate the back-end database "
                                   "management system information, structure "
                                   "and data contained in the tables. Moreover "
-                                  "you can run your own SQL statements.")
+                                  "you can run your own SQL statements")
 
         enumeration.add_option("-b", "--banner", dest="getBanner",
                                action="store_true", help="Retrieve DBMS banner")
@@ -361,7 +361,7 @@ def cmdLineParser():
         # User-defined function options
         brute = OptionGroup(parser, "Brute force", "These "
                           "options can be used to run brute force "
-                          "checks.")
+                          "checks")
 
         brute.add_option("--common-tables", dest="commonTables", action="store_true",
                                help="Check existence of common tables")
@@ -372,7 +372,7 @@ def cmdLineParser():
         # User-defined function options
         udf = OptionGroup(parser, "User-defined function injection", "These "
                           "options can be used to create custom user-defined "
-                          "functions.")
+                          "functions")
 
         udf.add_option("--udf-inject", dest="udfInject", action="store_true",
                        help="Inject custom user-defined functions")
@@ -383,7 +383,7 @@ def cmdLineParser():
         # File system options
         filesystem = OptionGroup(parser, "File system access", "These options "
                                  "can be used to access the back-end database "
-                                 "management system underlying file system.")
+                                 "management system underlying file system")
 
         filesystem.add_option("--file-read", dest="rFile",
                               help="Read a file from the back-end DBMS "
@@ -401,7 +401,7 @@ def cmdLineParser():
         takeover = OptionGroup(parser, "Operating system access", "These "
                                "options can be used to access the back-end "
                                "database management system underlying "
-                               "operating system.")
+                               "operating system")
 
         takeover.add_option("--os-cmd", dest="osCmd",
                             help="Execute an operating system command")
@@ -442,7 +442,7 @@ def cmdLineParser():
         windows = OptionGroup(parser, "Windows registry access", "These "
                                "options can be used to access the back-end "
                                "database management system Windows "
-                               "registry.")
+                               "registry")
 
         windows.add_option("--reg-read", dest="regRead",
                             action="store_true",
@@ -470,7 +470,7 @@ def cmdLineParser():
 
         # General options
         general = OptionGroup(parser, "General", "These options can be used "
-                             "to set some general working parameters. " )
+                             "to set some general working parameters" )
 
         #general.add_option("-x", dest="xmlFile",
         #                    help="Dump the data into an XML file")
@@ -648,7 +648,7 @@ def cmdLineParser():
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependencies)):
-            errMsg = "missing a mandatory parameter (-d, -u, -l, -m, -r, -g, -c, --wizard, --update or --dependencies), "
+            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --update or --dependencies), "
             errMsg += "-h for help"
             parser.error(errMsg)
 

@@ -1319,7 +1319,7 @@ def __cleanupOptions():
 
             warnMsg = "increasing default value for "
             warnMsg += "--time-sec to %d because " % conf.timeSec
-            warnMsg += "--tor switch was provided"
+            warnMsg += "switch '--tor' was provided"
             logger.warn(warnMsg)
         else:
             kb.adjustTimeDelay = True
@@ -1714,7 +1714,7 @@ def __setTorHttpProxySettings():
         errMsg = "can't establish connection with the Tor proxy. "
         errMsg += "Please make sure that you have Vidalia, Privoxy or "
         errMsg += "Polipo bundle installed for you to be able to "
-        errMsg += "successfully use --tor switch "
+        errMsg += "successfully use switch '--tor' "
 
         if IS_WIN:
             errMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
@@ -1770,31 +1770,31 @@ def __basicOptionValidation():
         raise sqlmapSyntaxException, errMsg
 
     if conf.textOnly and conf.nullConnection:
-        errMsg = "switch --text-only is incompatible with switch --null-connection"
+        errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.titles and conf.nullConnection:
-        errMsg = "switch --titles is incompatible with switch --null-connection"
+        errMsg = "switch '--titles' is incompatible with switch '--null-connection'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.data and conf.nullConnection:
-        errMsg = "switch --data is incompatible with switch --null-connection"
+        errMsg = "option '--data' is incompatible with switch '--null-connection'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.string and conf.nullConnection:
-        errMsg = "switch --string is incompatible with switch --null-connection"
+        errMsg = "option '--string' is incompatible with switch '--null-connection'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.regexp and conf.nullConnection:
-        errMsg = "switch --regexp is incompatible with switch --null-connection"
+        errMsg = "option '--regexp' is incompatible with switch '--null-connection'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.dumpTable and conf.dumpAll:
-        errMsg = "switch --dump is incompatible with switch --dump-all"
+        errMsg = "switch '--dump' is incompatible with switch '--dump-all'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.predictOutput and (conf.threads > 1 or conf.optimize):
-        errMsg = "switch --predict-output is incompatible with switch --threads and -o"
+        errMsg = "switch '--predict-output' is incompatible with option '--threads' and switch '-o'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.threads > MAX_NUMBER_OF_THREADS:
@@ -1802,56 +1802,56 @@ def __basicOptionValidation():
         raise sqlmapSyntaxException, errMsg
 
     if conf.forms and not conf.url:
-        errMsg = "switch --forms requires usage of -u (--url) switch"
+        errMsg = "switch '--forms' requires usage of option '-u' (--url)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.tor and conf.ignoreProxy:
-        errMsg = "switch --tor is incompatible with switch --ignore-proxy"
+        errMsg = "switch '--tor' is incompatible with switch '--ignore-proxy'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.tor and conf.proxy:
-        errMsg = "switch --tor is incompatible with switch --proxy"
+        errMsg = "switch '--tor' is incompatible with option '--proxy'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.checkTor and not any([conf.tor, conf.proxy]):
-        errMsg = "switch --check-tor requires usage of switch --tor (or --proxy with HTTP proxy address using Tor)"
+        errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address using Tor)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.torPort is not None and not (isinstance(conf.torPort, int) and conf.torPort > 0):
-        errMsg = "value for --tor-port (torPort) option must be an integer value greater than zero (>0)"
+        errMsg = "value for option '--tor-port' must be a positive integer"
         raise sqlmapSyntaxException, errMsg
 
     if conf.torType not in getPublicTypeMembers(PROXYTYPE, True):
-        errMsg = "switch --tor-type accepts one of following values: %s" % ", ".join(getPublicTypeMembers(PROXYTYPE, True))
+        errMsg = "option '--tor-type' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(PROXYTYPE, True))
         raise sqlmapSyntaxException, errMsg
 
     if conf.skip and conf.testParameter:
-        errMsg = "switch --skip is incompatible with switch -p"
+        errMsg = "option '--skip' is incompatible with option '-p'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.mobile and conf.agent:
-        errMsg = "switch --mobile is incompatible with switch --user-agent"
+        errMsg = "switch '--mobile' is incompatible with option '--user-agent'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.proxy and conf.ignoreProxy:
-        errMsg = "switch --proxy is incompatible with switch --ignore-proxy"
+        errMsg = "option '--proxy' is incompatible with switch '--ignore-proxy'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
-        errMsg = "switch --forms is compatible only with -u (--url) target switch"
+        errMsg = "switch '--forms' is compatible only with option '-u' (--url)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.timeSec < 1:
-        errMsg = "value for --time-sec option must be an integer greater than 0"
+        errMsg = "value for option '--time-sec' must be a positive integer"
         raise sqlmapSyntaxException, errMsg
 
     if conf.uChar and not re.match(UNION_CHAR_REGEX, conf.uChar):
-        errMsg = "value for --union-char option must be an alpha-numeric value (e.g. 1)"
+        errMsg = "value for option '--union-char' must be an alpha-numeric value (e.g. 1)"
         raise sqlmapSyntaxException, errMsg
 
     if isinstance(conf.uCols, basestring):
         if not conf.uCols.isdigit() and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
-            errMsg = "value for --union-cols must be a range with hyphon "
+            errMsg = "value for option '--union-cols' must be a range with hyphon "
             errMsg += "(e.g. 1-10) or integer value (e.g. 5)"
             raise sqlmapSyntaxException, errMsg
 

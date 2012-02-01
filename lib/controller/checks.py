@@ -524,7 +524,7 @@ def checkSqlInjection(place, parameter, value):
     if injection.place is not None and injection.parameter is not None:
         if not conf.dropSetCookie and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data and injection.data[PAYLOAD.TECHNIQUE.BOOLEAN].vector.startswith('OR'):
             warnMsg = "in OR boolean-based injections, please consider usage "
-            warnMsg += "of switch --drop-set-cookie if you experience any "
+            warnMsg += "of switch '--drop-set-cookie' if you experience any "
             warnMsg += "problems during data retrieval"
             logger.warn(warnMsg)
 
@@ -715,7 +715,7 @@ def checkDynamicContent(firstPage, secondPage):
 
             if count > conf.retries:
                 warnMsg = "target url is too dynamic. "
-                warnMsg += "switching to --text-only. "
+                warnMsg += "switching to '--text-only' "
                 logger.warn(warnMsg)
 
                 conf.textOnly = True
@@ -905,7 +905,7 @@ def checkWaf():
 
     if retVal:
         warnMsg = "it appears that the target is protected. Please "
-        warnMsg += "consider usage of tamper scripts (--tamper switch)"
+        warnMsg += "consider usage of tamper scripts (option '--tamper')"
         logger.warn(warnMsg)
     else:
         infoMsg = "it appears that the target is not protected"
