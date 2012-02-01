@@ -1400,7 +1400,7 @@ class Enumeration:
 
             return entries, lengths
 
-        elif isNoneValue(count):
+        elif not isNumPosStrValue(count):
             return None
 
         for column in colList:
