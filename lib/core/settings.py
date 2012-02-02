@@ -224,7 +224,8 @@ SQL_STATEMENTS = {
                              "load ",           ),
 
                        "SQL data control":      (
-                             "grant ",          ),
+                             "grant ",
+                             "revoke ",         ),
 
                        "SQL data execution":    (
                              "exec ",
