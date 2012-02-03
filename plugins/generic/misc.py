@@ -41,7 +41,7 @@ class Miscellaneous:
             if Backend.isOs(OS.WINDOWS):
                 self.checkDbmsOs(detailed=True)
 
-                if Backend.getOsVersion() == "2000":
+                if Backend.getOsVersion() in ("2000", "NT"):
                     conf.tmpPath = "C:/WINNT/Temp"
                 elif Backend.getOsVersion() in ("2003", "XP"):
                     conf.tmpPath = "C:/Documents and Settings/All Users/Application Data/TEMP"
