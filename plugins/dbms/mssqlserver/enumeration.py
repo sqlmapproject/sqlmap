@@ -97,7 +97,7 @@ class Enumeration(GenericEnumeration):
 
                     continue
 
-                for query in (rootQuery.inband.query, rootQuery.inband.query2):
+                for query in (rootQuery.inband.query, rootQuery.inband.query2, rootQuery.inband.query3):
                     query = query.replace("%s", db)
                     value = inject.getValue(query, blind=False)
                     if not isNoneValue(value):
@@ -118,7 +118,7 @@ class Enumeration(GenericEnumeration):
                 infoMsg += "database '%s'" % db
                 logger.info(infoMsg)
 
-                for query in (rootQuery.blind.count, rootQuery.blind.count2):
+                for query in (rootQuery.blind.count, rootQuery.blind.count2, rootQuery.blind.count3):
                     _ = query.replace("%s", db)
                     count = inject.getValue(_, inband=False, error=False, charsetType=2)
                     if not isNoneValue(count):
@@ -134,7 +134,7 @@ class Enumeration(GenericEnumeration):
                 tables = []
 
                 for index in xrange(int(count)):
-                    _ = (rootQuery.blind.query if query == rootQuery.blind.count else rootQuery.blind.query2).replace("%s", db) % index
+                    _ = (rootQuery.blind.query if query == rootQuery.blind.count else rootQuery.blind.query2 if query == rootQuery.blind.count2 else rootQuery.blind.query3).replace("%s", db) % index
 
                     table = inject.getValue(_, inband=False, error=False)
                     kb.hintValue = table
