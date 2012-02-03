@@ -141,6 +141,7 @@ def unionUse(expression, unpack=True, dump=False):
 
     initTechnique(PAYLOAD.TECHNIQUE.UNION)
 
+    abortedFlag = False
     count = None
     origExpr = expression
     startLimit = 0
@@ -331,6 +332,8 @@ def unionUse(expression, unpack=True, dump=False):
                     clearConsoleLine(True)
 
             except KeyboardInterrupt:
+                abortedFlag = True
+
                 warnMsg = "user aborted during enumeration. sqlmap "
                 warnMsg += "will display partial output"
                 logger.warn(warnMsg)
@@ -339,7 +342,7 @@ def unionUse(expression, unpack=True, dump=False):
                 value = threadData.shared.value
                 kb.suppressResumeInfo = False
 
-    if not value:
+    if not value and not abortedFlag:
         expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full inband doesn't play well with ORDER BY
         value = __oneShotUnionUse(expression, unpack)
 

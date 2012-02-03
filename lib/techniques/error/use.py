@@ -202,6 +202,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
 
     initTechnique(PAYLOAD.TECHNIQUE.ERROR)
 
+    abortedFlag = False
     count = None
     start = time.time()
     startLimit = 0
@@ -374,6 +375,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 runThreads(numThreads, errorThread)
 
             except KeyboardInterrupt:
+                abortedFlag = True
                 warnMsg = "user aborted during enumeration. sqlmap "
                 warnMsg += "will display partial output"
                 logger.warn(warnMsg)
@@ -382,7 +384,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                 outputs = threadData.shared.outputs
                 kb.suppressResumeInfo = False
 
-    if not outputs:
+    if not outputs and not abortedFlag:
         outputs = __errorFields(expression, expressionFields, expressionFieldsList)
 
     if outputs and isinstance(outputs, list) and len(outputs) == 1 and isinstance(outputs[0], basestring):

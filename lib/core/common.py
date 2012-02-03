@@ -2798,7 +2798,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism:
         payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, '')))
 
-        regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX.encode("string-escape"))
+        regex = r"\b%s\b" % filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX.encode("string-escape"))
 
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
