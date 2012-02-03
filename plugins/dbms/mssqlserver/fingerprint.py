@@ -152,11 +152,11 @@ class Fingerprint(GenericFingerprint):
 
         # Get back-end DBMS underlying operating system version
         for version, data in versions.items():
-            query = "SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
-            query += "LIKE '%Windows NT " + data[0] + "%'"
-            result = inject.goStacked(query)
+            query = "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query += "LIKE '%Windows NT " + data[0] + "%')>0"
+            result = inject.checkBooleanExpression(query)
 
-            if result is not None and len(result) > 0 and result[0].isdigit():
+            if result:
                 Backend.setOsVersion(version)
                 infoMsg += " %s" % Backend.getOsVersion()
                 break
