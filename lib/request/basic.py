@@ -108,46 +108,46 @@ def checkCharEncoding(encoding):
         return encoding
 
     # http://www.destructor.de/charsets/index.htm
-    translate = { 'windows-874': 'iso-8859-11', 'en_us': 'utf8', 'macintosh': 'iso-8859-1', 'euc_tw': 'big5_tw', 'th': 'tis-620' }
+    translate = { "windows-874": "iso-8859-11", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8" }
 
     for delimiter in (';', ',', '('):
         if delimiter in encoding:
             encoding = encoding[:encoding.find(delimiter)].strip()
 
     # popular typos/errors
-    if '8858' in encoding:
-        encoding = encoding.replace('8858', '8859') # iso-8858 -> iso-8859
-    elif '8559' in encoding:
-        encoding = encoding.replace('8559', '8859') # iso-8559 -> iso-8859
-    elif '5889' in encoding:
-        encoding = encoding.replace('5889', '8859') # iso-5889 -> iso-8859
-    elif '2313' in encoding:
-        encoding = encoding.replace('2313', '2312') # gb2313 -> gb2312
-    elif 'x-euc' in encoding:
-        encoding = encoding.replace('x-euc', 'euc') # x-euc-kr -> euc-kr
+    if "8858" in encoding:
+        encoding = encoding.replace("8858", "8859") # iso-8858 -> iso-8859
+    elif "8559" in encoding:
+        encoding = encoding.replace("8559", "8859") # iso-8559 -> iso-8859
+    elif "5889" in encoding:
+        encoding = encoding.replace("5889", "8859") # iso-5889 -> iso-8859
+    elif "2313" in encoding:
+        encoding = encoding.replace("2313", "2312") # gb2313 -> gb2312
+    elif "x-euc" in encoding:
+        encoding = encoding.replace("x-euc", "euc") # x-euc-kr -> euc-kr
 
     # name adjustment for compatibility
-    if encoding.startswith('8859'):
-        encoding = 'iso-%s' % encoding
-    elif encoding.startswith('cp-'):
-        encoding = 'cp%s' % encoding[3:]
-    elif encoding.startswith('euc-'):
-        encoding = 'euc_%s' % encoding[4:]
-    elif encoding.startswith('windows') and not encoding.startswith('windows-'):
-        encoding = 'windows-%s' % encoding[7:]
-    elif encoding.find('iso-88') > 0:
-        encoding = encoding[encoding.find('iso-88'):]
-    elif encoding.startswith('is0-'):
-        encoding = 'iso%s' % encoding[4:]
-    elif encoding.find('ascii') > 0:
-        encoding = 'ascii'
-    elif encoding.find('utf8') > 0:
-        encoding = 'utf8'
+    if encoding.startswith("8859"):
+        encoding = "iso-%s" % encoding
+    elif encoding.startswith("cp-"):
+        encoding = "cp%s" % encoding[3:]
+    elif encoding.startswith("euc-"):
+        encoding = "euc_%s" % encoding[4:]
+    elif encoding.startswith("windows") and not encoding.startswith("windows-"):
+        encoding = "windows-%s" % encoding[7:]
+    elif encoding.find("iso-88") > 0:
+        encoding = encoding[encoding.find("iso-88"):]
+    elif encoding.startswith("is0-"):
+        encoding = "iso%s" % encoding[4:]
+    elif encoding.find("ascii") > 0:
+        encoding = "ascii"
+    elif encoding.find("utf8") > 0:
+        encoding = "utf8"
 
     # http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
         encoding = translate[encoding]
-    elif encoding in ('null', '{charset}', '*'):
+    elif encoding in ("null", "{charset}", "*"):
         return None
 
     # http://www.iana.org/assignments/character-sets
@@ -167,7 +167,7 @@ def getHeuristicCharEncoding(page):
     Returns page encoding charset detected by usage of heuristics
     Reference: http://chardet.feedparser.org/docs/
     """
-    retVal = detect(page)['encoding']
+    retVal = detect(page)["encoding"]
 
     infoMsg = "heuristics detected web page charset '%s'" % retVal
     singleTimeLogMessage(infoMsg, logging.INFO, retVal)
@@ -182,8 +182,8 @@ def decodePage(page, contentEncoding, contentType):
     if not page or (conf.nullConnection and len(page) < 2):
         return getUnicode(page)
 
-    if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ('gzip', 'x-gzip', 'deflate'):
-        if contentEncoding == 'deflate':
+    if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ("gzip", "x-gzip", "deflate"):
+        if contentEncoding == "deflate":
             # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
             data = StringIO.StringIO(zlib.decompress(page, -15))
         else:
