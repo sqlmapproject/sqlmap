@@ -960,8 +960,6 @@ def readInput(message, default=None, checkBatch=True):
     elif message[-1] == ']':
         message += " "
 
-    message = "\r%s" % message
-
     if checkBatch and conf.batch:
         if isinstance(default, (list, tuple, set)):
             options = ",".join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
@@ -979,7 +977,7 @@ def readInput(message, default=None, checkBatch=True):
         data = default
     else:
         logging._acquireLock()
-        dataToStdout(message, True)
+        dataToStdout("\r%s" % message, True)
         data = raw_input()
         #data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
         logging._releaseLock()
