@@ -2374,7 +2374,7 @@ def aliasToDbmsEnum(dbms):
         return None
 
     for key, item in DBMS_DICT.items():
-        if dbms.lower() in item[0]:
+        if dbms.lower() in item[0] or dbms.lower() == key.lower():
             retVal = key
             break
 
