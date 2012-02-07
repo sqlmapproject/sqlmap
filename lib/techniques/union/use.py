@@ -165,7 +165,7 @@ def unionUse(expression, unpack=True, dump=False):
     if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
        (dump and (conf.limitStart or conf.limitStop))) and \
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
-       not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE \
+       not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE \
        and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
        and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 

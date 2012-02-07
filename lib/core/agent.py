@@ -576,7 +576,7 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and inbandQuery.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and inbandQuery.endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
             inbandQuery = inbandQuery[:-len(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()])]
 
         for element in xrange(0, count):
@@ -747,7 +747,7 @@ class Agent:
         if Backend.getIdentifiedDbms() is not None and hasattr(queries[Backend.getIdentifiedDbms()], "case"):
             caseExpression = queries[Backend.getIdentifiedDbms()].case.query % expression
 
-            if "(IIF" not in caseExpression and Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not caseExpression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+            if "(IIF" not in caseExpression and Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not caseExpression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
                 caseExpression += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
         return caseExpression

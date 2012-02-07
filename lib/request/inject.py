@@ -159,7 +159,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     # NOTE: I assume that only queries that get data from a table
     # can return multiple entries
     if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
-      not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
+      not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not \
       expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 
@@ -215,7 +215,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                     stopLimit += startLimit
 
             if not stopLimit or stopLimit <= 1:
-                if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+                if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
                     test = False
                 else:
                     test = True

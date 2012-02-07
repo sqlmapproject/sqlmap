@@ -257,7 +257,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if isNullValue(kb.uChar) else PAYLOAD.WHERE.NEGATIVE)
 
     if count:
-        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and query.endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
             query = query[:-len(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()])]
 
         if count:
