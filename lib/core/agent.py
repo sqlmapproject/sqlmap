@@ -26,7 +26,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.settings import FROM_TABLE
+from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.unescaper import unescaper
@@ -559,7 +559,7 @@ class Agent:
 
         if limited:
             inbandQuery += ",".join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
-            inbandQuery += FROM_TABLE.get(Backend.getIdentifiedDbms(), "")
+            inbandQuery += FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")
             inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
             return inbandQuery
@@ -576,8 +576,8 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if Backend.getIdentifiedDbms() in FROM_TABLE and inbandQuery.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
-            inbandQuery = inbandQuery[:-len(FROM_TABLE[Backend.getIdentifiedDbms()])]
+        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and inbandQuery.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+            inbandQuery = inbandQuery[:-len(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()])]
 
         for element in xrange(0, count):
             if element > 0:
@@ -596,9 +596,9 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if Backend.getIdentifiedDbms() in FROM_TABLE:
+        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE:
             if " FROM " not in inbandQuery or "(CASE " in inbandQuery or "(IIF" in inbandQuery:
-                inbandQuery += FROM_TABLE[Backend.getIdentifiedDbms()]
+                inbandQuery += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
         if intoRegExp:
             inbandQuery += intoRegExp
@@ -615,8 +615,8 @@ class Agent:
                 else:
                     inbandQuery += char
 
-            if Backend.getIdentifiedDbms() in FROM_TABLE:
-                inbandQuery += FROM_TABLE[Backend.getIdentifiedDbms()]
+            if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE:
+                inbandQuery += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
         inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
@@ -747,8 +747,8 @@ class Agent:
         if Backend.getIdentifiedDbms() is not None and hasattr(queries[Backend.getIdentifiedDbms()], "case"):
             caseExpression = queries[Backend.getIdentifiedDbms()].case.query % expression
 
-            if "(IIF" not in caseExpression and Backend.getIdentifiedDbms() in FROM_TABLE and not caseExpression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
-                caseExpression += FROM_TABLE[Backend.getIdentifiedDbms()]
+            if "(IIF" not in caseExpression and Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not caseExpression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+                caseExpression += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
         return caseExpression
 

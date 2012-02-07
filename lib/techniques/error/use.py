@@ -35,7 +35,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapConnectionException
-from lib.core.settings import FROM_TABLE
+from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
@@ -227,9 +227,9 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
     # NOTE: I assume that only queries that get data from a table can
     # return multiple entries
     if (dump and (conf.limitStart or conf.limitStop)) or (" FROM " in \
-       expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_TABLE) \
-       or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
-       expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
+       expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_DUMMY_TABLE) \
+       or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not \
+       expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
        and ("(CASE" not in expression.upper() or ("(CASE" in expression.upper() and "WHEN use" in expression))) \
        and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 

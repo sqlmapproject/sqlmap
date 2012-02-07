@@ -2370,13 +2370,11 @@ def aliasToDbmsEnum(dbms):
 
     retVal = None
 
-    if dbms is None:
-        return None
-
-    for key, item in DBMS_DICT.items():
-        if dbms.lower() in item[0] or dbms.lower() == key.lower():
-            retVal = key
-            break
+    if dbms:
+        for key, item in DBMS_DICT.items():
+            if dbms.lower() in item[0] or dbms.lower() == key.lower():
+                retVal = key
+                break
 
     return retVal
 

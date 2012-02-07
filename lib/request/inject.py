@@ -36,7 +36,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import FROM_TABLE
+from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
@@ -159,8 +159,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
     # NOTE: I assume that only queries that get data from a table
     # can return multiple entries
     if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
-      not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
-      expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
+      not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE and not \
+      expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
@@ -215,7 +215,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
                     stopLimit += startLimit
 
             if not stopLimit or stopLimit <= 1:
-                if Backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+                if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
                     test = False
                 else:
                     test = True
@@ -318,8 +318,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, r
 
                 return outputs
 
-    elif Backend.getIdentifiedDbms() in FROM_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
-        expression += FROM_TABLE[Backend.getIdentifiedDbms()]
+    elif Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
+        expression += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
     outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, resumeValue=resumeValue, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
     returnValue = ", ".join(output for output in outputs)

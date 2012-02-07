@@ -35,7 +35,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.settings import FROM_TABLE
+from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import UNION_MIN_RESPONSE_CHARS
 from lib.core.settings import UNION_STDEV_COEFF
 from lib.core.settings import MIN_RATIO
@@ -257,14 +257,14 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if isNullValue(kb.uChar) else PAYLOAD.WHERE.NEGATIVE)
 
     if count:
-        if Backend.getIdentifiedDbms() in FROM_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
-            query = query[:-len(FROM_TABLE[Backend.getIdentifiedDbms()])]
+        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and query.endswith(FROM_TABLE[Backend.getIdentifiedDbms()]):
+            query = query[:-len(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()])]
 
         if count:
             query += ", %s" % kb.uChar
 
-        if Backend.getIdentifiedDbms() in FROM_TABLE:
-            query += FROM_TABLE[Backend.getIdentifiedDbms()]
+        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE:
+            query += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
         validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
 

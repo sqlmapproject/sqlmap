@@ -182,7 +182,7 @@ USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
 REFERER_ALIASES = ( "ref", "referer", "referrer" )
 HOST_ALIASES = ( "host", )
 
-FROM_TABLE = {
+FROM_DUMMY_TABLE = {
                         DBMS.ORACLE: " FROM DUAL",
                         DBMS.ACCESS: " FROM MSysAccessObjects",
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",

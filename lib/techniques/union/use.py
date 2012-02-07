@@ -36,7 +36,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
-from lib.core.settings import FROM_TABLE
+from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -165,8 +165,8 @@ def unionUse(expression, unpack=True, dump=False):
     if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
        (dump and (conf.limitStart or conf.limitStop))) and \
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
-       not in FROM_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE \
-       and not expression.upper().endswith(FROM_TABLE[Backend.getIdentifiedDbms()]))) \
+       not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_TABLE \
+       and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
        and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
