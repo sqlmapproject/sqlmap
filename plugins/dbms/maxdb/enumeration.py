@@ -78,8 +78,6 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         for db in dbs:
-            db = unArrayizeValue(db)
-
             randStr = randomStr()
             query = rootQuery.inband.query % (("'%s'" % db) if db != "USER" else 'USER')
             retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.tablename' % randStr], blind=True)

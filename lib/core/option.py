@@ -86,6 +86,7 @@ from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
 from lib.core.settings import IS_WIN
+from lib.core.settings import NULL
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
@@ -1474,7 +1475,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.testQueryCount = 0
     kb.threadContinue = True
     kb.threadException = False
-    kb.uChar = "NULL"
+    kb.uChar = NULL
     kb.xpCmdshellAvailable = False
 
     kb.chars = AttribDict()

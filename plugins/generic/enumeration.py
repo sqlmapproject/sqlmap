@@ -897,7 +897,7 @@ class Enumeration:
                     value = map(lambda x: (dbs[0], x), value)
 
                 for db, table in filterPairValues(value):
-                    db = safeSQLIdentificatorNaming(unArrayizeValue(db))
+                    db = safeSQLIdentificatorNaming(db)
                     table = safeSQLIdentificatorNaming(table, True)
 
                     if not kb.data.cachedTables.has_key(db):
@@ -1653,6 +1653,10 @@ class Enumeration:
                                 colEntry = entry
                             else:
                                 colEntry = entry[index] if index < len(entry) else u''
+
+                            if colEntry is None:
+                                import pdb
+                                pdb.set_trace()
 
                             colEntryLen = len(getUnicode(colEntry))
                             maxLen = max(colLen, colEntryLen)

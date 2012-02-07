@@ -65,19 +65,17 @@ def direct(query, content=True):
     if not output:
         return output
     elif content:
-        if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
-            dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.hostname, kb.injection.place, conf.parameters[kb.injection.place], query, base64pickle(output)))
+        #if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
+            #dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.hostname, kb.injection.place, conf.parameters[kb.injection.place], query, base64pickle(output)))
 
-        if len(output) == 1:
+        if output and isinstance(output, (list, tuple)):
             if len(output[0]) == 1:
-                out = list(output)[0][0]
-                if isinstance(out, str):
-                    out = utf8decode(out)
-                return getUnicode(out, UNICODE_ENCODING)
-            else:
-                return list(output)
-        else:
-            return output
+                if len(output) > 1:
+                    output = map(lambda _: _[0], output)
+                else:
+                    output = output[0][0]
+
+        return getUnicode(output, noneToNull=True)
     else:
         for line in output:
             if line[0] in (1, -1):

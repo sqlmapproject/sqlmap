@@ -84,6 +84,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
+from lib.core.settings import NULL
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
@@ -1088,9 +1089,9 @@ def parsePasswordHash(password):
     blank = " " * 8
 
     if not password or password == " ":
-        password = "NULL"
+        password = NULL
 
-    if Backend.isDbms(DBMS.MSSQL) and password != "NULL" and isHexEncodedString(password):
+    if Backend.isDbms(DBMS.MSSQL) and password != NULL and isHexEncodedString(password):
         hexPassword = password
         password = "%s\n" % hexPassword
         password += "%sheader: %s\n" % (blank, hexPassword[:6])
@@ -2047,7 +2048,7 @@ def getPartRun():
     # Return the INI tag to consider for common outputs (e.g. 'Databases')
     return commonPartsDict[retVal][1] if isinstance(commonPartsDict.get(retVal), tuple) else retVal
 
-def getUnicode(value, encoding=None, system=False):
+def getUnicode(value, encoding=None, system=False, noneToNull=False):
     """
     Return the unicode representation of the supplied value:
 
@@ -2058,6 +2059,13 @@ def getUnicode(value, encoding=None, system=False):
     >>> getUnicode(1)
     u'1'
     """
+
+    if noneToNull and value is None:
+        return NULL
+
+    if isinstance(value, (list, tuple)):
+        value = list(getUnicode(_, encoding, system, noneToNull) for _ in value)
+        return value
 
     if not system:
         if isinstance(value, unicode):
@@ -2917,7 +2925,7 @@ def isNullValue(value):
     Returns whether the value contains explicit 'NULL' value
     """
 
-    return isinstance(value, basestring) and value.upper() == "NULL"
+    return isinstance(value, basestring) and value.upper() == NULL
 
 def expandMnemonics(mnemonics, parser, args):
     """

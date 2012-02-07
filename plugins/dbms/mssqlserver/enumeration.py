@@ -89,8 +89,6 @@ class Enumeration(GenericEnumeration):
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             for db in dbs:
-                db = unArrayizeValue(db)
-
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     logger.info(infoMsg)
@@ -172,9 +170,6 @@ class Enumeration(GenericEnumeration):
             enumDbs = kb.data.cachedDbs
 
         for db in enumDbs:
-            if isinstance(db, list):
-                db = db[0]
-
             db = safeSQLIdentificatorNaming(db)
             foundTbls[db] = []
 

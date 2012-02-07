@@ -139,8 +139,6 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         for db in dbs:
-            db = unArrayizeValue(db)
-
             for blind in blinds:
                 randStr = randomStr()
                 query = rootQuery.inband.query % db

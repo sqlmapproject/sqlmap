@@ -29,6 +29,7 @@ from lib.core.enums import DBMS
 from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import BUFFERED_LOG_SIZE
+from lib.core.settings import NULL
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 
@@ -455,7 +456,7 @@ class Dump:
                         value = getUnicode(info["values"][i])
 
                         if re.search("^[\ *]*$", value):
-                            value = "NULL"
+                            value = NULL
 
                     values.append(value)
                     maxlength = int(info["length"])

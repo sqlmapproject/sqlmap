@@ -239,6 +239,9 @@ SQL_STATEMENTS = {
                              "rollback ",       ),
                      }
 
+# string representation for NULL value
+NULL = "NULL"
+
 # Regular expressions used for parsing error messages (--parse-errors)
 ERROR_PARSING_REGEXES = (   
                           r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>", 
