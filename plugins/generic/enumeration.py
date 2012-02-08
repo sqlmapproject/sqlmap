@@ -1768,20 +1768,20 @@ class Enumeration:
 
                         entriesCount = len(columnEntries)
 
-                if len(kb.data.dumpedTable) > 0:
+                if len(kb.data.dumpedTable) == 0 or (entriesCount == 0 and kb.permissionFlag):
+                    warnMsg = "unable to retrieve the entries of "
+                    if conf.col:
+                        warnMsg += "columns '%s' " % colString
+                    warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                    warnMsg += "on database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
+                    logger.warn(warnMsg)
+                else:
                     kb.data.dumpedTable["__infos__"] = { "count": entriesCount,
                                                          "table": safeSQLIdentificatorNaming(tbl, True),
                                                          "db":    safeSQLIdentificatorNaming(conf.db) }
 
                     attackDumpedTable()
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
-                else:
-                    warnMsg = "unable to retrieve the entries of "
-                    if conf.col:
-                        warnMsg += "columns '%s' " % colString
-                    warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    warnMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                    logger.warn(warnMsg)
 
             except sqlmapConnectionException, e:
                 errMsg = "connection exception detected in dumping phase: "

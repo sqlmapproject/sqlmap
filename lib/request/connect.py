@@ -731,6 +731,8 @@ class Connect:
         if not response and removeReflection:
             page = removeReflectiveValues(page, payload)
 
+        kb.permissionFlag = re.search(r"permission denied", page or "", re.I) is not None
+
         if content or response:
             return page, headers
 
