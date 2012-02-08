@@ -102,10 +102,12 @@ class Enumeration:
             infoMsg = "fetching banner"
             logger.info(infoMsg)
 
-            # Needed for IBM DB2 versions < 9
-            if Backend.isDbms(DBMS.DB2) and int(Backend.getVersion().split(".")[0]) < 9:
-                query = queries[Backend.getIdentifiedDbms()].banner.query2
-                kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
+            if Backend.isDbms(DBMS.DB2):
+                rootQuery = queries[DBMS.DB2].banner
+                for query in (rootQuery.query, rootQuery.query2):
+                    kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
+                    if kb.data.banner:
+                        break
             else:
                 query = queries[Backend.getIdentifiedDbms()].banner.query
                 kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
