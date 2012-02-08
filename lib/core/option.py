@@ -1455,6 +1455,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.pageEncoding = DEFAULT_PAGE_ENCODING
     kb.pageStable = None
     kb.partRun = None
+    kb.permissionFlag = False
     kb.processResponseCounter = 0
     kb.proxyAuthHeader = None
     kb.queryCounter = 0

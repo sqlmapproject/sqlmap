@@ -1654,10 +1654,6 @@ class Enumeration:
                             else:
                                 colEntry = entry[index] if index < len(entry) else u''
 
-                            if colEntry is None:
-                                import pdb
-                                pdb.set_trace()
-
                             colEntryLen = len(getUnicode(colEntry))
                             maxLen = max(colLen, colEntryLen)
 
