@@ -1268,7 +1268,7 @@ def parseTargetUrl():
     __urlSplit = urlparse.urlsplit(conf.url)
     __hostnamePort = __urlSplit[1].split(":")
 
-    conf.scheme = __urlSplit[0].strip()
+    conf.scheme = __urlSplit[0].strip() if not conf.forceSSL else "https"
     conf.path = __urlSplit[2].strip()
     conf.hostname = __hostnamePort[0].strip()
 
