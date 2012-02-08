@@ -1292,9 +1292,6 @@ def parseTargetUrl():
     else:
         conf.port = 80
 
-    if conf.forceSSL and conf.port == 80:
-        conf.port = 443
-
     if __urlSplit[3]:
         conf.parameters[PLACE.GET] = urldecode(__urlSplit[3]) if __urlSplit[3] and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in __urlSplit[3] else __urlSplit[3]
 
