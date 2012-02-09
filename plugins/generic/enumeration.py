@@ -163,9 +163,9 @@ class Enumeration:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query
 
         query = agent.forgeCaseStatement(query)
-        isDba = unArrayizeValue(inject.getValue(query, charsetType=1))
+        kb.data.isDba = unArrayizeValue(inject.getValue(query, charsetType=1))
 
-        return isDba == "1"
+        return kb.data.isDba == "1"
 
     def getUsers(self):
         infoMsg = "fetching database users"
