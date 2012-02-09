@@ -1228,7 +1228,7 @@ def parseTargetDirect():
                     if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
                         errMsg = "'%s' third-party library must be " % data[1]
                         errMsg += "version >= 1.0.2 to work properly. "
-                        errMsg += "Download from %s" % data[2]
+                        errMsg += "Download from '%s'" % data[2]
                         raise sqlmapMissingDependence, errMsg
 
                 elif dbmsName == DBMS.MYSQL:
@@ -1246,7 +1246,7 @@ def parseTargetDirect():
             except ImportError, _:
                 errMsg = "sqlmap requires '%s' third-party library " % data[1]
                 errMsg += "in order to directly connect to the database "
-                errMsg += "%s. Download from %s" % (dbmsName, data[2])
+                errMsg += "%s. Download from '%s'" % (dbmsName, data[2])
                 raise sqlmapMissingDependence, errMsg
 
 def parseTargetUrl():

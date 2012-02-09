@@ -163,10 +163,7 @@ class Enumeration:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query
 
         query = agent.forgeCaseStatement(query)
-        isDba = inject.getValue(query, charsetType=1)
-
-        if user is None:
-            kb.data.isDba = unArrayizeValue(isDba)
+        isDba = unArrayizeValue(inject.getValue(query, charsetType=1))
 
         return isDba == "1"
 

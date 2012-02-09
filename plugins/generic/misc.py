@@ -83,7 +83,7 @@ class Miscellaneous:
             query = "SELECT %s" % query
 
         kb.bannerFp["dbmsVersion"] = inject.getValue(query)
-        kb.bannerFp["dbmsVersion"] = kb.bannerFp["dbmsVersion"].replace(",", "").replace("-", "").replace(" ", "")
+        kb.bannerFp["dbmsVersion"] = (kb.bannerFp["dbmsVersion"] or "").replace(",", "").replace("-", "").replace(" ", "")
 
     def delRemoteFile(self, tempFile):
         self.checkDbmsOs()
