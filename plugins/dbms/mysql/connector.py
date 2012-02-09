@@ -57,7 +57,7 @@ class Connector(GenericConnector):
             self.cursor.execute(query)
             retVal = True
         except (pymysql.OperationalError, pymysql.ProgrammingError), msg:
-            logger.warn(msg[1])
+            logger.warn("(remote) %s" % msg[1])
         except pymysql.InternalError, msg:
             raise sqlmapConnectionException, msg[1]
 

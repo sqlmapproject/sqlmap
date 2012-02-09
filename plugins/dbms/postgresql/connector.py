@@ -61,7 +61,7 @@ class Connector(GenericConnector):
             self.cursor.execute(query)
             retVal = True
         except (psycopg2.OperationalError, psycopg2.ProgrammingError), msg:
-            logger.warn(msg)
+            logger.warn(("(remote) %s" % msg).strip())
         except psycopg2.InternalError, msg:
             raise sqlmapConnectionException, msg
 

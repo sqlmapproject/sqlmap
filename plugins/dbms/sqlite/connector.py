@@ -71,14 +71,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except self.__sqlite.OperationalError, msg:
-            logger.warn(msg[0])
+            logger.warn("(remote) %s" % msg[0])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(utf8encode(query))
         except self.__sqlite.OperationalError, msg:
-            logger.warn(msg[0])
+            logger.warn("(remote) %s" % msg[0])
         except self.__sqlite.DatabaseError, msg:
             raise sqlmapConnectionException, msg[0]
 

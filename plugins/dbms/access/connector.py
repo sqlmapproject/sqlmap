@@ -53,14 +53,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except pyodbc.ProgrammingError, msg:
-            logger.warn(msg[1])
+            logger.warn("(remote) %s" % msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
         except (pyodbc.OperationalError, pyodbc.ProgrammingError), msg:
-            logger.warn(msg[1])
+            logger.warn("(remote) %s" % msg[1])
         except pyodbc.Error, msg:
             raise sqlmapConnectionException, msg[1]
 

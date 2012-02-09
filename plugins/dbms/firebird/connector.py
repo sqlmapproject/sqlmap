@@ -50,14 +50,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except kinterbasdb.OperationalError, msg:
-            logger.warn(msg[1])
+            logger.warn("(remote) %s" % msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
         except kinterbasdb.OperationalError, msg:
-            logger.warn(msg[1])
+            logger.warn("(remote) %s" % msg[1])
         except kinterbasdb.Error, msg:
             raise sqlmapConnectionException, msg[1]
 

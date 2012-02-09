@@ -52,7 +52,7 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except (pymssql.ProgrammingError, pymssql.OperationalError, _mssql.MssqlDatabaseException), msg:
-            logger.warn(msg)
+            logger.warn("(remote) %s" % msg)
             return None
 
     def execute(self, query):
@@ -62,7 +62,7 @@ class Connector(GenericConnector):
             self.cursor.execute(utf8encode(query))
             retVal = True
         except (pymssql.OperationalError, pymssql.ProgrammingError), msg:
-            logger.warn(msg)
+            logger.warn("(remote) %s" % msg)
         except pymssql.InternalError, msg:
             raise sqlmapConnectionException, msg
 

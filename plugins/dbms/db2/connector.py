@@ -45,14 +45,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except ibm_db_dbi.ProgrammingError, msg:
-            logger.warn(msg[1])
+            logger.warn("(remote) %s" % msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
         except (ibm_db_dbi.OperationalError, ibm_db_dbi.ProgrammingError), msg:
-            logger.warn(msg[1])
+            logger.warn("(remote) %s" % msg[1])
         except ibm_db_dbi.InternalError, msg:
             raise sqlmapConnectionException, msg[1]
 
