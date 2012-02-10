@@ -129,17 +129,17 @@ def __formatInjection(inj):
 
     for stype, sdata in inj.data.items():
         title = sdata.title
-        _ = sdata.vector
+        vector = sdata.vector
         if stype == PAYLOAD.TECHNIQUE.UNION:
             count = re.sub(r"\(.+\)", "", sdata.payload).count(",") + 1
             title = re.sub(r"\d+ to \d+", str(count), title)
-            _ = agent.forgeInbandQuery("[QUERY]", _[0], _[1], _[2], _[3], _[4], _[5])
+            vector = agent.forgeInbandQuery("[QUERY]", vector[0], vector[1], vector[2], vector[3], vector[4], vector[5])
             if count == 1:
                 title = title.replace("columns", "column")
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % title
         data += "    Payload: %s\n" % (sdata.payload if stype != PAYLOAD.TECHNIQUE.TIME else sdata.payload.replace("[SLEEPTIME]", str(conf.timeSec)))
-        data += "    Vector: %s\n\n" % _ if conf.verbose > 1 else "\n"
+        data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data
 
