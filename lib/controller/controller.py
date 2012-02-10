@@ -133,7 +133,7 @@ def __formatInjection(inj):
         if stype == PAYLOAD.TECHNIQUE.UNION:
             count = re.sub(r"\(.+\)", "", sdata.payload).count(",") + 1
             title = re.sub(r"\d+ to \d+", str(count), title)
-            vector = agent.forgeInbandQuery("[QUERY]", vector[0], vector[1], vector[2], vector[3], vector[4], vector[5])
+            vector = agent.forgeInbandQuery("[QUERY]", vector[0], vector[1], vector[2], None, None, vector[5])
             if count == 1:
                 title = title.replace("columns", "column")
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
