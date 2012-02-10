@@ -18,8 +18,10 @@ from lib.core.common import dataToStdout
 from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
+from lib.core.common import getCounter
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
+from lib.core.common import incrementCounter
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import replaceNewlineTabs
@@ -55,6 +57,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     Bisection algorithm that can be used to perform blind SQL injection
     on an affected host
     """
+
+    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
+
+    if retVal:
+        return 0, retVal
 
     partialValue = ""
     finalValue = ""
@@ -130,7 +137,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
 
-    queriesCount = [0] # As list to deal with nested scoping rules
     hintlock = threading.Lock()
 
     def tryHint(idx):
@@ -145,8 +151,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 posValue = ord(hintValue[idx-1])
 
             forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
-            queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+            incrementCounter(kb.technique)
 
             if result:
                 return hintValue[idx-1]
@@ -191,8 +197,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if len(charTbl) == 1:
             forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
-            queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+            incrementCounter(kb.technique)
 
             if result:
                 return decodeIntToUnicode(charTbl[0])
@@ -214,8 +220,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 unescapedCharValue = unescaper.unescape("'%s'" % decodeIntToUnicode(posValue))
                 forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
-            queriesCount[0] += 1
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+            incrementCounter(kb.technique)
 
             if result:
                 minValue = posValue
@@ -292,8 +298,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     # candidates
                     for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
                         forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, retVal))
-                        queriesCount[0] += 1
                         result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                        incrementCounter(kb.technique)
 
                         if result:
                             return decodeIntToUnicode(retVal)
@@ -450,8 +456,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     testValue = unescaper.unescape("'%s'" % commonValue) if "'" not in commonValue else unescaper.unescape("%s" % commonValue, quote=False)
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
                     query = agent.suffixQuery(query)
-                    queriesCount[0] += 1
                     result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
+                    incrementCounter(kb.technique)
 
                     # Did we have luck?
                     if result:
@@ -474,8 +480,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
                     query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                     query = agent.suffixQuery(query)
-                    queriesCount[0] += 1
                     result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
+                    incrementCounter(kb.technique)
 
                     # Did we have luck?
                     if result:
@@ -521,9 +527,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         logger.info(infoMsg)
 
     if not partialValue:
+        conf.hashDB.write(expression, finalValue)
         dataToSessionFile("]\n")
 
     if kb.threadException:
         raise sqlmapThreadException, "something unexpected happened inside the threads"
 
-    return queriesCount[0], safecharencode(finalValue) if kb.safeCharEncode else finalValue
+    return getCounter(kb.technique), safecharencode(finalValue) if kb.safeCharEncode else finalValue

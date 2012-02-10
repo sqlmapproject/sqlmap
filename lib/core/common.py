@@ -3203,3 +3203,6 @@ def incrementCounter(counter):
     if counter not in kb.counters:
         resetCounter(counter)
     kb.counters[counter] += 1
+
+def getCounter(counter):
+    return kb.counters.get(counter, 0)
