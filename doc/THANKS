@@ -305,6 +305,9 @@ Truong Duc Luong <luongductruong@gmail.com>
 Pavol Luptak <pavol.luptak@nethemba.com>
     for reporting a bug when injecting on a POST data parameter
 
+Till Maas <opensource@till.name>
+    for suggesting a minor feature
+
 Michael Majchrowicz <mmajchrowicz@gmail.com>
     for extensively beta-testing sqlmap on various MySQL DBMS
     for providing really appreciated feedback
