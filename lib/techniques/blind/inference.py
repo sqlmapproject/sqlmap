@@ -170,7 +170,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         """
 
         forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
-        queriesCount[0] += 1
+        incrementCounter(kb.technique)
         result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
         return not result
