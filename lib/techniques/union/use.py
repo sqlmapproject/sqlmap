@@ -319,12 +319,12 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
                             if conf.verbose == 1:
-                                status = "[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
+                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
 
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
 
-                                dataToStdout(status, True)
+                                dataToStdout("%s\r\n" % status, True)
 
                 runThreads(numThreads, unionThread)
 
