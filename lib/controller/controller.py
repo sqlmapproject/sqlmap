@@ -384,7 +384,7 @@ def start():
 
                     skip |= (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
-                    skip |= (place == PLACE.COOKIE and intersect('cookie', conf.skip, True) not in ([], None))
+                    skip |= (place == PLACE.COOKIE and intersect(PLACE.COOKIE, conf.skip, True) not in ([], None))
 
                     skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
@@ -472,7 +472,7 @@ def start():
                                     break
 
                                 msg = "%s parameter '%s' " % (injection.place, injection.parameter)
-                                msg += "is vulnerable. Do you want to keep testing the others? [Y/n] "
+                                msg += "is vulnerable. Do you want to keep testing the others (if any)? [Y/n] "
                                 test = readInput(msg, default="Y")
 
                                 if test[0] in ("n", "N"):
