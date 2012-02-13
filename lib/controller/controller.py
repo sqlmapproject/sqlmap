@@ -472,10 +472,10 @@ def start():
                                     break
 
                                 msg = "%s parameter '%s' " % (injection.place, injection.parameter)
-                                msg += "is vulnerable. Do you want to keep testing the others (if any)? [Y/n] "
-                                test = readInput(msg, default="Y")
+                                msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
+                                test = readInput(msg, default="N")
 
-                                if test[0] in ("n", "N"):
+                                if test[0] not in ("y", "Y"):
                                     proceed = False
                                     paramKey = (conf.hostname, conf.path, None, None)
                                     kb.testedParams.add(paramKey)
