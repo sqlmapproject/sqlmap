@@ -532,7 +532,7 @@ def cmdLineParser():
 
         general.add_option("--save", dest="saveCmdline",
                             action="store_true",
-                            help="Save options on a configuration INI file")
+                            help="Save options to a configuration INI file")
 
         general.add_option("--tor", dest="tor", 
                                   action="store_true",
@@ -556,7 +556,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--beep", dest="beep",
                                   action="store_true",
-                                  help="Alert when sql injection found")
+                                  help="Sound alert when SQL injection found")
 
         miscellaneous.add_option("--check-payload", dest="checkPayload",
                                   action="store_true",
