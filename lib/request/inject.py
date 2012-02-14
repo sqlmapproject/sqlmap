@@ -404,8 +404,19 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
         getCurrentThreadData().disableStdOut = suppressOutput
 
     try:
+        if expected == EXPECTED.BOOL:
+            forgeCaseExpression = booleanExpression = expression
+
+            if expression.upper().startswith("SELECT "):
+                booleanExpression = expression[len("SELECT "):]
+            else:
+                forgeCaseExpression = agent.forgeCaseStatement(expression)
+
         if conf.direct:
-            value = direct(expression)
+            if expected == EXPECTED.BOOL:
+                value = direct(forgeCaseExpression)
+            else:
+                value = direct(expression)
 
         elif any(map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))):
             query = cleanQuery(expression)
@@ -417,14 +428,6 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 query = query.replace("DISTINCT ", "")
 
             count = 0
-
-            if expected == EXPECTED.BOOL:
-                forgeCaseExpression = booleanExpression = expression
-
-                if expression.upper().startswith("SELECT "):
-                    booleanExpression = expression[len("SELECT "):]
-                else:
-                    forgeCaseExpression = agent.forgeCaseStatement(expression)
 
             if inband and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
