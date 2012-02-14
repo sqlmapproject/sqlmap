@@ -52,6 +52,10 @@ DUMP_CR_MARKER = "__CARRIAGE_RETURN__"
 DUMP_TAB_MARKER = "__TAB__"
 DUMP_DEL_MARKER = "__DEL__"
 
+# markers for special cases when parameter values contain html encoded characters
+PARAMETER_AMP_MARKER = "__AMP__"
+PARAMETER_SEMICOLON_MARKER = "__SEMICOLON__"
+
 URI_QUESTION_MARKER = "__QUESTION_MARK__"
 
 PAYLOAD_DELIMITER = "\x00"

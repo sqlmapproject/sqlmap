@@ -106,6 +106,8 @@ from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DUMP_NEWLINE_MARKER
 from lib.core.settings import DUMP_CR_MARKER
 from lib.core.settings import DUMP_TAB_MARKER
+from lib.core.settings import PARAMETER_AMP_MARKER
+from lib.core.settings import PARAMETER_SEMICOLON_MARKER
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
@@ -687,10 +689,11 @@ def paramToDict(place, parameters=None):
 
     if place != PLACE.SOAP:
         parameters = parameters.replace(", ", ",")
-
+        parameters = re.sub(r"&(\w{1,4});", r"%s\g<1>%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), parameters)
         splitParams = parameters.split(conf.pDel or (DEFAULT_COOKIE_DELIMITER if place == PLACE.COOKIE else DEFAULT_GET_POST_DELIMITER))
 
         for element in splitParams:
+            element = re.sub(r"%s(.+?)%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), r"&\g<1>;", element)
             elem = element.split("=")
 
             if len(elem) >= 2:

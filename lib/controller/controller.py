@@ -27,7 +27,6 @@ from lib.core.common import getFilteredPageContent
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
 from lib.core.common import intersect
-from lib.core.common import paramToDict
 from lib.core.common import parseTargetUrl
 from lib.core.common import randomStr
 from lib.core.common import readInput
