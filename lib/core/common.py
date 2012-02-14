@@ -73,6 +73,7 @@ from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
+from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
@@ -702,13 +703,19 @@ def paramToDict(place, parameters=None):
                     testableParameters[parameter] = "=".join(elem[1:])
                     if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
                       or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
-                        errMsg = "you have provided tainted parameter values "
-                        errMsg += "('%s') with most probably leftover " % element
-                        errMsg += "chars from manual sql injection "
-                        errMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
-                        errMsg += "Please, always use only valid parameter values "
-                        errMsg += "so sqlmap could be able to properly run"
-                        raise sqlmapSyntaxException, errMsg
+                        warnMsg = "it appears that you have provided tainted parameter values "
+                        warnMsg += "('%s') with most probably leftover " % element
+                        warnMsg += "chars from manual sql injection "
+                        warnMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
+                        warnMsg += "Please, always use only valid parameter values "
+                        warnMsg += "so sqlmap could be able to properly run "
+                        logger.warn(warnMsg)
+
+                        message = "Are you sure you want to continue? [y/N] "
+                        test = readInput(message, default="N")
+                        if test[0] not in ("y", "Y"):
+                            raise sqlmapSilentQuitException
+
     else:
         root = ET.XML(parameters)
         iterator = root.getiterator()
