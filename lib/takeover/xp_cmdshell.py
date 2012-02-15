@@ -8,12 +8,15 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
+from lib.core.common import getSPLSnippet
 from lib.core.common import randomStr
+from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import wasLastRequestDelayed
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import paths
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setXpCmdshellAvailability
 from lib.core.unescaper import unescaper
@@ -60,12 +63,7 @@ class xp_cmdshell:
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
 
-        cmd = "EXEC master..sp_configure 'show advanced options', 1; "
-        cmd += "RECONFIGURE WITH OVERRIDE; "
-        cmd += "EXEC master..sp_configure 'xp_cmdshell', %d; " % mode
-        cmd += "RECONFIGURE WITH OVERRIDE; "
-        cmd += "EXEC sp_configure 'show advanced options', 0; "
-        cmd += "RECONFIGURE WITH OVERRIDE; "
+        cmd = getSPLSnippet("configure_xp_cmdshell", ENABLE=str(mode))
 
         return cmd
 

@@ -1127,6 +1127,7 @@ def cleanQuery(query):
 def setPaths():
     # sqlmap paths
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
+    paths.SQLMAP_PROCS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "procs")
     paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
     paths.SQLMAP_TAMPER_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "tamper")
     paths.SQLMAP_TXT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
@@ -1805,6 +1806,17 @@ def parseXmlFile(xmlFile, handler):
     stream = StringIO(readCachedFileContent(xmlFile))
     parse(stream, handler)
     stream.close()
+
+def getSPLSnippet(name, **variables):
+    """
+    Returns content of snippet stored in program's "procs" directory
+    """
+    filename = os.path.join(paths.SQLMAP_PROCS_PATH, "%s.txt" % name)
+    checkFile(filename)
+    retVal = readCachedFileContent(filename)
+    for _ in variables.keys():
+        retVal = re.sub(r"%%%s%%" % _, variables[_], retVal, flags=re.I)
+    return retVal
 
 def readCachedFileContent(filename, mode='rb'):
     """
