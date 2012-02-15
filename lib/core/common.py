@@ -1809,13 +1809,21 @@ def parseXmlFile(xmlFile, handler):
 
 def getSPLSnippet(name, **variables):
     """
-    Returns content of snippet stored in program's "procs" directory
+    Returns content of SPL snippet located inside "procs" directory
     """
+
     filename = os.path.join(paths.SQLMAP_PROCS_PATH, "%s.txt" % name)
     checkFile(filename)
     retVal = readCachedFileContent(filename)
+
     for _ in variables.keys():
         retVal = re.sub(r"%%%s%%" % _, variables[_], retVal, flags=re.I)
+
+    _ = re.search(r"%([^%]+)%", retVal, re.I)
+    if _:
+        errMsg = "unresolved variable '%s' in SPL snippet '%s'" % (_.group(1), name)
+        raise sqlmapGenericException, errMsg
+
     return retVal
 
 def readCachedFileContent(filename, mode='rb'):
