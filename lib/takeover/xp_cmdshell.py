@@ -17,6 +17,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import DBMS
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setXpCmdshellAvailability
 from lib.core.unescaper import unescaper
@@ -63,7 +64,7 @@ class xp_cmdshell:
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
 
-        cmd = getSPLSnippet("configure_xp_cmdshell", ENABLE=str(mode))
+        cmd = getSPLSnippet(DBMS.MSSQL, "configure_xp_cmdshell", ENABLE=str(mode))
 
         return cmd
 

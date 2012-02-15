@@ -61,6 +61,7 @@ from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
+from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import OS
@@ -1807,12 +1808,14 @@ def parseXmlFile(xmlFile, handler):
     parse(stream, handler)
     stream.close()
 
-def getSPLSnippet(name, **variables):
+def getSPLSnippet(dbms, name, **variables):
     """
     Returns content of SPL snippet located inside "procs" directory
     """
 
-    filename = os.path.join(paths.SQLMAP_PROCS_PATH, "%s.txt" % name)
+    _ = { DBMS.MSSQL: DBMS_DIRECTORY_NAME.MSSQL, DBMS.PGSQL: DBMS_DIRECTORY_NAME.PGSQL }
+
+    filename = os.path.join(paths.SQLMAP_PROCS_PATH, _[dbms], "%s.txt" % name)
     checkFile(filename)
     retVal = readCachedFileContent(filename)
 

@@ -26,6 +26,7 @@ class SORT_ORDER:
 
 class DBMS:
     ACCESS = "Microsoft Access"
+    DB2 = "IBM DB2"    
     FIREBIRD = "Firebird"
     MAXDB = "SAP MaxDB"
     MSSQL = "Microsoft SQL Server"
@@ -34,7 +35,18 @@ class DBMS:
     PGSQL = "PostgreSQL"
     SQLITE = "SQLite"
     SYBASE = "Sybase"
-    DB2 = "IBM DB2"    
+
+class DBMS_DIRECTORY_NAME:
+    ACCESS = "access"
+    DB2 = "db2"
+    FIREBIRD = "firebird"
+    MAXDB = "maxdb"
+    MSSQL = "mssqlserver"
+    MYSQL = "mysql"
+    ORACLE = "oracle"
+    PGSQL = "postgresql"
+    SQLITE = "sqlite"
+    SYBASE = "sybase"
 
 class CUSTOM_LOGGING:
     PAYLOAD = 9

