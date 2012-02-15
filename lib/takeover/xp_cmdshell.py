@@ -62,9 +62,10 @@ class xp_cmdshell:
 
         cmd = "EXEC master..sp_configure 'show advanced options', 1; "
         cmd += "RECONFIGURE WITH OVERRIDE; "
-        cmd += "EXEC master..sp_configure 'xp_cmdshell', %d " % mode
+        cmd += "EXEC master..sp_configure 'xp_cmdshell', %d; " % mode
         cmd += "RECONFIGURE WITH OVERRIDE; "
-        cmd += "EXEC sp_configure 'show advanced options', 0"
+        cmd += "EXEC sp_configure 'show advanced options', 0; "
+        cmd += "RECONFIGURE WITH OVERRIDE; "
 
         return cmd
 
