@@ -114,7 +114,7 @@ class xp_cmdshell:
         self.getRemoteTempPath()
 
         tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
-        cmd = "%s > %s" % (cmd, tmpFile)
+        cmd = "%s > \"%s\"" % (cmd, tmpFile)
 
         self.xpCmdshellExecCmd(cmd)
 
