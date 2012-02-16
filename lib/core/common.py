@@ -374,14 +374,11 @@ class Backend:
             _ = readInput(msg, default='1')
 
             if isinstance(_, basestring) and _.isdigit() and int(_) in ( 1, 2 ):
-                if int(_) == 1:
-                    kb.arch = 32
-                else:
-                    kb.arch = 64
+                kb.arch = 32 if int(_) == 1 else 64
 
                 break
             else:
-                warnMsg = "invalid value, valid values are 1 and 2"
+                warnMsg = "invalid value. Valid values are 1 and 2"
                 logger.warn(warnMsg)
 
         return kb.arch
@@ -482,10 +479,8 @@ class Backend:
         if Backend.getVersionList() is None:
             return False
 
-        for dbmsVersion in Backend.getVersionList():
-            if dbmsVersion == UNKNOWN_DBMS_VERSION:
-                continue
-            elif dbmsVersion in versionList:
+        for _ in Backend.getVersionList():
+            if _ != UNKNOWN_DBMS_VERSION and _ in versionList:
                 return True
 
         return False

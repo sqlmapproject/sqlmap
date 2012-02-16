@@ -30,64 +30,64 @@ class MSSQLBannerHandler(ContentHandler):
     def __init__(self, banner, info):
         ContentHandler.__init__(self)
 
-        self.__banner = sanitizeStr(banner)
-        self.__inVersion = False
-        self.__inServicePack = False
-        self.__release = None
-        self.__version = ""
-        self.__versionAlt = None
-        self.__servicePack = ""
-        self.__info = info
+        self._banner = sanitizeStr(banner)
+        self._inVersion = False
+        self._inServicePack = False
+        self._release = None
+        self._version = ""
+        self._versionAlt = None
+        self._servicePack = ""
+        self._info = info
 
-    def __feedInfo(self, key, value):
+    def _feedInfo(self, key, value):
         value = sanitizeStr(value)
 
         if value in ( None, "None" ):
             return
 
-        self.__info[key] = value
+        self._info[key] = value
 
     def startElement(self, name, attrs):
         if name == "signatures":
-            self.__release = sanitizeStr(attrs.get("release"))
+            self._release = sanitizeStr(attrs.get("release"))
 
         elif name == "version":
-            self.__inVersion = True
+            self._inVersion = True
 
         elif name == "servicepack":
-            self.__inServicePack = True
+            self._inServicePack = True
 
     def characters(self, data):
-        if self.__inVersion:
-            self.__version += sanitizeStr(data)
-        elif self.__inServicePack:
-            self.__servicePack += sanitizeStr(data)
+        if self._inVersion:
+            self._version += sanitizeStr(data)
+        elif self._inServicePack:
+            self._servicePack += sanitizeStr(data)
 
     def endElement(self, name):
         if name == "signature":
-            for version in (self.__version, self.__versionAlt):
+            for version in (self._version, self._versionAlt):
                 regObj = getCompiledRegex(" %s[\.\ ]+" % version)
-                if version and regObj.search(self.__banner):
-                    self.__feedInfo("dbmsRelease", self.__release)
-                    self.__feedInfo("dbmsVersion", self.__version)
-                    self.__feedInfo("dbmsServicePack", self.__servicePack)
+                if version and regObj.search(self._banner):
+                    self._feedInfo("dbmsRelease", self._release)
+                    self._feedInfo("dbmsVersion", self._version)
+                    self._feedInfo("dbmsServicePack", self._servicePack)
                     break
 
-            self.__version = ""
-            self.__versionAlt = None
-            self.__servicePack = ""
+            self._version = ""
+            self._versionAlt = None
+            self._servicePack = ""
 
         elif name == "version":
-            self.__inVersion = False
-            self.__version = self.__version.replace(" ", "")
+            self._inVersion = False
+            self._version = self._version.replace(" ", "")
 
             regObj = getCompiledRegex(r"\A(?P<major>\d+)\.00\.(?P<build>\d+)\Z")
-            match = regObj.search(self.__version)
-            self.__versionAlt = "%s.0.%s.0" % (match.group('major'), match.group('build')) if match else None
+            match = regObj.search(self._version)
+            self._versionAlt = "%s.0.%s.0" % (match.group('major'), match.group('build')) if match else None
 
         elif name == "servicepack":
-            self.__inServicePack = False
-            self.__servicePack = self.__servicePack.replace(" ", "")
+            self._inServicePack = False
+            self._servicePack = self._servicePack.replace(" ", "")
 
 def bannerParser(banner):
     """

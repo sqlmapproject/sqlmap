@@ -48,10 +48,7 @@
     <dbms value="IBM DB2">
         <error regexp="CLI Driver.*DB2"/>
         <error regexp="DB2 SQL error"/>
-        <error regexp="db2_connect\("/>
-        <error regexp="db2_exec\("/>
-        <error regexp="db2_execute\("/>        
-        <error regexp="db2_fetch_"/>        
+        <error regexp="db2_\w+\("/>
     </dbms>
 
     <!-- Informix -->

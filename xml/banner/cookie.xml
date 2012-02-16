@@ -30,4 +30,8 @@
     <regexp value="JServSessionId">
         <info technology="Apache|JSP"/>
     </regexp>
+
+    <regexp value="CFID|CFTOKEN|CFMAGIC">
+        <info technology="ColdFusion"/>
+    </regexp>
 </root>

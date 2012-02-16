@@ -21,60 +21,60 @@ class FingerprintHandler(ContentHandler):
     def __init__(self, banner, info):
         ContentHandler.__init__(self)
 
-        self.__banner = sanitizeStr(banner)
-        self.__regexp = None
-        self.__match = None
-        self.__dbmsVersion = None
-        self.__techVersion = None
-        self.__info = info
+        self._banner = sanitizeStr(banner)
+        self._regexp = None
+        self._match = None
+        self._dbmsVersion = None
+        self._techVersion = None
+        self._info = info
 
-    def __feedInfo(self, key, value):
+    def _feedInfo(self, key, value):
         value = sanitizeStr(value)
 
         if value in ( None, "None" ):
             return
 
         if key == "dbmsVersion":
-            self.__info[key] = value
+            self._info[key] = value
         else:
-            if key not in self.__info.keys():
-                self.__info[key] = set()
+            if key not in self._info.keys():
+                self._info[key] = set()
 
             for _ in value.split("|"):
-                self.__info[key].add(_)
+                self._info[key].add(_)
 
     def startElement(self, name, attrs):
         if name == "regexp":
-            self.__regexp = sanitizeStr(attrs.get("value"))
-            _ = re.match("\A[A-Za-z0-9]+", self.__regexp) # minor trick avoiding compiling of large amount of regexes
+            self._regexp = sanitizeStr(attrs.get("value"))
+            _ = re.match("\A[A-Za-z0-9]+", self._regexp) # minor trick avoiding compiling of large amount of regexes
 
-            if _ and _.group(0).lower() in self.__banner.lower() or not _:
-                self.__match = re.search(self.__regexp, self.__banner, re.I | re.M)
+            if _ and _.group(0).lower() in self._banner.lower() or not _:
+                self._match = re.search(self._regexp, self._banner, re.I | re.M)
             else:
-                self.__match = None
+                self._match = None
 
-        if name == "info" and self.__match:
-            self.__feedInfo("type", attrs.get("type"))
-            self.__feedInfo("distrib", attrs.get("distrib"))
-            self.__feedInfo("release", attrs.get("release"))
-            self.__feedInfo("codename", attrs.get("codename"))
+        if name == "info" and self._match:
+            self._feedInfo("type", attrs.get("type"))
+            self._feedInfo("distrib", attrs.get("distrib"))
+            self._feedInfo("release", attrs.get("release"))
+            self._feedInfo("codename", attrs.get("codename"))
 
-            self.__dbmsVersion = sanitizeStr(attrs.get("dbms_version"))
-            self.__techVersion = sanitizeStr(attrs.get("tech_version"))
-            self.__sp = sanitizeStr(attrs.get("sp"))
+            self._dbmsVersion = sanitizeStr(attrs.get("dbms_version"))
+            self._techVersion = sanitizeStr(attrs.get("tech_version"))
+            self._sp = sanitizeStr(attrs.get("sp"))
 
-            if self.__dbmsVersion.isdigit():
-                self.__feedInfo("dbmsVersion", self.__match.group(int(self.__dbmsVersion)))
+            if self._dbmsVersion.isdigit():
+                self._feedInfo("dbmsVersion", self._match.group(int(self._dbmsVersion)))
 
-            if self.__techVersion.isdigit():
-                self.__feedInfo("technology", "%s %s" % (attrs.get("technology"), self.__match.group(int(self.__techVersion))))
+            if self._techVersion.isdigit():
+                self._feedInfo("technology", "%s %s" % (attrs.get("technology"), self._match.group(int(self._techVersion))))
             else:
-                self.__feedInfo("technology", attrs.get("technology"))
+                self._feedInfo("technology", attrs.get("technology"))
 
-            if self.__sp.isdigit():
-                self.__feedInfo("sp", "Service Pack %s" % self.__match.group(int(self.__sp)))
+            if self._sp.isdigit():
+                self._feedInfo("sp", "Service Pack %s" % self._match.group(int(self._sp)))
 
-            self.__regexp = None
-            self.__match = None
-            self.__dbmsVersion = None
-            self.__techVersion = None
+            self._regexp = None
+            self._match = None
+            self._dbmsVersion = None
+            self._techVersion = None
