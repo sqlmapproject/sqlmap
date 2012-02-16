@@ -286,12 +286,12 @@ class Backend:
             msg += "correct [%s (default)/%s] " % (kb.dbms, dbms)
 
             while True:
-                inp = readInput(msg, default=kb.dbms)
+                _ = readInput(msg, default=kb.dbms)
 
-                if aliasToDbmsEnum(inp) == kb.dbms:
+                if aliasToDbmsEnum(_) == kb.dbms:
                     break
-                elif aliasToDbmsEnum(inp) == dbms:
-                    kb.dbms = aliasToDbmsEnum(inp)
+                elif aliasToDbmsEnum(_) == dbms:
+                    kb.dbms = aliasToDbmsEnum(_)
                     break
                 else:
                     warnMsg = "invalid value"
@@ -344,12 +344,12 @@ class Backend:
             msg += "correct [%s (default)/%s] " % (kb.os, os)
 
             while True:
-                inp = readInput(msg, default=kb.os)
+                _ = readInput(msg, default=kb.os)
 
-                if inp == kb.os:
+                if _ == kb.os:
                     break
-                elif inp == os:
-                    kb.os = inp.capitalize()
+                elif _ == os:
+                    kb.os = _.capitalize()
                     break
                 else:
                     warnMsg = "invalid value"
@@ -383,10 +383,10 @@ class Backend:
         msg += "\n[2] 64-bit"
 
         while True:
-            arch = readInput(msg, default='1')
+            _ = readInput(msg, default='1')
 
-            if isinstance(arch, basestring) and arch.isdigit() and int(arch) in ( 1, 2 ):
-                if int(arch) == 1:
+            if isinstance(_, basestring) and _.isdigit() and int(_) in ( 1, 2 ):
+                if int(_) == 1:
                     kb.arch = 32
                 else:
                     kb.arch = 64

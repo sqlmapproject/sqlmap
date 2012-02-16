@@ -61,6 +61,7 @@ def getCurrentThreadUID():
     return hash(threading.currentThread())
 
 def readInput(message, default=None):
+    # It will be overwritten by original from lib.core.common
     pass
 
 def getCurrentThreadData():
