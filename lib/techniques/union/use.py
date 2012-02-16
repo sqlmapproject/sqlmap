@@ -12,8 +12,8 @@ import threading
 import time
 
 from lib.core.agent import agent
+from lib.core.bigarray import BigArray
 from lib.core.common import Backend
-from lib.core.common import BigArray
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout

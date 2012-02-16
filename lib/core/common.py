@@ -24,7 +24,6 @@ import socket
 import string
 import struct
 import sys
-import tempfile
 import time
 import types
 import urllib
@@ -50,6 +49,7 @@ from extra.clientform.clientform import ParseError
 from extra.cloak.cloak import decloak
 from extra.magic import magic
 from extra.odict.odict import OrderedDict
+from lib.core.bigarray import BigArray
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -76,7 +76,6 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
-from lib.core.settings import BIGARRAY_CHUNK_LENGTH
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_USER_INJECTION
@@ -155,153 +154,6 @@ class UnicodeRawConfigParser(RawConfigParser):
                         fp.write("%s = %s\n" % (key, getUnicode(value, UNICODE_ENCODING).replace('\n', '\n\t')))
 
             fp.write("\n")
-
-class Wordlist:
-    """
-    Iterator for looping over a large dictionaries
-    """
-
-    def __init__(self, filenames):
-        self.filenames = filenames
-        self.fp = None
-        self.index = 0
-        self.iter = None
-        self.custom = []
-        self.adjust()
-        self.lock = None
-
-    def __iter__(self):
-        return self
-
-    def adjust(self):
-        self.closeFP()
-        if self.index > len(self.filenames):
-            raise StopIteration
-        elif self.index == len(self.filenames):
-            if self.custom:
-                self.iter = iter(self.custom)
-            else:
-                raise StopIteration
-        else:
-            current = self.filenames[self.index]
-            infoMsg = "loading dictionary from '%s'" % current
-            singleTimeLogMessage(infoMsg)
-            self.fp = open(current, "r")
-            self.iter = iter(self.fp)
-
-        self.index += 1
-
-    def append(self, value):
-        self.custom.append(value)
-        
-    def closeFP(self):
-        if self.fp:
-            self.fp.close()
-            self.fp = None
-
-    def next(self):
-        retVal = None
-        if self.lock:
-            self.lock.acquire()
-        try:
-            retVal = self.iter.next().rstrip()
-        except StopIteration:
-            self.adjust()
-            retVal = self.iter.next().rstrip()
-        finally:
-            if self.lock:
-                self.lock.release()
-        return retVal
-
-    def rewind(self):
-        self.index = 0
-        self.adjust()
-
-class BigArray(list):
-    """
-    List-like object used for storing large amounts of data (disk cached)
-    """
-
-    def __init__(self):
-        self.chunks = [[]]
-        self.cache = None
-        self.length = 0
-        self.filenames = set()
-
-    def append(self, value):
-        self.chunks[-1].append(value)
-        if len(self.chunks[-1]) >= BIGARRAY_CHUNK_LENGTH:
-            filename = self._dump(self.chunks[-1])
-            del(self.chunks[-1][:])
-            self.chunks[-1] = filename
-            self.chunks.append([])
-
-    def pop(self):
-        if len(self.chunks[-1]) < 1:
-            self.chunks.pop()
-            with open(self.chunks[-1], 'rb') as fp:
-                self.chunks[-1] = pickle.load(fp)
-        return self.chunks[-1].pop()
-
-    def index(self, value):
-        for index in xrange(len(self)):
-            if self[index] == value:
-                return index
-        return ValueError, "%s is not in list" % value
-
-    def _dump(self, value):
-        handle, filename = tempfile.mkstemp()
-        self.filenames.add(filename)
-        os.close(handle)
-        with open(filename, 'w+b') as fp:
-            pickle.dump(value, fp)
-        return filename
-
-    def _checkcache(self, index):
-        if (self.cache and self.cache[0] != index and self.cache[2]):
-            filename = self._dump(self.cache[1])
-            self.chunks[self.cache[0]] = filename
-        if not (self.cache and self.cache[0] == index):
-            with open(self.chunks[index], 'rb') as fp:
-                self.cache = (index, pickle.load(fp), False)
-
-    def __getitem__(self, y):
-        index = y / BIGARRAY_CHUNK_LENGTH
-        offset = y % BIGARRAY_CHUNK_LENGTH
-        chunk = self.chunks[index]
-        if isinstance(chunk, list):
-            return chunk[offset]
-        else:
-            self._checkcache(index)
-            return self.cache[1][offset]
-
-    def __setitem__(self, y, value):
-        index = y / BIGARRAY_CHUNK_LENGTH
-        offset = y % BIGARRAY_CHUNK_LENGTH
-        chunk = self.chunks[index]
-        if isinstance(chunk, list):
-            chunk[offset] = value
-        else:
-            self._checkcache(index)
-            self.cache[1][offset] = value
-            self.cache[2] = True # dirty flag
-
-    def __repr__(self):
-        return "%s%s" % ("..." if len(self.chunks) > 1 else "", self.chunks[-1].__repr__())
-
-    def __iter__(self):
-        for i in xrange(len(self)):
-            yield self[i]
-
-    def __len__(self):
-        return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * BIGARRAY_CHUNK_LENGTH + len(self.chunks[-1])
-
-    def __del__(self):
-        for filename in self.filenames:
-            try:
-                os.remove(filename)
-            except OSError:
-                pass
 
 class DynamicContentItem:
     """

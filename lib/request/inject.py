@@ -11,8 +11,8 @@ import re
 import time
 
 from lib.core.agent import agent
+from lib.core.bigarray import BigArray
 from lib.core.common import Backend
-from lib.core.common import BigArray
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import dataToSessionFile
