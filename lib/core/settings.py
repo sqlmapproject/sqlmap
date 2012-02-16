@@ -14,6 +14,7 @@ import sys
 
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
+from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import PLACE
 from lib.core.revision import getRevisionNumber
 
@@ -166,6 +167,8 @@ FIREBIRD_ALIASES = ( "firebird", "mozilla firebird", "interbase", "ibase", "fb" 
 MAXDB_ALIASES = ( "maxdb", "sap maxdb", "sap db" )
 SYBASE_ALIASES = ( "sybase", "sybase sql server" )
 DB2_ALIASES = ( "db2", "ibm db2", "ibmdb2" )
+
+DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
 
 SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES
 SUPPORTED_OS = ( "linux", "windows" )

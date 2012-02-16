@@ -61,7 +61,6 @@ from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
-from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import OS
@@ -84,6 +83,7 @@ from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
+from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
 from lib.core.settings import NULL
@@ -1813,9 +1813,7 @@ def getSPLSnippet(dbms, name, **variables):
     Returns content of SPL snippet located inside "procs" directory
     """
 
-    _ = { DBMS.MSSQL: DBMS_DIRECTORY_NAME.MSSQL, DBMS.PGSQL: DBMS_DIRECTORY_NAME.PGSQL }
-
-    filename = os.path.join(paths.SQLMAP_PROCS_PATH, _[dbms], "%s.txt" % name)
+    filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], "%s.txt" % name)
     checkFile(filename)
     retVal = readCachedFileContent(filename)
 
