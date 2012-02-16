@@ -155,18 +155,6 @@ class UnicodeRawConfigParser(RawConfigParser):
 
             fp.write("\n")
 
-class DynamicContentItem:
-    """
-    Represents line in content page with dynamic properties (candidate
-    for removal prior detection phase)
-    """
-
-    def __init__(self, lineNumber, pageTotal, lineContentBefore, lineContentAfter):
-        self.lineNumber = lineNumber
-        self.pageTotal = pageTotal
-        self.lineContentBefore = lineContentBefore
-        self.lineContentAfter = lineContentAfter
-
 class Format:
     @staticmethod
     def humanize(values, chain=" or "):

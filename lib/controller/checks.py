@@ -39,7 +39,6 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
-from lib.core.common import DynamicContentItem
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
