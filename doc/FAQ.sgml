@@ -50,19 +50,13 @@ url="http://www.python.org" name="Python"> <bf>>= 2.6</bf>.
 <p>
 Yes. sqlmap is released under the terms of the GPLv2, which means that any
 derivative work must be distributed without further restrictions on the
-rights granted by the GPL itself. If this constitutes a problem, feel free
-to contact us so we can find a solution.
-
-<sect1>How can I integrate sqlmap with my own tool?
-
-<p>
-TODO
+rights granted by the GPL itself.
 
 <sect1>Will you support other database management systems?
 
 <p>
-Yes. There are plans to support also IBM DB2, Informix and Ingres at some
-point.
+Yes. There are plans to support also Informix and Ingres at some
+point of time.
 
 <sect1>How can I occasionally contribute?
 
@@ -104,7 +98,7 @@ some money"> to the developers via PayPal.
 <sect1>When sqlmap will switch to the Python 3?
 
 <p>
-Currently there is no huge pressure on Python projects to switch to the new
+Currently there is no pressure on Python projects to switch to the new
 version of Python interpreter, as the process of switching, especially on
 larger projects can be cumbersome (due to the few backward incompatibilities).
 The switch will take place eventually, but currently it's a very low priority task.
@@ -162,18 +156,6 @@ improve detection capabilities.
 Question(s):
 <htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/699" name="#1">
 
-<sect1>sqlmap is retrieving weird characters for even simplest data (e.g. <tt>--banner</tt>)?
-
-<p>
-If everything you retrieve from the target is garbled, then you are 
-most probably dealing with false positive blind injection. Please 
-report the problem to the <htmlurl url="mailto:dev@sqlmap.org" name="developers">.
-
-<p>
-Question(s):
-<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/686" name="#1">
-<htmlurl url="http://thread.gmane.org/gmane.comp.security.sqlmap/1181" name="#2">
-
 <sect1>I am getting <tt>"CRITICAL connection timed"</tt> while I am able to browse 
 the site normally?
 
@@ -194,7 +176,8 @@ and/or <tt>-</tt><tt>-sql-shell</tt>?
 
 <p>
 It is possible to use those commands, but only if the stacked injection is supported
-by the vulnerable target.
+by the vulnerable target. In vast majority of cases affected DBMSes by these kind of
+attacks are Microsoft SQL Server and PostgreSQL.
 
 <p>
 Question(s):
@@ -214,10 +197,11 @@ Question(s):
 <sect1>sqlmap is not able to detect/exploit injection while other commercial tools are?
 
 <p>
-Currently there are only two of us working on a pure good will and donating our 
-free time to the community. If you are not willing to help us achive better tool
-you are strongly advised to buy those commercial tool(s) and just 
-forget about the sqlmap.
+In most of those kind of cases blatant error message detection is used by commercial
+tools making some "false positive" claims. You have to be aware that
+DBMS error message doesn't mean that the affected web application is vulnerable to
+SQL injection attacks. sqlmap goes several steps further and never claims
+an injection point without making through tests if it can be exploited at the first place. 
 
 <p>
 Question(s):
