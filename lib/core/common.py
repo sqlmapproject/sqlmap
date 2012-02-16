@@ -1192,11 +1192,14 @@ def expandAsteriskForColumns(expression):
 
     return expression
 
-def getRange(count, dump=False, plusOne=False):
+def getLimitRange(count, dump=False, plusOne=False):
+    """
+    Returns range of values used in limit/offset constructs
+    """
+
+    retVal = None
     count = int(count)
-    indexRange = None
-    limitStart = 1
-    limitStop = count
+    limitStart, limitStop = 1, count
 
     if dump:
         if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
@@ -1205,11 +1208,15 @@ def getRange(count, dump=False, plusOne=False):
         if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
             limitStart = conf.limitStart
 
-    indexRange = xrange(limitStart, limitStop + 1) if plusOne else xrange(limitStart - 1, limitStop)
+    retVal = xrange(limitStart, limitStop + 1) if plusOne else xrange(limitStart - 1, limitStop)
 
-    return indexRange
+    return retVal
 
 def parseUnionPage(output, unique=True):
+    """
+    Returns resulting items from inband query inside provided page content
+    """
+
     if output is None:
         return None
 
@@ -1250,7 +1257,7 @@ def parseUnionPage(output, unique=True):
 
 def parseFilePaths(page):
     """
-    Detect (possible) absolute system paths inside the provided page content
+    Detects (possible) absolute system paths inside the provided page content
     """
 
     if page:
@@ -1264,32 +1271,6 @@ def parseFilePaths(page):
 
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)
-
-def getDelayQuery(andCond=False):
-    query = None
-
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-        if not kb.data.banner:
-            conf.dbmsHandler.getVersionFromBanner()
-
-        banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
-
-        if banVer is None or (Backend.isDbms(DBMS.MYSQL) and banVer >= "5.0.12") or (Backend.isDbms(DBMS.PGSQL) and banVer >= "8.2"):
-            query = queries[Backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
-        else:
-            query = queries[Backend.getIdentifiedDbms()].timedelay.query2 % conf.timeSec
-    elif Backend.isDbms(DBMS.FIREBIRD):
-        query = queries[Backend.getIdentifiedDbms()].timedelay.query
-    else:
-        query = queries[Backend.getIdentifiedDbms()].timedelay.query % conf.timeSec
-
-    if andCond:
-        if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.SQLITE ):
-            query = query.replace("SELECT ", "")
-        elif Backend.isDbms(DBMS.FIREBIRD):
-            query = "(%s)>0" % query
-
-    return query
 
 def getLocalIP():
     retVal = None
@@ -1310,11 +1291,11 @@ def getRemoteIP():
 
 def getFileType(filePath):
     try:
-        magicFileType = magic.from_file(filePath)
+        _ = magic.from_file(filePath)
     except:
         return "unknown"
 
-    return "text" if "ASCII" in magicFileType or "text" in magicFileType else "binary"
+    return "text" if "ASCII" in _ or "text" in _ else "binary"
 
 def getCharset(charsetType=None):
     asciiTbl = []
@@ -1354,15 +1335,14 @@ def getCharset(charsetType=None):
 
     return asciiTbl
 
-def searchEnvPath(fileName):
-    envPaths = os.environ["PATH"]
+def searchEnvPath(filename):
     result = None
+    path = os.environ.get("PATH", "")
+    paths = path.split(";") if IS_WIN else path.split(":")
 
-    envPaths = envPaths.split(";") if IS_WIN else envPaths.split(":")
-
-    for envPath in envPaths:
-        envPath = envPath.replace(";", "")
-        result = os.path.exists(os.path.normpath(os.path.join(envPath, fileName)))
+    for _ in paths:
+        _ = _.replace(";", "")
+        result = os.path.exists(os.path.normpath(os.path.join(_, filename)))
 
         if result:
             break
@@ -1394,28 +1374,40 @@ def urlEncodeCookieValues(cookieStr):
     else:
         return None
 
-def directoryPath(path):
+def directoryPath(filepath):
+    """
+    Returns directory path for a given filepath
+    """
+
     retVal = None
 
-    if isWindowsDriveLetterPath(path):
-        retVal = ntpath.dirname(path)
+    if isWindowsDriveLetterPath(filepath):
+        retVal = ntpath.dirname(filepath)
     else:
-        retVal = posixpath.dirname(path)
+        retVal = posixpath.dirname(filepath)
 
     return retVal
 
-def normalizePath(path):
+def normalizePath(filepath):
+    """
+    Returns normalized string representation of a given filepath
+    """
+
     retVal = None
 
-    if isWindowsDriveLetterPath(path):
-        retVal = ntpath.normpath(path)
+    if isWindowsDriveLetterPath(filepath):
+        retVal = ntpath.normpath(filepath)
     else:
-        retVal = posixpath.normpath(path)
+        retVal = posixpath.normpath(filepath)
 
     return retVal
 
-def safeStringFormat(formatStr, params):
-    retVal = formatStr.replace("%d", "%s")
+def safeStringFormat(format_, params):
+    """
+    Avoids problems with inappropriate string format strings
+    """
+
+    retVal = format_.replace("%d", "%s")
 
     if isinstance(params, basestring):
         retVal = retVal.replace("%s", params)
@@ -1435,23 +1427,12 @@ def safeStringFormat(formatStr, params):
 
     return retVal
 
-def sanitizeAsciiString(subject):
-    if subject:
-        index = None
-
-        for i in xrange(len(subject)):
-            if ord(subject[i]) >= 128:
-                index = i
-                break
-
-        if index is None:
-            return subject
-        else:
-            return subject[:index] + "".join(subject[i] if ord(subject[i]) < 128 else '?' for i in xrange(index, len(subject)))
-    else:
-        return None
-
 def getFilteredPageContent(page, onlyText=True):
+    """
+    Returns filtered page content without script, style and/or comments
+    or all HTML tags
+    """
+
     retVal = page
 
     # only if the page's charset has been successfully identified
@@ -2402,6 +2383,10 @@ def isTechniqueAvailable(technique):
         return getTechniqueData(technique) is not None
 
 def isInferenceAvailable():
+    """
+    Returns True whether techniques using inference technique are available
+    """
+
     return any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.STACKED, PAYLOAD.TECHNIQUE.TIME))
 
 def setOptimize():
@@ -2619,7 +2604,7 @@ def listToStrValue(value):
 def getExceptionFrameLocals():
     """
     Returns dictionary with local variable content from frame
-    where exception was raised
+    where exception has been raised
     """
 
     retVal = {}
@@ -2793,7 +2778,7 @@ def isNullValue(value):
 
 def expandMnemonics(mnemonics, parser, args):
     """
-    Expand mnemonic options
+    Expands mnemonic options
     """
 
     class MnemonicNode:
@@ -2876,7 +2861,7 @@ def expandMnemonics(mnemonics, parser, args):
 
 def safeCSValue(value):
     """
-    Returns value safe for CSV dumping.
+    Returns value safe for CSV dumping
     Reference: http://tools.ietf.org/html/rfc4180
     """
 
@@ -2890,6 +2875,10 @@ def safeCSValue(value):
     return retVal
 
 def filterPairValues(values):
+    """
+    Returns only list-like values with length 2
+    """
+
     retVal = []
 
     if not isNoneValue(values) and hasattr(values, '__iter__'):
@@ -2973,6 +2962,10 @@ def asciifyUrl(url, forceQuote=False):
     return urlparse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment])
 
 def findPageForms(content, url, raise_=False, addToTargets=False):
+    """
+    Parses given page content for possible forms
+    """
+
     class _(StringIO):
         def __init__(self, content, url):
             StringIO.__init__(self, unicodeencode(content, kb.pageEncoding) if isinstance(content, unicode) else content)
@@ -3016,15 +3009,18 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                             if not item.selected:
                                 item.selected = True
                             break
+
             request = form.click()
             url = urldecode(request.get_full_url(), kb.pageEncoding)
             method = request.get_method()
             data = request.get_data() if request.has_data() else None
             data = urldecode(data, kb.pageEncoding) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data
+
             if not data and method and method.upper() == HTTPMETHOD.POST:
                 debugMsg = "invalid POST form with blank data detected"
                 logger.debug(debugMsg)
                 continue
+
             target = (url, method, data, conf.cookie)
             retVal.add(target)
     else:
@@ -3041,6 +3037,10 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     return retVal
 
 def getHostHeader(url):
+    """
+    Returns proper Host header value for a given target URL
+    """
+
     retVal = urlparse.urlparse(url).netloc
 
     if any(retVal.endswith(':%d' % _) for _ in [80, 443]):
@@ -3048,7 +3048,11 @@ def getHostHeader(url):
 
     return retVal
 
-def executeCode(code, variables=None):
+def evaluateCode(code, variables=None):
+    """
+    Executes given python code given in a string form
+    """
+
     try:
         exec(code, variables)
     except Exception, ex:
@@ -3056,21 +3060,39 @@ def executeCode(code, variables=None):
         raise sqlmapGenericException, errMsg
 
 def serializeObject(object_):
+    """
+    Serializes given object
+    """
+
     return pickle.dumps(object_)
 
 def unserializeObject(value):
+    """
+    Unserializes object from given serialized form
+    """
+
     retVal = None
     if value:
         retVal = pickle.loads(value.encode(UNICODE_ENCODING)) # pickle has problems with Unicode
     return retVal
 
-def resetCounter(counter):
-    kb.counters[counter] = 0
+def resetCounter(technique):
+    """
+    Resets query counter for a given technique
+    """
 
-def incrementCounter(counter):
-    if counter not in kb.counters:
-        resetCounter(counter)
-    kb.counters[counter] += 1
+    kb.counters[technique] = 0
 
-def getCounter(counter):
-    return kb.counters.get(counter, 0)
+def incrementCounter(technique):
+    """
+    Increments query counter for a given technique
+    """
+
+    kb.counters[technique] = getCounter(technique) + 1
+
+def getCounter(technique):
+    """
+    Returns query counter for a given technique
+    """
+
+    return kb.counters.get(technique, 0)

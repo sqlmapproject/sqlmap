@@ -24,7 +24,7 @@ from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
-from lib.core.common import executeCode
+from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getFilteredPageContent
@@ -636,10 +636,10 @@ class Connect:
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
-                        executeCode("%s='%s'" % (name, value), variables)
+                        evaluateCode("%s='%s'" % (name, value), variables)
 
             originals.update(variables)
-            executeCode(conf.evalCode, variables)
+            evaluateCode(conf.evalCode, variables)
 
             for name, value in variables.items():
                 if name != "__builtins__" and originals.get(name, "") != value:

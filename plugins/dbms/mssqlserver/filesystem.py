@@ -11,7 +11,7 @@ import codecs
 import ntpath
 import os
 
-from lib.core.common import getRange
+from lib.core.common import getLimitRange
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import posixToNtSlashes
@@ -105,7 +105,7 @@ class Filesystem(GenericFilesystem):
                 errMsg += "file '%s'" % rFile
                 raise sqlmapNoneDataException(errMsg)
 
-            indexRange = getRange(count)
+            indexRange = getLimitRange(count)
 
             for index in indexRange:
                 chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, unique=False, charsetType=3)

@@ -9,7 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import Backend
-from lib.core.common import getRange
+from lib.core.common import getLimitRange
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
@@ -142,7 +142,7 @@ class Enumeration(GenericEnumeration):
 
                 roles = set()
 
-                indexRange = getRange(count, plusOne=True)
+                indexRange = getLimitRange(count, plusOne=True)
 
                 for index in indexRange:
                     if query2:

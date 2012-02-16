@@ -17,7 +17,7 @@ from lib.core.common import Backend
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import filterPairValues
-from lib.core.common import getRange
+from lib.core.common import getLimitRange
 from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import isInferenceAvailable
@@ -59,6 +59,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
 from lib.core.settings import CONCAT_ROW_DELIMITER
 from lib.core.settings import CONCAT_VALUE_DELIMITER
+from lib.core.settings import CURRENT_DB
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import MAX_INT
 from lib.core.settings import SQL_STATEMENTS
@@ -200,11 +201,8 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of database users"
                 raise sqlmapNoneDataException, errMsg
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                plusOne = True
-            else:
-                plusOne = False
-            indexRange = getRange(count, plusOne=plusOne)
+            plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+            indexRange = getLimitRange(count, plusOne=plusOne)
 
             for index in indexRange:
                 if Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MAXDB):
@@ -350,11 +348,8 @@ class Enumeration:
 
                     passwords = []
 
-                    if Backend.isDbms(DBMS.ORACLE):
-                        plusOne = True
-                    else:
-                        plusOne = False
-                    indexRange = getRange(count, plusOne=plusOne)
+                    plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                    indexRange = getLimitRange(count, plusOne=plusOne)
 
                     for index in indexRange:
                         if Backend.isDbms(DBMS.MSSQL):
@@ -593,11 +588,8 @@ class Enumeration:
 
                 privileges = set()
 
-                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                    plusOne = True
-                else:
-                    plusOne = False
-                indexRange = getRange(count, plusOne=plusOne)
+                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                indexRange = getLimitRange(count, plusOne=plusOne)
 
                 for index in indexRange:
                     if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
@@ -760,11 +752,8 @@ class Enumeration:
                 errMsg = "unable to retrieve the number of databases"
                 logger.error(errMsg)
             else:
-                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                    plusOne = True
-                else:
-                    plusOne = False
-                indexRange = getRange(count, plusOne=plusOne)
+                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                indexRange = getLimitRange(count, plusOne=plusOne)
 
                 for index in indexRange:
                     if Backend.isDbms(DBMS.SYBASE):
@@ -820,7 +809,7 @@ class Enumeration:
                 else:
                     return tables
 
-        if conf.db == "CD":
+        if conf.db == CURRENT_DB:
             conf.db = self.getCurrentDb()
 
         if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
@@ -930,11 +919,8 @@ class Enumeration:
 
                 tables = []
 
-                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                    plusOne = True
-                else:
-                    plusOne = False
-                indexRange = getRange(count, plusOne=plusOne)
+                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                indexRange = getLimitRange(count, plusOne=plusOne)
 
                 for index in indexRange:
                     if Backend.isDbms(DBMS.SYBASE):
@@ -977,7 +963,7 @@ class Enumeration:
     def getColumns(self, onlyColNames=False, colTuple=None, bruteForce=None):
         self.forceDbmsEnum()
 
-        if conf.db is None or conf.db == "CD":
+        if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
                 warnMsg = "missing database parameter, sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
@@ -1226,7 +1212,7 @@ class Enumeration:
                 table = {}
                 columns = {}
 
-                indexRange = getRange(count)
+                indexRange = getLimitRange(count)
 
                 for index in indexRange:
                     if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
@@ -1506,7 +1492,7 @@ class Enumeration:
     def dumpTable(self, foundData=None):
         self.forceDbmsEnum()
 
-        if conf.db is None or conf.db == "CD":
+        if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
                 warnMsg = "missing database parameter, sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
@@ -1719,11 +1705,8 @@ class Enumeration:
                             entries, lengths = retVal
 
                     else:
-                        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                            plusOne = True
-                        else:
-                            plusOne = False
-                        indexRange = getRange(count, dump=True, plusOne=plusOne)
+                        plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                        indexRange = getLimitRange(count, dump=True, plusOne=plusOne)
 
                         try:
                             for index in indexRange:
@@ -1967,7 +1950,7 @@ class Enumeration:
 
                     continue
 
-                indexRange = getRange(count)
+                indexRange = getLimitRange(count)
 
                 for index in indexRange:
                     if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
@@ -2032,7 +2015,7 @@ class Enumeration:
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
             logger.info(infoMsg)
 
-            if conf.db and conf.db != "CD":
+            if conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
                 whereDbsQuery = "".join(" AND '%s' = %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in _)
                 infoMsg = "for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
@@ -2085,7 +2068,7 @@ class Enumeration:
 
                     continue
 
-                indexRange = getRange(count)
+                indexRange = getLimitRange(count)
 
                 for index in indexRange:
                     query = rootQuery.blind.query
@@ -2130,7 +2113,7 @@ class Enumeration:
 
                         continue
 
-                    indexRange = getRange(count)
+                    indexRange = getLimitRange(count)
 
                     for index in indexRange:
                         query = rootQuery.blind.query2
@@ -2201,7 +2184,7 @@ class Enumeration:
 
             foundCols[column] = {}
 
-            if conf.db and conf.db != "CD":
+            if conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
                 whereDbsQuery = "".join(" AND '%s' = %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in _)
                 infoMsg = "for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
@@ -2277,7 +2260,7 @@ class Enumeration:
 
                         continue
 
-                    indexRange = getRange(count)
+                    indexRange = getLimitRange(count)
 
                     for index in indexRange:
                         query = rootQuery.blind.query
@@ -2328,7 +2311,7 @@ class Enumeration:
 
                             continue
 
-                        indexRange = getRange(count)
+                        indexRange = getLimitRange(count)
 
                         for index in indexRange:
                             query = rootQuery.blind.query2

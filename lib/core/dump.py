@@ -41,45 +41,45 @@ class Dump:
     """
 
     def __init__(self):
-        self.__outputFile = None
-        self.__outputFP = None
-        self.__outputBP = None
-        self.__lock = threading.Lock()
+        self._outputFile = None
+        self._outputFP = None
+        self._outputBP = None
+        self._lock = threading.Lock()
 
-    def __write(self, data, n=True, console=True):
+    def _write(self, data, n=True, console=True):
         text = "%s%s" % (data, "\n" if n else " ")
         if console:
             dataToStdout(text)
 
         if kb.get("multiThreadMode"):
-            self.__lock.acquire()
+            self._lock.acquire()
 
-        self.__outputBP.write(text)
+        self._outputBP.write(text)
 
-        if self.__outputBP.tell() > BUFFERED_LOG_SIZE:
+        if self._outputBP.tell() > BUFFERED_LOG_SIZE:
             self.flush()
 
         if kb.get("multiThreadMode"):
-            self.__lock.release()
+            self._lock.release()
 
         kb.dataOutputFlag = True
 
     def flush(self):
-        if self.__outputBP and self.__outputFP and self.__outputBP.tell() > 0:
-            _ = self.__outputBP.getvalue()
-            self.__outputBP.truncate(0)
-            self.__outputFP.write(_)
+        if self._outputBP and self._outputFP and self._outputBP.tell() > 0:
+            _ = self._outputBP.getvalue()
+            self._outputBP.truncate(0)
+            self._outputFP.write(_)
 
-    def __formatString(self, inpStr):
+    def _formatString(self, inpStr):
         return restoreDumpMarkedChars(getUnicode(inpStr))
 
     def setOutputFile(self):
-        self.__outputFile = "%s%slog" % (conf.outputPath, os.sep)
-        self.__outputFP = codecs.open(self.__outputFile, "ab", UNICODE_ENCODING)
-        self.__outputBP = StringIO.StringIO()
+        self._outputFile = "%s%slog" % (conf.outputPath, os.sep)
+        self._outputFP = codecs.open(self._outputFile, "ab", UNICODE_ENCODING)
+        self._outputBP = StringIO.StringIO()
 
     def getOutputFile(self):
-        return self.__outputFile
+        return self._outputFile
 
     def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
@@ -90,21 +90,21 @@ class Dump:
         data = getUnicode(data)
 
         if data:
-            data = self.__formatString(data)
+            data = self._formatString(data)
 
             if data[-1] == '\n':
                 data = data[:-1]
 
             if "\n" in data:
-                self.__write("%s:\n---\n%s\n---\n" % (header, data))
+                self._write("%s:\n---\n%s\n---\n" % (header, data))
             else:
-                self.__write("%s:    '%s'\n" % (header, data))
+                self._write("%s:    '%s'\n" % (header, data))
         else:
-            self.__write("%s:\tNone\n" % header)
+            self._write("%s:\tNone\n" % header)
 
     def lister(self, header, elements, sort=True):
         if elements:
-            self.__write("%s [%d]:" % (header, len(elements)))
+            self._write("%s [%d]:" % (header, len(elements)))
 
         if sort:
             try:
@@ -116,12 +116,12 @@ class Dump:
 
         for element in elements:
             if isinstance(element, basestring):
-                self.__write("[*] %s" % element)
+                self._write("[*] %s" % element)
             elif isinstance(element, (list, tuple, set)):
-                self.__write("[*] " + ", ".join(getUnicode(e) for e in element))
+                self._write("[*] " + ", ".join(getUnicode(e) for e in element))
 
         if elements:
-            self.__write("")
+            self._write("")
 
     def technic(self, header, data):
         self.string(header, data)
@@ -147,13 +147,13 @@ class Dump:
         self.lister("database management system users", users)
 
     def userSettings(self, header, userSettings, subHeader):
-        self.__areAdmins = set()
+        self._areAdmins = set()
 
         if userSettings:
-            self.__write("%s:" % header)
+            self._write("%s:" % header)
 
         if isinstance(userSettings, (tuple, list, set)):
-            self.__areAdmins = userSettings[1]
+            self._areAdmins = userSettings[1]
             userSettings = userSettings[0]
 
         users = userSettings.keys()
@@ -167,16 +167,16 @@ class Dump:
             else:
                 stringSettings = " [%d]:" % len(settings)
 
-            if user in self.__areAdmins:
-                self.__write("[*] %s (administrator)%s" % (user, stringSettings))
+            if user in self._areAdmins:
+                self._write("[*] %s (administrator)%s" % (user, stringSettings))
             else:
-                self.__write("[*] %s%s" % (user, stringSettings))
+                self._write("[*] %s%s" % (user, stringSettings))
 
             if settings:
                 settings.sort()
 
                 for setting in settings:
-                    self.__write("    %s: %s" % (subHeader, setting))
+                    self._write("    %s: %s" % (subHeader, setting))
         print
 
     def dbs(self,dbs):
@@ -198,23 +198,23 @@ class Dump:
             for db, tables in dbTables.items():
                 tables.sort()
 
-                self.__write("Database: %s" % db if db else "Current database")
+                self._write("Database: %s" % db if db else "Current database")
 
                 if len(tables) == 1:
-                    self.__write("[1 table]")
+                    self._write("[1 table]")
                 else:
-                    self.__write("[%d tables]" % len(tables))
+                    self._write("[%d tables]" % len(tables))
 
-                self.__write("+%s+" % lines)
+                self._write("+%s+" % lines)
 
                 for table in tables:
                     if isinstance(table, (list, tuple, set)):
                         table = table[0]
 
                     blank = " " * (maxlength - len(normalizeUnicode(table) or str(table)))
-                    self.__write("| %s%s |" % (table, blank))
+                    self._write("| %s%s |" % (table, blank))
 
-                self.__write("+%s+\n" % lines)
+                self._write("+%s+\n" % lines)
         else:
             self.string("tables", dbTables)
 
@@ -246,17 +246,17 @@ class Dump:
                         maxlength2 = max(maxlength2, len("TYPE"))
                         lines2 = "-" * (maxlength2 + 2)
 
-                    self.__write("Database: %s\nTable: %s" % (db if db else "Current database", table))
+                    self._write("Database: %s\nTable: %s" % (db if db else "Current database", table))
 
                     if len(columns) == 1:
-                        self.__write("[1 column]")
+                        self._write("[1 column]")
                     else:
-                        self.__write("[%d columns]" % len(columns))
+                        self._write("[%d columns]" % len(columns))
 
                     if colType is not None:
-                        self.__write("+%s+%s+" % (lines1, lines2))
+                        self._write("+%s+%s+" % (lines1, lines2))
                     else:
-                        self.__write("+%s+" % lines1)
+                        self._write("+%s+" % lines1)
 
                     blank1 = " " * (maxlength1 - len("COLUMN"))
 
@@ -264,11 +264,11 @@ class Dump:
                         blank2 = " " * (maxlength2 - len("TYPE"))
 
                     if colType is not None:
-                        self.__write("| Column%s | Type%s |" % (blank1, blank2))
-                        self.__write("+%s+%s+" % (lines1, lines2))
+                        self._write("| Column%s | Type%s |" % (blank1, blank2))
+                        self._write("+%s+%s+" % (lines1, lines2))
                     else:
-                        self.__write("| Column%s |" % blank1)
-                        self.__write("+%s+" % lines1)
+                        self._write("| Column%s |" % blank1)
+                        self._write("+%s+" % lines1)
 
                     for column in colList:
                         colType = columns[column]
@@ -276,14 +276,14 @@ class Dump:
 
                         if colType is not None:
                             blank2 = " " * (maxlength2 - len(colType))
-                            self.__write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
+                            self._write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
                         else:
-                            self.__write("| %s%s |" % (column, blank1))
+                            self._write("| %s%s |" % (column, blank1))
 
                     if colType is not None:
-                        self.__write("+%s+%s+\n" % (lines1, lines2))
+                        self._write("+%s+%s+\n" % (lines1, lines2))
                     else:
-                        self.__write("+%s+\n" % lines1)
+                        self._write("+%s+\n" % lines1)
 
     def dbTablesCount(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
@@ -296,16 +296,16 @@ class Dump:
                         maxlength1 = max(maxlength1, len(normalizeUnicode(table) or str(table)))
 
             for db, counts in dbTables.items():
-                self.__write("Database: %s" % db if db else "Current database")
+                self._write("Database: %s" % db if db else "Current database")
 
                 lines1 = "-" * (maxlength1 + 2)
                 blank1 = " " * (maxlength1 - len("Table"))
                 lines2 = "-" * (maxlength2 + 2)
                 blank2 = " " * (maxlength2 - len("Entries"))
 
-                self.__write("+%s+%s+" % (lines1, lines2))
-                self.__write("| Table%s | Entries%s |" % (blank1, blank2))
-                self.__write("+%s+%s+" % (lines1, lines2))
+                self._write("+%s+%s+" % (lines1, lines2))
+                self._write("| Table%s | Entries%s |" % (blank1, blank2))
+                self._write("+%s+%s+" % (lines1, lines2))
 
                 sortedCounts = counts.keys()
                 sortedCounts.sort(reverse=True)
@@ -321,9 +321,9 @@ class Dump:
                     for table in tables:
                         blank1 = " " * (maxlength1 - len(normalizeUnicode(table) or str(table)))
                         blank2 = " " * (maxlength2 - len(str(count)))
-                        self.__write("| %s%s | %d%s |" % (table, blank1, count, blank2))
+                        self._write("| %s%s | %d%s |" % (table, blank1, count, blank2))
 
-                self.__write("+%s+%s+\n" % (lines1, lines2))
+                self._write("+%s+%s+\n" % (lines1, lines2))
         else:
             logger.error("unable to retrieve the number of entries for any table")
 
@@ -365,7 +365,7 @@ class Dump:
                 separator += "+%s" % lines
 
         separator += "+"
-        self.__write("Database: %s\nTable: %s" % (db if db else "Current database", table))
+        self._write("Database: %s\nTable: %s" % (db if db else "Current database", table))
 
         if conf.replicate:
             cols = []
@@ -402,11 +402,11 @@ class Dump:
             rtable = replication.createTable(table, cols)
 
         if count == 1:
-            self.__write("[1 entry]")
+            self._write("[1 entry]")
         else:
-            self.__write("[%d entries]" % count)
+            self._write("[%d entries]" % count)
 
-        self.__write(separator)
+        self._write(separator)
 
         for column in columns:
             if column != "__infos__":
@@ -414,7 +414,7 @@ class Dump:
                 maxlength = int(info["length"])
                 blank = " " * (maxlength - len(column))
 
-                self.__write("| %s%s" % (column, blank), n=False)
+                self._write("| %s%s" % (column, blank), n=False)
 
                 if not conf.replicate:
                     if field == fields:
@@ -424,7 +424,7 @@ class Dump:
 
                 field += 1
 
-        self.__write("|\n%s" % separator)
+        self._write("|\n%s" % separator)
 
         if not conf.replicate:
             dataToDumpFile(dumpFP, "\n")
@@ -461,7 +461,7 @@ class Dump:
                     values.append(value)
                     maxlength = int(info["length"])
                     blank = " " * (maxlength - len(value))
-                    self.__write("| %s%s" % (value, blank), n=False, console=console)
+                    self._write("| %s%s" % (value, blank), n=False, console=console)
 
                     if not conf.replicate:
                         if field == fields:
@@ -477,12 +477,12 @@ class Dump:
                 except sqlmapValueException:
                     pass
 
-            self.__write("|", console=console)
+            self._write("|", console=console)
 
             if not conf.replicate:
                 dataToDumpFile(dumpFP, "\n")
 
-        self.__write("%s\n" % separator)
+        self._write("%s\n" % separator)
 
         if conf.replicate:
             rtable.endTransaction()
@@ -502,26 +502,26 @@ class Dump:
 
             msg = "Column%s found in the " % colConsiderStr
             msg += "following databases:"
-            self.__write(msg)
+            self._write(msg)
 
-            printDbs = {}
+            _ = {}
 
             for db, tblData in dbs.items():
                 for tbl, colData in tblData.items():
                     for col, dataType in colData.items():
                         if column.lower() in col.lower():
-                            if db in printDbs:
-                                if tbl in printDbs[db]:
-                                    printDbs[db][tbl][col] = dataType
+                            if db in _:
+                                if tbl in _[db]:
+                                    _[db][tbl][col] = dataType
                                 else:
-                                    printDbs[db][tbl] = { col: dataType }
+                                    _[db][tbl] = { col: dataType }
                             else:
-                                printDbs[db] = {}
-                                printDbs[db][tbl] = { col: dataType }
+                                _[db] = {}
+                                _[db][tbl] = { col: dataType }
 
                             continue
 
-            self.dbTableColumns(printDbs)
+            self.dbTableColumns(_)
 
     def query(self, query, queryRes):
         self.string(query, queryRes)

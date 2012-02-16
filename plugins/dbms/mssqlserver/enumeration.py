@@ -10,7 +10,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
-from lib.core.common import getRange
+from lib.core.common import getLimitRange
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
@@ -25,6 +25,7 @@ from lib.core.data import queries
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import CURRENT_DB
 from lib.request import inject
 
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
@@ -68,7 +69,7 @@ class Enumeration(GenericEnumeration):
 
         self.forceDbmsEnum()
 
-        if conf.db == "CD":
+        if conf.db == CURRENT_DB:
             conf.db = self.getCurrentDb()
 
         if conf.db:
@@ -230,7 +231,7 @@ class Enumeration(GenericEnumeration):
 
                         continue
 
-                    indexRange = getRange(count)
+                    indexRange = getLimitRange(count)
 
                     for index in indexRange:
                         query = rootQuery.blind.query
@@ -347,7 +348,7 @@ class Enumeration(GenericEnumeration):
 
                         continue
 
-                    indexRange = getRange(count)
+                    indexRange = getLimitRange(count)
 
                     for index in indexRange:
                         query = rootQuery.blind.query

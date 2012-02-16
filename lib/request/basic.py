@@ -22,7 +22,6 @@ from lib.core.common import getUnicode
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import posixToNtSlashes
 from lib.core.common import readInput
-from lib.core.common import sanitizeAsciiString
 from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
 from lib.core.data import kb

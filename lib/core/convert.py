@@ -91,34 +91,32 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
         return value
 
     count = 0
-    result = None
+    result = None if value is None else ""
 
-    if value is None:
-        return result
+    if value:
+        if convall or safe is None:
+            safe = ""
 
-    if convall or safe is None:
-        safe = ""
+        # corner case when character % really needs to be
+        # encoded (when not representing url encoded char)
+        # except in cases when tampering scripts are used
+        if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
+            value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value, re.DOTALL | re.IGNORECASE)
 
-    # corner case when character % really needs to be
-    # encoded (when not representing url encoded char)
-    # except in cases when tampering scripts are used
-    if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
-        value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value, re.DOTALL | re.IGNORECASE)
+        while True:
+            result = urllib.quote(utf8encode(value), safe)
 
-    while True:
-        result = urllib.quote(utf8encode(value), safe)
-
-        if limit and len(result) > URLENCODE_CHAR_LIMIT:
-            if count >= len(URLENCODE_FAILSAFE_CHARS):
-                break
-
-            while count < len(URLENCODE_FAILSAFE_CHARS):
-                safe += URLENCODE_FAILSAFE_CHARS[count]
-                count += 1
-                if safe[-1] in value:
+            if limit and len(result) > URLENCODE_CHAR_LIMIT:
+                if count >= len(URLENCODE_FAILSAFE_CHARS):
                     break
-        else:
-            break
+
+                while count < len(URLENCODE_FAILSAFE_CHARS):
+                    safe += URLENCODE_FAILSAFE_CHARS[count]
+                    count += 1
+                    if safe[-1] in value:
+                        break
+            else:
+                break
 
     return result
 

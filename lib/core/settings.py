@@ -249,6 +249,9 @@ SQL_STATEMENTS = {
 # string representation for NULL value
 NULL = "NULL"
 
+# string representation for current database
+CURRENT_DB = "CD"
+
 # Regular expressions used for parsing error messages (--parse-errors)
 ERROR_PARSING_REGEXES = (   
                           r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>", 

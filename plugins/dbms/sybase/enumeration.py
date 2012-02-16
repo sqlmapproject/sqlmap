@@ -22,6 +22,7 @@ from lib.core.dicts import sybaseTypes
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import CURRENT_DB
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
@@ -114,7 +115,7 @@ class Enumeration(GenericEnumeration):
 
         self.forceDbmsEnum()
 
-        if conf.db == "CD":
+        if conf.db == CURRENT_DB:
             conf.db = self.getCurrentDb()
 
         if conf.db:
@@ -160,7 +161,7 @@ class Enumeration(GenericEnumeration):
     def getColumns(self, onlyColNames=False):
         self.forceDbmsEnum()
 
-        if conf.db is None or conf.db == "CD":
+        if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
                 warnMsg = "missing database parameter, sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
