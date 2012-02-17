@@ -76,8 +76,7 @@ class Takeover(GenericTakeover):
 
         shellcodeChar = shellcodeChar[:-1]
 
-        self.spExploit = """
-        DECLARE @buf NVARCHAR(4000),
+        self.spExploit = """DECLARE @buf NVARCHAR(4000),
         @val NVARCHAR(4),
         @counter INT
         SET @buf = '

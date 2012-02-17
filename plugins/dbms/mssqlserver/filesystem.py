@@ -51,8 +51,7 @@ class Filesystem(GenericFilesystem):
         inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (txtTbl, rFile, randomStr(10), randomStr(10)), silent=True)
 
         # Reference: http://support.microsoft.com/kb/104829
-        binToHexQuery = """
-        DECLARE @charset VARCHAR(16)
+        binToHexQuery = """DECLARE @charset VARCHAR(16)
         DECLARE @counter INT
         DECLARE @hexstr VARCHAR(4096)
         DECLARE @length INT
