@@ -13,7 +13,6 @@ import traceback
 
 from lib.core.agent import agent
 from lib.core.common import Backend
-from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
@@ -46,6 +45,7 @@ from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
+from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import PYVERSION
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
@@ -58,466 +58,459 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     on an affected host
     """
 
-    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
-
-    if retVal:
-        return 0, retVal
-
-    partialValue = ""
-    finalValue = ""
+    partialValue = u""
+    finalValue = None
+    abortedFlag = False
     asciiTbl = getCharset(charsetType)
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
+    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None
 
-    # Set kb.partRun in case "common prediction" feature (a.k.a. "good
-    # samaritan") is used
-    kb.partRun = getPartRun() if conf.predictOutput else None
-
-    if "LENGTH(" in expression or "LEN(" in expression:
-        firstChar = 0
-    elif dump and conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit() ) ):
-        firstChar = int(conf.firstChar) - 1
-    elif firstChar is None:
-        firstChar = 0
-    elif ( isinstance(firstChar, basestring) and firstChar.isdigit() ) or isinstance(firstChar, int):
-        firstChar = int(firstChar) - 1
-
-    if "LENGTH(" in expression or "LEN(" in expression:
-        lastChar = 0
-    elif dump and conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit() ) ):
-        lastChar = int(conf.lastChar)
-    elif lastChar in ( None, "0" ):
-        lastChar = 0
-    elif ( isinstance(lastChar, basestring) and lastChar.isdigit() ) or isinstance(lastChar, int):
-        lastChar = int(lastChar)
-
-    if Backend.getDbms():
-        _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
-        nulledCastedField = agent.nullAndCastField(fieldToCastStr)
-        expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
-        expressionUnescaped = unescaper.unescape(expressionReplaced)
-    else:
-        expressionUnescaped = unescaper.unescape(expression)
-
-    if length and not isinstance(length, int) and length.isdigit():
-        length = int(length)
-
-    if length == 0:
-        return 0, ""
-
-    if lastChar > 0 and length > ( lastChar - firstChar ):
-        length = ( lastChar - firstChar )
-
-    showEta = conf.eta and isinstance(length, int)
-    numThreads = min(conf.threads, length)
-
-    if showEta:
-        progress = ProgressBar(maxValue=length)
-        progressTime = []
-
-    if timeBasedCompare and conf.threads > 1:
-        warnMsg = "multi-threading is considered unsafe in time-based data retrieval. Going to switch it off automatically"
-        singleTimeWarnMessage(warnMsg)
-
-    if numThreads > 1:
-        if not timeBasedCompare:
-            debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
-            logger.debug(debugMsg)
+    if retVal:
+        if PARTIAL_VALUE_MARKER in retVal:
+            partialValue = retVal.replace(PARTIAL_VALUE_MARKER, "")
+            dataToStdout("[%s] [INFO] resuming partial value: '%s'\r\n" % (time.strftime("%X"), safecharencode(partialValue)))
         else:
-            numThreads = 1
+            dataToStdout("[%s] [INFO] resumed: %s\r\n" % (time.strftime("%X"), safecharencode(retVal)))
+            return 0, retVal
 
-    if conf.threads == 1 and not timeBasedCompare:
-        warnMsg = "running in a single-thread mode. Please consider "
-        warnMsg += "usage of option '--threads' for faster data retrieval"
-        singleTimeWarnMessage(warnMsg)
+    try:
+        # Set kb.partRun in case "common prediction" feature (a.k.a. "good
+        # samaritan") is used
+        kb.partRun = getPartRun() if conf.predictOutput else None
 
-    if conf.verbose in (1, 2) and not showEta:
-        if isinstance(length, int) and conf.threads > 1:
-            dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
-            dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
+        if partialValue:
+            firstChar = len(partialValue)
+        elif "LENGTH(" in expression or "LEN(" in expression:
+            firstChar = 0
+        elif dump and conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit() ) ):
+            firstChar = int(conf.firstChar) - 1
+        elif firstChar is None:
+            firstChar = 0
+        elif ( isinstance(firstChar, basestring) and firstChar.isdigit() ) or isinstance(firstChar, int):
+            firstChar = int(firstChar) - 1
+
+        if "LENGTH(" in expression or "LEN(" in expression:
+            lastChar = 0
+        elif dump and conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit() ) ):
+            lastChar = int(conf.lastChar)
+        elif lastChar in ( None, "0" ):
+            lastChar = 0
+        elif ( isinstance(lastChar, basestring) and lastChar.isdigit() ) or isinstance(lastChar, int):
+            lastChar = int(lastChar)
+
+        if Backend.getDbms():
+            _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
+            nulledCastedField = agent.nullAndCastField(fieldToCastStr)
+            expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
+            expressionUnescaped = unescaper.unescape(expressionReplaced)
         else:
-            dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
+            expressionUnescaped = unescaper.unescape(expression)
 
-    hintlock = threading.Lock()
+        if length and not isinstance(length, int) and length.isdigit():
+            length = int(length)
 
-    def tryHint(idx):
-        hintlock.acquire()
-        hintValue = kb.hintValue
-        hintlock.release()
+        if length == 0:
+            return 0, ""
 
-        if hintValue is not None and len(hintValue) >= idx:
-            if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
-                posValue = hintValue[idx-1]
+        if lastChar > 0 and length > ( lastChar - firstChar ):
+            length = ( lastChar - firstChar )
+
+        showEta = conf.eta and isinstance(length, int)
+        numThreads = min(conf.threads, length)
+
+        if showEta:
+            progress = ProgressBar(maxValue=length)
+            progressTime = []
+
+        if timeBasedCompare and conf.threads > 1:
+            warnMsg = "multi-threading is considered unsafe in time-based data retrieval. Going to switch it off automatically"
+            singleTimeWarnMessage(warnMsg)
+
+        if numThreads > 1:
+            if not timeBasedCompare:
+                debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
+                logger.debug(debugMsg)
             else:
-                posValue = ord(hintValue[idx-1])
+                numThreads = 1
 
-            forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
-            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-            incrementCounter(kb.technique)
+        if conf.threads == 1 and not timeBasedCompare:
+            warnMsg = "running in a single-thread mode. Please consider "
+            warnMsg += "usage of option '--threads' for faster data retrieval"
+            singleTimeWarnMessage(warnMsg)
 
-            if result:
-                return hintValue[idx-1]
-
-        hintlock.acquire()
-        kb.hintValue = None
-        hintlock.release()
-
-        return None
-
-    def validateChar(idx, value):
-        """
-        Used in time-based inference (in case that original and retrieved
-        value are not equal there will be a deliberate delay).
-        """
-
-        forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
-        incrementCounter(kb.technique)
-        result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-
-        return not result
-
-    def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None, shiftTable=None):
-        """
-        continuousOrder means that distance between each two neighbour's
-        numerical values is exactly 1
-        """
-
-        result = tryHint(idx)
-
-        if result:
-            return result
-
-        originalTbl = list(charTbl)
-
-        if continuousOrder and shiftTable is None:
-            # Used for gradual expanding into unicode charspace
-            shiftTable = [5, 4]
-
-        if CHAR_INFERENCE_MARK in payload and ord('\n') in charTbl:
-            charTbl.remove(ord('\n'))
-
-        if len(charTbl) == 1:
-            forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
-            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-            incrementCounter(kb.technique)
-
-            if result:
-                return decodeIntToUnicode(charTbl[0])
+        if conf.verbose in (1, 2) and not showEta:
+            if isinstance(length, int) and conf.threads > 1:
+                dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
+                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
             else:
-                return None
+                dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
 
-        maxChar = maxValue = charTbl[-1]
-        minChar = minValue = charTbl[0]
+        hintlock = threading.Lock()
 
-        while len(charTbl) != 1:
-            position = (len(charTbl) >> 1)
-            posValue = charTbl[position]
+        def tryHint(idx):
+            hintlock.acquire()
+            hintValue = kb.hintValue
+            hintlock.release()
 
-            if CHAR_INFERENCE_MARK not in payload:
-                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
-            else:
-                # e.g.: ... > '%c' -> ... > ORD(..)
-                markingValue = "'%s'" % CHAR_INFERENCE_MARK
-                unescapedCharValue = unescaper.unescape("'%s'" % decodeIntToUnicode(posValue))
-                forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
-
-            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-            incrementCounter(kb.technique)
-
-            if result:
-                minValue = posValue
-
-                if type(charTbl) != xrange:
-                    charTbl = charTbl[position:]
+            if hintValue is not None and len(hintValue) >= idx:
+                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
+                    posValue = hintValue[idx-1]
                 else:
-                    # xrange() - extended virtual charset used for memory/space optimization
-                    charTbl = xrange(charTbl[position], charTbl[-1] + 1)
-            else:
-                maxValue = posValue
+                    posValue = ord(hintValue[idx-1])
 
-                if type(charTbl) != xrange:
-                    charTbl = charTbl[:position]
-                else:
-                    charTbl = xrange(charTbl[0], charTbl[position])
+                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
+                result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                incrementCounter(kb.technique)
+
+                if result:
+                    return hintValue[idx-1]
+
+            hintlock.acquire()
+            kb.hintValue = None
+            hintlock.release()
+
+            return None
+
+        def validateChar(idx, value):
+            """
+            Used in time-based inference (in case that original and retrieved
+            value are not equal there will be a deliberate delay).
+            """
+
+            forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
+            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+            incrementCounter(kb.technique)
+
+            return not result
+
+        def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None, shiftTable=None):
+            """
+            continuousOrder means that distance between each two neighbour's
+            numerical values is exactly 1
+            """
+
+            result = tryHint(idx)
+
+            if result:
+                return result
+
+            originalTbl = list(charTbl)
+
+            if continuousOrder and shiftTable is None:
+                # Used for gradual expanding into unicode charspace
+                shiftTable = [5, 4]
+
+            if CHAR_INFERENCE_MARK in payload and ord('\n') in charTbl:
+                charTbl.remove(ord('\n'))
 
             if len(charTbl) == 1:
-                if continuousOrder:
-                    if maxValue == 1:
-                        return None
+                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
+                result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                incrementCounter(kb.technique)
 
-                    # Going beyond the original charset
-                    elif minValue == maxChar:
-                        # If the original charTbl was [0,..,127] new one
-                        # will be [128,..,128*16-1] or from 128 to 2047
-                        # and instead of making a HUGE list with all the
-                        # elements we use a xrange, which is a virtual
-                        # list
-                        if expand and shiftTable:
-                            charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
-                            originalTbl = list(charTbl)
-                            maxChar = maxValue = charTbl[-1]
-                            minChar = minValue = charTbl[0]
-                        else:
-                            return None
-                    else:
-                        retVal = minValue + 1
-
-                        if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                            if timeBasedCompare and not validateChar(idx, retVal):
-                                if not kb.originalTimeDelay:
-                                    kb.originalTimeDelay = conf.timeSec
-
-                                if (conf.timeSec - kb.originalTimeDelay) < MAX_TIME_REVALIDATION_STEPS:
-                                    errMsg = "invalid character detected. retrying.."
-                                    logger.error(errMsg)
-
-                                    warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                                    logger.warn(warnMsg)
-
-                                    conf.timeSec += 1
-
-                                    if kb.adjustTimeDelay:
-                                        dbgMsg = "turning off auto-adjustment mechanism"
-                                        logger.debug(dbgMsg)
-                                        kb.adjustTimeDelay = False
-                                    return getChar(idx, originalTbl, continuousOrder, expand, shiftTable)
-                                else:
-                                    errMsg = "unable to properly validate last character value ('%s').." % decodeIntToUnicode(retVal)
-                                    logger.error(errMsg)
-                                    conf.timeSec = kb.originalTimeDelay
-                                    return decodeIntToUnicode(retVal)
-                            else:
-                                return decodeIntToUnicode(retVal)
-                        else:
-                            return None
+                if result:
+                    return decodeIntToUnicode(charTbl[0])
                 else:
-                    if minValue == maxChar or maxValue == minChar:
-                        return None
-
-                    # If we are working with non-continuous elements, set
-                    # both minValue and character afterwards are possible
-                    # candidates
-                    for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
-                        forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, retVal))
-                        result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-                        incrementCounter(kb.technique)
-
-                        if result:
-                            return decodeIntToUnicode(retVal)
-
                     return None
 
-    def etaProgressUpdate(charTime, index):
-        if len(progressTime) <= ( (length * 3) / 100 ):
-            eta = 0
-        else:
-            midTime = sum(progressTime) / len(progressTime)
-            midTimeWithLatest = (midTime + charTime) / 2
-            eta = midTimeWithLatest * (length - index) / conf.threads
+            maxChar = maxValue = charTbl[-1]
+            minChar = minValue = charTbl[0]
 
-        progressTime.append(charTime)
-        progress.update(index)
-        progress.draw(eta)
+            while len(charTbl) != 1:
+                position = (len(charTbl) >> 1)
+                posValue = charTbl[position]
 
-    # Go multi-threading (--threads > 1)
-    if conf.threads > 1 and isinstance(length, int) and length > 1:
-        value = []
-        threadData = getCurrentThreadData()
+                if CHAR_INFERENCE_MARK not in payload:
+                    forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
+                else:
+                    # e.g.: ... > '%c' -> ... > ORD(..)
+                    markingValue = "'%s'" % CHAR_INFERENCE_MARK
+                    unescapedCharValue = unescaper.unescape("'%s'" % decodeIntToUnicode(posValue))
+                    forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
-        threadData.shared.value = [ None ] * length
-        threadData.shared.index = [ firstChar ]    # As list for python nested function scoping
+                result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                incrementCounter(kb.technique)
 
-        try:
-            def blindThread():
-                threadData = getCurrentThreadData()
+                if result:
+                    minValue = posValue
 
-                while kb.threadContinue:
-                    kb.locks.index.acquire()
+                    if type(charTbl) != xrange:
+                        charTbl = charTbl[position:]
+                    else:
+                        # xrange() - extended virtual charset used for memory/space optimization
+                        charTbl = xrange(charTbl[position], charTbl[-1] + 1)
+                else:
+                    maxValue = posValue
 
-                    if threadData.shared.index[0] >= length:
+                    if type(charTbl) != xrange:
+                        charTbl = charTbl[:position]
+                    else:
+                        charTbl = xrange(charTbl[0], charTbl[position])
+
+                if len(charTbl) == 1:
+                    if continuousOrder:
+                        if maxValue == 1:
+                            return None
+
+                        # Going beyond the original charset
+                        elif minValue == maxChar:
+                            # If the original charTbl was [0,..,127] new one
+                            # will be [128,..,128*16-1] or from 128 to 2047
+                            # and instead of making a HUGE list with all the
+                            # elements we use a xrange, which is a virtual
+                            # list
+                            if expand and shiftTable:
+                                charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
+                                originalTbl = list(charTbl)
+                                maxChar = maxValue = charTbl[-1]
+                                minChar = minValue = charTbl[0]
+                            else:
+                                return None
+                        else:
+                            retVal = minValue + 1
+
+                            if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
+                                if timeBasedCompare and not validateChar(idx, retVal):
+                                    if not kb.originalTimeDelay:
+                                        kb.originalTimeDelay = conf.timeSec
+
+                                    if (conf.timeSec - kb.originalTimeDelay) < MAX_TIME_REVALIDATION_STEPS:
+                                        errMsg = "invalid character detected. retrying.."
+                                        logger.error(errMsg)
+
+                                        warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                        logger.warn(warnMsg)
+
+                                        conf.timeSec += 1
+
+                                        if kb.adjustTimeDelay:
+                                            dbgMsg = "turning off auto-adjustment mechanism"
+                                            logger.debug(dbgMsg)
+                                            kb.adjustTimeDelay = False
+                                        return getChar(idx, originalTbl, continuousOrder, expand, shiftTable)
+                                    else:
+                                        errMsg = "unable to properly validate last character value ('%s').." % decodeIntToUnicode(retVal)
+                                        logger.error(errMsg)
+                                        conf.timeSec = kb.originalTimeDelay
+                                        return decodeIntToUnicode(retVal)
+                                else:
+                                    return decodeIntToUnicode(retVal)
+                            else:
+                                return None
+                    else:
+                        if minValue == maxChar or maxValue == minChar:
+                            return None
+
+                        # If we are working with non-continuous elements, set
+                        # both minValue and character afterwards are possible
+                        # candidates
+                        for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
+                            forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, retVal))
+                            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                            incrementCounter(kb.technique)
+
+                            if result:
+                                return decodeIntToUnicode(retVal)
+
+                        return None
+
+        def etaProgressUpdate(charTime, index):
+            if len(progressTime) <= ( (length * 3) / 100 ):
+                eta = 0
+            else:
+                midTime = sum(progressTime) / len(progressTime)
+                midTimeWithLatest = (midTime + charTime) / 2
+                eta = midTimeWithLatest * (length - index) / conf.threads
+
+            progressTime.append(charTime)
+            progress.update(index)
+            progress.draw(eta)
+
+        # Go multi-threading (--threads > 1)
+        if conf.threads > 1 and isinstance(length, int) and length > 1:
+            value = []
+            threadData = getCurrentThreadData()
+
+            threadData.shared.value = [ None ] * length
+            threadData.shared.index = [ firstChar ]    # As list for python nested function scoping
+            threadData.shared.start = firstChar
+
+            try:
+                def blindThread():
+                    threadData = getCurrentThreadData()
+
+                    while kb.threadContinue:
+                        kb.locks.index.acquire()
+
+                        if threadData.shared.index[0] >= length:
+                            kb.locks.index.release()
+
+                            return
+
+                        threadData.shared.index[0] += 1
+                        curidx = threadData.shared.index[0]
                         kb.locks.index.release()
 
-                        return
+                        if kb.threadContinue:
+                            charStart = time.time()
+                            val = getChar(curidx)
+                            if val is None:
+                                val = INFERENCE_UNKNOWN_CHAR
+                        else:
+                            break
 
-                    threadData.shared.index[0] += 1
-                    curidx = threadData.shared.index[0]
-                    kb.locks.index.release()
+                        kb.locks.value.acquire()
+                        threadData.shared.value[curidx - 1] = val
+                        currentValue = list(threadData.shared.value)
+                        kb.locks.value.release()
 
-                    if kb.threadContinue:
-                        charStart = time.time()
-                        val = getChar(curidx)
-                        if val is None:
-                            val = INFERENCE_UNKNOWN_CHAR
-                    else:
-                        break
+                        if kb.threadContinue:
+                            if showEta:
+                                etaProgressUpdate(time.time() - charStart, threadData.shared.index[0])
+                            elif conf.verbose >= 1:
+                                startCharIndex = 0
+                                endCharIndex = 0
 
-                    kb.locks.value.acquire()
-                    threadData.shared.value[curidx-1] = val
-                    currentValue = list(threadData.shared.value)
-                    kb.locks.value.release()
+                                for i in xrange(length):
+                                    if currentValue[i] is not None:
+                                        endCharIndex = max(endCharIndex, i)
 
-                    if kb.threadContinue:
-                        if showEta:
-                            etaProgressUpdate(time.time() - charStart, threadData.shared.index[0])
-                        elif conf.verbose >= 1:
-                            startCharIndex = 0
-                            endCharIndex = 0
+                                output = ''
 
-                            for i in xrange(length):
-                                if currentValue[i] is not None:
-                                    endCharIndex = max(endCharIndex, i)
+                                if endCharIndex > conf.progressWidth:
+                                    startCharIndex = endCharIndex - conf.progressWidth
 
-                            output = ''
+                                count = threadData.shared.start
 
-                            if endCharIndex > conf.progressWidth:
-                                startCharIndex = endCharIndex - conf.progressWidth
+                                for i in xrange(startCharIndex, endCharIndex + 1):
+                                    output += '_' if currentValue[i] is None else currentValue[i]
 
-                            count = 0
+                                for i in xrange(length):
+                                    count += 1 if currentValue[i] is not None else 0
 
-                            for i in xrange(startCharIndex, endCharIndex + 1):
-                                output += '_' if currentValue[i] is None else currentValue[i]
+                                if startCharIndex > 0:
+                                    output = '..' + output[2:]
 
-                            for i in xrange(length):
-                                count += 1 if currentValue[i] is not None else 0
+                                if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length-1):
+                                    output = output[:-2] + '..'
 
-                            if startCharIndex > 0:
-                                output = '..' + output[2:]
+                                if conf.verbose in (1, 2) and not showEta:
+                                    output += '_' * (min(length, conf.progressWidth) - len(output))
+                                    status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
+                                    output += status if count != length else " "*len(status)
 
-                            if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length-1):
-                                output = output[:-2] + '..'
+                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
 
-                            if conf.verbose in (1, 2) and not showEta:
-                                output += '_' * (min(length, conf.progressWidth) - len(output))
-                                status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
-                                output += status if count != length else " "*len(status)
+                runThreads(numThreads, blindThread, startThreadMsg=False)
 
-                                dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
+            except KeyboardInterrupt:
+                abortedFlag = True
 
-                if not kb.threadContinue:
-                    if int(threading.currentThread().getName()) == numThreads - 1:
-                        partialValue = unicode()
-                        for v in threadData.shared.value:
-                            if v is None:
-                                break
-                            elif isinstance(v, basestring):
-                                partialValue += v
+            finally:
+                value = map(lambda _: partialValue[_] if _ < len(partialValue) else threadData.shared.value[_], xrange(length))
 
-                        if len(partialValue) > 0:
-                            dataToSessionFile(replaceNewlineTabs(partialValue))
+            infoMsg = None
 
-            runThreads(numThreads, blindThread, startThreadMsg=False)
+            # If we have got one single character not correctly fetched it
+            # can mean that the connection to the target url was lost
+            if None in value:
+                partialValue = "".join(_ for _ in value[:value.index(None)])
 
-        except KeyboardInterrupt:
-            raise
-
-        finally:
-            value = threadData.shared.value
-
-        infoMsg = None
-
-        # If we have got one single character not correctly fetched it
-        # can mean that the connection to the target url was lost
-        if None in value:
-            for v in value:
-                if isinstance(v, basestring) and v is not None:
-                    partialValue += v
-
-            if partialValue:
-                finalValue = partialValue
-                infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
-        else:
-            finalValue = "".join(value)
-            infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
-
-        if isinstance(finalValue, basestring) and len(finalValue) > 0:
-            dataToSessionFile(replaceNewlineTabs(finalValue))
-
-        if conf.verbose in (1, 2) and not showEta and infoMsg:
-            dataToStdout(infoMsg)
-
-    # No multi-threading (--threads = 1)
-    else:
-        index = firstChar
-
-        while True:
-            index += 1
-            charStart = time.time()
-
-            # Common prediction feature (a.k.a. "good samaritan")
-            # NOTE: to be used only when multi-threading is not set for
-            # the moment
-            if conf.predictOutput and len(finalValue) > 0 and kb.partRun is not None:
-                val = None
-                commonValue, commonPattern, commonCharset, otherCharset = goGoodSamaritan(finalValue, asciiTbl)
-
-                # If there is one single output in common-outputs, check
-                # it via equal against the query output
-                if commonValue is not None:
-                    # One-shot query containing equals commonValue
-                    testValue = unescaper.unescape("'%s'" % commonValue) if "'" not in commonValue else unescaper.unescape("%s" % commonValue, quote=False)
-                    query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
-                    query = agent.suffixQuery(query)
-                    result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
-                    incrementCounter(kb.technique)
-
-                    # Did we have luck?
-                    if result:
-                        dataToSessionFile(replaceNewlineTabs(commonValue[index-1:]))
-
-                        if showEta:
-                            etaProgressUpdate(time.time() - charStart, len(commonValue))
-                        elif conf.verbose in (1, 2):
-                            dataToStdout(commonValue[index-1:])
-
-                        finalValue = commonValue
-
-                        break
-
-                # If there is a common pattern starting with finalValue,
-                # check it via equal against the substring-query output
-                if commonPattern is not None:
-                    # Substring-query containing equals commonPattern
-                    subquery = queries[Backend.getIdentifiedDbms()].substring.query % (expressionUnescaped, 1, len(commonPattern))
-                    testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
-                    query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
-                    query = agent.suffixQuery(query)
-                    result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
-                    incrementCounter(kb.technique)
-
-                    # Did we have luck?
-                    if result:
-                        val = commonPattern[index-1:]
-                        index += len(val)-1
-
-                # Otherwise if there is no commonValue (single match from
-                # txt/common-outputs.txt) and no commonPattern
-                # (common pattern) use the returned common charset only
-                # to retrieve the query output
-                if not val and commonCharset:
-                    val = getChar(index, commonCharset, False)
-
-                # If we had no luck with commonValue and common charset,
-                # use the returned other charset
-                if not val:
-                    val = getChar(index, otherCharset, otherCharset == asciiTbl)
+                if partialValue:
+                    infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), filterControlChars(partialValue))
             else:
-                val = getChar(index, asciiTbl)
+                finalValue = "".join(value)
+                infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
 
-            if val is None or ( lastChar > 0 and index > lastChar ):
-                break
+            if conf.verbose in (1, 2) and not showEta and infoMsg:
+                dataToStdout(infoMsg)
 
-            if kb.data.processChar:
-                val = kb.data.processChar(val)
+        # No multi-threading (--threads = 1)
+        else:
+            index = firstChar
 
-            finalValue += val
-            dataToSessionFile(replaceNewlineTabs(val))
+            while True:
+                index += 1
+                charStart = time.time()
 
-            if showEta:
-                etaProgressUpdate(time.time() - charStart, index)
-            elif conf.verbose in (1, 2):
-                dataToStdout(val)
+                # Common prediction feature (a.k.a. "good samaritan")
+                # NOTE: to be used only when multi-threading is not set for
+                # the moment
+                if conf.predictOutput and len(partialValue) > 0 and kb.partRun is not None:
+                    val = None
+                    commonValue, commonPattern, commonCharset, otherCharset = goGoodSamaritan(partialValue, asciiTbl)
 
-            if len(finalValue) > INFERENCE_BLANK_BREAK and finalValue[-INFERENCE_BLANK_BREAK:].isspace():
-                break
+                    # If there is one single output in common-outputs, check
+                    # it via equal against the query output
+                    if commonValue is not None:
+                        # One-shot query containing equals commonValue
+                        testValue = unescaper.unescape("'%s'" % commonValue) if "'" not in commonValue else unescaper.unescape("%s" % commonValue, quote=False)
+                        query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
+                        query = agent.suffixQuery(query)
+                        result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
+                        incrementCounter(kb.technique)
+
+                        # Did we have luck?
+                        if result:
+                            if showEta:
+                                etaProgressUpdate(time.time() - charStart, len(commonValue))
+                            elif conf.verbose in (1, 2):
+                                dataToStdout(commonValue[index-1:])
+
+                            finalValue = commonValue
+
+                            break
+
+                    # If there is a common pattern starting with partialValue,
+                    # check it via equal against the substring-query output
+                    if commonPattern is not None:
+                        # Substring-query containing equals commonPattern
+                        subquery = queries[Backend.getIdentifiedDbms()].substring.query % (expressionUnescaped, 1, len(commonPattern))
+                        testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
+                        query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
+                        query = agent.suffixQuery(query)
+                        result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
+                        incrementCounter(kb.technique)
+
+                        # Did we have luck?
+                        if result:
+                            val = commonPattern[index-1:]
+                            index += len(val)-1
+
+                    # Otherwise if there is no commonValue (single match from
+                    # txt/common-outputs.txt) and no commonPattern
+                    # (common pattern) use the returned common charset only
+                    # to retrieve the query output
+                    if not val and commonCharset:
+                        val = getChar(index, commonCharset, False)
+
+                    # If we had no luck with commonValue and common charset,
+                    # use the returned other charset
+                    if not val:
+                        val = getChar(index, otherCharset, otherCharset == asciiTbl)
+                else:
+                    val = getChar(index, asciiTbl)
+
+                if val is None or ( lastChar > 0 and index > lastChar ):
+                    finalValue = partialValue
+                    break
+
+                if kb.data.processChar:
+                    val = kb.data.processChar(val)
+
+                partialValue += val
+
+                if showEta:
+                    etaProgressUpdate(time.time() - charStart, index)
+                elif conf.verbose in (1, 2):
+                    dataToStdout(val)
+
+                if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
+                    finalValue = partialValue
+                    break
+
+    except KeyboardInterrupt:
+        abortedFlag = True
 
     if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
@@ -526,11 +519,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         infoMsg = "retrieved: %s" % filterControlChars(finalValue)
         logger.info(infoMsg)
 
-    if not partialValue:
+    if finalValue is not None:
         conf.hashDB.write(expression, finalValue)
-        dataToSessionFile("]\n")
+    else:
+        conf.hashDB.write(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
 
     if kb.threadException:
         raise sqlmapThreadException, "something unexpected happened inside the threads"
 
-    return getCounter(kb.technique), safecharencode(finalValue) if kb.safeCharEncode else finalValue
+    if abortedFlag:
+        raise KeyboardInterrupt
+
+    _ = finalValue or partialValue
+    return getCounter(kb.technique), safecharencode(_) if kb.safeCharEncode else _

@@ -61,6 +61,7 @@ from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.enums import DBMS
+from lib.core.enums import EXPECTED
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import OS
@@ -2206,10 +2207,10 @@ def trimAlphaNum(value):
 
 def isNumPosStrValue(value):
     """
-    Returns True if value is a string with a positive integer representation
+    Returns True if value is a string (or integer) with a positive integer representation
     """
 
-    return value and isinstance(value, basestring) and value.isdigit() and value != "0"
+    return (value and isinstance(value, basestring) and value.isdigit() and value != "0") or (isinstance(value, int) and value != 0)
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
@@ -3096,3 +3097,36 @@ def getCounter(technique):
     """
 
     return kb.counters.get(technique, 0)
+
+def extractExpectedValue(value, expected):
+    """
+    Extracts and returns expected value by a given type
+    """
+
+    if not expected:
+        return value
+
+    value = unArrayizeValue(value)
+
+    if isNoneValue(value):
+        value = None
+    elif expected == EXPECTED.BOOL:
+        if isinstance(value, int):
+            value = bool(value)
+        elif isinstance(value, basestring):
+            value = value.strip().lower()
+            if value in ("true", "false"):
+                value = value == "true"
+            elif value in ("1", "-1"):
+                value = True
+            elif value == "0":
+                value = False
+            else:
+                value = None
+    elif expected == EXPECTED.INT:
+        if isinstance(value, basestring):
+            if value.isdigit():
+                value = int(value)
+            else:
+                value = None
+    return value

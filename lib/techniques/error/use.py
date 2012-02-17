@@ -45,10 +45,9 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
-from lib.utils.resume import resume
 
 def __oneShotErrorUse(expression, field):
-    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
+    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
@@ -137,7 +136,7 @@ def __oneShotErrorUse(expression, field):
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 
-def __errorFields(expression, expressionFields, expressionFieldsList, expected=None, num=None, resumeValue=True):
+def __errorFields(expression, expressionFields, expressionFieldsList, expected=None, num=None):
     outputs = []
     origExpr = None
 
@@ -158,22 +157,13 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
 
-        if resumeValue:
-            output = resume(expressionReplaced, None)
+        output = __oneShotErrorUse(expressionReplaced, field)
 
-        if not output or (expected == EXPECTED.INT and not output.isdigit()):
-            if output:
-                warnMsg = "expected value type %s, resumed '%s', " % (expected, output)
-                warnMsg += "sqlmap is going to retrieve the value again"
-                logger.warn(warnMsg)
+        if not kb.threadContinue:
+            return None
 
-            output = __oneShotErrorUse(expressionReplaced, field)
-
-            if not kb.threadContinue:
-                return None
-
-            if output is not None:
-                dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
+        if output is not None:
+            dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
 
         if isinstance(num, int):
             expression = origExpr
@@ -194,7 +184,7 @@ def __errorReplaceChars(value):
 
     return retVal
 
-def errorUse(expression, expected=None, resumeValue=True, dump=False):
+def errorUse(expression, expected=None, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of the error-based
     SQL injection vulnerability on the affected parameter.
@@ -207,17 +197,10 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
     start = time.time()
     startLimit = 0
     stopLimit = None
+    output = None
     outputs = []
     untilLimitChar = None
     untilOrderChar = None
-
-    if resumeValue:
-        output = resume(expression, None)
-    else:
-        output = None
-
-    if output and (expected is None or (expected == EXPECTED.INT and output.isdigit())):
-        return output
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
@@ -295,11 +278,8 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
             if " ORDER BY " in expression:
                 countedExpression = countedExpression[:countedExpression.index(" ORDER BY ")]
 
-            count = resume(countedExpression, None)
-
-            if not count or not count.isdigit():
-                _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
-                count = __oneShotErrorUse(countedExpression, countedExpressionFields)
+            _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
+            count = __oneShotErrorUse(countedExpression, countedExpressionFields)
 
             if isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
@@ -360,7 +340,7 @@ def errorUse(expression, expected=None, resumeValue=True, dump=False):
                         finally:
                             kb.locks.limits.release()
 
-                        output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, resumeValue)
+                        output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num)
 
                         if not kb.threadContinue:
                             break

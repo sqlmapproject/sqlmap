@@ -69,13 +69,6 @@ def queryOutputLength(expression, payload):
     infoMsg = "retrieving the length of query output"
     logger.info(infoMsg)
 
-    output = resume(lengthExpr, payload)
-
-    if output:
-        return 0, output, regExpr
-
-    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], lengthExpr))
-
     start = time.time()
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
     count, length = bisection(payload, lengthExprUnescaped, charsetType=2)

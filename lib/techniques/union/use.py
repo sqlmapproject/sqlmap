@@ -43,10 +43,9 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
-from lib.utils.resume import resume
 
 def __oneShotUnionUse(expression, unpack=True, limited=False):
-    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries]) else None
+    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
@@ -233,14 +232,8 @@ def unionUse(expression, unpack=True, dump=False):
                 _ = countedExpression.upper().rindex(" ORDER BY ")
                 countedExpression = countedExpression[:_]
 
-            count = resume(countedExpression, None)
-            count = parseUnionPage(count)
-
-            if not count or not count.isdigit():
-                output = __oneShotUnionUse(countedExpression, unpack)
-
-                if output:
-                    count = parseUnionPage(output)
+            output = __oneShotUnionUse(countedExpression, unpack)
+            count = parseUnionPage(output)
 
             if isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
@@ -301,10 +294,7 @@ def unionUse(expression, unpack=True, dump=False):
                             field = None
 
                         limitedExpr = agent.limitQuery(num, expression, field)
-                        output = resume(limitedExpr, None)
-
-                        if not output:
-                            output = __oneShotUnionUse(limitedExpr, unpack, True)
+                        output = __oneShotUnionUse(limitedExpr, unpack, True)
 
                         if not kb.threadContinue:
                             break
