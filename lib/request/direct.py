@@ -47,7 +47,7 @@ def direct(query, content=True):
     logger.log(9, query)
 
     start = time.time()
-    if not select:
+    if not select and "EXEC " not in query:
         _ = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
     elif conf.hostname in kb.resumedQueries and query in kb.resumedQueries[conf.hostname] and "sqlmapoutput" not in query and "sqlmapfile" not in query:
         try:

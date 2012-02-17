@@ -76,31 +76,49 @@ class UDF:
 
         self.createSupportTbl(self.cmdTblName, self.tblField, dataType)
 
+    def udfForgeCmd(self, cmd):
+        if not cmd.startswith("'"):
+            cmd = "'%s" % cmd
+
+        if not cmd.endswith("'"):
+            cmd = "%s'" % cmd
+
+        return cmd
+
     def udfExecCmd(self, cmd, silent=False, udfName=None):
         if udfName is None:
-            cmd = "'%s'" % cmd
             udfName = "sys_exec"
 
-        cmd = unescaper.unescape(cmd)
+        cmd = unescaper.unescape(self.udfForgeCmd(cmd))
 
-        inject.goStacked("SELECT %s(%s)" % (udfName, cmd), silent)
+        return inject.goStacked("SELECT %s(%s)" % (udfName, cmd), silent)
 
     def udfEvalCmd(self, cmd, first=None, last=None, udfName=None):
         if udfName is None:
-            cmd = "'%s'" % cmd
             udfName = "sys_eval"
 
-        cmd = unescaper.unescape(cmd)
+        if conf.direct:
+            output = self.udfExecCmd(cmd, udfName=udfName)
 
-        inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
-        output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False)
-        inject.goStacked("DELETE FROM %s" % self.cmdTblName)
+            if output and isinstance(output, (list, tuple)):
+                new_output = ""
 
-        if output and isinstance(output, (list, tuple)):
-            output = output[0]
+                for line in output:
+                    new_output += line.replace("\r", "\n")
+
+                output = new_output
+        else:
+            cmd = unescaper.unescape(self.udfForgeCmd(cmd))
+
+            inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
+            output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False)
+            inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
             if output and isinstance(output, (list, tuple)):
                 output = output[0]
+
+                if output and isinstance(output, (list, tuple)):
+                    output = output[0]
 
         return output
 

@@ -34,7 +34,7 @@ class Filesystem(GenericFilesystem):
 
         self.initEnv()
 
-        return self.udfEvalCmd(cmd="'%s'" % rFile, udfName="sys_fileread")
+        return self.udfEvalCmd(cmd=rFile, udfName="sys_fileread")
 
     def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
         errMsg = "PostgreSQL does not support file upload with UNION "
