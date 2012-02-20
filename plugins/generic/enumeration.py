@@ -572,7 +572,7 @@ class Enumeration:
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
 
                 if not isNumPosStrValue(count):
-                    if not (isinstance(count, basestring) and count.isdigit()) and Backend.isDbms(DBMS.ORACLE) and not query2:
+                    if Backend.isDbms(DBMS.ORACLE) and not query2:
                         infoMsg = "trying with table USER_SYS_PRIVS"
                         logger.info(infoMsg)
 
@@ -1320,7 +1320,7 @@ class Enumeration:
 
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=2)
 
-        if count is not None and isinstance(count, basestring) and count.isdigit():
+        if isNumPosStrValue(count):
             if safeSQLIdentificatorNaming(db) not in kb.data.cachedCounts:
                 kb.data.cachedCounts[safeSQLIdentificatorNaming(db)] = {}
 
@@ -1672,7 +1672,7 @@ class Enumeration:
                     lengths = {}
                     entries = {}
 
-                    if count == "0":
+                    if count == 0:
                         warnMsg  = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "on database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
                         warnMsg += "appears to be empty"
