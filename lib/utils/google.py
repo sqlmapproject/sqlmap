@@ -16,12 +16,14 @@ import urllib2
 from lib.core.common import getUnicode
 from lib.core.common import readInput
 from lib.core.convert import htmlunescape
+from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
+from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.request.basic import decodePage
@@ -33,26 +35,23 @@ class Google:
     """
 
     def __init__(self, handlers):
-        self.__matches = []
-        self.__cj = cookielib.LWPCookieJar()
+        self._matches = []
+        self._cj = cookielib.LWPCookieJar()
 
-        handlers.append(urllib2.HTTPCookieProcessor(self.__cj))
+        handlers.append(urllib2.HTTPCookieProcessor(self._cj))
 
         self.opener = urllib2.build_opener(*handlers)
         self.opener.addheaders = conf.httpHeaders
 
-    def __parsePage(self, page):
+    def _parsePage(self, page):
         """
         Parse Google dork search results page to get the list of
         HTTP addresses
         """
 
-        matches = []
+        retVal = re.findall(GOOGLE_REGEX, page, re.I | re.S)
 
-        regExpr = r'h3 class="?r"?><a href="(http[s]?://[^"]+?)"\s(class="?l"?|onmousedown=)'
-        matches = re.findall(regExpr, page, re.I | re.S)
-
-        return [match[0] for match in matches]
+        return retVal 
 
     def getTargetUrls(self):
         """
@@ -60,16 +59,17 @@ class Google:
         your Google dork search results
         """
 
-        for match in self.__matches:
-            if re.search(r"(.*?)\?(.+)", match):
-                kb.targetUrls.add(( htmlunescape(htmlunescape(match)), None, None, None ))
-            elif re.search(URI_INJECTABLE_REGEX, match, re.I):
+        for _ in self._matches:
+            _ = urldecode(_)
+            if re.search(r"(.*?)\?(.+)", _):
+                kb.targetUrls.add((_, None, None, None))
+            elif re.search(URI_INJECTABLE_REGEX, _, re.I):
                 if kb.scanOnlyGoogleGETs is None:
                     message = "do you want to scan only results containing GET parameters? [Y/n] "
                     test = readInput(message, default="Y")
                     kb.scanOnlyGoogleGETs = test.lower() != 'n'
                 if not kb.scanOnlyGoogleGETs:
-                    kb.targetUrls.add(( htmlunescape(htmlunescape("%s" % match)), None, None, None ))
+                    kb.targetUrls.add((_, None, None, None))
 
     def getCookie(self):
         """
@@ -138,11 +138,11 @@ class Google:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
-        self.__matches = self.__parsePage(page)
+        self._matches = self._parsePage(page)
 
-        if not self.__matches and "detected unusual traffic" in page:
+        if not self._matches and "detected unusual traffic" in page:
             warnMsg = "Google has detected 'unusual' traffic from "
             warnMsg += "this computer disabling further searches"
             raise sqlmapGenericException, warnMsg
 
-        return self.__matches
+        return self._matches
