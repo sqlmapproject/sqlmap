@@ -1637,7 +1637,7 @@ def getSPLSnippet(dbms, name, **variables):
     retVal = re.sub(r"#.+", "", retVal)
 
     for _ in variables.keys():
-        retVal = re.sub(r"%%%s%%" % _, variables[_], retVal, flags=re.I)
+        retVal = re.sub(r"%%%s%%" % _, variables[_], retVal)
 
     _ = re.search(r"%([^%]+)%", retVal, re.I)
     if _:
