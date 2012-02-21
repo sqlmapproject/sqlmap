@@ -303,7 +303,7 @@
     <dbms value="SQLite">
         <cast query="CAST(%s AS VARCHAR(8000))" dbms_version="&gt;=3.0"/>
         <length query="LENGTH(%s)"/>
-        <isnull query="IFNULL(%s,' ')"/>
+        <isnull query="IFNULL(%s,' ')" dbms_version="&gt;=3.0"/>
         <delimiter query="||"/>
         <limit query="LIMIT %d,%d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
@@ -316,6 +316,7 @@
         <timedelay query="SELECT LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB(1000000%d))))" dbms_version="&gt;=3.0"/>
         <substring query="SUBSTR((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <banner query="SELECT SQLITE_VERSION()"/>
         <current_user/>
@@ -456,6 +457,7 @@
         <current_db query="SELECT DATABASE() FROM DUAL"/>
         <order query="ORDER BY %s ASC"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <delimiter query=","/>
         <substring query="SUBSTR((%s),%d,%d)"/>
@@ -502,6 +504,7 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <hex query="BINTOSTR(CONVERT(VARBINARY, %s))"/>
         <inference query="ASCII(SUBSTRING((%s),%d,1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>
@@ -569,6 +572,7 @@
         <timedelay query=""/>
         <substring query="SUBSTR((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSIBM.SYSDUMMY1"/>
+        <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <!-- NOTE: We have to use the complicated UDB OLAP functions in query2 because sqlmap injects isnull query inside MAX function, else we would use: SELECT MAX(versionnumber) FROM sysibm.sysversions -->
         <banner query="SELECT service_level FROM TABLE (sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT, versionnumber FROM sysibm.sysversions) AS foobar WHERE LIMIT=1"/>

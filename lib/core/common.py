@@ -3117,13 +3117,14 @@ def decodeHexValue(value):
     """
 
     def _(value):
-        if isinstance(value, basestring) and len(value) % 2 == 0:
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL):
-                value = value.decode("hex")
-            elif Backend.isDbms(DBMS.MSSQL):
-                value = value[2:].decode("hex")
-                if value[1] == '\x00':
-                    value = value.decode("utf16")
+        if value and isinstance(value, basestring) and len(value) % 2 == 0:
+            if value.lower().startswith("0x"):
+                value = value[2:]
+            value = value.decode("hex")
+            if len(value) > 1 and value[1] == '\x00':
+                value = value.decode("utf-16-le")
+            elif value and value[0] == '\x00':
+                value = value.decode("utf-16-be")
         return value
 
     return applyFunctionRecursively(value, _)
