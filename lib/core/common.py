@@ -1234,6 +1234,7 @@ def parseUnionPage(output, unique=True):
 
         for entry in output:
             entry = entry.group(1)
+            entry = decodeHexValue(entry) if conf.hexConvert else entry
 
             if unique:
                 key = entry.lower()
@@ -3098,35 +3099,63 @@ def getCounter(technique):
 
     return kb.counters.get(technique, 0)
 
+def applyFunctionRecursively(value, function):
+    """
+    Applies function recursively through list-like structures
+    """
+
+    if isinstance(value, (list, tuple, set, BigArray)):
+        retVal = [applyFunctionRecursively(_, function) for _ in value]
+    else:
+        retVal = function(value)
+
+    return retVal
+
+def decodeHexValue(value):
+    """
+    Returns value decoded from DBMS specific hexadecimal representation
+    """
+
+    def _(value):
+        if isinstance(value, basestring) and len(value) % 2 == 0:
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL):
+                value = value.decode("hex")
+            elif Backend.isDbms(DBMS.MSSQL):
+                value = value[2:].decode("hex")
+                if value[1] == '\x00':
+                    value = value.decode("utf16")
+        return value
+
+    return applyFunctionRecursively(value, _)
+
 def extractExpectedValue(value, expected):
     """
     Extracts and returns expected value by a given type
     """
 
-    if not expected:
-        return value
+    if expected:
+        value = unArrayizeValue(value)
 
-    value = unArrayizeValue(value)
+        if isNoneValue(value):
+            value = None
+        elif expected == EXPECTED.BOOL:
+            if isinstance(value, int):
+                value = bool(value)
+            elif isinstance(value, basestring):
+                value = value.strip().lower()
+                if value in ("true", "false"):
+                    value = value == "true"
+                elif value in ("1", "-1"):
+                    value = True
+                elif value == "0":
+                    value = False
+                else:
+                    value = None
+        elif expected == EXPECTED.INT:
+            if isinstance(value, basestring):
+                if value.isdigit():
+                    value = int(value)
+                else:
+                    value = None
 
-    if isNoneValue(value):
-        value = None
-    elif expected == EXPECTED.BOOL:
-        if isinstance(value, int):
-            value = bool(value)
-        elif isinstance(value, basestring):
-            value = value.strip().lower()
-            if value in ("true", "false"):
-                value = value == "true"
-            elif value in ("1", "-1"):
-                value = True
-            elif value == "0":
-                value = False
-            else:
-                value = None
-    elif expected == EXPECTED.INT:
-        if isinstance(value, basestring):
-            if value.isdigit():
-                value = int(value)
-            else:
-                value = None
     return value

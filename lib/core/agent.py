@@ -17,6 +17,7 @@ from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -286,11 +287,22 @@ class Agent:
         if field.startswith("(CASE") or field.startswith("(IIF"):
             nulledCastedField = field
         else:
-            nulledCastedField = queries[Backend.getIdentifiedDbms()].cast.query % field
+            _ = queries[Backend.getIdentifiedDbms()]
+            nulledCastedField = _.cast.query % field
             if Backend.isDbms(DBMS.ACCESS):
-                nulledCastedField = queries[Backend.getIdentifiedDbms()].isnull.query % (nulledCastedField, nulledCastedField)
+                nulledCastedField = _.isnull.query % (nulledCastedField, nulledCastedField)
             else:
-                nulledCastedField = queries[Backend.getIdentifiedDbms()].isnull.query % nulledCastedField
+                nulledCastedField = _.isnull.query % nulledCastedField
+
+            if conf.hexConvert:
+                if 'hex' in _:
+                    nulledCastedField = _.hex.query % nulledCastedField
+                else:
+                    warnMsg = "switch '--hex' is currently not supported on DBMS '%s'. " % Backend.getIdentifiedDbms()
+                    warnMsg += "Going to switch it off"
+                    singleTimeWarnMessage(warnMsg)
+
+                    conf.hexConvert = False
 
         return nulledCastedField
 

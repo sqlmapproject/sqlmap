@@ -522,6 +522,10 @@ def cmdLineParser():
                             action="store_true",
                             help="Ignores query results stored in session file")
 
+        general.add_option("--hex", dest="hexConvert",
+                            action="store_true",
+                            help="Uses DBMS hex conversion function(s) for data retrieval")
+
         general.add_option("--parse-errors", dest="parseErrors",
                                   action="store_true",
                                   help="Parse and display DBMS error messages from responses")

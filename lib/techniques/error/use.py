@@ -16,6 +16,7 @@ from lib.core.bigarray import BigArray
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToStdout
+from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import incrementCounter
@@ -122,6 +123,8 @@ def __oneShotErrorUse(expression, field):
             else:
                 retVal = output
                 break
+
+        retVal = decodeHexValue(retVal) if conf.hexConvert else retVal
 
         if isinstance(retVal, basestring):
             retVal = htmlunescape(retVal).replace("<br>", "\n")

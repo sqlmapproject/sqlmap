@@ -14,6 +14,7 @@ import traceback
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
+from lib.core.common import decodeHexValue
 from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
@@ -520,6 +521,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         logger.info(infoMsg)
 
     if finalValue is not None:
+        finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
         conf.hashDB.write(expression, finalValue)
     else:
         conf.hashDB.write(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
