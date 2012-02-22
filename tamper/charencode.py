@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 import string
 
 from lib.core.enums import PRIORITY
-from lib.core.exception import sqlmapUnsupportedFeatureException
 
 __priority__ = PRIORITY.LOWEST
 

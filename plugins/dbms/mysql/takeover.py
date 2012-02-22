@@ -22,7 +22,6 @@ from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.request import inject
 from lib.request.connect import Connect as Request
-
 from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):

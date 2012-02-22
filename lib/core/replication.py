@@ -7,8 +7,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import unsafeSQLIdentificatorNaming
-from lib.core.convert import safechardecode
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapValueException
 
@@ -21,7 +21,7 @@ class Replication:
     def __init__(self, dbpath):
         try:
             import sqlite3
-        except ImportError, _:
+        except ImportError:
             errMsg = "missing module 'sqlite3' needed by switch '--replicate'"
             raise sqlmapMissingDependence, errMsg
 

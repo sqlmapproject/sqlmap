@@ -15,7 +15,6 @@ import sys
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import DBMS_DIRECTORY_NAME
-from lib.core.enums import PLACE
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
@@ -258,9 +257,9 @@ NULL = "NULL"
 CURRENT_DB = "CD"
 
 # Regular expressions used for parsing error messages (--parse-errors)
-ERROR_PARSING_REGEXES = (   
-                          r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>", 
-                          r"<li>Error Type:<br>(?P<result>.+?)</li>", 
+ERROR_PARSING_REGEXES = (
+                          r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>",
+                          r"<li>Error Type:<br>(?P<result>.+?)</li>",
                           r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)"
                         )
 

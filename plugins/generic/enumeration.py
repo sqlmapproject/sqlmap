@@ -8,8 +8,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
-import time
 
+from extra.safe2bin.safe2bin import safechardecode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import arrayizeValue
@@ -18,7 +18,6 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import filterPairValues
 from lib.core.common import getLimitRange
-from lib.core.common import getCompiledRegex
 from lib.core.common import getUnicode
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
@@ -30,13 +29,11 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import strToHex
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
-from lib.core.convert import safechardecode
 from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -60,15 +57,12 @@ from lib.core.session import setOs
 from lib.core.settings import CONCAT_ROW_DELIMITER
 from lib.core.settings import CONCAT_VALUE_DELIMITER
 from lib.core.settings import CURRENT_DB
-from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import MAX_INT
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
-from lib.core.unescaper import unescaper
 from lib.core.threads import getCurrentThreadData
 from lib.parse.banner import bannerParser
 from lib.request import inject
-from lib.request.connect import Connect as Request
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
 from lib.utils.hash import attackDumpedTable
@@ -499,7 +493,7 @@ class Enumeration:
                             elif Backend.isDbms(DBMS.ORACLE) or ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema ):
                                 privileges.add(privilege)
 
-                            # In MySQL < 5.0 we get Y if the privilege is 
+                            # In MySQL < 5.0 we get Y if the privilege is
                             # True, N otherwise
                             elif Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                                 if privilege.upper() == "Y":
@@ -522,7 +516,7 @@ class Enumeration:
 
                                     i += 1
 
-                                privileges.add(privilege)  
+                                privileges.add(privilege)
 
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
@@ -624,7 +618,7 @@ class Enumeration:
                     elif Backend.isDbms(DBMS.ORACLE) or ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema ):
                         privileges.add(privilege)
 
-                    # In MySQL < 5.0 we get Y if the privilege is 
+                    # In MySQL < 5.0 we get Y if the privilege is
                     # True, N otherwise
                     elif Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                         privilege = privilege.replace(", ", ",")
@@ -1425,7 +1419,7 @@ class Enumeration:
             raise sqlmapNoneDataException, errMsg
 
         if not validPivotValue:
-            warnMsg = "no proper pivot column provided (with unique values)." 
+            warnMsg = "no proper pivot column provided (with unique values)."
             warnMsg += " It's not possible to retrieve all rows."
             logger.warn(warnMsg)
 

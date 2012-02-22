@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.data import conf
@@ -19,8 +18,6 @@ from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import ORACLE_ALIASES
 from lib.request import inject
-from lib.request.connect import Connect as Request
-
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):

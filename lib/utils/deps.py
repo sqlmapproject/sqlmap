@@ -7,10 +7,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
-from lib.core.exception import sqlmapMissingDependence
 from lib.core.settings import DBMS_DICT
 from lib.core.settings import IS_WIN
 

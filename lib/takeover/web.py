@@ -34,8 +34,6 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapUnsupportedDBMSException
-from lib.core.shell import autoCompletion
 from lib.request.connect import Connect as Request
 
 

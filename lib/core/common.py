@@ -14,7 +14,6 @@ import httplib
 import inspect
 import logging
 import ntpath
-import optparse
 import os
 import pickle
 import posixpath
@@ -25,7 +24,6 @@ import string
 import struct
 import sys
 import time
-import types
 import urllib
 import urlparse
 import unicodedata
@@ -49,14 +47,13 @@ from extra.clientform.clientform import ParseError
 from extra.cloak.cloak import decloak
 from extra.magic import magic
 from extra.odict.odict import OrderedDict
+from extra.safe2bin.safe2bin import safecharencode
 from lib.core.bigarray import BigArray
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.data import queries
 from lib.core.convert import htmlunescape
-from lib.core.convert import safecharencode
 from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
@@ -120,7 +117,6 @@ from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
-from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
 from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import URI_QUESTION_MARKER
@@ -403,7 +399,7 @@ class Backend:
         1. Sort the tests, getSortedInjectionTests() - detection phase.
         2. Ask user whether or not skip specific DBMS tests in detection phase,
            lib/controller/checks.py - detection phase.
-        3. Sort the fingerprint of the DBMS, lib/controller/handler.py - 
+        3. Sort the fingerprint of the DBMS, lib/controller/handler.py -
            fingerprint phase.
         """
 
@@ -869,7 +865,7 @@ def randomStr(length=4, lowercase=False, alphabet=None):
     """
 
     if alphabet:
-        rndStr = "".join(random.choice(alphabet) for _ in xrange(0, length))    
+        rndStr = "".join(random.choice(alphabet) for _ in xrange(0, length))
     elif lowercase:
         rndStr = "".join(random.choice(string.lowercase) for _ in xrange(0, length))
     else:
@@ -1670,7 +1666,7 @@ def readXmlFile(xmlFile):
     Reads XML file content and returns it's DOM representation
     """
 
-    checkFile(xmlFile)  
+    checkFile(xmlFile)
 
     with codecs.open(xmlFile, 'r', UNICODE_ENCODING) as f:
         retVal = minidom.parse(f).documentElement
@@ -2179,7 +2175,7 @@ def enumValueToNameLookup(type_, value_):
 
 def extractRegexResult(regex, content, flags=0):
     """
-    Returns 'result' group value from a possible match with regex on a given 
+    Returns 'result' group value from a possible match with regex on a given
     content
     """
 

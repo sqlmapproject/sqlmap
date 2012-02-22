@@ -24,7 +24,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
 

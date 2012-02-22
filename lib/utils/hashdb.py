@@ -13,7 +13,6 @@ import threading
 
 from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
-from lib.core.data import conf
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData

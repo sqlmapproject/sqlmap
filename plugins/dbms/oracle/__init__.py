@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.enums import DBMS
 from lib.core.settings import ORACLE_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-
 from plugins.dbms.oracle.enumeration import Enumeration
 from plugins.dbms.oracle.filesystem import Filesystem
 from plugins.dbms.oracle.fingerprint import Fingerprint

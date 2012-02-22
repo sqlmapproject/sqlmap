@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.exception import sqlmapUnsupportedFeatureException
-
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):

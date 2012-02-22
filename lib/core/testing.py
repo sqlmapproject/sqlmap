@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import doctest
-import logging
 import os
 import re
 import shutil

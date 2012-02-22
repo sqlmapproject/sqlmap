@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import codecs
 import cookielib
-import difflib
 import inspect
 import logging
 import os
@@ -44,7 +43,6 @@ from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
 from lib.core.common import randomStr
-from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
@@ -55,7 +53,6 @@ from lib.core.convert import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
@@ -87,7 +84,6 @@ from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
 from lib.core.settings import IS_WIN
 from lib.core.settings import NULL
-from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
 from lib.core.settings import DBMS_DICT

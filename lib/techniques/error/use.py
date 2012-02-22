@@ -8,9 +8,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
-import threading
 import time
 
+from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
@@ -23,19 +23,14 @@ from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
-from lib.core.common import randomInt
 from lib.core.common import readInput
-from lib.core.common import safeStringFormat
 from lib.core.convert import htmlunescape
-from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
@@ -203,7 +198,6 @@ def errorUse(expression, expected=None, dump=False):
     output = None
     outputs = []
     untilLimitChar = None
-    untilOrderChar = None
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 

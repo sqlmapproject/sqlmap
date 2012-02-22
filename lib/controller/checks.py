@@ -8,13 +8,11 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import httplib
-import logging
 import re
 import socket
 import time
 
 from lib.core.agent import agent
-from lib.core.common import aliasToDbmsEnum
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import beep
@@ -22,7 +20,6 @@ from lib.core.common import extractRegexResult
 from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getComparePageRatio
-from lib.core.common import getCompiledRegex
 from lib.core.common import getLastRequestHTTPError
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
@@ -36,13 +33,11 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import showStaticWords
 from lib.core.common import singleTimeWarnMessage
-from lib.core.common import trimAlphaNum
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import paths
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.enums import HTTPHEADER
@@ -51,7 +46,6 @@ from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
@@ -614,7 +608,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
 def simpletonCheckSqlInjection(place, parameter, value):
     """
-    This is a function for the quickest and simplest 
+    This is a function for the quickest and simplest
     sql injection check (e.g. AND 1=1) - only works
     with integer parameters
     """
@@ -879,7 +873,7 @@ def checkWaf():
     conf.parameters[PLACE.GET] += "%s=%d %s" % (randomStr(), randomInt(), IDS_WAF_CHECK_PAYLOAD)
 
     kb.matchRatio = None
-    _ = Request.queryPage()
+    Request.queryPage()
 
     if kb.errorIsNone and kb.matchRatio is None:
         kb.matchRatio = LOWER_RATIO_BOUND

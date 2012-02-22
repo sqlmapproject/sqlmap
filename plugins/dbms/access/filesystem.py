@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.exception import sqlmapUnsupportedFeatureException
-
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):

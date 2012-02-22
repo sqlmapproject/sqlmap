@@ -12,7 +12,6 @@ from lib.core.common import filterPairValues
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import safeSQLIdentificatorNaming
-from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb

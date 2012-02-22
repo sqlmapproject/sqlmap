@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.enums import DBMS
 from lib.core.settings import MYSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-
 from plugins.dbms.mysql.enumeration import Enumeration
 from plugins.dbms.mysql.filesystem import Filesystem
 from plugins.dbms.mysql.fingerprint import Fingerprint

@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 import codecs
 import gzip
 import logging
-import os
 import re
 import StringIO
 import zlib
@@ -19,8 +18,6 @@ from extra.chardet import detect
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
-from lib.core.common import isWindowsDriveLetterPath
-from lib.core.common import posixToNtSlashes
 from lib.core.common import readInput
 from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
@@ -28,12 +25,10 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import PLACE
-from lib.core.exception import sqlmapDataException
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
-from lib.core.settings import UNICODE_ENCODING
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 
@@ -229,4 +224,4 @@ def processResponse(page, responseHeaders):
         msg = extractErrorMessage(page)
 
         if msg:
-            logger.info("parsed error message: '%s'" % msg) 
+            logger.info("parsed error message: '%s'" % msg)

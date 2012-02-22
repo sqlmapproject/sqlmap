@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.enums import DBMS
 from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-
 from plugins.dbms.postgresql.enumeration import Enumeration
 from plugins.dbms.postgresql.filesystem import Filesystem
 from plugins.dbms.postgresql.fingerprint import Fingerprint

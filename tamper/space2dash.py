@@ -10,8 +10,6 @@ See the file 'doc/COPYING' for copying permission
 import random
 import string
 
-from lib.core.common import singleTimeWarnMessage
-from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW

@@ -13,19 +13,14 @@ except:
     import md5
     import sha
 
-import binascii
 import pickle
 import re
 import sys
-import string
 import struct
 import urllib
 
-from extra.safe2bin.safe2bin import safecharencode
-from extra.safe2bin.safe2bin import safechardecode
 from lib.core.data import conf
 from lib.core.data import kb
-from lib.core.data import logger
 from lib.core.enums import PLACE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URLENCODE_CHAR_LIMIT

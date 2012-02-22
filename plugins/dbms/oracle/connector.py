@@ -12,15 +12,14 @@ try:
 except ImportError, _:
     pass
 
-import os 
+import os
 
 from lib.core.convert import utf8encode
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
-
 from plugins.generic.connector import Connector as GenericConnector
 
-os.environ["NLS_LANG"] = ".AL32UTF8" 
+os.environ["NLS_LANG"] = ".AL32UTF8"
 
 class Connector(GenericConnector):
     """

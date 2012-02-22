@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.enums import DBMS
 from lib.core.settings import FIREBIRD_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-
 from plugins.dbms.firebird.enumeration import Enumeration
 from plugins.dbms.firebird.filesystem import Filesystem
 from plugins.dbms.firebird.fingerprint import Fingerprint

@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import readInput
-from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import OS
 from lib.core.exception import sqlmapUndefinedMethod

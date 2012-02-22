@@ -15,7 +15,6 @@ import urllib2
 
 from lib.core.common import getUnicode
 from lib.core.common import readInput
-from lib.core.convert import htmlunescape
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
 from lib.core.data import conf
@@ -51,7 +50,7 @@ class Google:
 
         retVal = re.findall(GOOGLE_REGEX, page, re.I | re.S)
 
-        return retVal 
+        return retVal
 
     def getTargetUrls(self):
         """
@@ -84,7 +83,7 @@ class Google:
             _ = conn.info()
         except urllib2.HTTPError, e:
             _ = e.info()
-        except urllib2.URLError, _:
+        except urllib2.URLError:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
@@ -134,7 +133,7 @@ class Google:
                 warnMsg += "to get error page information (%d)" % e.code
                 logger.critical(warnMsg)
                 return None
-        except (urllib2.URLError, socket.error, socket.timeout), _:
+        except (urllib2.URLError, socket.error, socket.timeout):
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 

@@ -23,14 +23,11 @@ except (ImportError, OSError):
 else:
     _multiprocessing = multiprocessing
 
-import os
-import re
 import time
 
 from hashlib import md5
 from hashlib import sha1
 from Queue import Queue
-from zipfile import ZipFile
 
 from extra.pydes.pyDes import des
 from extra.pydes.pyDes import CBC
@@ -63,7 +60,6 @@ from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
 from lib.core.settings import IS_WIN
 from lib.core.settings import ITOA64
-from lib.core.settings import PYVERSION
 from lib.core.settings import ML
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
@@ -289,14 +285,14 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
     return retVal.upper() if uppercase else retVal
 
 __functions__ = {
-                    HASH.MYSQL: mysql_passwd, 
+                    HASH.MYSQL: mysql_passwd,
                     HASH.MYSQL_OLD: mysql_old_passwd,
-                    HASH.POSTGRES: postgres_passwd, 
-                    HASH.MSSQL: mssql_passwd, 
-                    HASH.MSSQL_OLD: mssql_old_passwd, 
+                    HASH.POSTGRES: postgres_passwd,
+                    HASH.MSSQL: mssql_passwd,
+                    HASH.MSSQL_OLD: mssql_old_passwd,
                     HASH.ORACLE: oracle_passwd,
-                    HASH.ORACLE_OLD: oracle_old_passwd, 
-                    HASH.MD5_GENERIC: md5_generic_passwd, 
+                    HASH.ORACLE_OLD: oracle_old_passwd,
+                    HASH.MD5_GENERIC: md5_generic_passwd,
                     HASH.SHA1_GENERIC: sha1_generic_passwd,
                     HASH.CRYPT_GENERIC: crypt_generic_passwd,
                     HASH.WORDPRESS: wordpress_passwd

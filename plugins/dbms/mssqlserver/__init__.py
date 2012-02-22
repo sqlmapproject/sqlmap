@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.enums import DBMS
 from lib.core.settings import MSSQL_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-
 from plugins.dbms.mssqlserver.enumeration import Enumeration
 from plugins.dbms.mssqlserver.filesystem import Filesystem
 from plugins.dbms.mssqlserver.fingerprint import Fingerprint

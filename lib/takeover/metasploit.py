@@ -10,7 +10,6 @@ See the file 'doc/COPYING' for copying permission
 import codecs
 import os
 import re
-import stat
 import sys
 import time
 
@@ -29,7 +28,6 @@ from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import DBMS
@@ -41,7 +39,6 @@ from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
 from lib.core.subprocessng import pollProcess
 from lib.core.subprocessng import setNonBlocking
-from lib.request.connect import Connect as Request
 
 
 class Metasploit:

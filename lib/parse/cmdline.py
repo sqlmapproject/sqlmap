@@ -20,7 +20,6 @@ from lib.core.data import logger
 from lib.core.defaults import defaults
 from lib.core.settings import IS_WIN
 from lib.core.settings import VERSION_STRING
-from lib.core.settings import UNICODE_ENCODING
 
 def cmdLineParser():
     """
@@ -33,7 +32,7 @@ def cmdLineParser():
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
-        parser.add_option("-v", dest="verbose", type="int", 
+        parser.add_option("-v", dest="verbose", type="int",
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
 
         # Target options
@@ -138,10 +137,10 @@ def cmdLineParser():
                            help="Retries when the connection timeouts "
                                 "(default %d)" % defaults.retries)
 
-        request.add_option("--scope", dest="scope", 
+        request.add_option("--scope", dest="scope",
                            help="Regexp to filter targets from provided proxy log")
 
-        request.add_option("--safe-url", dest="safUrl", 
+        request.add_option("--safe-url", dest="safUrl",
                            help="Url address to visit frequently during testing")
 
         request.add_option("--safe-freq", dest="saFreq", type="int",
@@ -494,7 +493,7 @@ def cmdLineParser():
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
-        general.add_option("--check-tor", dest="checkTor", 
+        general.add_option("--check-tor", dest="checkTor",
                                   action="store_true",
                                   help="Check to see if Tor is used properly")
 
@@ -538,14 +537,14 @@ def cmdLineParser():
                             action="store_true",
                             help="Save options to a configuration INI file")
 
-        general.add_option("--tor", dest="tor", 
+        general.add_option("--tor", dest="tor",
                                   action="store_true",
                                   help="Use Tor anonymity network")
 
-        general.add_option("--tor-port", dest="torPort", 
+        general.add_option("--tor-port", dest="torPort",
                                   help="Set Tor proxy port other than default")
 
-        general.add_option("--tor-type", dest="torType", 
+        general.add_option("--tor-type", dest="torType",
                                   help="Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)")
 
         general.add_option("--update", dest="updateAll",
@@ -665,7 +664,7 @@ def cmdLineParser():
     except (OptionError, TypeError), e:
         parser.error(e)
 
-    except SystemExit, _:
+    except SystemExit:
         # Protection against Windows dummy double clicking
         if IS_WIN:
             print "\nPress Enter to continue...",

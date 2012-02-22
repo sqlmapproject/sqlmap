@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import getUnicode
@@ -24,8 +23,6 @@ from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
-from lib.request.connect import Connect as Request
-
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):

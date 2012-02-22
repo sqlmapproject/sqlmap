@@ -10,14 +10,11 @@ See the file 'doc/COPYING' for copying permission
 import time
 
 from lib.core.agent import agent
-from lib.core.common import dataToSessionFile
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getUnicode
-from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
-from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

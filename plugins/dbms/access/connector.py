@@ -12,12 +12,10 @@ try:
 except ImportError, _:
     pass
 
-from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.settings import IS_WIN
-
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):

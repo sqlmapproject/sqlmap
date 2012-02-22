@@ -7,13 +7,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
-
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import Format
-from lib.core.common import randomInt
-from lib.core.common import randomRange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -22,7 +18,6 @@ from lib.core.session import setDbms
 from lib.core.settings import MAXDB_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
-
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
@@ -140,4 +135,4 @@ class Fingerprint(GenericFingerprint):
             conf.db = "USER"
 
         if conf.tbl:
-            conf.tbl = conf.tbl.upper() 
+            conf.tbl = conf.tbl.upper()

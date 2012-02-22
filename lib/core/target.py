@@ -45,7 +45,6 @@ from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.utils.hashdb import HashDB
 from lib.core.xmldump import dumper as xmldumper
-from lib.request.connect import Connect as Request
 
 def __setRequestParams():
     """
@@ -289,7 +288,7 @@ def __setOutputResume():
 
 def __setResultsFile():
     """
-    Create results file for storing results of running in a 
+    Create results file for storing results of running in a
     multiple target mode.
     """
 
@@ -374,7 +373,7 @@ def __createTargetDirs():
 
 def __restoreCmdLineOptions():
     """
-    Restore command line options that could be possibly 
+    Restore command line options that could be possibly
     changed during the testing of previous target.
     """
     conf.regexp = cmdLineOptions.regexp

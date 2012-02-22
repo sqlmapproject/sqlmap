@@ -10,13 +10,11 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.common import Backend
 from lib.core.common import getSPLSnippet
 from lib.core.common import randomStr
-from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import wasLastRequestDelayed
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import paths
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.session import setXpCmdshellAvailability

@@ -15,7 +15,6 @@ from lib.core.data import paths
 from lib.core.enums import OS
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.request import inject
-
 from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):

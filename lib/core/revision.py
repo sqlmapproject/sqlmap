@@ -23,7 +23,7 @@ def getRevisionNumber():
         client = pysvn.Client()
         if client.info(curDir):
             retVal = client.info(curDir).revision.number
-    except ImportError, _:
+    except ImportError:
         process = execute("svn info %s" % curDir, shell=True, stdout=PIPE, stderr=PIPE)
         svnStdout, svnStderr = process.communicate()
 

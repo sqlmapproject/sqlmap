@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import getCurrentThreadData
@@ -23,10 +22,7 @@ from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import METADB_SUFFIX
-from lib.core.threads import getCurrentThreadData
 from lib.request import inject
-from lib.request.connect import Connect as Request
-
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
@@ -54,7 +50,7 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         # Microsoft Access table reference updated on 01/2010
-        sysTables = { 
+        sysTables = {
                       "97":           ("MSysModules2", "MSysAccessObjects"),
                       "2000" :        ("!MSysModules2", "MSysAccessObjects"),
                       "2002-2003" :   ("MSysAccessStorage", "!MSysNavPaneObjectIDs"),

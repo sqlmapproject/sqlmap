@@ -12,7 +12,6 @@ import re
 from lib.core.common import getCompiledRegex
 from lib.core.common import readXmlFile
 from lib.core.convert import urldecode
-from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.data import logger
 

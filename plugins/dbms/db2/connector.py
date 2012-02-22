@@ -14,7 +14,6 @@ except ImportError, _:
 
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
-
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
@@ -31,9 +30,9 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
 
-        try:     
+        try:
             database = "DRIVER={IBM DB2 ODBC DRIVER};DATABASE=%s;HOSTNAME=%s;PORT=%s;PROTOCOL=TCPIP;" % (self.db, self.hostname, self.port)
-            self.connector = ibm_db_dbi.connect(database, self.user, self.password)            
+            self.connector = ibm_db_dbi.connect(database, self.user, self.password)
         except ibm_db_dbi.OperationalError, msg:
             raise sqlmapConnectionException, msg
 

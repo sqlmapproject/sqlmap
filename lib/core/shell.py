@@ -13,10 +13,8 @@ import rlcompleter
 
 from lib.core import readlineng as readline
 from lib.core.common import Backend
-from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.data import queries
 from lib.core.enums import OS
 
 def saveHistory():
@@ -70,7 +68,7 @@ def autoCompletion(sqlShell=False, osShell=False):
         else:
             # Reference: http://en.wikipedia.org/wiki/List_of_Unix_commands
             completer = CompleterNG({
-                                      "cp": None, "rm": None, "ls": None, 
+                                      "cp": None, "rm": None, "ls": None,
                                       "echo": None, "mkdir": None, "free": None,
                                       "mv": None, "ifconfig": None, "netstat -natu": None,
                                       "pwd": None, "uname": None, "id": None,

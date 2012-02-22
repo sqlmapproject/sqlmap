@@ -17,7 +17,6 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapMissingDependence
-
 from plugins.generic.connector import Connector as GenericConnector
 
 

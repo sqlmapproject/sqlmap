@@ -7,7 +7,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.data import conf
@@ -18,8 +17,6 @@ from lib.core.session import setDbms
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import SQLITE_ALIASES
 from lib.request import inject
-from lib.request.connect import Connect as Request
-
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):

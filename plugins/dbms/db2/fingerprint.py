@@ -18,12 +18,11 @@ from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import DB2_ALIASES
 from lib.request import inject
-
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
     def __init__(self):
-        GenericFingerprint.__init__(self, DBMS.DB2)		
+        GenericFingerprint.__init__(self, DBMS.DB2)
 
     def __versionCheck(self):
         minor, major = None, None
@@ -39,8 +38,8 @@ class Fingerprint(GenericFingerprint):
                     if result:
                         minor = version
                         version = "%s.%s" % (major, minor)
-                        break        
-            
+                        break
+
                 break
 
         if major and minor:

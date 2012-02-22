@@ -9,8 +9,8 @@ See the file 'doc/COPYING' for copying permission
 
 import threading
 import time
-import traceback
 
+from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
@@ -22,21 +22,14 @@ from lib.core.common import getCounter
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import incrementCounter
-from lib.core.common import popValue
-from lib.core.common import pushValue
-from lib.core.common import replaceNewlineTabs
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
-from lib.core.common import unhandledExceptionMessage
-from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapThreadException
 from lib.core.progress import ProgressBar
 from lib.core.settings import CHAR_INFERENCE_MARK
@@ -47,7 +40,6 @@ from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
 from lib.core.settings import PARTIAL_VALUE_MARKER
-from lib.core.settings import PYVERSION
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper

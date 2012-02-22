@@ -20,18 +20,15 @@ from extra.multipart import multipartpost
 
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
-from lib.core.common import average
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
 from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
-from lib.core.common import getFilteredPageContent
 from lib.core.common import getHostHeader
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
-from lib.core.common import parseTargetUrl
 from lib.core.common import randomizeParameterValue
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
@@ -61,7 +58,6 @@ from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import WARN_TIME_STDEV
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
-from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import processResponse
@@ -171,7 +167,6 @@ class Connect:
         url = url.replace(" ", "%20")
 
         page = None
-        cookieStr = u""
         requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
         requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
         responseMsg = u"HTTP response "
@@ -203,7 +198,7 @@ class Connect:
                     requestMsg += "?%s" % params
 
             elif multipart:
-                # Needed in this form because of potential circle dependency 
+                # Needed in this form because of potential circle dependency
                 # problem (option -> update -> connect -> option)
                 from lib.core.option import proxyHandler
 
@@ -563,7 +558,7 @@ class Connect:
 
         elif place:
             if place in (PLACE.GET, PLACE.POST, PLACE.URI):
-                # payloads in GET and/or POST need to be urlencoded 
+                # payloads in GET and/or POST need to be urlencoded
                 # throughly without safe chars (especially & and =)
                 # addendum: as we support url encoding in tampering
                 # functions therefore we need to use % as a safe char
@@ -619,7 +614,6 @@ class Connect:
             for randomParameter in conf.rParam:
                 for item in [PLACE.GET, PLACE.POST, PLACE.COOKIE]:
                     if item in conf.parameters:
-                        origValue = conf.parameters[item]
                         if item == PLACE.GET and get:
                             get = _randomizeParameter(get, randomParameter)
                         elif item == PLACE.POST and post:

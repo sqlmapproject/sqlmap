@@ -11,9 +11,7 @@ from lib.core.common import Backend
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.enums import DBMS
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
@@ -64,7 +62,7 @@ def setHandler():
                   ( FIREBIRD_ALIASES, FirebirdMap, FirebirdConn ),
                   ( MAXDB_ALIASES, MaxDBMap, MaxDBConn ),
                   ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
-                  ( DB2_ALIASES, DB2Map, DB2Conn )                  
+                  ( DB2_ALIASES, DB2Map, DB2Conn )
                 ]
 
     if Backend.getIdentifiedDbms() is not None:

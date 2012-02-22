@@ -17,7 +17,6 @@ from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
-
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):

@@ -7,7 +7,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import threading
 import time
 
 from lib.core.common import clearConsoleLine
@@ -16,11 +15,8 @@ from lib.core.common import filterListValue
 from lib.core.common import getFileItems
 from lib.core.common import Backend
 from lib.core.common import getPageWordSet
-from lib.core.common import popValue
-from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -30,12 +26,9 @@ from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapThreadException
-from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
 from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
-from lib.core.session import safeFormatString
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject

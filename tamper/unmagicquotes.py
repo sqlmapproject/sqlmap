@@ -9,8 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import singleTimeWarnMessage
-from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL

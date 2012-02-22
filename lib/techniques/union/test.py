@@ -9,15 +9,10 @@ See the file 'doc/COPYING' for copying permission
 
 import random
 import re
-import time
 
 from lib.core.agent import agent
 from lib.core.common import average
 from lib.core.common import Backend
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
-from lib.core.common import extractRegexResult
-from lib.core.common import getUnicode
 from lib.core.common import isNullValue
 from lib.core.common import listToStrValue
 from lib.core.common import popValue
@@ -32,8 +27,6 @@ from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import UNION_MIN_RESPONSE_CHARS

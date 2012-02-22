@@ -7,13 +7,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import os
 import re
-import shutil
-import sys
 import time
-
-from distutils.dir_util import mkpath
 
 from subprocess import PIPE
 from subprocess import Popen as execute
@@ -23,11 +18,9 @@ from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.exception import sqlmapFilePathException
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import pollProcess
-from lib.request.connect import Connect as Request
 
 def update():
     if not conf.updateAll:

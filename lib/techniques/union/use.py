@@ -8,9 +8,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
-import threading
 import time
 
+from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
@@ -27,14 +27,12 @@ from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeWarnMessage
-from lib.core.convert import safecharencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import SQL_SCALAR_REGEX
