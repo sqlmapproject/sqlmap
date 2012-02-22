@@ -61,7 +61,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
         # Forge the inband SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
-        query = agent.forgeInbandQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], None, limited)
+        query = agent.forgeInbandQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
         payload = agent.payload(newValue=query, where=where)
 
         # Perform the request

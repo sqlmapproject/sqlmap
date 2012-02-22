@@ -107,7 +107,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     pages = {}
 
     for count in xrange(lowerCount, upperCount+1):
-        query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar)
+        query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar, where)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
         if not isNullValue(kb.uChar):
@@ -181,7 +181,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
         # Forge the inband SQL injection request
-        query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar)
+        query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
         # Perform the request
@@ -202,7 +202,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 
                 # Confirm that it is a full inband SQL injection
-                query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, multipleUnions=randQueryUnescaped2)
+                query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
                 payload = agent.payload(place=place, parameter=parameter, newValue=query, where=PAYLOAD.WHERE.NEGATIVE)
 
                 # Perform the request

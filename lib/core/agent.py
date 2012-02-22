@@ -528,7 +528,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, multipleUnions=None, limited=False):
+    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -562,7 +562,7 @@ class Agent:
         if query.startswith("SELECT "):
             query = query[len("SELECT "):]
 
-        inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
+        inbandQuery = self.prefixQuery("UNION ALL SELECT " if not (where == PAYLOAD.WHERE.NEGATIVE or multipleUnions) else "UNION SELECT ", prefix=prefix)
 
         if limited:
             inbandQuery += ",".join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
