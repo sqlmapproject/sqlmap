@@ -290,7 +290,7 @@ class Backend:
     @staticmethod
     def setVersion(version):
         if isinstance(version, basestring):
-            kb.dbmsVersion = [ version ]
+            kb.dbmsVersion = [version]
 
         return kb.dbmsVersion
 
@@ -370,7 +370,7 @@ class Backend:
         while True:
             _ = readInput(msg, default='1')
 
-            if isinstance(_, basestring) and _.isdigit() and int(_) in ( 1, 2 ):
+            if isinstance(_, basestring) and _.isdigit() and int(_) in (1, 2):
                 kb.arch = 32 if int(_) == 1 else 64
 
                 break
@@ -493,7 +493,7 @@ class Backend:
 # Reference: http://code.activestate.com/recipes/325205-cache-decorator-in-python-24/
 def cachedmethod(f, cache={}):
     def g(*args, **kwargs):
-        key = ( f, tuple(args), frozenset(kwargs.items()) )
+        key = (f, tuple(args), frozenset(kwargs.items()))
         if key not in cache:
             cache[key] = f(*args, **kwargs)
         return cache[key]
@@ -517,7 +517,7 @@ def paramToDict(place, parameters=None):
 
     testableParameters = OrderedDict()
 
-    if conf.parameters.has_key(place) and not parameters:
+    if place in conf.parameters and not parameters:
         parameters = conf.parameters[place]
 
     if place != PLACE.SOAP:
@@ -587,7 +587,7 @@ def paramToDict(place, parameters=None):
 
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
-            if not testableParameters.has_key(parameter):
+            if parameter not in testableParameters:
                 warnMsg =  "provided parameter '%s' " % parameter
                 warnMsg += "is not inside the %s" % place
                 logger.warn(warnMsg)
@@ -1087,7 +1087,7 @@ def parseTargetDirect():
                     import pyodbc
                 elif dbmsName == DBMS.FIREBIRD:
                     import kinterbasdb
-            except ImportError, _:
+            except ImportError:
                 errMsg = "sqlmap requires '%s' third-party library " % data[1]
                 errMsg += "in order to directly connect to the database "
                 errMsg += "%s. Download from '%s'" % (dbmsName, data[2])
@@ -1259,7 +1259,7 @@ def parseFilePaths(page):
     """
 
     if page:
-        for regex in ( r" in <b>(?P<result>.*?)</b> on line",  r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)" ):
+        for regex in (r" in <b>(?P<result>.*?)</b> on line", r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)"):
             for match in re.finditer(regex, page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
@@ -1303,30 +1303,30 @@ def getCharset(charsetType=None):
 
     # 0 or 1
     elif charsetType == 1:
-        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 50))
 
     # Digits
     elif charsetType == 2:
-        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 58))
 
     # Hexadecimal
     elif charsetType == 3:
-        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 58))
         asciiTbl.extend(xrange(64, 71))
         asciiTbl.extend(xrange(96, 103))
 
     # Characters
     elif charsetType == 4:
-        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(64, 91))
         asciiTbl.extend(xrange(96, 123))
 
     # Characters and digits
     elif charsetType == 5:
-        asciiTbl.extend([ 0, 1 ])
+        asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 58))
         asciiTbl.extend(xrange(64, 91))
         asciiTbl.extend(xrange(96, 123))
@@ -1417,7 +1417,7 @@ def safeStringFormat(format_, params):
 
             if index != -1:
                 if count < len(params):
-                    retVal = retVal[:index] + getUnicode(params[count]) + retVal[index+2:]
+                    retVal = retVal[:index] + getUnicode(params[count]) + retVal[index + 2:]
                 else:
                     raise sqlmapNoneDataException, "wrong number of parameters during string formatting"
 
@@ -1465,7 +1465,7 @@ def showStaticWords(firstPage, secondPage):
 
     if firstPage and secondPage:
         match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
-        commonText = firstPage[match[0]:match[0]+match[2]]
+        commonText = firstPage[match[0]:match[0] + match[2]]
         commonWords = getPageWordSet(commonText)
     else:
         commonWords = None
@@ -1509,7 +1509,7 @@ def decloakToMkstemp(filepath, **kwargs):
     handle, name = mkstemp(**kwargs)
 
     fptr = os.fdopen(handle)
-    fptr.close() # close low level handle (causing problems latter)
+    fptr.close()  # close low level handle (causing problems latter)
 
     retVal = open(name, 'w+b')
 
@@ -1689,7 +1689,7 @@ def stdev(values):
     else:
         avg = average(values)
         _ = reduce(lambda x, y: x + pow((y or 0) - avg, 2), values, 0.0)
-        retVal = sqrt(_/(len(values) - 1))
+        retVal = sqrt(_ / (len(values) - 1))
         kb.cache.stdev[key] = retVal
 
     return retVal
@@ -1722,7 +1722,7 @@ def initCommonOutputs():
     key = None
 
     with codecs.open(paths.COMMON_OUTPUTS, 'r', UNICODE_ENCODING) as f:
-        for line in f.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
+        for line in f.readlines():  # xreadlines doesn't return unicode strings when codec.open() is used
             if line.find('#') != -1:
                 line = line[:line.find('#')]
 
@@ -1748,7 +1748,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     checkFile(filename)
 
     with codecs.open(filename, 'r', UNICODE_ENCODING) if unicode_ else open(filename, 'r') as f:
-        for line in (f.readlines() if unicode_ else f.xreadlines()): # xreadlines doesn't return unicode strings when codec.open() is used
+        for line in (f.readlines() if unicode_ else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
             if commentPrefix:
                 if line.find(commentPrefix) != -1:
                     line = line[:line.find(commentPrefix)]
@@ -1873,7 +1873,7 @@ def getPartRun():
 
         # Goes backwards through the stack to find the conf.dbmsHandler method
         # calling this function
-        for i in xrange(0, len(stack)-1):
+        for i in xrange(0, len(stack) - 1):
             for regex in (getCompiledRegex('self\.(get[^(]+)\(\)'), getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')):
                 match = regex.search(stack[i])
 
@@ -1918,7 +1918,7 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
         elif isinstance(value, basestring):
             return unicode(value, encoding or UNICODE_ENCODING, errors="replace")
         else:
-            return unicode(value) # encoding ignored for non-basestring instances
+            return unicode(value)  # encoding ignored for non-basestring instances
     else:
         try:
             return getUnicode(value, sys.getfilesystemencoding() or sys.stdin.encoding)
@@ -2102,7 +2102,7 @@ def runningAsAdmin():
 
     isAdmin = False
 
-    if PLATFORM in ( "posix", "mac" ):
+    if PLATFORM in ("posix", "mac"):
         isAdmin = os.geteuid()
 
         if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
@@ -2262,7 +2262,7 @@ def findDynamicContent(firstPage, secondPage):
             prefix = trimAlphaNum(prefix)
             suffix = trimAlphaNum(suffix)
 
-            kb.dynamicMarkings.append((re.escape(prefix[-DYNAMICITY_MARK_LENGTH/2:]) if prefix else None, re.escape(suffix[:DYNAMICITY_MARK_LENGTH/2]) if suffix else None))
+            kb.dynamicMarkings.append((re.escape(prefix[-DYNAMICITY_MARK_LENGTH / 2:]) if prefix else None, re.escape(suffix[:DYNAMICITY_MARK_LENGTH / 2]) if suffix else None))
 
     if len(kb.dynamicMarkings) > 0:
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
@@ -2424,7 +2424,7 @@ def initTechnique(technique=None):
             warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
             logger.warn(warnMsg)
 
-    except sqlmapDataException, _:
+    except sqlmapDataException:
         errMsg = "missing data in old session file(s). "
         errMsg += "Please use '--flush-session' to deal "
         errMsg += "with this error"
@@ -2437,7 +2437,7 @@ def arrayizeValue(value):
     """
 
     if not isinstance(value, (list, tuple)):
-        value = [ value ]
+        value = [value]
 
     return value
 
@@ -2539,7 +2539,7 @@ def decodeIntToUnicode(value):
     try:
         # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
-            return struct.pack('B' if value<256 else '<H', value).decode(kb.pageEncoding or UNICODE_ENCODING)
+            return struct.pack('B' if value < 256 else '<H', value).decode(kb.pageEncoding or UNICODE_ENCODING)
         else:
             return unichr(value)
     except:
@@ -2577,7 +2577,7 @@ def maskSensitiveData(msg):
         regex = SENSITIVE_DATA_REGEX % item
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
-            retVal = retVal.replace(value, '*'*len(value))
+            retVal = retVal.replace(value, '*' * len(value))
 
     return retVal
 
@@ -2658,10 +2658,10 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        if all(part.lower() in content.lower() for part in regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)): # fast optimization check
+        if all(part.lower() in content.lower() for part in regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)):  # fast optimization check
             parts = regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)
-            if len(parts) > REFLECTED_MAX_REGEX_PARTS: # preventing CPU hogs
-                regex = "%s.+?%s" % (REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS/2]), REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS/2:]))
+            if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
+                regex = "%s.+?%s" % (REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:]))
 
             retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
 
@@ -2689,7 +2689,7 @@ def normalizeUnicode(value):
 
     retVal = value
     if isinstance(value, unicode):
-        retVal = unicodedata.normalize('NFKD', value).encode('ascii','ignore')
+        retVal = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
     return retVal
 
 def safeSQLIdentificatorNaming(name, isTable=False):
@@ -2744,7 +2744,7 @@ def isBinaryData(value):
 
     retVal = False
     if isinstance(value, basestring):
-       retVal = reduce(lambda x, y: x or not (y in string.printable or ord(y) > 255), value, False)
+        retVal = reduce(lambda x, y: x or not (y in string.printable or ord(y) > 255), value, False)
     return retVal
 
 def isNoneValue(value):
@@ -3071,7 +3071,7 @@ def unserializeObject(value):
 
     retVal = None
     if value:
-        retVal = pickle.loads(value.encode(UNICODE_ENCODING)) # pickle has problems with Unicode
+        retVal = pickle.loads(value.encode(UNICODE_ENCODING))  # pickle has problems with Unicode
     return retVal
 
 def resetCounter(technique):

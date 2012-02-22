@@ -110,13 +110,13 @@ class Enumeration:
             bannerParser(kb.data.banner)
 
             if conf.os and conf.os == "windows":
-                kb.bannerFp["type"] = set([ "Windows" ])
+                kb.bannerFp["type"] = set(["Windows"])
 
             elif conf.os and conf.os == "linux":
-                kb.bannerFp["type"] = set([ "Linux" ])
+                kb.bannerFp["type"] = set(["Linux"])
 
             elif conf.os:
-                kb.bannerFp["type"] = set([ "%s%s" % (conf.os[0].upper(), conf.os[1:]) ])
+                kb.bannerFp["type"] = set(["%s%s" % (conf.os[0].upper(), conf.os[1:])])
 
             if conf.os:
                 setOs()
@@ -168,8 +168,8 @@ class Enumeration:
 
         rootQuery = queries[Backend.getIdentifiedDbms()].users
 
-        condition = ( Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")) )
-        condition |= ( Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema )
+        condition = (Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")))
+        condition |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema)
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
             if condition:
@@ -260,7 +260,7 @@ class Enumeration:
                 randStr = randomStr()
                 getCurrentThreadData().disableStdOut = True
 
-                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=False)
+                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=False)
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
@@ -280,7 +280,7 @@ class Enumeration:
 
                     password = parsePasswordHash(password)
 
-                    if not kb.data.cachedUsersPasswords.has_key(user):
+                    if user not in kb.data.cachedUsersPasswords:
                         kb.data.cachedUsersPasswords[user] = [password]
                     else:
                         kb.data.cachedUsersPasswords[user].append(password)
@@ -302,7 +302,7 @@ class Enumeration:
                 randStr = randomStr()
                 query = rootQuery.inband.query
 
-                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.password' % randStr], blind=True)
+                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=True)
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
@@ -389,24 +389,24 @@ class Enumeration:
     def __isAdminFromPrivileges(self, privileges):
         # In PostgreSQL the usesuper privilege means that the
         # user is DBA
-        dbaCondition = ( Backend.isDbms(DBMS.PGSQL) and "super" in privileges )
+        dbaCondition = (Backend.isDbms(DBMS.PGSQL) and "super" in privileges)
 
         # In Oracle the DBA privilege means that the
         # user is DBA
-        dbaCondition |= ( Backend.isDbms(DBMS.ORACLE) and "DBA" in privileges )
+        dbaCondition |= (Backend.isDbms(DBMS.ORACLE) and "DBA" in privileges)
 
         # In MySQL >= 5.0 the SUPER privilege means
         # that the user is DBA
-        dbaCondition |= ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema and "SUPER" in privileges )
+        dbaCondition |= (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema and "SUPER" in privileges)
 
         # In MySQL < 5.0 the super_priv privilege means
         # that the user is DBA
-        dbaCondition |= ( Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema and "super_priv" in privileges )
+        dbaCondition |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema and "super_priv" in privileges)
 
         # In Firebird there is no specific privilege that means
         # that the user is DBA
         # TODO: confirm
-        dbaCondition |= ( Backend.isDbms(DBMS.FIREBIRD) and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges )
+        dbaCondition |= (Backend.isDbms(DBMS.FIREBIRD) and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges)
 
         return dbaCondition
 
@@ -490,7 +490,7 @@ class Enumeration:
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
-                            elif Backend.isDbms(DBMS.ORACLE) or ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema ):
+                            elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema):
                                 privileges.add(privilege)
 
                             # In MySQL < 5.0 we get Y if the privilege is
@@ -521,7 +521,7 @@ class Enumeration:
                     if self.__isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
 
-                    if kb.data.cachedUsersPrivileges.has_key(user):
+                    if user in kb.data.cachedUsersPrivileges:
                         kb.data.cachedUsersPrivileges[user].extend(privileges)
                     else:
                         kb.data.cachedUsersPrivileges[user] = list(privileges)
@@ -615,7 +615,7 @@ class Enumeration:
 
                     # In MySQL >= 5.0 and Oracle we get the list
                     # of privileges as string
-                    elif Backend.isDbms(DBMS.ORACLE) or ( Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema ):
+                    elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema):
                         privileges.add(privilege)
 
                     # In MySQL < 5.0 we get Y if the privilege is
@@ -679,7 +679,7 @@ class Enumeration:
             errMsg += "for the database users"
             raise sqlmapNoneDataException, errMsg
 
-        return ( kb.data.cachedUsersPrivileges, areAdmins )
+        return (kb.data.cachedUsersPrivileges, areAdmins)
 
     def getRoles(self, query2=False):
         warnMsg = "on %s the concept of roles does not " % Backend.getIdentifiedDbms()
@@ -830,7 +830,7 @@ class Enumeration:
             if resumeAvailable:
                 for db, table in kb.brute.tables:
                     if db == conf.db:
-                        if not kb.data.cachedTables.has_key(conf.db):
+                        if conf.db not in kb.data.cachedTables:
                             kb.data.cachedTables[conf.db] = [table]
                         else:
                             kb.data.cachedTables[conf.db].append(table)
@@ -882,7 +882,7 @@ class Enumeration:
                     db = safeSQLIdentificatorNaming(db)
                     table = safeSQLIdentificatorNaming(table, True)
 
-                    if not kb.data.cachedTables.has_key(db):
+                    if db not in kb.data.cachedTables:
                         kb.data.cachedTables[db] = [table]
                     else:
                         kb.data.cachedTables[db].append(table)
@@ -1078,7 +1078,7 @@ class Enumeration:
                     infoMsg += "database '%s'" % conf.db
                     logger.info(infoMsg)
 
-                    return { conf.db: kb.data.cachedColumns[conf.db]}
+                    return {conf.db: kb.data.cachedColumns[conf.db]}
 
                 infoMsg = "fetching columns "
 
@@ -1101,10 +1101,10 @@ class Enumeration:
                 infoMsg += "on database '%s'" % conf.db
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
-                elif Backend.getIdentifiedDbms() in ( DBMS.ORACLE, DBMS.DB2):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl.upper())
                     query += condQuery
                 elif Backend.isDbms(DBMS.MSSQL):
@@ -1147,7 +1147,7 @@ class Enumeration:
                     infoMsg += "database '%s'" % conf.db
                     logger.info(infoMsg)
 
-                    return { conf.db: kb.data.cachedColumns[conf.db]}
+                    return {conf.db: kb.data.cachedColumns[conf.db]}
 
                 infoMsg = "fetching columns "
 
@@ -1170,7 +1170,7 @@ class Enumeration:
                 infoMsg += "on database '%s'" % conf.db
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
@@ -1209,7 +1209,7 @@ class Enumeration:
                 indexRange = getLimitRange(count)
 
                 for index in indexRange:
-                    if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query += condQuery
                         field = None
@@ -1232,7 +1232,7 @@ class Enumeration:
 
                     if not isNoneValue(column):
                         if not onlyColNames:
-                            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
                             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
@@ -1457,7 +1457,7 @@ class Enumeration:
 
                     if conf.limitStart or conf.limitStop:
                         if conf.limitStart and (i + 1) < conf.limitStart:
-                            warnMsg  = "skipping first %d pivot " % conf.limitStart
+                            warnMsg = "skipping first %d pivot " % conf.limitStart
                             warnMsg += "point values"
                             singleTimeWarnMessage(warnMsg)
                             break
@@ -1611,7 +1611,7 @@ class Enumeration:
                     if isNoneValue(entries):
                         entries = []
                     elif isinstance(entries, basestring):
-                        entries = [ entries ]
+                        entries = [entries]
                     elif not isinstance(entries, (list, tuple)):
                         entries = []
 
@@ -1621,8 +1621,8 @@ class Enumeration:
                     for column in colList:
                         colLen = len(column)
 
-                        if not kb.data.dumpedTable.has_key(column):
-                            kb.data.dumpedTable[column] = { "length": colLen, "values": [] }
+                        if column not in kb.data.dumpedTable:
+                            kb.data.dumpedTable[column] = {"length": colLen, "values": []}
 
                         for entry in entries:
                             if entry is None or len(entry) == 0:
@@ -1667,7 +1667,7 @@ class Enumeration:
                     entries = {}
 
                     if count == 0:
-                        warnMsg  = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                        warnMsg = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "on database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
                         warnMsg += "appears to be empty"
                         logger.warn(warnMsg)
@@ -1711,7 +1711,7 @@ class Enumeration:
                                     if column not in entries:
                                         entries[column] = BigArray()
 
-                                    if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                                         query = rootQuery.blind.query % (column, conf.db, conf.tbl, sorted(colList, key=len)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                                         query = rootQuery.blind.query % (column, column,
@@ -1736,7 +1736,7 @@ class Enumeration:
                     for column, columnEntries in entries.items():
                         length = max(lengths[column], len(column))
 
-                        kb.data.dumpedTable[column] = { "length": length, "values": columnEntries }
+                        kb.data.dumpedTable[column] = {"length": length, "values": columnEntries}
 
                         entriesCount = len(columnEntries)
 
@@ -1748,9 +1748,9 @@ class Enumeration:
                     warnMsg += "on database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
                     logger.warn(warnMsg)
                 else:
-                    kb.data.dumpedTable["__infos__"] = { "count": entriesCount,
-                                                         "table": safeSQLIdentificatorNaming(tbl, True),
-                                                         "db":    safeSQLIdentificatorNaming(conf.db) }
+                    kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
+                                                        "table": safeSQLIdentificatorNaming(tbl, True),
+                                                        "db": safeSQLIdentificatorNaming(conf.db)}
 
                     attackDumpedTable()
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
@@ -1783,7 +1783,7 @@ class Enumeration:
 
         if kb.data.cachedTables:
             if isinstance(kb.data.cachedTables, list):
-                kb.data.cachedTables = { None : kb.data.cachedTables }
+                kb.data.cachedTables = {None : kb.data.cachedTables}
 
             for db, tables in kb.data.cachedTables.items():
                 conf.db = db
@@ -1915,7 +1915,7 @@ class Enumeration:
 
                 if not isNoneValue(values):
                     if isinstance(values, basestring):
-                        values = [ values ]
+                        values = [values]
 
                     for value in values:
                         value = safeSQLIdentificatorNaming(value)
@@ -2040,7 +2040,7 @@ class Enumeration:
                     if foundDb in foundTbls:
                         foundTbls[foundDb].append(foundTbl)
                     else:
-                        foundTbls[foundDb] = [ foundTbl ]
+                        foundTbls[foundDb] = [foundTbl]
             else:
                 infoMsg = "fetching number of databases with table"
                 if tblConsider == "1":
@@ -2231,7 +2231,7 @@ class Enumeration:
                     if foundDb in foundCols[column]:
                         foundCols[column][foundDb].append(foundTbl)
                     else:
-                        foundCols[column][foundDb] = [ foundTbl ]
+                        foundCols[column][foundDb] = [foundTbl]
             else:
                 if not conf.db:
                     infoMsg = "fetching number of databases with tables containing column"
@@ -2360,7 +2360,6 @@ class Enumeration:
     def sqlQuery(self, query):
         output = None
         sqlType = None
-        getOutput = None
 
         query = query.rstrip(';')
 
@@ -2425,7 +2424,7 @@ class Enumeration:
             if not query:
                 continue
 
-            if query.lower() in ( "x", "q", "exit", "quit" ):
+            if query.lower() in ("x", "q", "exit", "quit"):
                 break
 
             output = self.sqlQuery(query)

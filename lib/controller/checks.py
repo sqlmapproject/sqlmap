@@ -201,7 +201,7 @@ def checkSqlInjection(place, parameter, value):
                     clauseMatch = True
                     break
 
-            if clause != [ 0 ] and injection.clause and injection.clause != [ 0 ] and not clauseMatch:
+            if clause != [0] and injection.clause and injection.clause != [0] and not clauseMatch:
                 debugMsg = "skipping test '%s' because the clauses " % title
                 debugMsg += "differs from the clause already identified"
                 logger.debug(debugMsg)
@@ -243,7 +243,7 @@ def checkSqlInjection(place, parameter, value):
                         clauseMatch = True
                         break
 
-                if test.clause != [ 0 ] and boundary.clause != [ 0 ] and not clauseMatch:
+                if test.clause != [0] and boundary.clause != [0] and not clauseMatch:
                     continue
 
                 # Skip boundary if it does not match against test's <where>
@@ -328,7 +328,7 @@ def checkSqlInjection(place, parameter, value):
                             # Useful to set kb.matchRatio at first based on
                             # the False response content
                             kb.matchRatio = None
-                            _ = Request.queryPage(genCmpPayload(), place, raise404=False)
+                            Request.queryPage(genCmpPayload(), place, raise404=False)
 
                             # If in the comparing stage there was an error
                             # then anything non-error will be considered as True
@@ -626,7 +626,7 @@ def simpletonCheckSqlInjection(place, parameter, value):
 
     if not (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
         if getComparePageRatio(kb.originalPage, firstPage, filtered=True) > CONSTANT_RATIO:
-            payload = "%s AND %d=%d" % (value, randInt, randInt+1)
+            payload = "%s AND %d=%d" % (value, randInt, randInt + 1)
 
             payload = agent.payload(place, parameter, value, payload)
             secondPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
@@ -737,7 +737,7 @@ def checkStability():
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
 
-    firstPage = kb.originalPage # set inside checkConnection()
+    firstPage = kb.originalPage  # set inside checkConnection()
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True, raise404=False)
 
