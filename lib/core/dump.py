@@ -379,7 +379,7 @@ class Dump:
                             if not value or re.search("^[\ *]*$", value): #NULL
                                 continue
 
-                            _ = int(value)
+                            int(value)
                         except ValueError:
                             colType = None
                             break
@@ -392,7 +392,7 @@ class Dump:
                                 if not value or re.search("^[\ *]*$", value): #NULL
                                     continue
 
-                                _ = float(value)
+                                float(value)
                             except ValueError:
                                 colType = None
                                 break
@@ -527,7 +527,7 @@ class Dump:
         self.string(query, queryRes)
 
     def rFile(self,filePath,fileData):
-        self.string("%s file saved to" % filePath,fileData,sort=False) 
+        self.string("%s file saved to" % filePath,fileData,sort=False)
 
     def registerValue(self,registerData):
         self.string("Registry key value data", registerData,sort=False)

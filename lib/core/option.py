@@ -58,7 +58,6 @@ from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.defaults import defaults
 from lib.core.enums import CUSTOM_LOGGING
-from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
@@ -1018,7 +1017,7 @@ def __setHTTPAuthentication():
         elif aTypeLower == "ntlm":
             try:
                 from ntlm import HTTPNtlmAuthHandler
-            except ImportError, _:
+            except ImportError:
                 errMsg = "sqlmap requires Python NTLM third-party library "
                 errMsg += "in order to authenticate via NTLM, "
                 errMsg += "http://code.google.com/p/python-ntlm/"

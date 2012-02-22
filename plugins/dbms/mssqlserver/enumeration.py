@@ -160,7 +160,7 @@ class Enumeration(GenericEnumeration):
         foundTbls = {}
         tblList = conf.tbl.split(",")
         tblCond = rootQuery.inband.condition
-        dbCond = rootQuery.inband.condition2
+        #dbCond = rootQuery.inband.condition2
 
         tblConsider, tblCondParam = self.likeOrExact("table")
 
