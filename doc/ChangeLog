@@ -1,18 +1,24 @@
 sqlmap (1.0-1) stable; urgency=low
 
-  * Added support for automatic decoding of page content through detected
+  * Implemented support for Unicode and/or international characters (Miroslav)
+  * Implemented support for automatic decoding of page content through detected
     charset (Miroslav)
-  * Added support for Unicode and/or international characters (Miroslav)
   * Fixed problems with display of binary data (Miroslav)
-  * Proper data dumping for DBMSes not supporting LIMIT/OFFSET like mechanism(s)
-    (e.g. Microsoft SQL Server, Sybase, etc.) (Miroslav)
-  * Considerable program stabilization based on user reports (Miroslav)
+  * Fixed major bug with resuming of time-based injection data (Miroslav)
+  * Implemented mechanism for proper data dumping on DBMSes not supporting
+    LIMIT/OFFSET like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.)
+    (Miroslav)
+  * Major improvements to program stabilization based on user reports (Miroslav)
   * Used shell scripts revisited and rewritten from scratch (Miroslav)
   * Quick fix for avoiding AV scanners (Miroslav)
   * Update of used banner signatures for different platforms (Miroslav)
   * Added new tampering scripts avoiding popular WAF/IPS/IDS mechanisms
     (Miroslav)
+  * Added support for setting Tor proxy type together with port (Miroslav)
+  * Fixed major bug with DNS leaking in Tor mode (Miroslav)
   * Added wordlist compilation made of the most popular cracking dictionaries
+    (Miroslav)
+  * Added support for mnemonics substantially helping user with program setup
     (Miroslav)
   * Implemented multi-processor hash cracking routine(s) (Miroslav)
   * Sharpened mechanism for data retrieval for blind injections (Miroslav)
@@ -21,7 +27,7 @@ sqlmap (1.0-1) stable; urgency=low
   * Added automatic adjustment of time-based delays based on quality of
     retrieved data (Miroslav)
   * Added verification phase in time-based data retrieval (Miroslav)
-  * Substantial speedup of all techniques in detection and usage phase
+  * Major speedup of all techniques in detection and usage phase
     (Miroslav)
   * Added support for automatic speed-up of inband injection detection through
     ORDER BY mechanism (Miroslav)
@@ -32,20 +38,20 @@ sqlmap (1.0-1) stable; urgency=low
   * Refactoring and stabilization of multi-threading routines (Miroslav)
   * Added switch -m for scanning multiple targets enlisted in a given textual
     file (Miroslav)
-  * Added switch --randomize for randomly changing value for a given
-    parameter(s) (Miroslav)
+  * Added switch --randomize for randomly changing value of a given
+    parameter(s) based on it's original form (Miroslav)
   * Added switch --force-ssl for forcing usage of SSL/HTTPS requests (Miroslav)
   * Added switch --host for manually setting HTTP Host header value (Miroslav)
   * Added switch --eval for evaluating provided Python code (with resulting
-    parameter values) before the request itself (Miroslav)
-  * Added switch --skip for skipping testing for given parameter(s) (Miroslav)
+    parameter values) right before the request itself (Miroslav)
+  * Added switch --skip for skipping tests for given parameter(s) (Miroslav)
   * Added switch --titles for comparing pages based only on their titles
     (Miroslav)
   * Added switch --charset for forcing character encoding used for data
     retrieval (Miroslav)
   * Added switch --check-tor for checking if Tor is used properly (Miroslav)
-  * Added switch --crawl for crawling given website starting from the target url
-    (Miroslav)
+  * Added switch --crawl for multithreaded crawling of a given website starting
+    from the target url (Miroslav)
   * Added switch --csv-del for manually setting delimiting character used in CSV
     output (Miroslav)
   * Added switch --hex for using DBMS hex conversion function(s) for data
