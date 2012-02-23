@@ -4,7 +4,7 @@
 
 <title>sqlmap user's manual
 <author>by <htmlurl url="mailto:bernardo@sqlmap.org" name="Bernardo Damele A. G.">, <htmlurl url="mailto:miroslav@sqlmap.org" name="Miroslav Stampar">
-<date>version 1.0-dev, XXX XX, 2011
+<date>version 1.0-dev, XXX XX, 2012
 <abstract>
 This document is the user's manual for <htmlurl url="http://www.sqlmap.org" name="sqlmap">.
 </abstract>
@@ -3336,10 +3336,9 @@ agencies.
 <sect>Authors
 
 <p>
-<htmlurl url="mailto:bernardo@sqlmap.org" name="Bernardo Damele A. G."> (inquis) - Lead developer.
-PGP Key ID: Unavailable
+<htmlurl url="mailto:bernardo@sqlmap.org" name="Bernardo Damele A. G."> (inquis)
 
-<htmlurl url="mailto:miroslav@sqlmap.org" name="Miroslav Stampar"> (stamparm) - Developer.
+<htmlurl url="mailto:miroslav@sqlmap.org" name="Miroslav Stampar"> (stamparm)
 PGP Key ID: <htmlurl url="http://pgp.mit.edu:11371/pks/lookup?op=get&amp;search=0xB5397B1B" name="0xB5397B1B">
 
 </article>
