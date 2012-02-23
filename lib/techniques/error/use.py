@@ -196,7 +196,7 @@ def errorUse(expression, expected=None, dump=False):
     startLimit = 0
     stopLimit = None
     output = None
-    outputs = []
+    outputs = None
     untilLimitChar = None
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)

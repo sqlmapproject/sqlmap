@@ -143,7 +143,7 @@ def unionUse(expression, unpack=True, dump=False):
     origExpr = expression
     startLimit = 0
     stopLimit = None
-    value = ""
+    value = None
 
     width = getConsoleWidth()
     start = time.time()
