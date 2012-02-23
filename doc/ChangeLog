@@ -1,5 +1,53 @@
 sqlmap (1.0-1) stable; urgency=low
 
+  * Considerable program stabilization based on user reports (Miroslav)
+  * Used shell scripts revisited and rewritten from scratch (Miroslav)
+  * Quick fix for avoiding AV scanners (Miroslav)
+  * Update of used banner signatures for different platforms (Miroslav)
+  * Added new tampering scripts avoiding popular WAF/IPS/IDS mechanisms
+    (Miroslav)
+  * Added wordlist compilation made of the most popular cracking dictionaries
+    (Miroslav)
+  * Implemented multi-processor hash cracking routine(s) (Miroslav)
+  * Sharpened mechanism for data retrieval for blind injections (Miroslav)
+  * Implemented advanced detection techniques for inband and time-based
+    injections by usage of standard deviation method (Miroslav)
+  * Added automatic adjustment of time-based delays based on quality of
+    retrieved data (Miroslav)
+  * Added verification phase in time-based data retrieval (Miroslav)
+  * Substantial speedup of all techniques in detection and usage phase
+    (Miroslav)
+  * Added support for automatic speed-up of inband injection detection through
+    ORDER BY mechanism (Miroslav)
+  * Old resume files are now deprecated and replaced by fast HashDB (SQLite3)
+    mechanism (Miroslav)
+  * Substantial smaller memory footprint, especially in resume phase (Miroslav)
+  * Substantial code optimization together with refactoring (Miroslav)
+  * Refactoring and stabilization of multi-threading routines (Miroslav)
+  * Added switch -m for scanning multiple targets enlisted in a given textual
+    file (Miroslav)
+  * Added switch --randomize for randomly changing value for a given
+    parameter(s) (Miroslav)
+  * Added switch --force-ssl for forcing usage of SSL/HTTPS requests (Miroslav)
+  * Added switch --host for manually setting HTTP Host header value (Miroslav)
+  * Added switch --eval for evaluating provided Python code (with resulting
+    parameter values) before the request itself (Miroslav)
+  * Added switch --skip for skipping testing for given parameter(s) (Miroslav)
+  * Added switch --titles for comparing pages based only on their titles
+    (Miroslav)
+  * Added switch --charset for forcing character encoding used for data
+    retrieval (Miroslav)
+  * Added switch --check-tor for checking if Tor is used properly (Miroslav)
+  * Added switch --crawl for crawling given website starting from the target url
+    (Miroslav)
+  * Added switch --csv-del for manually setting delimiting character used in CSV
+    output (Miroslav)
+  * Added switch --hex for using DBMS hex conversion function(s) for data
+    retrieval (Miroslav)
+  * Added switch --smart for conducting through tests only in case of positive
+    heuristic(s) (Miroslav)
+  * Added switch --check-waf for checking of existence of WAF/IPS/IDS protection
+    (Miroslav)
   * Added --schema switch to enumerate DBMS schema: shows all columns of
     all databases' tables (Bernardo)
   * Added --count switch to count the number of entries for a specific
