@@ -1445,6 +1445,10 @@ def getFilteredPageContent(page, onlyText=True):
     return retVal
 
 def getPageWordSet(page):
+    """
+    Returns word set used in page content
+    """
+
     retVal = set()
 
     # only if the page's charset has been successfully identified
@@ -1846,7 +1850,7 @@ def goGoodSamaritan(prevValue, originalCharset):
 def getCompiledRegex(regex, flags=0):
     """
     Returns compiled regular expression and stores it in cache for further
-    usage
+    usage (deprecated as newer versions of Python do this automatically)
 
     >>> getCompiledRegex('test') # doctest: +ELLIPSIS
     <_sre.SRE_Pattern object at...
@@ -2573,7 +2577,7 @@ def maskSensitiveData(msg):
 
     retVal = msg
 
-    for item in filter(None, map(lambda x: conf.get(x), ["hostname", "googleDork", "aCred", "pCred", "tbl", "db", "col", "user", "cookie", "proxy"])):
+    for item in filter(None, map(lambda x: conf.get(x), ("hostname", "googleDork", "aCred", "pCred", "tbl", "db", "col", "user", "cookie", "proxy"))):
         regex = SENSITIVE_DATA_REGEX % item
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
@@ -2851,7 +2855,7 @@ def expandMnemonics(mnemonics, parser, args):
 
             if value is not None:
                 setattr(args, found.dest, value)
-            elif not found.type: # boolean
+            elif not found.type:  # boolean
                 setattr(args, found.dest, True)
             else:
                 errMsg = "mnemonic '%s' requires value of type '%s'" % (name, found.type)
@@ -2939,7 +2943,7 @@ def asciifyUrl(url, forceQuote=False):
         #     urllib.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
         if s.encode("ascii", "replace") != s or forceQuote:
-            return urllib.quote(s.encode("utf8"), safe=safe)
+            return urllib.quote(s.encode(UNICODE_ENCODING), safe=safe)
         return s
 
     username = quote(parts.username, '')
