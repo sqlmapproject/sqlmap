@@ -1465,7 +1465,7 @@ class Enumeration:
                             breakRetrieval = True
                             break
 
-                    value = "" if isNoneValue(value) else value
+                    value = "" if isNoneValue(value) else unArrayizeValue(value)
 
                     lengths[column] = max(lengths[column], len(value) if value else 0)
                     entries[column].append(value)
