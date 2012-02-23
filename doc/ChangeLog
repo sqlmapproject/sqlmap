@@ -1,5 +1,11 @@
 sqlmap (1.0-1) stable; urgency=low
 
+  * Added support for automatic decoding of page content through detected
+    charset (Miroslav)
+  * Added support for Unicode and/or international characters (Miroslav)
+  * Fixed problems with display of binary data (Miroslav)
+  * Proper data dumping for DBMSes not supporting LIMIT/OFFSET like mechanism(s)
+    (e.g. Microsoft SQL Server, Sybase, etc.) (Miroslav)
   * Considerable program stabilization based on user reports (Miroslav)
   * Used shell scripts revisited and rewritten from scratch (Miroslav)
   * Quick fix for avoiding AV scanners (Miroslav)
