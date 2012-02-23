@@ -1,10 +1,7 @@
 sqlmap (1.0-1) stable; urgency=low
 
-  * Implemented support for Unicode and/or international characters (Miroslav)
   * Implemented support for automatic decoding of page content through detected
     charset (Miroslav)
-  * Fixed problems with display of binary data (Miroslav)
-  * Fixed major bug with resuming of time-based injection data (Miroslav)
   * Implemented mechanism for proper data dumping on DBMSes not supporting
     LIMIT/OFFSET like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.)
     (Miroslav)
@@ -20,9 +17,6 @@ sqlmap (1.0-1) stable; urgency=low
   * Implemented multi-processor hash cracking routine(s) on Linux OS (Miroslav)
   * Implemented advanced detection techniques for inband and time-based
     injections by usage of standard deviation method (Miroslav)
-  * Added verification phase in time-based data retrieval (Miroslav)
-  * Added support for automatic speed-up of inband injection detection through
-    ORDER BY mechanism (Miroslav)
   * Old resume files are now deprecated and replaced by faster SQLite based
     session mechanism (Miroslav)
   * Substantial code optimization and smaller memory footprint (Miroslav)
