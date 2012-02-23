@@ -3118,9 +3118,15 @@ def decodeHexValue(value):
                 value = value[2:]
             value = value.decode("hex")
             if len(value) > 1 and value[1] == '\x00':
-                value = value.decode("utf-16-le")
+                try:
+                    value = value.decode("utf-16-le")
+                except UnicodeDecodeError:
+                    pass
             elif value and value[0] == '\x00':
-                value = value.decode("utf-16-be")
+                try:
+                    value = value.decode("utf-16-be")
+                except UnicodeDecodeError:
+                    pass
         return value
 
     return applyFunctionRecursively(value, _)

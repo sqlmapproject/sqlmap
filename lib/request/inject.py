@@ -20,7 +20,6 @@ from lib.core.common import expandAsteriskForColumns
 from lib.core.common import extractExpectedValue
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import initTechnique
-from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseUnionPage
