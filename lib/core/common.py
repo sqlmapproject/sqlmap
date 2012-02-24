@@ -3192,9 +3192,9 @@ def hashDBWrite(key, value, serialize=False):
 
     conf.hashDB.write(key, value, serialize)
 
-def hashDBRetrieve(key, unserialize=False):
+def hashDBRetrieve(key, unserialize=False, checkConf=False):
     """
     Helper function for restoring session data from HashDB
     """
 
-    return conf.hashDB.retrieve(key, unserialize) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None
+    return conf.hashDB.retrieve(key, unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None

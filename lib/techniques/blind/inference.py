@@ -59,7 +59,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     abortedFlag = False
     asciiTbl = getCharset(charsetType)
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
-    retVal = hashDBRetrieve(expression)
+    retVal = hashDBRetrieve(expression, checkConf=True)
 
     if retVal:
         if PARTIAL_VALUE_MARKER in retVal:

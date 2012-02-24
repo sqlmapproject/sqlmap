@@ -45,7 +45,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
 def __oneShotErrorUse(expression, field):
-    retVal = hashDBRetrieve(expression)
+    retVal = hashDBRetrieve(expression, checkConf=True)
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
