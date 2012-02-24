@@ -23,6 +23,7 @@ from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import incrementCounter
 from lib.core.common import safeStringFormat
+from lib.core.common import setFormatterPrependFlag
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -319,6 +320,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             progress.update(index)
             progress.draw(eta)
 
+        setFormatterPrependFlag(True)
+
         # Go multi-threading (--threads > 1)
         if conf.threads > 1 and isinstance(length, int) and length > 1:
             value = []
@@ -504,6 +507,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     except KeyboardInterrupt:
         abortedFlag = True
+    finally:
+        setFormatterPrependFlag(False)
 
     if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
