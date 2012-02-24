@@ -26,6 +26,8 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.common import intersect
 from lib.core.common import parseTargetUrl
 from lib.core.common import randomStr
@@ -179,12 +181,12 @@ def __saveToSessionFile():
         setInjection(inj)
 
 def __saveToHashDB():
-    _ = conf.hashDB.retrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
+    _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
     _.update(kb.absFilePaths)
-    conf.hashDB.write(HASHDB_KEYS.KB_ABS_FILE_PATHS, _, True)
+    hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, _, True)
 
-    if not conf.hashDB.retrieve(HASHDB_KEYS.KB_CHARS):
-        conf.hashDB.write(HASHDB_KEYS.KB_CHARS, kb.chars, True)
+    if not hashDBRetrieve(HASHDB_KEYS.KB_CHARS):
+        hashDBWrite(HASHDB_KEYS.KB_CHARS, kb.chars, True)
 
 def __saveToResultsFile():
     if not conf.resultsFP:

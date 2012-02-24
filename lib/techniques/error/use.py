@@ -19,6 +19,8 @@ from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
@@ -43,7 +45,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
 def __oneShotErrorUse(expression, field):
-    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None
+    retVal = hashDBRetrieve(expression)
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
@@ -126,7 +128,7 @@ def __oneShotErrorUse(expression, field):
 
         retVal = __errorReplaceChars(retVal)
 
-        conf.hashDB.write(expression, retVal)
+        hashDBWrite(expression, retVal)
 
     else:
         _ = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)

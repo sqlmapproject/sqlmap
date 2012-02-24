@@ -15,6 +15,8 @@ from lib.core.common import filterListValue
 from lib.core.common import getFileItems
 from lib.core.common import Backend
 from lib.core.common import getPageWordSet
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safeStringFormat
@@ -132,7 +134,7 @@ def tableExists(tableFile, regex=None):
         if _ not in kb.brute.tables:
             kb.brute.tables.append(_)
 
-    conf.hashDB.write(HASHDB_KEYS.KB_BRUTE_TABLES, kb.brute.tables, True)
+    hashDBWrite(HASHDB_KEYS.KB_BRUTE_TABLES, kb.brute.tables, True)
 
     return kb.data.cachedTables
 
@@ -231,6 +233,6 @@ def columnExists(columnFile, regex=None):
             if _ not in kb.brute.columns:
                 kb.brute.columns.append(_)
 
-        conf.hashDB.write(HASHDB_KEYS.KB_BRUTE_COLUMNS, kb.brute.columns, True)
+        hashDBWrite(HASHDB_KEYS.KB_BRUTE_COLUMNS, kb.brute.columns, True)
 
     return kb.data.cachedColumns

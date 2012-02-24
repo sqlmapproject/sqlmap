@@ -3176,3 +3176,17 @@ def setFormatterPrependFlag(value=True):
     """
 
     FORMATTER._prepend_flag = value
+
+def hashDBWrite(key, value, serialize=False):
+    """
+    Helper function for writing session data to HashDB
+    """
+
+    conf.hashDB.write(key, value, serialize)
+
+def hashDBRetrieve(key, unserialize=False):
+    """
+    Helper function for restoring session data from HashDB
+    """
+
+    return conf.hashDB.retrieve(key, unserialize) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None

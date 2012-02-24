@@ -19,6 +19,8 @@ from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import extractExpectedValue
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.common import initTechnique
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -315,13 +317,13 @@ def __goBooleanProxy(expression):
     payload = agent.payload(newValue=query)
     timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
 
-    output = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None
+    output = hashDBRetrieve(expression)
 
     if not output:
         output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare, raise404=False)
 
     if output is not None:
-        conf.hashDB.write(expression, output)
+        hashDBWrite(expression, output)
 
     return output
 

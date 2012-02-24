@@ -38,6 +38,8 @@ from lib.core.common import dataToStdout
 from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.common import normalizeUnicode
 from lib.core.common import paths
 from lib.core.common import readInput
@@ -592,7 +594,7 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {'salt': hash_[4:12], 'count': 1<<ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
 
                     if item and hash_ not in keys:
-                        resumed = conf.hashDB.retrieve(hash_)
+                        resumed = hashDBRetrieve(hash_)
                         if not resumed:
                             attack_info.append(item)
                         else:
@@ -723,7 +725,7 @@ def dictionaryAttack(attack_dict):
 
                         while not retVal.empty():
                             _, hash_, word = item = retVal.get(block=False)
-                            conf.hashDB.write(hash_, word)
+                            hashDBWrite(hash_, word)
                             results.append(item)
 
                         conf.hashDB.endTransaction()
@@ -806,7 +808,7 @@ def dictionaryAttack(attack_dict):
 
                             while not retVal.empty():
                                 _, hash_, word = item = retVal.get(block=False)
-                                conf.hashDB.write(hash_, word)
+                                hashDBWrite(hash_, word)
                                 results.append(item)
 
                             conf.hashDB.endTransaction()

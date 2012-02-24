@@ -21,6 +21,8 @@ from lib.core.common import getCharset
 from lib.core.common import getCounter
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
 from lib.core.common import safeStringFormat
 from lib.core.common import setFormatterPrependFlag
@@ -57,7 +59,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     abortedFlag = False
     asciiTbl = getCharset(charsetType)
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
-    retVal = conf.hashDB.retrieve(expression) if not any([conf.flushSession, conf.freshQueries, not kb.resumeValues]) else None
+    retVal = hashDBRetrieve(expression)
 
     if retVal:
         if PARTIAL_VALUE_MARKER in retVal:
@@ -517,9 +519,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     if finalValue is not None:
         finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
-        conf.hashDB.write(expression, finalValue)
+        hashDBWrite(expression, finalValue)
     else:
-        conf.hashDB.write(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
+        hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
 
     if kb.threadException:
         raise sqlmapThreadException, "something unexpected happened inside the threads"
