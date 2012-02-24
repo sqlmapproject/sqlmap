@@ -734,7 +734,7 @@ def dataToStdout(data, forceOutput=False):
                 sys.stdout.flush()
                 if kb.get("multiThreadMode"):
                     logging._releaseLock()
-                setFormatterPrependFlag(len(data) == 1)
+                setFormatterPrependFlag(len(data) == 1 and data != '\n')
 
 def dataToSessionFile(data):
     if not conf.sessionFile or kb.suppressSession:
@@ -3174,4 +3174,5 @@ def setFormatterPrependFlag(value=True):
     Sets logging formatter flag used for signaling if newline is needed before
     the logging message itself (used in inference mode)
     """
+
     FORMATTER._prepend_flag = value
