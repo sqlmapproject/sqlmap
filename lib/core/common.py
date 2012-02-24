@@ -3190,11 +3190,11 @@ def hashDBWrite(key, value, serialize=False):
     Helper function for writing session data to HashDB
     """
 
-    conf.hashDB.write(key, value, serialize)
+    conf.hashDB.write("%s%s" % (conf.url, key), value, serialize)
 
 def hashDBRetrieve(key, unserialize=False, checkConf=False):
     """
     Helper function for restoring session data from HashDB
     """
 
-    return conf.hashDB.retrieve(key, unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None
+    return conf.hashDB.retrieve("%s%s" % (conf.url, key), unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None
