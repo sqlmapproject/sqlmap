@@ -394,11 +394,14 @@ def __setMultipleTargets():
         infoMsg += "testable requests from the targets list"
         logger.info(infoMsg)
 
-def __adjustFormatter():
+def __adjustLoggingFormatter():
     """
     Solves problem of line deletition caused by overlapping logging messages
     and retrieved data info in inference mode
     """
+
+    if hasattr(FORMATTER, '_format'):
+        return
 
     def format(record):
         _ = FORMATTER._format(record)
@@ -406,6 +409,7 @@ def __adjustFormatter():
             _ = "\n%s" % _
             FORMATTER._prepend_flag = False
         return _
+
     FORMATTER._format = FORMATTER.format
     FORMATTER._prepend_flag = False
     FORMATTER.format = format
@@ -1902,7 +1906,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __checkDependencies()
     __basicOptionValidation()
     __setTorProxySettings()
-    __adjustFormatter()
+    __adjustLoggingFormatter()
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()
