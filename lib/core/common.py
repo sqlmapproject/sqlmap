@@ -734,7 +734,7 @@ def dataToStdout(data, forceOutput=False):
                 sys.stdout.flush()
                 if kb.get("multiThreadMode"):
                     logging._releaseLock()
-                setFormatterPrependFlag(len(data) == 1 and data != '\n')
+                setFormatterPrependFlag(len(data) == 1 and data != '\n' or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
 
 def dataToSessionFile(data):
     if not conf.sessionFile or kb.suppressSession:

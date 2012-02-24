@@ -137,7 +137,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
                 dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
             else:
-                dataToStdout("[%s] [INFO] retrieved: " % time.strftime("%X"))
+                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
 
         hintlock = threading.Lock()
 
@@ -319,8 +319,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             progressTime.append(charTime)
             progress.update(index)
             progress.draw(eta)
-
-        setFormatterPrependFlag(True)
 
         # Go multi-threading (--threads > 1)
         if conf.threads > 1 and isinstance(length, int) and length > 1:
