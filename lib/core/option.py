@@ -81,6 +81,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
+from lib.core.settings import FORMATTER
 from lib.core.settings import IS_WIN
 from lib.core.settings import NULL
 from lib.core.settings import PYVERSION
@@ -392,6 +393,22 @@ def __setMultipleTargets():
         infoMsg = "sqlmap parsed %d " % (updatedTargetsCount - initialTargetsCount)
         infoMsg += "testable requests from the targets list"
         logger.info(infoMsg)
+
+def __adjustFormatter():
+    """
+    Solves problem of line deletition caused by overlapping logging messages
+    and retrieved data info in inference mode
+    """
+
+    def format(record):
+        _ = FORMATTER._format(record)
+        if FORMATTER._prepend_flag:
+            _ = "\n%s" % _
+            FORMATTER._prepend_flag = False
+        return _
+    FORMATTER._format = FORMATTER.format
+    FORMATTER._prepend_flag = False
+    FORMATTER.format = format
 
 def __setRequestFromFile():
     """
@@ -1885,6 +1902,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __checkDependencies()
     __basicOptionValidation()
     __setTorProxySettings()
+    __adjustFormatter()
     __setMultipleTargets()
     __setTamperingFunctions()
     __setTrafficOutputFP()

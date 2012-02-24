@@ -83,6 +83,7 @@ from lib.core.settings import DBMS_DICT
 from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
+from lib.core.settings import FORMATTER
 from lib.core.settings import NULL
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
@@ -3166,3 +3167,10 @@ def extractExpectedValue(value, expected):
                     value = None
 
     return value
+
+def setFormatterPrependFlag(value=True):
+    """
+    Sets logging formatter flag used for signaling if newline is needed before
+    the logging message itself (used in inference mode)
+    """
+    FORMATTER._prepend_flag = value

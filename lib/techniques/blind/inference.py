@@ -23,6 +23,7 @@ from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import incrementCounter
 from lib.core.common import safeStringFormat
+from lib.core.common import setFormatterPrependFlag
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -449,6 +450,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 etaProgressUpdate(time.time() - charStart, len(commonValue))
                             elif conf.verbose in (1, 2):
                                 dataToStdout(commonValue[index-1:])
+                                setFormatterPrependFlag(True)
 
                             finalValue = commonValue
 
@@ -497,6 +499,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     etaProgressUpdate(time.time() - charStart, index)
                 elif conf.verbose in (1, 2):
                     dataToStdout(val)
+                    setFormatterPrependFlag(True)
 
                 if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
                     finalValue = partialValue
@@ -504,6 +507,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     except KeyboardInterrupt:
         abortedFlag = True
+    finally:
+        setFormatterPrependFlag(False)
 
     if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
