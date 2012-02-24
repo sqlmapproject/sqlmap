@@ -960,6 +960,10 @@ def cleanQuery(query):
     return upperQuery
 
 def setPaths():
+    """
+    Sets absolute paths for project directories and files
+    """
+
     # sqlmap paths
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
     paths.SQLMAP_PROCS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "procs")
@@ -1099,6 +1103,7 @@ def parseTargetUrl():
     """
     Parse target url and set some attributes into the configuration singleton.
     """
+
     if not conf.url:
         return
 
@@ -1157,9 +1162,12 @@ def parseTargetUrl():
         conf.httpHeaders.append((HTTPHEADER.HOST, getHostHeader(conf.url)))
 
 def expandAsteriskForColumns(expression):
-    # If the user provided an asterisk rather than the column(s)
-    # name, sqlmap will retrieve the columns itself and reprocess
-    # the SQL query string (expression)
+    """
+    If the user provided an asterisk rather than the column(s)
+    name, sqlmap will retrieve the columns itself and reprocess
+    the SQL query string (expression)
+    """
+
     asterisk = re.search("^SELECT\s+\*\s+FROM\s+([\w\.\_]+)\s*", expression, re.I)
 
     if asterisk:
