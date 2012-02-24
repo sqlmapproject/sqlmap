@@ -1138,7 +1138,7 @@ class Enumeration:
                         table[safeSQLIdentificatorNaming(tbl, True)] = columns
                         kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
-        if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns and isInferenceAvailable() and not conf.direct:
+        elif isInferenceAvailable() and not conf.direct:
             for tbl in tblList:
                 if conf.db is not None and len(kb.data.cachedColumns) > 0 \
                    and conf.db in kb.data.cachedColumns and tbl in \
