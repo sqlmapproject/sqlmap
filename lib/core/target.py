@@ -14,6 +14,7 @@ import tempfile
 import time
 
 from lib.core.common import dataToSessionFile
+from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
 from lib.core.common import paramToDict
 from lib.core.common import readInput
@@ -208,10 +209,12 @@ def __resumeHashDBValues():
     Resume stored data values from HashDB
     """
 
-    kb.absFilePaths = conf.hashDB.retrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or kb.absFilePaths
-    kb.chars = conf.hashDB.retrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
-    kb.brute.tables = conf.hashDB.retrieve(HASHDB_KEYS.KB_BRUTE_TABLES, True) or kb.brute.tables
-    kb.brute.columns = conf.hashDB.retrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
+    kb.absFilePaths = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or kb.absFilePaths
+    kb.chars = hashDBRetrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
+    kb.brute.tables = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_TABLES, True) or kb.brute.tables
+    kb.brute.columns = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
+
+    conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
 
 def __setOutputResume():
     """

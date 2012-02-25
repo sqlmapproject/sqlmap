@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import getCompiledRegex
 from lib.core.common import Backend
+from lib.core.common import hashDBWrite
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -19,11 +20,11 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.session import setRemoteTempPath
 from lib.request import inject
 
 class Miscellaneous:
@@ -57,7 +58,7 @@ class Miscellaneous:
         conf.tmpPath = normalizePath(conf.tmpPath)
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
 
-        setRemoteTempPath()
+        hashDBWrite(HASHDB_KEYS.CONF_TMP_PATH, conf.tmpPath)
 
     def getVersionFromBanner(self):
         if "dbmsVersion" in kb.bannerFp:
