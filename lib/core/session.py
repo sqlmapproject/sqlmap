@@ -150,15 +150,6 @@ def setOs():
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), Backend.getOs()))
 
-def setXpCmdshellAvailability(available):
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("xp_cmdshell availability") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][xp_cmdshell availability][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), str(available).lower()))
-
 def resumeConfKb(expression, url, value):
     if expression == "Injection data" and url == conf.url:
         try:
