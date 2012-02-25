@@ -213,6 +213,7 @@ def __resumeHashDBValues():
     kb.chars = hashDBRetrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
     kb.brute.tables = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_TABLES, True) or kb.brute.tables
     kb.brute.columns = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
+    kb.xpCmdshellAvailable = hashDBRetrieve(HASHDB_KEYS.XP_CMDSHELL_AVAILABLE) or kb.xpCmdshellAvailable
 
     conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
 

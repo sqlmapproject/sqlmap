@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import getSPLSnippet
+from lib.core.common import hashDBWrite
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import wasLastRequestDelayed
@@ -16,8 +17,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import HASHDB_KEYS
 from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.session import setXpCmdshellAvailability
 from lib.core.unescaper import unescaper
 from lib.request import inject
 
@@ -145,7 +146,7 @@ class xp_cmdshell:
         return output
 
     def xpCmdshellInit(self):
-        if kb.xpCmdshellAvailable is False:
+        if not kb.xpCmdshellAvailable:
             infoMsg = "checking if xp_cmdshell extended procedure is "
             infoMsg += "available, please wait.."
             logger.info(infoMsg)
@@ -185,7 +186,7 @@ class xp_cmdshell:
                             warnMsg += "because sp_OACreate is disabled"
                             logger.warn(warnMsg)
 
-            setXpCmdshellAvailability(kb.xpCmdshellAvailable)
+            hashDBWrite(HASHDB_KEYS.XP_CMDSHELL_AVAILABLE, kb.xpCmdshellAvailable)
 
             if not kb.xpCmdshellAvailable:
                 errMsg = "unable to proceed without xp_cmdshell"
