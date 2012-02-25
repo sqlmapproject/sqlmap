@@ -186,7 +186,7 @@ class xp_cmdshell:
                             warnMsg += "because sp_OACreate is disabled"
                             logger.warn(warnMsg)
 
-            hashDBWrite(HASHDB_KEYS.XP_CMDSHELL_AVAILABLE, kb.xpCmdshellAvailable)
+            hashDBWrite(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE, kb.xpCmdshellAvailable)
 
             if not kb.xpCmdshellAvailable:
                 errMsg = "unable to proceed without xp_cmdshell"
