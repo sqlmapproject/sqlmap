@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import hashlib
 import sqlite3
 import threading
+import time
 
 from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
@@ -101,8 +102,10 @@ class HashDB(object):
                         except sqlite3.IntegrityError:
                             self.cursor.execute("UPDATE storage SET value=? WHERE id=?", (value, hash_,))
                     except sqlite3.OperationalError, ex:
-                        if not 'locked' in ex.message:
+                        if not any(_ in ex.message for _ in ('locked', 'I/O')):
                             raise
+                        else:
+                            time.sleep(1)
                     else:
                         break
         finally:

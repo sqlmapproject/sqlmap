@@ -79,6 +79,7 @@ class Dump:
         self._outputBP = StringIO.StringIO()
 
     def getOutputFile(self):
+        self.flush()
         return self._outputFile
 
     def string(self, header, data, sort=True):
