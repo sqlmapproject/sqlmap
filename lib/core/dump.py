@@ -88,10 +88,8 @@ class Dump:
 
             return
 
-        data = getUnicode(data)
-
         if data:
-            data = self._formatString(data)
+            data = self._formatString(getUnicode(data))
 
             if data[-1] == '\n':
                 data = data[:-1]
