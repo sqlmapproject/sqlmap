@@ -49,7 +49,6 @@ from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.session import setInjection
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
@@ -173,14 +172,10 @@ def __randomFillBlankFields(value):
 
     return retVal
 
-def __saveToSessionFile():
-    for inj in kb.injections:
-        if inj.place is None or inj.parameter is None:
-            continue
-
-        setInjection(inj)
-
 def __saveToHashDB():
+    kb.injections = [_ for _ in kb.injections if _ and _.place is not None and _.parameter is not None]
+    hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, kb.injections, True)
+
     _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
     _.update(kb.absFilePaths)
     hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, _, True)
@@ -546,7 +541,6 @@ def start():
                 # Flush the flag
                 kb.testMode = False
 
-                __saveToSessionFile()
                 __saveToResultsFile()
                 __saveToHashDB()
                 __showInjections()

@@ -217,6 +217,17 @@ def __resumeHashDBValues():
 
     conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
 
+    for injection in hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []:
+        if injection.place in conf.paramDict and \
+            injection.parameter in conf.paramDict[injection.place]:
+
+            if not conf.tech or intersect(conf.tech, injection.data.keys()):
+                if intersect(conf.tech, injection.data.keys()):
+                    injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
+
+                if injection not in kb.injections:
+                    kb.injections.append(injection)
+
 def __setOutputResume():
     """
     Check and set the output text file and the resume functionality.

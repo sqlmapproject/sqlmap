@@ -36,32 +36,6 @@ def unSafeFormatString(value):
         retVal = retVal.replace("__LEFT_SQUARE_BRACKET__", "[").replace("__RIGHT_SQUARE_BRACKET__", "]")
     return retVal
 
-def setInjection(inj):
-    """
-    Save information retrieved about injection place and parameter in the
-    session file.
-    """
-
-    try:
-        condition = ( not kb.resumedQueries
-                    or ( kb.resumedQueries.has_key(conf.url) and
-                    not kb.resumedQueries[conf.url].has_key("Injection data"))
-                    or ( kb.resumedQueries[conf.url].has_key("Injection data")
-                    and intersect(base64unpickle(kb.resumedQueries[conf.url]["Injection data"][:-1]).data.keys(),\
-                        inj.data.keys()) != inj.data.keys()
-                    ) )
-    except AttributeError:
-        warnMsg = "there were some changes in data model "
-        warnMsg += "preventing normal resume of previously stored "
-        warnMsg += "injection data. please use the --flush-session "
-        warnMsg += "to have it fixed"
-        singleTimeWarnMessage(warnMsg)
-
-        condition = False
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Injection data][%s]\n" % (conf.url, inj.place, safeFormatString(conf.parameters[inj.place]), base64pickle(inj)))
-
 def setDynamicMarkings(markings):
     """
     Save information retrieved about dynamic markings to the
@@ -150,36 +124,26 @@ def setOs():
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), Backend.getOs()))
 
+def setRemoteTempPath():
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("Remote temp path") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(conf.tmpPath)))
+
+def setXpCmdshellAvailability(available):
+    condition = (
+                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
+                  not kb.resumedQueries[conf.url].has_key("xp_cmdshell availability") )
+                )
+
+    if condition:
+        dataToSessionFile("[%s][%s][%s][xp_cmdshell availability][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), str(available).lower()))
+
 def resumeConfKb(expression, url, value):
-    if expression == "Injection data" and url == conf.url:
-        try:
-            injection = base64unpickle(value[:-1])
-        except AttributeError:
-            warnMsg = "there were some changes in data model "
-            warnMsg += "preventing normal resume of previously stored "
-            warnMsg += "injection data. please use the --flush-session "
-            warnMsg += "to have it fixed"
-            singleTimeWarnMessage(warnMsg)
-            return
-
-        infoMsg = "resuming injection data from session file"
-        logger.info(infoMsg)
-
-        if injection.place in conf.paramDict and \
-           injection.parameter in conf.paramDict[injection.place]:
-
-            if not conf.tech or intersect(conf.tech, injection.data.keys()):
-                if intersect(conf.tech, injection.data.keys()):
-                    injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
-
-                if injection not in kb.injections:
-                    kb.injections.append(injection)
-        else:
-            warnMsg = "there is an injection in %s parameter '%s' " % (injection.place, injection.parameter)
-            warnMsg += "but you did not provided it this time"
-            logger.warn(warnMsg)
-
-    elif expression == "Dynamic markings" and url == conf.url:
+    if expression == "Dynamic markings" and url == conf.url:
         kb.dynamicMarkings = base64unpickle(value[:-1])
         infoMsg = "resuming dynamic markings from session file"
         logger.info(infoMsg)
