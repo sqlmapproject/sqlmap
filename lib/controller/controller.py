@@ -173,8 +173,17 @@ def __randomFillBlankFields(value):
     return retVal
 
 def __saveToHashDB():
-    kb.injections = [_ for _ in kb.injections if _ and _.place is not None and _.parameter is not None]
-    hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, kb.injections, True)
+    injections = hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []
+    injections.extend(_ for _ in kb.injections if _ and _.place is not None and _.parameter is not None)
+
+    _ = dict()
+    for injection in injections:
+        key = (injection.place, injection.parameter, injection.ptype)
+        if key not in _:
+            _[key] = injection
+        else:
+            _[key].data.update(injection.data)
+    hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, _.values(), True)
 
     _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
     _.update(kb.absFilePaths)

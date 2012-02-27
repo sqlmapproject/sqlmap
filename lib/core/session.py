@@ -124,15 +124,6 @@ def setOs():
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), Backend.getOs()))
 
-def setRemoteTempPath():
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Remote temp path") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Remote temp path][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), safeFormatString(conf.tmpPath)))
-
 def setXpCmdshellAvailability(available):
     condition = (
                   not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
