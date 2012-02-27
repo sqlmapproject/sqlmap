@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import time
 
+from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
@@ -16,7 +17,6 @@ from lib.core.common import getCurrentThreadData
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
-from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -67,7 +67,8 @@ def direct(query, content=True):
                 else:
                     output = output[0][0]
 
-        return getUnicode(output, noneToNull=True)
+        retVal = getUnicode(output, noneToNull=True)
+        return safecharencode(retVal) if kb.safeCharEncode else retVal
     else:
         for line in output:
             if line[0] in (1, -1):
