@@ -15,7 +15,6 @@ from lib.core.bigarray import BigArray
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
-from lib.core.common import dataToSessionFile
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import extractExpectedValue
 from lib.core.common import getPublicTypeMembers
@@ -62,8 +61,6 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
         _, length, _ = queryOutputLength(expression, payload)
     else:
         length = None
-
-    dataToSessionFile("[%s][%s][%s][%s][" % (conf.url, kb.injection.place, conf.parameters[kb.injection.place], expression))
 
     kb.inferenceMode = True
     count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)

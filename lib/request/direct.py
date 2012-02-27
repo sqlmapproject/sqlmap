@@ -14,6 +14,8 @@ from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getUnicode
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
@@ -24,7 +26,6 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.utils.timeout import timeout
 
 def direct(query, content=True):
-    output = None
     select = True
     query = agent.payloadDirect(query)
     threadData = getCurrentThreadData()
@@ -43,28 +44,22 @@ def direct(query, content=True):
 
     logger.log(9, query)
 
+    output = hashDBRetrieve(query, True, True)
+
     start = time.time()
     if not select and "EXEC " not in query:
         _ = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
-    elif conf.hostname in kb.resumedQueries and query in kb.resumedQueries[conf.hostname] and "sqlmapoutput" not in query and "sqlmapfile" not in query:
-        try:
-            output = base64unpickle(kb.resumedQueries[conf.hostname][query][:-1])
-        except:
-            output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
-
-        infoMsg = "resumed from file '%s': " % conf.sessionFile
-        infoMsg += "%s..." % getUnicode(output, UNICODE_ENCODING)[:20]
-        logger.info(infoMsg)
-    else:
+    elif not (output and "sqlmapoutput" not in query and "sqlmapfile" not in query):
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
+        hashDBWrite(query, output, True)
+    elif output:
+        infoMsg = "resumed: %s..." % getUnicode(output, UNICODE_ENCODING)[:20]
+        logger.info(infoMsg)
     threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
     if not output:
         return output
     elif content:
-        #if conf.hostname not in kb.resumedQueries or ( conf.hostname in kb.resumedQueries and query not in kb.resumedQueries[conf.hostname] ):
-            #dataToSessionFile("[%s][%s][%s][%s][%s]\n" % (conf.hostname, kb.injection.place, conf.parameters[kb.injection.place], query, base64pickle(output)))
-
         if output and isinstance(output, (list, tuple)):
             if len(output[0]) == 1:
                 if len(output) > 1:
