@@ -36,22 +36,6 @@ def unSafeFormatString(value):
         retVal = retVal.replace("__LEFT_SQUARE_BRACKET__", "[").replace("__RIGHT_SQUARE_BRACKET__", "]")
     return retVal
 
-def setDynamicMarkings(markings):
-    """
-    Save information retrieved about dynamic markings to the
-    session file.
-    """
-
-    condition = (
-                  ( not kb.resumedQueries
-                  or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("Dynamic markings")
-                  ) )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][Dynamic markings][%s]\n" % (conf.url, None, None, base64pickle(markings)))
-
 def setDbms(dbms):
     """
     @param dbms: database management system to be set into the knowledge
@@ -123,15 +107,6 @@ def setOs():
 
     if condition:
         dataToSessionFile("[%s][%s][%s][OS][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), Backend.getOs()))
-
-def setXpCmdshellAvailability(available):
-    condition = (
-                  not kb.resumedQueries or ( kb.resumedQueries.has_key(conf.url) and
-                  not kb.resumedQueries[conf.url].has_key("xp_cmdshell availability") )
-                )
-
-    if condition:
-        dataToSessionFile("[%s][%s][%s][xp_cmdshell availability][%s]\n" % (conf.url, kb.injection.place, safeFormatString(conf.parameters[kb.injection.place]), str(available).lower()))
 
 def resumeConfKb(expression, url, value):
     if expression == "Dynamic markings" and url == conf.url:

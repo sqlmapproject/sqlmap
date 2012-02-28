@@ -49,7 +49,6 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.session import setDynamicMarkings
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import LOWER_RATIO_BOUND

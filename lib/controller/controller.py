@@ -192,6 +192,9 @@ def __saveToHashDB():
     if not hashDBRetrieve(HASHDB_KEYS.KB_CHARS):
         hashDBWrite(HASHDB_KEYS.KB_CHARS, kb.chars, True)
 
+    if not hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS):
+        hashDBWrite(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, kb.dynamicMarkings, True)
+
 def __saveToResultsFile():
     if not conf.resultsFP:
         return
