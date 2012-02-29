@@ -29,6 +29,8 @@ from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import wasLastRequestDBMSError
+from lib.core.convert import htmlunescape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -79,6 +81,10 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
+
+            # Special case when DBMS is Microsoft SQL Server and error message is used as a result of inband injection
+            if Backend.isDbms(DBMS.MSSQL) and wasLastRequestDBMSError():
+                retVal = htmlunescape(retVal).replace("<br>", "\n")
         else:
             trimmed = extractRegexResult(trimcheck, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
                     or extractRegexResult(trimcheck, removeReflectiveValues(listToStrValue(headers.headers \
