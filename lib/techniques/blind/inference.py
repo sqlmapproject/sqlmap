@@ -274,15 +274,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
+                                        conf.timeSec += 1
+
                                         warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
                                         logger.warn(warnMsg)
-
-                                        conf.timeSec += 1
 
                                         if kb.adjustTimeDelay:
                                             dbgMsg = "turning off auto-adjustment mechanism"
                                             logger.debug(dbgMsg)
                                             kb.adjustTimeDelay = False
+
                                         return getChar(idx, originalTbl, continuousOrder, expand, shiftTable)
                                     else:
                                         errMsg = "unable to properly validate last character value ('%s').." % decodeIntToUnicode(retVal)
