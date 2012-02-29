@@ -2767,7 +2767,7 @@ def isNoneValue(value):
     """
 
     if isinstance(value, basestring):
-        return value == "None"
+        return value in ("None", "")
     elif isinstance(value, (list, tuple)):
         if len(value) == 1:
             return isNoneValue(value[0])

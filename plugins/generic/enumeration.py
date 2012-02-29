@@ -1449,7 +1449,7 @@ class Enumeration:
                         value = inject.getValue(query, blind=False)
 
                     if column == colList[0]:
-                        if isNoneValue(value) or not value:
+                        if isNoneValue(value):
                             breakRetrieval = True
                             break
                         else:
