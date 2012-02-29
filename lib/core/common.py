@@ -735,7 +735,7 @@ def dataToStdout(data, forceOutput=False):
                 sys.stdout.flush()
                 if kb.get("multiThreadMode"):
                     logging._releaseLock()
-                setFormatterPrependFlag(len(data) == 1 and data != '\n' or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
+                setFormatterPrependFlag(len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
 
 def dataToSessionFile(data):
     if not conf.sessionFile or kb.suppressSession:
@@ -1627,6 +1627,7 @@ def clearConsoleLine(forceOutput=False):
     """
 
     dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
+    setFormatterPrependFlag(False)
 
 def parseXmlFile(xmlFile, handler):
     """
@@ -2447,8 +2448,7 @@ def initTechnique(technique=None):
 
 def arrayizeValue(value):
     """
-    Makes a list out of value if it is not already a list, tuple or set
-    itself
+    Makes a list out of value if it is not already a list or tuple itself
     """
 
     if not isinstance(value, (list, tuple)):
@@ -2458,8 +2458,7 @@ def arrayizeValue(value):
 
 def unArrayizeValue(value):
     """
-    Makes a value out of iterable if it is a list, tuple or set
-    itself
+    Makes a value out of iterable if it is a list or tuple itself
     """
 
     if isinstance(value, (list, tuple)):
