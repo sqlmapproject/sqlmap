@@ -2763,19 +2763,13 @@ def isBinaryData(value):
 
 def isNoneValue(value):
     """
-    Returns whether the value contains implicit 'None' value
+    Returns whether the value is unusable (None or '')
     """
 
     if isinstance(value, basestring):
         return value in ("None", "")
     elif isinstance(value, (list, tuple)):
-        if len(value) == 1:
-            return isNoneValue(value[0])
-        else:
-            for item in value:
-                if item and item != "None":
-                    return False
-            return True
+        return all(isNoneValue(_) for _ in value)
     elif isinstance(value, dict):
         return not any(value)
     else:
