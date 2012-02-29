@@ -102,7 +102,9 @@ class Enumeration(GenericEnumeration):
                         break
 
                 if not isNoneValue(value):
-                    kb.data.cachedTables[db] = arrayizeValue(value)
+                    value = filter(None, arrayizeValue(value))
+                    value = [safeSQLIdentificatorNaming(_, True) for _ in value]
+                    kb.data.cachedTables[db] = value
 
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:

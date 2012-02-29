@@ -927,9 +927,10 @@ class Enumeration:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
 
                     table = inject.getValue(query, inband=False, error=False)
-                    kb.hintValue = table
-                    table = safeSQLIdentificatorNaming(table, True)
-                    tables.append(table)
+                    if not isNoneValue(table):
+                        kb.hintValue = table
+                        table = safeSQLIdentificatorNaming(table, True)
+                        tables.append(table)
 
                 if tables:
                     kb.data.cachedTables[db] = tables
