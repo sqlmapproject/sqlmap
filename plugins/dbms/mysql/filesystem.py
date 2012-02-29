@@ -14,6 +14,7 @@ from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
@@ -51,7 +52,7 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
         inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
 
-        length = unArrayizeValue(inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=2))
+        length = unArrayizeValue(inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=CHARSET_TYPE.DIGITS))
 
         if not isNumPosStrValue(length):
             errMsg = "unable to retrieve the content of the "
@@ -65,11 +66,11 @@ class Filesystem(GenericFilesystem):
             result = []
 
             for i in xrange(1, length, sustrLen):
-                chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, unique=False, resumeValue=False, charsetType=3)
+                chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
                 result.append(chunk)
         else:
-            result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=3)
+            result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
         return result
 

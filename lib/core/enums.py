@@ -80,6 +80,13 @@ class REFLECTIVE_COUNTER:
     MISS = "MISS"
     HIT = "HIT"
 
+class CHARSET_TYPE:
+    BINARY = 1,
+    DIGITS = 2,
+    HEXADECIMAL = 3,
+    ALPHA = 4,
+    ALPHANUM = 5
+
 class HASH:
     MYSQL = r'(?i)\A\*[0-9a-f]{40}\Z'
     MYSQL_OLD = r'(?i)\A(?![0-9]+\Z)[0-9a-f]{16}\Z'

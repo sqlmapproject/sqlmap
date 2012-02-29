@@ -21,6 +21,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
@@ -120,7 +121,7 @@ class Enumeration(GenericEnumeration):
 
                 for query in (rootQuery.blind.count, rootQuery.blind.count2, rootQuery.blind.count3):
                     _ = query.replace("%s", db)
-                    count = inject.getValue(_, inband=False, error=False, charsetType=2)
+                    count = inject.getValue(_, inband=False, error=False, charsetType=CHARSET_TYPE.DIGITS)
                     if not isNoneValue(count):
                         break
 
@@ -221,7 +222,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count
                     query = query.replace("%s", db)
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -338,7 +339,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count
                     query = query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no tables contain column"

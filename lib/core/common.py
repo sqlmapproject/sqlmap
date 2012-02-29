@@ -57,6 +57,7 @@ from lib.core.convert import htmlunescape
 from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import HTTPHEADER
@@ -1312,30 +1313,30 @@ def getCharset(charsetType=None):
         asciiTbl.extend(xrange(0, 128))
 
     # 0 or 1
-    elif charsetType == 1:
+    elif charsetType == CHARSET_TYPE.BINARY:
         asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 50))
 
     # Digits
-    elif charsetType == 2:
+    elif charsetType == CHARSET_TYPE.DIGITS:
         asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 58))
 
     # Hexadecimal
-    elif charsetType == 3:
+    elif charsetType == CHARSET_TYPE.HEXADECIMAL:
         asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 58))
         asciiTbl.extend(xrange(64, 71))
         asciiTbl.extend(xrange(96, 103))
 
     # Characters
-    elif charsetType == 4:
+    elif charsetType == CHARSET_TYPE.ALPHA:
         asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(64, 91))
         asciiTbl.extend(xrange(96, 123))
 
     # Characters and digits
-    elif charsetType == 5:
+    elif charsetType == CHARSET_TYPE.ALPHANUM:
         asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 58))
         asciiTbl.extend(xrange(64, 91))

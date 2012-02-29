@@ -19,6 +19,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUndefinedMethod
@@ -109,7 +110,7 @@ class Filesystem:
         wFileSize = os.path.getsize(wFile)
 
         logger.debug("checking if the %s file has been written" % fileType)
-        dFileSize = inject.getValue(lengthQuery, resumeValue=False, charsetType=2)
+        dFileSize = inject.getValue(lengthQuery, resumeValue=False, charsetType=CHARSET_TYPE.DIGITS)
 
         if dFileSize and dFileSize.isdigit():
             infoMsg = "the file has been successfully written and "

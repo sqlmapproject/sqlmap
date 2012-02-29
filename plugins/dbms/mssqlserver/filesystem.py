@@ -18,6 +18,7 @@ from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -96,7 +97,7 @@ class Filesystem(GenericFilesystem):
 
         if not result:
             result = []
-            count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, charsetType=2)
+            count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the content of the "
@@ -106,7 +107,7 @@ class Filesystem(GenericFilesystem):
             indexRange = getLimitRange(count)
 
             for index in indexRange:
-                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, unique=False, charsetType=3)
+                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, unique=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
                 result.append(chunk)
 
         inject.goStacked("DROP TABLE %s" % hexTbl)

@@ -45,6 +45,7 @@ from lib.core.dicts import mysqlPrivs
 from lib.core.dicts import pgsqlPrivs
 from lib.core.dicts import firebirdPrivs
 from lib.core.dicts import db2Privs
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
@@ -158,7 +159,7 @@ class Enumeration:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query
 
         query = agent.forgeCaseStatement(query)
-        kb.data.isDba = unArrayizeValue(inject.getValue(query, charsetType=1))
+        kb.data.isDba = unArrayizeValue(inject.getValue(query, charsetType=CHARSET_TYPE.BINARY))
 
         return kb.data.isDba == "1"
 
@@ -189,7 +190,7 @@ class Enumeration:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
-            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
@@ -329,7 +330,7 @@ class Enumeration:
                         query = rootQuery.blind.count2 % user
                     else:
                         query = rootQuery.blind.count % user
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "unable to retrieve the number of password "
@@ -563,7 +564,7 @@ class Enumeration:
                     query = rootQuery.blind.count2 % user
                 else:
                     query = rootQuery.blind.count % user
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     if Backend.isDbms(DBMS.ORACLE) and not query2:
@@ -740,7 +741,7 @@ class Enumeration:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
-            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of databases"
@@ -903,7 +904,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(db)
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     warnMsg = "unable to retrieve the number of "
@@ -1194,7 +1195,7 @@ class Enumeration:
                     parseSqliteTableSchema(value)
                     return kb.data.cachedColumns
 
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     errMsg = "unable to retrieve the number of columns "
@@ -1313,7 +1314,7 @@ class Enumeration:
         else:
             query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
 
-        count = inject.getValue(query, expected=EXPECTED.INT, charsetType=2)
+        count = inject.getValue(query, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if isNumPosStrValue(count):
             if safeSQLIdentificatorNaming(db) not in kb.data.cachedCounts:
@@ -1662,7 +1663,7 @@ class Enumeration:
                         query = rootQuery.blind.count % tbl
                     else:
                         query = rootQuery.blind.count % (conf.db, tbl)
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     lengths = {}
                     entries = {}
@@ -1934,7 +1935,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                 query += dbQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     warnMsg = "no database"
@@ -2052,7 +2053,7 @@ class Enumeration:
                 query = rootQuery.blind.count
                 query += tblQuery
                 query += whereDbsQuery
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     warnMsg = "no databases have table"
@@ -2096,7 +2097,7 @@ class Enumeration:
                     query = rootQuery.blind.count2
                     query = query % unsafeSQLIdentificatorNaming(db)
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -2244,7 +2245,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                     query += colQuery
                     query += whereDbsQuery
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no databases have tables containing column"
@@ -2294,7 +2295,7 @@ class Enumeration:
                         query = rootQuery.blind.count2
                         query = query % db
                         query += " AND %s" % colQuery
-                        count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=2)
+                        count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
                             warnMsg = "no tables contain column"
