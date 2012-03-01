@@ -523,7 +523,7 @@ def cmdLineParser():
 
         general.add_option("--hex", dest="hexConvert",
                             action="store_true",
-                            help="Uses DBMS hex conversion function(s) for data retrieval")
+                            help="Uses DBMS hex function(s) for data retrieval")
 
         general.add_option("--parse-errors", dest="parseErrors",
                                   action="store_true",
