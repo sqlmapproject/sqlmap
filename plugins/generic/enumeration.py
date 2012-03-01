@@ -897,7 +897,7 @@ class Enumeration:
                     continue
 
                 infoMsg = "fetching number of tables for "
-                infoMsg += "database '%s'" % db
+                infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(db)
                 logger.info(infoMsg)
 
                 if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS):
@@ -908,7 +908,7 @@ class Enumeration:
 
                 if not isNumPosStrValue(count):
                     warnMsg = "unable to retrieve the number of "
-                    warnMsg += "tables for database '%s'" % db
+                    warnMsg += "tables for database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.warn(warnMsg)
                     continue
 
@@ -937,7 +937,7 @@ class Enumeration:
                     kb.data.cachedTables[db] = tables
                 else:
                     warnMsg = "unable to retrieve the table names "
-                    warnMsg += "for database '%s'" % db
+                    warnMsg += "for database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.warn(warnMsg)
 
         if isNoneValue(kb.data.cachedTables):
@@ -1012,7 +1012,7 @@ class Enumeration:
                 tblList = list(tblList)
             else:
                 errMsg = "unable to retrieve the tables "
-                errMsg += "on database '%s'" % conf.db
+                errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise sqlmapNoneDataException, errMsg
 
         for tbl in tblList:
@@ -1077,7 +1077,7 @@ class Enumeration:
                    and conf.db in kb.data.cachedColumns and tbl in \
                    kb.data.cachedColumns[conf.db]:
                     infoMsg = "fetched tables' columns on "
-                    infoMsg += "database '%s'" % conf.db
+                    infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     return {conf.db: kb.data.cachedColumns[conf.db]}
@@ -1099,8 +1099,8 @@ class Enumeration:
                 else:
                     condQuery = ""
 
-                infoMsg += "for table '%s' " % tbl
-                infoMsg += "on database '%s'" % conf.db
+                infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -1168,8 +1168,8 @@ class Enumeration:
                 else:
                     condQuery = ""
 
-                infoMsg += "for table '%s' " % tbl
-                infoMsg += "on database '%s'" % conf.db
+                infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -1199,8 +1199,8 @@ class Enumeration:
 
                 if not isNumPosStrValue(count):
                     errMsg = "unable to retrieve the number of columns "
-                    errMsg += "for table '%s' " % tbl
-                    errMsg += "on database '%s'" % conf.db
+                    errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                    errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.error(errMsg)
 
                     continue
@@ -1264,7 +1264,7 @@ class Enumeration:
 
         if not kb.data.cachedColumns:
             errMsg = "unable to retrieve the columns for any "
-            errMsg += "table on database '%s'" % conf.db
+            errMsg += "table on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.error(errMsg)
 
             if bruteForce is None:
@@ -1339,7 +1339,7 @@ class Enumeration:
         if conf.tbl is not None and conf.db is None:
             warnMsg = "missing database parameter, sqlmap is going to "
             warnMsg += "use the current database to retrieve the "
-            warnMsg += "number of entries for table '%s'" % conf.tbl
+            warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)
             logger.warn(warnMsg)
 
             conf.db = self.getCurrentDb()
@@ -1372,7 +1372,7 @@ class Enumeration:
             count = inject.getValue(query, inband=False, error=False) if blind else inject.getValue(query, blind=False)
 
         if count == "0":
-            infoMsg = "table '%s' appears to be empty" % table
+            infoMsg = "table '%s' appears to be empty" % unsafeSQLIdentificatorNaming(table)
             logger.info(infoMsg)
 
             for column in colList:
@@ -1523,7 +1523,7 @@ class Enumeration:
                     tblList = tblList[0]
             else:
                 errMsg = "unable to retrieve the tables "
-                errMsg += "on database '%s'" % conf.db
+                errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise sqlmapNoneDataException, errMsg
 
         for tbl in tblList:

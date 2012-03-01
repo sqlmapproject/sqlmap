@@ -197,7 +197,7 @@ class Enumeration(GenericEnumeration):
                     tblList = tblList[0]
             else:
                 errMsg = "unable to retrieve the tables "
-                errMsg += "on database '%s'" % conf.db
+                errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise sqlmapNoneDataException, errMsg
 
         for tbl in tblList:
@@ -215,7 +215,7 @@ class Enumeration(GenericEnumeration):
                and conf.db in kb.data.cachedColumns and tbl in \
                kb.data.cachedColumns[conf.db]:
                 infoMsg = "fetched tables' columns on "
-                infoMsg += "database '%s'" % conf.db
+                infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 return { conf.db: kb.data.cachedColumns[conf.db]}
@@ -227,8 +227,8 @@ class Enumeration(GenericEnumeration):
                 continue
 
             infoMsg = "fetching columns "
-            infoMsg += "for table '%s' " % tbl
-            infoMsg += "on database '%s'" % conf.db
+            infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+            infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.info(infoMsg)
 
             for blind in blinds:
