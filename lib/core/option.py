@@ -1502,9 +1502,8 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.chars.delimiter = randomStr(length=6, lowercase=True)
     kb.chars.start = ":%s:" % randomStr(length=3, lowercase=True)
     kb.chars.stop = ":%s:" % randomStr(length=3, lowercase=True)
-    kb.chars.at = ":%s:" % randomStr(length=1, lowercase=True)
-    kb.chars.space = ":%s:" % randomStr(length=1, lowercase=True)
-    kb.chars.dollar = ":%s:" % randomStr(length=1, lowercase=True)
+
+    kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = (":%s:" % _ for _ in randomStr(length=4, lowercase=True))
 
     if flushAll:
         kb.headerPaths = {}
