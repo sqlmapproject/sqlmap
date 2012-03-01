@@ -179,7 +179,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             return not result
 
-        def getChar(idx, charTbl=asciiTbl, continuousOrder=True, expand=charsetType is None, shiftTable=None):
+        def getChar(idx, charTbl=None, continuousOrder=True, expand=charsetType is None, shiftTable=None):
             """
             continuousOrder means that distance between each two neighbour's
             numerical values is exactly 1
@@ -190,6 +190,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if result:
                 return result
 
+            if charTbl is None:
+                charTbl = list(asciiTbl)
+
             originalTbl = list(charTbl)
 
             if continuousOrder and shiftTable is None:
@@ -199,7 +202,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if CHAR_INFERENCE_MARK in payload and ord('\n') in charTbl:
                 charTbl.remove(ord('\n'))
 
-            if len(charTbl) == 1:
+            if not charTbl:
+                return None
+
+            elif len(charTbl) == 1:
                 forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(kb.technique)
