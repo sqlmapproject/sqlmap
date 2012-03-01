@@ -33,6 +33,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
@@ -213,7 +214,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, u
                     countedExpression = countedExpression[:untilOrderChar]
 
                 if not stopLimit:
-                    count = __goInference(payload, countedExpression, 2, firstChar, lastChar)
+                    count = __goInference(payload, countedExpression, CHARSET_TYPE.DIGITS, firstChar, lastChar)
 
                     if isNumPosStrValue(count):
                         count = int(count)

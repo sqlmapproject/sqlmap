@@ -720,8 +720,6 @@ def checkDynamicContent(firstPage, secondPage):
             secondPage, _ = Request.queryPage(content=True)
             findDynamicContent(firstPage, secondPage)
 
-        setDynamicMarkings(kb.dynamicMarkings)
-
 def checkStability():
     """
     This function checks if the URL content is stable requesting the
