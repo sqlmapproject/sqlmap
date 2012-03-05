@@ -571,7 +571,14 @@ def heuristicCheckSqlInjection(place, parameter):
         debugMsg = "heuristic checking skipped "
         debugMsg += "because NULL connection used"
         logger.debug(debugMsg)
-        return
+        return None
+
+    if wasLastRequestDBMSError():
+        debugMsg = "heuristic checking skipped "
+        debugMsg += "because original page content "
+        debugMsg += "contains DBMS error"
+        logger.debug(debugMsg)
+        return None
 
     prefix = ""
     suffix = ""
