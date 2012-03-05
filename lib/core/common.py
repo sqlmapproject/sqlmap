@@ -193,7 +193,7 @@ class Format:
 
         htmlParsed = ""
 
-        if len(kb.htmlFp) == 0:
+        if len(kb.htmlFp) == 0 or kb.heuristicTest is None:
             return None
         elif len(kb.htmlFp) == 1:
             htmlParsed = kb.htmlFp[0]
@@ -405,7 +405,7 @@ class Backend:
            fingerprint phase.
         """
 
-        return kb.htmlFp
+        return kb.htmlFp if kb.heuristicTest is not None else []
 
     @staticmethod
     def getIdentifiedDbms():
