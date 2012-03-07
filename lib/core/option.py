@@ -148,7 +148,12 @@ def __urllib2Opener():
     handlers = [proxyHandler, authHandler, redirectHandler, rangeHandler]
 
     if not conf.dropSetCookie:
-        conf.cj = cookielib.LWPCookieJar()
+        if not conf.loC:
+            conf.cj = cookielib.CookieJar()
+        else:
+            conf.cj = cookielib.MozillaCookieJar()
+            conf.cj.load(conf.loC)
+
         handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
 
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html

@@ -35,7 +35,7 @@ class Google:
 
     def __init__(self, handlers):
         self._matches = []
-        self._cj = cookielib.LWPCookieJar()
+        self._cj = cookielib.CookieJar()
 
         handlers.append(urllib2.HTTPCookieProcessor(self._cj))
 

@@ -26,6 +26,7 @@ optDict = {
                                "data":              "string",
                                "pDel":              "string",
                                "cookie":            "string",
+                               "loC":               "string",
                                "cookieUrlencode":   "boolean",
                                "dropSetCookie":     "boolean",
                                "agent":             "string",

@@ -73,6 +73,9 @@ def cmdLineParser():
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
 
+        request.add_option("--load-cookies", dest="loC",
+                           help="File containing cookies in Netscape/wget format")
+
         request.add_option("--cookie-urlencode", dest="cookieUrlencode",
                              action="store_true",
                              help="URL Encode generated cookie injections")
