@@ -267,3 +267,7 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
+
+    def search(self):
+        warnMsg = "on Sybase search option is not available"
+        logger.warn(warnMsg)

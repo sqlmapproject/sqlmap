@@ -73,3 +73,7 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
+
+    def search(self):
+        warnMsg = "on Microsoft Access search option is not available"
+        logger.warn(warnMsg)

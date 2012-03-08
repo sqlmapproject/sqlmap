@@ -43,3 +43,7 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return []
+
+    def search(self):
+        warnMsg = "on Firebird search option is not available"
+        logger.warn(warnMsg)
