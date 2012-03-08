@@ -54,6 +54,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.convert import base64pickle
+from lib.core.convert import base64unpickle
 from lib.core.convert import htmlunescape
 from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
@@ -3071,7 +3073,7 @@ def serializeObject(object_):
     Serializes given object
     """
 
-    return pickle.dumps(object_)
+    return base64pickle(object_)
 
 def unserializeObject(value):
     """
@@ -3080,7 +3082,7 @@ def unserializeObject(value):
 
     retVal = None
     if value:
-        retVal = pickle.loads(value.encode(UNICODE_ENCODING))  # pickle has problems with Unicode
+        retVal = base64unpickle(value)
     return retVal
 
 def resetCounter(technique):
