@@ -1973,12 +1973,6 @@ class Enumeration:
             errMsg += "back-end DBMS is MySQL < 5.0"
             bruteForce = True
 
-        elif Backend.isDbms(DBMS.ACCESS):
-            errMsg = "cannot retrieve table names, "
-            errMsg += "back-end DBMS is Access"
-            logger.error(errMsg)
-            bruteForce = True
-
         if bruteForce:
             message = "do you want to use common table existence check? [Y/n/q]"
             test = readInput(message, default="Y")
