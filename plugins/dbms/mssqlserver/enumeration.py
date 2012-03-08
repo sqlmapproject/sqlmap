@@ -314,7 +314,7 @@ class Enumeration(GenericEnumeration):
                                 conf.tbl = foundTbl
                                 conf.col = column
 
-                                self.getColumns(onlyColNames=True)
+                                self.getColumns(onlyColNames=True, bruteForce=False)
 
                                 if db in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[db]\
                                   and not isNoneValue(kb.data.cachedColumns[db][foundTbl]):
@@ -371,7 +371,7 @@ class Enumeration(GenericEnumeration):
                             conf.tbl = tbl
                             conf.col = column
 
-                            self.getColumns(onlyColNames=True)
+                            self.getColumns(onlyColNames=True, bruteForce=False)
 
                             if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
                                 dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])

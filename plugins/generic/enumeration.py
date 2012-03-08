@@ -2222,7 +2222,7 @@ class Enumeration:
                         conf.tbl = foundTbl
                         conf.col = column
 
-                        self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
+                        self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
                         if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
                             dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
@@ -2327,7 +2327,7 @@ class Enumeration:
                                 conf.tbl = tbl
                                 conf.col = column
 
-                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam))
+                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
                                 if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
                                     dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
