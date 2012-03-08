@@ -2009,19 +2009,19 @@ class Enumeration:
             if tblConsider == "1":
                 infoMsg += "s like"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
-            logger.info(infoMsg)
 
             if conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
                 whereDbsQuery = "".join(" AND '%s' = %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in _)
-                infoMsg = "for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
-                logger.info(infoMsg)
+                infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
                 whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
-                logger.info(infoMsg)
+                infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                logger.info(infoMsg2)
             else:
                 whereDbsQuery = ""
+
+            logger.info(infoMsg)
 
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % tbl
@@ -2176,21 +2176,21 @@ class Enumeration:
             if colConsider == "1":
                 infoMsg += "s like"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
-            logger.info(infoMsg)
 
             foundCols[column] = {}
 
             if conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
                 whereDbsQuery = "".join(" AND '%s' = %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in _)
-                infoMsg = "for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
-                logger.info(infoMsg)
+                infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
                 whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
-                logger.info(infoMsg)
+                infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                logger.info(infoMsg2)
             else:
                 whereDbsQuery = ""
+
+            logger.info(infoMsg)
 
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)

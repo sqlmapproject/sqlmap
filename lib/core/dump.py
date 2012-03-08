@@ -214,6 +214,8 @@ class Dump:
                     self._write("| %s%s |" % (table, blank))
 
                 self._write("+%s+\n" % lines)
+        elif dbTables is None or len(dbTables) == 0:
+            print "No tables found"
         else:
             self.string("tables", dbTables)
 
