@@ -152,7 +152,12 @@ def __urllib2Opener():
             conf.cj = cookielib.CookieJar()
         else:
             conf.cj = cookielib.MozillaCookieJar()
-            conf.cj.load(conf.loC)
+            try:
+                conf.cj.load(conf.loC)
+            except cookielib.LoadError, msg:
+                errMsg = "there was a problem loading "
+                errMsg += "cookies file ('%s')" % msg
+                raise sqlmapGenericException, errMsg
 
         handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
 
@@ -1888,6 +1893,11 @@ def __basicOptionValidation():
             errMsg += "'%s' to get the full list of " % CODECS_LIST_PAGE
             errMsg += "supported charsets"
             raise sqlmapSyntaxException, errMsg
+
+    if conf.loC:
+        if not os.path.exists(conf.loC):
+            errMsg = "cookies file '%s' does not exist" % conf.loC
+            raise sqlmapFilePathException, errMsg
 
 def __resolveCrossReferences():
     lib.core.threads.readInput = readInput
