@@ -7,6 +7,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import binascii
 import codecs
 import os
 import re
@@ -210,25 +211,31 @@ def __resumeHashDBValues():
     Resume stored data values from HashDB
     """
 
-    kb.absFilePaths = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or kb.absFilePaths
-    kb.chars = hashDBRetrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
-    kb.dynamicMarkings = hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, True) or kb.dynamicMarkings
-    kb.brute.tables = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_TABLES, True) or kb.brute.tables
-    kb.brute.columns = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
-    kb.xpCmdshellAvailable = hashDBRetrieve(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE) or kb.xpCmdshellAvailable
+    try:
+        kb.absFilePaths = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or kb.absFilePaths
+        kb.chars = hashDBRetrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
+        kb.dynamicMarkings = hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, True) or kb.dynamicMarkings
+        kb.brute.tables = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_TABLES, True) or kb.brute.tables
+        kb.brute.columns = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
+        kb.xpCmdshellAvailable = hashDBRetrieve(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE) or kb.xpCmdshellAvailable
 
-    conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
+        conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
 
-    for injection in hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []:
-        if injection.place in conf.paramDict and \
-            injection.parameter in conf.paramDict[injection.place]:
+        for injection in hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []:
+            if injection.place in conf.paramDict and \
+                injection.parameter in conf.paramDict[injection.place]:
 
-            if not conf.tech or intersect(conf.tech, injection.data.keys()):
-                if intersect(conf.tech, injection.data.keys()):
-                    injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
+                if not conf.tech or intersect(conf.tech, injection.data.keys()):
+                    if intersect(conf.tech, injection.data.keys()):
+                        injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
 
-                if injection not in kb.injections:
-                    kb.injections.append(injection)
+                    if injection not in kb.injections:
+                        kb.injections.append(injection)
+    except binascii.Error:
+        errMsg = "revision r4833 invalidated all previous session data. "
+        errMsg += "You are advised either to temporary revert to the previous "
+        errMsg += "revision or (recommended) run with the switch '--flush-session'"
+        raise sqlmapGenericException, errMsg
 
 def __setOutputResume():
     """
