@@ -1093,7 +1093,7 @@ class Enumeration:
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
                     if colConsider == "1":
-                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                        infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     else:
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                 else:
@@ -1162,7 +1162,7 @@ class Enumeration:
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
                     if colConsider == "1":
-                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                        infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     else:
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                 else:
@@ -2199,24 +2199,22 @@ class Enumeration:
                     if foundDb is None or foundTbl is None:
                         continue
 
-                    if foundDb not in dbs:
-                        dbs[foundDb] = {}
+                    conf.db = foundDb
+                    conf.tbl = foundTbl
+                    conf.col = column
 
-                    if foundTbl not in dbs[foundDb]:
-                        dbs[foundDb][foundTbl] = {}
+                    self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
-                    if colConsider == "1":
-                        conf.db = foundDb
-                        conf.tbl = foundTbl
-                        conf.col = column
+                    if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
+                        if foundDb not in dbs:
+                            dbs[foundDb] = {}
 
-                        self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
+                        if foundTbl not in dbs[foundDb]:
+                            dbs[foundDb][foundTbl] = {}
 
-                        if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
-                            dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
-                        kb.data.cachedColumns = {}
-                    else:
-                        dbs[foundDb][foundTbl][column] = None
+                        dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
+
+                    kb.data.cachedColumns = {}
 
                     if foundDb in foundCols[column]:
                         foundCols[column][foundDb].append(foundTbl)
@@ -2263,7 +2261,6 @@ class Enumeration:
                             foundCols[column][db] = []
                 else:
                     for db in conf.db.split(","):
-                        dbs[db] = {}
                         if db not in foundCols[column]:
                             foundCols[column][db] = []
 
@@ -2307,23 +2304,27 @@ class Enumeration:
 
                             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-                            if tbl not in dbs[db]:
-                                dbs[db][tbl] = {}
+                            conf.db = db
+                            conf.tbl = tbl
+                            conf.col = column
 
-                            if colConsider == "1":
-                                conf.db = db
-                                conf.tbl = tbl
-                                conf.col = column
+                            self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
-                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
+                            if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
+                                if db not in dbs:
+                                    dbs[db] = {}
 
-                                if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
-                                    dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
-                                kb.data.cachedColumns = {}
+                                if tbl not in dbs[db]:
+                                    dbs[db][tbl] = {}
+
+                                dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
+
+                            kb.data.cachedColumns = {}
+
+                            if db in foundCols[column]:
+                                foundCols[column][db].append(tbl)
                             else:
-                                dbs[db][tbl][column] = None
-
-                            foundCols[column][db].append(tbl)
+                                foundCols[column][db] = [tbl]
 
         self.dumpFoundColumn(dbs, foundCols, colConsider)
 
