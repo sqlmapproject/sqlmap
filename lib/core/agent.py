@@ -278,25 +278,26 @@ class Agent:
         @rtype: C{str}
         """
 
+        rootQuery = queries[Backend.getIdentifiedDbms()]
+
         if field.startswith("(CASE") or field.startswith("(IIF") or conf.noCast:
             nulledCastedField = field
         else:
-            _ = queries[Backend.getIdentifiedDbms()]
-            nulledCastedField = _.cast.query % field
+            nulledCastedField = rootQuery.cast.query % field
             if Backend.isDbms(DBMS.ACCESS):
-                nulledCastedField = _.isnull.query % (nulledCastedField, nulledCastedField)
+                nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
             else:
-                nulledCastedField = _.isnull.query % nulledCastedField
+                nulledCastedField = rootQuery.isnull.query % nulledCastedField
 
-            if conf.hexConvert:
-                if 'hex' in _:
-                    nulledCastedField = _.hex.query % nulledCastedField
-                else:
-                    warnMsg = "switch '--hex' is currently not supported on DBMS '%s'. " % Backend.getIdentifiedDbms()
-                    warnMsg += "Going to switch it off"
-                    singleTimeWarnMessage(warnMsg)
+        if conf.hexConvert:
+            if 'hex' in rootQuery:
+                nulledCastedField = rootQuery.hex.query % nulledCastedField
+            else:
+                warnMsg = "switch '--hex' is currently not supported on DBMS '%s'. " % Backend.getIdentifiedDbms()
+                warnMsg += "Going to switch it off"
+                singleTimeWarnMessage(warnMsg)
 
-                    conf.hexConvert = False
+                conf.hexConvert = False
 
         return nulledCastedField
 
