@@ -44,6 +44,7 @@ from lib.core.common import paths
 from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
 from lib.core.common import setOptimize
@@ -152,12 +153,7 @@ def __urllib2Opener():
             conf.cj = cookielib.CookieJar()
         else:
             conf.cj = cookielib.MozillaCookieJar()
-            try:
-                conf.cj.load(conf.loC)
-            except cookielib.LoadError, msg:
-                errMsg = "there was a problem loading "
-                errMsg += "cookies file ('%s')" % msg
-                raise sqlmapGenericException, errMsg
+            resetCookieJar(conf.cj)
 
         handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
 

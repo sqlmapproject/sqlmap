@@ -18,6 +18,7 @@ from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
 from lib.core.common import paramToDict
 from lib.core.common import readInput
+from lib.core.common import resetCookieJar
 from lib.core.convert import urldecode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
@@ -409,7 +410,7 @@ def initTargetEnv():
             conf.hashDB.close()
 
         if conf.cj:
-            conf.cj.clear()
+            resetCookieJar(conf.cj)
 
         conf.paramDict = {}
         conf.parameters = {}

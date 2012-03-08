@@ -19,6 +19,7 @@ from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
 from lib.core.common import readInput
+from lib.core.common import resetCookieJar
 from lib.core.common import singleTimeLogMessage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -71,7 +72,7 @@ def forgeHeaders(items=None):
                     headers[HTTPHEADER.COOKIE] += "%s %s=%s" % (DEFAULT_COOKIE_DELIMITER, cookie.name, cookie.value)
 
         if kb.testMode:
-            conf.cj.clear()
+            resetCookieJar(conf.cj)
 
     if kb.redirectSetCookie and not conf.dropSetCookie:
         if HTTPHEADER.COOKIE in headers:

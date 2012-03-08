@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
+import cookielib
 import copy
 import ctypes
 import httplib
@@ -3194,3 +3195,15 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
 
     _ = "%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key)
     return conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None
+
+def resetCookieJar(cookieJar):
+    if not conf.loC:
+        cookieJar.clear()
+    else:
+        try:
+            cookieJar.load(conf.loC)
+            cookieJar.clear_expired_cookies()
+        except cookielib.LoadError, msg:
+            errMsg = "there was a problem loading "
+            errMsg += "cookies file ('%s')" % msg
+            raise sqlmapGenericException, errMsg
