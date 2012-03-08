@@ -29,6 +29,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.common import safeStringFormat
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -445,6 +446,12 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             getCurrentThreadData().disableStdOut = popValue()
 
     kb.safeCharEncode = False
+
+    if not kb.testMode and value is None:
+        warnMsg = "in case of continuous data retrieval problems you are advised to try "
+        warnMsg += "a hidden switch '--no-cast' (fixing problems with some collation "
+        warnMsg += "issues) and/or switch '--hex'"
+        singleTimeWarnMessage(warnMsg)
 
     return extractExpectedValue(value, expected)
 
