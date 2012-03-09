@@ -2149,6 +2149,8 @@ class Enumeration:
         dbs = {}
         whereDbsQuery = ""
         whereTblsQuery = ""
+        infoMsgTbl = ""
+        infoMsgDb = ""
         colList = conf.col.split(",")
         colCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
@@ -2172,20 +2174,20 @@ class Enumeration:
             if conf.tbl:
                 _ = conf.tbl.split(",")
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
-                infoMsg += " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
+                infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
 
             if conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
-                infoMsg += " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+                infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
                 whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
                 infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg2)
             else:
-                infoMsg += " across all databases"
+                infoMsgDb = " across all databases"
 
-            logger.info(infoMsg)
+            logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
@@ -2245,7 +2247,7 @@ class Enumeration:
                     if colConsider == "1":
                         infoMsg += "s like"
                     infoMsg += " '%s'" % column
-                    logger.info(infoMsg)
+                    logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
                     query = rootQuery.blind.count
                     query += colQuery
@@ -2258,7 +2260,7 @@ class Enumeration:
                         if colConsider == "1":
                             warnMsg += "s like"
                         warnMsg += " '%s'" % column
-                        logger.warn(warnMsg)
+                        logger.warn("%s%s" % (warnMsg, infoMsgTbl))
 
                         continue
 
