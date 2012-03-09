@@ -1012,7 +1012,7 @@ class Enumeration:
                 tblList = list(tblList)
             else:
                 errMsg = "unable to retrieve the tables "
-                errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise sqlmapNoneDataException, errMsg
 
         for tbl in tblList:
@@ -1100,7 +1100,7 @@ class Enumeration:
                     condQuery = ""
 
                 infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -1169,7 +1169,7 @@ class Enumeration:
                     condQuery = ""
 
                 infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -1200,7 +1200,7 @@ class Enumeration:
                 if not isNumPosStrValue(count):
                     errMsg = "unable to retrieve the number of columns "
                     errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.error(errMsg)
 
                     continue
@@ -1264,7 +1264,7 @@ class Enumeration:
 
         if not kb.data.cachedColumns:
             errMsg = "unable to retrieve the columns for any "
-            errMsg += "table on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+            errMsg += "table in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.error(errMsg)
 
             if bruteForce is None:
@@ -1523,7 +1523,7 @@ class Enumeration:
                     tblList = tblList[0]
             else:
                 errMsg = "unable to retrieve the tables "
-                errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise sqlmapNoneDataException, errMsg
 
         for tbl in tblList:
@@ -1548,7 +1548,7 @@ class Enumeration:
                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] \
                    or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
                     warnMsg = "unable to enumerate the columns for table "
-                    warnMsg += "'%s' on database" % unsafeSQLIdentificatorNaming(tbl)
+                    warnMsg += "'%s' in database" % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     warnMsg += ", skipping" if len(tblList) > 1 else ""
                     logger.warn(warnMsg)
@@ -1563,7 +1563,7 @@ class Enumeration:
                 if conf.col:
                     infoMsg += " of column(s) '%s'" % colString
                 infoMsg += " for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                infoMsg += " on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 entriesCount = 0
@@ -1650,7 +1650,7 @@ class Enumeration:
                     if conf.col:
                         infoMsg += "column(s) '%s' " % colString
                     infoMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
@@ -1670,7 +1670,7 @@ class Enumeration:
 
                     if count == 0:
                         warnMsg = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                        warnMsg += "on database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
+                        warnMsg += "in database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
                         warnMsg += "appears to be empty"
                         logger.warn(warnMsg)
 
@@ -1683,7 +1683,7 @@ class Enumeration:
                         if conf.col:
                             warnMsg += "column(s) '%s' " % colString
                         warnMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                        warnMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                        warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                         logger.warn(warnMsg)
 
                         continue
@@ -1747,7 +1747,7 @@ class Enumeration:
                     if conf.col:
                         warnMsg += "columns '%s' " % colString
                     warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    warnMsg += "on database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
+                    warnMsg += "in database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
                     logger.warn(warnMsg)
                 else:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
@@ -1990,6 +1990,7 @@ class Enumeration:
         tblList = conf.tbl.split(",")
         tblCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
+        whereDbsQuery = ""
 
         tblConsider, tblCondParam = self.likeOrExact("table")
 
@@ -2012,8 +2013,6 @@ class Enumeration:
                 whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
                 infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg2)
-            else:
-                whereDbsQuery = ""
 
             logger.info(infoMsg)
 
@@ -2148,9 +2147,11 @@ class Enumeration:
         rootQuery = queries[Backend.getIdentifiedDbms()].search_column
         foundCols = {}
         dbs = {}
+        whereDbsQuery = ""
         colList = conf.col.split(",")
         colCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
+        tblCond = rootQuery.inband.condition3
 
         colConsider, colCondParam = self.likeOrExact("column")
 
@@ -2167,16 +2168,19 @@ class Enumeration:
 
             foundCols[column] = {}
 
+            if conf.tbl:
+                _ = conf.tbl.split(",")
+                whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
+                infoMsg += " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
+
             if conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
-                whereDbsQuery = "".join(" AND '%s' = %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in _)
-                infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+                whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
+                infoMsg += " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
-                whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
+                whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
                 infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg2)
-            else:
-                whereDbsQuery = ""
 
             logger.info(infoMsg)
 
@@ -2185,41 +2189,53 @@ class Enumeration:
 
             if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                 if not all((conf.db, conf.tbl)):
+                    # Enumerate tables containing the column provided if
+                    # either of database(s) or table(s) is not provided
                     query = rootQuery.inband.query
                     query += colQuery
                     query += whereDbsQuery
+                    query += whereTblsQuery
                     values = inject.getValue(query, blind=False)
                 else:
-                    values = ((conf.db, conf.tbl),)
+                    # Assume provided databases' tables contain the
+                    # column(s) provided
+                    values = []
+
+                    for db in conf.db.split(","):
+                        for tbl in conf.tbl.split(","):
+                            values.append([db, tbl])
 
                 for foundDb, foundTbl in filterPairValues(values):
                     foundDb = safeSQLIdentificatorNaming(foundDb)
-                    foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
+                    foundTbls = foundTbl.split(",")
 
-                    if foundDb is None or foundTbl is None:
-                        continue
+                    for foundTbl in foundTbls:
+                        foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
 
-                    conf.db = foundDb
-                    conf.tbl = foundTbl
-                    conf.col = column
+                        if foundDb is None or foundTbl is None:
+                            continue
 
-                    self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
+                        conf.db = foundDb
+                        conf.tbl = foundTbl
+                        conf.col = column
 
-                    if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
-                        if foundDb not in dbs:
-                            dbs[foundDb] = {}
+                        self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
-                        if foundTbl not in dbs[foundDb]:
-                            dbs[foundDb][foundTbl] = {}
+                        if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
+                            if foundDb not in dbs:
+                                dbs[foundDb] = {}
 
-                        dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
+                            if foundTbl not in dbs[foundDb]:
+                                dbs[foundDb][foundTbl] = {}
 
-                    kb.data.cachedColumns = {}
+                            dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
 
-                    if foundDb in foundCols[column]:
-                        foundCols[column][foundDb].append(foundTbl)
-                    else:
-                        foundCols[column][foundDb] = [foundTbl]
+                            if foundDb in foundCols[column]:
+                                foundCols[column][foundDb].append(foundTbl)
+                            else:
+                                foundCols[column][foundDb] = [foundTbl]
+
+                        kb.data.cachedColumns = {}
             else:
                 if not conf.db:
                     infoMsg = "fetching number of databases with tables containing column"
@@ -2231,6 +2247,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                     query += colQuery
                     query += whereDbsQuery
+                    query += whereTblsQuery
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
@@ -2248,6 +2265,7 @@ class Enumeration:
                         query = rootQuery.blind.query
                         query += colQuery
                         query += whereDbsQuery
+                        query += whereTblsQuery
                         if Backend.isDbms(DBMS.DB2):
                             query += ") AS foobar"
                         query = agent.limitQuery(index, query)
@@ -2280,6 +2298,7 @@ class Enumeration:
                         query = rootQuery.blind.count2
                         query = query % db
                         query += " AND %s" % colQuery
+                        query += whereTblsQuery
                         count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
@@ -2298,6 +2317,7 @@ class Enumeration:
                             query = rootQuery.blind.query2
                             query = query % db
                             query += " AND %s" % colQuery
+                            query += whereTblsQuery
                             query = agent.limitQuery(index, query)
                             tbl = inject.getValue(query, inband=False, error=False)
                             kb.hintValue = tbl
