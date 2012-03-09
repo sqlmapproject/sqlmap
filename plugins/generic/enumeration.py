@@ -2148,6 +2148,7 @@ class Enumeration:
         foundCols = {}
         dbs = {}
         whereDbsQuery = ""
+        whereTblsQuery = ""
         colList = conf.col.split(",")
         colCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
@@ -2181,6 +2182,8 @@ class Enumeration:
                 whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
                 infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg2)
+            else:
+                infoMsg += " across all databases"
 
             logger.info(infoMsg)
 
