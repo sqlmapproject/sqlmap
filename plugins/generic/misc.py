@@ -60,6 +60,8 @@ class Miscellaneous:
 
         hashDBWrite(HASHDB_KEYS.CONF_TMP_PATH, conf.tmpPath)
 
+        return conf.tmpPath
+
     def getVersionFromBanner(self):
         if "dbmsVersion" in kb.bannerFp:
             return

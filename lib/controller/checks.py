@@ -562,7 +562,7 @@ def checkFalsePositives(injection):
             retVal = None
 
         if retVal is None:
-            warnMsg = "false positive and/or unexploitable injection point detected"
+            warnMsg = "false positive or unexploitable injection point detected"
             logger.warn(warnMsg)
 
         kb.injection = popValue()
