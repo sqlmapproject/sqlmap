@@ -540,26 +540,29 @@ def checkFalsePositives(injection):
         infoMsg += "parameter '%s' is a false positive" % injection.parameter
         logger.info(infoMsg)
 
+        def _():
+            return int(randomInt(2)) + 1
+
         kb.injection = injection
-        randInt1, randInt2 = int(randomInt(2)) + 1, int(randomInt(2)) + 1
+        randInt1, randInt2, randInt3 = (_() for i in xrange(3))
 
         # Just in case (also, they have to be different than 0 because of the last test)
         while randInt1 == randInt2:
-            randInt2 = int(randomInt(2)) + 1
+            randInt2 = _()
 
         # Simple arithmetic operations which should show basic
         # arithmetic ability of the backend if it's really injectable
         if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
             retVal = None
-        elif checkBooleanExpression("%d=%d" % (randInt1, randInt2)):
+        elif checkBooleanExpression("%d>(%d+%d)" % (min(randInt1, randInt2), randInt3, max(randInt1, randInt2))):
             retVal = None
-        if not checkBooleanExpression("%d=(%d+%d)" % (randInt1 + randInt2, randInt1, randInt2)):
+        elif not checkBooleanExpression("%d=(%d+%d)" % (randInt1 + randInt2, randInt1, randInt2)):
             retVal = None
-        elif checkBooleanExpression("%d=%d" % (randInt2, randInt1)):
+        elif checkBooleanExpression("(%d+%d)>%d" % (randInt3, min(randInt1, randInt2), randInt1 + randInt2 + randInt3)):
             retVal = None
 
         if retVal is None:
-            warnMsg = "false positive injection point detected"
+            warnMsg = "false positive and/or unexploitable injection point detected"
             logger.warn(warnMsg)
 
         kb.injection = popValue()
