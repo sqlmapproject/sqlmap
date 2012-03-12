@@ -1743,9 +1743,9 @@ class Enumeration:
                         entriesCount = len(columnEntries)
 
                 if len(kb.data.dumpedTable) == 0 or (entriesCount == 0 and kb.permissionFlag):
-                    warnMsg = "unable to retrieve the entries of "
+                    warnMsg = "unable to retrieve the entries "
                     if conf.col:
-                        warnMsg += "columns '%s' " % colString
+                        warnMsg += "of columns '%s' " % colString
                     warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += "in database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
                     logger.warn(warnMsg)
