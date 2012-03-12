@@ -89,6 +89,7 @@ from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
 from lib.core.settings import FORMATTER
 from lib.core.settings import NULL
+from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import IS_WIN
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
@@ -3187,7 +3188,7 @@ def hashDBWrite(key, value, serialize=False):
     Helper function for writing session data to HashDB
     """
 
-    _ = "%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key)
+    _ = "%s%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key, HASHDB_MILESTONE_VALUE)
     conf.hashDB.write(_, value, serialize)
 
 def hashDBRetrieve(key, unserialize=False, checkConf=False):
@@ -3195,7 +3196,7 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
     Helper function for restoring session data from HashDB
     """
 
-    _ = "%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key)
+    _ = "%s%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key, HASHDB_MILESTONE_VALUE)
     return conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None
 
 def resetCookieJar(cookieJar):
