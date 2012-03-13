@@ -316,6 +316,7 @@ class Connect:
                     redirecting = conn.redcode
                     page = threadData.lastRedirectMsg[1]
                 else:
+                    kb.queryCounter += 1
                     kwargs['url'] = conf.url if kb.redirectChoice == REDIRECTION.ORIGINAL else conn.redurl
                     kwargs['redirecting'] = conn.redcode
                     return Connect.__getPageProxy(**kwargs)
