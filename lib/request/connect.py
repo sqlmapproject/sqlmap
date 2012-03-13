@@ -272,7 +272,9 @@ class Connect:
             requestHeaders += "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items())
 
             if not req.has_header(HTTPHEADER.COOKIE) and conf.cj:
-                requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in conf.cj))
+                conf.cj._policy._now = conf.cj._now = int(time.time())
+                cookies = conf.cj._cookies_for_request(req)
+                requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
 
             if not req.has_header(HTTPHEADER.CONNECTION):
                 requestHeaders += "\n%s: close" % HTTPHEADER.CONNECTION
