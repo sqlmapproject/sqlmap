@@ -663,7 +663,7 @@ class Connect:
 
                 if conf.tor:
                     warnMsg = "it's highly recommended to avoid usage of switch '--tor' for "
-                    warnMsg += "time-based injections because of it's high latency time"
+                    warnMsg += "time-based injections because of its high latency time"
                     singleTimeWarnMessage(warnMsg)
 
                 warnMsg = "time-based comparison needs larger statistical "

@@ -54,7 +54,7 @@ def forgeHeaders(items=None):
                 if ("%s=" % cookie.name) in headers[HTTPHEADER.COOKIE]:
                     if kb.mergeCookies is None:
                         message = "you provided a HTTP %s header value. " % HTTPHEADER.COOKIE
-                        message += "The target url provided it's own cookies within "
+                        message += "The target url provided its own cookies within "
                         message += "the HTTP %s header which intersect with yours. " % HTTPHEADER.SET_COOKIE
                         message += "Do you want to merge them in futher requests? [Y/n] "
                         test = readInput(message, default="Y")

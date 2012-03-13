@@ -160,7 +160,7 @@ def __urllib2Opener():
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
     if conf.keepAlive:
         warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-        warnMsg += "been disabled because of it's incompatibility "
+        warnMsg += "been disabled because of its incompatibility "
 
         if conf.proxy:
             warnMsg += "with HTTP(s) proxy"
@@ -475,7 +475,7 @@ def __setGoogleDorking():
     if conf.keepAlive:
         if conf.proxy:
             warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-            warnMsg += "been disabled because of it's incompatibility "
+            warnMsg += "been disabled because of its incompatibility "
             warnMsg += "with HTTP(s) proxy"
             logger.warn(warnMsg)
         else:

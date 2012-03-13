@@ -1683,7 +1683,7 @@ def readCachedFileContent(filename, mode='rb'):
 
 def readXmlFile(xmlFile):
     """
-    Reads XML file content and returns it's DOM representation
+    Reads XML file content and returns its DOM representation
     """
 
     checkFile(xmlFile)
@@ -2738,7 +2738,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
 def unsafeSQLIdentificatorNaming(name):
     """
-    Extracts identificator's name from it's safe SQL representation
+    Extracts identificator's name from its safe SQL representation
     """
 
     retVal = name
