@@ -446,8 +446,8 @@ DEFAULT_COOKIE_DELIMITER = ';'
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32
 
-# Unique milestone value used for forced deprecation of old HashDB values (e.g. because of changing of load/store mechanism)
-HASHDB_MILESTONE_VALUE = "4SXDcCai5n"  # r4853
+# Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing hash/pickle mechanism)
+HASHDB_MILESTONE_VALUE = "EfjamfhMVw"  # r4856
 
 # Warn user of possible delay due to large page dump in full UNION query injections
 LARGE_OUTPUT_THRESHOLD = 1024**2

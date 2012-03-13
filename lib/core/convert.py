@@ -33,7 +33,7 @@ def base64encode(value):
     return value.encode("base64")[:-1].replace("\n", "")
 
 def base64pickle(value):
-    return base64encode(pickle.dumps(value))
+    return base64encode(pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
 
 def base64unpickle(value):
     return pickle.loads(base64decode(value))
