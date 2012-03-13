@@ -10,19 +10,14 @@ See the file 'doc/COPYING' for copying permission
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
-from lib.core.common import isNoneValue
 from lib.core.common import isTechniqueAvailable
-from lib.core.common import pushValue
 from lib.core.common import readInput
-from lib.core.common import popValue
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
-from lib.core.threads import getCurrentThreadData
 from lib.takeover.udf import UDF
 from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import xp_cmdshell
@@ -113,19 +108,6 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 infoMsg += "operating system command execution"
                 logger.info(infoMsg)
 
-                threadData = getCurrentThreadData()
-                pushValue(threadData.disableStdOut)
-                threadData.disableStdOut = True
-
-                output = self.evalCmd("echo 1")
-                if isNoneValue(output):
-                    errMsg = "it seems that the temporary directory ('%s') used for storing " % self.getRemoteTempPath()
-                    errMsg += "console output at the back-end OS does not have "
-                    errMsg += "writing permissions for the DBMS process. You are advised "
-                    errMsg += "to manually adjust it with option '--tmp-path'"
-                    raise sqlmapGenericException, errMsg
-
-                threadData.disableStdOut = popValue()
             else:
                 errMsg = "feature not yet implemented for the back-end DBMS"
                 raise sqlmapUnsupportedFeatureException, errMsg

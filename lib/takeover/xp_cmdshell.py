@@ -10,6 +10,9 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.common import Backend
 from lib.core.common import getSPLSnippet
 from lib.core.common import hashDBWrite
+from lib.core.common import isNoneValue
+from lib.core.common import pushValue
+from lib.core.common import popValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import wasLastRequestDelayed
@@ -19,6 +22,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request import inject
 
@@ -94,6 +98,22 @@ class xp_cmdshell:
         inject.goStacked(cmd)
 
         return wasLastRequestDelayed()
+
+    def __xpCmdshellTest(self):
+        threadData = getCurrentThreadData()
+        pushValue(threadData.disableStdOut)
+        threadData.disableStdOut = True
+
+        output = self.evalCmd("echo 1")
+        if isNoneValue(output):
+            errMsg = "it seems that the temporary directory ('%s') used for storing " % self.getRemoteTempPath()
+            errMsg += "console output at the back-end OS does not have "
+            errMsg += "writing permissions for the DBMS process. You are advised "
+            errMsg += "to manually adjust it with option '--tmp-path' or you won't "
+            errMsg += "be able to retrieve the console output"
+            logger.error(errMsg)
+
+        threadData.disableStdOut = popValue()
 
     def xpCmdshellForgeCmd(self, cmd):
         self.__randStr = randomStr(lowercase=True)
@@ -199,3 +219,5 @@ class xp_cmdshell:
         # TEXT can't be used here because in error technique you get:
         # "The text, ntext, and image data types cannot be compared or sorted"
         self.createSupportTbl(self.cmdTblName, self.tblField, "NVARCHAR(4000)")
+
+        self.__xpCmdshellTest()

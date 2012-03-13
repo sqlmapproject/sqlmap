@@ -447,7 +447,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
     kb.safeCharEncode = False
 
-    if not kb.testMode and value is None:
+    if not kb.testMode and value is None and Backend.getDbms():
         warnMsg = "in case of continuous data retrieval problems you are advised to try "
         warnMsg += "a hidden switch '--no-cast' (fixing problems with some collation "
         warnMsg += "issues) and/or switch '--hex'"
