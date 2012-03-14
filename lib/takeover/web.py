@@ -136,7 +136,7 @@ class Web:
         logger.info(infoMsg)
 
         default = None
-        choices = ['asp', 'aspx', 'php', 'jsp']
+        choices = ('asp', 'aspx', 'php', 'jsp')
 
         for ext in choices:
             if conf.url.endswith(ext):

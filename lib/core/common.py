@@ -1245,7 +1245,6 @@ def parseUnionPage(output, unique=True):
 
         for entry in output:
             entry = entry.group(1)
-            entry = decodeHexValue(entry) if conf.hexConvert else entry
 
             if unique:
                 key = entry.lower()
@@ -1256,8 +1255,13 @@ def parseUnionPage(output, unique=True):
                 else:
                     continue
 
-            entry = safecharencode(entry) if kb.safeCharEncode else entry
             entry = entry.split(kb.chars.delimiter)
+
+            if conf.hexConvert:
+                entry = applyFunctionRecursively(entry, decodeHexValue)
+
+            if kb.safeCharEncode:
+                entry = applyFunctionRecursively(entry, safecharencode)
 
             data.append(entry[0] if len(entry) == 1 else entry)
     else:
