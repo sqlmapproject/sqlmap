@@ -173,6 +173,7 @@ class Connect:
         requestHeaders = u""
         responseHeaders = None
         logHeaders = u""
+        skipLogTraffic = False
 
         raise404 = raise404 and not kb.ignoreNotFound
 
@@ -317,6 +318,7 @@ class Connect:
                 if kb.redirectChoice == REDIRECTION.IGNORE:
                     redirecting = conn.redcode
                     page = threadData.lastRedirectMsg[1]
+                    skipLogTraffic = True
                 else:
                     kb.queryCounter += 1
                     kwargs['url'] = conf.url if kb.redirectChoice == REDIRECTION.ORIGINAL else conn.redurl
@@ -503,7 +505,8 @@ class Connect:
         if responseHeaders:
             logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
 
-        logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
+        if not skipLogTraffic:
+            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
         if conf.verbose <= 5:
             responseMsg += getUnicode(logHeaders)
