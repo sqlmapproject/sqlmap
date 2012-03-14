@@ -46,7 +46,7 @@ class Miscellaneous:
                     if Backend.getOsVersion() in ("2000", "NT"):
                         conf.tmpPath = "C:/WINNT/Temp"
                     elif Backend.isOs("XP"):
-                        conf.tmpPath = "C:/Documents and Settings/All Users/Application Data"
+                        conf.tmpPath = "C:/Documents and Settings/All Users/Application Data/Temp"
                     else:
                         conf.tmpPath = "C:/Windows/Temp"
             else:
