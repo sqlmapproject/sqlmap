@@ -302,7 +302,9 @@ def unionUse(expression, unpack=True, dump=False):
 
                         if output:
                             if all(map(lambda x: x in output, [kb.chars.start, kb.chars.stop])):
-                                items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.chars.start, kb.chars.stop), output, re.DOTALL | re.IGNORECASE).split(kb.chars.delimiter)
+                                #items = extractRegexResult(r'%s(?P<result>.*?)%s' % (kb.chars.start, kb.chars.stop), output, re.DOTALL | re.IGNORECASE).split(kb.chars.delimiter)
+                                items = parseUnionPage(output)
+                                items = items[0] if isinstance(items, list) and len(items) == 1 else items
                                 kb.locks.value.acquire()
                                 threadData.shared.value.append(items[0] if len(items) == 1 else items)
                                 kb.locks.value.release()
