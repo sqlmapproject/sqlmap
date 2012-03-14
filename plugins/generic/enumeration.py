@@ -55,10 +55,12 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
+from lib.core.settings import BLANK
 from lib.core.settings import CONCAT_ROW_DELIMITER
 from lib.core.settings import CONCAT_VALUE_DELIMITER
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import MAX_INT
+from lib.core.settings import NULL
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.threads import getCurrentThreadData
@@ -1635,7 +1637,7 @@ class Enumeration:
                             else:
                                 colEntry = entry[index] if index < len(entry) else u''
 
-                            colEntryLen = len(getUnicode(colEntry))
+                            colEntryLen = len({" ": NULL, "": BLANK}.get(getUnicode(colEntry), getUnicode(colEntry)))
                             maxLen = max(colLen, colEntryLen)
 
                             if maxLen > kb.data.dumpedTable[column]["length"]:

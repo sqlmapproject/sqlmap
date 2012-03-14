@@ -253,6 +253,9 @@ SQL_STATEMENTS = {
 # string representation for NULL value
 NULL = "NULL"
 
+# string representation for blank ('') value
+BLANK = "<blank>"
+
 # string representation for current database
 CURRENT_DB = "CD"
 

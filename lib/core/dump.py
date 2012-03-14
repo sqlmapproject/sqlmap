@@ -28,6 +28,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
+from lib.core.settings import BLANK
 from lib.core.settings import BUFFERED_LOG_SIZE
 from lib.core.settings import NULL
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
@@ -377,7 +378,7 @@ class Dump:
 
                     for value in tableValues[column]['values']:
                         try:
-                            if not value or re.search("^[\ *]*$", value): #NULL
+                            if not value or value == " ":  # NULL
                                 continue
 
                             int(value)
@@ -390,7 +391,7 @@ class Dump:
 
                         for value in tableValues[column]['values']:
                             try:
-                                if not value or re.search("^[\ *]*$", value): #NULL
+                                if not value or value == " ":  # NULL
                                     continue
 
                                 float(value)
@@ -455,9 +456,7 @@ class Dump:
                         value = u''
                     else:
                         value = getUnicode(info["values"][i])
-
-                        if re.search("^[\ *]*$", value):
-                            value = NULL
+                        value = {" ": NULL, "": BLANK}.get(value, value)
 
                     values.append(value)
                     maxlength = int(info["length"])
