@@ -104,14 +104,19 @@ class xp_cmdshell:
         pushValue(threadData.disableStdOut)
         threadData.disableStdOut = True
 
+        logger.info("testing if xp_cmdshell extended procedure is usable")
         output = self.evalCmd("echo 1")
+
         if isNoneValue(output):
-            errMsg = "it seems that the temporary directory ('%s') used for storing " % self.getRemoteTempPath()
-            errMsg += "console output at the back-end OS does not have "
-            errMsg += "writing permissions for the DBMS process. You are advised "
-            errMsg += "to manually adjust it with option '--tmp-path' or you won't "
-            errMsg += "be able to retrieve the console output"
+            errMsg = "it seems that the temporary directory ('%s') used for " % self.getRemoteTempPath()
+            errMsg += "storing console output within the back-end file system "
+            errMsg += "does not have writing permissions for the DBMS process. "
+            errMsg += "You are advised to manually adjust it with option "
+            errMsg += "--tmp-path switch or you will not be able to retrieve "
+            errMsg += "the commands output"
             logger.error(errMsg)
+        else:
+            logger.info("xp_cmdshell extended procedure is usable")
 
         threadData.disableStdOut = popValue()
 
