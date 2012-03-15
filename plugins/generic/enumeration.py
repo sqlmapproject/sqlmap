@@ -2212,35 +2212,35 @@ class Enumeration:
                         for tbl in conf.tbl.split(","):
                             values.append([db, tbl])
 
-                for foundDb, foundTbl in filterPairValues(values):
-                    foundDb = safeSQLIdentificatorNaming(foundDb)
-                    foundTbls = foundTbl.split(",")
+                for db, tbl in filterPairValues(values):
+                    db = safeSQLIdentificatorNaming(db)
+                    tbls = tbl.split(",")
 
-                    for foundTbl in foundTbls:
-                        foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
+                    for tbl in tbls:
+                        tbl = safeSQLIdentificatorNaming(tbl, True)
 
-                        if foundDb is None or foundTbl is None:
+                        if db is None or tbl is None:
                             continue
 
-                        conf.db = foundDb
-                        conf.tbl = foundTbl
+                        conf.db = db
+                        conf.tbl = tbl
                         conf.col = column
 
                         self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
-                        if foundDb in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[foundDb]:
-                            if foundDb not in dbs:
-                                dbs[foundDb] = {}
+                        if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
+                            if db not in dbs:
+                                dbs[db] = {}
 
-                            if foundTbl not in dbs[foundDb]:
-                                dbs[foundDb][foundTbl] = {}
+                            if tbl not in dbs[db]:
+                                dbs[db][tbl] = {}
 
-                            dbs[foundDb][foundTbl].update(kb.data.cachedColumns[foundDb][foundTbl])
+                            dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])
 
-                            if foundDb in foundCols[column]:
-                                foundCols[column][foundDb].append(foundTbl)
+                            if db in foundCols[column]:
+                                foundCols[column][db].append(tbl)
                             else:
-                                foundCols[column][foundDb] = [foundTbl]
+                                foundCols[column][db] = [tbl]
 
                         kb.data.cachedColumns = {}
             else:
