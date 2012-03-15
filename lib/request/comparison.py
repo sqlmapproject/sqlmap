@@ -35,24 +35,23 @@ def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     seqMatcher = getCurrentThreadData().seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
-    def _(condition):
-        condition = not condition if kb.negativeLogic else condition
-        return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+    def checkNegativeLogic(condition):
+        return not condition if kb.negativeLogic else condition
 
     if any([conf.string, conf.regexp]):
         rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
         # String to match in page when the query is valid
         if conf.string:
-            return _(conf.string in rawResponse)
+            return checkNegativeLogic(conf.string in rawResponse)
 
         # Regular expression to match in page when the query is valid
         if conf.regexp:
-            return _(re.search(conf.regexp, rawResponse, re.I | re.M) is not None)
+            return checkNegativeLogic(re.search(conf.regexp, rawResponse, re.I | re.M) is not None)
 
     # HTTP code to match when the query is valid
     if isinstance(code, int) and conf.code:
-        return _(conf.code == code)
+        return checkNegativeLogic(conf.code == code)
 
     if page:
         # In case of an DBMS error page return None
