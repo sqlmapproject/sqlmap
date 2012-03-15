@@ -392,6 +392,8 @@ class Connect:
 
             logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
 
+            skipLogTraffic = True
+
             if conf.verbose <= 5:
                 responseMsg += getUnicode(logHeaders)
             elif conf.verbose > 5:
