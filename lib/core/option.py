@@ -299,6 +299,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
             if getPostReq and (params or cookie):
                 if conf.forceSSL:
                     scheme = "https"
+                    port = "443"
                 if not port and isinstance(scheme, basestring) and scheme.lower() == "https":
                     port = "443"
                 elif not scheme and port == "443":
