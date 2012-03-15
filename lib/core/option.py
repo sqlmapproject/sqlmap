@@ -1463,6 +1463,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.matchRatio = None
     kb.mergeCookies = None
     kb.multiThreadMode = False
+    kb.negativeLogic = False
     kb.nullConnection = None
     kb.pageTemplate = None
     kb.pageTemplates = dict()

@@ -414,6 +414,9 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
 
+                pushValue(kb.negativeLogic)
+                kb.negativeLogic = "OR NOT" in kb.injection.data[kb.technique].vector
+
                 if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(booleanExpression)
                 else:
@@ -421,6 +424,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
+
+                kb.negativeLogic = popValue()
 
             if time and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)) and not found:
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
