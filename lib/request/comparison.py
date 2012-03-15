@@ -36,7 +36,8 @@ def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     seqMatcher.set_seq1(kb.pageTemplate)
 
     def checkNegativeLogic(condition):
-        return not condition if kb.negativeLogic else condition
+        condition = not condition if kb.negativeLogic else condition
+        return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
 
     if any([conf.string, conf.regexp]):
         rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
