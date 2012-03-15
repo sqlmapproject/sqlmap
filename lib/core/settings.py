@@ -463,3 +463,9 @@ HASH_RECOGNITION_QUIT_THRESHOLD = 10000
 
 # Size of a buffer used for log file output
 BUFFERED_LOG_SIZE = 10000
+
+# Maximum number of redirections to any single URL - this is needed because of the state that cookies introduce
+MAX_SINGLE_URL_REDIRECTIONS = 4
+
+# Maximum total number of redirections (regardless of URL) - before assuming we're in a loop
+MAX_TOTAL_REDIRECTIONS = 10

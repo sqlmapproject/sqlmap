@@ -149,7 +149,6 @@ class Connect:
         ignoreTimeout = kwargs.get('ignoreTimeout', kb.ignoreTimeout)
         refreshing = kwargs.get('refreshing',       False)
         retrying = kwargs.get('retrying',           False)
-        redirecting = kwargs.get('redirecting',     None)
         crawling = kwargs.get('crawling',           False)
 
         if not urlparse.urlsplit(url).netloc:
@@ -299,41 +298,20 @@ class Connect:
             if not kb.proxyAuthHeader and req.has_header(HTTPHEADER.PROXY_AUTHORIZATION):
                 kb.proxyAuthHeader = req.get_header(HTTPHEADER.PROXY_AUTHORIZATION)
 
-            if hasattr(conn, "setcookie"):
-                kb.redirectSetCookie = conn.setcookie
-
-            if hasattr(conn, "redurl") and hasattr(conn, "redcode") and target\
-              and not redirecting and not conf.realTest:
-
-                if kb.redirectChoice is None:
-                    msg = "sqlmap got a %d redirect to " % conn.redcode
-                    msg += "'%s'. What do you want to do? " % conn.redurl
-                    msg += "\n[1] Follow the redirection (default)"
-                    msg += "\n[2] Stay on the original page"
-                    msg += "\n[3] Ignore"
-                    choice = readInput(msg, default="1")
-
-                    kb.redirectChoice = choice
-
-                if kb.redirectChoice == REDIRECTION.IGNORE:
-                    redirecting = conn.redcode
-                    page = threadData.lastRedirectMsg[1]
-                    skipLogTraffic = True
-                else:
-                    kb.queryCounter += 1
-                    kwargs['url'] = conf.url if kb.redirectChoice == REDIRECTION.ORIGINAL else conn.redurl
-                    kwargs['redirecting'] = conn.redcode
-                    return Connect.__getPageProxy(**kwargs)
-
             # Return response object
             if response:
                 return conn, None, None
 
             # Get HTTP response
-            if page is None:
+            if hasattr(conn, 'redurl'):
+                page = threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.IGNORE\
+                  else kb.originalPage if kb.redirectChoice == REDIRECTION.ORIGINAL\
+                  else conn.read()
+                skipLogTraffic = True
+            else:
                 page = conn.read()
 
-            code = redirecting or conn.code
+            code = conn.code
             responseHeaders = conn.info()
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
             page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
@@ -404,9 +382,7 @@ class Connect:
             code = e.code
             threadData.lastHTTPError = (threadData.lastRequestUID, code)
 
-            if code not in kb.httpErrorCodes:
-                kb.httpErrorCodes[code] = 0
-            kb.httpErrorCodes[code] += 1
+            kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
 
             status = getUnicode(e.msg)
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
