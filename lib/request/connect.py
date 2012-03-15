@@ -307,7 +307,7 @@ class Connect:
                 page = threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.IGNORE\
                   else kb.originalPage if kb.redirectChoice == REDIRECTION.ORIGINAL\
                   else conn.read()
-                skipLogTraffic = True
+                skipLogTraffic = kb.redirectChoice != REDIRECTION.FOLLOW
             else:
                 page = conn.read()
 
