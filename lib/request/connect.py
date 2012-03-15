@@ -165,6 +165,7 @@ class Connect:
         # url splitted with space char while urlencoding it in the later phase
         url = url.replace(" ", "%20")
 
+        code = None
         page = None
         requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
         requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
@@ -308,10 +309,11 @@ class Connect:
                   else kb.originalPage if kb.redirectChoice == REDIRECTION.ORIGINAL\
                   else conn.read()
                 skipLogTraffic = kb.redirectChoice != REDIRECTION.FOLLOW
+                code = conn.redcode
             else:
                 page = conn.read()
 
-            code = conn.code
+            code = code or conn.code
             responseHeaders = conn.info()
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
             page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
