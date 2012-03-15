@@ -259,7 +259,9 @@ class Enumeration(GenericEnumeration):
         colCond = rootQuery.inband.condition
         colConsider, colCondParam = self.likeOrExact("column")
 
-        if not len(kb.data.cachedDbs):
+        if conf.db is not None:
+            enumDbs = conf.db.split(",")
+        elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
         else:
             enumDbs = kb.data.cachedDbs
