@@ -1834,7 +1834,7 @@ Formats:
         <vector>; IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]);</vector>
         <request>
             <payload>; SELECT SLEEP([SLEEPTIME]);</payload>
-            <comment>#</comment>
+            <comment>--</comment>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1855,7 +1855,7 @@ Formats:
         <vector>; IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM]);</vector>
         <request>
             <payload>; SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'));</payload>
-            <comment>#</comment>
+            <comment>--</comment>
         </request>
         <response>
             <time>[DELAYED]</time>

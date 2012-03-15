@@ -959,7 +959,7 @@ def cleanQuery(query):
             sqlStatementEsc = sqlStatement.replace("(", "\\(")
             queryMatch = re.search("(%s)" % sqlStatementEsc, query, re.I)
 
-            if queryMatch:
+            if queryMatch and "sys_exec" not in query:
                 upperQuery = upperQuery.replace(queryMatch.group(1), sqlStatement.upper())
 
     return upperQuery
