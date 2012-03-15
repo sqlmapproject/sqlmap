@@ -309,7 +309,7 @@ class Connect:
                   else kb.originalPage if kb.redirectChoice == REDIRECTION.ORIGINAL\
                   else conn.read()
                 skipLogTraffic = kb.redirectChoice != REDIRECTION.FOLLOW
-                code = conn.redcode
+                code = conn.redcode if kb.redirectChoice != REDIRECTION.ORIGINAL else kb.originalCode
             else:
                 page = conn.read()
 
@@ -517,6 +517,7 @@ class Connect:
         page = None
         pageLength = None
         uri = None
+        code = None
 
         if not place:
             place = kb.injection.place or PLACE.GET
@@ -699,6 +700,8 @@ class Connect:
             page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
+
+        kb.originalCode = kb.originalCode or code
 
         if kb.testMode:
             kb.testQueryCount += 1

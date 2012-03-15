@@ -1469,6 +1469,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.pageTemplates = dict()
     kb.previousMethod = None
     kb.orderByColumns = None
+    kb.originalCode = None
     kb.originalPage = None
     kb.originalTimeDelay = None
 
