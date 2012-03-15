@@ -38,7 +38,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         return retVal
 
     def _ask_redirect_choice(self, redcode, redurl):
-        if kb.redirectChoice is None:
+        if kb.redirectChoice is None and kb.originalPage:
             msg = "sqlmap got a %d redirect to " % redcode
             msg += "'%s'. What do you want to do? " % redurl
             msg += "\n[1] Follow the redirection (default)"
@@ -93,7 +93,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
 
-        if kb.redirectChoice == REDIRECTION.FOLLOW:
+        if kb.redirectChoice == REDIRECTION.FOLLOW or kb.originalPage is None:
             req.headers[HTTPHEADER.HOST] = getHostHeader(redurl)
             result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         else:

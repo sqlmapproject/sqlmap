@@ -665,6 +665,9 @@ def checkDynParam(place, parameter, value):
     dynamicity might depend on another parameter.
     """
 
+    if kb.redirectChoice:
+        return None
+
     kb.matchRatio = None
     dynResult = None
     randInt = randomInt()
@@ -745,6 +748,9 @@ def checkStability():
     the same page, the dynamicity might depend on other parameters,
     like for instance string matching (--string).
     """
+
+    if kb.redirectChoice:
+        return None
 
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
