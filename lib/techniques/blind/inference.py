@@ -63,8 +63,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     if retVal:
         if PARTIAL_VALUE_MARKER in retVal:
-            partialValue = retVal.replace(PARTIAL_VALUE_MARKER, "")
-            dataToStdout("[%s] [INFO] resuming partial value: '%s'\r\n" % (time.strftime("%X"), safecharencode(partialValue)))
+            retVal = retVal.replace(PARTIAL_VALUE_MARKER, "")
+            if retVal:
+                partialValue = retVal
+                dataToStdout("[%s] [INFO] resuming partial value: '%s'\r\n" % (time.strftime("%X"), safecharencode(partialValue)))
         else:
             dataToStdout("[%s] [INFO] resumed: %s\r\n" % (time.strftime("%X"), safecharencode(retVal)))
             return 0, retVal
