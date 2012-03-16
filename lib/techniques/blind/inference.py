@@ -517,18 +517,18 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     finally:
         setFormatterPrependFlag(False)
 
+        if finalValue is not None:
+            finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
+            hashDBWrite(expression, finalValue)
+        else:
+            hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
+
     if conf.verbose in (1, 2) or showEta:
         dataToStdout("\n")
 
     if ( conf.verbose in ( 1, 2 ) and showEta ) or conf.verbose >= 3:
         infoMsg = "retrieved: %s" % filterControlChars(finalValue)
         logger.info(infoMsg)
-
-    if finalValue is not None:
-        finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
-        hashDBWrite(expression, finalValue)
-    else:
-        hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
 
     if kb.threadException:
         raise sqlmapThreadException, "something unexpected happened inside the threads"
