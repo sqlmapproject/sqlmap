@@ -147,8 +147,10 @@ def __setRequestParams():
     # Perform checks on header values
     if conf.httpHeaders:
         for httpHeader, headerValue in conf.httpHeaders:
+            # Url encoding of the header values should be avoided
+            # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
+
             if httpHeader == PLACE.UA:
-                # No need for url encoding/decoding the user agent
                 conf.parameters[PLACE.UA] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
@@ -158,7 +160,6 @@ def __setRequestParams():
                     __testableParameters = True
 
             elif httpHeader == PLACE.REFERER:
-                # No need for url encoding/decoding the referer
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
@@ -168,7 +169,6 @@ def __setRequestParams():
                     __testableParameters = True
 
             elif httpHeader == PLACE.HOST:
-                # No need for url encoding/decoding the host
                 conf.parameters[PLACE.HOST] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))

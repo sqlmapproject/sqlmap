@@ -121,9 +121,6 @@ class Agent:
             retValue = paramString.replace("%s=%s" % (parameter, origValue),
                                            "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
 
-        # Debug print
-        #print "retValue:", retValue
-
         return retValue
 
     def fullPayload(self, query):
