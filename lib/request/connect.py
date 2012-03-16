@@ -432,8 +432,6 @@ class Connect:
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
-                processResponse(page, responseHeaders)
-                return page, responseHeaders, code
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError), e:
             tbMsg = traceback.format_exc()
