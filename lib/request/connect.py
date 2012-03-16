@@ -505,6 +505,8 @@ class Connect:
         string match check ('--string' command line parameter)
         """
 
+        kb.negativeLogic = "OR NOT" in (value or "")
+
         if conf.direct:
             return direct(value, content)
 

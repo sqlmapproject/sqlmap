@@ -322,9 +322,6 @@ def checkSqlInjection(place, parameter, value):
                                 boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
                                 cmpPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
 
-                                pushValue(kb.negativeLogic)
-                                kb.negativeLogic = "OR NOT" in cmpPayload
-
                                 return cmpPayload
 
                             # Useful to set kb.matchRatio at first based on
@@ -349,8 +346,6 @@ def checkSqlInjection(place, parameter, value):
                                     logger.info(infoMsg)
 
                                     injectable = True
-
-                            kb.negativeLogic = popValue()
 
                         # In case of error-based SQL injection
                         elif method == PAYLOAD.METHOD.GREP:
