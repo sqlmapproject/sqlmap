@@ -520,7 +520,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if finalValue is not None:
             finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
             hashDBWrite(expression, finalValue)
-        else:
+        elif partialValue:
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
 
     if conf.verbose in (1, 2) or showEta:
