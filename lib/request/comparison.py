@@ -56,7 +56,7 @@ def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
 
     if page:
         # In case of an DBMS error page return None
-        if checkNegativeLogic(kb.errorIsNone and (wasLastRequestDBMSError() or wasLastRequestHTTPError())):
+        if not kb.negativeLogic and kb.errorIsNone and (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
             return None
 
         # Dynamic content lines to be excluded before comparison
