@@ -306,7 +306,7 @@ class Connect:
             # Get HTTP response
             if hasattr(conn, 'redurl'):
                 page = threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.IGNORE\
-                  else kb.originalPage if kb.redirectChoice == REDIRECTION.ORIGINAL\
+                  else kb.pageTemplate if kb.redirectChoice == REDIRECTION.ORIGINAL\
                   else conn.read()
                 skipLogTraffic = kb.redirectChoice != REDIRECTION.FOLLOW
                 code = conn.redcode if kb.redirectChoice != REDIRECTION.ORIGINAL else kb.originalCode
