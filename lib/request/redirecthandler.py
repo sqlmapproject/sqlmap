@@ -40,13 +40,10 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     def _ask_redirect_choice(self, redcode, redurl):
         if kb.redirectChoice is None and kb.originalPage:
             msg = "sqlmap got a %d redirect to " % redcode
-            msg += "'%s'. What do you want to do? " % redurl
-            msg += "\n[1] Follow the redirection (default)"
-            msg += "\n[2] Stay on the original page"
-            msg += "\n[3] Ignore"
-            choice = readInput(msg, default="1")
+            msg += "'%s'. Do you want to follow? [Y/n] " % redurl
+            choice = readInput(msg, default="Y")
 
-            kb.redirectChoice = choice
+            kb.redirectChoice = choice.upper()
 
     def _process_http_redirect(self, result, headers, code, content, msg, redurl):
         content = decodePage(content, headers.get(HTTPHEADER.CONTENT_ENCODING), headers.get(HTTPHEADER.CONTENT_TYPE))
@@ -93,7 +90,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
 
-        if kb.redirectChoice == REDIRECTION.FOLLOW or kb.originalPage is None:
+        if kb.redirectChoice == REDIRECTION.YES or kb.originalPage is None:
             req.headers[HTTPHEADER.HOST] = getHostHeader(redurl)
             result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         else:

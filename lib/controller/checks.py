@@ -720,7 +720,7 @@ def checkDynamicContent(firstPage, secondPage):
 
             if count > conf.retries:
                 warnMsg = "target url is too dynamic. "
-                warnMsg += "switching to '--text-only' "
+                warnMsg += "Switching to '--text-only' "
                 logger.warn(warnMsg)
 
                 conf.textOnly = True
@@ -744,15 +744,15 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    if kb.redirectChoice:
-        return None
-
     infoMsg = "testing if the url is stable, wait a few seconds"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
     time.sleep(1)
     secondPage, _ = Request.queryPage(content=True, raise404=False)
+
+    if kb.redirectChoice:
+        return None
 
     kb.pageStable = (firstPage == secondPage)
 

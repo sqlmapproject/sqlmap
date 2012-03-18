@@ -29,6 +29,7 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
+    print "AA: ", page[:100]
     if page is None and pageLength is None:
         return None
 

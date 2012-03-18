@@ -152,9 +152,8 @@ class HASHDB_KEYS:
     KB_DYNAMIC_MARKINGS = "KB_DYNAMIC_MARKINGS"
 
 class REDIRECTION:
-    FOLLOW = "1"
-    ORIGINAL = "2"
-    IGNORE = "3"
+    YES = "Y"
+    NO = "N"
 
 class PAYLOAD:
     SQLINJECTION = {
