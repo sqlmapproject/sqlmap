@@ -13,6 +13,7 @@ import time
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
+from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
@@ -30,6 +31,7 @@ from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
@@ -306,7 +308,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = parseUnionPage(output)
                                 if isNoneValue(items):
                                     continue
-                                items = items[0] if isinstance(items, list) and len(items) == 1 else items
+                                items = arrayizeValue(unArrayizeValue(items))
                                 kb.locks.value.acquire()
                                 threadData.shared.value.append(items[0] if len(items) == 1 else items)
                                 kb.locks.value.release()
