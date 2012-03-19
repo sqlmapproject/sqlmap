@@ -106,7 +106,7 @@ class Fingerprint(GenericFingerprint):
             if inject.checkBooleanExpression("REVERSE('sqlmap')='pamlqs'"):
                 Backend.setVersion(">= 9.1.0")
             elif inject.checkBooleanExpression("LENGTH(TO_CHAR(1, 'EEEE'))>0"):
-                Backend.setVersionList(">= 9.0.0", "< 9.1.0")
+                Backend.setVersionList([">= 9.0.0", "< 9.1.0"])
             elif inject.checkBooleanExpression("2=(SELECT DIV(6, 3))"):
                 Backend.setVersionList([">= 8.4.0", "< 9.0.0"])
             elif inject.checkBooleanExpression("EXTRACT(ISODOW FROM CURRENT_TIMESTAMP)<8"):
