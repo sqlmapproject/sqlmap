@@ -2680,7 +2680,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
             regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
 
-        if all(part.lower() in content.lower() for part in regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)):  # fast optimization check
+        if all(part.lower() in content.lower() for part in regex.strip('\\b').split(REFLECTED_NON_ALPHA_NUM_REGEX)):  # fast optimization check
             parts = regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)
             if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
                 regex = "%s.+?%s" % (REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:]))
