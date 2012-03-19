@@ -30,14 +30,9 @@ class Syntax(GenericSyntax):
 
                 lastIndex = firstIndex + index
                 old = "'%s'" % expression[firstIndex:lastIndex]
-                unescaped = ""
 
-                for i in xrange(firstIndex, lastIndex):
-                    unescaped += "%s(%d)" % ("CHAR" if ord(expression[i]) < 256 else "NCHAR", ord(expression[i]))
-                    if i < lastIndex - 1:
-                        unescaped += "+"
+                unescaped = "+".join("%s(%d)" % ("CHAR" if ord(expression[i]) < 256 else "NCHAR", ord(expression[i])) for i in xrange(firstIndex, lastIndex))
 
-                #unescaped += ")"
                 expression = expression.replace(old, unescaped)
         else:
             expression = "+".join("CHAR(%d)" % ord(c) for c in expression)
