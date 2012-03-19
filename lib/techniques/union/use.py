@@ -308,15 +308,14 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = parseUnionPage(output)
                                 if isNoneValue(items):
                                     continue
-                                items = arrayizeValue(unArrayizeValue(items))
                                 kb.locks.value.acquire()
-                                threadData.shared.value.append(items[0] if len(items) == 1 else items)
+                                threadData.shared.value.append(unArrayizeValue(items))
                                 kb.locks.value.release()
                             else:
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
                             if conf.verbose == 1:
-                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join(map(lambda x: "\"%s\"" % x, items))))
+                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join(map(lambda x: "\"%s\"" % x, arrayizeValue(items)))))
 
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
