@@ -65,7 +65,7 @@ class Fingerprint(GenericFingerprint):
         """
         References for fingerprint:
 
-        * http://www.postgresql.org/docs/8.4/interactive/release.html (up to 8.4.2)
+        * http://www.postgresql.org/docs/9.1/interactive/release.html (up to 9.1.3)
         """
 
         if not conf.extensiveFp and (Backend.isDbmsWithin(PGSQL_ALIASES) or conf.dbms in PGSQL_ALIASES):
@@ -103,7 +103,9 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            if inject.checkBooleanExpression("LENGTH(TO_CHAR(1, 'EEEE'))>0"):
+            if inject.checkBooleanExpression("REVERSE('sqlmap')='pamlqs'"):
+                Backend.setVersion(">= 9.1.0")
+            elif inject.checkBooleanExpression("LENGTH(TO_CHAR(1, 'EEEE'))>0"):
                 Backend.setVersion(">= 9.0.0")
             elif inject.checkBooleanExpression("2=(SELECT DIV(6, 3))"):
                 Backend.setVersionList([">= 8.4.0", "< 9.0.0"])

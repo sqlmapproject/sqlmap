@@ -50,7 +50,8 @@ class Fingerprint(GenericFingerprint):
                      (50000, 50092),    # MySQL 5.0
                      (50100, 50156),    # MySQL 5.1
                      (50400, 50404),    # MySQL 5.4
-                     (50500, 50511),    # MySQL 5.5
+                     (50500, 50521),    # MySQL 5.5
+                     (50600, 50604),    # MySQL 5.6
                      (60000, 60014),    # MySQL 6.0
                    )
 
