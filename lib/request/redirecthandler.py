@@ -40,8 +40,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     def _ask_redirect_choice(self, redcode, redurl):
         if kb.redirectChoice is None:
             msg = "sqlmap got a %d redirect to " % redcode
-            msg += "'%s'. Do you want to follow? [Y/n] " % redurl
-            choice = readInput(msg, default="Y")
+            msg += "'%s'. Do you want to follow? [y/N] " % redurl
+            choice = readInput(msg, default="N")
 
             kb.redirectChoice = choice.upper()
 
