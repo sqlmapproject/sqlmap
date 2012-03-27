@@ -628,6 +628,9 @@ def cmdLineParser():
         parser.add_option("--test-filter", dest="testFilter",
                            help=SUPPRESS_HELP)
 
+        parser.add_option("--dns-domain", dest="dnsDomain",
+                          help=SUPPRESS_HELP)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(optimization)
