@@ -30,16 +30,8 @@ class Syntax(GenericSyntax):
 
                 lastIndex = firstIndex + index
                 old = "'%s'" % expression[firstIndex:lastIndex]
-                #unescaped = "("
-                unescaped = ""
+                unescaped = "||".join("CHR(%d)" % (ord(expression[i])) for i in xrange(firstIndex, lastIndex))  # Postgres CHR() function already accepts Unicode code point of character(s)
 
-                for i in xrange(firstIndex, lastIndex):
-                    # Postgres CHR() function already accepts Unicode code point of character(s)
-                    unescaped += "CHR(%d)" % (ord(expression[i]))
-                    if i < lastIndex - 1:
-                        unescaped += "||"
-
-                #unescaped += ")"
                 expression = expression.replace(old, unescaped)
         else:
             expression = "||".join("CHR(%d)" % ord(c) for c in expression)
