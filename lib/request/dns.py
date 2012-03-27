@@ -7,6 +7,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import socket
+import threading
+
 class DNSQuery:
     """
     Used for making fake DNS resolution responses based on received
@@ -42,3 +45,24 @@ class DNSQuery:
             retval += "".join(chr(int(_)) for _ in resolution.split('.'))       # 4 bytes of IP
 
         return retval
+
+class DNSServer:
+    def __init__(self):
+        self._requests = []
+
+    def run(self):
+        def _():
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.bind(("", 53))
+
+            try:
+                while True:
+                    data, addr = s.recvfrom(1024)
+                    _ = DNSQuery(data)
+                    s.sendto(_.response("127.0.0.1"), addr)
+                    self._requests.append(_._query)
+            finally:
+                s.close()
+
+        thread = threading.Thread(target=_)
+        thread.start()
