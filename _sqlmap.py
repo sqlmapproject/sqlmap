@@ -128,6 +128,3 @@ def main():
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if hasattr(conf, "threads") and conf.threads > 1:
             os._exit(0)
-
-if __name__ == "__main__":
-    main()
