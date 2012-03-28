@@ -61,7 +61,7 @@ def forgeHeaders(items=None):
                         kb.mergeCookies = not test or test[0] in ("y", "Y")
 
                     if kb.mergeCookies:
-                        _ = lambda x: re.sub("%s=[^%s]+" % (cookie.name, DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, cookie.value), x, re.I)
+                        _ = lambda x: re.sub("(?i)%s=[^%s]+" % (cookie.name, DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, cookie.value), x)
                         headers[HTTPHEADER.COOKIE] = _(headers[HTTPHEADER.COOKIE])
 
                         if PLACE.COOKIE in conf.parameters:

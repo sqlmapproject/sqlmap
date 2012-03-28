@@ -96,7 +96,7 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
         # encoded (when not representing url encoded char)
         # except in cases when tampering scripts are used
         if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
-            value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value, re.DOTALL | re.IGNORECASE)
+            value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value)
 
         while True:
             result = urllib.quote(utf8encode(value), safe)
