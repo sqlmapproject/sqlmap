@@ -161,9 +161,7 @@ class UnicodeRawConfigParser(RawConfigParser):
 class Format:
     @staticmethod
     def humanize(values, chain=" or "):
-        strJoin = "|".join(v for v in values)
-
-        return strJoin.replace("|", chain)
+        return chain.join(values)
 
     # Get methods
     @staticmethod
@@ -179,10 +177,7 @@ class Format:
         if versions is None and Backend.getVersionList():
             versions = Backend.getVersionList()
 
-        if versions is None:
-            return Backend.getDbms()
-        else:
-            return "%s %s" % (Backend.getDbms(), " and ".join(v for v in versions))
+        return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(v for v in versions))
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -195,14 +190,14 @@ class Format:
         @rtype: C{str}
         """
 
-        htmlParsed = ""
+        htmlParsed = None
 
         if len(kb.htmlFp) == 0 or kb.heuristicTest is None:
-            return None
+            pass
         elif len(kb.htmlFp) == 1:
             htmlParsed = kb.htmlFp[0]
         elif len(kb.htmlFp) > 1:
-            htmlParsed = " or ".join(htmlFp for htmlFp in kb.htmlFp)
+            htmlParsed = " or ".join(kb.htmlFp)
 
         return htmlParsed
 
@@ -378,7 +373,6 @@ class Backend:
 
             if isinstance(_, basestring) and _.isdigit() and int(_) in (1, 2):
                 kb.arch = 32 if int(_) == 1 else 64
-
                 break
             else:
                 warnMsg = "invalid value. Valid values are 1 and 2"
@@ -458,7 +452,6 @@ class Backend:
     def getArch():
         if kb.arch is None:
             Backend.setArch()
-
         return kb.arch
 
     # Comparison methods
@@ -773,36 +766,16 @@ def dataToOutFile(data):
 
     return rFilePath
 
-def strToHex(inpStr):
+def strToHex(value):
     """
-    @param inpStr: inpStr to be converted into its hexadecimal value.
-    @type inpStr: C{str}
-
-    @return: the hexadecimal converted inpStr.
-    @rtype: C{str}
+    Converts string value to it's hexadecimal representation
     """
 
-    hexStr = ""
-
-    for character in inpStr:
-        if character == "\n":
-            character = " "
-
-        hexChar = "%2x" % ord(character)
-        hexChar = hexChar.replace(" ", "0")
-        hexChar = hexChar.upper()
-
-        hexStr += hexChar
-
-    return hexStr
+    return (value if not isinstance(value, unicode) else value.encode(UNICODE_ENCODING)).encode("hex").upper()
 
 def readInput(message, default=None, checkBatch=True):
     """
-    @param message: message to display on terminal.
-    @type message: C{str}
-
-    @return: a string read from keyboard as input.
-    @rtype: C{str}
+    Reads input from terminal
     """
 
     if "\n" in message:
@@ -839,36 +812,21 @@ def readInput(message, default=None, checkBatch=True):
 
 def randomRange(start=0, stop=1000):
     """
-    @param start: starting number.
-    @type start: C{int}
-
-    @param stop: last number.
-    @type stop: C{int}
-
-    @return: a random number within the range.
-    @rtype: C{int}
+    Returns random integer value in given range
     """
 
     return int(random.randint(start, stop))
 
 def randomInt(length=4):
     """
-    @param length: length of the random string.
-    @type length: C{int}
-
-    @return: a random string of digits.
-    @rtype: C{str}
+    Returns random integer value with provided number of digits
     """
 
     return int("".join(random.choice(string.digits if i!=0 else string.digits.replace('0', '')) for i in xrange(0, length)))
 
 def randomStr(length=4, lowercase=False, alphabet=None):
     """
-    @param length: length of the random string.
-    @type length: C{int}
-
-    @return: a random string of characters.
-    @rtype: C{str}
+    Returns random string value with provided number of characters
     """
 
     if alphabet:
@@ -882,20 +840,14 @@ def randomStr(length=4, lowercase=False, alphabet=None):
 
 def sanitizeStr(value):
     """
-    @param value: value to sanitize: cast to str datatype and replace
-    newlines with one space and strip carriage returns.
-    @type value: C{str}
-
-    @return: sanitized value
-    @rtype: C{str}
+    Sanitizes string value in respect to newline and line-feed characters
     """
 
     return getUnicode(value).replace("\n", " ").replace("\r", "")
 
 def checkFile(filename):
     """
-    @param filename: filename to check if it exists.
-    @type filename: C{str}
+    Checks for file existence
     """
 
     if not os.path.exists(filename):
@@ -2997,6 +2949,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     forms = None
     retVal = set()
     response = _(content, url)
+
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:

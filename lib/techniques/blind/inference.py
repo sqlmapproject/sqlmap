@@ -419,7 +419,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             # If we have got one single character not correctly fetched it
             # can mean that the connection to the target url was lost
             if None in value:
-                partialValue = "".join(_ for _ in value[:value.index(None)])
+                partialValue = "".join(value[:value.index(None)])
 
                 if partialValue:
                     infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), filterControlChars(partialValue))
