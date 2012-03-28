@@ -329,8 +329,8 @@ EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREA
 # Mark used for replacement of reflected values
 REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
 
-# Regular expression used for marking non-alphanum characters
-REFLECTED_NON_ALPHA_NUM_REGEX = r'[^\r\n]+?'
+# Regular expression used for replacing non-alphanum characters
+REFLECTED_REPLACEMENT_REGEX = r'.+'
 
 # Maximum number of alpha-numerical parts in reflected regex (for speed purposes)
 REFLECTED_MAX_REGEX_PARTS = 10

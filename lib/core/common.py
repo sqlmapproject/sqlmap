@@ -116,7 +116,7 @@ from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
-from lib.core.settings import REFLECTED_NON_ALPHA_NUM_REGEX
+from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import TIME_STDEV_COEFF
@@ -2627,17 +2627,17 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism:
         payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, '')))
 
-        regex = r"\b%s\b" % filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_NON_ALPHA_NUM_REGEX.encode("string-escape"))
+        regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_REPLACEMENT_REGEX.encode("string-escape"))
 
-        while 2 * REFLECTED_NON_ALPHA_NUM_REGEX in regex:
-            regex = regex.replace(2 * REFLECTED_NON_ALPHA_NUM_REGEX, REFLECTED_NON_ALPHA_NUM_REGEX)
+        while 2 * REFLECTED_REPLACEMENT_REGEX in regex:
+            regex = regex.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
 
-        if all(part.lower() in content.lower() for part in regex.strip('\\b').split(REFLECTED_NON_ALPHA_NUM_REGEX)):  # fast optimization check
-            parts = regex.split(REFLECTED_NON_ALPHA_NUM_REGEX)
+        if all(part.lower() in content.lower() for part in regex.split(REFLECTED_REPLACEMENT_REGEX)):  # fast optimization check
+            parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
             if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
-                regex = "%s.+?%s" % (REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_NON_ALPHA_NUM_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:]))
+                regex = "%s.+?%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:]))
 
-            retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content, re.I)
+            retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, content)
 
         if retVal != content:
             kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
