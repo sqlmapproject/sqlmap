@@ -533,7 +533,8 @@ def checkFalsePositives(injection):
     retVal = injection
 
     if len(injection.data) == 1 and any(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED]))\
-      or len(injection.data) == 2 and all(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED])):
+      or len(injection.data) == 2 and all(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED]))\
+      or len(injection.data) == 1 and 'Generic' in injection.data.values()[0].title and not Backend.getDbms():
         pushValue(kb.injection)
 
         infoMsg = "checking if the injection point on %s " % injection.place
