@@ -327,6 +327,7 @@ def checkSqlInjection(place, parameter, value):
                             # Useful to set kb.matchRatio at first based on
                             # the False response content
                             kb.matchRatio = None
+                            kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
                             Request.queryPage(genCmpPayload(), place, raise404=False)
 
                             # Perform the test's True request

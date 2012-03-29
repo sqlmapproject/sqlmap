@@ -615,12 +615,12 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR NOT ([INFERENCE])</vector>
+        <vector>OR ([INFERENCE])</vector>
         <request>
-            <payload>OR NOT ([RANDNUM]=[RANDNUM])</payload>
+            <payload>OR ([RANDNUM]=[RANDNUM])</payload>
         </request>
         <response>
-            <comparison>OR NOT ([RANDNUM]=[RANDNUM1])</comparison>
+            <comparison>OR ([RANDNUM]=[RANDNUM1])</comparison>
         </response>
     </test>
 
@@ -631,13 +631,13 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR NOT ([INFERENCE])</vector>
+        <vector>OR ([INFERENCE])</vector>
         <request>
-            <payload>OR NOT ([RANDNUM]=[RANDNUM])</payload>
+            <payload>OR ([RANDNUM]=[RANDNUM])</payload>
             <comment>#</comment>
         </request>
         <response>
-            <comparison>OR NOT ([RANDNUM]=[RANDNUM1])</comparison>
+            <comparison>OR ([RANDNUM]=[RANDNUM1])</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -651,13 +651,13 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR NOT ([INFERENCE])</vector>
+        <vector>OR ([INFERENCE])</vector>
         <request>
-            <payload>OR NOT ([RANDNUM]=[RANDNUM])</payload>
+            <payload>OR ([RANDNUM]=[RANDNUM])</payload>
             <comment>-- </comment>
         </request>
         <response>
-            <comparison>OR NOT ([RANDNUM]=[RANDNUM1])</comparison>
+            <comparison>OR ([RANDNUM]=[RANDNUM1])</comparison>
         </response>
     </test>
 

@@ -2386,6 +2386,7 @@ def initTechnique(technique=None):
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
             kb.matchRatio = data.matchRatio
+            kb.negativeLogic = (technique == PAYLOAD.TECHNIQUE.BOOLEAN) and (data.where == PAYLOAD.WHERE.NEGATIVE)
 
             # Restoring stored conf options
             for key, value in kb.injection.conf.items():

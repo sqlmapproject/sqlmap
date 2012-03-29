@@ -29,12 +29,19 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
-    #return _checkNegativeLogic(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
-    return _comparison(page, headers, code, getRatioValue, pageLength)
+    return _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
 
-def _checkNegativeLogic(condition, getRatioValue):
-    condition = not (condition or False) if kb.negativeLogic else condition
-    return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+def _adjust(condition, getRatioValue):
+    # Negative logic approach is used in raw page comparison scheme as that what is "different" than original
+    # PAYLOAD.WHERE.NEGATIVE response is considered as True; in switch based approach negative logic is not
+    # applied as that is by the user considered as True is that what is returned by the comparison mechanism
+    # itself
+    if not any([conf.string, conf.regexp, conf.code]):
+        retVal = not (condition or False) if kb.negativeLogic else condition
+    else:
+        retVal = condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+
+    return retVal
 
 def _comparison(page, headers, code, getRatioValue, pageLength):
     if page is None and pageLength is None:
