@@ -29,30 +29,34 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
+    #return _checkNegativeLogic(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
+    return _comparison(page, headers, code, getRatioValue, pageLength)
+
+def _checkNegativeLogic(condition, getRatioValue):
+    condition = not (condition or False) if kb.negativeLogic else condition
+    return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
+
+def _comparison(page, headers, code, getRatioValue, pageLength):
     if page is None and pageLength is None:
         return None
 
     seqMatcher = getCurrentThreadData().seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
-    def checkNegativeLogic(condition):
-        condition = not condition if kb.negativeLogic else condition
-        return condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
-
     if any([conf.string, conf.regexp]):
         rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
         # String to match in page when the query is valid
         if conf.string:
-            return checkNegativeLogic(conf.string in rawResponse)
+            return conf.string in rawResponse
 
         # Regular expression to match in page when the query is valid
         if conf.regexp:
-            return checkNegativeLogic(re.search(conf.regexp, rawResponse, re.I | re.M) is not None)
+            return re.search(conf.regexp, rawResponse, re.I | re.M) is not None
 
     # HTTP code to match when the query is valid
     if isinstance(code, int) and conf.code:
-        return checkNegativeLogic(conf.code == code)
+        return conf.code == code
 
     if page:
         # In case of an DBMS error page return None

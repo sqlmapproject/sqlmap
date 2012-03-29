@@ -329,11 +329,6 @@ def checkSqlInjection(place, parameter, value):
                             kb.matchRatio = None
                             Request.queryPage(genCmpPayload(), place, raise404=False)
 
-                            # If in the comparing stage there was an error
-                            # then anything non-error will be considered as True
-                            if kb.errorIsNone and kb.matchRatio is None:
-                                kb.matchRatio = LOWER_RATIO_BOUND
-
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
 
