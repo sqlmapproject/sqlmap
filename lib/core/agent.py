@@ -208,11 +208,12 @@ class Agent:
 
         randInt = randomInt()
         randInt1 = randomInt()
+        randInt2 = randomInt()
         randStr = randomStr()
         randStr1 = randomStr()
 
         _ = (
-                ("[RANDNUM]", str(randInt)), ("[RANDNUM1]", str(randInt1)), ("[RANDSTR]", randStr),\
+                ("[RANDNUM]", str(randInt)), ("[RANDNUM1]", str(randInt1)), ("[RANDNUM2]", str(randInt2)), ("[RANDSTR]", randStr),\
                 ("[RANDSTR1]", randStr1), ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
                 ("[AT_REPLACE]", kb.chars.at), ("[SPACE_REPLACE]", kb.chars.space), ("[DOLLAR_REPLACE]", kb.chars.dollar),\
                 ("[HASH_REPLACE]", kb.chars.hash_)

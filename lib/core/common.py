@@ -116,6 +116,7 @@ from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.settings import REFLECTED_BORDER_REGEX
 from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
 from lib.core.settings import REFLECTED_VALUE_MARKER
@@ -2625,19 +2626,30 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     retVal = content
 
     if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism:
+        def _(value):
+            while 2 * REFLECTED_REPLACEMENT_REGEX in value:
+                value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
+            return value
+
         payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, '')))
-
-        regex = filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_REPLACEMENT_REGEX.encode("string-escape"))
-
-        while 2 * REFLECTED_REPLACEMENT_REGEX in regex:
-            regex = regex.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
+        regex = _(filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
 
         if all(part.lower() in content.lower() for part in regex.split(REFLECTED_REPLACEMENT_REGEX)):  # fast optimization check
             parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
             if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
-                regex = "%s.+?%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:]))
+                regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
 
-            retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, content)
+            if regex.lstrip(REFLECTED_REPLACEMENT_REGEX) != regex:
+                regex = r"%s%s" % (REFLECTED_BORDER_REGEX, regex.lstrip(REFLECTED_REPLACEMENT_REGEX))
+            else:
+                regex = r"\b%s" % regex
+
+            if regex.rstrip(REFLECTED_REPLACEMENT_REGEX) != regex:
+                regex = r"%s%s" % (regex.rstrip(REFLECTED_REPLACEMENT_REGEX), REFLECTED_BORDER_REGEX)
+            else:
+                regex = r"%s\b" % regex
+
+            retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, content)
 
         if retVal != content:
             kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1

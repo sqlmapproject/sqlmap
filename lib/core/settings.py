@@ -327,22 +327,25 @@ MSSQL_ERROR_CHUNK_LENGTH = 100
 EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", "'%s'" % CHAR_INFERENCE_MARK)
 
 # Mark used for replacement of reflected values
-REFLECTED_VALUE_MARKER = '__REFLECTED_VALUE__'
+REFLECTED_VALUE_MARKER = "__REFLECTED_VALUE__"
+
+# Regular expression used for replacing border non-alphanum characters
+REFLECTED_BORDER_REGEX = r"[^\s]+"
 
 # Regular expression used for replacing non-alphanum characters
-REFLECTED_REPLACEMENT_REGEX = r'.+'
+REFLECTED_REPLACEMENT_REGEX = r".+?"
 
 # Maximum number of alpha-numerical parts in reflected regex (for speed purposes)
 REFLECTED_MAX_REGEX_PARTS = 10
 
 # Chars which can be used as a failsafe values in case of too long URL encoding value
-URLENCODE_FAILSAFE_CHARS = '()|,'
+URLENCODE_FAILSAFE_CHARS = "()|,"
 
 # Maximum length of urlencoded value after which failsafe procedure takes away
 URLENCODE_CHAR_LIMIT = 2000
 
 # Default schema for Microsoft SQL Server DBMS
-DEFAULT_MSSQL_SCHEMA = 'dbo'
+DEFAULT_MSSQL_SCHEMA = "dbo"
 
 # Display hash attack info every mod number of items
 HASH_MOD_ITEM_DISPLAY = 11
@@ -357,10 +360,10 @@ IGNORE_PARAMETERS = ("__VIEWSTATE", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENT
 TURN_OFF_RESUME_INFO_LIMIT = 20
 
 # Strftime format for results file used in multiple target mode
-RESULTS_FILE_FORMAT = 'results-%m%d%Y_%I%M%p.csv'
+RESULTS_FILE_FORMAT = "results-%m%d%Y_%I%M%p.csv"
 
 # Official web page with the list of Python supported codecs
-CODECS_LIST_PAGE = 'http://docs.python.org/library/codecs.html#standard-encodings'
+CODECS_LIST_PAGE = "http://docs.python.org/library/codecs.html#standard-encodings"
 
 # Simple regular expression used to distinguish scalar from multiple-row commands (not sole condition)
 SQL_SCALAR_REGEX = r"\A(SELECT(?!\s+DISTINCT\(?))?\s*\w*\("
@@ -390,13 +393,13 @@ REFLECTIVE_MISS_THRESHOLD = 20
 HTML_TITLE_REGEX = "<title>(?P<result>[^<]+)</title>"
 
 # Table used for Base64 conversion in WordPress hash cracking routine
-ITOA64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+ITOA64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 # Chars used to quickly distinguish if the user provided tainted parameter values
 DUMMY_SQL_INJECTION_CHARS = ";()'"
 
 # Simple check against dummy users
-DUMMY_USER_INJECTION = "(?i)[^\w](AND|OR)\s+[^\s]+[=><]"
+DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]"
 
 # Extensions skipped by crawler
 CRAWL_EXCLUDE_EXTENSIONS = ("gif","jpg","jar","tif","bmp","war","ear","mpg","wmv","mpeg","scm","iso","dmp","dll","cab","so","avi","bin","exe","iso","tar","png","pdf","ps","mp3","zip","rar","gz")
