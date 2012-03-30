@@ -52,36 +52,53 @@ class DNSServer:
     def __init__(self):
         self._requests = []
         self._lock = threading.Lock()
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self._socket.bind(("", 53))
+        self._running = False
+
+    def pop(self):
+        retVal = None
+        with self._lock:
+            if len(self._requests):
+                retVal = self._requests.pop(0)
+        return retVal
 
     def run(self):
         def _():
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.bind(("", 53))
-
             try:
+                self._running = True
                 while True:
-                    data, addr = s.recvfrom(1024)
+                    data, addr = self._socket.recvfrom(1024)
                     _ = DNSQuery(data)
-                    s.sendto(_.response("127.0.0.1"), addr)
-                    self._lock.acquire()
-                    self._requests.append(_._query)
-                    self._lock.release()
+                    self._socket.sendto(_.response("127.0.0.1"), addr)
+                    with self._lock:
+                        self._requests.append(_._query)
+            except KeyboardInterrupt:
+                raise
             finally:
-                s.close()
+                self._running = False
 
         thread = threading.Thread(target=_)
         thread.start()
 
 if __name__ == "__main__":
-    server = DNSServer()
     try:
+        server = DNSServer()
         server.run()
-        while True:
-            server._lock.acquire()
-            for _ in server._requests[:]:
-                print _
-            server._requests = []
-            server._lock.release()
+        while server._running:
+            while True:
+                _ = server.pop()
+                if _ is None:
+                    break
+                else:
+                    print "[i] %s" % _
             time.sleep(1)
+    except socket.error, ex:
+        if 'Permission' in str(ex):
+            print "[x] Please run with sudo/Administrator privileges"
+        else:
+            raise
     except KeyboardInterrupt:
         os._exit(0)
+    finally:
+        server._running = False
