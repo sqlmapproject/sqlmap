@@ -26,20 +26,23 @@ class htmlHandler(ContentHandler):
     def __init__(self, page):
         ContentHandler.__init__(self)
 
-        self.__dbms = None
-        self.__page = page
+        self._dbms = None
+        self._page = page
 
         self.dbms = None
 
+    def _markAsErrorPage(self):
+        threadData = getCurrentThreadData()
+        threadData.lastErrorPage = (threadData.lastRequestUID, self._page)
+
     def startElement(self, name, attrs):
         if name == "dbms":
-            self.__dbms = attrs.get("value")
+            self._dbms = attrs.get("value")
 
         elif name == "error":
-            if re.search(attrs.get("regexp"), self.__page, re.I):
-                self.dbms = self.__dbms
-                threadData = getCurrentThreadData()
-                threadData.lastErrorPage = (threadData.lastRequestUID, self.__page)
+            if re.search(attrs.get("regexp"), self._page, re.I):
+                self.dbms = self._dbms
+                self._markAsErrorPage()
 
 def htmlParser(page):
     """
@@ -58,5 +61,9 @@ def htmlParser(page):
         kb.htmlFp.append(handler.dbms)
     else:
         kb.lastParserStatus = None
+
+    # generic SQL warning/error messages
+    if re.search(r"SQL (warning|error|syntax)", page, re.I):
+        handler._markAsErrorPage()
 
     return handler.dbms

@@ -29,7 +29,8 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
-    return _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
+    _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
+    return _
 
 def _adjust(condition, getRatioValue):
     if not any([conf.string, conf.regexp, conf.code]):
@@ -37,7 +38,7 @@ def _adjust(condition, getRatioValue):
         # PAYLOAD.WHERE.NEGATIVE response is considered as True; in switch based approach negative logic is not
         # applied as that what is by user considered as True is that what is returned by the comparison mechanism
         # itself
-        retVal = not (condition or False) if kb.negativeLogic else condition
+        retVal = not condition if kb.negativeLogic and condition is not None else condition
     else:
         retVal = condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
 
@@ -67,7 +68,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
 
     if page:
         # In case of an DBMS error page return None
-        if not kb.negativeLogic and kb.errorIsNone and (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
+        if kb.errorIsNone and (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
             return None
 
         # Dynamic content lines to be excluded before comparison
