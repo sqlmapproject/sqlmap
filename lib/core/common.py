@@ -2655,8 +2655,8 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         if retVal != content:
             kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
             if not suppressWarning:
-                debugMsg = "reflective value found and filtered out"
-                logger.debug(debugMsg)
+                warnMsg = "reflective value(s) found and filtering out"
+                singleTimeWarnMessage(warnMsg)
 
         elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
             kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
