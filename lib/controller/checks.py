@@ -285,7 +285,7 @@ def checkSqlInjection(place, parameter, value):
                         # Use different page template than the original
                         # one as we are changing parameters value, which
                         # will likely result in a different content
-                        if not conf.logicNegative:
+                        if not conf.logicalNegate:
                             origValue = "-%s" % randomInt()
                         else:
                             origValue = "%s AND %s=%s" % (origValue, randomInt(), randomInt())

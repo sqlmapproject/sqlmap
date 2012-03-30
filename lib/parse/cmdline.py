@@ -196,12 +196,16 @@ def cmdLineParser():
         injection.add_option("--suffix", dest="suffix",
                              help="Injection payload suffix string")
 
-        injection.add_option("--logic-negative", dest="logicNegative",
+        injection.add_option("--logical-negate", dest="logicalNegate",
                              action="store_true",
-                             help="Use logic operation(s) instead of negating values")
+                             help="Use logic operation(s) for negating values")
+
+        injection.add_option("--no-cast", dest="noCast",
+                             action="store_true",
+                             help="Turn off payload casting mechanism")
 
         injection.add_option("--skip", dest="skip",
-                           help="Skip testing for given parameter(s)")
+                             help="Skip testing for given parameter(s)")
 
         injection.add_option("--tamper", dest="tamper",
                              help="Use given script(s) for tampering injection data")
@@ -620,9 +624,6 @@ def cmdLineParser():
                           help=SUPPRESS_HELP)
 
         parser.add_option("--group-concat", dest="groupConcat", action="store_true",
-                           help=SUPPRESS_HELP)
-
-        parser.add_option("--no-cast", dest="noCast", action="store_true",
                            help=SUPPRESS_HELP)
 
         parser.add_option("--test-filter", dest="testFilter",

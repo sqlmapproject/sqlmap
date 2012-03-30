@@ -87,7 +87,7 @@ class Agent:
             if where == PAYLOAD.WHERE.ORIGINAL:
                 value = origValue
             elif where == PAYLOAD.WHERE.NEGATIVE:
-                if not conf.logicNegative:
+                if not conf.logicalNegate:
                     if newValue.startswith("-"):
                         value = ""
                     else:
