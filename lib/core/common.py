@@ -2077,18 +2077,16 @@ def runningAsAdmin():
     Returns True if the current process is run under admin privileges
     """
 
-    isAdmin = False
+    isAdmin = None
 
     if PLATFORM in ("posix", "mac"):
-        isAdmin = os.geteuid()
+        _ = os.geteuid()
 
-        if isinstance(isAdmin, (int, float, long)) and isAdmin == 0:
-            isAdmin = True
+        isAdmin = isinstance(_, (int, float, long)) and _ == 0
     elif IS_WIN:
-        isAdmin = ctypes.windll.shell32.IsUserAnAdmin()
+        _ = ctypes.windll.shell32.IsUserAnAdmin()
 
-        if isinstance(isAdmin, (int, float, long)) and isAdmin == 1:
-            isAdmin = True
+        isAdmin = isinstance(_, (int, float, long)) and _ == 1
     else:
         errMsg = "sqlmap is not able to check if you are running it "
         errMsg += "as an administrator account on this platform. "
