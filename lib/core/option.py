@@ -77,6 +77,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
+from lib.request.dns import DNSServer
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
@@ -581,7 +582,7 @@ def __setMetasploit():
     if conf.osSmb:
         isAdmin = runningAsAdmin()
 
-        if isAdmin is not True:
+        if not isAdmin:
             errMsg = "you need to run sqlmap as an administrator "
             errMsg += "if you want to perform a SMB relay attack because "
             errMsg += "it will need to listen on a user-specified SMB "
@@ -1380,6 +1381,7 @@ def __setConfAttributes():
     conf.cj = None
     conf.dbmsConnector = None
     conf.dbmsHandler = None
+    conf.dnsServer = None
     conf.dumpPath = None
     conf.hashDB = None
     conf.hashDBFile = None
@@ -1711,6 +1713,25 @@ def __setTrafficOutputFP():
 
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
+def __setDNSServer():
+    if not conf.dnsDomain:
+        return
+
+    infoMsg = "making DNS server instance"
+    logger.info(infoMsg)
+
+    isAdmin = runningAsAdmin()
+
+    if isAdmin:
+        conf.dnsServer = DNSServer()
+        conf.dnsServer.run()
+    else:
+        errMsg = "you need to run sqlmap as an administrator "
+        errMsg += "if you want to perform a DNS data exfiltration attack "
+        errMsg += "as it will need to listen on privileged TCP port 53 "
+        errMsg += "for incoming address resolution attempts"
+        raise sqlmapMissingPrivileges, errMsg
+
 def __setTorProxySettings():
     if not conf.tor:
         return
@@ -1919,6 +1940,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __checkDependencies()
     __basicOptionValidation()
     __setTorProxySettings()
+    __setDNSServer()
     __adjustLoggingFormatter()
     __setMultipleTargets()
     __setTamperingFunctions()

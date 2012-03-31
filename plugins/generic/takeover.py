@@ -119,7 +119,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         if tunnel == 2:
             isAdmin = runningAsAdmin()
 
-            if isAdmin is not True:
+            if not isAdmin:
                 errMsg = "you need to run sqlmap as an administrator "
                 errMsg += "if you want to establish an out-of-band ICMP "
                 errMsg += "tunnel because icmpsh uses raw sockets to "
