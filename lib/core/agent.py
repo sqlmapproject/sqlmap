@@ -200,7 +200,7 @@ class Agent:
         elif any([kb.injection.suffix, suffix]):
             expression += " %s" % (kb.injection.suffix or suffix)
 
-        return expression
+        return re.sub(r"(?s);\W*;", ";", expression)
 
     def cleanupPayload(self, payload, origValue=None):
         if payload is None:

