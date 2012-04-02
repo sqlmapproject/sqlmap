@@ -1608,7 +1608,7 @@ def getSPLSnippet(dbms, name, **variables):
     checkFile(filename)
     retVal = readCachedFileContent(filename)
 
-    retVal = re.sub(r"#.+", "", retVal)
+    retVal = re.sub(r"#.+", "", retVal).strip()
 
     for _ in variables.keys():
         retVal = re.sub(r"%%%s%%" % _, variables[_], retVal)

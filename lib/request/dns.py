@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import re
 import socket
 import threading
 import time
@@ -61,6 +62,16 @@ class DNSServer:
         with self._lock:
             if len(self._requests):
                 retVal = self._requests.pop(0)
+        return retVal
+
+    def pop(self, prefix, suffix):
+        retVal = None
+        with self._lock:
+            for _ in self._requests:
+                if re.search("%s\..+\.%s" % (prefix, suffix), _, re.I):
+                    retVal = _
+                    self._requests.remove(_)
+                    break
         return retVal
 
     def run(self):

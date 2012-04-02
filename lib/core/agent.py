@@ -244,7 +244,27 @@ class Agent:
         return payload
 
     def getComment(self, request):
+        """
+        Returns comment form for the given request
+        """
+
         return request.comment if "comment" in request else ""
+
+    def hexConvertField(self, field):
+        """
+        Returns hex converted field string
+        """
+
+        rootQuery = queries[Backend.getIdentifiedDbms()]
+        hexField = field
+
+        if 'hex' in rootQuery:
+            hexField = rootQuery.hex.query % field
+        else:
+            warnMsg = "switch '--hex' is currently not supported on DBMS '%s'. " % Backend.getIdentifiedDbms()
+            singleTimeWarnMessage(warnMsg)
+
+        return hexField
 
     def nullAndCastField(self, field):
         """
@@ -288,14 +308,7 @@ class Agent:
                 nulledCastedField = rootQuery.isnull.query % nulledCastedField
 
         if conf.hexConvert:
-            if 'hex' in rootQuery:
-                nulledCastedField = rootQuery.hex.query % nulledCastedField
-            else:
-                warnMsg = "switch '--hex' is currently not supported on DBMS '%s'. " % Backend.getIdentifiedDbms()
-                warnMsg += "Going to switch it off"
-                singleTimeWarnMessage(warnMsg)
-
-                conf.hexConvert = False
+            nulledCastedField = hexConvertField(nulledCastedField)
 
         return nulledCastedField
 
