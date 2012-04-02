@@ -48,7 +48,7 @@ def dnsUse(payload, expression):
 
     if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE):
         output = hashDBRetrieve(expression, checkConf=True)
-        if PARTIAL_VALUE_MARKER in output:
+        if output and PARTIAL_VALUE_MARKER in output:
             output = None
 
         if output is None:
@@ -86,7 +86,8 @@ def dnsUse(payload, expression):
         if output is not None:
             retVal = output
             dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
-            hashDBWrite(expression, output)
+            if count > 0:
+                hashDBWrite(expression, output)
 
         if not kb.bruteMode:
             debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
