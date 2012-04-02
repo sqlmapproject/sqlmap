@@ -261,7 +261,7 @@ class Agent:
         if 'hex' in rootQuery:
             hexField = rootQuery.hex.query % field
         else:
-            warnMsg = "switch '--hex' is currently not supported on DBMS '%s'" % Backend.getIdentifiedDbms()
+            warnMsg = "switch '--hex' is currently not supported on DBMS %s" % Backend.getIdentifiedDbms()
             singleTimeWarnMessage(warnMsg)
 
         return hexField

@@ -472,3 +472,6 @@ MAX_SINGLE_URL_REDIRECTIONS = 4
 
 # Maximum total number of redirections (regardless of URL) - before assuming we're in a loop
 MAX_TOTAL_REDIRECTIONS = 10
+
+# Reference: http://www.tcpipguide.com/free/t_DNSLabelsNamesandSyntaxRules.htm
+MAX_DNS_LABEL = 63

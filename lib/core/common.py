@@ -1613,7 +1613,7 @@ def getSPLSnippet(dbms, name, **variables):
     for _ in variables.keys():
         retVal = re.sub(r"%%%s%%" % _, variables[_], retVal)
 
-    _ = re.search(r"%([^%]+)%", retVal, re.I)
+    _ = re.search(r"%(\w+)%", retVal, re.I)
     if _:
         errMsg = "unresolved variable '%s' in SPL snippet '%s'" % (_.group(1), name)
         raise sqlmapGenericException, errMsg

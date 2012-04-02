@@ -48,29 +48,36 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
-from lib.techniques.union.use import unionUse
 from lib.techniques.blind.inference import bisection
+from lib.techniques.dns.use import dnsUse
 from lib.techniques.error.use import errorUse
+from lib.techniques.union.use import unionUse
 from lib.utils.resume import queryOutputLength
 from lib.utils.resume import resume
 
 def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None, dump=False):
     start = time.time()
+    value = None
+    count = 0
 
-    timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
+    if conf.dnsDomain:
+        value = dnsUse(payload, expression)
 
-    if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
-        _, length, _ = queryOutputLength(expression, payload)
-    else:
-        length = None
+    if value is None:
+        timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
-    kb.inferenceMode = True
-    count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)
-    kb.inferenceMode = False
+        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
+            _, length, _ = queryOutputLength(expression, payload)
+        else:
+            length = None
 
-    if not kb.bruteMode:
-        debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
-        logger.debug(debugMsg)
+        kb.inferenceMode = True
+        count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)
+        kb.inferenceMode = False
+
+        if not kb.bruteMode:
+            debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
+            logger.debug(debugMsg)
 
     return value
 
