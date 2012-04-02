@@ -3092,6 +3092,8 @@ def decodeHexValue(value):
     Returns value decoded from DBMS specific hexadecimal representation
     """
 
+    retVal = value
+
     def _(value):
         if value and isinstance(value, basestring) and len(value) % 2 == 0:
             if value.lower().startswith("0x"):
@@ -3109,7 +3111,12 @@ def decodeHexValue(value):
                     pass
         return value
 
-    return applyFunctionRecursively(value, _)
+    try:
+        retVal = applyFunctionRecursively(value, _)
+    except Exception:
+        singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
+
+    return retVal
 
 def extractExpectedValue(value, expected):
     """

@@ -12,6 +12,7 @@ import sqlite3
 import threading
 import time
 
+from lib.core.common import getUnicode
 from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
@@ -74,7 +75,7 @@ class HashDB(object):
         if key:
             hash_ = HashDB.hashKey(key)
             self._cache_lock.acquire()
-            self._write_cache[hash_] = value if not serialize else serializeObject(value)
+            self._write_cache[hash_] = getUnicode(value) if not serialize else serializeObject(value)
             self._cache_lock.release()
 
         if getCurrentThreadName() in ('0', 'MainThread'):
