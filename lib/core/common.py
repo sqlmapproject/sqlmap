@@ -1599,9 +1599,9 @@ def parseXmlFile(xmlFile, handler):
     parse(stream, handler)
     stream.close()
 
-def getSPLSnippet(dbms, name, **variables):
+def getSPQLSnippet(dbms, name, **variables):
     """
-    Returns content of SPL snippet located inside "procs" directory
+    Returns content of SP(Q)L snippet located inside "procs" directory
     """
 
     filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], "%s.txt" % name)

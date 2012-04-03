@@ -1438,6 +1438,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]
     kb.dep = None
     kb.dnsMode = False
+    kb.dnsTest = None
     kb.docRoot = None
     kb.dumpMode = False
     kb.dynamicMarkings = []

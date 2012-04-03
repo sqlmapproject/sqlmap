@@ -90,6 +90,7 @@ class DNSServer:
                 self._running = False
 
         thread = threading.Thread(target=_)
+        thread.daemon = True
         thread.start()
 
 if __name__ == "__main__":

