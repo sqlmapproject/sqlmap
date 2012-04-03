@@ -451,12 +451,12 @@ Formats:
 
     <!-- Pre-WHERE generic boundaries (e.g. "UPDATE table SET '$_REQUEST["name"]' WHERE id=1" or "INSERT INTO table VALUES('$_REQUEST["value"]') WHERE id=1)"-->
     <boundary>
-        <level>4</level>
+        <level>5</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>1</ptype>
-        <prefix>) WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix></suffix>
+        <ptype>2</ptype>
+        <prefix>') WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- AND ('[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -464,8 +464,17 @@ Formats:
         <clause>1</clause>
         <where>1,2</where>
         <ptype>2</ptype>
-        <prefix>') WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix></suffix>
+        <prefix>") WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- AND ("[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>) WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- AND ([RANDNUM1]=[RANDNUM1]</suffix>
     </boundary>
 
     <boundary>
@@ -474,7 +483,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix></suffix>
+        <suffix>-- AND '[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -483,7 +492,16 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>" WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix></suffix>
+        <suffix>-- AND "[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix> WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- AND [RANDNUM1]=[RANDNUM1]</suffix>
     </boundary>
     <!-- End of pre-WHERE generic boundaries -->
 
@@ -493,8 +511,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix> || (SELECT [RANDNUM1] FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>) ||</suffix>
+        <prefix>||(SELECT [RANDNUM1] FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)||</suffix>
     </boundary>
 
     <boundary>
@@ -502,8 +520,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix>|| (SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>) ||</suffix>
+        <prefix>||(SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)||</suffix>
     </boundary>
 
     <boundary>
@@ -511,8 +529,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix>' || (SELECT [RANDNUM1] FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>) || '</suffix>
+        <prefix>'||(SELECT [RANDNUM1] FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)||'</suffix>
     </boundary>
 
     <boundary>
@@ -520,8 +538,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix>' || (SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>) || '</suffix>
+        <prefix>'||(SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)||'</suffix>
     </boundary>
 
     <boundary>
@@ -529,7 +547,7 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>1</ptype>
-        <prefix> + (SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <prefix>+(SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
         <suffix>)</suffix>
     </boundary>
 
@@ -538,8 +556,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix>' + (SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>) + '</suffix>
+        <prefix>'+(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)+'</suffix>
     </boundary>
     <!-- End of INSERT/UPDATE generic boundaries -->
 
