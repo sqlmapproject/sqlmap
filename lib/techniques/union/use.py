@@ -32,7 +32,6 @@ from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeWarnMessage
-from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.convert import htmlunescape
 from lib.core.data import conf

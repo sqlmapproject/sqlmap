@@ -460,7 +460,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             if showEta:
                                 etaProgressUpdate(time.time() - charStart, len(commonValue))
                             elif conf.verbose in (1, 2):
-                                dataToStdout(commonValue[index-1:])
+                                dataToStdout(filterControlChars(commonValue[index-1:]))
 
                             finalValue = commonValue
 
@@ -508,7 +508,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if showEta:
                     etaProgressUpdate(time.time() - charStart, index)
                 elif conf.verbose in (1, 2):
-                    dataToStdout(val)
+                    dataToStdout(filterControlChars(val))
 
                 if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
                     finalValue = partialValue
