@@ -57,18 +57,11 @@ class DNSServer:
         self._socket.bind(("", 53))
         self._running = False
 
-    def pop(self):
-        retVal = None
-        with self._lock:
-            if len(self._requests):
-                retVal = self._requests.pop(0)
-        return retVal
-
-    def pop(self, prefix, suffix):
+    def pop(self, prefix=None, suffix=None):
         retVal = None
         with self._lock:
             for _ in self._requests:
-                if re.search("%s\..+\.%s" % (prefix, suffix), _, re.I):
+                if prefix is None and suffix is None or re.search("%s\..+\.%s" % (prefix, suffix), _, re.I):
                     retVal = _
                     self._requests.remove(_)
                     break
