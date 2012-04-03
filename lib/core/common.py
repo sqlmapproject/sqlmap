@@ -2427,6 +2427,18 @@ def unArrayizeValue(value):
 
     return value
 
+def flattenValue(value):
+    """
+    Returns an iterator representing flat representation of a given value
+    """
+
+    for i in iter(value):
+        if isinstance(i, (list, tuple)):
+            for j in flattenValue(i):
+                yield j
+        else:
+            yield i
+
 def getSortedInjectionTests():
     """
     Returns prioritized test list by eventually detected DBMS from error

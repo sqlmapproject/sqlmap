@@ -19,6 +19,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
+from lib.core.common import flattenValue
 from lib.core.common import getConsoleWidth
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
@@ -316,7 +317,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
                             if conf.verbose == 1:
-                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in arrayizeValue(unArrayizeValue(items)))))
+                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items)))))
 
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
