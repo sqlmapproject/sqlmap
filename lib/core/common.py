@@ -1821,22 +1821,6 @@ def goGoodSamaritan(prevValue, originalCharset):
     else:
         return None, None, None, originalCharset
 
-def getCompiledRegex(regex, flags=0):
-    """
-    Returns compiled regular expression and stores it in cache for further
-    usage (deprecated as newer versions of Python do this automatically)
-
-    >>> getCompiledRegex('test') # doctest: +ELLIPSIS
-    <_sre.SRE_Pattern object at...
-    """
-
-    if (regex, flags) in kb.cache.regex:
-        retVal = kb.cache.regex[(regex, flags)]
-    else:
-        retVal = re.compile(regex, flags)
-        kb.cache.regex[(regex, flags)] = retVal
-    return retVal
-
 def getPartRun():
     """
     Goes through call stack and finds constructs matching conf.dbmsHandler.*.
@@ -1852,8 +1836,8 @@ def getPartRun():
         # Goes backwards through the stack to find the conf.dbmsHandler method
         # calling this function
         for i in xrange(0, len(stack) - 1):
-            for regex in (getCompiledRegex('self\.(get[^(]+)\(\)'), getCompiledRegex('conf\.dbmsHandler\.([^(]+)\(\)')):
-                match = regex.search(stack[i])
+            for regex in (r"self\.(get[^(]+)\(\)", r"conf\.dbmsHandler\.([^(]+)\(\)"):
+                match = re.search(regex, stack[i])
 
                 if match:
                     # This is the calling conf.dbmsHandler or self method
@@ -2158,7 +2142,7 @@ def extractRegexResult(regex, content, flags=0):
     retVal = None
 
     if regex and content and '?P<result>' in regex:
-        match = getCompiledRegex(regex, flags).search(content)
+        match = re.search(regex, content, flags)
 
         if match:
             retVal = match.group("result")
@@ -2257,11 +2241,11 @@ def removeDynamicContent(page):
             if prefix is None and suffix is None:
                 continue
             elif prefix is None:
-                page = getCompiledRegex('(?s)^.+%s' % suffix).sub(suffix, page)
+                page = re.sub(r'(?s)^.+%s' % suffix, suffix, page)
             elif suffix is None:
-                page = getCompiledRegex('(?s)%s.+$' % prefix).sub(prefix, page)
+                page = re.sub(r'(?s)%s.+$' % prefix, prefix, page)
             else:
-                page = getCompiledRegex('(?s)%s.+%s' % (prefix, suffix)).sub('%s%s' % (prefix, suffix), page)
+                page = re.sub(r'(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), page)
 
     return page
 
@@ -2327,7 +2311,7 @@ def parseSqliteTableSchema(value):
         table = {}
         columns = {}
 
-        for match in re.finditer(getCompiledRegex(r"(\w+)\s+(TEXT|NUMERIC|INTEGER|REAL|NONE)"), value):
+        for match in re.finditer(r"(\w+)\s+(TEXT|NUMERIC|INTEGER|REAL|NONE)", value):
             columns[match.group(1)] = match.group(2)
 
         table[conf.tbl] = columns
@@ -2473,7 +2457,7 @@ def filterListValue(value, regex):
     """
 
     if isinstance(value, list) and regex:
-        retVal = filter(lambda x: getCompiledRegex(regex, re.I).search(x), value)
+        retVal = filter(lambda _: re.search(regex, _, re.I), value)
     else:
         retVal = value
 

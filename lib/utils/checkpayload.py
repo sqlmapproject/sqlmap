@@ -9,7 +9,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import getCompiledRegex
 from lib.core.common import readXmlFile
 from lib.core.convert import urldecode
 from lib.core.data import paths
@@ -51,9 +50,7 @@ def checkPayload(payload):
 
     if payload:
         for rule, desc in rules:
-            regObj = getCompiledRegex(rule)
-
-            if regObj.search(payload):
+            if re.search(rule, payload):
                 detected = True
                 logger.warn("highly probable IDS/IPS detection: '%s: %s'" % (desc, payload))
 

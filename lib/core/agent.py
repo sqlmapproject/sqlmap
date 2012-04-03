@@ -12,7 +12,6 @@ import re
 from xml.etree import ElementTree as ET
 
 from lib.core.common import Backend
-from lib.core.common import getCompiledRegex
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
@@ -379,14 +378,14 @@ class Agent:
         """
 
         prefixRegex = "(?:\s+(?:FIRST|SKIP)\s+\d+)*"
-        fieldsSelectTop = getCompiledRegex("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", re.I).search(query)
-        fieldsSelectDistinct = getCompiledRegex("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, re.I).search(query)
-        fieldsSelectCase = getCompiledRegex("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, re.I).search(query)
-        fieldsSelectFrom = getCompiledRegex("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, re.I).search(query)
-        fieldsExists = getCompiledRegex("EXISTS(.*)", re.I).search(query)
-        fieldsSelect = getCompiledRegex("\ASELECT%s\s+(.*)" % prefixRegex, re.I).search(query)
-        fieldsSubstr = getCompiledRegex("\A(SUBSTR|MID\()", re.I).search(query)
-        fieldsMinMaxstr = getCompiledRegex("(?:MIN|MAX)\(([^\(\)]+)\)", re.I).search(query)
+        fieldsSelectTop = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
+        fieldsSelectDistinct = re.search("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
+        fieldsSelectCase = re.search("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
+        fieldsSelectFrom = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
+        fieldsExists = re.search("EXISTS(.*)", query, re.I)
+        fieldsSelect = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
+        fieldsSubstr = re.search("\A(SUBSTR|MID\()", query, re.I)
+        fieldsMinMaxstr = re.search("(?:MIN|MAX)\(([^\(\)]+)\)", query, re.I)
         fieldsNoSelect = query
 
         if fieldsSubstr:
@@ -799,8 +798,7 @@ class Agent:
         retVal = None
 
         if inpStr:
-            regObj = getCompiledRegex("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
-            match = regObj.search(inpStr)
+            match = re.search("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), inpStr)
 
             if match:
                 retVal = match.group("result")
@@ -814,8 +812,7 @@ class Agent:
         retVal = inpStr
 
         if inpStr:
-            regObj = getCompiledRegex("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER))
-            retVal = regObj.sub("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr)
+            retVal = re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), "%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr)
 
         return retVal
 

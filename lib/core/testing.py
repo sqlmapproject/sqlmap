@@ -19,7 +19,6 @@ from lib.controller.controller import start
 from lib.core.common import beep
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import getCompiledRegex
 from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import logger
@@ -231,7 +230,7 @@ def runCase(switches=None, log=None, session=None):
 def replaceVars(item, vars_):
     retVal = item
     if item and vars_:
-        for var in re.findall(getCompiledRegex("\$\{([^}]+)\}"), item):
+        for var in re.findall("\$\{([^}]+)\}", item):
             if var in vars_:
                 retVal = retVal.replace("${%s}" % var, vars_[var])
     return retVal

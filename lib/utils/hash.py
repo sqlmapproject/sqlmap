@@ -23,6 +23,7 @@ except (ImportError, OSError):
 else:
     _multiprocessing = multiprocessing
 
+import re
 import time
 
 from hashlib import md5
@@ -35,7 +36,6 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import getCompiledRegex
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import hashDBRetrieve
@@ -404,7 +404,7 @@ def hashRecognition(value):
             elif regex == HASH.CRYPT_GENERIC:
                 if any((value.lower() == value, value.upper() == value)):
                     continue
-            elif getCompiledRegex(regex).match(value):
+            elif re.match(regex, value):
                 retVal = regex
                 break
 
@@ -574,7 +574,7 @@ def dictionaryAttack(attack_dict):
 
                 hash_ = hash_.split()[0]
 
-                if getCompiledRegex(hash_regex).match(hash_):
+                if re.match(hash_regex, hash_):
                     item = None
 
                     if hash_regex not in (HASH.CRYPT_GENERIC, HASH.WORDPRESS):

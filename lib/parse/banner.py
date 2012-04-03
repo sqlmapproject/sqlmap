@@ -7,10 +7,11 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
+
 from xml.sax.handler import ContentHandler
 
 from lib.core.common import checkFile
-from lib.core.common import getCompiledRegex
 from lib.core.common import Backend
 from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
@@ -64,8 +65,7 @@ class MSSQLBannerHandler(ContentHandler):
     def endElement(self, name):
         if name == "signature":
             for version in (self._version, self._versionAlt):
-                regObj = getCompiledRegex(" %s[\.\ ]+" % version)
-                if version and regObj.search(self._banner):
+                if version and re.search(r" %s[\.\ ]+" % version, self._banner):
                     self._feedInfo("dbmsRelease", self._release)
                     self._feedInfo("dbmsVersion", self._version)
                     self._feedInfo("dbmsServicePack", self._servicePack)
@@ -79,8 +79,7 @@ class MSSQLBannerHandler(ContentHandler):
             self._inVersion = False
             self._version = self._version.replace(" ", "")
 
-            regObj = getCompiledRegex(r"\A(?P<major>\d+)\.00\.(?P<build>\d+)\Z")
-            match = regObj.search(self._version)
+            match = re.search(r"\A(?P<major>\d+)\.00\.(?P<build>\d+)\Z", self._version)
             self._versionAlt = "%s.0.%s.0" % (match.group('major'), match.group('build')) if match else None
 
         elif name == "servicepack":

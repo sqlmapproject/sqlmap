@@ -14,7 +14,6 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToSessionFile
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
-from lib.core.common import getCompiledRegex
 from lib.core.common import safeStringFormat
 from lib.core.common import randomStr
 from lib.core.common import replaceNewlineTabs
@@ -133,7 +132,7 @@ def resume(expression, payload):
             return None
 
         substringQuery = queries[Backend.getIdentifiedDbms()].substring.query
-        select = getCompiledRegex("\ASELECT ", re.I).search(expression)
+        select = re.search("\ASELECT ", expression, re.I)
 
         _, length, regExpr = queryOutputLength(expression, payload)
 

@@ -7,7 +7,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import getCompiledRegex
+import re
+
 from lib.core.common import Backend
 from lib.core.common import hashDBWrite
 from lib.core.common import isTechniqueAvailable
@@ -52,7 +53,7 @@ class Miscellaneous:
             else:
                 conf.tmpPath = "/tmp"
 
-        if getCompiledRegex("(?i)\A[\w]:[\/\\\\]+").search(conf.tmpPath):
+        if re.search(r"\A[\w]:[\/\\]+", conf.tmpPath, re.I):
             Backend.setOs(OS.WINDOWS)
 
         conf.tmpPath = normalizePath(conf.tmpPath)
