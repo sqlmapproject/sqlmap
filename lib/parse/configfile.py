@@ -12,6 +12,7 @@ import codecs
 from ConfigParser import MissingSectionHeaderError
 
 from lib.core.common import checkFile
+from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
 from lib.core.data import logger
@@ -87,15 +88,9 @@ def configFileParser(configFile):
 
     for family, optionData in optDict.items():
         for option, datatype in optionData.items():
-            boolean = False
-            integer = False
+            datatype = unArrayizeValue(datatype)
 
-            if isinstance(datatype, (list, tuple, set)):
-                datatype = datatype[0]
-
-            if datatype == "boolean":
-                boolean = True
-            elif datatype == "integer":
-                integer = True
+            boolean = datatype == "boolean"
+            integer = datatype == "integer"
 
             configFileProxy(family, option, boolean, integer)
