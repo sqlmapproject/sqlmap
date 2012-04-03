@@ -1369,11 +1369,14 @@ class Enumeration:
         validColumnList = False
         validPivotValue = False
 
-        if not count:
+        if count is None:
             query = dumpNode.count % table
-            count = inject.getValue(query, inband=False, error=False) if blind else inject.getValue(query, blind=False)
+            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False, expected=EXPECTED.INT)
 
-        if count == "0":
+        if isinstance(count, basestring) and count.isdigit():
+            count = int(count)
+
+        if count == 0:
             infoMsg = "table '%s' appears to be empty" % unsafeSQLIdentificatorNaming(table)
             logger.info(infoMsg)
 
@@ -1400,9 +1403,9 @@ class Enumeration:
             query = dumpNode.count2 % (column, table)
 
             if blind:
-                value = inject.getValue(query, inband=False, error=False)
+                value = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
             else:
-                value = inject.getValue(query, blind=False)
+                value = inject.getValue(query, blind=False, expected=EXPECTED.INT)
 
             if isNumPosStrValue(value):
                 validColumnList = True
@@ -1424,14 +1427,14 @@ class Enumeration:
 
         if not validPivotValue:
             warnMsg = "no proper pivot column provided (with unique values)."
-            warnMsg += " It's not possible to retrieve all rows."
+            warnMsg += " It won't be possible to retrieve all rows"
             logger.warn(warnMsg)
 
         pivotValue = " "
         breakRetrieval = False
 
         try:
-            for i in xrange(int(count)):
+            for i in xrange(count):
                 if breakRetrieval:
                     break
 

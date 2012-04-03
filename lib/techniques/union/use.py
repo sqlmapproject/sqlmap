@@ -309,13 +309,14 @@ def unionUse(expression, unpack=True, dump=False):
                                 if isNoneValue(items):
                                     continue
                                 kb.locks.value.acquire()
-                                threadData.shared.value.append(unArrayizeValue(items))
+                                for item in items:
+                                    threadData.shared.value.append(item)
                                 kb.locks.value.release()
                             else:
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
                             if conf.verbose == 1:
-                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join(map(lambda x: "\"%s\"" % x, arrayizeValue(items)))))
+                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in unArrayizeValue(items))))
 
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]

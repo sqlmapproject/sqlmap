@@ -121,12 +121,12 @@ class Enumeration(GenericEnumeration):
 
                 for query in (rootQuery.blind.count, rootQuery.blind.count2, rootQuery.blind.count3):
                     _ = query.replace("%s", db)
-                    count = inject.getValue(_, inband=False, error=False, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(_, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
                     if not isNoneValue(count):
                         break
 
                 if not isNumPosStrValue(count):
-                    if count != "0":
+                    if count != 0:
                         warnMsg = "unable to retrieve the number of "
                         warnMsg += "tables for database '%s'" % db
                         logger.warn(warnMsg)
