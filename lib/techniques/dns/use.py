@@ -10,6 +10,7 @@ See the file 'doc/COPYING' for copying permission
 import re
 import time
 
+from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
@@ -109,4 +110,4 @@ def dnsUse(payload, expression):
         warnMsg += "is currently not available for DBMS %s" % Backend.getIdentifiedDbms()
         singleTimeWarnMessage(warnMsg)
 
-    return retVal
+    return safecharencode(retVal) if kb.safeCharEncode else retVal
