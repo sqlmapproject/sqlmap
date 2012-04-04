@@ -14,15 +14,12 @@ from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
-from lib.core.common import cleanQuery
 from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
 from lib.core.common import getSPQLSnippet
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
-from lib.core.common import pushValue
-from lib.core.common import popValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safecharencode
@@ -33,7 +30,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
 from lib.core.settings import MAX_DNS_LABEL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
