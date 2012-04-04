@@ -502,6 +502,8 @@ class Connect:
         string match check ('--string' command line parameter)
         """
 
+        value = value.replace("[SLEEPTIME]", str(conf.timeSec)) if value else value
+
         if conf.direct:
             return direct(value, content)
 
@@ -518,9 +520,6 @@ class Connect:
 
         if not place:
             place = kb.injection.place or PLACE.GET
-
-        if timeBasedCompare:
-            value = value.replace("[SLEEPTIME]", str(conf.timeSec))
 
         raise404 = place != PLACE.URI if raise404 is None else raise404
 
