@@ -49,6 +49,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.techniques.blind.inference import bisection
+from lib.techniques.dns.test import dnsTest
 from lib.techniques.dns.use import dnsUse
 from lib.techniques.error.use import errorUse
 from lib.techniques.union.use import unionUse
@@ -85,19 +86,7 @@ def __goDns(payload, expression):
 
     if conf.dnsDomain and kb.dnsTest is not False:
         if kb.dnsTest is None:
-            logger.info("testing for data retrieval through DNS channel")
-
-            randInt = randomInt()
-            kb.dnsTest = dnsUse(payload, "SELECT %d%s" % (randInt, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""))) == str(randInt)
-
-            if not kb.dnsTest:
-                errMsg = "data retrieval through DNS channel failed. Turning off DNS exfiltration support"
-                logger.error(errMsg)
-
-                conf.dnsDomain = None
-            else:
-                infoMsg = "data retrieval through DNS channel was successful"
-                logger.info(infoMsg)
+            dnsTest(payload)
 
         if kb.dnsTest:
             value = dnsUse(payload, expression)

