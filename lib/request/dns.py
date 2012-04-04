@@ -28,9 +28,11 @@ class DNSQuery:
         self._query = ""
 
         type_ = (ord(raw[2]) >> 3) & 15                 # Opcode bits
+
         if type_ == 0:                                  # Standard query
             i = 12
             j = ord(raw[i])
+
             while j != 0:
                 self._query += raw[i+1:i+j+1] + '.'
                 i = i + j + 1
@@ -59,26 +61,32 @@ class DNSServer:
 
     def pop(self, prefix=None, suffix=None):
         retVal = None
+
         with self._lock:
             for _ in self._requests:
                 if prefix is None and suffix is None or re.search("%s\..+\.%s" % (prefix, suffix), _, re.I):
                     retVal = _
                     self._requests.remove(_)
                     break
+
         return retVal
 
     def run(self):
         def _():
             try:
                 self._running = True
+
                 while True:
                     data, addr = self._socket.recvfrom(1024)
                     _ = DNSQuery(data)
                     self._socket.sendto(_.response("127.0.0.1"), addr)
+
                     with self._lock:
                         self._requests.append(_._query)
+
             except KeyboardInterrupt:
                 raise
+
             finally:
                 self._running = False
 

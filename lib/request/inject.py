@@ -91,12 +91,12 @@ def __goDns(payload, expression):
             kb.dnsTest = dnsUse(payload, "SELECT %d%s" % (randInt, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""))) == str(randInt)
 
             if not kb.dnsTest:
-                errMsg = "test for data retrieval through DNS channel failed. Turning off DNS exfiltration support"
+                errMsg = "data retrieval through DNS channel failed. Turning off DNS exfiltration support"
                 logger.error(errMsg)
 
                 conf.dnsDomain = None
             else:
-                infoMsg = "test for data retrieval through DNS channel was successful"
+                infoMsg = "data retrieval through DNS channel was successful"
                 logger.info(infoMsg)
 
         if kb.dnsTest:
