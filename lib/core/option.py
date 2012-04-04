@@ -1792,7 +1792,7 @@ def __checkTor():
 
     page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
     if not page or 'Congratulations' not in page:
-        errMsg = "it seems that Tor is not properly set"
+        errMsg = "it seems that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
         raise sqlmapConnectionException, errMsg
     else:
         infoMsg = "Tor is properly being used"
