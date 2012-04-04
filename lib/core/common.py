@@ -1107,18 +1107,6 @@ def parseTargetUrl():
     conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
-    if not conf.referer and (conf.level >= 3 or intersect(REFERER_ALIASES, conf.testParameter, True)):
-        debugMsg = "setting the HTTP Referer header to the target url"
-        logger.debug(debugMsg)
-        conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.REFERER, conf.httpHeaders)
-        conf.httpHeaders.append((HTTPHEADER.REFERER, conf.url))
-
-    if not conf.host and (conf.level >= 5 or intersect(HOST_ALIASES, conf.testParameter, True)):
-        debugMsg = "setting the HTTP Host header to the target url"
-        logger.debug(debugMsg)
-        conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.HOST, conf.httpHeaders)
-        conf.httpHeaders.append((HTTPHEADER.HOST, getHostHeader(conf.url)))
-
 def expandAsteriskForColumns(expression):
     """
     If the user provided an asterisk rather than the column(s)
