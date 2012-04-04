@@ -24,7 +24,6 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import EXPECTED
 from lib.core.unescaper import unescaper
 from lib.techniques.blind.inference import bisection
 
@@ -71,7 +70,7 @@ def queryOutputLength(expression, payload):
 
     start = time.time()
     lengthExprUnescaped = unescaper.unescape(lengthExpr)
-    count, length = bisection(payload, lengthExprUnescaped, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+    count, length = bisection(payload, lengthExprUnescaped, charsetType=CHARSET_TYPE.DIGITS)
 
     debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
     logger.debug(debugMsg)
