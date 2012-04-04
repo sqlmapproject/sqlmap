@@ -95,6 +95,7 @@ class DNSServer:
         thread.start()
 
 if __name__ == "__main__":
+    server = None
     try:
         server = DNSServer()
         server.run()
@@ -118,4 +119,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         os._exit(0)
     finally:
-        server._running = False
+        if server:
+            server._running = False
+

