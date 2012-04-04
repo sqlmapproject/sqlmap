@@ -502,8 +502,6 @@ class Connect:
         string match check ('--string' command line parameter)
         """
 
-        value = value.replace("[SLEEPTIME]", str(conf.timeSec)) if value else value
-
         if conf.direct:
             return direct(value, content)
 
@@ -523,6 +521,7 @@ class Connect:
 
         raise404 = place != PLACE.URI if raise404 is None else raise404
 
+        value = value.replace("[SLEEPTIME]", str(conf.timeSec)) if value else value
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
 
