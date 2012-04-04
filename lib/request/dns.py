@@ -90,14 +90,18 @@ if __name__ == "__main__":
     try:
         server = DNSServer()
         server.run()
+
         while server._running:
             while True:
                 _ = server.pop()
+
                 if _ is None:
                     break
                 else:
                     print "[i] %s" % _
+
             time.sleep(1)
+
     except socket.error, ex:
         if 'Permission' in str(ex):
             print "[x] Please run with sudo/Administrator privileges"

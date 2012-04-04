@@ -194,12 +194,12 @@ REFERER_ALIASES = ( "ref", "referer", "referrer" )
 HOST_ALIASES = ( "host", )
 
 FROM_DUMMY_TABLE = {
-                        DBMS.ORACLE: " FROM DUAL",
-                        DBMS.ACCESS: " FROM MSysAccessObjects",
-                        DBMS.FIREBIRD: " FROM RDB$DATABASE",
-                        DBMS.MAXDB: " FROM VERSIONS",
-                        DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"
-                      }
+                     DBMS.ORACLE: " FROM DUAL",
+                     DBMS.ACCESS: " FROM MSysAccessObjects",
+                     DBMS.FIREBIRD: " FROM RDB$DATABASE",
+                     DBMS.MAXDB: " FROM VERSIONS",
+                     DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"
+                   }
 
 SQL_STATEMENTS = {
                        "SQL SELECT statement":  (

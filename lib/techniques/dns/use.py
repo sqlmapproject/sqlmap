@@ -53,6 +53,7 @@ def dnsUse(payload, expression):
 
     if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE):
         output = hashDBRetrieve(expression, checkConf=True)
+
         if output and PARTIAL_VALUE_MARKER in output or kb.dnsTest is None:
             output = None
 
@@ -79,14 +80,17 @@ def dnsUse(payload, expression):
                     forgedPayload = agent.payload(newValue=query)
                 else:
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, randomInt(1), randomInt(3)))
+
                 Request.queryPage(forgedPayload, content=False, noteResponseTime=False, raise404=False)
 
                 _ = conf.dnsServer.pop(prefix, suffix)
+
                 if _:
                     _ = extractRegexResult("%s\.(?P<result>.+)\.%s" % (prefix, suffix), _, re.I)
                     _ = decodeHexValue(_)
                     output = (output or "") + _
                     offset += len(_)
+
                     if len(_) < chunk_length:
                         break
                 else:
@@ -96,8 +100,10 @@ def dnsUse(payload, expression):
 
         if output is not None:
             retVal = output
+
             if kb.dnsTest is not None:
                 dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
+
                 if count > 0:
                     hashDBWrite(expression, output)
 

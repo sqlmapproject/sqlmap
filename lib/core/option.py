@@ -77,7 +77,6 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
-from lib.request.dns import DNSServer
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
@@ -116,6 +115,7 @@ from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
 from lib.request.connect import Connect as Request
+from lib.request.dns import DNSServer
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
@@ -1719,7 +1719,7 @@ def __setDNSServer():
     if not conf.dnsDomain:
         return
 
-    infoMsg = "making DNS server instance"
+    infoMsg = "setting up DNS server instance"
     logger.info(infoMsg)
 
     isAdmin = runningAsAdmin()
@@ -1730,7 +1730,7 @@ def __setDNSServer():
     else:
         errMsg = "you need to run sqlmap as an administrator "
         errMsg += "if you want to perform a DNS data exfiltration attack "
-        errMsg += "as it will need to listen on privileged TCP port 53 "
+        errMsg += "as it will need to listen on privileged UDP port 53 "
         errMsg += "for incoming address resolution attempts"
         raise sqlmapMissingPrivileges, errMsg
 
