@@ -39,6 +39,10 @@ class DNSQuery:
                 j = ord(raw[i])
 
     def response(self, resolution):
+        """
+        Crafts raw DNS resolution response packet
+        """
+
         retVal = ""
 
         if self._query:
@@ -60,6 +64,11 @@ class DNSServer:
         self._running = False
 
     def pop(self, prefix=None, suffix=None):
+        """
+        Returns received DNS resolution request (if any) that has given
+        prefix/suffix combination (e.g. prefix.<query result>.suffix.domain)
+        """
+
         retVal = None
 
         with self._lock:
@@ -72,6 +81,10 @@ class DNSServer:
         return retVal
 
     def run(self):
+        """
+        Runs a DNSServer instance as a daemon thread (killed by program exit)
+        """
+
         def _():
             try:
                 self._running = True
