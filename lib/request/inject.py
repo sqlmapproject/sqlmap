@@ -151,7 +151,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, u
         expressionFieldsList = [expressionFields]
 
     if len(expressionFieldsList) > 1:
-        infoMsg = "the SQL query provided has more than a field. "
+        infoMsg = "the SQL query provided has more than one field. "
         infoMsg += "sqlmap will now unpack it into distinct queries "
         infoMsg += "to be able to retrieve the output even if we "
         infoMsg += "are going blind"
