@@ -18,8 +18,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
+from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import EXPECTED
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapFilePathException
@@ -54,7 +55,7 @@ class UDF:
         logger.info("checking if UDF '%s' already exist" % udf)
 
         query = agent.forgeCaseStatement(queries[Backend.getIdentifiedDbms()].check_udf.query % (udf, udf))
-        exists = inject.getValue(query, resumeValue=False, charsetType=CHARSET_TYPE.DIGITS)
+        exists = inject.getValue(query, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if exists == "1":
             return True

@@ -123,7 +123,7 @@ class Enumeration(GenericEnumeration):
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
-                    if not count.isdigit() and not query2:
+                    if count != 0 and not query2:
                         infoMsg = "trying with table USER_SYS_PRIVS"
                         logger.info(infoMsg)
 

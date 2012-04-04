@@ -10,11 +10,11 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.common import isNumPosStrValue
 from lib.core.common import randomStr
 from lib.core.common import singleTimeWarnMessage
-from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import EXPECTED
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
@@ -52,7 +52,7 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
         inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
 
-        length = unArrayizeValue(inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=CHARSET_TYPE.DIGITS))
+        length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if not isNumPosStrValue(length):
             errMsg = "unable to retrieve the content of the "

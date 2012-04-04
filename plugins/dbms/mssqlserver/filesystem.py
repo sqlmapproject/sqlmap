@@ -19,6 +19,7 @@ from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -97,7 +98,7 @@ class Filesystem(GenericFilesystem):
 
         if not result:
             result = []
-            count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, charsetType=CHARSET_TYPE.DIGITS)
+            count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the content of the "

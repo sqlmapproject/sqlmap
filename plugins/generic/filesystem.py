@@ -14,13 +14,15 @@ import os
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import Backend
+from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
+from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUndefinedMethod
 from lib.request import inject
@@ -110,9 +112,9 @@ class Filesystem:
         wFileSize = os.path.getsize(wFile)
 
         logger.debug("checking if the %s file has been written" % fileType)
-        dFileSize = inject.getValue(lengthQuery, resumeValue=False, charsetType=CHARSET_TYPE.DIGITS)
+        dFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-        if dFileSize and dFileSize.isdigit():
+        if isNumPosStrValue(dFileSize):
             infoMsg = "the file has been successfully written and "
             infoMsg += "its size is %s bytes" % dFileSize
 
