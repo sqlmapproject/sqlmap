@@ -28,7 +28,7 @@ from lib.utils.timeout import timeout
 def direct(query, content=True):
     select = True
     query = agent.payloadDirect(query)
-    query = query.replace("[SLEEPTIME]", str(conf.timeSec))
+    query = agent.adjustSleepTime(query)
     threadData = getCurrentThreadData()
 
     if Backend.isDbms(DBMS.ORACLE) and query.startswith("SELECT ") and " FROM " not in query:

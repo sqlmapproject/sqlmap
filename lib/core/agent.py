@@ -242,6 +242,13 @@ class Agent:
 
         return payload
 
+    def adjustSleepTime(self, payload):
+        """
+        Returns payload with a replaced tag for SLEEPTIME
+        """
+
+        return payload.replace("[SLEEPTIME]", str(conf.timeSec)) if payload else payload
+
     def getComment(self, request):
         """
         Returns comment form for the given request

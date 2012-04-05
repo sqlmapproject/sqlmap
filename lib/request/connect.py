@@ -521,7 +521,7 @@ class Connect:
 
         raise404 = place != PLACE.URI if raise404 is None else raise404
 
-        value = value.replace("[SLEEPTIME]", str(conf.timeSec)) if value else value
+        value = agent.adjustSleepTime(value)
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
 
