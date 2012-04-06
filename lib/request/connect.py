@@ -52,12 +52,14 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
+from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
 from lib.core.settings import META_REFRESH_REGEX
-from lib.core.settings import IS_WIN
 from lib.core.settings import MIN_TIME_RESPONSES
-from lib.core.settings import WARN_TIME_STDEV
+from lib.core.settings import IS_WIN
+from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
+from lib.core.settings import WARN_TIME_STDEV
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import processResponse
@@ -116,6 +118,21 @@ class Connect:
 
         kwargs['retrying'] = True
         return Connect.__getPageProxy(**kwargs)
+
+    @staticmethod
+    def __connReadProxy(conn):
+        retVal = ""
+        while True:
+            _ = conn.read(MAX_CONNECTION_CHUNK_SIZE)
+            if len(_) == MAX_CONNECTION_CHUNK_SIZE:
+                warnMsg = "large response detected. This could take a while"
+                singleTimeWarnMessage(warnMsg)
+                _ = re.sub(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start), "%s%s%s" % (kb.chars.stop, LARGE_CHUNK_TRIM_MARKER, kb.chars.start), _)
+                retVal += _
+            else:
+                retVal += _
+                break
+        return retVal
 
     @staticmethod
     def getPage(**kwargs):
@@ -205,7 +222,7 @@ class Connect:
 
                 multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(unicodeencode(url), multipart)
-                page = conn.read()
+                page = Connect.__connReadProxy(conn)
                 responseHeaders = conn.info()
                 responseHeaders[URI_HTTP_HEADER] = conn.geturl()
                 page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
@@ -306,11 +323,11 @@ class Connect:
             # Get HTTP response
             if hasattr(conn, 'redurl'):
                 page = threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO\
-                  else conn.read()
+                  else Connect.__connReadProxy(conn)
                 skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
                 code = conn.redcode
             else:
-                page = conn.read()
+                page = Connect.__connReadProxy(conn)
 
             code = code or conn.code
             responseHeaders = conn.info()

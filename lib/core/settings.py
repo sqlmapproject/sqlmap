@@ -475,3 +475,9 @@ MAX_TOTAL_REDIRECTIONS = 10
 
 # Reference: http://www.tcpipguide.com/free/t_DNSLabelsNamesandSyntaxRules.htm
 MAX_DNS_LABEL = 63
+
+# Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION/inband injections)
+MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
+
+# Mark used for trimming unnecessary content in large chunks
+LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
