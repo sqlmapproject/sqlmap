@@ -805,7 +805,7 @@ class Agent:
         retVal = None
 
         if inpStr:
-            match = re.search("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), inpStr)
+            match = re.search("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), inpStr, re.S)
 
             if match:
                 retVal = match.group("result")

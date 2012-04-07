@@ -1609,10 +1609,16 @@ def getSPQLSnippet(dbms, name, **variables):
     retVal = readCachedFileContent(filename)
 
     retVal = re.sub(r"#.+", "", retVal)
-    retVal = re.sub(r"(?s);\W+", "; ", retVal).strip()
+    retVal = re.sub(r"(?s);\s+", "; ", retVal).strip()
 
     for _ in variables.keys():
         retVal = re.sub(r"%%%s%%" % _, variables[_], retVal)
+
+    for _ in re.findall(r"%RANDSTR\d+%", retVal, re.I):
+        retVal = retVal.replace(_, randomStr())
+
+    for _ in re.findall(r"%RANDINT\d+%", retVal, re.I):
+        retVal = retVal.replace(_, randomInt())
 
     _ = re.search(r"%(\w+)%", retVal, re.I)
     if _:

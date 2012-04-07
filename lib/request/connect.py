@@ -15,6 +15,7 @@ import urllib2
 import urlparse
 import traceback
 
+from extra.safe2bin.safe2bin import safecharencode
 from extra.socks.socks import ProxyError
 from extra.multipart import multipartpost
 
@@ -549,7 +550,7 @@ class Connect:
 
                 value = agent.replacePayload(value, payload)
 
-            logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
+            logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload))
 
         if place == PLACE.COOKIE and conf.cookieUrlencode:
             value = agent.removePayloadDelimiters(value)
