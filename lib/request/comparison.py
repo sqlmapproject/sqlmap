@@ -45,10 +45,15 @@ def _adjust(condition, getRatioValue):
     return retVal
 
 def _comparison(page, headers, code, getRatioValue, pageLength):
+    threadData = getCurrentThreadData()
+
+    if kb.testMode:
+        threadData.lastComparisonPage = page
+
     if page is None and pageLength is None:
         return None
 
-    seqMatcher = getCurrentThreadData().seqMatcher
+    seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
     if any([conf.string, conf.regexp]):

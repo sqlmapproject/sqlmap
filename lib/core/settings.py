@@ -62,10 +62,13 @@ URI_QUESTION_MARKER = "__QUESTION_MARK__"
 
 PAYLOAD_DELIMITER = "\x00"
 CHAR_INFERENCE_MARK = "%c"
-PRINTABLE_CHAR_REGEX = r'[^\x00-\x1f\x7e-\xff]'
+PRINTABLE_CHAR_REGEX = r"[^\x00-\x1f\x7e-\xff]"
 
 # regular expression used for extracting results from google search
-GOOGLE_REGEX = r'url\?q=(http[^>]+)&amp;sa=U&amp'
+GOOGLE_REGEX = r"url\?q=(http[^>]+)&amp;sa=U&amp"
+
+# regular expression used for extracting content from "textual" tags
+TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
 
 # dumping characters used in GROUP_CONCAT MySQL technique
 CONCAT_ROW_DELIMITER = ','

@@ -17,6 +17,7 @@ from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import beep
 from lib.core.common import extractRegexResult
+from lib.core.common import extractTextTagContent
 from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getComparePageRatio
@@ -329,9 +330,11 @@ def checkSqlInjection(place, parameter, value):
                             kb.matchRatio = None
                             kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
                             Request.queryPage(genCmpPayload(), place, raise404=False)
+                            falsePage = threadData.lastComparisonPage
 
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
+                            truePage = threadData.lastComparisonPage
 
                             if trueResult:
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
@@ -341,6 +344,15 @@ def checkSqlInjection(place, parameter, value):
                                     infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
                                     logger.info(infoMsg)
 
+                                    injectable = True
+                            else:
+                                trueSet = set(extractTextTagContent(truePage))
+                                falseSet = set(extractTextTagContent(falsePage))
+                                candidate = reduce(lambda x, y: x or (y.strip() if y.strip() in (kb.pageTemplate or "") else None), (trueSet - falseSet), None)
+                                if candidate:
+                                    conf.string = candidate
+                                    infoMsg = "%s parameter '%s' is '%s' injectable (with --string='%s')" % (place, parameter, title, candidate)
+                                    logger.info(infoMsg)
                                     injectable = True
 
                         # In case of error-based SQL injection

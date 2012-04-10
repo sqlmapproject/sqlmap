@@ -124,6 +124,7 @@ from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
+from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
 from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import URI_QUESTION_MARKER
@@ -2154,6 +2155,13 @@ def extractRegexResult(regex, content, flags=0):
             retVal = match.group("result")
 
     return retVal
+
+def extractTextTagContent(page):
+    """
+    Returns list containing content from "textual" tags
+    """
+
+    return [_.group('result') for _ in re.finditer(TEXT_TAG_REGEX, page or "")]
 
 def trimAlphaNum(value):
     """
