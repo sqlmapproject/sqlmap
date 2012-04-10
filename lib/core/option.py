@@ -78,6 +78,7 @@ from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
+from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
@@ -216,22 +217,21 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         scheme = None
 
         reqResList = re.findall(BURP_REQUEST_REGEX, content, re.I | re.S)
-
         if not reqResList:
             reqResList = [content]
 
         for request in reqResList:
             if scheme is None:
-                schemePort = re.search("(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
+                schemePort = re.search(r"(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
 
                 if schemePort:
                     scheme = schemePort.group(1)
                     port = schemePort.group(2)
 
-            if not re.search ("^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
+            if not re.search (r"^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
                 continue
 
-            if re.search("^[\n]*(GET|POST).*?\.(gif|jpg|png)\sHTTP\/", request, re.I | re.M):
+            if re.search(r"^[\n]*(GET|POST).*?\.(%s)\sHTTP\/" % "|".join(CRAWL_EXCLUDE_EXTENSIONS), request, re.I | re.M):
                 continue
 
             getPostReq = False
