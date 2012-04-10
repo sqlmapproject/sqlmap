@@ -345,14 +345,16 @@ def checkSqlInjection(place, parameter, value):
                                     logger.info(infoMsg)
 
                                     injectable = True
-                            else:
+
+                            elif not conf.string:
                                 trueSet = set(extractTextTagContent(truePage))
                                 falseSet = set(extractTextTagContent(falsePage))
                                 candidate = reduce(lambda x, y: x or (y.strip() if y.strip() in (kb.pageTemplate or "") else None), (trueSet - falseSet), None)
                                 if candidate:
                                     conf.string = candidate
-                                    infoMsg = "%s parameter '%s' is '%s' injectable (with --string='%s')" % (place, parameter, title, candidate)
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=%s)" % (place, parameter, title, repr(candidate).lstrip('u'))
                                     logger.info(infoMsg)
+
                                     injectable = True
 
                         # In case of error-based SQL injection
