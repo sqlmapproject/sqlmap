@@ -291,7 +291,7 @@ COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@
 WEBSCARAB_SPLITTER = "### Conversation"
 
 # Splitter used between requests in BURP log files
-BURP_REQUEST_REGEX = r"={10,}\s+[^=]+={10,}\s+.+?={10,}"
+BURP_REQUEST_REGEX = r"={10,}\s+[^=]+={10,}\s(.+?)\s={10,}"
 
 # Encoding used for Unicode data
 UNICODE_ENCODING = "utf8"
