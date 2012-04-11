@@ -2161,7 +2161,8 @@ def extractTextTagContent(page):
     Returns list containing content from "textual" tags
     """
 
-    return [_.group('result') for _ in re.finditer(TEXT_TAG_REGEX, page or "")]
+    page = re.sub(r"(?si)%s[^<]*" % REFLECTED_VALUE_MARKER, "", page or "")
+    return [_.group('result') for _ in re.finditer(TEXT_TAG_REGEX, page)]
 
 def trimAlphaNum(value):
     """
