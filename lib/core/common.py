@@ -2648,6 +2648,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         if regex != payload:
             if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
                 parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
+                retVal = content.replace(payload, REFLECTED_VALUE_MARKER)  # dummy approach
 
                 if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
                     regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
@@ -2664,11 +2665,11 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                 else:
                     regex = r"%s\b" % regex
 
-                retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, content)
+                retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, retVal)
 
                 if len(parts) > 2:
                     regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
-                    retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, content)
+                    retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, retVal)
 
             if retVal != content:
                 kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
