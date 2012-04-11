@@ -349,7 +349,7 @@ def checkSqlInjection(place, parameter, value):
                             if not injectable and not conf.string:
                                 trueSet = set(extractTextTagContent(truePage))
                                 falseSet = set(extractTextTagContent(falsePage))
-                                candidate = reduce(lambda x, y: x or (y.strip() if y.strip() in (kb.pageTemplate or "") else None), (trueSet - falseSet), None)
+                                candidate = reduce(lambda x, y: x or (y.strip() if y.strip() in (kb.pageTemplate or "") and y.strip() not in falsePage else None), (trueSet - falseSet), None)
                                 if candidate:
                                     conf.string = candidate
                                     infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=%s)" % (place, parameter, title, repr(candidate).lstrip('u'))
