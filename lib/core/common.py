@@ -116,6 +116,7 @@ from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import ML
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.settings import REFLECTED_BORDER_REGEX
 from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
 from lib.core.settings import REFLECTED_VALUE_MARKER
@@ -2160,7 +2161,7 @@ def extractTextTagContent(page):
     Returns list containing content from "textual" tags
     """
 
-    page = re.sub(r"(?si)%s[^<]*" % REFLECTED_VALUE_MARKER, "", page or "")
+    page = re.sub(r"(?si)[^\s]*%s[^<]*" % REFLECTED_VALUE_MARKER, "", page or "")
     return [_.group('result') for _ in re.finditer(TEXT_TAG_REGEX, page)]
 
 def trimAlphaNum(value):
@@ -2634,7 +2635,6 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     """
 
     retVal = content
-    regex = ""
 
     if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism:
         def _(value):
@@ -2643,20 +2643,32 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
             return value
 
         payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, '')))
-        regex = _(filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
+        regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
 
         if regex != payload:
             if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
                 parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
-                if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
-                    parts = parts[:REFLECTED_MAX_REGEX_PARTS / 2] + parts[-REFLECTED_MAX_REGEX_PARTS / 2:]
-                parts = filter(None, parts)
 
-                for _ in xrange(2):
-                    if parts:
-                        regex = r"(?i)\b%s\b" % REFLECTED_REPLACEMENT_REGEX.join(parts)
-                        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, retVal)
-                        parts = parts[1:]
+                if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
+                    regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
+
+                parts = filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))
+
+                if regex.startswith(REFLECTED_REPLACEMENT_REGEX):
+                    regex = r"%s%s" % (REFLECTED_BORDER_REGEX, regex[len(REFLECTED_REPLACEMENT_REGEX):])
+                else:
+                    regex = r"\b%s" % regex
+
+                if regex.endswith(REFLECTED_REPLACEMENT_REGEX):
+                    regex = r"%s%s" % (regex[:-len(REFLECTED_REPLACEMENT_REGEX)], REFLECTED_BORDER_REGEX)
+                else:
+                    regex = r"%s\b" % regex
+
+                retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, content)
+
+                if len(parts) > 2:
+                    regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
+                    retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, content)
 
             if retVal != content:
                 kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
@@ -3193,3 +3205,4 @@ def resetCookieJar(cookieJar):
             errMsg = "there was a problem loading "
             errMsg += "cookies file ('%s')" % msg
             raise sqlmapGenericException, errMsg
+
