@@ -2630,8 +2630,8 @@ def cpuThrottle(value):
 
 def removeReflectiveValues(content, payload, suppressWarning=False):
     """
-    Neutralizes (static/marked) reflective values in a given content based on a payload
-    (e.g. ?search=sql injection ---> ...value="sql%20injection")
+    Neutralizes reflective values in a given content based on a payload
+    (e.g. ..search.php?q=1 AND 1=2 --> "...searching for <b>1%20AND%202</b>..." --> "...searching for <b>__REFLECTED_VALUE__</b>...")
     """
 
     retVal = content
