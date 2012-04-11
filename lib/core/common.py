@@ -2646,14 +2646,17 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
         regex = _(filterStringValue(payload, r'[A-Za-z0-9]', REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
 
         if regex != payload:
-            if all(part.lower() in content.lower() for part in regex.split(REFLECTED_REPLACEMENT_REGEX)):  # fast optimization check
+            if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
                 parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
                 if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
                     parts = parts[:REFLECTED_MAX_REGEX_PARTS / 2] + parts[-REFLECTED_MAX_REGEX_PARTS / 2:]
-
                 parts = filter(None, parts)
-                regex = r"(?i)\b%s\b" % REFLECTED_REPLACEMENT_REGEX.join(parts)
-                retVal = re.sub(regex, REFLECTED_VALUE_MARKER, content)
+
+                for _ in xrange(2):
+                    if parts:
+                        regex = r"(?i)\b%s\b" % REFLECTED_REPLACEMENT_REGEX.join(parts)
+                        retVal = re.sub(regex, REFLECTED_VALUE_MARKER, retVal)
+                        parts = parts[1:]
 
             if retVal != content:
                 kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
