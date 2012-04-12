@@ -727,6 +727,7 @@ class Connect:
         if not response and removeReflection:
             page = removeReflectiveValues(page, payload)
 
+        kb.maxConnectionsFlag = re.search(r"max.+connections", page or "", re.I) is not None
         kb.permissionFlag = re.search(r"(command|permission|access)\s*(was|is)?\s*denied", page or "", re.I) is not None
 
         if content or response:

@@ -1465,6 +1465,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
+    kb.maxConnectionsFlag = False
     kb.mergeCookies = None
     kb.multiThreadMode = False
     kb.negativeLogic = False

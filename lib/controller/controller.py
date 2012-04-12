@@ -608,8 +608,14 @@ def start():
         finally:
             showHttpErrorCodes()
 
+            if kb.maxConnectionsFlag:
+                warnMsg  = "it appears that the target "
+                warnMsg += "has a maximum connections "
+                warnMsg += "constraint"
+                logger.warn(warnMsg)
+
     if kb.dataOutputFlag and not conf.multipleTargets:
-        logger.info("Fetched data logged to text files under '%s'" % conf.outputPath)
+        logger.info("fetched data logged to text files under '%s'" % conf.outputPath)
 
     if conf.multipleTargets and conf.resultsFilename:
         infoMsg  = "you can find results of scanning in multiple targets "
