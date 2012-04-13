@@ -346,7 +346,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
-                            if not injectable and not conf.string:
+                            if not injectable and not conf.string and kb.pageStable:
                                 trueSet = set(extractTextTagContent(truePage))
                                 falseSet = set(extractTextTagContent(falsePage))
                                 candidate = reduce(lambda x, y: x or (y.strip() if y.strip() in (kb.pageTemplate or "") and y.strip() not in falsePage else None), (trueSet - falseSet), None)
