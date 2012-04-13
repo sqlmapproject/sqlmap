@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import httplib
+import random
 import re
 import socket
 import time
@@ -349,10 +350,10 @@ def checkSqlInjection(place, parameter, value):
                             if not injectable and not conf.string and kb.pageStable:
                                 trueSet = set(extractTextTagContent(truePage))
                                 falseSet = set(extractTextTagContent(falsePage))
-                                candidate = reduce(lambda x, y: x or (y.strip() if y.strip() in (kb.pageTemplate or "") and y.strip() not in falsePage else None), (trueSet - falseSet), None)
-                                if candidate:
-                                    conf.string = candidate
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=%s)" % (place, parameter, title, repr(candidate).lstrip('u'))
+                                candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage else None for _ in (trueSet - falseSet)))
+                                if candidates:
+                                    conf.string = random.sample(candidates, 1)[0]
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=%s)" % (place, parameter, title, repr(conf.string).lstrip('u'))
                                     logger.info(infoMsg)
 
                                     injectable = True
