@@ -208,7 +208,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
             unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
 
             if unionErrorCase:
-                warnMsg = "combined UNION/error SQL injection case found on "
+                warnMsg = "combined UNION/error-based SQL injection case found on "
                 warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
                 warnMsg += "column with better characteristics"
                 logger.warn(warnMsg)
