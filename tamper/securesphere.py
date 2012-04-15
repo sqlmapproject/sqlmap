@@ -29,9 +29,4 @@ def tamper(payload):
         * Reference: http://seclists.org/fulldisclosure/2011/May/163
     """
 
-    retVal = payload
-
-    if payload:
-        retVal += " and '0having'='0having'"
-
-    return retVal
+    return payload + " and '0having'='0having'" if payload else payload

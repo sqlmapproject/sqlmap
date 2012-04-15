@@ -40,7 +40,7 @@ def tamper(payload):
     #   LF      0A      new line
     #   FF      0C      new page
     #   CR      0D      carriage return
-    blanks = ['%09', '%0A', '%0C', '%0D']
+    blanks = ("%09", "%0A", "%0C", "%0D")
     retVal = payload
 
     if payload:
@@ -60,7 +60,7 @@ def tamper(payload):
             elif payload[i] == '"':
                 doublequote = not doublequote
 
-            elif payload[i] == " " and not doublequote and not quote:
+            elif payload[i] == ' ' and not doublequote and not quote:
                 retVal += random.choice(blanks)
                 continue
 

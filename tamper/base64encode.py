@@ -25,9 +25,4 @@ def tamper(payload):
         * Output: MScgQU5EIFNMRUVQKDUpIw==
     """
 
-    retVal = payload
-
-    if payload:
-        retVal = base64.b64encode(payload)
-
-    return retVal
+    return base64.b64encode(payload) if payload else payload

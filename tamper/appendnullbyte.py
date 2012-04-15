@@ -33,9 +33,4 @@ def tamper(payload):
     Reference: http://projects.webappsec.org/w/page/13246949/Null-Byte-Injection
     """
 
-    retVal = payload
-
-    if payload:
-        retVal = "%s%%00" % payload
-
-    return retVal
+    return "%s%%00" % payload if payload else payload

@@ -23,9 +23,4 @@ def tamper(payload):
         * Output: AND %00%271%00%27=%00%271%00%27
     """
 
-    retVal = payload
-
-    if payload:
-        retVal = payload.replace('\'', '%00%27')
-
-    return retVal
+    return payload.replace('\'', '%00%27') if payload else payload
