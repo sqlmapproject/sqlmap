@@ -196,7 +196,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
 
                 # Confirm that it is a full inband SQL injection
                 query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
-                payload = agent.payload(place=place, parameter=parameter, newValue=query, where=PAYLOAD.WHERE.NEGATIVE)
+                payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                 # Perform the request
                 page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
