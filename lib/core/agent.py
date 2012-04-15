@@ -579,7 +579,7 @@ class Agent:
         if query.startswith("SELECT "):
             query = query[len("SELECT "):]
 
-        inbandQuery = self.prefixQuery("UNION ALL SELECT " if not (where == PAYLOAD.WHERE.NEGATIVE or multipleUnions) else "UNION SELECT ", prefix=prefix)
+        inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if limited:
             inbandQuery += ",".join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
