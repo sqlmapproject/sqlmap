@@ -202,7 +202,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
                 page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
                 content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
-                if content and ((randQuery in content and phrase2 not in content) or (randQuery not in content and phrase2 in content)):
+                if not all(_ in content for _ in (phrase, phrase2)):
                     vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE)
 
             unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
