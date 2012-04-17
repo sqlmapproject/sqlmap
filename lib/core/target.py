@@ -59,16 +59,16 @@ def __setRequestParams():
         conf.parameters[None] = "direct connection"
         return
 
-    __testableParameters = False
+    testableParameters = False
 
     # Perform checks on GET parameters
     if conf.parameters.has_key(PLACE.GET) and conf.parameters[PLACE.GET]:
         parameters = conf.parameters[PLACE.GET]
-        __paramDict = paramToDict(PLACE.GET, parameters)
+        paramDict = paramToDict(PLACE.GET, parameters)
 
-        if __paramDict:
-            conf.paramDict[PLACE.GET] = __paramDict
-            __testableParameters = True
+        if paramDict:
+            conf.paramDict[PLACE.GET] = paramDict
+            testableParameters = True
 
     # Perform checks on POST parameters
     if conf.method == HTTPMETHOD.POST and not conf.data:
@@ -83,18 +83,17 @@ def __setRequestParams():
         else:
             conf.data = conf.data.replace("\n", " ")
 
-        # Check if POST data is in xml syntax
         if re.match(SOAP_REGEX, conf.data, re.I | re.M):
             place = PLACE.SOAP
         else:
             place = PLACE.POST
 
         conf.parameters[place] = conf.data
-        __paramDict = paramToDict(place, conf.data)
+        paramDict = paramToDict(place, conf.data)
 
-        if __paramDict:
-            conf.paramDict[place] = __paramDict
-            __testableParameters = True
+        if paramDict:
+            conf.paramDict[place] = paramDict
+            testableParameters = True
 
         conf.method = HTTPMETHOD.POST
 
@@ -109,40 +108,52 @@ def __setRequestParams():
         message += "in the target url itself? [Y/n/q] "
         test = readInput(message, default="Y")
 
-        if not test or test[0] in ("y", "Y"):
+        if not test or test[0] not in ("n", "N"):
             conf.url = "%s%s" % (conf.url, CUSTOM_INJECTION_MARK_CHAR)
-        elif test[0] in ("n", "N"):
-            pass
+            kb.processUserMarks = True
         elif test[0] in ("q", "Q"):
             raise sqlmapUserQuitException
 
-    if CUSTOM_INJECTION_MARK_CHAR in conf.url:
-        conf.parameters[PLACE.URI] = conf.url
-        conf.paramDict[PLACE.URI] = {}
-        parts = conf.url.split(CUSTOM_INJECTION_MARK_CHAR)
+    for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data)):
+        if CUSTOM_INJECTION_MARK_CHAR in (value or ""):
+            if kb.processUserMarks is None:
+                message = "custom injection mark ('%s') found in " % CUSTOM_INJECTION_MARK_CHAR
+                message += "'%s'. Do you want to process it? [Y/n/q] " % {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data'}[place]
+                test = readInput(message, default="Y")
+                if test and test[0] in ("q", "Q"):
+                    raise sqlmapUserQuitException
+                else:
+                    kb.processUserMarks = not test or test[0] not in ("n", "N")
 
-        for i in xrange(len(parts)-1):
-            result = str()
+            if not kb.processUserMarks:
+                continue
 
-            for j in xrange(len(parts)):
-                result += parts[j]
+            conf.parameters[place] = value
+            conf.paramDict[place] = {}
+            parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
 
-                if i == j:
-                    result += CUSTOM_INJECTION_MARK_CHAR
+            for i in xrange(len(parts) - 1):
+                conf.paramDict[place]["#%d%s" % (i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts)))
 
-            conf.paramDict[PLACE.URI]["#%d%s" % (i+1, CUSTOM_INJECTION_MARK_CHAR)] = result
+            if place == PLACE.URI and PLACE.GET in conf.paramDict:
+                del conf.paramDict[PLACE.GET]
+            elif place == PLACE.CUSTOM_POST and PLACE.POST in conf.paramDict:
+                del conf.paramDict[PLACE.POST]
 
-        conf.url = conf.url.replace(CUSTOM_INJECTION_MARK_CHAR, str())
-        __testableParameters = True
+            testableParameters = True
+
+    if kb.processUserMarks:
+        conf.url = conf.url.replace(CUSTOM_INJECTION_MARK_CHAR, "")
+        conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, "") if conf.data else conf.data
 
     # Perform checks on Cookie parameters
     if conf.cookie:
         conf.parameters[PLACE.COOKIE] = conf.cookie
-        __paramDict = paramToDict(PLACE.COOKIE, conf.cookie)
+        paramDict = paramToDict(PLACE.COOKIE, conf.cookie)
 
-        if __paramDict:
-            conf.paramDict[PLACE.COOKIE] = __paramDict
-            __testableParameters = True
+        if paramDict:
+            conf.paramDict[PLACE.COOKIE] = paramDict
+            testableParameters = True
 
     # Perform checks on header values
     if conf.httpHeaders:
@@ -157,7 +168,7 @@ def __setRequestParams():
 
                 if condition:
                     conf.paramDict[PLACE.UA] = { PLACE.UA: headerValue }
-                    __testableParameters = True
+                    testableParameters = True
 
             elif httpHeader == PLACE.REFERER:
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
@@ -166,7 +177,7 @@ def __setRequestParams():
 
                 if condition:
                     conf.paramDict[PLACE.REFERER] = { PLACE.REFERER: headerValue }
-                    __testableParameters = True
+                    testableParameters = True
 
             elif httpHeader == PLACE.HOST:
                 conf.parameters[PLACE.HOST] = urldecode(headerValue)
@@ -175,14 +186,14 @@ def __setRequestParams():
 
                 if condition:
                     conf.paramDict[PLACE.HOST] = { PLACE.HOST: headerValue }
-                    __testableParameters = True
+                    testableParameters = True
 
     if not conf.parameters:
         errMsg = "you did not provide any GET, POST and Cookie "
         errMsg += "parameter, neither an User-Agent, Referer or Host header value"
         raise sqlmapGenericException, errMsg
 
-    elif not __testableParameters:
+    elif not testableParameters:
         errMsg = "all testable parameters you provided are not present "
         errMsg += "within the GET, POST and Cookie parameters"
         raise sqlmapGenericException, errMsg

@@ -66,6 +66,7 @@ class PLACE:
     UA = "User-Agent"
     REFERER = "Referer"
     HOST = "Host"
+    CUSTOM_POST = "(custom) POST"
 
 class HTTPMETHOD:
     GET = "GET"

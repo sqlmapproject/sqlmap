@@ -51,6 +51,7 @@ from lib.core.enums import PLACE
 from lib.core.enums import REDIRECTION
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
@@ -557,7 +558,7 @@ class Connect:
             value = urlEncodeCookieValues(value)
 
         elif place:
-            if place in (PLACE.GET, PLACE.POST, PLACE.URI):
+            if place in (PLACE.GET, PLACE.POST, PLACE.URI, PLACE.CUSTOM_POST):
                 # payloads in GET and/or POST need to be urlencoded
                 # throughly without safe chars (especially & and =)
                 # addendum: as we support url encoding in tampering
@@ -581,6 +582,9 @@ class Connect:
 
         if PLACE.POST in conf.parameters:
             post = conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value
+
+        if PLACE.CUSTOM_POST in conf.parameters:
+            post = conf.parameters[PLACE.CUSTOM_POST].replace(CUSTOM_INJECTION_MARK_CHAR, "") if place != PLACE.CUSTOM_POST or not value else value
 
         if PLACE.SOAP in conf.parameters:
             post = conf.parameters[PLACE.SOAP] if place != PLACE.SOAP or not value else value

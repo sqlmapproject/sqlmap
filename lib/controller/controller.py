@@ -368,7 +368,7 @@ def start():
                 parameters = conf.parameters.keys()
 
                 # Order of testing list (last to first)
-                orderList = (PLACE.URI, PLACE.GET, PLACE.POST)
+                orderList = (PLACE.URI, PLACE.GET, PLACE.POST, PLACE.CUSTOM_POST)
 
                 for place in orderList:
                     if place in parameters:

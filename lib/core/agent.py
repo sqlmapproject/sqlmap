@@ -12,6 +12,7 @@ import re
 from xml.etree import ElementTree as ET
 
 from lib.core.common import Backend
+from lib.core.common import extractRegexResult
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
@@ -62,9 +63,6 @@ class Agent:
         if where is None and isTechniqueAvailable(kb.technique):
             where = kb.injection.data[kb.technique].where
 
-        # Debug print
-        #print "value: %s, newValue: %s, where: %s, kb.technique: %s" % (value, newValue, where, kb.technique)
-
         if kb.injection.place is not None:
             place = kb.injection.place
 
@@ -81,6 +79,9 @@ class Agent:
             for char in ('?', '=', ':'):
                 if char in origValue:
                     origValue = origValue[origValue.rfind(char) + 1:]
+        elif place == PLACE.CUSTOM_POST:
+            origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            origValue = extractRegexResult(r"(?s)(?P<result>(\W+\Z|\w+\Z))", origValue)
 
         if value is None:
             if where == PAYLOAD.WHERE.ORIGINAL:
@@ -112,7 +113,7 @@ class Agent:
                 child.text = self.addPayloadDelimiters(newValue)
 
             retValue = ET.tostring(root)
-        elif place == PLACE.URI:
+        elif place in (PLACE.URI, PLACE.CUSTOM_POST):
             retValue = paramString.replace("%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue))
         elif place in (PLACE.UA, PLACE.REFERER, PLACE.HOST):
             retValue = paramString.replace(origValue, self.addPayloadDelimiters(newValue))

@@ -1473,6 +1473,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.pageTemplate = None
     kb.pageTemplates = dict()
     kb.previousMethod = None
+    kb.processUserMarks = None
     kb.orderByColumns = None
     kb.originalCode = None
     kb.originalPage = None
