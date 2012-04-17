@@ -37,6 +37,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.session import resumeConfKb
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
@@ -44,7 +45,6 @@ from lib.core.settings import SOAP_REGEX
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
-from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.utils.hashdb import HashDB
 from lib.core.xmldump import dumper as xmldumper
@@ -110,16 +110,16 @@ def __setRequestParams():
         test = readInput(message, default="Y")
 
         if not test or test[0] in ("y", "Y"):
-            conf.url = "%s%s" % (conf.url, URI_INJECTION_MARK_CHAR)
+            conf.url = "%s%s" % (conf.url, CUSTOM_INJECTION_MARK_CHAR)
         elif test[0] in ("n", "N"):
             pass
         elif test[0] in ("q", "Q"):
             raise sqlmapUserQuitException
 
-    if URI_INJECTION_MARK_CHAR in conf.url:
+    if CUSTOM_INJECTION_MARK_CHAR in conf.url:
         conf.parameters[PLACE.URI] = conf.url
         conf.paramDict[PLACE.URI] = {}
-        parts = conf.url.split(URI_INJECTION_MARK_CHAR)
+        parts = conf.url.split(CUSTOM_INJECTION_MARK_CHAR)
 
         for i in xrange(len(parts)-1):
             result = str()
@@ -128,11 +128,11 @@ def __setRequestParams():
                 result += parts[j]
 
                 if i == j:
-                    result += URI_INJECTION_MARK_CHAR
+                    result += CUSTOM_INJECTION_MARK_CHAR
 
-            conf.paramDict[PLACE.URI]["#%d%s" % (i+1, URI_INJECTION_MARK_CHAR)] = result
+            conf.paramDict[PLACE.URI]["#%d%s" % (i+1, CUSTOM_INJECTION_MARK_CHAR)] = result
 
-        conf.url = conf.url.replace(URI_INJECTION_MARK_CHAR, str())
+        conf.url = conf.url.replace(CUSTOM_INJECTION_MARK_CHAR, str())
         __testableParameters = True
 
     # Perform checks on Cookie parameters

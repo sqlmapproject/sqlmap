@@ -78,6 +78,7 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.optiondict import optDict
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_USER_INJECTION
@@ -126,7 +127,6 @@ from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
-from lib.core.settings import URI_INJECTION_MARK_CHAR
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.threads import getCurrentThreadData
 
@@ -1072,7 +1072,7 @@ def parseTargetUrl():
         else:
             conf.url = "http://" + conf.url
 
-    if URI_INJECTION_MARK_CHAR in conf.url:
+    if CUSTOM_INJECTION_MARK_CHAR in conf.url:
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     __urlSplit = urlparse.urlsplit(conf.url)

@@ -317,8 +317,8 @@ MIN_RATIO = 0.0
 # Maximum value for comparison ratio
 MAX_RATIO = 1.0
 
-# Character used for marking injectable position inside URI
-URI_INJECTION_MARK_CHAR = '*'
+# Character used for marking injectable position inside provided data
+CUSTOM_INJECTION_MARK_CHAR = '*'
 
 # Maximum length used for retrieving data over MySQL error based payload due to "known" problems with longer result strings
 MYSQL_ERROR_CHUNK_LENGTH = 50
