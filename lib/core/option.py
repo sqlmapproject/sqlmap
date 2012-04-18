@@ -298,13 +298,14 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                         conf.httpHeaders.append((str(key), str(value)))
 
             if getPostReq and (params or cookie):
-                if conf.forceSSL:
-                    scheme = "https"
-                    port = "443"
                 if not port and isinstance(scheme, basestring) and scheme.lower() == "https":
                     port = "443"
                 elif not scheme and port == "443":
                     scheme = "https"
+
+                if conf.forceSSL:
+                    scheme = "https"
+                    port = port or "443"
 
                 if not url.startswith("http"):
                     url = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
