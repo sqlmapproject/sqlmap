@@ -55,22 +55,28 @@ class Filesystem(GenericFilesystem):
         length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if not isNumPosStrValue(length):
-            errMsg = "unable to retrieve the content of the "
-            errMsg += "file '%s'" % rFile
-            raise sqlmapNoneDataException, errMsg
+            warnMsg = "unable to retrieve the content of the "
+            warnMsg += "file '%s'" % rFile
 
-        length = int(length)
-        sustrLen = 1024
-
-        if length > sustrLen:
-            result = []
-
-            for i in xrange(1, length, sustrLen):
-                chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
-
-                result.append(chunk)
+            if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
+                warnMsg += ", going to fall-back to simpler technique"
+                logger.warn(warnMsg)
+                result = self.unionReadFile(rFile)
+            else:
+                raise sqlmapNoneDataException, warnMsg
         else:
-            result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+            length = int(length)
+            sustrLen = 1024
+
+            if length > sustrLen:
+                result = []
+
+                for i in xrange(1, length, sustrLen):
+                    chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+
+                    result.append(chunk)
+            else:
+                result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
         return result
 
