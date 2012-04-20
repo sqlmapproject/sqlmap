@@ -464,8 +464,8 @@ class Connect:
             elif "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target url"
             elif "BadStatusLine" in tbMsg:
-                warnMsg = "the target url responded with an unknown HTTP "
-                warnMsg += "status code, try to force the HTTP User-Agent "
+                warnMsg = "connection dropped or unknown HTTP "
+                warnMsg += "status code received. Try to force the HTTP User-Agent "
                 warnMsg += "header with option '--user-agent' or switch '--random-agent'"
             elif "IncompleteRead" in tbMsg:
                 warnMsg = "there was an incomplete read error while retrieving data "
