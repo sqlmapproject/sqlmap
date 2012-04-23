@@ -1378,7 +1378,7 @@ def __purgeOutput():
     Safely removes (purges) output directory.
     """
 
-    if conf.purgeOutput and os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
+    if conf.purgeOutput:
         purge(paths.SQLMAP_OUTPUT_PATH)
 
 def __setConfAttributes():
