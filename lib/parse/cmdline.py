@@ -596,6 +596,10 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Display page rank (PR) for Google dork results")
 
+        miscellaneous.add_option("--purge-output", dest="purgeOutput",
+                                  action="store_true",
+                                  help="Safely remove all content from output directory")
+
         miscellaneous.add_option("--smart", dest="smart",
                                   action="store_true",
                                   help="Conduct through tests only if positive heuristic(s)")

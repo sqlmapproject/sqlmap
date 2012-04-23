@@ -77,6 +77,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.optiondict import optDict
+from lib.core.purge import purge
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -1372,6 +1373,17 @@ def __cleanupOptions():
     threadData = getCurrentThreadData()
     threadData.reset()
 
+def __purgeOutput():
+    """
+    Safely removes (purges) output directory.
+    """
+
+    if conf.purgeOutput and os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
+        infoMsg = "purging content of output directory ('%s')" % paths.SQLMAP_OUTPUT_PATH
+        logger.info(infoMsg)
+
+        purge(paths.SQLMAP_OUTPUT_PATH)
+
 def __setConfAttributes():
     """
     This function set some needed attributes into the configuration
@@ -1945,6 +1957,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __saveCmdline()
     __setRequestFromFile()
     __cleanupOptions()
+    __purgeOutput()
     __checkDependencies()
     __basicOptionValidation()
     __setTorProxySettings()
