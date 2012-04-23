@@ -1379,9 +1379,6 @@ def __purgeOutput():
     """
 
     if conf.purgeOutput and os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-        infoMsg = "purging content of output directory ('%s')" % paths.SQLMAP_OUTPUT_PATH
-        logger.info(infoMsg)
-
         purge(paths.SQLMAP_OUTPUT_PATH)
 
 def __setConfAttributes():
