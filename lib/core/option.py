@@ -1968,7 +1968,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     parseTargetUrl()
     parseTargetDirect()
 
-    if any([conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.liveTest]):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.liveTest)):
         __setHTTPTimeout()
         __setHTTPExtraHeaders()
         __setHTTPCookies()

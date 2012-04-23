@@ -665,8 +665,8 @@ def cmdLineParser():
                 break
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
-            args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependencies)):
-            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --update or --dependencies), "
+            args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependencies, args.purgeOutput)):
+            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for help"
             parser.error(errMsg)
 

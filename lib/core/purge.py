@@ -23,7 +23,7 @@ def purge(directory):
     if not os.path.isdir(directory):
         return
 
-    infoMsg = "purging content of directory ('%s'). Please wait. This could take a while..." % directory
+    infoMsg = "purging content of directory ('%s'). Please wait as this could take a while" % directory
     logger.info(infoMsg)
 
     filepaths = []
