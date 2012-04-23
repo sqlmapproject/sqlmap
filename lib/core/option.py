@@ -1103,7 +1103,7 @@ def __setHTTPExtraHeaders():
                 if header and value:
                     conf.httpHeaders.append((header, value))
             else:
-                errMsg = "Invalid header value: %s" % repr(headerValue).lstrip('u')
+                errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
                 raise sqlmapSyntaxException, errMsg
 
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
