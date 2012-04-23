@@ -1097,11 +1097,14 @@ def __setHTTPExtraHeaders():
         conf.headers = conf.headers.split("\n") if "\n" in conf.headers else conf.headers.split("\\n")
 
         for headerValue in conf.headers:
-            if ":" in headerValue:
+            if headerValue.count(':') == 1:
                 header, value = (_.lstrip() for _ in headerValue.split(":"))
 
                 if header and value:
                     conf.httpHeaders.append((header, value))
+            else:
+                errMsg = "Invalid header value: %s" % repr(headerValue).lstrip('u')
+                raise sqlmapSyntaxException, errMsg
 
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
         conf.httpHeaders.append((HTTPHEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
