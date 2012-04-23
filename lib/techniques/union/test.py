@@ -59,7 +59,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
             infoMsg += "This should reduce the time needed "
             infoMsg += "to find the right number "
             infoMsg += "of query columns. Automatically extending the "
-            infoMsg += "range for UNION query injection technique"
+            infoMsg += "range for current UNION query injection technique test"
             singleTimeLogMessage(infoMsg)
 
             lowCols, highCols = 1, ORDER_BY_STEP

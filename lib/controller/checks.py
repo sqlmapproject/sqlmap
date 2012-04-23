@@ -34,6 +34,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import showStaticWords
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.common import wasLastRequestHTTPError
@@ -107,6 +108,20 @@ def checkSqlInjection(place, parameter, value):
                     debugMsg += "provided custom column range %s" % conf.uCols
                     logger.debug(debugMsg)
                     continue
+
+                match = re.search(r"(\d+)-(\d+)", test.request.columns)
+                if injection.data and match:
+                    lower, upper = int(match.group(1)), int(match.group(2))
+                    for _ in (lower, upper):
+                        if _ > 1:
+                            infoMsg = "automatically extending ranges "
+                            infoMsg += "for further UNION query injection technique tests as "
+                            infoMsg += "there is at least one other injection technique found"
+                            singleTimeLogMessage(infoMsg)
+
+                            test.request.columns = re.sub(r"\b%d\b" % _, str(2 * _), test.request.columns)
+                            title = re.sub(r"\b%d\b" % _, str(2 * _), title)
+                            test.title = re.sub(r"\b%d\b" % _, str(2 * _), test.title)
 
             # Skip test if the user's wants to test only for a specific
             # technique
